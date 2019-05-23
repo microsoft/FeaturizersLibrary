@@ -186,7 +186,7 @@ def EntryPoint(
                     development activities, please run the following command. Note that
                     this command must be run every time you open a new terminal window.
 
-                        {} {}
+                        {}{} {}
 
                     # ----------------------------------------------------------------------
                     # ----------------------------------------------------------------------
@@ -194,7 +194,14 @@ def EntryPoint(
 
                     """,
                 ).format(
-                    os.path.join(_script_dir, "Activate{}".format(CurrentShell.ScriptExtension)),
+                    ". " if CurrentShell.CategoryName == "Linux" else "",
+                    os.path.join(
+                        _script_dir,
+                        "Activate{}{}".format(
+                            ".{}".format(os.getenv("DEVELOPMENT_ENVIRONMENT_ENVIRONMENT_NAME")) if os.getenv("DEVELOPMENT_ENVIRONMENT_ENVIRONMENT_NAME") != "DefaultEnv" else "",
+                            CurrentShell.ScriptExtension,
+                        ),
+                    ),
                     _ACTIVATION_REPO_CONFIGURATION or "",
                 ),
                 16,
