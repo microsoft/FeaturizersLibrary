@@ -1,0 +1,31 @@
+name: $(TeamProject)-$(BuildDefinitionName)-$(SourceBranchName)-$(Date:yyyy.MM.dd)-$(Rev:rr)
+trigger:
+    batch: true
+    branches:
+        include:
+        -   master
+
+stages:
+# TODO: -   template: BuildAndTest.template.yaml
+# TODO:     parameters:
+# TODO:         agent_pool: "Hosted Windows 2019 with VS2019"
+# TODO:         operating_system: Windows
+# TODO:         configuration: python
+# TODO: 
+# TODO: -   template: BuildAndTest.template.yaml
+# TODO:     parameters:
+# TODO:         agent_pool: "Hosted Windows 2019 with VS2019"
+# TODO:         operating_system: Windows
+# TODO:         configuration: x64
+
+-   template: BuildAndTest.template.yaml
+    parameters:
+        agent_pool: "Hosted Ubuntu 1604"
+        operating_system: Linux
+        configuration: python
+
+-   template: BuildAndTest.template.yaml
+    parameters:
+        agent_pool: "Hosted Ubuntu 1604"
+        operating_system: Linux
+        configuration: x64
