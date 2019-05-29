@@ -6,26 +6,26 @@ trigger:
         -   master
 
 stages:
-# TODO: -   template: BuildAndTest.template.yaml
-# TODO:     parameters:
-# TODO:         agent_pool: "Hosted Windows 2019 with VS2019"
-# TODO:         operating_system: Windows
-# TODO:         configuration: python
-# TODO: 
-# TODO: -   template: BuildAndTest.template.yaml
-# TODO:     parameters:
-# TODO:         agent_pool: "Hosted Windows 2019 with VS2019"
-# TODO:         operating_system: Windows
-# TODO:         configuration: x64
+-   template: BuildAndTest.template.yaml
+    parameters:
+        agent_pool: vs2015-win2012r2
+        operating_system: Windows
+        configuration: python
 
 -   template: BuildAndTest.template.yaml
     parameters:
-        agent_pool: "Hosted Ubuntu 1604"
+        agent_pool: vs2015-win2012r2
+        operating_system: Windows
+        configuration: x64
+
+-   template: BuildAndTest.template.yaml
+    parameters:
+        agent_pool: ubuntu-16.04
         operating_system: Linux
         configuration: python
 
 -   template: BuildAndTest.template.yaml
     parameters:
-        agent_pool: "Hosted Ubuntu 1604"
+        agent_pool: ubuntu-16.04
         operating_system: Linux
         configuration: x64

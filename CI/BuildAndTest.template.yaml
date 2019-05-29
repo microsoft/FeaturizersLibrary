@@ -27,8 +27,11 @@ stages:
         # In the UX, this display name contains redundant info (the OS and config appear twice). However, it
         # needs to be here to ensure that the information appears in the status email messages.
         displayName: "Build and Test (${{ parameters.operating_system }} - ${{ parameters.configuration }})"
-        pool: "${{ parameters.agent_pool }}"
-        
+        pool:
+            vmImage: "${{ parameters.agent_pool }}"
+        workspace:
+            clean: all
+
         steps:
         # These steps are an ugly hack to set Azure DevOps variables conditionally. It really seems like there should be a better way to do this.
         -   ${{ if eq(parameters.operating_system, 'Windows') }}:
@@ -48,7 +51,7 @@ stages:
                     echo ##vso[task.setvariable variable=azure_agent_temp_directory]%AGENT_TEMPDIRECTORY%
                     echo ##vso[task.setvariable variable=azure_artifacts_directory]%BUILD_ARTIFACTSTAGINGDIRECTORY%
 
-                displayName: "[Implementation] Environment-Specific Variables"
+                displayName: "[IMPL] Environment-Specific Variables"
 
         -   ${{ if eq(parameters.operating_system, 'Linux') }}:
             -   script: |-
@@ -67,7 +70,7 @@ stages:
                     echo "##vso[task.setvariable variable=azure_agent_temp_directory]${AGENT_TEMPDIRECTORY}"
                     echo "##vso[task.setvariable variable=azure_artifacts_directory]${BUILD_ARTIFACTSTAGINGDIRECTORY}"
 
-                displayName: "[Implementation] Environment-Specific Variables"
+                displayName: "[IMPL] Environment-Specific Variables"
         
         # Continue with standard processing
         -   script: |-
@@ -88,20 +91,26 @@ stages:
 
         -   script: |-
                 $(azure_bootstrap_command) $(azure_agent_temp_directory) /verbose
-            displayName: "Bootstrap"
+            displayName: "<Bootstrap>"
             timeoutInMinutes: 180
 
         # TODO: Code formatting
 
         -   script: |-
                 $(azure_activate_script) ${{ parameters.configuration }} && Builder$(azure_script_extension) Execute . "$(azure_artifacts_directory)/Builder" /verbose
-            displayName: "Builder"
+            displayName: "<Builder>"
             timeoutInMinutes: 180
+
+        -   script: |-
+                $(azure_activate_script) ${{ parameters.configuration }} && Tester$(azure_script_extension) MatchAllTests . UnitTests /verbose
+            displayName: "<Tester (MatchAllTests) - UnitTests>"
+            timeoutInMinutes: 1800
+            condition: succeededOrFailed()
 
         -   ${{ each test_type in parameters.test_types }}:
             -   script: |-
                     $(azure_activate_script) ${{ parameters.configuration }} && Tester$(azure_script_extension) TestAll . "$(azure_artifacts_directory)/Tester/${{ test_type.key }}" ${{ test_type.key }} ${{ test_type.value }} /verbose
-                displayName: 'Tester - ${{ test_type.key }}'
+                displayName: '<Tester - ${{ test_type.key }}>'
                 timeoutInMinutes: 180
                 condition: succeededOrFailed()
 

@@ -15,7 +15,7 @@
 @REM ----------------------------------------------------------------------
 @echo off
 
-IF "%1"=="" (
+IF "%~1"=="" (
     echo.
     echo This script bootstraps common library enlistment and setup.
     echo.
@@ -26,7 +26,7 @@ IF "%1"=="" (
     exit /B -1
 )
 
-set _COMMON_CODE_DIR=%1
+set _COMMON_CODE_DIR=%~1
 shift /1
 
 if "%DEVELOPMENT_ENVIRONMENT_REPOSITORY_ACTIVATED_FLAG%" NEQ "" (
@@ -52,9 +52,9 @@ set _BOOTSTRAP_CLA=
 
 :GetRemainingArgs_Begin
 
-if "%1"=="" goto :GetRemainingArgs_End
+if "%~1"=="" goto :GetRemainingArgs_End
 
-set _ARG=%1
+set _ARG=%~1
 
 if "%_ARG:~,9%"=="/name_EQ_" goto :GetRemainingArgs_Name
 if "%_ARG:~,9%"=="-name_EQ_" goto :GetRemainingArgs_Name

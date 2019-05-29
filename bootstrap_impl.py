@@ -95,11 +95,9 @@ def EntryPoint(
                 for index, (output_dir, data) in enumerate(enlistment_repositories):
                     enlist_dm.stream.write("'{}' ({} of {})...".format(data[0], index + 1, len(enlistment_repositories)))
                     with enlist_dm.stream.DoneManager() as this_dm:
-                        temp_directory = CurrentShell.CreateTempDirectory()
+                        FileSystem.MakeDirs(os.path.dirname(output_dir))
 
-                        command_line = data[1].format(
-                            output_dir=temp_directory,
-                        )
+                        temp_directory = output_dir + "_tmp"
 
                         sink = six.moves.StringIO()
 
@@ -123,7 +121,6 @@ def EntryPoint(
 
                             return this_dm.result
 
-                        FileSystem.MakeDirs(os.path.dirname(output_dir))
                         shutil.move(temp_directory, output_dir)
 
         dm.stream.write("Setting up {}...".format(inflect.no("repository", len(repo_data))))
