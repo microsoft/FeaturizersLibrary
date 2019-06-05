@@ -2,7 +2,7 @@ __pycache__
 *.pyc
 *.pyo
 
-Generated/*
+**/Generated/*
 
 Activate.cmd
 Activate.*.cmd
@@ -14,4 +14,6 @@ Activate.*.sh
 .coverage
 coverage.xml
 
-.vscode/*
+**/.vscode/*
+
+Libraries/Python/DataPipelines/v1\.0/DataPipelines/GeneratedCode/Compiler\.ConditionalInvocationQueryMixin\.data

@@ -1,0 +1,9 @@
+<Functions *>:
+    <func_name string>
+
+    <raw_return_type string>
+    <simple_return_type string>
+
+    <var_names string *>
+    <raw_var_types string *>
+    <simple_var_types string *>
