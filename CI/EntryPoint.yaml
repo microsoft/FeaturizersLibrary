@@ -10,19 +10,7 @@ stages:
     parameters:
         agent_pool: vs2015-win2012r2
         operating_system: Windows
-        configuration: python
-
--   template: BuildAndTest.template.yaml
-    parameters:
-        agent_pool: vs2015-win2012r2
-        operating_system: Windows
         configuration: x64
-
--   template: BuildAndTest.template.yaml
-    parameters:
-        agent_pool: ubuntu-16.04
-        operating_system: Linux
-        configuration: python
 
 -   template: BuildAndTest.template.yaml
     parameters:

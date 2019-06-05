@@ -43,11 +43,25 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 #   ("<repo name>", "<clone command line>", "<setup command suffix>" or None) 
 _REPO_DATA                                  = [
     ("Common_cpp_Clang_8", 'git clone https://github.com/davidbrownell/Common_cpp_Clang_8 "{output_dir}"', None),
-    ("Common_cpp_Clang_Common", 'git clone https://github.com/davidbrownell/Common_cpp_Clang_Common "{output_dir}"', "/configuration=x64"),
+    ("Common_cpp_Clang_Common", 'git clone https://github.com/davidbrownell/Common_cpp_Clang_Common "{output_dir}"', None),
     ("Common_cpp_Common", 'git clone https://github.com/davidbrownell/Common_cpp_Common "{output_dir}"', None),
 ]
 
-_ACTIVATION_REPO_CONFIGURATION              = "<x64|x86|python>"
+if CurrentShell.CategoryName == "Linux":
+    _REPO_DATA += [
+        ("Common_cpp_binutils", 'git clone https://github.com/davidbrownell/Common_cpp_binutils "{output_dir}"', None),
+        ("Common_cpp_GCC", 'git clone https://github.com/davidbrownell/Common_cpp_GCC "{output_dir}"', None),
+    ]
+elif CurrentShell.CategoryName == "Windows":
+    _REPO_DATA += [
+        ("Common_cpp_MSVC_2019", 'git clone https://github.com/davidbrownell/Common_cpp_MSVC_2019 "{output_dir}"', None),
+        ("Common_cpp_MSVC_Common", 'git clone https://github.com/davidbrownell/Common_cpp_MSVC_Common "{output_dir}"', None),
+        ("Common_cpp_MSVC_WindowsKits_10", 'git clone https://github.com/davidbrownell/Common_cpp_MSVC_WindowsKits_10 "{output_dir}"', None),
+    ]
+else:
+    raise Exception("'{}' is not supported OS".format(CurrentShell.CategoryName))
+
+_ACTIVATION_REPO_CONFIGURATION              = "x64"
 
 # ----------------------------------------------------------------------
 inflect                                     = inflect_mod.engine()
@@ -70,7 +84,8 @@ def EntryPoint(
     ) as dm:
         repo_data = OrderedDict()
         enlistment_repositories = []
-        
+        sync_repositories = []
+
         dm.stream.write("Calculating enlistment repositories...")
         with dm.stream.DoneManager(
             done_suffix=lambda: "{} found for enlistment".format(inflect.no("repository", len(enlistment_repositories))),
@@ -82,6 +97,8 @@ def EntryPoint(
                 repo_output_dir = os.path.join(output_dir, repo_name.replace("_", os.path.sep))
                 if not os.path.isdir(repo_output_dir):
                     enlistment_repositories.append((repo_output_dir, data))
+                else:
+                    sync_repositories.append((repo_output_dir, data))
 
                 repo_data[repo_output_dir] = data
 
@@ -122,6 +139,23 @@ def EntryPoint(
                             return this_dm.result
 
                         shutil.move(temp_directory, output_dir)
+
+        if sync_repositories:
+            dm.stream.write("Syncing {}...".format(inflect.no("repository", len(sync_repositories))))
+            with dm.stream.DoneManager(
+                suffix="\n",
+            ) as sync_dm:
+                sync_command_template = '{} PullAndUpdate "/directory={{}}"'.format(CurrentShell.CreateScriptName("SCM"))
+
+                for index, (output_dir, data) in enumerate(sync_repositories):
+                    sync_dm.stream.write("'{}' ({} of {})...".format(data[0], index + 1, len(sync_repositories)))
+                    with sync_dm.stream.DoneManager() as this_dm:
+                        this_dm.result, output = Process.Execute(sync_command_template.format(output_dir))
+                        if this_dm.result != 0:
+                            this_dm.stream.write(output)
+
+                if sync_dm.result != 0:
+                    return sync_dm.result
 
         dm.stream.write("Setting up {}...".format(inflect.no("repository", len(repo_data))))
         with dm.stream.DoneManager(
