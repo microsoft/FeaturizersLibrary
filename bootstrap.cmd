@@ -79,7 +79,13 @@ if "%_BOOTSTRAP_NAME%" NEQ "" (
     set _BOOTSTRAP_NAME_ARG=/name_EQ_%_BOOTSTRAP_NAME%
 )
 
-call "%_COMMON_CODE_DIR%\Common\Environment\Setup.cmd" %_BOOTSTRAP_NAME_ARG% %_BOOTSTRAP_CLA%
+REM This works around a strange problem when attempting to invoke a command file using
+REM a relative path.
+pushd "%_COMMON_CODE_DIR%
+set _COMMON_CODE_ABSOLUTE_DIR=%CD%
+popd
+
+call "%_COMMON_CODE_ABSOLUTE_DIR%\Common\Environment\Setup.cmd" %_BOOTSTRAP_NAME_ARG% %_BOOTSTRAP_CLA%
 if %ERRORLEVEL% NEQ 0 exit /B %ERRORLEVEL%
 
 REM Write the environment activation and python execution statements to a temporary
@@ -107,5 +113,6 @@ set _BOOTSTRAP_CLA=
 set _BOOTSTRAP_NAME=
 set _BOOTSTRAP_NAME_ARG=
 set _COMMON_CODE_DIR=
+set _COMMON_CODE_ABSOLUTE_DIR=
 
 if %_ERRORLEVEL% NEQ 0 exit /B %_ERRORLEVEL%
