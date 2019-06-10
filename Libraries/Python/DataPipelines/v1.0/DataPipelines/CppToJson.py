@@ -5,7 +5,8 @@ import CommonEnvironment.FileSystem as fileSystem
 import CommonEnvironment.CallOnExit as callOnExit
 import CommonEnvironment.Shell as CE_Shell
 
-def ObtainFunctions(input_filename):
+
+def ObtainFunctions(input_filename, on_unsupported_func, policy):
     '''
         This function will extract return value, name and parameters for every
         function given. input_filename can be a file name or a string that is the code
@@ -56,13 +57,39 @@ def ObtainFunctions(input_filename):
 
         # ----------------------------------------------------------------------
         def Enumerate(node):
+
             if node.kind == cindex.CursorKind.NAMESPACE:
                 for child in node.get_children():
                     Enumerate(child)
 
+            # ----------------------------------------------------------------------
+
+            pattern_words = re.compile(r"[\w']+")
+
+            def TestAndVerify(types):
+                '''
+                This is an early version of TestAndVerify that checks if a type should be accepted or not. 
+                It will find all words in the type and check them against a policy. This will be adapted as we
+                get more information about what is supported and what is not.
+                '''
+                type_list = re.findall(pattern_words, types)
+                
+                for var_type in type_list:
+                    if not policy(var_type):
+                        return False
+                return True
+
+            # ----------------------------------------------------------------------
+            
+
             if node.kind == cindex.CursorKind.FUNCTION_DECL and node.location.file.name == input_filename:
+                valid_func = True
                 func = {}
                 func["func_name"] = node.spelling
+
+                if not TestAndVerify(node.result_type.spelling):
+                    valid_func = False
+
                 func["raw_return_type"] = node.result_type.spelling
                 func["simple_return_type"] = SimpleVarType(node.result_type.spelling)
                 func["var_names"] = []
@@ -70,9 +97,17 @@ def ObtainFunctions(input_filename):
                 func["simple_var_types"] = []
                 for arg in node.get_arguments():
                     func["var_names"].append(arg.displayname)
+
+                    if not TestAndVerify(arg.type.spelling):
+                        valid_func = False
+
                     func["raw_var_types"].append(arg.type.spelling)
                     func["simple_var_types"].append(SimpleVarType(arg.type.spelling))
-                funcs_list.append(func)
+
+                if not valid_func:
+                    on_unsupported_func(node.spelling, node.location.line)
+                else:
+                    funcs_list.append(func)
 
         # ----------------------------------------------------------------------
         for child in cursor.get_children():
@@ -80,3 +115,4 @@ def ObtainFunctions(input_filename):
 
         return funcs_list
     # ----------------------------------------------------------------------
+    

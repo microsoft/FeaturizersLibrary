@@ -18,7 +18,7 @@ class FuncTest(unittest.TestCase):
                 return 0;
             }
         ''')
-        func_list = CppToJson.ObtainFunctions(s)
+        func_list = CppToJson.ObtainFunctions(s, None, lambda type: True)
         
         self.assertEqual(func_list[0]['func_name'], 'add')
         self.assertEqual(func_list[0]['raw_return_type'], 'int')
@@ -49,7 +49,7 @@ class FuncTest(unittest.TestCase):
                 return 0;
             }
         ''')
-        func_list = CppToJson.ObtainFunctions(s)
+        func_list = CppToJson.ObtainFunctions(s, None, lambda type: True)
         
         self.assertEqual(func_list[0]['func_name'], 'counting')
         self.assertEqual(func_list[0]['raw_return_type'], 'std::vector<int>')
@@ -81,7 +81,7 @@ class FuncTest(unittest.TestCase):
                 return 0;
             }
         ''')
-        func_list = CppToJson.ObtainFunctions(s)
+        func_list = CppToJson.ObtainFunctions(s, None, lambda type: True)
 
         self.assertEqual(func_list[0]['func_name'], 'counting')
         self.assertEqual(func_list[0]['raw_return_type'], 'vector<int>')
@@ -114,7 +114,7 @@ class FuncTest(unittest.TestCase):
                 return 0;
             }
         ''')
-        func_list = CppToJson.ObtainFunctions(s)
+        func_list = CppToJson.ObtainFunctions(s, None, lambda type: True)
         
         self.assertEqual(func_list[0]['func_name'], 'counting')
         self.assertEqual(func_list[0]['raw_return_type'], 'vector<vector<int> >')
@@ -130,6 +130,208 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
 
+    def test_many_arguments(self):
+        s = textwrap.dedent('''
+            int two(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, 
+                int k, int l, int m, int n, int o, int p, int q, int r, int s, int t, int u, 
+                int v, int w, int x, int y, int z){
+
+                return 2;
+            }
+            int main(){
+                return 0;
+            }
+        ''')
+        func_list = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        self.assertEqual(func_list[0]['func_name'], 'two')
+        self.assertEqual(func_list[0]['raw_return_type'], 'int')
+        self.assertEqual(func_list[0]['simple_return_type'], 'int')
+        self.assertEqual(func_list[0]['var_names'], ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
+        self.assertEqual(func_list[0]['raw_var_types'], ['int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int'])
+        self.assertEqual(func_list[0]['simple_var_types'], ['int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int'])
+
+        self.assertEqual(func_list[1]['func_name'], 'main')
+        self.assertEqual(func_list[1]['raw_return_type'], 'int')
+        self.assertEqual(func_list[1]['simple_return_type'], 'int')
+        self.assertEqual(func_list[1]['var_names'], [])
+        self.assertEqual(func_list[1]['raw_var_types'], [])
+        self.assertEqual(func_list[1]['simple_var_types'], [])
+
+    def test_many_arguments_ref(self):
+        s = textwrap.dedent('''
+            int two(int **a, int **b, int **c, int **d, int **e, int **f, int **g, int **h,
+                int **i, int **j, int **k, int **l, int **m, int **n, int **o, int **p, int **q,
+                int **r, int **s, int **t, int **u, int **v, int **w, int **x, int **y, int **z){
+                    
+                return 2;
+            }
+            int main(){
+                return 0;
+            }
+        ''')
+        func_list = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        self.assertEqual(func_list[0]['func_name'], 'two')
+        self.assertEqual(func_list[0]['raw_return_type'], 'int')
+        self.assertEqual(func_list[0]['simple_return_type'], 'int')
+        self.assertEqual(func_list[0]['var_names'], ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
+        self.assertEqual(func_list[0]['raw_var_types'], ['int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **'])
+        self.assertEqual(func_list[0]['simple_var_types'], ['int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int'])
+
+        self.assertEqual(func_list[1]['func_name'], 'main')
+        self.assertEqual(func_list[1]['raw_return_type'], 'int')
+        self.assertEqual(func_list[1]['simple_return_type'], 'int')
+        self.assertEqual(func_list[1]['var_names'], [])
+        self.assertEqual(func_list[1]['raw_var_types'], [])
+        self.assertEqual(func_list[1]['simple_var_types'], [])
+
+    def test_const_ret(self):
+        s = textwrap.dedent('''
+            const float square(float x){
+                const float ret = x*x;
+                return ret;
+            }
+            int main(){
+                return 0;
+            }
+        ''')
+        func_list = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        self.assertEqual(func_list[0]['func_name'], 'square')
+        self.assertEqual(func_list[0]['raw_return_type'], 'const float')
+        self.assertEqual(func_list[0]['simple_return_type'], 'float')
+        self.assertEqual(func_list[0]['var_names'], ['x'])
+        self.assertEqual(func_list[0]['raw_var_types'], ['float'])
+        self.assertEqual(func_list[0]['simple_var_types'], ['float'])
+
+        self.assertEqual(func_list[1]['func_name'], 'main')
+        self.assertEqual(func_list[1]['raw_return_type'], 'int')
+        self.assertEqual(func_list[1]['simple_return_type'], 'int')
+        self.assertEqual(func_list[1]['var_names'], [])
+        self.assertEqual(func_list[1]['raw_var_types'], [])
+        self.assertEqual(func_list[1]['simple_var_types'], [])
+    
+    def test_const_arg(self):
+        s = textwrap.dedent('''
+            float sum(const float x, const int y){
+                return x+y;
+            }
+            int main(){
+                return 0;
+            }
+        ''')
+        func_list = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        self.assertEqual(func_list[0]['func_name'], 'sum')
+        self.assertEqual(func_list[0]['raw_return_type'], 'float')
+        self.assertEqual(func_list[0]['simple_return_type'], 'float')
+        self.assertEqual(func_list[0]['var_names'], ['x', 'y'])
+        self.assertEqual(func_list[0]['raw_var_types'], ['const float', 'const int'])
+        self.assertEqual(func_list[0]['simple_var_types'], ['float', 'int'])
+
+        self.assertEqual(func_list[1]['func_name'], 'main')
+        self.assertEqual(func_list[1]['raw_return_type'], 'int')
+        self.assertEqual(func_list[1]['simple_return_type'], 'int')
+        self.assertEqual(func_list[1]['var_names'], [])
+        self.assertEqual(func_list[1]['raw_var_types'], [])
+        self.assertEqual(func_list[1]['simple_var_types'], [])
+
+    def test_map_vec_ref(self):
+        s = textwrap.dedent( '''
+            #include <vector>
+            #include <map>
+
+            using namespace std;
+
+            vector<map<int, float>> * nonsense(vector<int> &v, map<bool, bool>* mp){
+                vector<map<int, float>> *ret = new vector<map<int, float>>;
+                return ret;
+            }
+
+            int main(){
+                return 0;
+            }
+        ''')
+        func_list = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        self.assertEqual(func_list[0]['func_name'], 'nonsense')
+        self.assertEqual(func_list[0]['raw_return_type'], 'vector<map<int, float> > *')
+        self.assertEqual(func_list[0]['simple_return_type'], 'vector<map<int, float> >')
+        self.assertEqual(func_list[0]['var_names'], ['v', 'mp'])
+        self.assertEqual(func_list[0]['raw_var_types'], ['vector<int> &', 'map<bool, bool> *'])
+        self.assertEqual(func_list[0]['simple_var_types'], ['vector<int>', 'map<bool, bool>'])
+
+        self.assertEqual(func_list[1]['func_name'], 'main')
+        self.assertEqual(func_list[1]['raw_return_type'], 'int')
+        self.assertEqual(func_list[1]['simple_return_type'], 'int')
+        self.assertEqual(func_list[1]['var_names'], [])
+        self.assertEqual(func_list[1]['raw_var_types'], [])
+        self.assertEqual(func_list[1]['simple_var_types'], [])
+    
+    def test_struct_unsupported(self):
+        was_called = False
+
+        s = textwrap.dedent( '''
+            struct x{
+                int a, b;
+            };
+
+            int go(struct x ya){
+                return 2;
+            }
+
+            int main(){
+                return 0;
+            }
+        ''')
+        # ----------------------------------------------------------------------
+        def onUnsupportedFunc(func, line):
+            nonlocal was_called
+            was_called = True
+            self.assertTrue([func, line] in [['go', 6], ['main', 10]])
+        
+        # ----------------------------------------------------------------------
+
+        func_list = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
+
+        self.assertEqual(was_called, True)
+
+        self.assertEqual(func_list, [])
+
+
+    def test_class_unsupported(self):
+        was_called = False
+
+        s = textwrap.dedent('''
+            class Point{
+                public:
+                    int x, y;
+                    Point() {}
+                    Point(int a, int b){
+                        x=a;
+                        y=b;
+                    }
+            };
+
+            Point operator+ (const Point& a, const Point& b) {
+                Point ret;
+                ret.x = a.x + b.x;
+                ret.y = a.y + b.y;
+                return ret;
+            }
+
+            int main(){
+                return 0;
+            }
+        ''')
+        # ----------------------------------------------------------------------
+        def onUnsupportedFunc(func, line):
+            nonlocal was_called
+            was_called = True
+            self.assertTrue([func, line] in [['operator+', 12], ['main', 19]])
+        
+        # ----------------------------------------------------------------------
+        func_list = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
+
+        self.assertEqual(was_called, True)
+
+        self.assertEqual(func_list, [])
 
 if __name__ == '__main__':
     unittest.main()
