@@ -3,6 +3,7 @@ import re
 import clang.cindex as cindex
 import CommonEnvironment.FileSystem as fileSystem
 import CommonEnvironment.CallOnExit as callOnExit
+from CommonEnvironment.Shell.All import CurrentShell
 import CommonEnvironment.Shell as CE_Shell
 
 
@@ -12,7 +13,7 @@ def ObtainFunctions(input_filename, on_unsupported_func, policy):
         function given. input_filename can be a file name or a string that is the code
         itself.
         Return value:
-            Returns a list of functions, every item in this list is a dictionary that 
+            Returns a list of functions, every item in this list is a dictionary that
             has information about the function.
     '''
     is_temp_file = False
@@ -35,24 +36,42 @@ def ObtainFunctions(input_filename, on_unsupported_func, policy):
 
         pattern_const = re.compile("^const ")
         pattern_star  = re.compile(r"( \*)*\**")
-        pattern_amper = re.compile("( &)*&*") 
+        pattern_amper = re.compile("( &)*&*")
 
         # ----------------------------------------------------------------------
         def SimpleVarType(name):
             name = re.sub(pattern_const,  "", name)
             name = re.sub(pattern_star,  "", name)
-            name = re.sub(pattern_amper,  "", name) 
+            name = re.sub(pattern_amper,  "", name)
             return name
 
         # ----------------------------------------------------------------------
 
         index = cindex.Index.create()
         args = []
-        
-        if os.name == 'posix':
-            args = ['-I{}'.format(v) for v in os.environ['INCLUDE'].split(":") if v.strip()]
+
+        # On Windows, clang recognizes the INCLUDE and LIB environment variables, but
+        # on Linux it does not. Recognize the INCLUDE var on Linux.
+        if CurrentShell.CategoryName == "Linux":
+            include_vars = [value for value in os.getenv("INCLUDE").split(":") if value.strip()]
+
+            # In the past, we used the GCC repository which would prepopulate the INCLUDE environment
+            # variable with standard includes. However, that repo had issues when attempting to link
+            # compile binaries and has been temporarily disabled. Unfortunately, this code needs that
+            # populated environment variable to function correctly in order to tokenize input.
+            #
+            # For now, add those includes here. When Clang's dependency on GCC is restored in the future,
+            # we can remove this explicit step.
+            include_vars.append("/usr/lib/gcc/x86_64-linux-gnu/7/include")
+
+            args = ['-I{}'.format(include_var) for include_var in include_vars]
 
         translation_unit = index.parse(input_filename, args=args)
+
+        diagnostics = list(translation_unit.diagnostics)
+        if diagnostics:
+            raise Exception("\n".join([str(diag) for diag in diagnostics]))
+
         cursor = translation_unit.cursor
 
         # ----------------------------------------------------------------------
@@ -68,19 +87,19 @@ def ObtainFunctions(input_filename, on_unsupported_func, policy):
 
             def TestAndVerify(types):
                 '''
-                This is an early version of TestAndVerify that checks if a type should be accepted or not. 
+                This is an early version of TestAndVerify that checks if a type should be accepted or not.
                 It will find all words in the type and check them against a policy. This will be adapted as we
                 get more information about what is supported and what is not.
                 '''
                 type_list = re.findall(pattern_words, types)
-                
+
                 for var_type in type_list:
                     if not policy(var_type):
                         return False
                 return True
 
             # ----------------------------------------------------------------------
-            
+
 
             if node.kind == cindex.CursorKind.FUNCTION_DECL and node.location.file.name == input_filename:
                 valid_func = True
@@ -115,4 +134,3 @@ def ObtainFunctions(input_filename, on_unsupported_func, policy):
 
         return funcs_list
     # ----------------------------------------------------------------------
-    

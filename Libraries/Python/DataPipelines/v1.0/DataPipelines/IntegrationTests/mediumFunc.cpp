@@ -1,6 +1,6 @@
-#include <iostream>#include <stdio.h>#include <string>
-
-using namespace std;
+#include <iostream>
+#include <stdio.h>
+#include <string>
 
 int add(float a, int b){
     return a + b;
@@ -10,11 +10,11 @@ float mult(int a, float b, bool signal){
     return a * b * (2*signal - 1);
 }
 
-string toUp(string s){
-    if(s[0] <= 'a' and s[0]<='z')
+std::string toUp(std::string s){
+    if(s[0] <= 'a' && s[0]<='z')
         s[0] = s[0] - 'a' + 'A';
     return s;
-} 
+}
 
 int fat(int curr, int at = 3){
     if(at == 0)return 1;
@@ -22,6 +22,6 @@ int fat(int curr, int at = 3){
 }
 
 int main(){
-    cout << "Hello World"  << endl;
+    std::cout << "Hello World\n";
     return 0;
 }
