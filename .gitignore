@@ -15,5 +15,6 @@ Activate.*.sh
 coverage.xml
 
 **/.vscode/*
+**/build/*
 
 Libraries/Python/DataPipelines/v1\.0/DataPipelines/GeneratedCode/Compiler\.ConditionalInvocationQueryMixin\.data
