@@ -41,6 +41,8 @@ class TestSuite(unittest.TestCase):
         self.assertTrue(not hasattr(result[0], "var_names"))
         self.assertTrue(not hasattr(result[0], "raw_var_types"))
         self.assertTrue(not hasattr(result[0], "simple_var_types"))
+        self.assertTrue(not hasattr(result[0], "declaration_line"))
+        self.assertTrue(not hasattr(result[0], "definition_line"))
 
     # ----------------------------------------------------------------------
     def test_WithArgs(self):
@@ -53,6 +55,8 @@ class TestSuite(unittest.TestCase):
                     "var_names": ["a", "b",],
                     "raw_var_types": ["c", "d",],
                     "simple_var_types": ["e", "f",],
+                    "declaration_line": 3,
+                    "definition_line": 7,
                 },
             ],
         )
@@ -64,6 +68,8 @@ class TestSuite(unittest.TestCase):
         self.assertEqual(result[0].var_names, ["a", "b",])
         self.assertEqual(result[0].raw_var_types, ["c", "d",])
         self.assertEqual(result[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].declaration_line, 3)
+        self.assertEqual(result[0].definition_line, 7)
 
     # ----------------------------------------------------------------------
     def test_Multiple(self):
@@ -73,11 +79,13 @@ class TestSuite(unittest.TestCase):
                     "func_name": "Name1",
                     "raw_return_type": "int1",
                     "simple_return_type": "int2",
+                    "definition_line": 12,
                 },
                 {
                     "func_name": "Name2",
                     "raw_return_type": "int3",
                     "simple_return_type": "int4",
+                    "definition_line": 34,
                 },
             ],
         )
@@ -87,16 +95,20 @@ class TestSuite(unittest.TestCase):
         self.assertEqual(result[0].func_name, "Name1")
         self.assertEqual(result[0].raw_return_type, "int1")
         self.assertEqual(result[0].simple_return_type, "int2")
+        self.assertEqual(result[0].definition_line, 12)
         self.assertTrue(not hasattr(result[0], "var_names"))
         self.assertTrue(not hasattr(result[0], "raw_var_types"))
         self.assertTrue(not hasattr(result[0], "simple_var_types"))
+        self.assertTrue(not hasattr(result[0], "declaration_line"))
 
         self.assertEqual(result[1].func_name, "Name2")
         self.assertEqual(result[1].raw_return_type, "int3")
         self.assertEqual(result[1].simple_return_type, "int4")
+        self.assertEqual(result[1].definition_line, 34)
         self.assertTrue(not hasattr(result[1], "var_names"))
         self.assertTrue(not hasattr(result[1], "raw_var_types"))
         self.assertTrue(not hasattr(result[1], "simple_var_types"))
+        self.assertTrue(not hasattr(result[1], "declaration_line"))
 
     # ----------------------------------------------------------------------
     def test_InvalidName(self):
@@ -291,6 +303,66 @@ class TestSuite(unittest.TestCase):
                         "var_names": ["", "b",],
                         "raw_var_types": ["c", "d",],
                         "simple_var_types": ["e", "", "g",],
+                    },
+                ],
+            ),
+        )
+     # ----------------------------------------------------------------------
+    def test_InvalidDeclarationLine(self):
+        self.assertRaisesRegex(
+            Exception,
+            "0 is not >= 1",
+            lambda: Deserialize(
+                [
+                    {
+                        "func_name": "Name",
+                        "raw_return_type": "int1",
+                        "simple_return_type": "int1",
+                        "declaration_line": 0,
+                    },
+                ],
+            ),
+        )
+        self.assertRaisesRegex(
+            Exception,
+            "'String' is not a valid 'Integer' string - Value must be >= 1",
+            lambda: Deserialize(
+                [
+                    {
+                        "func_name": "Name",
+                        "raw_return_type": "int1",
+                        "simple_return_type": "int1",
+                        "declaration_line": "String",
+                    },
+                ],
+            ),
+        )
+     # ----------------------------------------------------------------------
+    def test_InvalidDefinitionLine(self):
+        self.assertRaisesRegex(
+            Exception,
+            "0 is not >= 1",
+            lambda: Deserialize(
+                [
+                    {
+                        "func_name": "Name",
+                        "raw_return_type": "int1",
+                        "simple_return_type": "int1",
+                        "definition_line": 0,
+                    },
+                ],
+            ),
+        )
+        self.assertRaisesRegex(
+            Exception,
+            "'String' is not a valid 'Integer' string - Value must be >= 1",
+            lambda: Deserialize(
+                [
+                    {
+                        "func_name": "Name",
+                        "raw_return_type": "int1",
+                        "simple_return_type": "int1",
+                        "definition_line": "String",
                     },
                 ],
             ),

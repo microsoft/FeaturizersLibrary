@@ -7,3 +7,6 @@
     <var_names string *>
     <raw_var_types string *>
     <simple_var_types string *>
+
+    <declaration_line int min=1 ?>
+    <definition_line int min=1 ?>
