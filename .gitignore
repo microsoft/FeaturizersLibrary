@@ -16,5 +16,7 @@ coverage.xml
 
 **/.vscode/*
 **/build/*
+**/.vs/*
+**/out/*
 
 Libraries/Python/DataPipelines/v1\.0/DataPipelines/GeneratedCode/Compiler\.ConditionalInvocationQueryMixin\.data

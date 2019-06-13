@@ -36,7 +36,7 @@ stages:
         # These steps are an ugly hack to set Azure DevOps variables conditionally. It really seems like there should be a better way to do this.
         -   ${{ if eq(parameters.operating_system, 'Windows') }}:
             -   script: |-
-                    set _AZURE_ACTIVATE_SCRIPT=Activate.cmd
+                    set _AZURE_ACTIVATE_SCRIPT=call Activate.cmd
                     echo ##vso[task.setvariable variable=azure_activate_script]%_AZURE_ACTIVATE_SCRIPT%
 
                     set _AZURE_SCRIPT_EXTENSION=.cmd
