@@ -40,7 +40,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 # ----------------------------------------------------------------------
 
 # Tuples in the form:
-#   ("<repo name>", "<clone command line>", "<setup command suffix>" or None) 
+#   ("<repo name>", "<clone command line>", "<setup command suffix>" or None)
 _REPO_DATA                                  = [
     ("Common_cpp_Clang_8", 'git clone https://github.com/davidbrownell/Common_cpp_Clang_8 "{output_dir}"', None),
     ("Common_cpp_Clang_Common", 'git clone https://github.com/davidbrownell/Common_cpp_Clang_Common "{output_dir}"', None),
@@ -109,12 +109,12 @@ def EntryPoint(
             with dm.stream.DoneManager(
                 suffix="\n",
             ) as enlist_dm:
-                for index, (output_dir, data) in enumerate(enlistment_repositories):
+                for index, (repo_output_dir, data) in enumerate(enlistment_repositories):
                     enlist_dm.stream.write("'{}' ({} of {})...".format(data[0], index + 1, len(enlistment_repositories)))
                     with enlist_dm.stream.DoneManager() as this_dm:
-                        FileSystem.MakeDirs(os.path.dirname(output_dir))
+                        FileSystem.MakeDirs(os.path.dirname(repo_output_dir))
 
-                        temp_directory = output_dir + "_tmp"
+                        temp_directory = repo_output_dir + "_tmp"
 
                         sink = six.moves.StringIO()
 
@@ -138,7 +138,10 @@ def EntryPoint(
 
                             return this_dm.result
 
-                        shutil.move(temp_directory, output_dir)
+                        shutil.move(temp_directory, repo_output_dir)
+
+                if CurrentShell.CategoryName == "Linux":
+                    CurrentShell.UpdateOwnership(output_dir)
 
         if sync_repositories:
             dm.stream.write("Syncing {}...".format(inflect.no("repository", len(sync_repositories))))
@@ -147,10 +150,10 @@ def EntryPoint(
             ) as sync_dm:
                 sync_command_template = '{} PullAndUpdate "/directory={{}}"'.format(CurrentShell.CreateScriptName("SCM"))
 
-                for index, (output_dir, data) in enumerate(sync_repositories):
+                for index, (repo_output_dir, data) in enumerate(sync_repositories):
                     sync_dm.stream.write("'{}' ({} of {})...".format(data[0], index + 1, len(sync_repositories)))
                     with sync_dm.stream.DoneManager() as this_dm:
-                        this_dm.result, output = Process.Execute(sync_command_template.format(output_dir))
+                        this_dm.result, output = Process.Execute(sync_command_template.format(repo_output_dir))
                         if this_dm.result != 0:
                             this_dm.stream.write(output)
 
@@ -163,11 +166,11 @@ def EntryPoint(
         ) as setup_dm:
             command_line_template = "Setup{} {{suffix}}".format(CurrentShell.ScriptExtension)
 
-            for index, (output_dir, data) in enumerate(six.iteritems(repo_data)):
+            for index, (repo_output_dir, data) in enumerate(six.iteritems(repo_data)):
                 setup_dm.stream.write("'{}' ({} of {})...".format(data[0], index + 1, len(repo_data)))
                 with setup_dm.stream.DoneManager() as this_dm:
                     prev_dir = os.getcwd()
-                    os.chdir(output_dir)
+                    os.chdir(repo_output_dir)
 
                     with CallOnExit(lambda: os.chdir(prev_dir)):
                         command_line = command_line_template.format(
@@ -203,12 +206,12 @@ def EntryPoint(
             StringHelpers.LeftJustify(
                 textwrap.dedent(
                     """\
-                    
-                    
-                    
-                    
-                    
-                    
+
+
+
+
+
+
                     # ----------------------------------------------------------------------
                     # ----------------------------------------------------------------------
                     # ----------------------------------------------------------------------
