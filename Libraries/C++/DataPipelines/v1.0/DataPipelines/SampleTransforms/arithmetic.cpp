@@ -4,7 +4,7 @@
 // ----------------------------------------------------------------------
 
 #include <stdint.h>
-#include "arithmetic.h"
+#include "arithmetic.hpp"
 
 /* Defined in enclosed namespace */
 namespace DataPipelines {
