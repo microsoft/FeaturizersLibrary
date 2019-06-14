@@ -128,7 +128,7 @@ class TestSuite(unittest.TestCase):
 
         self.assertRaisesRegex(
             Exception,
-            "'' is not a valid 'String' string - Value must have more than 1 character",
+            "'' is not a valid 'String' string - Value must have at least 1 character",
             lambda: Deserialize(
                 [
                     {
@@ -158,7 +158,7 @@ class TestSuite(unittest.TestCase):
 
         self.assertRaisesRegex(
             Exception,
-            "'' is not a valid 'String' string - Value must have more than 1 character",
+            "'' is not a valid 'String' string - Value must have at least 1 character",
             lambda: Deserialize(
                 [
                     {
@@ -188,7 +188,7 @@ class TestSuite(unittest.TestCase):
 
         self.assertRaisesRegex(
             Exception,
-            "'' is not a valid 'String' string - Value must have more than 1 character",
+            "'' is not a valid 'String' string - Value must have at least 1 character",
             lambda: Deserialize(
                 [
                     {
@@ -221,7 +221,7 @@ class TestSuite(unittest.TestCase):
 
         self.assertRaisesRegex(
             Exception,
-            "'' is not a valid 'String' string - Value must have more than 1 character",
+            "'' is not a valid 'String' string - Value must have at least 1 character",
             lambda: Deserialize(
                 [
                     {
@@ -257,7 +257,7 @@ class TestSuite(unittest.TestCase):
 
         self.assertRaisesRegex(
             Exception,
-            "'' is not a valid 'String' string - Value must have more than 1 character",
+            "'' is not a valid 'String' string - Value must have at least 1 character",
             lambda: Deserialize(
                 [
                     {
@@ -293,7 +293,7 @@ class TestSuite(unittest.TestCase):
 
         self.assertRaisesRegex(
             Exception,
-            "'' is not a valid 'String' string - Value must have more than 1 character",
+            "'' is not a valid 'String' string - Value must have at least 1 character",
             lambda: Deserialize(
                 [
                     {
