@@ -70,7 +70,7 @@ def CreateCodeGenerator(plugin):
         # ----------------------------------------------------------------------
         @classmethod
         @Interface.override
-        def _CreateContext(cls, metadata):
+        def _CreateContext(cls, metadata, status_stream):
             # Ensure that all plugin settings are present and that they are the
             # expected type.
             custom_settings = OrderedDict([(k, v) for k, v in plugin.GenerateCustomMetadataSettingsAndDefaults()])
@@ -103,7 +103,7 @@ def CreateCodeGenerator(plugin):
             context["output_filenames"] = [os.path.join(context["output_dir"], filename) for filename in plugin.GenerateOutputFilenames(context)]
             context = plugin.PostprocessContext(context)
 
-            return super(CodeGenerator, cls)._CreateContext(context)
+            return super(CodeGenerator, cls)._CreateContext(context, status_stream)
 
         # ----------------------------------------------------------------------
         @classmethod

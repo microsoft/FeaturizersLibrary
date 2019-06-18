@@ -86,6 +86,7 @@ class CreateContextTests(unittest.TestCase):
                         "Invalid Value": True,
                     },
                 },
+                None,
             ),
         )
 
@@ -100,6 +101,7 @@ class CreateContextTests(unittest.TestCase):
                     "Custom": "False",
                 },
             },
+            None,
         )
 
         self.assertEqual(result["plugin_settings"]["Custom"], False)
@@ -115,6 +117,7 @@ class CreateContextTests(unittest.TestCase):
                 {
                     "plugin_settings": {},
                 },
+                None,
             ),
         )
 
