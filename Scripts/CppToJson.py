@@ -8,30 +8,33 @@ from DataPipelines.CheckPolicy import Policy
 
 @CommandLine.EntryPoint
 @CommandLine.Constraints(
-    input_filename=CommandLine.FilenameTypeInfo(
+    input=CommandLine.FilenameTypeInfo(
         arity="+",
     ),
 )
 def EntryPoint(
-    input_filename,
+    input,
     treat_warnings_as_errors=False,
 ):
+    inputs = input
+    del input
+
     class UnsupportedException(Exception):
         pass
 
-    def OnUnsupportedFunc(func, line):
+    def OnUnsupportedFunc(func, filename, line):
         # Display error
         if treat_warnings_as_errors:
-            sys.stdout.write("Error: Unsupported function '{}' on line {}\n".format(func, line))
+            sys.stdout.write("Error: Unsupported function '{}' in {} <{}>\n".format(func, filename, line))
             raise UnsupportedException()
         else:
-            sys.stdout.write("Warning: Unsupported function '{}' on line {}\n".format(func, line))
+            sys.stdout.write("Warning: Unsupported function '{}' in {} <{}>\n".format(func, filename, line))
 
     # ----------------------------------------------------------------------
 
     try:
         file_dict = {}
-        for file_name in input_filename:
+        for file_name in inputs:
             file_dict[file_name] = CppToJson.ObtainFunctions(file_name, OnUnsupportedFunc, Policy)
         sys.stdout.write("{}\n".format(json.dumps(file_dict)))
     except UnsupportedException:

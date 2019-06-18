@@ -21,27 +21,30 @@ class FileTest(unittest.TestCase):
         that the files are being opened and the information inside is being correctly processed.
     '''
     def test_basic_file(self):
-        func_list = CppToJson.ObtainFunctions(os.path.join(_script_dir, "basicFunc.cpp"), None, lambda type: True)
-        
+        filename = os.path.join(_script_dir, "basicFunc.cpp")
+        func_list = self._GetFuncList(filename, CppToJson.ObtainFunctions(filename, None, lambda type: True))
+
         self.assertEqual(func_list[0], {'func_name': 'add', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': ['a', 'b'], 'raw_var_types': ['int', 'int'], 'simple_var_types': ['int', 'int'], 'definition_line': 6, 'declaration_line': None})
         self.assertEqual(func_list[1], {'func_name': 'sub', 'raw_return_type': 'float', 'simple_return_type': 'float', 'var_names': ['a', 'b'], 'raw_var_types': ['float', 'float'], 'simple_var_types': ['float', 'float'], 'definition_line': 10, 'declaration_line': None})
         self.assertEqual(func_list[2], {'func_name': 'isPos', 'raw_return_type': 'bool', 'simple_return_type': 'bool', 'var_names': ['x'], 'raw_var_types': ['bool'], 'simple_var_types': ['bool'], 'definition_line': 14, 'declaration_line': None})
         self.assertEqual(func_list[3], {'func_name': 'three', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'definition_line': 18, 'declaration_line': None})
         self.assertEqual(func_list[4], {'func_name': 'nothing', 'raw_return_type': 'void', 'simple_return_type': 'void', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'definition_line': 22, 'declaration_line': None})
         self.assertEqual(func_list[5], {'func_name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'definition_line': 27, 'declaration_line': None})
-    
+
     def test_medium_file(self):
-        func_list = CppToJson.ObtainFunctions(os.path.join(_script_dir, "mediumFunc.cpp"), None, lambda type: True)
-        
+        filename = os.path.join(_script_dir, "mediumFunc.cpp")
+        func_list = self._GetFuncList(filename, CppToJson.ObtainFunctions(filename, None, lambda type: True))
+
         self.assertEqual(func_list[0], {'func_name': 'add', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': ['a', 'b'], 'raw_var_types': ['float', 'int'], 'simple_var_types': ['float', 'int'], 'definition_line': 5, 'declaration_line': None})
         self.assertEqual(func_list[1], {'func_name': 'mult', 'raw_return_type': 'float', 'simple_return_type': 'float', 'var_names': ['a', 'b', 'signal'], 'raw_var_types': ['int', 'float', 'bool'], 'simple_var_types': ['int', 'float', 'bool'], 'definition_line': 9, 'declaration_line': None})
         self.assertEqual(func_list[2], {'func_name': 'toUp', 'raw_return_type': 'std::string', 'simple_return_type': 'std::string', 'var_names': ['s'], 'raw_var_types': ['std::string'], 'simple_var_types': ['std::string'], 'definition_line': 13, 'declaration_line': None})
         self.assertEqual(func_list[3], {'func_name': 'fat', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': ['curr', 'at'], 'raw_var_types': ['int', 'int'], 'simple_var_types': ['int', 'int'], 'definition_line': 19, 'declaration_line': None})
         self.assertEqual(func_list[4], {'func_name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'definition_line': 24, 'declaration_line': None})
 
-    
+
     def test_hard_file(self):
-        func_list = CppToJson.ObtainFunctions(os.path.join(_script_dir, "hardFunc.cpp"), None, lambda type: True)
+        filename = os.path.join(_script_dir, "hardFunc.cpp")
+        func_list = self._GetFuncList(filename, CppToJson.ObtainFunctions(filename, None, lambda type: True))
 
         self.assertEqual(func_list[0], {'func_name': 'add', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': ['a'], 'raw_var_types': ['int'], 'simple_var_types': ['int'], 'definition_line': 10, 'declaration_line': None})
         self.assertEqual(func_list[1], {'func_name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'definition_line': 17, 'declaration_line': None})
@@ -52,8 +55,9 @@ class FileTest(unittest.TestCase):
 
 
     def test_convoluted_file(self):
-        func_list = CppToJson.ObtainFunctions(os.path.join(_script_dir, "convolutedFunc.cpp"), None, lambda type: True)
-        
+        filename = os.path.join(_script_dir, "convolutedFunc.cpp")
+        func_list = self._GetFuncList(filename, CppToJson.ObtainFunctions(filename, None, lambda type: True))
+
         self.assertEqual(func_list[0], {'func_name': 'matrix', 'raw_return_type': 'vector<vector<int> >', 'simple_return_type': 'vector<vector<int> >', 'var_names': ['n'], 'raw_var_types': ['int'], 'simple_var_types': ['int'], 'definition_line': 9, 'declaration_line': None})
         self.assertEqual(func_list[1], {'func_name': 'nonsense', 'raw_return_type': 'map<map<int, vector<bool> >, vector<float> >', 'simple_return_type': 'map<map<int, vector<bool> >, vector<float> >', 'var_names': ['n'], 'raw_var_types': ['int'], 'simple_var_types': ['int'], 'definition_line': 19, 'declaration_line': None})
         self.assertEqual(func_list[2], {'func_name': 'vectorLine', 'raw_return_type': 'vector<vector<vector<vector<float> > > >', 'simple_return_type': 'vector<vector<vector<vector<float> > > >', 'var_names': ['mp'], 'raw_var_types': ['map<bool, int>'], 'simple_var_types': ['map<bool, int>'], 'definition_line': 30, 'declaration_line': None})
@@ -61,35 +65,39 @@ class FileTest(unittest.TestCase):
         self.assertEqual(func_list[4], {'func_name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'definition_line': 50, 'declaration_line': None})
 
     def test_mix_file(self):
-        func_list = CppToJson.ObtainFunctions(os.path.join(_script_dir, "mixFunc.cpp"), None, lambda type: True)
-        
-        self.assertEqual(func_list[0], {'func_name': 'nonsense', 'raw_return_type': 'vector<map<int, float> > *', 'simple_return_type': 'vector<map<int, float> >', 'var_names': ['v', 'mp'], 'raw_var_types': ['vector<int> &', 'map<bool, bool> *'], 'simple_var_types': ['vector<int>', 'map<bool, bool>'], 'definition_line': 6, 'declaration_line': None}) 
-        self.assertEqual(func_list[1], {'func_name': 'address', 'raw_return_type': 'vector<int> &', 'simple_return_type': 'vector<int>', 'var_names': ['v'], 'raw_var_types': ['vector<int> &'], 'simple_var_types': ['vector<int>'], 'definition_line': 11, 'declaration_line': None}) 
-        self.assertEqual(func_list[2], {'func_name': 'even', 'raw_return_type': 'map<int, vector<bool> > **', 'simple_return_type': 'map<int, vector<bool> >', 'var_names': ['n'], 'raw_var_types': ['int'], 'simple_var_types': ['int'], 'definition_line': 15, 'declaration_line': None}) 
-        self.assertEqual(func_list[3], {'func_name': 'dereference', 'raw_return_type': 'int **********', 'simple_return_type': 'int', 'var_names': ['ref'], 'raw_var_types': ['int ***********'], 'simple_var_types': ['int'], 'definition_line': 22, 'declaration_line': None}) 
-        self.assertEqual(func_list[4], {'func_name': 'constDereference', 'raw_return_type': 'const int **********', 'simple_return_type': 'int', 'var_names': ['ref'], 'raw_var_types': ['const int ***********'], 'simple_var_types': ['int'], 'definition_line': 26, 'declaration_line': None}) 
-        self.assertEqual(func_list[5], {'func_name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'definition_line': 31, 'declaration_line': None}) 
+        filename = os.path.join(_script_dir, "mixFunc.cpp")
+        func_list = self._GetFuncList(filename, CppToJson.ObtainFunctions(filename, None, lambda type: True))
+
+        self.assertEqual(func_list[0], {'func_name': 'nonsense', 'raw_return_type': 'vector<map<int, float> > *', 'simple_return_type': 'vector<map<int, float> >', 'var_names': ['v', 'mp'], 'raw_var_types': ['vector<int> &', 'map<bool, bool> *'], 'simple_var_types': ['vector<int>', 'map<bool, bool>'], 'definition_line': 6, 'declaration_line': None})
+        self.assertEqual(func_list[1], {'func_name': 'address', 'raw_return_type': 'vector<int> &', 'simple_return_type': 'vector<int>', 'var_names': ['v'], 'raw_var_types': ['vector<int> &'], 'simple_var_types': ['vector<int>'], 'definition_line': 11, 'declaration_line': None})
+        self.assertEqual(func_list[2], {'func_name': 'even', 'raw_return_type': 'map<int, vector<bool> > **', 'simple_return_type': 'map<int, vector<bool> >', 'var_names': ['n'], 'raw_var_types': ['int'], 'simple_var_types': ['int'], 'definition_line': 15, 'declaration_line': None})
+        self.assertEqual(func_list[3], {'func_name': 'dereference', 'raw_return_type': 'int **********', 'simple_return_type': 'int', 'var_names': ['ref'], 'raw_var_types': ['int ***********'], 'simple_var_types': ['int'], 'definition_line': 22, 'declaration_line': None})
+        self.assertEqual(func_list[4], {'func_name': 'constDereference', 'raw_return_type': 'const int **********', 'simple_return_type': 'int', 'var_names': ['ref'], 'raw_var_types': ['const int ***********'], 'simple_var_types': ['int'], 'definition_line': 26, 'declaration_line': None})
+        self.assertEqual(func_list[5], {'func_name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'definition_line': 31, 'declaration_line': None})
 
     def test_class_file_unsupported(self):
+        filename = os.path.join(_script_dir, "classFunc.cpp")
+
         called_count = 0
 
         # ----------------------------------------------------------------------
-        def onUnsupportedFunc(func, line):
+        def onUnsupportedFunc(func, this_filename, line):
             nonlocal called_count
             called_count += 1
-            self.assertTrue([func, line] in [['operator+', 15], ['sum', 22], ['go', 26], ['main', 34]])
-        
+            self.assertTrue([func, this_filename, line] in [['operator+', filename, 15], ['sum', filename, 22], ['go', filename, 26], ['main', filename, 34]])
+
         # ----------------------------------------------------------------------
 
-        func_list = CppToJson.ObtainFunctions(os.path.join(_script_dir, "classFunc.cpp"), onUnsupportedFunc, lambda type: False)
-        
+        func_list = self._GetFuncList(filename, CppToJson.ObtainFunctions(filename, onUnsupportedFunc, lambda type: False))
+
         self.assertEqual(called_count, 4)
 
         self.assertEqual(func_list, [])
 
     def test_namespace_file(self):
-        func_list = CppToJson.ObtainFunctions(os.path.join(_script_dir, "arithmetic.cpp"), None, lambda type: True)
-        
+        filename = os.path.join(_script_dir, "arithmetic.cpp")
+        func_list = self._GetFuncList(filename, CppToJson.ObtainFunctions(filename, None, lambda type: True))
+
         self.assertEqual(func_list[0], {'func_name': 'DataPipelines::Arithmetic::Add', 'raw_return_type': 'int64_t', 'simple_return_type': 'int64_t', 'var_names': ['a', 'b'], 'raw_var_types': ['const int64_t', 'const int64_t'], 'simple_var_types': ['int64_t', 'int64_t'], 'definition_line': 12, 'declaration_line': None})
         self.assertEqual(func_list[1], {'func_name': 'DataPipelines::Arithmetic::Add', 'raw_return_type': 'uint64_t', 'simple_return_type': 'uint64_t', 'var_names': ['a', 'b'], 'raw_var_types': ['const uint64_t', 'const uint64_t'], 'simple_var_types': ['uint64_t', 'uint64_t'], 'definition_line': 13, 'declaration_line': None})
         self.assertEqual(func_list[2], {'func_name': 'DataPipelines::Arithmetic::Add', 'raw_return_type': 'uint32_t', 'simple_return_type': 'uint32_t', 'var_names': ['a', 'b'], 'raw_var_types': ['const uint32_t', 'const uint32_t'], 'simple_var_types': ['uint32_t', 'uint32_t'], 'definition_line': 14, 'declaration_line': None})
@@ -100,6 +108,12 @@ class FileTest(unittest.TestCase):
         self.assertEqual(func_list[7], {'func_name': 'Addu64', 'raw_return_type': 'uint64_t', 'simple_return_type': 'uint64_t', 'var_names': ['a', 'b'], 'raw_var_types': ['const uint64_t', 'const uint64_t'], 'simple_var_types': ['uint64_t', 'uint64_t'], 'definition_line': 38, 'declaration_line': None})
         self.assertEqual(func_list[8],  {'func_name': 'Addi64', 'raw_return_type': 'int64_t', 'simple_return_type': 'int64_t', 'var_names': ['a', 'b'], 'raw_var_types': ['const int64_t', 'const int64_t'], 'simple_var_types': ['int64_t', 'int64_t'], 'definition_line': 44, 'declaration_line': None})
         self.assertEqual(func_list[9],  {'func_name': 'Addu32', 'raw_return_type': 'uint32_t', 'simple_return_type': 'uint32_t', 'var_names': ['a', 'b'], 'raw_var_types': ['const uint32_t', 'const uint32_t'], 'simple_var_types': ['uint32_t', 'uint32_t'], 'definition_line': 48, 'declaration_line': None})
+
+    def _GetFuncList(self, filename, results):
+        self.assertEqual(len(results), 1)
+        self.assertEqual(filename, list(results.keys())[0])
+
+        return results[filename]
 
 if __name__ == '__main__':
     unittest.main()
