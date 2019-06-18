@@ -46,7 +46,8 @@ class StandardTests(unittest.TestCase):
         result = self._code_generator._GetOptionalMetadata()
         result_names = [r[0] for r in result]
 
-        self.assertTrue("plugin_settings" in result_names)
+        self.assertTrue("include_regexes" in result_names)
+        self.assertTrue("exclude_regexes" in result_names)
 
     # ----------------------------------------------------------------------
     def test_GetAdditionalGeneratorItems(self):
@@ -94,15 +95,19 @@ class CreateContextTests(unittest.TestCase):
     def test_ValidPluginSettings(self):
         self._mock.GenerateCustomMetadataSettingsAndDefaults.return_value = [("Custom", True)]
 
-        result = self._code_generator._CreateContext(
-            {
-                "output_dir": os.getcwd(),
-                "plugin_settings": {
-                    "Custom": "False",
+        with unittest.mock.patch("CodeGenerator.ExtractContent") as mocked:
+            result = self._code_generator._CreateContext(
+                {
+                    "inputs": [],
+                    "include_regexes": [],
+                    "exclude_regexes": [],
+                    "output_dir": os.getcwd(),
+                    "plugin_settings": {
+                        "Custom": "False",
+                    },
                 },
-            },
-            None,
-        )
+                None,
+            )
 
         self.assertEqual(result["plugin_settings"]["Custom"], False)
 

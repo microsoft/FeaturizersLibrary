@@ -22,6 +22,8 @@ from CommonEnvironment.TypeInfo.FundamentalTypes.All import CreateFromPythonType
 from CommonEnvironment.TypeInfo.FundamentalTypes.FilenameTypeInfo import FilenameTypeInfo
 from CommonEnvironment.TypeInfo.FundamentalTypes.Serialization.StringSerialization import StringSerialization
 
+from ContentExtractor import ExtractContent
+
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
 _script_dir, _script_name                   = os.path.split(_script_fullpath)
@@ -65,7 +67,10 @@ def CreateCodeGenerator(plugin):
         @classmethod
         @Interface.override
         def _GetOptionalMetadata(cls):
-            return [("plugin_settings", {}),] + super(CodeGenerator, cls)._GetOptionalMetadata()
+            return [
+                ("include_regexes", []),
+                ("exclude_regexes", []),
+            ] + super(CodeGenerator, cls)._GetOptionalMetadata()
 
         # ----------------------------------------------------------------------
         @classmethod
@@ -102,6 +107,17 @@ def CreateCodeGenerator(plugin):
             context = plugin.PreprocessContext(metadata)
             context["output_filenames"] = [os.path.join(context["output_dir"], filename) for filename in plugin.GenerateOutputFilenames(context)]
             context = plugin.PostprocessContext(context)
+
+            # Create data based on the input files
+            context["plugin_context"] = ExtractContent(
+                context["inputs"],
+                status_stream,
+                include_regexes=context["include_regexes"],
+                exclude_regexes=context["exclude_regexes"],
+            )
+
+            del context["include_regexes"]
+            del context["exclude_regexes"]
 
             return super(CodeGenerator, cls)._CreateContext(context, status_stream)
 

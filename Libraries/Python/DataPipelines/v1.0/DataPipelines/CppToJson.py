@@ -19,7 +19,6 @@ def ObtainFunctions(
     traverse_include_dependencies=True,
     include_regexes=None,
     exclude_regexes=None,
-    working_directory=os.getcwd(),
 ):
     '''
         This function will extract return value, name and parameters for every
@@ -140,7 +139,7 @@ def ObtainFunctions(
             if not traverse_include_dependencies:
                 return
 
-            include_filename = os.path.realpath(os.path.join(working_directory, include_name))
+            include_filename = os.path.realpath(os.path.join(os.path.basename(include_name), include_name))
 
             if any(regex.match(include_filename) for regex in exclude_regexes):
                 return

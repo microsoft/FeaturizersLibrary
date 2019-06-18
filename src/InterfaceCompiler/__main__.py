@@ -11,7 +11,7 @@ import textwrap
 
 from collections import OrderedDict
 
-import inflect as inflcet_mod
+import inflect as inflect_mod
 import six
 
 import CommonEnvironment
@@ -74,12 +74,16 @@ if not PLUGINS:
 
 _PluginTypeInfo                             = CommandLine.EnumTypeInfo(list(six.iterkeys(PLUGINS)))
 
+inflect                                     = inflect_mod.engine()
+
 # ----------------------------------------------------------------------
 @CommandLine.EntryPoint(
-    plugin=CommandLine.EntryPoint.Parameter("Name of plugin used for generation"),
-    output_name=CommandLine.EntryPoint.Parameter("Output name used during generation; the way in which this value impacts generated output varies from plugin to plugin"),
-    output_dir=CommandLine.EntryPoint.Parameter("Output directory used during generation; the way in which this value impacts generated output varies from plugin to plugin"),
-    input=CommandLine.EntryPoint.Parameter("C++ input filename or directory containing C++ source code"),
+    plugin=CommandLine.EntryPoint.Parameter("Name of plugin used for generation."),
+    output_name=CommandLine.EntryPoint.Parameter("Output name used during generation; the way in which this value impacts generated output varies from plugin to plugin."),
+    output_dir=CommandLine.EntryPoint.Parameter("Output directory used during generation; the way in which this value impacts generated output varies from plugin to plugin."),
+    input=CommandLine.EntryPoint.Parameter("C++ input filename or directory containing C++ source code."),
+    include_regex=CommandLine.EntryPoint.Parameter("Regular expression used to control which include files are parsed when extracting information from C++ files; only files in this list are included when specified."),
+    exclude_regex=CommandLine.EntryPoint.Parameter("Regular expression used to control which include files are parsed when extracting information from C++ files; files in this list are excluded."),
     output_data_filename_prefix=CommandLine.EntryPoint.Parameter("Prefix for filenames used by the compiler system to store information from invocation to invocation; customize this value if multiple plugins output to the same output directory."),
     plugin_arg=CommandLine.EntryPoint.Parameter("Argument value passed directly to the plugin"),
     force=CommandLine.EntryPoint.Parameter("Force generation"),
@@ -95,6 +99,12 @@ _PluginTypeInfo                             = CommandLine.EnumTypeInfo(list(six.
         match_any=True,
         arity="+",
     ),
+    include_regex=CommandLine.StringTypeInfo(
+        arity="*",
+    ),
+    exclude_regex=CommandLine.StringTypeInfo(
+        arity="*",
+    ),
     output_data_filename_prefix=CommandLine.StringTypeInfo(
         arity="?",
     ),
@@ -109,6 +119,8 @@ def Generate(
     output_name,
     output_dir,
     input,
+    include_regex=None,
+    exclude_regex=None,
     output_data_filename_prefix=None,
     plugin_arg=None,
     force=False,
@@ -117,49 +129,77 @@ def Generate(
 ):
     """Generates content for the given input using the named plugin"""
 
-    code_generator = CreateCodeGenerator(PLUGINS[plugin])
-
-    inputs = []
-
-    output_stream.write("Analyzing inputs...")
-    with StreamDecorator(output_stream).DoneManager(
-        display_exceptions=False,
-    ):
-        for i in input:
-            if os.path.isfile(i):
-                try:
-                    code_generator.InputTypeInfo.ValidateItem(i)
-                    inputs.append(i)
-                except Exception as ex:
-                    raise CommandLine.UsageException(str(ex))
-            elif os.path.isdir(i):
-                len_inputs = len(inputs)
-
-                for filename in FileSystem.WalkFiles(i):
-                    if code_generator.InputTypeInfo.IsValid(filename):
-                        inputs.append(filename)
-
-                if len(inputs) == len_inputs:
-                    raise CommandLine.UsageException("No valid input files were found in '{}'".format(i))
-
-            else:
-                assert False, i
-
     plugin_args = plugin_arg
     del plugin_arg
 
-    return CommandLineGenerate(
-        code_generator,
-        inputs,
-        output_stream,
-        verbose,
-        plugin_name=plugin,
-        output_name=output_name,
-        output_dir=output_dir,
-        plugin_settings=plugin_args,
-        force=force,
-        output_data_filename_prefix=output_data_filename_prefix,
-    )
+    include_regexes = include_regex
+    del include_regex
+
+    exclude_regexes = exclude_regex
+    del exclude_regex
+
+    with StreamDecorator(output_stream).DoneManager(
+        line_prefix="",
+        prefix="\nResults: ",
+        suffix="\n",
+    ) as dm:
+        code_generator = CreateCodeGenerator(PLUGINS[plugin])
+
+        # Get the inputs
+        inputs = []
+
+        dm.stream.write("Analyzing inputs...")
+        with dm.stream.DoneManager(
+            suffix="\n",
+        ) as this_dm:
+            for i in input:
+                if os.path.isfile(i):
+                    try:
+                        code_generator.InputTypeInfo.ValidateItem(i)
+                        inputs.append(i)
+                    except Exception as ex:
+                        this_dm.stream.write("ERROR: {}\n".format(str(ex)))
+                        this_dm.result = -1
+
+                elif os.path.isdir(i):
+                    len_inputs = len(inputs)
+
+                    for filename in FileSystem.WalkFiles(i):
+                        if code_generator.InputTypeInfo.IsValid(filename):
+                            inputs.append(filename)
+
+                    if len(inputs) == len_inputs:
+                        this_dm.stream.write("WARNING: No valid input files were found in '{}'\n".format(i))
+                        if this_dm.result >= 0:
+                            this_dm.result = 1
+
+                else:
+                    assert False, i
+
+            if this_dm.result < 0:
+                return this_dm.result
+
+        # Invoke the code generator
+        dm.stream.write("Generating code...")
+        with dm.stream.DoneManager() as this_dm:
+            this_dm.result = CommandLineGenerate(
+                code_generator,
+                inputs,
+                this_dm.stream,
+                verbose,
+                plugin_name=plugin,
+                output_name=output_name,
+                output_dir=output_dir,
+                plugin_settings=plugin_args,
+                force=force,
+                output_data_filename_prefix=output_data_filename_prefix,
+                include_regexes=include_regexes,
+                exclude_regexes=exclude_regexes,
+            )
+            if this_dm.result < 0:
+                return this_dm.result
+
+        return dm.result
 
 
 # ----------------------------------------------------------------------
