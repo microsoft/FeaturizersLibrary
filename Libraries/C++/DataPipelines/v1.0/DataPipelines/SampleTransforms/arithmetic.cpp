@@ -13,8 +13,6 @@ namespace DataPipelines {
         uint64_t Add(const uint64_t a, const uint64_t b) { return a + b; }
         uint32_t Add(const uint32_t a, const uint32_t b) { return a + b; }
 
-        
-
         MyStruct Add(const MyStruct& s1, const MyStruct& s2) {
             return MyStruct(s1.a + s2.a, s1.b + s2.b);
         }

@@ -1,0 +1,7 @@
+filter:
+  includes: 
+    - DataPipelines::Chrono::*
+  excludes:
+    - Catch2::*
+    - std::*
+

@@ -18,6 +18,18 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-#function(_add_unit_test, _name)
+function(_add_unit_test _name)
+    add_executable(${_name} ${_name}.cpp)
 
-#endfunction()
+    target_include_directories(${_name} PRIVATE ${_includes})
+    target_link_directories(${_name} PRIVATE ${_libs})
+
+    add_test(NAME ${_name} COMMAND ${_name} --success)
+endfunction(_add_unit_test)
+
+function(_add_unit_tests)
+    enable_testing()
+    foreach(_name IN ${ARGN})
+        _add_unit_test(${_name})
+    endforeach()
+endfunction(_add_unit_tests)

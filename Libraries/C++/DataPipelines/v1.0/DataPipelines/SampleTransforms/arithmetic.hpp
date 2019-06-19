@@ -6,7 +6,7 @@
 #pragma once
 
 #include <stdint.h>
-
+#include <assert.h>
 
 /* Sample functions to add two things. 
  * Various signature types until we've got a handle on what we want to export. */
@@ -27,13 +27,17 @@ namespace DataPipelines {
         struct MyStruct {
             int64_t a;
             int64_t b;
+            
             MyStruct(int64_t _a = 0, int64_t _b = 0) : a(_a), b(_b) {}
+            MyStruct(MyStruct&& s) { a = s.a; b = s.b; }
+            MyStruct(const MyStruct& s) = delete;
+
+            MyStruct& operator=(const MyStruct&) = delete;
         };
         MyStruct Add(const MyStruct& s1, const MyStruct& s2);
 
         /* unique function name, still in a namespace */
         int32_t Addi32(const int32_t a, const int32_t b);
-
     }
 }
 
