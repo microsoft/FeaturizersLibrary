@@ -45,6 +45,7 @@ class Plugin(PluginBase):
     @Interface.override
     def GenerateCustomMetadataSettingsAndDefaults(cls):
         # TODO: yield any custom settings here
+        yield ("binary_version", "1.0.0")
         yield from super(Plugin, cls).GenerateCustomMetadataSettingsAndDefaults()
 
     # ----------------------------------------------------------------------
@@ -66,7 +67,7 @@ class Plugin(PluginBase):
         assert "output_name" in context
         output_name = context["output_name"]
 
-        yield "{}.cpp".format(output_name)
+        yield "{}.wrapper.cpp".format(output_name)
         yield "{}.cs".format(output_name)
         yield "CMakeLists.txt"
 
@@ -87,13 +88,13 @@ class Plugin(PluginBase):
             cmake_filename,
         ) = context["output_filenames"]
 
-        context = context["plugin_context"]
+        plugin_context = context["plugin_context"]
 
         status_stream.write("'{}'...".format(cpp_filename))
         with status_stream.DoneManager() as dm:
             dm.result = CreateCppWrapper(
                 cpp_filename,
-                context,
+                plugin_context,
                 cls._GenerateFileHeader,
             )
             if dm.result != 0:
@@ -103,7 +104,7 @@ class Plugin(PluginBase):
         with status_stream.DoneManager() as dm:
             dm.result = CreateCsFile(
                 cs_filename,
-                context,
+                plugin_context,
                 cls._GenerateFileHeader,
             )
             if dm.result != 0:
@@ -113,8 +114,12 @@ class Plugin(PluginBase):
         with status_stream.DoneManager() as dm:
             dm.result = CreateCMakeFile(
                 cmake_filename,
-                context,
+                plugin_context,
+                context["output_name"],
+                context["inputs"],
+                cpp_filename,
                 cls._GenerateFileHeader,
+                binary_version=context["plugin_settings"]["binary_version"],
             )
             if dm.result != 0:
                 return dm.result
