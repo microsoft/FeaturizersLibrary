@@ -17,9 +17,9 @@ _script_fullpath                            = CommonEnvironment.ThisFullpath()
 _script_dir, _script_name                   = os.path.split(_script_fullpath)
 # ----------------------------------------------------------------------
 
-sys.path.insert(0, os.path.join(_script_dir, ".."))
+sys.path.insert(0, os.path.join(_script_dir, "..", ".."))
 with CallOnExit(lambda: sys.path.pop(0)):
-    from CodeGenerator import *
+    from Impl.CodeGenerator import *
 
 # ----------------------------------------------------------------------
 class StandardTests(unittest.TestCase):
@@ -95,7 +95,7 @@ class CreateContextTests(unittest.TestCase):
     def test_ValidPluginSettings(self):
         self._mock.GenerateCustomMetadataSettingsAndDefaults.return_value = [("Custom", True)]
 
-        with unittest.mock.patch("CodeGenerator.ExtractContent") as mocked:
+        with unittest.mock.patch("Impl.CodeGenerator.ExtractContent") as mocked:
             result = self._code_generator._CreateContext(
                 {
                     "inputs": [],

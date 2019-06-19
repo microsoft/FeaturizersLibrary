@@ -22,7 +22,7 @@ from CommonEnvironment.TypeInfo.FundamentalTypes.All import CreateFromPythonType
 from CommonEnvironment.TypeInfo.FundamentalTypes.FilenameTypeInfo import FilenameTypeInfo
 from CommonEnvironment.TypeInfo.FundamentalTypes.Serialization.StringSerialization import StringSerialization
 
-from ContentExtractor import ExtractContent
+from Impl.ContentExtractor import ExtractContent
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -125,7 +125,7 @@ def CreateCodeGenerator(plugin):
         @classmethod
         @Interface.override
         def _GetAdditionalGeneratorItems(cls, context):
-            return plugin.GetAdditionalGeneratorFilenames() + super(CodeGenerator, cls)._GetAdditionalGeneratorItems(context)
+            return [plugin] + plugin.GetAdditionalGeneratorFilenames() + super(CodeGenerator, cls)._GetAdditionalGeneratorItems(context)
 
         # ----------------------------------------------------------------------
         @staticmethod
