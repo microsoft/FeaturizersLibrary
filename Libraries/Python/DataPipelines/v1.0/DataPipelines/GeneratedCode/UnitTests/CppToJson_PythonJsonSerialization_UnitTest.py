@@ -27,90 +27,274 @@ class TestSuite(unittest.TestCase):
         result = Deserialize(
             [
                 {
-                    "func_name": "Name",
-                    "raw_return_type": "int1",
-                    "simple_return_type": "int2",
+                    "function_list": [
+                        {
+                            "func_name": "Name",
+                            "raw_return_type": "int1",
+                            "simple_return_type": "int2",
+                        }
+                    ]
                 },
             ],
         )
-
+        
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].func_name, "Name")
-        self.assertEqual(result[0].raw_return_type, "int1")
-        self.assertEqual(result[0].simple_return_type, "int2")
-        self.assertTrue(not hasattr(result[0], "var_names"))
-        self.assertTrue(not hasattr(result[0], "raw_var_types"))
-        self.assertTrue(not hasattr(result[0], "simple_var_types"))
-        self.assertTrue(not hasattr(result[0], "declaration_line"))
-        self.assertTrue(not hasattr(result[0], "definition_line"))
+        self.assertEqual(result[0].function_list[0].func_name, "Name")
+        self.assertEqual(result[0].function_list[0].raw_return_type, "int1")
+        self.assertEqual(result[0].function_list[0].simple_return_type, "int2")
+        self.assertTrue(not hasattr(result[0].function_list[0], "var_names"))
+        self.assertTrue(not hasattr(result[0].function_list[0], "raw_var_types"))
+        self.assertTrue(not hasattr(result[0].function_list[0], "simple_var_types"))
+        self.assertTrue(not hasattr(result[0].function_list[0], "declaration_line"))
+        self.assertTrue(not hasattr(result[0].function_list[0], "definition_line"))
+
+        self.assertTrue(not hasattr(result[0], "struct_list"))
+        self.assertTrue(not hasattr(result[0], "include_list"))
 
     # ----------------------------------------------------------------------
     def test_WithArgs(self):
         result = Deserialize(
             [
                 {
-                    "func_name": "Name",
-                    "raw_return_type": "int1",
-                    "simple_return_type": "int2",
-                    "var_names": ["a", "b",],
-                    "raw_var_types": ["c", "d",],
-                    "simple_var_types": ["e", "f",],
-                    "declaration_line": 3,
-                    "definition_line": 7,
+                    "function_list": [
+                        {
+                            "func_name": "Name",
+                            "raw_return_type": "int1",
+                            "simple_return_type": "int2",
+                            "var_names": ["a", "b",],
+                            "raw_var_types": ["c", "d",],
+                            "simple_var_types": ["e", "f",],
+                            "declaration_line": 3,
+                            "definition_line": 7,
+                        }
+                    ]
                 },
             ],
         )
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].func_name, "Name")
-        self.assertEqual(result[0].raw_return_type, "int1")
-        self.assertEqual(result[0].simple_return_type, "int2")
-        self.assertEqual(result[0].var_names, ["a", "b",])
-        self.assertEqual(result[0].raw_var_types, ["c", "d",])
-        self.assertEqual(result[0].simple_var_types, ["e", "f",])
-        self.assertEqual(result[0].declaration_line, 3)
-        self.assertEqual(result[0].definition_line, 7)
+        self.assertEqual(result[0].function_list[0].func_name, "Name")
+        self.assertEqual(result[0].function_list[0].raw_return_type, "int1")
+        self.assertEqual(result[0].function_list[0].simple_return_type, "int2")
+        self.assertEqual(result[0].function_list[0].var_names, ["a", "b",])
+        self.assertEqual(result[0].function_list[0].raw_var_types, ["c", "d",])
+        self.assertEqual(result[0].function_list[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].function_list[0].declaration_line, 3)
+        self.assertEqual(result[0].function_list[0].definition_line, 7)
+
+        self.assertTrue(not hasattr(result[0], "struct_list"))
+        self.assertTrue(not hasattr(result[0], "include_list"))
 
     # ----------------------------------------------------------------------
     def test_Multiple(self):
         result = Deserialize(
             [
                 {
-                    "func_name": "Name1",
-                    "raw_return_type": "int1",
-                    "simple_return_type": "int2",
-                    "definition_line": 12,
-                },
-                {
-                    "func_name": "Name2",
-                    "raw_return_type": "int3",
-                    "simple_return_type": "int4",
-                    "definition_line": 34,
+                    "function_list": [
+                        {
+                            "func_name": "Name1",
+                            "raw_return_type": "int1",
+                            "simple_return_type": "int2",
+                            "definition_line": 12,
+                        },
+                        {
+                            "func_name": "Name2",
+                            "raw_return_type": "int3",
+                            "simple_return_type": "int4",
+                            "definition_line": 34,
+                        },
+                    ]
                 },
             ],
         )
 
-        self.assertEqual(len(result), 2)
+        self.assertEqual(len(result[0].function_list), 2)
 
-        self.assertEqual(result[0].func_name, "Name1")
-        self.assertEqual(result[0].raw_return_type, "int1")
-        self.assertEqual(result[0].simple_return_type, "int2")
-        self.assertEqual(result[0].definition_line, 12)
-        self.assertTrue(not hasattr(result[0], "var_names"))
-        self.assertTrue(not hasattr(result[0], "raw_var_types"))
-        self.assertTrue(not hasattr(result[0], "simple_var_types"))
-        self.assertTrue(not hasattr(result[0], "declaration_line"))
+        self.assertEqual(result[0].function_list[0].func_name, "Name1")
+        self.assertEqual(result[0].function_list[0].raw_return_type, "int1")
+        self.assertEqual(result[0].function_list[0].simple_return_type, "int2")
+        self.assertEqual(result[0].function_list[0].definition_line, 12)
+        self.assertTrue(not hasattr(result[0].function_list[0], "var_names"))
+        self.assertTrue(not hasattr(result[0].function_list[0], "raw_var_types"))
+        self.assertTrue(not hasattr(result[0].function_list[0], "simple_var_types"))
+        self.assertTrue(not hasattr(result[0].function_list[0], "declaration_line"))
 
-        self.assertEqual(result[1].func_name, "Name2")
-        self.assertEqual(result[1].raw_return_type, "int3")
-        self.assertEqual(result[1].simple_return_type, "int4")
-        self.assertEqual(result[1].definition_line, 34)
-        self.assertTrue(not hasattr(result[1], "var_names"))
-        self.assertTrue(not hasattr(result[1], "raw_var_types"))
-        self.assertTrue(not hasattr(result[1], "simple_var_types"))
-        self.assertTrue(not hasattr(result[1], "declaration_line"))
+        self.assertEqual(result[0].function_list[1].func_name, "Name2")
+        self.assertEqual(result[0].function_list[1].raw_return_type, "int3")
+        self.assertEqual(result[0].function_list[1].simple_return_type, "int4")
+        self.assertEqual(result[0].function_list[1].definition_line, 34)
+        self.assertTrue(not hasattr(result[0].function_list[1], "var_names"))
+        self.assertTrue(not hasattr(result[0].function_list[1], "raw_var_types"))
+        self.assertTrue(not hasattr(result[0].function_list[1], "simple_var_types"))
+        self.assertTrue(not hasattr(result[0].function_list[1], "declaration_line"))
+
+        self.assertTrue(not hasattr(result[0], "struct_list"))
+        self.assertTrue(not hasattr(result[0], "include_list"))
 
     # ----------------------------------------------------------------------
+    def test_NoConstructor(self):
+        result = Deserialize(
+            [
+                {
+                    "struct_list": [
+                        {
+                            "struct_name": "Name",
+                            "var_names": ["a", "b",],
+                            "raw_var_types": ["c", "d",],
+                            "simple_var_types": ["e", "f",],
+                            "definition_line": 7,
+                        }
+                    ]
+                },
+            ],
+        )
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].struct_list[0].struct_name, "Name")
+        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
+        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
+        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].struct_list[0].definition_line, 7)
+        self.assertTrue(not hasattr(result[0].struct_list[0], "constructor_list"))
+
+        self.assertTrue(not hasattr(result[0], "function_list"))
+        self.assertTrue(not hasattr(result[0], "include_list"))
+
+    # ----------------------------------------------------------------------
+    def test_WithConstructor(self):
+        result = Deserialize(
+            [
+                {
+                    "struct_list": [
+                        {
+                            "struct_name": "Name",
+                            "var_names": ["a", "b",],
+                            "raw_var_types": ["c", "d",],
+                            "simple_var_types": ["e", "f",],
+                            "definition_line": 7,
+                            "constructor_list": [
+                                {
+                                    "constructor_name": "CName",
+                                    "arg_names": ['arg1', 'arg2'],
+                                    "raw_arg_types": ['a', 'b'],
+                                    "simple_arg_types": ['c', 'd'],
+                                    "definition_line": 13,
+                                }
+                            ]
+                        }
+                    ]
+                },
+            ],
+        )
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].struct_list[0].struct_name, "Name")
+        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
+        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
+        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].struct_list[0].definition_line, 7)
+
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].constructor_name, "CName")
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].arg_names, ['arg1', 'arg2'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].raw_arg_types, ['a', 'b'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].simple_arg_types, ['c', 'd'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].definition_line, 13)
+
+        self.assertTrue(not hasattr(result[0], "function_list"))
+        self.assertTrue(not hasattr(result[0], "include_list"))
+
+        # ----------------------------------------------------------------------
+    def test_WithMultipleConstructors(self):
+        result = Deserialize(
+            [
+                {
+                    "struct_list": [
+                        {
+                            "struct_name": "Name",
+                            "var_names": ["a", "b",],
+                            "raw_var_types": ["c", "d",],
+                            "simple_var_types": ["e", "f",],
+                            "definition_line": 7,
+                            "constructor_list": [
+                                {
+                                    "constructor_name": "CName",
+                                    "arg_names": ['arg1', 'arg2'],
+                                    "raw_arg_types": ['a', 'b'],
+                                    "simple_arg_types": ['c', 'd'],
+                                    "definition_line": 13,
+                                },
+                                {
+                                    "constructor_name": "CName2",
+                                    "arg_names": ['arg12', 'arg22'],
+                                    "raw_arg_types": ['a2', 'b2'],
+                                    "simple_arg_types": ['c2', 'd2'],
+                                    "definition_line": 132,
+                                },
+                            ]
+                        }
+                    ]
+                },
+            ],
+        )
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].struct_list[0].struct_name, "Name")
+        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
+        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
+        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].struct_list[0].definition_line, 7)
+
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].constructor_name, "CName")
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].arg_names, ['arg1', 'arg2'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].raw_arg_types, ['a', 'b'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].simple_arg_types, ['c', 'd'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].definition_line, 13)
+
+        self.assertEqual(result[0].struct_list[0].constructor_list[1].constructor_name, "CName2")
+        self.assertEqual(result[0].struct_list[0].constructor_list[1].arg_names, ['arg12', 'arg22'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[1].raw_arg_types, ['a2', 'b2'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[1].simple_arg_types, ['c2', 'd2'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[1].definition_line, 132)
+
+        self.assertTrue(not hasattr(result[0], "function_list"))
+        self.assertTrue(not hasattr(result[0], "include_list"))
+
+
+    # ----------------------------------------------------------------------
+    def test_include(self):
+        result = Deserialize(
+            [
+                {
+                    "include_list": ["vector"]
+                },
+            ],
+        )
+        
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].include_list, ["vector"])
+
+        self.assertTrue(not hasattr(result[0], "function_list"))
+        self.assertTrue(not hasattr(result[0], "struct_list"))
+    # ----------------------------------------------------------------------
+
+    def test_multiple_includes(self):
+        result = Deserialize(
+            [
+                {
+                    "include_list": ["vector", "a", "b", "c"]
+                },
+            ],
+        )
+        
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].include_list, ["vector", "a", "b", "c"])
+
+        self.assertTrue(not hasattr(result[0], "function_list"))
+        self.assertTrue(not hasattr(result[0], "struct_list"))
+
+    # ----------------------------------------------------------------------
+
+    
     def test_InvalidName(self):
         self.assertRaisesRegex(
             Exception,
@@ -118,12 +302,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": None,
-                        "raw_return_type": "int1",
-                        "simple_return_type": "int2",
+                        "function_list": [
+                            {
+                                "func_name": None,
+                                "raw_return_type": "int1",
+                                "simple_return_type": "int2",
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
 
         self.assertRaisesRegex(
@@ -132,12 +320,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "",
-                        "raw_return_type": "int1",
-                        "simple_return_type": "int2",
+                        "function_list": [
+                            {
+                                "func_name": "",
+                                "raw_return_type": "int1",
+                                "simple_return_type": "int2",
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
 
     # ----------------------------------------------------------------------
@@ -148,12 +340,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": None,
-                        "simple_return_type": "int2",
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": None,
+                                "simple_return_type": "int2",
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
 
         self.assertRaisesRegex(
@@ -162,12 +358,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "",
-                        "simple_return_type": "int2",
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "",
+                                "simple_return_type": "int2",
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
 
     # ----------------------------------------------------------------------
@@ -178,12 +378,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "int1",
-                        "simple_return_type": None,
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "int1",
+                                "simple_return_type": None,
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
 
         self.assertRaisesRegex(
@@ -192,12 +396,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "int1",
-                        "simple_return_type": "",
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "int1",
+                                "simple_return_type": "",
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
 
     # ----------------------------------------------------------------------
@@ -208,15 +416,19 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "int1",
-                        "simple_return_type": "int2",
-                        "var_names": [None, "b",],
-                        "raw_var_types": ["c", "d",],
-                        "simple_var_types": ["e", "f",],
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "int1",
+                                "simple_return_type": "int2",
+                                "var_names": [None, "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
 
         self.assertRaisesRegex(
@@ -225,15 +437,19 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "int1",
-                        "simple_return_type": "int2",
-                        "var_names": ["", "b",],
-                        "raw_var_types": ["c", "d",],
-                        "simple_var_types": ["e", "f",],
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "int1",
+                                "simple_return_type": "int2",
+                                "var_names": ["", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
 
     # ----------------------------------------------------------------------
@@ -244,15 +460,19 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "int1",
-                        "simple_return_type": "int2",
-                        "var_names": ["a", "b",],
-                        "raw_var_types": ["c", None,],
-                        "simple_var_types": ["e", "f",],
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "int1",
+                                "simple_return_type": "int2",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", None,],
+                                "simple_var_types": ["e", "f",],
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
 
         self.assertRaisesRegex(
@@ -261,15 +481,19 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "int1",
-                        "simple_return_type": "int2",
-                        "var_names": ["a", "b",],
-                        "raw_var_types": ["c", "",],
-                        "simple_var_types": ["e", "f",],
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "int1",
+                                "simple_return_type": "int2",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "",],
+                                "simple_var_types": ["e", "f",],
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
 
     # ----------------------------------------------------------------------
@@ -280,15 +504,19 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "int1",
-                        "simple_return_type": "int2",
-                        "var_names": ["a", "b",],
-                        "raw_var_types": ["c", "d",],
-                        "simple_var_types": ["e", None, "g",],
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "int1",
+                                "simple_return_type": "int2",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", None, "g",],
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
 
         self.assertRaisesRegex(
@@ -297,15 +525,19 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "int1",
-                        "simple_return_type": "int2",
-                        "var_names": ["", "b",],
-                        "raw_var_types": ["c", "d",],
-                        "simple_var_types": ["e", "", "g",],
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "int1",
+                                "simple_return_type": "int2",
+                                "var_names": ["", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "", "g",],
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
      # ----------------------------------------------------------------------
     def test_InvalidDeclarationLine(self):
@@ -315,13 +547,17 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "int1",
-                        "simple_return_type": "int1",
-                        "declaration_line": 0,
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "int1",
+                                "simple_return_type": "int1",
+                                "declaration_line": 0,
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
         self.assertRaisesRegex(
             Exception,
@@ -329,13 +565,17 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "int1",
-                        "simple_return_type": "int1",
-                        "declaration_line": "String",
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "int1",
+                                "simple_return_type": "int1",
+                                "declaration_line": "String",
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
      # ----------------------------------------------------------------------
     def test_InvalidDefinitionLine(self):
@@ -345,13 +585,17 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "int1",
-                        "simple_return_type": "int1",
-                        "definition_line": 0,
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "int1",
+                                "simple_return_type": "int1",
+                                "definition_line": 0,
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
         self.assertRaisesRegex(
             Exception,
@@ -359,16 +603,570 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "func_name": "Name",
-                        "raw_return_type": "int1",
-                        "simple_return_type": "int1",
-                        "definition_line": "String",
+                        "function_list": [
+                            {
+                                "func_name": "Name",
+                                "raw_return_type": "int1",
+                                "simple_return_type": "int1",
+                                "definition_line": "String",
+                            },
+                        ]
                     },
                 ],
-            ),
+            )
         )
 
     # ----------------------------------------------------------------------
+
+    def test_InvalidNameStruct(self):
+        self.assertRaisesRegex(
+            Exception,
+            "An item was expected",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": None,
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+        self.assertRaisesRegex(
+            Exception,
+            "'' is not a valid 'String' string - Value must have at least 1 character",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+    # ----------------------------------------------------------------------
+
+    def test_InvalidVarNameStruct(self):
+        self.assertRaisesRegex(
+            Exception,
+            "expected string or bytes-like object",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": [None, "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+        self.assertRaisesRegex(
+            Exception,
+            "'' is not a valid 'String' string - Value must have at least 1 character",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+    # ----------------------------------------------------------------------
+    
+    def test_InvalidRawVarTypeStruct(self):
+        self.assertRaisesRegex(
+            Exception,
+            "expected string or bytes-like object",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": [None, "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+        self.assertRaisesRegex(
+            Exception,
+            "'' is not a valid 'String' string - Value must have at least 1 character",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+    # ----------------------------------------------------------------------
+
+    
+    def test_InvalidSimpleVarTypeStruct(self):
+        self.assertRaisesRegex(
+            Exception,
+            "expected string or bytes-like object",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": [None, "f",],
+                                "definition_line": 7,
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+        self.assertRaisesRegex(
+            Exception,
+            "'' is not a valid 'String' string - Value must have at least 1 character",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["", "f",],
+                                "definition_line": 7,
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+    # ----------------------------------------------------------------------
+
+    def test_InvalidDefinitionLineStruct(self):
+        self.assertRaisesRegex(
+            Exception,
+            "0 is not >= 1",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 0,
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+        self.assertRaisesRegex(
+            Exception,
+            "'String' is not a valid 'Integer' string - Value must be >= 1",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": "String",
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+    # ----------------------------------------------------------------------
+
+    def test_InvalidNameConstructor(self):
+        self.assertRaisesRegex(
+            Exception,
+            "An item was expected",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                                "constructor_list": [
+                                    {
+                                        "constructor_name": None,
+                                        "arg_names": ["ca", "cb"],
+                                        "raw_arg_types": ["cc", "cd"],
+                                        "simple_arg_types": ["ce", "cf"],
+                                        "definition_line": 14
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+        self.assertRaisesRegex(
+            Exception,
+            "'' is not a valid 'String' string - Value must have at least 1 character",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                                "constructor_list": [
+                                    {
+                                        "constructor_name": "",
+                                        "arg_names": ["ca", "cb"],
+                                        "raw_arg_types": ["cc", "cd"],
+                                        "simple_arg_types": ["ce", "cf"],
+                                        "definition_line": 14
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+    # ----------------------------------------------------------------------
+
+    def test_InvalidArgNamesConstructor(self):
+        self.assertRaisesRegex(
+            Exception,
+            "expected string or bytes-like object",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                                "constructor_list": [
+                                    {
+                                        "constructor_name": "Cname",
+                                        "arg_names": [None, "cb"],
+                                        "raw_arg_types": ["cc", "cd"],
+                                        "simple_arg_types": ["ce", "cf"],
+                                        "definition_line": 14
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+        self.assertRaisesRegex(
+            Exception,
+            "'' is not a valid 'String' string - Value must have at least 1 character",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                                "constructor_list": [
+                                    {
+                                        "constructor_name": "Cname",
+                                        "arg_names": ["", "cb"],
+                                        "raw_arg_types": ["cc", "cd"],
+                                        "simple_arg_types": ["ce", "cf"],
+                                        "definition_line": 14
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+    # ----------------------------------------------------------------------
+
+    def test_InvalidRawArgTypesConstructor(self):
+        self.assertRaisesRegex(
+            Exception,
+            "expected string or bytes-like object",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                                "constructor_list": [
+                                    {
+                                        "constructor_name": "Cname",
+                                        "arg_names": ["ca", "cb"],
+                                        "raw_arg_types": [None, "cd"],
+                                        "simple_arg_types": ["ce", "cf"],
+                                        "definition_line": 14
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+        self.assertRaisesRegex(
+            Exception,
+            "'' is not a valid 'String' string - Value must have at least 1 character",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                                "constructor_list": [
+                                    {
+                                        "constructor_name": "Cname",
+                                        "arg_names": ["ca", "cb"],
+                                        "raw_arg_types": ["", "cd"],
+                                        "simple_arg_types": ["ce", "cf"],
+                                        "definition_line": 14
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+    # ----------------------------------------------------------------------
+
+    def test_InvalidSimpleArgTypesConstructor(self):
+        self.assertRaisesRegex(
+            Exception,
+            "expected string or bytes-like object",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                                "constructor_list": [
+                                    {
+                                        "constructor_name": "Cname",
+                                        "arg_names": ["ca", "cb"],
+                                        "raw_arg_types": ["cc", "cd"],
+                                        "simple_arg_types": [None, "cf"],
+                                        "definition_line": 14
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+        self.assertRaisesRegex(
+            Exception,
+            "'' is not a valid 'String' string - Value must have at least 1 character",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                                "constructor_list": [
+                                    {
+                                        "constructor_name": "Cname",
+                                        "arg_names": ["ca", "cb"],
+                                        "raw_arg_types": ["cc", "cd"],
+                                        "simple_arg_types": ["", "cf"],
+                                        "definition_line": 14
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+    # ----------------------------------------------------------------------
+
+    def test_InvalidDefinitionLineConstructor(self):
+        self.assertRaisesRegex(
+            Exception,
+            "0 is not >= 1",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 0,
+                                "constructor_list": [
+                                    {
+                                        "constructor_name": "Cname",
+                                        "arg_names": ["ca", "cb"],
+                                        "raw_arg_types": ["cc", "cd"],
+                                        "simple_arg_types": ["ce", "cf"],
+                                        "definition_line": 0
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+        self.assertRaisesRegex(
+            Exception,
+            "'String' is not a valid 'Integer' string - Value must be >= 1",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "struct_name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": "String",
+                                "constructor_list": [
+                                    {
+                                        "constructor_name": "Cname",
+                                        "arg_names": ["ca", "cb"],
+                                        "raw_arg_types": ["cc", "cd"],
+                                        "simple_arg_types": ["ce", "cf"],
+                                        "definition_line": "String"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+    # ----------------------------------------------------------------------
+
+    def test_InvalidIncludeList(self):
+        self.assertRaisesRegex(
+            Exception,
+            "expected string or bytes-like object",
+            lambda: Deserialize(
+                [
+                    {
+                        "include_list": [None, "vector"]
+                    },
+                ],
+            )
+        )
+
+        self.assertRaisesRegex(
+            Exception,
+            "'' is not a valid 'String' string - Value must have at least 1 character",
+            lambda: Deserialize(
+                [
+                    {
+                        "include_list": ["", "vector"]
+                    },
+                ],
+            )
+        )
+
+    # ----------------------------------------------------------------------
+    
+    
     def test_ProcessAdditionalData(self):
         input = [
             {
