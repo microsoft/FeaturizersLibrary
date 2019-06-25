@@ -1,6 +1,6 @@
 #include <iostream>
-#include <stdio.h>
-#include <string>
+
+
 
 int add(float a, int b){
     return a + b;

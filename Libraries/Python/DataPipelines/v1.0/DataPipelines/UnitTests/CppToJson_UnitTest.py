@@ -19,6 +19,8 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
 
         self.assertEqual(func_list[0]['func_name'], 'add')
         self.assertEqual(func_list[0]['raw_return_type'], 'int')
@@ -38,6 +40,10 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 4)
         self.assertEqual(func_list[1]['declaration_line'], None)
 
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(include_list, [])
+
+
     def test_vector_func(self):
         s = textwrap.dedent('''\
             #include <vector>
@@ -54,6 +60,8 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
 
         self.assertEqual(func_list[0]['func_name'], 'counting')
         self.assertEqual(func_list[0]['raw_return_type'], 'std::vector<int>')
@@ -73,6 +81,9 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 10)
         self.assertEqual(func_list[1]['declaration_line'], None)
 
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(len(include_list), 1)
+
 
     def test_vector_using_std_func(self):
         s = textwrap.dedent('''\
@@ -90,6 +101,8 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
 
         self.assertEqual(func_list[0]['func_name'], 'counting')
         self.assertEqual(func_list[0]['raw_return_type'], 'vector<int>')
@@ -109,6 +122,9 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 10)
         self.assertEqual(func_list[1]['declaration_line'], None)
 
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(len(include_list), 1)
+
     def test_vector_map(self):
         s = textwrap.dedent('''\
             #include <vector>
@@ -126,6 +142,8 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
 
         self.assertEqual(func_list[0]['func_name'], 'counting')
         self.assertEqual(func_list[0]['raw_return_type'], 'vector<vector<int> >')
@@ -145,6 +163,9 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 11)
         self.assertEqual(func_list[1]['declaration_line'], None)
 
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(len(include_list), 2)
+
     def test_many_arguments(self):
         s = textwrap.dedent('''\
             int two(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j,
@@ -158,6 +179,9 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+
         self.assertEqual(func_list[0]['func_name'], 'two')
         self.assertEqual(func_list[0]['raw_return_type'], 'int')
         self.assertEqual(func_list[0]['simple_return_type'], 'int')
@@ -176,6 +200,9 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 7)
         self.assertEqual(func_list[1]['declaration_line'], None)
 
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(include_list, [])
+
     def test_many_arguments_ref(self):
         s = textwrap.dedent('''\
             int two(int **a, int **b, int **c, int **d, int **e, int **f, int **g, int **h,
@@ -189,6 +216,9 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+
         self.assertEqual(func_list[0]['func_name'], 'two')
         self.assertEqual(func_list[0]['raw_return_type'], 'int')
         self.assertEqual(func_list[0]['simple_return_type'], 'int')
@@ -207,6 +237,9 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 7)
         self.assertEqual(func_list[1]['declaration_line'], None)
 
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(include_list, [])
+
     def test_const_ret(self):
         s = textwrap.dedent('''\
             const float square(float x){
@@ -218,6 +251,9 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+
         self.assertEqual(func_list[0]['func_name'], 'square')
         self.assertEqual(func_list[0]['raw_return_type'], 'const float')
         self.assertEqual(func_list[0]['simple_return_type'], 'float')
@@ -236,6 +272,9 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 5)
         self.assertEqual(func_list[1]['declaration_line'], None)
 
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(include_list, [])
+
     def test_const_arg(self):
         s = textwrap.dedent('''\
             float sum(const float x, const int y){
@@ -246,6 +285,9 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+
         self.assertEqual(func_list[0]['func_name'], 'sum')
         self.assertEqual(func_list[0]['raw_return_type'], 'float')
         self.assertEqual(func_list[0]['simple_return_type'], 'float')
@@ -264,6 +306,9 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 4)
         self.assertEqual(func_list[1]['declaration_line'], None)
 
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(include_list, [])
+
     def test_map_vec_ref(self):
         s = textwrap.dedent( '''\
             #include <vector>
@@ -281,6 +326,9 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+
         self.assertEqual(func_list[0]['func_name'], 'nonsense')
         self.assertEqual(func_list[0]['raw_return_type'], 'vector<map<int, float> > *')
         self.assertEqual(func_list[0]['simple_return_type'], 'vector<map<int, float> >')
@@ -299,12 +347,17 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 11)
         self.assertEqual(func_list[1]['declaration_line'], None)
 
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(len(include_list), 2)
+
     def test_struct_unsupported(self):
         was_called = False
 
         s = textwrap.dedent( '''\
+            #include <utility>
             struct x{
                 int a, b;
+                x(struct x &&other): a(std::move(other.a)), b(std::move(other.b)){}
             };
 
             int go(struct x ya){
@@ -319,15 +372,74 @@ class FuncTest(unittest.TestCase):
         def onUnsupportedFunc(func, filename, line):
             nonlocal was_called
             was_called = True
-            self.assertTrue([func, filename, line] in [['go', None, 5], ['main', None, 9]])
+            self.assertTrue([func, filename, line] in [['x', None, 2], ['go', None, 7], ['main', None, 11]])
 
         # ----------------------------------------------------------------------
 
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
+        
 
         self.assertEqual(was_called, True)
 
         self.assertEqual(func_list, [])
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(len(include_list), 1)
+
+    def test_struct_supported(self):
+
+        s = textwrap.dedent( '''\
+            #include <utility>
+            struct x{
+                int a, b;
+                x(struct x &&other): a(std::move(other.a)), b(std::move(other.b)){}
+            };
+
+            int go(struct x ya){
+                return 2;
+            }
+
+            int main(){
+                return 0;
+            }
+        ''')
+
+        func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+
+        self.assertEqual(func_list[0]['func_name'], 'go')
+        self.assertEqual(func_list[0]['raw_return_type'], 'int')
+        self.assertEqual(func_list[0]['simple_return_type'], 'int')
+        self.assertEqual(func_list[0]['var_names'], ['ya'])
+        self.assertEqual(func_list[0]['raw_var_types'], ['x'])
+        self.assertEqual(func_list[0]['simple_var_types'], ['x'])
+        self.assertEqual(func_list[0]['definition_line'], 7)
+        self.assertEqual(func_list[0]['declaration_line'], None)
+
+        self.assertEqual(func_list[1]['func_name'], 'main')
+        self.assertEqual(func_list[1]['raw_return_type'], 'int')
+        self.assertEqual(func_list[1]['simple_return_type'], 'int')
+        self.assertEqual(func_list[1]['var_names'], [])
+        self.assertEqual(func_list[1]['raw_var_types'], [])
+        self.assertEqual(func_list[1]['simple_var_types'], [])
+        self.assertEqual(func_list[1]['definition_line'], 11)
+        self.assertEqual(func_list[1]['declaration_line'], None)
+
+        self.assertEqual(obj_type_list[0]['name'], 'x')
+        self.assertEqual(obj_type_list[0]['var_names'], ['a', 'b'])
+        self.assertEqual(obj_type_list[0]['raw_var_types'], ['int', 'int'])
+        self.assertEqual(obj_type_list[0]['simple_var_types'], ['int', 'int'])
+        self.assertEqual(obj_type_list[0]['definition_line'], 2)
+
+        self.assertEqual(len(obj_type_list[0]['constructor_list']), 1)
+        self.assertEqual(obj_type_list[0]['constructor_list'][0]['arg_names'], ['other'])
+        self.assertEqual(obj_type_list[0]['constructor_list'][0]['raw_arg_types'], ['x &&'])
+        self.assertEqual(obj_type_list[0]['constructor_list'][0]['simple_arg_types'], ['x'])
+        self.assertEqual(obj_type_list[0]['constructor_list'][0]['definition_line'], 4)
+
+        self.assertEqual(len(include_list), 1)
 
 
     def test_class_unsupported(self):
@@ -359,14 +471,18 @@ class FuncTest(unittest.TestCase):
         def onUnsupportedFunc(func, filename, line):
             nonlocal was_called
             was_called = True
-            self.assertTrue([func, filename, line] in [['operator+', None, 11], ['main', None, 18]])
+            self.assertTrue([func, filename, line] in [['Point', None, 1], ['operator+', None, 11], ['main', None, 18]])
 
         # ----------------------------------------------------------------------
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
 
         self.assertEqual(was_called, True)
 
         self.assertEqual(func_list, [])
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(include_list, [])
 
     def test_declaration(self):
         s = textwrap.dedent('''\
@@ -382,6 +498,9 @@ class FuncTest(unittest.TestCase):
 
 
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+
         self.assertEqual(func_list[0]['func_name'], 'add')
         self.assertEqual(func_list[0]['raw_return_type'], 'int')
         self.assertEqual(func_list[0]['simple_return_type'], 'int')
@@ -399,6 +518,9 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 6)
         self.assertEqual(func_list[1]['declaration_line'], None)
+
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(include_list, [])
 
     def test_namespace_declaration(self):
         s = textwrap.dedent('''\
@@ -419,6 +541,9 @@ class FuncTest(unittest.TestCase):
 
 
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+
         self.assertEqual(func_list[0]['func_name'], 'DataPipelines::Arithmetic::thisGuy')
         self.assertEqual(func_list[0]['raw_return_type'], 'void')
         self.assertEqual(func_list[0]['simple_return_type'], 'void')
@@ -437,6 +562,9 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 11)
         self.assertEqual(func_list[1]['declaration_line'], None)
 
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(include_list, [])
+
     def test_namespace_func(self):
         s = textwrap.dedent('''\
             #include <stdint.h>
@@ -451,6 +579,9 @@ class FuncTest(unittest.TestCase):
 
 
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, None, lambda type: True))
+
         self.assertEqual(func_list[0]['func_name'], 'DataPipelines::Arithmetic::Add')
         self.assertEqual(func_list[0]['raw_return_type'], 'int64_t')
         self.assertEqual(func_list[0]['simple_return_type'], 'int64_t')
@@ -459,6 +590,9 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['simple_var_types'], ['int64_t', 'int64_t'])
         self.assertEqual(func_list[0]['definition_line'], 6)
         self.assertEqual(func_list[0]['declaration_line'], None)
+
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(len(include_list), 1)
 
     def test_namespace_unsupported(self):
         was_called = False
@@ -486,23 +620,35 @@ class FuncTest(unittest.TestCase):
         def onUnsupportedFunc(func, filename, line):
             nonlocal was_called
             was_called = True
-            self.assertEqual(func, "DataPipelines::Arithmetic::Add")
-            self.assertEqual(filename, None)
-            self.assertEqual(line, 11)
+            self.assertTrue([func, filename, line] in [["DataPipelines::Arithmetic::MyStruct", None, 6], ["DataPipelines::Arithmetic::Add", None, 11]])
 
         # ----------------------------------------------------------------------
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
+        obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
+        include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
 
         self.assertEqual(was_called, True)
 
         self.assertEqual(func_list, [])
+        self.assertEqual(obj_type_list, [])
+        self.assertEqual(len(include_list), 1)
 
     def _GetFuncList(self, results):
         self.assertEqual(len(results), 1)
         self.assertEqual(None, list(results.keys())[0])
 
-        return results[None]
+        return results[None]['function_list']
+    def _GetObjList(self, results):
+        self.assertEqual(len(results), 1)
+        self.assertEqual(None, list(results.keys())[0])
 
+        return results[None]['object_type_list']
+
+    def _GetIncludeList(self, results):
+        self.assertEqual(len(results), 1)
+        self.assertEqual(None, list(results.keys())[0])
+
+        return results[None]['include_list']
 
 if __name__ == '__main__':
     unittest.main()
