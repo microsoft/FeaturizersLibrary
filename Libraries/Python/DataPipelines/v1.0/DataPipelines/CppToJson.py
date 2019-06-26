@@ -46,21 +46,31 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
 
     # The way to see if this is a definition or not, is to see if 'node' has any children. 
     is_def = True
+    # There are a few kinds that are supported, even though they are not directly exposed.
+    accepted_kinds = [cindex.CursorKind.CXX_ACCESS_SPEC_DECL, cindex.CursorKind.ENUM_DECL]
+
+    # ----------------------------------------------------------------------
+    def DeleteDefault(node, speficier):
+        '''
+        This function will receive a node and a specifier (default or deleted), and check if the
+        node has the specifier in question.
+        '''
+        token_list = []
+        for token in node.get_tokens():
+            token_list.append(token.spelling)
+        return len(token_list) >= 2 and token_list[-1] == speficier and token_list[-2] == '='
+            
+    # ----------------------------------------------------------------------
+
 
     for child in node.get_children():
         is_def = False
         if child.kind == cindex.CursorKind.CONSTRUCTOR:
-            constructor = {}
-            if child.is_move_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
-                has_move_constructor = True
-            elif child.is_copy_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
-                token_list = []
-                # If this is a public copy constructor, it needs to be deleted with "=delete" 
-                for token in child.get_tokens():
-                    token_list.append(token.spelling)
-                if len(token_list) < 2 or token_list[-1] != 'delete' or token_list[-2] != '=':
-                    valid_object_type = False
+            # If this constructor ends in "=delete", ignore it.
+            if DeleteDefault(child, "delete"):
+                continue
 
+            constructor = {}
             constructor['arg_names'] = []
             constructor['raw_arg_types'] = []
             constructor['simple_arg_types'] = []
@@ -71,6 +81,20 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
                 constructor['raw_arg_types'].append(arg_type)
                 constructor['simple_arg_types'].append(SimpleVarType(arg_type))
             object_type['constructor_list'].append(constructor)
+
+            if child.is_move_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
+                has_move_constructor = True
+                if DeleteDefault(child, "default"):
+                    # If this is a default move constructor, there wont be a variable name for the
+                    # argument in the function, so I create one.
+                    assert len(constructor['arg_names']) == 1
+                    constructor['arg_names'] = ['other']
+
+            elif child.is_copy_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
+                # No public copy constructors are allowed. 
+                valid_object_type = False
+
+            
             
         elif child.kind == cindex.CursorKind.FIELD_DECL:
             object_type['var_names'].append(child.spelling)
@@ -79,24 +103,23 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
             object_type['simple_var_types'].append(SimpleVarType(var_type))
             if child.access_specifier != cindex.AccessSpecifier.PUBLIC:
                 valid_object_type = False
-        elif child.kind == cindex.CursorKind.CXX_METHOD:
-            '''
-            TODO: This will change at some point, we will want to support 'operator=' as long as it is public and 
-            a move operator. This is a small draft of what it will look like. For now, all functions are not
-            supported.
-        
+        elif child.kind == cindex.CursorKind.CXX_METHOD: 
+            # If this method ends in "=delete", ignore it.
+            if DeleteDefault(child, "delete"):
+                continue
+            
+            # 'operator=' is supported as long as it is public and a move operator. 
             move_operator_arg_type = FullVarType(node.spelling) + " &&"
             if child.spelling == "operator=" and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
                 for arg in child.get_arguments():
+                    # Check the arguments to verify that this is a move operator.
                     if FullVarType(arg.type.spelling) != move_operator_arg_type:
                         valid_object_type = False
             else:
+                # No other functions besides move operators are allowed.
                 valid_object_type = False
-            '''
-
-            valid_object_type = False
                 
-        elif child.kind != cindex.CursorKind.CXX_ACCESS_SPEC_DECL:
+        elif child.kind not in accepted_kinds:
             valid_object_type = False
 
     if not is_def and (not valid_object_type or not has_move_constructor):
@@ -154,13 +177,13 @@ def ObtainFunctions(
             file_pointer.write(file_content)
 
     # ----------------------------------------------------------------------
-    def _DeleteFile():
+    def DeleteFile():
         if is_temp_file:
             os.remove(input_filename)
 
     # ----------------------------------------------------------------------
 
-    with callOnExit.CallOnExit(_DeleteFile):
+    with callOnExit.CallOnExit(DeleteFile):
         index = cindex.Index.create()
         args = []
 
@@ -183,9 +206,17 @@ def ObtainFunctions(
         parse_queue = [input_filename]
         parsed = set()
 
-        pattern_const = re.compile("^const ")
-        pattern_star  = re.compile(r"( \*)*\**")
-        pattern_amper = re.compile("( &)*&*")
+        pattern_const = re.compile(
+            textwrap.dedent(
+                r'''(?#
+                Not a letter)(?<!\w)(?#
+                Keyword)(?P<keyword>const)(?#
+                Not a letter)(?!\w)(?#
+                )'''
+            )
+        )
+        pattern_star  = re.compile(r"\**(\* )*")
+        pattern_amper = re.compile("&*(& )*")
 
         # ----------------------------------------------------------------------
         def SimpleVarType(name):
@@ -195,8 +226,8 @@ def ObtainFunctions(
             name = re.sub(pattern_const,  "", name)
             name = re.sub(pattern_star,  "", name)
             name = re.sub(pattern_amper,  "", name)
-            return name
-
+            return name.strip()
+            
         # ----------------------------------------------------------------------
         
         class Funcs:
@@ -265,7 +296,7 @@ def ObtainFunctions(
 
             funcs_list = {}
 
-            translation_unit = index.parse(filename, args=args)
+            translation_unit = index.parse(filename, args=args  + ['-std=c++17'])
 
             diagnostics = list(translation_unit.diagnostics)
             if diagnostics:
@@ -338,6 +369,8 @@ def ObtainFunctions(
 
             # ----------------------------------------------------------------------
             def Enumerate(node):
+                if node.location.file.name == filename:
+                    pass
                 if node.kind == cindex.CursorKind.NAMESPACE:
                     for child in node.get_children():
                         Enumerate(child)
@@ -351,6 +384,12 @@ def ObtainFunctions(
                         # If None was returned, there was a problem with the ObjectType and it can't be processed
                         on_unsupported_func(_FullName(node), filename if (not is_temp_file or filename != input_filename) else None, node.location.line)
 
+                if node.kind == cindex.CursorKind.CONSTRUCTOR:
+                    '''
+                    TODO: This will support a constructor outside a struct/class. This functionality
+                    will be implemented when multiple files are supported (next PR).
+                    '''
+                    pass
 
                 if node.kind == cindex.CursorKind.FUNCTION_DECL and node.location.file.name == filename:
                     ret_type = FullVarType(node.result_type.spelling)
