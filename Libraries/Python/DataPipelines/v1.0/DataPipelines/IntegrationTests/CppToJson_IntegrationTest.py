@@ -155,6 +155,43 @@ class FileTest(unittest.TestCase):
         
         self.assertEqual(len(include_list), 1)
 
+    def test_multiple_includes(self):
+        filename = os.path.join(_script_dir, "includes.cpp")
+
+        # ----------------------------------------------------------------------
+        def Policy(var_type):
+            accepted_list = ['double', 'int32_t', 'int64_t','uint32_t','uint64_t','int', 'bool', 'float', 'char', 'vector', 'map', 'pair', 'tuple', 'string', 'void']
+            ignored_list = ['const', 'signed', 'unsigned', 'std']
+            
+            if var_type not in accepted_list and var_type not in ignored_list:
+                return False
+            return True
+        # ----------------------------------------------------------------------
+
+        all_results = CppToJson.ObtainFunctions(filename, None, Policy)
+
+        self.assertEqual(len(all_results), 3)
+
+        self.assertEqual(filename, list(all_results.keys())[0])
+        self.assertEqual(all_results[filename]["function_list"][0], {'func_name': 'gox', 'raw_return_type': 'void', 'simple_return_type': 'void', 'var_names': ['x'], 'raw_var_types': ['go'], 'simple_var_types': ['go'], 'declaration_line': None, 'definition_line': 4})
+        self.assertEqual(all_results[filename]["function_list"][1], {'func_name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'declaration_line': None, 'definition_line': 8})
+        self.assertEqual(all_results[filename]["object_type_list"], [])
+        self.assertEqual(len(all_results[filename]["include_list"]), 1)
+
+        header2 = os.path.realpath(os.path.join(_script_dir, "header2.hpp"))
+        self.assertEqual(header2, list(all_results.keys())[1])
+        self.assertEqual(all_results[header2]["function_list"], [])
+        self.assertEqual(len(all_results[header2]["object_type_list"]), 1)
+        self.assertEqual(all_results[header2]["object_type_list"][0], {'name': 'go2', 'var_names': ['a', 'b'], 'raw_var_types': ['int', 'int'], 'simple_var_types': ['int', 'int'], 'definition_line': 5, 'constructor_list': [{'arg_names': ['other'], 'raw_arg_types': ['go2 &&'], 'simple_arg_types': ['go2'], 'definition_line': 7}]})
+        self.assertEqual(len(all_results[header2]["include_list"]), 1)
+
+        header1 = os.path.realpath(os.path.join(_script_dir, "header1.hpp"))
+        self.assertEqual(header1, list(all_results.keys())[2])
+        self.assertEqual(all_results[header1]["function_list"], [])
+        self.assertEqual(len(all_results[header2]["object_type_list"]), 1)
+        self.assertEqual(all_results[header1]["object_type_list"][0], {'name': 'go', 'var_names': ['a', 'b', 'x'], 'raw_var_types': ['int', 'int', 'go2'], 'simple_var_types': ['int', 'int', 'go2'], 'definition_line': 5, 'constructor_list': [{'arg_names': ['other'], 'raw_arg_types': ['go &&'], 'simple_arg_types': ['go'], 'definition_line': 8}]})
+        self.assertEqual(len(all_results[header1]["include_list"]), 1)
+
     def _GetFuncList(self, filename, results):
         self.assertEqual(len(results), 1)
         self.assertEqual(filename, list(results.keys())[0])

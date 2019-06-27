@@ -43,6 +43,7 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
     object_type['simple_var_types'] = []
     object_type['definition_line'] = node.location.line
     object_type['constructor_list'] = []
+    object_type['file'] = os.path.realpath(node.location.file.name)
 
     # The way to see if this is a definition or not, is to see if 'node' has any children. 
     is_def = True
@@ -182,6 +183,21 @@ def ObtainFunctions(
             os.remove(input_filename)
 
     # ----------------------------------------------------------------------
+    pattern_words = re.compile(r"[\w']+")
+    def TestAndVerify(types):
+        '''
+        This is an early version of TestAndVerify that checks if a type should be accepted or not. 
+        It will find all words in the type and check them against a policy. This will be adapted as we
+        get more information about what is supported and what is not.
+        '''
+        
+        type_list = re.findall(pattern_words, types)
+        
+        for var_type in type_list:
+            if not policy(var_type):
+                return False
+        return True
+    # ----------------------------------------------------------------------
 
     with callOnExit.CallOnExit(DeleteFile):
         index = cindex.Index.create()
@@ -294,8 +310,6 @@ def ObtainFunctions(
             #           validate exclude_regexes
             #           use the correct name in on_unsupported
 
-            funcs_list = {}
-
             translation_unit = index.parse(filename, args=args  + ['-std=c++17'])
 
             diagnostics = list(translation_unit.diagnostics)
@@ -337,7 +351,6 @@ def ObtainFunctions(
             )
 
             # ----------------------------------------------------------------------
-            pattern_words = re.compile(r"[\w']+")
 
             def FullVarType(types):
                 '''
@@ -352,44 +365,37 @@ def ObtainFunctions(
                 return types
             # ----------------------------------------------------------------------
 
-            def TestAndVerify(types):
-                '''
-                This is an early version of TestAndVerify that checks if a type should be accepted or not. 
-                It will find all words in the type and check them against a policy. This will be adapted as we
-                get more information about what is supported and what is not.
-                '''
-                type_list = re.findall(pattern_words, types)
-                
-                for var_type in type_list:
-                    if not policy(var_type):
-                        return False
-                return True
-
             object_type_list = []
+            funcs_list = {}
 
             # ----------------------------------------------------------------------
-            def Enumerate(node):
-                if node.location.file.name == filename:
-                    pass
+            def EnumerateObjType(node):
                 if node.kind == cindex.CursorKind.NAMESPACE:
                     for child in node.get_children():
-                        Enumerate(child)
+                        EnumerateObjType(child)
 
-                if (node.kind == cindex.CursorKind.STRUCT_DECL or node.kind == cindex.CursorKind.CLASS_DECL) and node.location.file.name == filename:
+                if node.kind == cindex.CursorKind.STRUCT_DECL or node.kind == cindex.CursorKind.CLASS_DECL:
                     obj_type = _GetObjectType(node, SimpleVarType, FullVarType)
 
                     if obj_type:
                         object_type_list.append(obj_type)
-                    elif obj_type is None:
+                    elif obj_type is None and node.location.file.name == filename:
                         # If None was returned, there was a problem with the ObjectType and it can't be processed
                         on_unsupported_func(_FullName(node), filename if (not is_temp_file or filename != input_filename) else None, node.location.line)
+
+            # ----------------------------------------------------------------------
+
+            def EnumerateFuncs(node):
+                if node.kind == cindex.CursorKind.NAMESPACE:
+                    for child in node.get_children():
+                        EnumerateFuncs(child)
 
                 if node.kind == cindex.CursorKind.CONSTRUCTOR:
                     '''
                     TODO: This will support a constructor outside a struct/class. This functionality
                     will be implemented when multiple files are supported (next PR).
+                    [EDIT]: This is proving to be much harder than expected. This will get a PR for itself later.
                     '''
-                    pass
 
                 if node.kind == cindex.CursorKind.FUNCTION_DECL and node.location.file.name == filename:
                     ret_type = FullVarType(node.result_type.spelling)
@@ -413,72 +419,42 @@ def ObtainFunctions(
 
             # ----------------------------------------------------------------------
 
+            # EnumerateObjType needs to be separated from EnumerateFuncs because of constructors that might be out
+            # of the function. 
             for child in cursor.get_children():
-                Enumerate(child)
-            
-            function_list = [func.ToObject(key["declaration_line"], key["definition_line"]) for func, key in funcs_list.items()]
+                EnumerateObjType(child)
+
+            for child in cursor.get_children():
+                EnumerateFuncs(child)
 
             # ----------------------------------------------------------------------
-            def GetIncludeList():
+            def GetIncludeList(filename):
                 include_list = []
                 for child in translation_unit.get_includes():
-                    if child.location.file.name == filename:
-                        include_list.append(os.path.realpath(os.path.join(filename, str(child.include))))
+                    include_list.append((os.path.realpath(str(child.location.file.name)) if (not is_temp_file or child.location.file.name != input_filename) else None, os.path.realpath(os.path.join(filename, str(child.include)))))
                 return include_list
-
-            # ----------------------------------------------------------------------
-            def GetAcceptedObjList():
-                accepted_obj_list = []
-
-                for obj in object_type_list:
-                    for curr_obj in object_type_list:
-                        if curr_obj in accepted_obj_list:
-                            break
-                        valid_obj = True
-                        for var_type in curr_obj['simple_var_types']:
-                            if not TestAndVerify(var_type):
-                                valid_obj = False
-                                break
-                        if valid_obj:
-                            accepted_obj_list.append(curr_obj)
-                return accepted_obj_list
-            
-            # ----------------------------------------------------------------------
-            def GetAcceptedFuncList():
-                accepted_func_list = []
-
-                for func in function_list:
-                    valid_func = True
-                    for var_type in func['simple_var_types']:
-                        if not TestAndVerify(var_type):
-                            valid_func = False
-                    if not TestAndVerify(func['simple_return_type']):
-                        valid_func = False
-                    if valid_func:
-                        accepted_func_list.append(func)
-                return accepted_func_list
             # ----------------------------------------------------------------------
 
-            include_list = GetIncludeList()
-            accepted_obj_list = GetAcceptedObjList()
-            accepted_func_list = GetAcceptedFuncList()
+            include_list = GetIncludeList(filename)
+            function_list = [func.ToObject(key["declaration_line"], key["definition_line"]) for func, key in funcs_list.items()]
 
-            for obj in object_type_list:
-                if obj not in accepted_obj_list:
-                    on_unsupported_func(obj['name'], filename if (not is_temp_file or filename != input_filename) else None, obj['definition_line'])
-            for func in function_list:
-                if func not in accepted_func_list:
-                    on_unsupported_func(func['func_name'], filename if (not is_temp_file or filename != input_filename) else None, func['definition_line'])
-
-
-            # TODO: Needs to expose structs/classes that are on other files. For now, it will just say that its an invalid
-            # function/struct/class.
-
-            return {"function_list": accepted_func_list, "object_type_list": accepted_obj_list, "include_list": include_list }
+            return {"function_list": function_list, "object_type_list": object_type_list, "include_list": include_list}
         # ----------------------------------------------------------------------
 
-        all_results = OrderedDict()
+        clean_results = OrderedDict()
 
+        def InitializeCleanResults(filename, raw_includes):
+            clean_results[filename] = {}
+            clean_results[filename]["function_list"] = []
+            clean_results[filename]["object_type_list"] = []
+            clean_results[filename]["include_list"] = []
+            for include_tuple in raw_includes:
+                name, include = include_tuple
+                if name == filename:
+                    clean_results[filename]["include_list"].append(include)
+
+        # ----------------------------------------------------------------------
+        
         while parse_queue:
             filename = parse_queue.pop(0)
             parsed.add(filename)
@@ -487,9 +463,82 @@ def ObtainFunctions(
 
             # If the original file was a temp file, make the key None rather than
             # the name of the temporary file used.
-            if not all_results and is_temp_file:
+            if not clean_results and is_temp_file:
                 filename = None
 
-            all_results[filename] = these_results
-        
-        return all_results
+            if not clean_results:
+                InitializeCleanResults(filename, these_results["include_list"])
+
+            needed_obj_type_list = []
+
+            # ----------------------------------------------------------------------
+            def getObjType(obj_type_name):
+                '''
+                Get ObjType from its name.
+                '''
+                for obj_type in these_results["object_type_list"]:
+                    if obj_type["name"] == obj_type_name:
+                        return obj_type
+                return None
+
+            # ----------------------------------------------------------------------
+            def isValidObjType(obj_type):
+                '''
+                Check all var types in this ObjType, this Obj is valid if they are all valid. There is an assumption that
+                this function will only be called for an ObjType that is required. If this Obj depends on another ObjType,
+                that means that the other ObjType is also required. 
+                '''
+                if obj_type is None:
+                    return False
+                if obj_type in needed_obj_type_list:
+                    return True
+                for var_type in obj_type["simple_var_types"]:
+                    if not TestAndVerify(var_type) and getObjType(var_type) != obj_type and not isValidObjType(getObjType(var_type)):
+                        return False
+                for constructor in obj_type["constructor_list"]:
+                    for arg_type in constructor["simple_arg_types"]:
+                        if not TestAndVerify(arg_type) and getObjType(arg_type) != obj_type and not isValidObjType(getObjType(arg_type)):
+                            return False
+
+                needed_obj_type_list.append(obj_type)
+                return True
+            
+            # ----------------------------------------------------------------------
+
+            # All ObjTypes in my file are required.
+            for obj_type in these_results["object_type_list"]:
+                if filename is None or obj_type["file"] == filename:
+                    if not isValidObjType(obj_type):
+                        on_unsupported_func(obj_type['name'], filename, obj_type['definition_line'])
+
+            # ----------------------------------------------------------------------
+            def isValidFunc(func):
+                '''
+                A function is valid if all var types are valid.
+                '''
+                for var_type in func["simple_var_types"]:
+                    if not TestAndVerify(var_type) and not isValidObjType(getObjType(var_type)):
+                        return False
+                if not TestAndVerify(func["simple_return_type"]) and not isValidObjType(getObjType(func["simple_return_type"])):
+                    return False
+                return True
+
+             # ----------------------------------------------------------------------
+            
+            for func in these_results["function_list"]:
+                if isValidFunc(func):
+                    clean_results[filename]["function_list"].append(func)
+                else:
+                    on_unsupported_func(func['func_name'], filename, func['definition_line'])
+
+            # Add required ObjType to the clean_results list.
+            for obj in needed_obj_type_list:
+                this_file_name = obj.pop('file')
+                if is_temp_file:
+                    this_file_name = None
+                if this_file_name not in clean_results:
+                    InitializeCleanResults(this_file_name, these_results["include_list"])
+                if obj not in clean_results[this_file_name]["object_type_list"]:
+                    clean_results[this_file_name]["object_type_list"].append(obj)
+                    
+        return clean_results
