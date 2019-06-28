@@ -6,9 +6,10 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include <cstdio>
-#include "../date_time.cpp"
+#include "../date_time.hpp"
 
 using namespace DataPipelines::Chrono;
+using SysClock = std::chrono::system_clock;
 
 TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[chrono][date_time]") {
     const time_t date = 217081625;
@@ -78,9 +79,9 @@ TEST_CASE("Far Future - 2998 March 2, 14:03:02", "[chrono][date_time]") {
     CHECK(tp.quarterOfYear == 1);
     CHECK(tp.weekOfMonth == 0);
 }
-#endif
 
-#ifndef _NO_NEGATIVE_TIME_T
+#else
+
 // msvcrt doesn't support negative time_t, so nothing before 1970
 TEST_CASE("Pre-Epoch - 1776 July 4", "[chrono][date_time]")
 {

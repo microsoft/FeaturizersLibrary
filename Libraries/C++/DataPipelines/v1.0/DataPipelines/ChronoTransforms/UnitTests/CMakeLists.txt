@@ -6,6 +6,10 @@
 cmake_minimum_required(VERSION 3.5.0)
 
 project(ChronoTransforms_UnitTests LANGUAGES CXX)
+
 include(../../DataPipelinesCommon.cmake)
+
 enable_testing()
 _add_unit_tests(ITEMS date_time_UnitTests)
+
+target_sources(date_time_UnitTests PRIVATE ../date_time.cpp ../date_time.hpp)

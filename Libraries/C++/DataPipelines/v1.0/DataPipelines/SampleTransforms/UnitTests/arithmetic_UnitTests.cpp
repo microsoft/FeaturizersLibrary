@@ -7,7 +7,7 @@
 #include "catch.hpp"
 
 #include <string>
-#include "../arithmetic.cpp"
+#include "../arithmetic.hpp"
 
 using namespace DataPipelines::Arithmetic;
 

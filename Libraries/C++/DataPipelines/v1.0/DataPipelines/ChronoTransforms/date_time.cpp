@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License
 // ----------------------------------------------------------------------
-
+#include <stdexcept>
 #include "date_time.hpp"
 
 #ifdef _MSC_VER
@@ -13,7 +13,6 @@ inline struct tm *gmtime_r(time_t const* const timer, struct tm* const  result) 
     return gmtime_s(result, timer) == 0 ? result : nullptr;
 }
 
-#define _NO_NEGATIVE_TIME_T
 #endif
 
 using SysClock = std::chrono::system_clock;

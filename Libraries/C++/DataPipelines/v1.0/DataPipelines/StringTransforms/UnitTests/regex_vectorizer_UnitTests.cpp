@@ -8,7 +8,7 @@
 #include "catch.hpp"
 
 #include <string>
-#include "../regex_vectorizer.cpp"
+#include "../regex_vectorizer.hpp"
 
 using namespace DataPipelines::StringTransforms;
 

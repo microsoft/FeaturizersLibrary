@@ -12,3 +12,5 @@ include(../../DataPipelinesCommon.cmake)
 enable_testing()
 
 _add_unit_tests(ITEMS regex_vectorizer_UnitTests)
+
+target_sources(regex_vectorizer_UnitTests PUBLIC ../regex_vectorizer.cpp ../regex_vectorizer.hpp)
