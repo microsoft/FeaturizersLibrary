@@ -23,8 +23,6 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 def ExtractContent(
     input_filenames,
     status_stream,
-    include_regexes=None,
-    exclude_regexes=None,
 ):
     all_results = OrderedDict()
 
@@ -43,8 +41,6 @@ def ExtractContent(
                     input_filename,
                     OnUnsupported,
                     CheckPolicy,
-                    include_regexes=include_regexes,
-                    exclude_regexes=exclude_regexes,
                 )
 
                 for k, v in six.iteritems(these_results):

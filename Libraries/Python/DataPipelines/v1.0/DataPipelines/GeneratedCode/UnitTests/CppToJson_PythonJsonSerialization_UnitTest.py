@@ -175,9 +175,9 @@ class TestSuite(unittest.TestCase):
                             "constructor_list": [
                                 {
                                     "constructor_name": "CName",
-                                    "arg_names": ['arg1', 'arg2'],
-                                    "raw_arg_types": ['a', 'b'],
-                                    "simple_arg_types": ['c', 'd'],
+                                    "var_names": ['arg1', 'arg2'],
+                                    "raw_var_types": ['a', 'b'],
+                                    "simple_var_types": ['c', 'd'],
                                     "definition_line": 13,
                                 }
                             ]
@@ -195,9 +195,9 @@ class TestSuite(unittest.TestCase):
         self.assertEqual(result[0].struct_list[0].definition_line, 7)
 
         self.assertEqual(result[0].struct_list[0].constructor_list[0].constructor_name, "CName")
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].arg_names, ['arg1', 'arg2'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].raw_arg_types, ['a', 'b'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].simple_arg_types, ['c', 'd'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].var_names, ['arg1', 'arg2'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].raw_var_types, ['a', 'b'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].simple_var_types, ['c', 'd'])
         self.assertEqual(result[0].struct_list[0].constructor_list[0].definition_line, 13)
 
         self.assertTrue(not hasattr(result[0], "function_list"))
@@ -218,16 +218,16 @@ class TestSuite(unittest.TestCase):
                             "constructor_list": [
                                 {
                                     "constructor_name": "CName",
-                                    "arg_names": ['arg1', 'arg2'],
-                                    "raw_arg_types": ['a', 'b'],
-                                    "simple_arg_types": ['c', 'd'],
+                                    "var_names": ['arg1', 'arg2'],
+                                    "raw_var_types": ['a', 'b'],
+                                    "simple_var_types": ['c', 'd'],
                                     "definition_line": 13,
                                 },
                                 {
                                     "constructor_name": "CName2",
-                                    "arg_names": ['arg12', 'arg22'],
-                                    "raw_arg_types": ['a2', 'b2'],
-                                    "simple_arg_types": ['c2', 'd2'],
+                                    "var_names": ['arg12', 'arg22'],
+                                    "raw_var_types": ['a2', 'b2'],
+                                    "simple_var_types": ['c2', 'd2'],
                                     "definition_line": 132,
                                 },
                             ]
@@ -245,15 +245,15 @@ class TestSuite(unittest.TestCase):
         self.assertEqual(result[0].struct_list[0].definition_line, 7)
 
         self.assertEqual(result[0].struct_list[0].constructor_list[0].constructor_name, "CName")
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].arg_names, ['arg1', 'arg2'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].raw_arg_types, ['a', 'b'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].simple_arg_types, ['c', 'd'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].var_names, ['arg1', 'arg2'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].raw_var_types, ['a', 'b'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[0].simple_var_types, ['c', 'd'])
         self.assertEqual(result[0].struct_list[0].constructor_list[0].definition_line, 13)
 
         self.assertEqual(result[0].struct_list[0].constructor_list[1].constructor_name, "CName2")
-        self.assertEqual(result[0].struct_list[0].constructor_list[1].arg_names, ['arg12', 'arg22'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[1].raw_arg_types, ['a2', 'b2'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[1].simple_arg_types, ['c2', 'd2'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[1].var_names, ['arg12', 'arg22'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[1].raw_var_types, ['a2', 'b2'])
+        self.assertEqual(result[0].struct_list[0].constructor_list[1].simple_var_types, ['c2', 'd2'])
         self.assertEqual(result[0].struct_list[0].constructor_list[1].definition_line, 132)
 
         self.assertTrue(not hasattr(result[0], "function_list"))
@@ -851,9 +851,9 @@ class TestSuite(unittest.TestCase):
                                 "constructor_list": [
                                     {
                                         "constructor_name": None,
-                                        "arg_names": ["ca", "cb"],
-                                        "raw_arg_types": ["cc", "cd"],
-                                        "simple_arg_types": ["ce", "cf"],
+                                        "var_names": ["ca", "cb"],
+                                        "raw_var_types": ["cc", "cd"],
+                                        "simple_var_types": ["ce", "cf"],
                                         "definition_line": 14
                                     }
                                 ]
@@ -880,9 +880,9 @@ class TestSuite(unittest.TestCase):
                                 "constructor_list": [
                                     {
                                         "constructor_name": "",
-                                        "arg_names": ["ca", "cb"],
-                                        "raw_arg_types": ["cc", "cd"],
-                                        "simple_arg_types": ["ce", "cf"],
+                                        "var_names": ["ca", "cb"],
+                                        "raw_var_types": ["cc", "cd"],
+                                        "simple_var_types": ["ce", "cf"],
                                         "definition_line": 14
                                     }
                                 ]
@@ -912,9 +912,9 @@ class TestSuite(unittest.TestCase):
                                 "constructor_list": [
                                     {
                                         "constructor_name": "Cname",
-                                        "arg_names": [None, "cb"],
-                                        "raw_arg_types": ["cc", "cd"],
-                                        "simple_arg_types": ["ce", "cf"],
+                                        "var_names": [None, "cb"],
+                                        "raw_var_types": ["cc", "cd"],
+                                        "simple_var_types": ["ce", "cf"],
                                         "definition_line": 14
                                     }
                                 ]
@@ -941,9 +941,9 @@ class TestSuite(unittest.TestCase):
                                 "constructor_list": [
                                     {
                                         "constructor_name": "Cname",
-                                        "arg_names": ["", "cb"],
-                                        "raw_arg_types": ["cc", "cd"],
-                                        "simple_arg_types": ["ce", "cf"],
+                                        "var_names": ["", "cb"],
+                                        "raw_var_types": ["cc", "cd"],
+                                        "simple_var_types": ["ce", "cf"],
                                         "definition_line": 14
                                     }
                                 ]
@@ -973,9 +973,9 @@ class TestSuite(unittest.TestCase):
                                 "constructor_list": [
                                     {
                                         "constructor_name": "Cname",
-                                        "arg_names": ["ca", "cb"],
-                                        "raw_arg_types": [None, "cd"],
-                                        "simple_arg_types": ["ce", "cf"],
+                                        "var_names": ["ca", "cb"],
+                                        "raw_var_types": [None, "cd"],
+                                        "simple_var_types": ["ce", "cf"],
                                         "definition_line": 14
                                     }
                                 ]
@@ -1002,9 +1002,9 @@ class TestSuite(unittest.TestCase):
                                 "constructor_list": [
                                     {
                                         "constructor_name": "Cname",
-                                        "arg_names": ["ca", "cb"],
-                                        "raw_arg_types": ["", "cd"],
-                                        "simple_arg_types": ["ce", "cf"],
+                                        "var_names": ["ca", "cb"],
+                                        "raw_var_types": ["", "cd"],
+                                        "simple_var_types": ["ce", "cf"],
                                         "definition_line": 14
                                     }
                                 ]
@@ -1034,9 +1034,9 @@ class TestSuite(unittest.TestCase):
                                 "constructor_list": [
                                     {
                                         "constructor_name": "Cname",
-                                        "arg_names": ["ca", "cb"],
-                                        "raw_arg_types": ["cc", "cd"],
-                                        "simple_arg_types": [None, "cf"],
+                                        "var_names": ["ca", "cb"],
+                                        "raw_var_types": ["cc", "cd"],
+                                        "simple_var_types": [None, "cf"],
                                         "definition_line": 14
                                     }
                                 ]
@@ -1063,9 +1063,9 @@ class TestSuite(unittest.TestCase):
                                 "constructor_list": [
                                     {
                                         "constructor_name": "Cname",
-                                        "arg_names": ["ca", "cb"],
-                                        "raw_arg_types": ["cc", "cd"],
-                                        "simple_arg_types": ["", "cf"],
+                                        "var_names": ["ca", "cb"],
+                                        "raw_var_types": ["cc", "cd"],
+                                        "simple_var_types": ["", "cf"],
                                         "definition_line": 14
                                     }
                                 ]
@@ -1095,9 +1095,9 @@ class TestSuite(unittest.TestCase):
                                 "constructor_list": [
                                     {
                                         "constructor_name": "Cname",
-                                        "arg_names": ["ca", "cb"],
-                                        "raw_arg_types": ["cc", "cd"],
-                                        "simple_arg_types": ["ce", "cf"],
+                                        "var_names": ["ca", "cb"],
+                                        "raw_var_types": ["cc", "cd"],
+                                        "simple_var_types": ["ce", "cf"],
                                         "definition_line": 0
                                     }
                                 ]
@@ -1124,9 +1124,9 @@ class TestSuite(unittest.TestCase):
                                 "constructor_list": [
                                     {
                                         "constructor_name": "Cname",
-                                        "arg_names": ["ca", "cb"],
-                                        "raw_arg_types": ["cc", "cd"],
-                                        "simple_arg_types": ["ce", "cf"],
+                                        "var_names": ["ca", "cb"],
+                                        "raw_var_types": ["cc", "cd"],
+                                        "simple_var_types": ["ce", "cf"],
                                         "definition_line": "String"
                                     }
                                 ]

@@ -4,168 +4,29 @@ import textwrap
 
 from collections import OrderedDict
 
-import six
-
 import clang.cindex as cindex
 
+import CommonEnvironment
 import CommonEnvironment.FileSystem as fileSystem
 import CommonEnvironment.CallOnExit as callOnExit
 from CommonEnvironment.Shell.All import CurrentShell
 import CommonEnvironment.Shell as CE_Shell
 
-# ----------------------------------------------------------------------
-
-def _FullName(node):
-    '''
-    This function will make the name of the function complete to include its namespace.
-    '''
-    name = node.spelling
-    parent = node.semantic_parent
-    while parent.kind != cindex.CursorKind.TRANSLATION_UNIT:
-        name = parent.spelling + "::" + name
-        parent = parent.semantic_parent
-    return name
 
 # ----------------------------------------------------------------------
-
-def _GetObjectType(node, SimpleVarType, FullVarType):
-    '''
-    This function will return the Object Type that this node refers to. It will return None if there were
-    errors.
-    '''
-
-    valid_object_type = True
-    has_move_constructor = False
-    object_type = {}
-    object_type['name'] = _FullName(node)
-    object_type['var_names'] = []
-    object_type['raw_var_types'] = []
-    object_type['simple_var_types'] = []
-    object_type['definition_line'] = node.location.line
-    object_type['constructor_list'] = []
-    object_type['file'] = os.path.realpath(node.location.file.name)
-
-    # The way to see if this is a definition or not, is to see if 'node' has any children. 
-    is_def = True
-    # There are a few kinds that are supported, even though they are not directly exposed.
-    accepted_kinds = [cindex.CursorKind.CXX_ACCESS_SPEC_DECL, cindex.CursorKind.ENUM_DECL]
-
-    # ----------------------------------------------------------------------
-    def DeleteDefault(node, speficier):
-        '''
-        This function will receive a node and a specifier (default or deleted), and check if the
-        node has the specifier in question.
-        '''
-        token_list = []
-        for token in node.get_tokens():
-            token_list.append(token.spelling)
-        return len(token_list) >= 2 and token_list[-1] == speficier and token_list[-2] == '='
-            
-    # ----------------------------------------------------------------------
-
-
-    for child in node.get_children():
-        is_def = False
-        if child.kind == cindex.CursorKind.CONSTRUCTOR:
-            # If this constructor ends in "=delete", ignore it.
-            if DeleteDefault(child, "delete"):
-                continue
-
-            constructor = {}
-            constructor['arg_names'] = []
-            constructor['raw_arg_types'] = []
-            constructor['simple_arg_types'] = []
-            constructor['definition_line'] = child.location.line
-            for arg in child.get_arguments():
-                constructor['arg_names'].append(arg.spelling)
-                arg_type = FullVarType(arg.type.spelling)
-                constructor['raw_arg_types'].append(arg_type)
-                constructor['simple_arg_types'].append(SimpleVarType(arg_type))
-            object_type['constructor_list'].append(constructor)
-
-            if child.is_move_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
-                has_move_constructor = True
-                if DeleteDefault(child, "default"):
-                    # If this is a default move constructor, there wont be a variable name for the
-                    # argument in the function, so I create one.
-                    assert len(constructor['arg_names']) == 1
-                    constructor['arg_names'] = ['other']
-
-            elif child.is_copy_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
-                # No public copy constructors are allowed. 
-                valid_object_type = False
-
-            
-            
-        elif child.kind == cindex.CursorKind.FIELD_DECL:
-            object_type['var_names'].append(child.spelling)
-            var_type = FullVarType(child.type.spelling)
-            object_type['raw_var_types'].append(var_type)
-            object_type['simple_var_types'].append(SimpleVarType(var_type))
-            if child.access_specifier != cindex.AccessSpecifier.PUBLIC:
-                valid_object_type = False
-        elif child.kind == cindex.CursorKind.CXX_METHOD: 
-            # If this method ends in "=delete", ignore it.
-            if DeleteDefault(child, "delete"):
-                continue
-            
-            # 'operator=' is supported as long as it is public and a move operator. 
-            move_operator_arg_type = FullVarType(node.spelling) + " &&"
-            if child.spelling == "operator=" and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
-                for arg in child.get_arguments():
-                    # Check the arguments to verify that this is a move operator.
-                    if FullVarType(arg.type.spelling) != move_operator_arg_type:
-                        valid_object_type = False
-            else:
-                # No other functions besides move operators are allowed.
-                valid_object_type = False
-                
-        elif child.kind not in accepted_kinds:
-            valid_object_type = False
-
-    if not is_def and (not valid_object_type or not has_move_constructor):
-        return None
-    elif not is_def:
-        return object_type
-    return {}
-
-# ----------------------------------------------------------------------
-
 def ObtainFunctions(
     input_filename,
     on_unsupported_func,
     policy,
-    traverse_include_dependencies=True,
-    include_regexes=None,
-    exclude_regexes=None,
 ):
-    '''
+    """
     This function will extract return value, name and parameters for every
     function given. input_filename can be a file name or a string that is the code
     itself.
     Return value:
-        Returns a list of functions, every item in this list is a dictionary that 
+        Returns a list of functions, every item in this list is a dictionary that
         has information about the function.
-    '''
-    
-    # ----------------------------------------------------------------------
-    def ProcessRegexes(regexes):
-        if regexes is None:
-            return []
-
-        results = []
-        for regex in regexes:
-            if isinstance(regex, six.string_types):
-                regex = re.compile(regex)
-
-            results.append(regex)
-
-        return results
-
-    # ----------------------------------------------------------------------
-
-    include_regexes = ProcessRegexes(include_regexes)
-    exclude_regexes = ProcessRegexes(exclude_regexes)
+    """
 
     is_temp_file = False
     # Since clang can only parse from a file, if we are given a string we need to create
@@ -185,14 +46,14 @@ def ObtainFunctions(
     # ----------------------------------------------------------------------
     pattern_words = re.compile(r"[\w']+")
     def TestAndVerify(types):
-        '''
-        This is an early version of TestAndVerify that checks if a type should be accepted or not. 
+        """
+        This is an early version of TestAndVerify that checks if a type should be accepted or not.
         It will find all words in the type and check them against a policy. This will be adapted as we
         get more information about what is supported and what is not.
-        '''
-        
+        """
+
         type_list = re.findall(pattern_words, types)
-        
+
         for var_type in type_list:
             if not policy(var_type):
                 return False
@@ -219,16 +80,13 @@ def ObtainFunctions(
 
             args = ['-I{}'.format(include_var) for include_var in include_vars]
 
-        parse_queue = [input_filename]
-        parsed = set()
-
         pattern_const = re.compile(
             textwrap.dedent(
-                r'''(?#
+                r"""(?#
                 Not a letter)(?<!\w)(?#
                 Keyword)(?P<keyword>const)(?#
                 Not a letter)(?!\w)(?#
-                )'''
+                )"""
             )
         )
         pattern_star  = re.compile(r"\**(\* )*")
@@ -236,81 +94,24 @@ def ObtainFunctions(
 
         # ----------------------------------------------------------------------
         def SimpleVarType(name):
-            '''
+            """
             Remove 'const', '*' and '&'
-            '''
+            """
             name = re.sub(pattern_const,  "", name)
             name = re.sub(pattern_star,  "", name)
             name = re.sub(pattern_amper,  "", name)
             return name.strip()
-            
-        # ----------------------------------------------------------------------
-        
-        class Funcs:
-            ''' 
-            This class will hold a function's information, it provides __hash__ and __eq__ functions.
-            It is needed so that its possible to have a dictionary using this class as a key, to keep
-            track of the declaration and implementation lines and have fast lookup.
-            '''
-            def __init__(self, func_name, raw_return_type, simple_return_type):
-                self._func_name = func_name
-                self._raw_return_type = raw_return_type
-                self._simple_return_type = simple_return_type
-                self._var_names = []
-                self._raw_var_types = []
-                self._simple_var_types = []
-            
-            def AddVar(self, var_name, raw_var_type, simple_var_type):
-                self._var_names.append(var_name)
-                self._raw_var_types.append(raw_var_type)
-                self._simple_var_types.append(simple_var_type)
-
-            def __hash__(self):
-                tuple_hash = (self._func_name, self._raw_return_type, self._simple_return_type,) + tuple(self._var_names) + tuple(self._raw_var_types) + tuple(self._simple_var_types)
-                return hash(tuple_hash)
-
-            def __eq__(self, other):
-                return self.__hash__() == other.__hash__()
-
-            def ToObject(self, declaration_line, definition_line):
-                # Need to remove the prefix "_" from the dictionary
-                new_dict = {key[1:] if (key and key.startswith("_")) else key :val for key, val in dict(self.__dict__).items()}
-
-                new_dict['declaration_line'] = declaration_line
-                new_dict['definition_line'] = definition_line
-                return new_dict
-
-        # ----------------------------------------------------------------------
-        def QueueIncludeFilename(include_name):
-            if not traverse_include_dependencies:
-                return
-
-            include_filename = os.path.realpath(os.path.join(os.path.basename(include_name), include_name))
-
-            if any(regex.match(include_filename) for regex in exclude_regexes):
-                return
-
-            if include_regexes and not any(regex.match(include_filename) for regex in include_regexes):
-                return
-
-            if include_filename in parsed:
-                return
-
-            if include_filename in parse_queue:
-                return
-
-            parse_queue.append(include_filename)
 
         # ----------------------------------------------------------------------
         def ParseFile(filename):
-            # TODO: Call `QueueIncludeFilename` with included filenames
-            # TODO: Create tests that:
-            #           parse includes
-            #           validate include_regexes
-            #           validate exclude_regexes
-            #           use the correct name in on_unsupported
+            """
+            Clang opens all files that are included in 'filename' at the same time. Only the functions on 
+            'filename' are processed, but all class-like objects are processed, because one of the functions
+            in 'filename' might need to use it. The ones that are not in 'filename' and are not used are not
+            exported.
+            """
 
-            translation_unit = index.parse(filename, args=args  + ['-std=c++17'])
+            translation_unit = index.parse(filename, args=args + ['-std=c++17'])
 
             diagnostics = list(translation_unit.diagnostics)
             if diagnostics:
@@ -319,49 +120,49 @@ def ObtainFunctions(
             cursor = translation_unit.cursor
 
             def GetAlias():
-                '''
+                """
                 This function will process all 'typedef' and 'using' and it will map the underlying type to
-                its definition. 
-                '''
+                its definition.
+                """
                 alias = {}
                 for child in cursor.get_children():
                     if (child.kind == cindex.CursorKind.TYPEDEF_DECL or child.kind == cindex.CursorKind.TYPE_ALIAS_DECL) and child.location.file.name == input_filename:
                         alias[child.spelling] = child.underlying_typedef_type.spelling
                 return alias
-            
+
             alias = GetAlias()
-            
+
             alias_regex = re.compile(
                 textwrap.dedent(
-                    r'''(?#
+                    r"""(?#
                     Not a letter)(?<!\w)(?#
                     Keyword)(?P<keyword>{})(?#
                     Not a letter)(?!\w)(?#
-                    )'''
+                    )"""
                 ).format("|".join([re.escape(key) for key in alias.keys()]))
             )
 
             struct_class_pattern = re.compile(
                 textwrap.dedent(
-                    r'''(?#
+                    r"""(?#
                     Not a letter)(?<!\w)(?#
                     Keyword with a space)(?P<keyword>struct\s|class\s)(?#
-                    )'''
+                    )"""
                 )
             )
 
             # ----------------------------------------------------------------------
 
             def FullVarType(types):
-                '''
+                """
                 This will undo all 'typedef' and 'using' by looking for the items in the 'alias' dict and substituting
                 the corresponding definitions. It will also remove all occurences of the words 'struct' and 'class'.
-                ''' 
+                """
                 num_subs = True
                 while num_subs and alias:
                     types, num_subs = re.subn(alias_regex, lambda k: alias[k.group(1)], types)
 
-                types = struct_class_pattern.sub(r'', types)      
+                types = struct_class_pattern.sub(r'', types)
                 return types
             # ----------------------------------------------------------------------
 
@@ -391,15 +192,15 @@ def ObtainFunctions(
                         EnumerateFuncs(child)
 
                 if node.kind == cindex.CursorKind.CONSTRUCTOR:
-                    '''
+                    """
                     TODO: This will support a constructor outside a struct/class. This functionality
                     will be implemented when multiple files are supported (next PR).
                     [EDIT]: This is proving to be much harder than expected. This will get a PR for itself later.
-                    '''
+                    """
 
                 if node.kind == cindex.CursorKind.FUNCTION_DECL and node.location.file.name == filename:
                     ret_type = FullVarType(node.result_type.spelling)
-                    func = Funcs(_FullName(node), ret_type, SimpleVarType(ret_type))
+                    func = Function(_FullName(node), ret_type, SimpleVarType(ret_type))
 
                     for arg in node.get_arguments():
                         arg_type = FullVarType(arg.type.spelling)
@@ -420,7 +221,7 @@ def ObtainFunctions(
             # ----------------------------------------------------------------------
 
             # EnumerateObjType needs to be separated from EnumerateFuncs because of constructors that might be out
-            # of the function. 
+            # of the function.
             for child in cursor.get_children():
                 EnumerateObjType(child)
 
@@ -436,109 +237,403 @@ def ObtainFunctions(
             # ----------------------------------------------------------------------
 
             include_list = GetIncludeList(filename)
-            function_list = [func.ToObject(key["declaration_line"], key["definition_line"]) for func, key in funcs_list.items()]
+            function_list = [func.ToDict(key["declaration_line"], key["definition_line"]) for func, key in funcs_list.items()]
 
             return {"function_list": function_list, "object_type_list": object_type_list, "include_list": include_list}
+
         # ----------------------------------------------------------------------
 
         clean_results = OrderedDict()
 
         def InitializeCleanResults(filename, raw_includes):
-            clean_results[filename] = {}
-            clean_results[filename]["function_list"] = []
-            clean_results[filename]["object_type_list"] = []
-            clean_results[filename]["include_list"] = []
+            clean_results[filename] = Results()
             for include_tuple in raw_includes:
                 name, include = include_tuple
                 if name == filename:
-                    clean_results[filename]["include_list"].append(include)
+                    clean_results[filename].include_list.append(include)
 
         # ----------------------------------------------------------------------
-        
-        while parse_queue:
-            filename = parse_queue.pop(0)
-            parsed.add(filename)
 
-            these_results = ParseFile(filename)
+        filename = input_filename
+        these_results = ParseFile(filename)
 
-            # If the original file was a temp file, make the key None rather than
-            # the name of the temporary file used.
-            if not clean_results and is_temp_file:
-                filename = None
+        # If the original file was a temp file, make the key None rather than
+        # the name of the temporary file used.
+        if not clean_results and is_temp_file:
+            filename = None
 
-            if not clean_results:
-                InitializeCleanResults(filename, these_results["include_list"])
+        if not clean_results:
+            InitializeCleanResults(filename, these_results["include_list"])
 
-            needed_obj_type_list = []
+        needed_obj_type_list = []
+        invalid_obj_type_list = []
 
-            # ----------------------------------------------------------------------
-            def getObjType(obj_type_name):
-                '''
-                Get ObjType from its name.
-                '''
-                for obj_type in these_results["object_type_list"]:
-                    if obj_type["name"] == obj_type_name:
-                        return obj_type
-                return None
-
-            # ----------------------------------------------------------------------
-            def isValidObjType(obj_type):
-                '''
-                Check all var types in this ObjType, this Obj is valid if they are all valid. There is an assumption that
-                this function will only be called for an ObjType that is required. If this Obj depends on another ObjType,
-                that means that the other ObjType is also required. 
-                '''
-                if obj_type is None:
-                    return False
-                if obj_type in needed_obj_type_list:
-                    return True
-                for var_type in obj_type["simple_var_types"]:
-                    if not TestAndVerify(var_type) and getObjType(var_type) != obj_type and not isValidObjType(getObjType(var_type)):
-                        return False
-                for constructor in obj_type["constructor_list"]:
-                    for arg_type in constructor["simple_arg_types"]:
-                        if not TestAndVerify(arg_type) and getObjType(arg_type) != obj_type and not isValidObjType(getObjType(arg_type)):
-                            return False
-
-                needed_obj_type_list.append(obj_type)
-                return True
-            
-            # ----------------------------------------------------------------------
-
-            # All ObjTypes in my file are required.
+        # ----------------------------------------------------------------------
+        def GetObjType(obj_type_name):
+            """
+            Get ObjType from its name.
+            """
             for obj_type in these_results["object_type_list"]:
-                if filename is None or obj_type["file"] == filename:
-                    if not isValidObjType(obj_type):
-                        on_unsupported_func(obj_type['name'], filename, obj_type['definition_line'])
+                if obj_type.Name == obj_type_name:
+                    return obj_type
+            return None
+
+        # ----------------------------------------------------------------------
+        def IsValidObjType(obj_type):
+            """
+            Check all var types in this ObjType, this ObjType is valid if they are all valid. There is an assumption that
+            this function will only be called for an ObjType that is required. If this ObjType depends on another ObjType,
+            that means that the other ObjType is also required.
+            """
+            if obj_type is None or obj_type in invalid_obj_type_list:
+                return False
+            if obj_type in needed_obj_type_list:
+                return True
+            for var_type in obj_type.EnumerateSimpleVarTypes():
+                if not TestAndVerify(var_type) and GetObjType(var_type) != obj_type and not IsValidObjType(GetObjType(var_type)):
+                    invalid_obj_type_list.append(obj_type)
+                    return False
+            for constructor in obj_type.constructor_list:
+                for arg_type in constructor.EnumerateSimpleVarTypes():
+                    if not TestAndVerify(arg_type) and GetObjType(arg_type) != obj_type and not IsValidObjType(GetObjType(arg_type)):
+                        invalid_obj_type_list.append(obj_type)
+                        return False
+
+            needed_obj_type_list.append(obj_type)
+            return True
+
+        # ----------------------------------------------------------------------
+
+        # All ObjTypes in my file are required.
+        for obj_type in these_results["object_type_list"]:
+            if filename is None or obj_type.Filename == filename:
+                if not IsValidObjType(obj_type):
+                    on_unsupported_func(obj_type.Name, filename, obj_type.DefinitionLine)
+
+        # ----------------------------------------------------------------------
+        def IsValidFunc(func):
+            """
+            A function is valid if all var types are valid.
+            """
+            for var_type in func["simple_var_types"]:
+                if not TestAndVerify(var_type) and not IsValidObjType(GetObjType(var_type)):
+                    return False
+            if not TestAndVerify(func["simple_return_type"]) and not IsValidObjType(GetObjType(func["simple_return_type"])):
+                return False
+            return True
 
             # ----------------------------------------------------------------------
-            def isValidFunc(func):
-                '''
-                A function is valid if all var types are valid.
-                '''
-                for var_type in func["simple_var_types"]:
-                    if not TestAndVerify(var_type) and not isValidObjType(getObjType(var_type)):
-                        return False
-                if not TestAndVerify(func["simple_return_type"]) and not isValidObjType(getObjType(func["simple_return_type"])):
-                    return False
-                return True
 
-             # ----------------------------------------------------------------------
+        for func in these_results["function_list"]:
+            if IsValidFunc(func):
+                clean_results[filename].function_list.append(func)
+            else:
+                on_unsupported_func(func['func_name'], filename, func['definition_line'])
+
+        # Add required ObjType to the clean_results list.
+        for object_type in needed_obj_type_list:
+            this_file_name = object_type.Filename
+
+            if is_temp_file:
+                this_file_name = None
+            if this_file_name not in clean_results:
+                InitializeCleanResults(this_file_name, these_results["include_list"])
+            clean_results[this_file_name].object_type_list.append(object_type.ToDict())
+
+        return dict([(filename, result.ToDict()) for  filename, result in clean_results.items()])
+
+# ----------------------------------------------------------------------
+# |
+# |  Private Types
+# |
+# ----------------------------------------------------------------------
+
+class _FuncWithArguments(object):
+    """\
+    Functionality common to C++ functions and constructors
+    """
+
+    # ----------------------------------------------------------------------
+    def __init__(
+        self,
+        variable_info=None,
+    ):
+        self._variable_info                 = variable_info or []
+
+    # ----------------------------------------------------------------------
+    def __repr__(self):
+        return CommonEnvironment.ObjectReprImpl(self)
+
+    # ----------------------------------------------------------------------
+    def __hash__(self):
+        return hash(tuple(self._variable_info))
+
+    # ----------------------------------------------------------------------
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()
+
+    # ----------------------------------------------------------------------
+    def AddVar(self, var_name, raw_var_type, simple_var_type):
+        self._variable_info.append((var_name, raw_var_type, simple_var_type))
+
+    # ----------------------------------------------------------------------
+    def ToDict(self):
+        new_dict = {}
+
+        new_dict["var_names"] = [name for name, _, _ in self._variable_info]
+        new_dict["raw_var_types"] = [type_ for _, type_, _ in self._variable_info]
+        new_dict["simple_var_types"] = [simple for _, _, simple in self._variable_info]
+
+        return new_dict
+
+    # ----------------------------------------------------------------------
+    def EnumerateSimpleVarTypes(self):
+        for _, _, simple_var_type in self._variable_info:
+            yield simple_var_type
+
+    # ----------------------------------------------------------------------
+    def VariableLen(self):
+        return len(self._variable_info)
+
+
+# ----------------------------------------------------------------------
+class ClassLikeObject(_FuncWithArguments):
+    """Captures information about a C++ class or struct"""
+
+    # ----------------------------------------------------------------------
+    def __init__(
+        self,
+        name,
+        definition_line,
+        filename,
+        variable_info=None,
+        constructor_list=None,
+    ):
+        super(ClassLikeObject, self).__init__(
+            variable_info=variable_info,
+        )
+
+        self.Name                           = name
+        self.DefinitionLine                 = definition_line
+        self.Filename                       = filename
+
+        self.constructor_list               = constructor_list or []
+
+    # ----------------------------------------------------------------------
+    def __repr__(self):
+        return CommonEnvironment.ObjectReprImpl(self)
+
+    # ----------------------------------------------------------------------
+    def ToDict(self):
+        results = {}
+
+        results["name"] = self.Name
+        results["definition_line"] = self.DefinitionLine
             
-            for func in these_results["function_list"]:
-                if isValidFunc(func):
-                    clean_results[filename]["function_list"].append(func)
-                else:
-                    on_unsupported_func(func['func_name'], filename, func['definition_line'])
+        for k, v in super(ClassLikeObject, self).ToDict().items():
+            results[k] = v
 
-            # Add required ObjType to the clean_results list.
-            for obj in needed_obj_type_list:
-                this_file_name = obj.pop('file')
-                if is_temp_file:
-                    this_file_name = None
-                if this_file_name not in clean_results:
-                    InitializeCleanResults(this_file_name, these_results["include_list"])
-                if obj not in clean_results[this_file_name]["object_type_list"]:
-                    clean_results[this_file_name]["object_type_list"].append(obj)
-                    
-        return clean_results
+        results["constructor_list"] = [constructor.ToDict() for constructor in self.constructor_list]
+
+        return results
+
+
+# ----------------------------------------------------------------------
+class Function(_FuncWithArguments):
+    """\
+    This class will hold a function's information, it provides __hash__ and __eq__ functions.
+    It is needed so that its possible to have a dictionary using this class as a key, to keep
+    track of the declaration and implementation lines and have fast lookup.
+    """
+
+    # ----------------------------------------------------------------------
+    def __init__(
+        self,
+        func_name,
+        raw_return_type,
+        simple_return_type,
+        variable_info=None,
+    ):
+        super(Function, self).__init__(
+            variable_info=variable_info,
+        )
+
+        self.FuncName                     = func_name
+        self.RawReturnType               = raw_return_type
+        self.SimpleReturnType            = simple_return_type
+
+    # ----------------------------------------------------------------------
+    def __hash__(self):
+        return hash((self.FuncName, self.RawReturnType, self.SimpleReturnType, super(Function, self).__hash__()))
+
+    # ----------------------------------------------------------------------
+    def ToDict(self, declaration_line, definition_line):
+        new_dict = {}
+
+        new_dict["func_name"] = self.FuncName
+        new_dict["raw_return_type"] = self.RawReturnType
+        new_dict["simple_return_type"] = self.SimpleReturnType
+
+        for k, v in super(Function, self).ToDict().items():
+            new_dict[k] = v
+
+        new_dict['declaration_line'] = declaration_line
+        new_dict['definition_line'] = definition_line
+
+        return new_dict
+
+
+# ----------------------------------------------------------------------
+class Constructor(_FuncWithArguments):
+    """Captures information about a C++ constructor"""
+
+    # ----------------------------------------------------------------------
+    def __init__(
+        self,
+        definition_line,
+        variable_info=None,
+    ):
+        self._definition_line               = definition_line
+        super(Constructor, self).__init__(
+            variable_info=variable_info,
+        )
+
+    # ----------------------------------------------------------------------
+    def __hash__(self):
+        return hash((self._definition_line, super(Constructor, self).__hash__()))
+
+    # ----------------------------------------------------------------------
+    def ToDict(self):
+        new_dict = super(Constructor, self).ToDict()
+
+        new_dict["definition_line"] = self._definition_line
+
+        return new_dict
+
+# ----------------------------------------------------------------------
+class Results(object):
+    """Stores final versions of Includes, Functions and Class-like objects"""
+
+    # ----------------------------------------------------------------------
+    def __init__(
+        self,
+        function_list=None,
+        object_type_list=None,
+        include_list=None,
+    ):
+        self.function_list                 = function_list or []
+        self.object_type_list              = object_type_list or []
+        self.include_list                  = include_list or []
+
+    # ----------------------------------------------------------------------
+    def ToDict(self):
+        new_dict = {}
+
+        new_dict["function_list"] = self.function_list
+        new_dict["object_type_list"] = self.object_type_list
+        new_dict["include_list"] = self.include_list
+
+        return new_dict
+
+
+# ----------------------------------------------------------------------
+# |
+# |  Private Methods
+# |
+# ----------------------------------------------------------------------
+def _FullName(node):
+    """
+    This function will make the name of the function complete to include its namespace.
+    """
+    name = node.spelling
+    parent = node.semantic_parent
+    while parent.kind != cindex.CursorKind.TRANSLATION_UNIT:
+        name = parent.spelling + "::" + name
+        parent = parent.semantic_parent
+    return name
+
+# ----------------------------------------------------------------------
+
+def _GetObjectType(node, SimpleVarType, FullVarType):
+    """
+    This function will return the Object Type that this node refers to. It will return None if there were
+    errors.
+    """
+
+    valid_object_type = True
+    has_move_constructor = False
+    object_type = ClassLikeObject(_FullName(node), node.location.line, os.path.realpath(node.location.file.name))
+
+    # The way to see if this is a definition or not, is to see if 'node' has any children.
+    is_def = True
+    # There are a few kinds that are supported, even though they are not directly exposed.
+    accepted_kinds = [cindex.CursorKind.CXX_ACCESS_SPEC_DECL, cindex.CursorKind.ENUM_DECL]
+
+    # ----------------------------------------------------------------------
+    def DeleteDefault(node, speficier):
+        """
+        This function will receive a node and a specifier (default or deleted), and check if the
+        node has the specifier in question.
+        """
+        token_list = []
+        for token in node.get_tokens():
+            token_list.append(token.spelling)
+        return len(token_list) >= 2 and token_list[-1] == speficier and token_list[-2] == '='
+
+    # ----------------------------------------------------------------------
+
+    for child in node.get_children():
+        is_def = False
+        if child.kind == cindex.CursorKind.CONSTRUCTOR:
+            # If this constructor ends in "=delete", ignore it.
+            if DeleteDefault(child, "delete"):
+                continue
+
+            constructor = Constructor(child.location.line)
+            for arg in child.get_arguments():
+                arg_type = FullVarType(arg.type.spelling)
+                constructor.AddVar(arg.spelling, arg_type, SimpleVarType(arg_type))
+
+            object_type.constructor_list.append(constructor)
+
+            if child.is_move_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
+                has_move_constructor = True
+                if DeleteDefault(child, "default"):
+                    # If this is a default move constructor, there wont be a variable name for the
+                    # argument in the function, so I create one.
+                    assert constructor.VariableLen() == 1
+                    # TODO: constructor['arg_names'] = ['other']
+
+            elif child.is_copy_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
+                # No public copy constructors are allowed.
+                valid_object_type = False
+
+        elif child.kind == cindex.CursorKind.FIELD_DECL:
+            var_type = FullVarType(child.type.spelling)
+            object_type.AddVar(child.spelling, var_type, SimpleVarType(var_type))
+            if child.access_specifier != cindex.AccessSpecifier.PUBLIC:
+                valid_object_type = False
+        elif child.kind == cindex.CursorKind.CXX_METHOD:
+            # If this method ends in "=delete", ignore it.
+            if DeleteDefault(child, "delete"):
+                continue
+
+            # 'operator=' is supported as long as it is public and a move operator.
+            move_operator_arg_type = FullVarType(node.spelling) + " &&"
+            if child.spelling == "operator=" and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
+                for arg in child.get_arguments():
+                    # Check the arguments to verify that this is a move operator.
+                    if FullVarType(arg.type.spelling) != move_operator_arg_type:
+                        valid_object_type = False
+            else:
+                # No other functions besides move operators are allowed.
+                valid_object_type = False
+
+        elif child.kind not in accepted_kinds:
+            valid_object_type = False
+
+    if not is_def and (not valid_object_type or not has_move_constructor):
+        return None
+    elif not is_def:
+        return object_type
+    return {}

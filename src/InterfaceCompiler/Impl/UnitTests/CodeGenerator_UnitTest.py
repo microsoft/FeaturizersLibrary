@@ -42,14 +42,6 @@ class StandardTests(unittest.TestCase):
         self.assertTrue("output_name" in result)
 
     # ----------------------------------------------------------------------
-    def test_GetOptionalMetadata(self):
-        result = self._code_generator._GetOptionalMetadata()
-        result_names = [r[0] for r in result]
-
-        self.assertTrue("include_regexes" in result_names)
-        self.assertTrue("exclude_regexes" in result_names)
-
-    # ----------------------------------------------------------------------
     def test_GetAdditionalGeneratorItems(self):
         self._mock.GetAdditionalGeneratorFilenames.return_value = []
         self._code_generator._GetAdditionalGeneratorItems(None)

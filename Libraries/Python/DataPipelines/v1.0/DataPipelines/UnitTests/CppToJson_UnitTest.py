@@ -379,7 +379,7 @@ class FuncTest(unittest.TestCase):
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
         obj_type_list = self._GetObjList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
         include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
-        
+
 
         self.assertEqual(was_called, True)
 
@@ -434,9 +434,9 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(obj_type_list[0]['definition_line'], 2)
 
         self.assertEqual(len(obj_type_list[0]['constructor_list']), 1)
-        self.assertEqual(obj_type_list[0]['constructor_list'][0]['arg_names'], ['other'])
-        self.assertEqual(obj_type_list[0]['constructor_list'][0]['raw_arg_types'], ['x &&'])
-        self.assertEqual(obj_type_list[0]['constructor_list'][0]['simple_arg_types'], ['x'])
+        self.assertEqual(obj_type_list[0]['constructor_list'][0]['var_names'], ['other'])
+        self.assertEqual(obj_type_list[0]['constructor_list'][0]['raw_var_types'], ['x &&'])
+        self.assertEqual(obj_type_list[0]['constructor_list'][0]['simple_var_types'], ['x'])
         self.assertEqual(obj_type_list[0]['constructor_list'][0]['definition_line'], 4)
 
         self.assertEqual(len(include_list), 1)

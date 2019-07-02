@@ -66,15 +66,6 @@ def CreateCodeGenerator(plugin):
         # ----------------------------------------------------------------------
         @classmethod
         @Interface.override
-        def _GetOptionalMetadata(cls):
-            return [
-                ("include_regexes", []),
-                ("exclude_regexes", []),
-            ] + super(CodeGenerator, cls)._GetOptionalMetadata()
-
-        # ----------------------------------------------------------------------
-        @classmethod
-        @Interface.override
         def _CreateContext(cls, metadata, status_stream):
             # Ensure that all plugin settings are present and that they are the
             # expected type.
@@ -112,12 +103,7 @@ def CreateCodeGenerator(plugin):
             context["plugin_context"] = ExtractContent(
                 context["inputs"],
                 status_stream,
-                include_regexes=context["include_regexes"],
-                exclude_regexes=context["exclude_regexes"],
             )
-
-            del context["include_regexes"]
-            del context["exclude_regexes"]
 
             return super(CodeGenerator, cls)._CreateContext(context, status_stream)
 
