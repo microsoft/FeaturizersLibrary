@@ -174,7 +174,6 @@ class TestSuite(unittest.TestCase):
                             "definition_line": 7,
                             "constructor_list": [
                                 {
-                                    "constructor_name": "CName",
                                     "var_names": ['arg1', 'arg2'],
                                     "raw_var_types": ['a', 'b'],
                                     "simple_var_types": ['c', 'd'],
@@ -194,7 +193,6 @@ class TestSuite(unittest.TestCase):
         self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
         self.assertEqual(result[0].struct_list[0].definition_line, 7)
 
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].constructor_name, "CName")
         self.assertEqual(result[0].struct_list[0].constructor_list[0].var_names, ['arg1', 'arg2'])
         self.assertEqual(result[0].struct_list[0].constructor_list[0].raw_var_types, ['a', 'b'])
         self.assertEqual(result[0].struct_list[0].constructor_list[0].simple_var_types, ['c', 'd'])
@@ -217,14 +215,12 @@ class TestSuite(unittest.TestCase):
                             "definition_line": 7,
                             "constructor_list": [
                                 {
-                                    "constructor_name": "CName",
                                     "var_names": ['arg1', 'arg2'],
                                     "raw_var_types": ['a', 'b'],
                                     "simple_var_types": ['c', 'd'],
                                     "definition_line": 13,
                                 },
                                 {
-                                    "constructor_name": "CName2",
                                     "var_names": ['arg12', 'arg22'],
                                     "raw_var_types": ['a2', 'b2'],
                                     "simple_var_types": ['c2', 'd2'],
@@ -244,13 +240,11 @@ class TestSuite(unittest.TestCase):
         self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
         self.assertEqual(result[0].struct_list[0].definition_line, 7)
 
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].constructor_name, "CName")
         self.assertEqual(result[0].struct_list[0].constructor_list[0].var_names, ['arg1', 'arg2'])
         self.assertEqual(result[0].struct_list[0].constructor_list[0].raw_var_types, ['a', 'b'])
         self.assertEqual(result[0].struct_list[0].constructor_list[0].simple_var_types, ['c', 'd'])
         self.assertEqual(result[0].struct_list[0].constructor_list[0].definition_line, 13)
 
-        self.assertEqual(result[0].struct_list[0].constructor_list[1].constructor_name, "CName2")
         self.assertEqual(result[0].struct_list[0].constructor_list[1].var_names, ['arg12', 'arg22'])
         self.assertEqual(result[0].struct_list[0].constructor_list[1].raw_var_types, ['a2', 'b2'])
         self.assertEqual(result[0].struct_list[0].constructor_list[1].simple_var_types, ['c2', 'd2'])
@@ -834,67 +828,6 @@ class TestSuite(unittest.TestCase):
 
     # ----------------------------------------------------------------------
 
-    def test_InvalidNameConstructor(self):
-        self.assertRaisesRegex(
-            Exception,
-            "An item was expected",
-            lambda: Deserialize(
-                [
-                    {
-                        "struct_list": [
-                            {
-                                "struct_name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                                "constructor_list": [
-                                    {
-                                        "constructor_name": None,
-                                        "var_names": ["ca", "cb"],
-                                        "raw_var_types": ["cc", "cd"],
-                                        "simple_var_types": ["ce", "cf"],
-                                        "definition_line": 14
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                ],
-            )
-        )
-
-        self.assertRaisesRegex(
-            Exception,
-            "'' is not a valid 'String' string - Value must have at least 1 character",
-            lambda: Deserialize(
-                [
-                    {
-                        "struct_list": [
-                            {
-                                "struct_name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                                "constructor_list": [
-                                    {
-                                        "constructor_name": "",
-                                        "var_names": ["ca", "cb"],
-                                        "raw_var_types": ["cc", "cd"],
-                                        "simple_var_types": ["ce", "cf"],
-                                        "definition_line": 14
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                ],
-            )
-        )
-
-    # ----------------------------------------------------------------------
-
     def test_InvalidArgNamesConstructor(self):
         self.assertRaisesRegex(
             Exception,
@@ -911,7 +844,6 @@ class TestSuite(unittest.TestCase):
                                 "definition_line": 7,
                                 "constructor_list": [
                                     {
-                                        "constructor_name": "Cname",
                                         "var_names": [None, "cb"],
                                         "raw_var_types": ["cc", "cd"],
                                         "simple_var_types": ["ce", "cf"],
@@ -940,7 +872,6 @@ class TestSuite(unittest.TestCase):
                                 "definition_line": 7,
                                 "constructor_list": [
                                     {
-                                        "constructor_name": "Cname",
                                         "var_names": ["", "cb"],
                                         "raw_var_types": ["cc", "cd"],
                                         "simple_var_types": ["ce", "cf"],
@@ -972,7 +903,6 @@ class TestSuite(unittest.TestCase):
                                 "definition_line": 7,
                                 "constructor_list": [
                                     {
-                                        "constructor_name": "Cname",
                                         "var_names": ["ca", "cb"],
                                         "raw_var_types": [None, "cd"],
                                         "simple_var_types": ["ce", "cf"],
@@ -1001,7 +931,6 @@ class TestSuite(unittest.TestCase):
                                 "definition_line": 7,
                                 "constructor_list": [
                                     {
-                                        "constructor_name": "Cname",
                                         "var_names": ["ca", "cb"],
                                         "raw_var_types": ["", "cd"],
                                         "simple_var_types": ["ce", "cf"],
@@ -1033,7 +962,6 @@ class TestSuite(unittest.TestCase):
                                 "definition_line": 7,
                                 "constructor_list": [
                                     {
-                                        "constructor_name": "Cname",
                                         "var_names": ["ca", "cb"],
                                         "raw_var_types": ["cc", "cd"],
                                         "simple_var_types": [None, "cf"],
@@ -1062,7 +990,6 @@ class TestSuite(unittest.TestCase):
                                 "definition_line": 7,
                                 "constructor_list": [
                                     {
-                                        "constructor_name": "Cname",
                                         "var_names": ["ca", "cb"],
                                         "raw_var_types": ["cc", "cd"],
                                         "simple_var_types": ["", "cf"],
@@ -1094,7 +1021,6 @@ class TestSuite(unittest.TestCase):
                                 "definition_line": 0,
                                 "constructor_list": [
                                     {
-                                        "constructor_name": "Cname",
                                         "var_names": ["ca", "cb"],
                                         "raw_var_types": ["cc", "cd"],
                                         "simple_var_types": ["ce", "cf"],
@@ -1123,7 +1049,6 @@ class TestSuite(unittest.TestCase):
                                 "definition_line": "String",
                                 "constructor_list": [
                                     {
-                                        "constructor_name": "Cname",
                                         "var_names": ["ca", "cb"],
                                         "raw_var_types": ["cc", "cd"],
                                         "simple_var_types": ["ce", "cf"],

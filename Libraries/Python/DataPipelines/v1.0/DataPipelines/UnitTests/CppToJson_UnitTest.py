@@ -403,6 +403,11 @@ class FuncTest(unittest.TestCase):
             int main(){
                 return 0;
             }
+
+            struct y{
+                int a, b;
+                y(struct y &&other): a(std::move(other.a)), b(std::move(other.b)){}
+            };
         ''')
 
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, None, lambda type: True))

@@ -119,6 +119,7 @@ def ObtainFunctions(
 
             cursor = translation_unit.cursor
 
+            # ----------------------------------------------------------------------
             def GetAlias():
                 """
                 This function will process all 'typedef' and 'using' and it will map the underlying type to
@@ -129,6 +130,8 @@ def ObtainFunctions(
                     if (child.kind == cindex.CursorKind.TYPEDEF_DECL or child.kind == cindex.CursorKind.TYPE_ALIAS_DECL) and child.location.file.name == input_filename:
                         alias[child.spelling] = child.underlying_typedef_type.spelling
                 return alias
+
+            # ----------------------------------------------------------------------
 
             alias = GetAlias()
 
@@ -152,7 +155,6 @@ def ObtainFunctions(
             )
 
             # ----------------------------------------------------------------------
-
             def FullVarType(types):
                 """
                 This will undo all 'typedef' and 'using' by looking for the items in the 'alias' dict and substituting
@@ -164,6 +166,7 @@ def ObtainFunctions(
 
                 types = struct_class_pattern.sub(r'', types)
                 return types
+
             # ----------------------------------------------------------------------
 
             object_type_list = []
@@ -185,18 +188,10 @@ def ObtainFunctions(
                         on_unsupported_func(_FullName(node), filename if (not is_temp_file or filename != input_filename) else None, node.location.line)
 
             # ----------------------------------------------------------------------
-
             def EnumerateFuncs(node):
                 if node.kind == cindex.CursorKind.NAMESPACE:
                     for child in node.get_children():
                         EnumerateFuncs(child)
-
-                if node.kind == cindex.CursorKind.CONSTRUCTOR:
-                    """
-                    TODO: This will support a constructor outside a struct/class. This functionality
-                    will be implemented when multiple files are supported (next PR).
-                    [EDIT]: This is proving to be much harder than expected. This will get a PR for itself later.
-                    """
 
                 if node.kind == cindex.CursorKind.FUNCTION_DECL and node.location.file.name == filename:
                     ret_type = FullVarType(node.result_type.spelling)
@@ -234,6 +229,7 @@ def ObtainFunctions(
                 for child in translation_unit.get_includes():
                     include_list.append((os.path.realpath(str(child.location.file.name)) if (not is_temp_file or child.location.file.name != input_filename) else None, os.path.realpath(os.path.join(filename, str(child.include)))))
                 return include_list
+
             # ----------------------------------------------------------------------
 
             include_list = GetIncludeList(filename)
@@ -241,10 +237,9 @@ def ObtainFunctions(
 
             return {"function_list": function_list, "object_type_list": object_type_list, "include_list": include_list}
 
-        # ----------------------------------------------------------------------
-
         clean_results = OrderedDict()
-
+        
+        # ----------------------------------------------------------------------
         def InitializeCleanResults(filename, raw_includes):
             clean_results[filename] = Results()
             for include_tuple in raw_includes:
@@ -290,12 +285,12 @@ def ObtainFunctions(
             if obj_type in needed_obj_type_list:
                 return True
             for var_type in obj_type.EnumerateSimpleVarTypes():
-                if not TestAndVerify(var_type) and GetObjType(var_type) != obj_type and not IsValidObjType(GetObjType(var_type)):
+                if GetObjType(var_type) != obj_type and not IsValidObjType(GetObjType(var_type)) and not TestAndVerify(var_type):
                     invalid_obj_type_list.append(obj_type)
                     return False
             for constructor in obj_type.constructor_list:
                 for arg_type in constructor.EnumerateSimpleVarTypes():
-                    if not TestAndVerify(arg_type) and GetObjType(arg_type) != obj_type and not IsValidObjType(GetObjType(arg_type)):
+                    if GetObjType(arg_type) != obj_type and not IsValidObjType(GetObjType(arg_type)) and not TestAndVerify(arg_type):
                         invalid_obj_type_list.append(obj_type)
                         return False
 
@@ -322,7 +317,7 @@ def ObtainFunctions(
                 return False
             return True
 
-            # ----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         for func in these_results["function_list"]:
             if IsValidFunc(func):
@@ -505,6 +500,10 @@ class Constructor(_FuncWithArguments):
     # ----------------------------------------------------------------------
     def ToDict(self):
         new_dict = super(Constructor, self).ToDict()
+        
+        # If the var name is "", it means that this is a default constructor.
+        if len(new_dict["var_names"]) == 1 and not new_dict["var_names"][0]:
+            new_dict["var_names"] = ["other"]
 
         new_dict["definition_line"] = self._definition_line
 
@@ -567,7 +566,7 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
     # The way to see if this is a definition or not, is to see if 'node' has any children.
     is_def = True
     # There are a few kinds that are supported, even though they are not directly exposed.
-    accepted_kinds = [cindex.CursorKind.CXX_ACCESS_SPEC_DECL, cindex.CursorKind.ENUM_DECL]
+    accepted_kinds = [cindex.CursorKind.CXX_ACCESS_SPEC_DECL]
 
     # ----------------------------------------------------------------------
     def DeleteDefault(node, speficier):
@@ -600,9 +599,8 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
                 has_move_constructor = True
                 if DeleteDefault(child, "default"):
                     # If this is a default move constructor, there wont be a variable name for the
-                    # argument in the function, so I create one.
+                    # argument in the function, so I create one when I return the dictionary representation.
                     assert constructor.VariableLen() == 1
-                    # TODO: constructor['arg_names'] = ['other']
 
             elif child.is_copy_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
                 # No public copy constructors are allowed.

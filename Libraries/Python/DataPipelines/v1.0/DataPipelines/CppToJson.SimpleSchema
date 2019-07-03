@@ -22,7 +22,6 @@
         <definition_line int min=1 ?>
 
         <constructor_list *>:
-            <constructor_name string>
             <var_names string *>
             <raw_var_types string *>
             <simple_var_types string *>
