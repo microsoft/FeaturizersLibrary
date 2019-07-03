@@ -20,9 +20,11 @@ def CreateCppWrapper(output_filename, data, generate_header_func):
     output = [generate_header_func("// ")]
     output.append(_GeneratePreProcessorCommands())
 
-    for key, value in data.items():
-        function_list = value["function_list"]
-        for function in function_list:
+    for value in data.values():
+        for include in value["include_list"]:
+            output.insert(1, "#include \"{}\"\n".format(include.split(os.sep)[-1]))
+
+        for function in value["function_list"]:
 
             function_name = function["func_name"]
             var_names = function["var_names"]

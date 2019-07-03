@@ -34,7 +34,7 @@ class StandardSuite(unittest.TestCase):
 
             mocked.return_value = sink
 
-            function_input = self.CreateSingleFunctionInput()
+            function_input = self._CreateSingleFunctionInput()
 
             result = CreateCppWrapper.CreateCppWrapper("ignored", function_input, lambda prefix: "{}The file header!\n".format(prefix))
             sink = sink.getvalue()
@@ -71,7 +71,7 @@ class StandardSuite(unittest.TestCase):
 
             mocked.return_value = sink
 
-            function_input = self.CreateTwoFunctionInput()
+            function_input = self._CreateTwoFunctionInput()
 
             result = CreateCppWrapper.CreateCppWrapper("ignored", function_input, lambda prefix: "{}The file header!\n".format(prefix))
             sink = sink.getvalue()
@@ -115,7 +115,7 @@ class StandardSuite(unittest.TestCase):
 
             mocked.return_value = sink
 
-            function_input = self.CreateFunctionOneInputParameter()
+            function_input = self._CreateFunctionOneInputParameter()
 
             result = CreateCppWrapper.CreateCppWrapper("ignored", function_input, lambda prefix: "{}The file header!\n".format(prefix))
             sink = sink.getvalue()
@@ -152,7 +152,7 @@ class StandardSuite(unittest.TestCase):
 
             mocked.return_value = sink
 
-            function_input = self.CreateFunctionNoInputParameters()
+            function_input = self._CreateFunctionNoInputParameters()
 
             result = CreateCppWrapper.CreateCppWrapper("ignored", function_input, lambda prefix: "{}The file header!\n".format(prefix))
             sink = sink.getvalue()
@@ -182,65 +182,112 @@ class StandardSuite(unittest.TestCase):
                 ),
             )
     
+    def test_FunctionWithMultipleTypesAndIncludesParameters(self):
+        with unittest.mock.patch("MlNetPluginImpl.CreateCppWrapper.open") as mocked:
+            sink = six.moves.StringIO()
+            sink.close = lambda: None
+
+            mocked.return_value = sink
+
+            function_input = self._CreateMultipleTypesWithIncludesFunctionInput()
+
+            result = CreateCppWrapper.CreateCppWrapper("ignored", function_input, lambda prefix: "{}The file header!\n".format(prefix))
+            sink = sink.getvalue()
+
+            self.assertEqual(result, 0)
+            self.assertEqual(
+                sink,
+                textwrap.dedent(
+                    """\
+                    // The file header!
+                    #include "cstdint"
+
+                    #if defined(_MSC_VER)
+                    #   define EXPORT __declspec(dllexport)
+                    #elif defined(__GNUC__)
+                    #   define EXPORT __attribute__((visibility("default")))
+                    #else
+                    #   error unsupported!
+                    #endif
+
+                    std::int64_t Add(std::uint32_t, double, char);
+                    extern "C" {
+                        EXPORT std::int64_t AddProxy(std::uint32_t a, double b, char c) {
+                            return Add(a, b, c);
+                        }
+                    }
+                    """
+                ),
+            )
+
     """
     TESTING HELPER METHODS
     """
-    def CreateFunctionOneInputParameter(self):
-        result = {}
-        function_list = []
-        intermediate_object = {}
-        function = self.CreateFunction("Add", 
+    def _CreateFunctionOneInputParameter(self):
+        function = self._CreateFunction("Add", 
             ["a"],
             "int",
             ["int"],
             ["int"],
             "int"
         )
-        function_list.append(function)
-        intermediate_object["function_list"] = function_list
-        result["file_name"] = intermediate_object
+        function_list = [function]
+        
+        intermediate_object = {
+            "function_list" : function_list,
+            "include_list" : []
+        }
+
+        result = {
+            "file_name" : intermediate_object
+        }
 
         return result
 
-    def CreateFunctionNoInputParameters(self):
-        result = {}
-        function_list = []
-        intermediate_object = {}
-        function = self.CreateFunction("Add", 
+    def _CreateFunctionNoInputParameters(self):
+        function = self._CreateFunction("Add", 
             [],
             "int",
             [],
             [],
             "int"
         )
-        function_list.append(function)
-        intermediate_object["function_list"] = function_list
-        result["file_name"] = intermediate_object
+        function_list = [function]
+        
+        intermediate_object = {
+            "function_list" : function_list,
+            "include_list" : []
+        }
+
+        result = {
+            "file_name" : intermediate_object
+        }
 
         return result
 
-    def CreateSingleFunctionInput(self):
-        result = {}
-        function_list = []
-        intermediate_object = {}
-        function = self.CreateFunction("Add", 
+    def _CreateSingleFunctionInput(self):
+        function = self._CreateFunction("Add", 
             ["a", "b"],
             "int",
             ["int", "int"],
             ["int", "int"],
             "int"
         )
-        function_list.append(function)
-        intermediate_object["function_list"] = function_list
-        result["file_name"] = intermediate_object
+        function_list = [function]
+        
+        intermediate_object = {
+            "function_list" : function_list,
+            "include_list" : []
+        }
+
+        result = {
+            "file_name" : intermediate_object
+        }
 
         return result
 
-    def CreateTwoFunctionInput(self):
-        result = {}
-        function_list = []
-        intermediate_object = {}
-        first_function = self.CreateFunction("Add", 
+    def _CreateTwoFunctionInput(self):
+        first_function = self._CreateFunction("Add", 
             ["a", "b"],
             "int",
             ["int", "int"],
@@ -248,7 +295,7 @@ class StandardSuite(unittest.TestCase):
             "int"
         )
 
-        second_function = self.CreateFunction("Subtract", 
+        second_function = self._CreateFunction("Subtract", 
             ["a", "b"],
             "int",
             ["int", "int"],
@@ -256,14 +303,41 @@ class StandardSuite(unittest.TestCase):
             "int"
         )
 
-        function_list.append(first_function)
-        function_list.append(second_function)
-        intermediate_object["function_list"] = function_list
-        result["file_name"] = intermediate_object
+        function_list = [first_function, second_function]
+        
+        intermediate_object = {
+            "function_list" : function_list,
+            "include_list" : []
+        }
+
+        result = {
+            "file_name" : intermediate_object
+        }
 
         return result
 
-    def CreateFunction(self, func_name, var_names, simple_return_type, raw_var_type, simple_var_types, raw_return_type):
+    def _CreateMultipleTypesWithIncludesFunctionInput(self):
+        function = self._CreateFunction("Add", 
+            ["a", "b", "c"],
+            "std::int64_t",
+            ["std::uint32_t", "double", "char"],
+            ["std::uint32_t", "double", "char"],
+            "std::int64_t"
+        )
+        function_list = [function]
+        
+        intermediate_object = {
+            "function_list" : function_list,
+            "include_list" : ["{0}some{0}file{0}path{0}cstdint".format(os.sep)]
+        }
+
+        result = {
+            "file_name" : intermediate_object
+        }
+
+        return result
+
+    def _CreateFunction(self, func_name, var_names, simple_return_type, raw_var_type, simple_var_types, raw_return_type):
         function = {}
         function["func_name"] = func_name
         function["var_names"] = var_names

@@ -684,6 +684,268 @@ class StandardSuite(unittest.TestCase):
                 ),
             )
     
+    def test_FullDifferentTypesParametersFile(self):
+        with unittest.mock.patch("MlNetPluginImpl.CreateCsFile.open") as mocked:
+            sink = six.moves.StringIO()
+            sink.close = lambda: None
+
+            mocked.return_value = sink
+
+            function = self._CreateFunctionDifferentTypesInputParameters()
+
+            result = CreateCsFile.CreateCsFile(function, "ignored", "Add", lambda prefix: "{}The file header!\n".format(prefix))
+            sink = sink.getvalue()
+
+            self.assertEqual(result, 0)
+            self.assertEqual(
+                textwrap.dedent(sink),
+                textwrap.dedent(
+                    """\
+                    // The file header!
+                    using Microsoft.ML;
+                    using Microsoft.ML.Data;
+                    using Microsoft.ML.Runtime;
+                    using System;
+                    using System.Linq;
+                    using System.Runtime.InteropServices;
+
+
+                    namespace Microsoft.ML.Autogen
+                    {
+                        
+                        public static class AddExtensionClass
+                        {
+                            
+                            public class TransformParameter<T>
+                            {
+                                private readonly T _rawValue;
+                                public readonly DataViewSchema.Column? Column;
+                                
+                                public T GetValue(DataViewRow row)
+                                {
+                                    if (Column.HasValue)
+                                    {
+                                        var column = row.Schema[Column.Value.Name];
+                                        var getter = row.GetGetter<T>(column);
+                                        T value = default;
+                                        getter(ref value);
+                                        return value;
+                                    }
+                                    else
+                                    {
+                                        return _rawValue;
+                                    }
+                                }
+                                
+                                public TransformParameter(T value)
+                                {
+                                    _rawValue = value;
+                                    Column = null;
+                                }
+                                
+                                public TransformParameter(DataViewSchema.Column column)
+                                {
+                                    _rawValue = default;
+                                    Column = column;
+                                }
+                                
+                            }
+                            
+                            public static AddEstimator Add(this TransformsCatalog catalog, uint a, double b, char c, string outputColumn)
+                                => AddEstimator.Create(CatalogUtils.GetEnvironment(catalog), a, b, c, outputColumn);
+                            
+                            public static AddEstimator Add(this TransformsCatalog catalog, uint a, double b, DataViewSchema.Column c, string outputColumn)
+                                => AddEstimator.Create(CatalogUtils.GetEnvironment(catalog), a, b, c, outputColumn);
+                            
+                            public static AddEstimator Add(this TransformsCatalog catalog, uint a, DataViewSchema.Column b, char c, string outputColumn)
+                                => AddEstimator.Create(CatalogUtils.GetEnvironment(catalog), a, b, c, outputColumn);
+                            
+                            public static AddEstimator Add(this TransformsCatalog catalog, uint a, DataViewSchema.Column b, DataViewSchema.Column c, string outputColumn)
+                                => AddEstimator.Create(CatalogUtils.GetEnvironment(catalog), a, b, c, outputColumn);
+                            
+                            public static AddEstimator Add(this TransformsCatalog catalog, DataViewSchema.Column a, double b, char c, string outputColumn)
+                                => AddEstimator.Create(CatalogUtils.GetEnvironment(catalog), a, b, c, outputColumn);
+                            
+                            public static AddEstimator Add(this TransformsCatalog catalog, DataViewSchema.Column a, double b, DataViewSchema.Column c, string outputColumn)
+                                => AddEstimator.Create(CatalogUtils.GetEnvironment(catalog), a, b, c, outputColumn);
+                            
+                            public static AddEstimator Add(this TransformsCatalog catalog, DataViewSchema.Column a, DataViewSchema.Column b, char c, string outputColumn)
+                                => AddEstimator.Create(CatalogUtils.GetEnvironment(catalog), a, b, c, outputColumn);
+                            
+                            public static AddEstimator Add(this TransformsCatalog catalog, DataViewSchema.Column a, DataViewSchema.Column b, DataViewSchema.Column c, string outputColumn)
+                                => AddEstimator.Create(CatalogUtils.GetEnvironment(catalog), a, b, c, outputColumn);
+                        }
+                        
+                        public class AddEstimator : IEstimator<AddTransformer>
+                        {
+                            private AddExtensionClass.TransformParameter<uint>  _a = default;
+                            private AddExtensionClass.TransformParameter<double>  _b = default;
+                            private AddExtensionClass.TransformParameter<char>  _c = default;
+                            private string _outputColumn = default;
+                            
+                            private readonly IHost _host;
+                            private static Type GetParameterType(object obj)
+                            {
+                                if (obj.GetType() == typeof(DataViewSchema.Column))
+                                {
+                                    return ((DataViewSchema.Column)obj).Type.RawType;
+                                }
+                                else
+                                {
+                                    return obj.GetType();
+                                }
+                            }
+                            
+                            private static Type GetParameterClassType(object obj)
+                            {
+                                var type = GetParameterType(obj);
+                                return typeof(AddExtensionClass.TransformParameter<>).MakeGenericType(type);
+                            }
+                            
+                            public static AddEstimator Create(IHostEnvironment env, object a, object b, object c, string outputColumn)
+                            {
+                                
+                                var aParam = new object[] { a };
+                                var aType = GetParameterClassType(a);
+                                var aInstance = Activator.CreateInstance(aType, aParam);
+                                
+                                var bParam = new object[] { b };
+                                var bType = GetParameterClassType(b);
+                                var bInstance = Activator.CreateInstance(bType, bParam);
+                                
+                                var cParam = new object[] { c };
+                                var cType = GetParameterClassType(c);
+                                var cInstance = Activator.CreateInstance(cType, cParam);
+                                
+                                var param = new object[] { env, aInstance, bInstance, cInstance, outputColumn };
+                                var estimator = Activator.CreateInstance(typeof(AddEstimator), param);
+                                
+                                return (AddEstimator)estimator;
+                            }
+                            
+                            public AddEstimator(IHostEnvironment env, AddExtensionClass.TransformParameter<uint> a, AddExtensionClass.TransformParameter<double> b, AddExtensionClass.TransformParameter<char> c, string outputColumn)
+                            {
+                                _a = a;
+                                _b = b;
+                                _c = c;
+                                _outputColumn = outputColumn;
+                                _host = env.Register(nameof(AddEstimator));
+                            }
+                            
+                            public AddTransformer Fit(IDataView input)
+                            {
+                                return new AddTransformer(_host, _a, _b, _c, _outputColumn);
+                            }
+                            
+                            public SchemaShape GetOutputSchema(SchemaShape inputSchema)
+                            {
+                                var columns = inputSchema.ToDictionary(x => x.Name);
+                                SchemaShape.Column col;
+                                
+                                col = new SchemaShape.Column(_outputColumn, SchemaShape.Column.VectorKind.Scalar,
+                                ColumnTypeExtensions.PrimitiveTypeFromType(typeof(long)), false, null);
+                                
+                                columns[_outputColumn] = col;
+                                return new SchemaShape(columns.Values);
+                            }
+                            
+                        }
+                        
+                        public class AddTransformer : RowToRowTransformerBase
+                        {
+                            private AddExtensionClass.TransformParameter<uint> _a = default;
+                            private AddExtensionClass.TransformParameter<double> _b = default;
+                            private AddExtensionClass.TransformParameter<char> _c = default;
+                            private string _outputColumn = default;
+                            
+                            public AddTransformer(IHost host, AddExtensionClass.TransformParameter<uint> a, AddExtensionClass.TransformParameter<double> b, AddExtensionClass.TransformParameter<char> c, string outputColumn) :
+                                base(host.Register(nameof(AddTransformer)))
+                            {
+                                _a = a;
+                                _b = b;
+                                _c = c;
+                                _outputColumn = outputColumn;
+                            }
+                            
+                            protected class Mapper : MapperBase
+                            {
+                                private readonly AddTransformer _parent;
+                                
+                                [DllImport("Add.dll", EntryPoint = "AddProxy")]
+                                extern static long Add(uint a, double b, char c);
+                                
+                                public Mapper(AddTransformer parent, DataViewSchema inputSchema) :
+                                    base(parent.Host.Register(nameof(Mapper)), inputSchema, parent)
+                                {
+                                    _parent = parent;
+                                }
+                                
+                                protected override DataViewSchema.DetachedColumn[] GetOutputColumnsCore()
+                                {
+                                    var output = new DataViewSchema.DetachedColumn(_parent._outputColumn,
+                                    ColumnTypeExtensions.PrimitiveTypeFromType(typeof(long)));
+                                    return new DataViewSchema.DetachedColumn[] { output };
+                                }
+                                
+                                private Delegate MakeGetter(DataViewRow input, int iinfo)
+                                {
+                                    ValueGetter<long> result = (ref long dst) =>
+                                    {
+                                        var aVal =  _parent._a.GetValue(input);
+                                        var bVal =  _parent._b.GetValue(input);
+                                        var cVal =  _parent._c.GetValue(input);
+                                        dst = Add(aVal, bVal, cVal);
+                                    };
+                                    
+                                    return result;
+                                }
+                                
+                                protected override Delegate MakeGetter(DataViewRow input, int iinfo, Func<int, bool> activeOutput, out Action disposer)
+                                {
+                                    disposer = null;
+                                    return MakeGetter(input, iinfo);
+                                }
+                                
+                                protected override Func<int, bool> GetDependenciesCore(Func<int, bool> activeOutput)
+                                {
+                                    var active = new bool[InputSchema.Count];
+                                    for (int i = 0; i < InputSchema.Count; i++)
+                                    {
+                                        if (_parent._a.Column.HasValue && InputSchema[i].Name.Equals(_parent._a.Column.Value.Name))
+                                        {
+                                            active[i] = true;
+                                        }
+                                        if (_parent._b.Column.HasValue && InputSchema[i].Name.Equals(_parent._b.Column.Value.Name))
+                                        {
+                                            active[i] = true;
+                                        }
+                                        if (_parent._c.Column.HasValue && InputSchema[i].Name.Equals(_parent._c.Column.Value.Name))
+                                        {
+                                            active[i] = true;
+                                        }
+                                    }
+                                    
+                                    return col => active[col];
+                                }
+                                
+                                protected override void SaveModel(ModelSaveContext ctx)
+                                {
+                                    throw new NotImplementedException();
+                                }
+                            }
+                            
+                            protected override IRowMapper MakeRowMapper(DataViewSchema schema) => new Mapper(this, schema);
+                            
+                            protected override void SaveModel(ModelSaveContext ctx)
+                            {
+                                throw new NotImplementedException();
+                            }
+                        }
+                    }
+                    """,
+                ),
+            )
+
     """
     TESTING HELPER METHODS
     """
@@ -724,6 +986,17 @@ class StandardSuite(unittest.TestCase):
             ["int", "int"],
             ["int", "int"],
             "int"
+        )
+
+        return function
+
+    def _CreateFunctionDifferentTypesInputParameters(self):
+        function = self.CreateFunction("Add", 
+            ["a", "b", "c"],
+            "std::int64_t",
+            ["std::uint32_t", "double", "char"],
+            ["std::uint32_t", "double", "char"],
+            "std::int64_t"
         )
 
         return function

@@ -44,8 +44,8 @@ def GenerateMLNetWrapper(function, output_name):
 
     function_name = function["func_name"]
     variable_names = function["var_names"]
-    variable_types = function["simple_var_types"]
-    return_type = function["simple_return_type"]
+    variable_types = list(_CppToCSharpVariableMapping(function["simple_var_types"]))
+    return_type = next(_CppToCSharpVariableMapping([function["simple_return_type"]]))
 
     extension_class_name = "{0}ExtensionClass".format(function_name)
     estimator_class_name = "{0}Estimator".format(function_name)
@@ -71,6 +71,39 @@ def GenerateMLNetWrapper(function, output_name):
     ]
     
     return "".join(code)
+
+def _CppToCSharpVariableMapping(variable_types):
+    """
+    Takes a list of C++ variable types and returns an equal size list of
+    C# variable types
+    """
+    # Initialize the dictionary of type mappings
+    mapping = {
+        "std::int8_t" : "sbyte",
+        "int8_t" : "sbyte",
+        "std::int16_t" : "short",
+        "int16_t" : "short",
+        "std::int32_t" : "int",
+        "int32_t" : "int",
+        "std::int64_t" : "long",
+        "int64_t" : "long",
+        "std::uint8_t" : "byte",
+        "uint8_t" : "byte",
+        "std::uint16_t" : "ushort",
+        "uint16_t" : "ushort",
+        "std::uint32_t" : "uint",
+        "uint32_t" : "uint",
+        "std::uint64_t" : "ulong",
+        "uint64_t" : "ulong",
+        "int" : "int",
+        "float" : "float",
+        "double" : "double",
+        "char" : "char",
+        "bool" : "bool"
+    }
+
+    for variable_type in variable_types:
+        yield mapping[variable_type]
 
 def _FormatAsCSharpAndWriteFile(output_filename, code):
     """

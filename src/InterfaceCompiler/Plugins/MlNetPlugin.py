@@ -113,19 +113,21 @@ class Plugin(PluginBase):
             if dm.result != 0:
                 return dm.result
 
+        current_filename_index = 0
         for value in plugin_context.values():
             function_list = value["function_list"]
-            for function, file_name in zip(function_list, cs_filenames):
-                status_stream.write("'{}'...".format(file_name))
+            for function in function_list:
+                status_stream.write("'{}'...".format(cs_filenames[current_filename_index]))
                 with status_stream.DoneManager() as dm:
                     dm.result = CreateCsFile(
                         function,
-                        file_name,
+                        cs_filenames[current_filename_index],
                         context["output_name"],
                         cls._GenerateFileHeader,
                     )
                     if dm.result != 0:
                         return dm.result
+                current_filename_index += 1          
 
         status_stream.write("'{}'...".format(cmake_filename))
         with status_stream.DoneManager() as dm:
