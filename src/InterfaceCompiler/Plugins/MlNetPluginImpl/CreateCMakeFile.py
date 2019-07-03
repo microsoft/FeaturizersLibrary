@@ -6,6 +6,7 @@
 
 import os
 import textwrap
+from pathlib import Path
 
 import CommonEnvironment
 from CommonEnvironment import StringHelpers
@@ -69,7 +70,7 @@ def CreateCMakeFile(
         ).format(
             output_name=output_name,
             binary_version=binary_version,
-            filenames=StringHelpers.LeftJustify("\n".join(input_filenames + [cpp_wrapper_filename]), 4).rstrip(),
+            filenames=StringHelpers.LeftJustify(Path("\n".join(input_filenames + [cpp_wrapper_filename])).as_posix(), 4).rstrip(),
         ),
     )
 

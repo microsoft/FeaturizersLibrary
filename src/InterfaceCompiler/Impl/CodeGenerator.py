@@ -96,14 +96,18 @@ def CreateCodeGenerator(plugin):
             metadata["plugin_settings"] = plugin.PreprocessMetadata(plugin_settings)
 
             context = plugin.PreprocessContext(metadata)
-            context["output_filenames"] = [os.path.join(context["output_dir"], filename) for filename in plugin.GenerateOutputFilenames(context)]
-            context = plugin.PostprocessContext(context)
 
             # Create data based on the input files
             context["plugin_context"] = ExtractContent(
                 context["inputs"],
                 status_stream,
             )
+
+            context["output_filenames"] = [os.path.join(context["output_dir"], filename) for filename in plugin.GenerateOutputFilenames(context)]
+            context = plugin.PostprocessContext(context)
+
+            del context["include_regexes"]
+            del context["exclude_regexes"]
 
             return super(CodeGenerator, cls)._CreateContext(context, status_stream)
 

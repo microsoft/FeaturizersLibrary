@@ -15,6 +15,7 @@ from CommonEnvironment import Interface
 from MlNetPluginImpl.CreateCMakeFile import CreateCMakeFile
 from MlNetPluginImpl.CreateCppWrapper import CreateCppWrapper
 from MlNetPluginImpl.CreateCsFile import CreateCsFile
+from MlNetPluginImpl.CreateCsInstructions import CreateCsInstructions
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -58,6 +59,7 @@ class Plugin(PluginBase):
             inspect.getfile(CreateCMakeFile),
             inspect.getfile(CreateCppWrapper),
             inspect.getfile(CreateCsFile),
+            inspect.getfile(CreateCsInstructions),
         ] + super(Plugin, cls).GetAdditionalGeneratorFilenames()
 
     # ----------------------------------------------------------------------
@@ -68,8 +70,18 @@ class Plugin(PluginBase):
         output_name = context["output_name"]
 
         yield "{}.wrapper.cpp".format(output_name)
-        yield "{}.cs".format(output_name)
         yield "CMakeLists.txt"
+        yield "CSharpCompileInstructions.txt"
+
+        # C# creates one .cs class per function, so we are loopiong through
+        # all the function names to correctly determine the .cs file name.
+
+        for value in context["plugin_context"].values():
+            function_list = value["function_list"]
+            for function in function_list:
+                function_name = function["func_name"]
+                yield "{}{}.cs".format(output_name, function_name)
+        
 
     # ----------------------------------------------------------------------
     @classmethod
@@ -84,8 +96,9 @@ class Plugin(PluginBase):
     ):
         (
             cpp_filename,
-            cs_filename,
             cmake_filename,
+            cs_instructions,
+            *cs_filenames,
         ) = context["output_filenames"]
 
         plugin_context = context["plugin_context"]
@@ -100,15 +113,19 @@ class Plugin(PluginBase):
             if dm.result != 0:
                 return dm.result
 
-        status_stream.write("'{}'...".format(cs_filename))
-        with status_stream.DoneManager() as dm:
-            dm.result = CreateCsFile(
-                cs_filename,
-                plugin_context,
-                cls._GenerateFileHeader,
-            )
-            if dm.result != 0:
-                return dm.result
+        for value in plugin_context.values():
+            function_list = value["function_list"]
+            for function, file_name in zip(function_list, cs_filenames):
+                status_stream.write("'{}'...".format(file_name))
+                with status_stream.DoneManager() as dm:
+                    dm.result = CreateCsFile(
+                        function,
+                        file_name,
+                        context["output_name"],
+                        cls._GenerateFileHeader,
+                    )
+                    if dm.result != 0:
+                        return dm.result
 
         status_stream.write("'{}'...".format(cmake_filename))
         with status_stream.DoneManager() as dm:
@@ -120,6 +137,17 @@ class Plugin(PluginBase):
                 cpp_filename,
                 cls._GenerateFileHeader,
                 binary_version=context["plugin_settings"]["binary_version"],
+            )
+            if dm.result != 0:
+                return dm.result
+
+        status_stream.write("'{}'...".format(cs_instructions))
+        with status_stream.DoneManager() as dm:
+            dm.result = CreateCsInstructions(
+                cs_instructions,
+                context["output_name"],
+                context["output_dir"],
+                cls._GenerateFileHeader,
             )
             if dm.result != 0:
                 return dm.result

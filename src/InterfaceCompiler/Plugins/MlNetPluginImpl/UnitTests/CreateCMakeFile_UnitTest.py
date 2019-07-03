@@ -95,6 +95,70 @@ class StandardSuite(unittest.TestCase):
                 ),
             )
 
+    def test_allFileShouldHavePosixFilenamesForCMakeFile(self):
+        with unittest.mock.patch("MlNetPluginImpl.CreateCMakeFile.open") as mocked:
+            sink = six.moves.StringIO()
+            sink.close = lambda: None
+
+            mocked.return_value = sink
+
+            result = CreateCMakeFile.CreateCMakeFile(
+                "TestOutputFilename",
+                None,
+                "TestOutputName",
+                [os.path.join("Temp", "one.cpp"), os.path.join("Temp", "two.cpp")],
+                "generated.wrapper.cpp",
+                lambda prefix: "{}The file header!\n".format(prefix),
+                binary_version="2.3.4",
+            )
+            sink = sink.getvalue()
+
+            self.assertEqual(result, 0)
+            self.assertEqual(
+                sink,
+                textwrap.dedent(
+                    """\
+                    # The file header!
+                    cmake_minimum_required(VERSION 3.5.0)
+
+                    project(TestOutputName VERSION 2.3.4 LANGUAGES CXX)
+
+                    set(CMAKE_MODULE_PATH "$ENV{DEVELOPMENT_ENVIRONMENT_CMAKE_MODULE_PATH}")
+                    set(_includes "$ENV{INCLUDE}")
+                    set(_libs "$ENV{LIB}")
+
+                    if(NOT WIN32)
+                        string(REPLACE ":" ";" CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}")
+                        string(REPLACE ":" ";" _includes "${_includes}")
+                        string(REPLACE ":" ";" _libs "${_libs}")
+                    endif()
+
+                    include(CppCommon)
+
+                    set(CMAKE_CXX_STANDARD 17)
+                    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+                    set(CMAKE_CXX_EXTENSIONS OFF)
+
+                    if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+                        foreach(_flag IN ITEMS
+                            -Wno-missing-prototypes
+                        )
+                            string(APPEND CMAKE_CXX_FLAGS " ${_flag}")
+                        endforeach()
+                    endif()
+
+                    add_library( TestOutputName SHARED
+                        Temp/one.cpp
+                        Temp/two.cpp
+                        generated.wrapper.cpp
+                    )
+
+                    target_include_directories(TestOutputName PRIVATE ${_includes})
+                    target_link_directories(TestOutputName PRIVATE ${_libs})
+                    """,
+                ),
+            )
+
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
