@@ -89,6 +89,7 @@ def ObtainFunctions(
                 )"""
             )
         )
+        # TODO: Dont support pointers.
         pattern_star  = re.compile(r"\**(\* )*")
         pattern_amper = re.compile("&*(& )*")
 
@@ -97,6 +98,7 @@ def ObtainFunctions(
             """
             Remove 'const', '*' and '&'
             """
+            # TODO: Dont support pointers.
             name = re.sub(pattern_const,  "", name)
             name = re.sub(pattern_star,  "", name)
             name = re.sub(pattern_amper,  "", name)
@@ -184,6 +186,7 @@ def ObtainFunctions(
                     if obj_type:
                         object_type_list.append(obj_type)
                     elif obj_type is None and node.location.file.name == filename:
+                        # TODO: Change this to not require that functions on the file are valid.
                         # If None was returned, there was a problem with the ObjectType and it can't be processed
                         on_unsupported_func(_FullName(node), filename if (not is_temp_file or filename != input_filename) else None, node.location.line)
 
@@ -298,22 +301,14 @@ def ObtainFunctions(
             return True
 
         # ----------------------------------------------------------------------
-
-        # All ObjTypes in my file are required.
-        for obj_type in these_results["object_type_list"]:
-            if filename is None or obj_type.Filename == filename:
-                if not IsValidObjType(obj_type):
-                    on_unsupported_func(obj_type.Name, filename, obj_type.DefinitionLine)
-
-        # ----------------------------------------------------------------------
         def IsValidFunc(func):
             """
             A function is valid if all var types are valid.
             """
             for var_type in func["simple_var_types"]:
-                if not TestAndVerify(var_type) and not IsValidObjType(GetObjType(var_type)):
+                if not TestAndVerify(var_type):
                     return False
-            if not TestAndVerify(func["simple_return_type"]) and not IsValidObjType(GetObjType(func["simple_return_type"])):
+            if not IsValidObjType(GetObjType(func["simple_return_type"])) and not TestAndVerify(func["simple_return_type"]):
                 return False
             return True
 
@@ -611,6 +606,7 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
             object_type.AddVar(child.spelling, var_type, SimpleVarType(var_type))
             if child.access_specifier != cindex.AccessSpecifier.PUBLIC:
                 valid_object_type = False
+
         elif child.kind == cindex.CursorKind.CXX_METHOD:
             # If this method ends in "=delete", ignore it.
             if DeleteDefault(child, "delete"):
@@ -627,6 +623,11 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
                 # No other functions besides move operators are allowed.
                 valid_object_type = False
 
+        elif child.kind == cindex.CursorKind.CXX_BASE_SPECIFIER:
+            # TODO: This means that this classLikeObject depends on another one
+            # there is the need to revify if the one that this one depends on is valid.
+            # Check that this is public.
+            pass
         elif child.kind not in accepted_kinds:
             valid_object_type = False
 

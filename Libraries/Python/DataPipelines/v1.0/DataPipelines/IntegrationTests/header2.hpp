@@ -4,7 +4,7 @@
 
 struct go2{
     int a, b;
-    go2(struct go2 &&other): a(std::move(other.a)), b(std::move(other.b)){}
+    go2(go2 &&other): a(std::move(other.a)), b(std::move(other.b)){}
 };
 
 

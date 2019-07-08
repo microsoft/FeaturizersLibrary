@@ -148,12 +148,12 @@ class FileTest(unittest.TestCase):
         obj_type_list = self._GetObjList(filename, CppToJson.ObtainFunctions(filename, None, lambda type: True))
         include_list = self._GetIncludeList(filename, CppToJson.ObtainFunctions(filename, None, lambda type: True))
 
-        self.assertEqual(func_list[0], {'func_name': 'go', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': ['ya'], 'raw_var_types': ['x'], 'simple_var_types': ['x'], 'declaration_line': None, 'definition_line': 12})
-        self.assertEqual(func_list[1], {'func_name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'declaration_line': None, 'definition_line': 16})
+        self.assertEqual(func_list[0], {'func_name': 'go', 'raw_return_type': 'x *', 'simple_return_type': 'x', 'var_names': ['y'], 'raw_var_types': ['int'], 'simple_var_types': ['int'], 'declaration_line': None, 'definition_line': 12})
+        self.assertEqual(func_list[1], {'func_name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'declaration_line': None, 'definition_line': 17})
 
         self.assertEqual(obj_type_list[0], {'name': 'x', 'var_names': ['a', 'b'], 'raw_var_types': ['int', 'int'], 'simple_var_types': ['int', 'int'], 'definition_line': 3, 'constructor_list': [{'var_names': ['other'], 'raw_var_types': ['x &&'], 'simple_var_types': ['x'], 'definition_line': 5}, {'var_names': ['xa', 'xb'], 'raw_var_types': ['int', 'int'], 'simple_var_types': ['int', 'int'], 'definition_line': 6}]})
 
-        self.assertEqual(len(include_list), 1)
+        self.assertEqual(len(include_list), 2)
 
     def test_multiple_includes(self):
         filename = os.path.join(_script_dir, "includes.cpp")
@@ -173,8 +173,8 @@ class FileTest(unittest.TestCase):
         self.assertEqual(len(all_results), 3)
 
         self.assertEqual(filename, list(all_results.keys())[0])
-        self.assertEqual(all_results[filename]["function_list"][0], {'func_name': 'gox', 'raw_return_type': 'void', 'simple_return_type': 'void', 'var_names': ['x'], 'raw_var_types': ['go'], 'simple_var_types': ['go'], 'declaration_line': None, 'definition_line': 4})
-        self.assertEqual(all_results[filename]["function_list"][1], {'func_name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'declaration_line': None, 'definition_line': 8})
+        self.assertEqual(all_results[filename]["function_list"][0], {'func_name': 'gox', 'raw_return_type': 'go *', 'simple_return_type': 'go', 'var_names': ['y'], 'raw_var_types': ['int'], 'simple_var_types': ['int'], 'declaration_line': None, 'definition_line': 4})
+        self.assertEqual(all_results[filename]["function_list"][1], {'func_name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'declaration_line': None, 'definition_line': 9})
         self.assertEqual(all_results[filename]["object_type_list"], [])
         self.assertEqual(len(all_results[filename]["include_list"]), 1)
 

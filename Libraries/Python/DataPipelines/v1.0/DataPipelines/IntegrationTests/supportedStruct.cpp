@@ -1,16 +1,17 @@
 #include <utility>
-
+#include <cstdio>
 struct x{
     int a, b;
-    x(struct x &&other): a(std::move(other.a)), b(std::move(other.b)){}
+    x(x &&other): a(std::move(other.a)), b(std::move(other.b)){}
     x(int xa, int xb){
         a=xa;
         b=xb;
     }
 };
 
-int go(struct x ya){
-    return 2;
+struct x *go(int y){
+    x *ret = NULL;
+    return ret;
 }
 
 int main(){

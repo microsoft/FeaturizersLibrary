@@ -1,8 +1,9 @@
 #include "header1.hpp"
 
 
-void gox(struct go x){
-    
+struct go *gox(int y){
+    struct go* ret = NULL;
+    return ret;
 }
 
 int main(){

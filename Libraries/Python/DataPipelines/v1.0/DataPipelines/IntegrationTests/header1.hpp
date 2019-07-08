@@ -5,12 +5,12 @@
 struct go{
     int a, b;
     go2 x;
-    go(struct go &&other): a(std::move(other.a)), b(std::move(other.b)), x(std::move(other.x)){}
+    go(go &&other): a(std::move(other.a)), b(std::move(other.b)), x(std::move(other.x)){}
 };
 
 struct oth{
     int x;
-    oth(struct oth &&other): x(std::move(other.x)){}
+    oth(oth &&other): x(std::move(other.x)){}
 };
 
 int notCounting(std::vector<float> v){
