@@ -22,7 +22,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 sys.path.insert(0, os.path.join(_script_dir, ".."))
 with CallOnExit(lambda: sys.path.pop(0)):
-    from Plugin import PluginBase
+    from Plugin import PluginBase           # <unable to import> pylint: disable = E0401
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
@@ -30,7 +30,9 @@ class Plugin(PluginBase):
     # ----------------------------------------------------------------------
     # |  Properties
     Name                                    = Interface.DerivedProperty("Debug")
-    Description                             = Interface.DerivedProperty("Plugin that displays debug information and nothing else")
+    Description                             = Interface.DerivedProperty(
+        "Plugin that displays debug information and nothing else",
+    )
 
     # ----------------------------------------------------------------------
     # |  Methods
@@ -50,7 +52,7 @@ class Plugin(PluginBase):
     # ----------------------------------------------------------------------
     @staticmethod
     @Interface.override
-    def Execute(invoke_reason, context, status_stream, verbose_stream, verbose):
+    def Execute(invoke_reason, context, status_stream, verbose_stream, verbose): # <unused argument> pylint: disable = W0613
         assert len(context["output_filenames"]) == 1, context["output_filenames"]
         output_filename = context["output_filenames"][0]
 

@@ -24,7 +24,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 sys.path.insert(0, os.path.join(_script_dir, ".."))
 with CallOnExit(lambda: sys.path.pop(0)):
-    from Plugin import PluginBase
+    from Plugin import PluginBase           # <unable to import> pylint: disable = E0401
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
@@ -93,7 +93,7 @@ class Plugin(PluginBase):
         status_stream,
         verbose_stream,
         verbose,
-    ):
+    ): # <unused argument> pylint: disable = W0613
         (
             cpp_filename,
             cmake_filename,
