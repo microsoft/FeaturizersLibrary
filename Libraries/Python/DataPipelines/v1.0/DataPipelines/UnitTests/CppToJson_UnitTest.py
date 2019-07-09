@@ -372,10 +372,28 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         # ----------------------------------------------------------------------
-        def onUnsupportedFunc(func, filename, line):
+        def onUnsupportedFunc(error_desc, filename, line):
             nonlocal was_called
             was_called = True
-            self.assertTrue([func, filename, line] in [['x', None, 4], ['go', None, 9], ['main', None, 14]])
+
+            unsupported_list = [
+                [textwrap.dedent("""\
+                The struct x is not supported:
+                \t- Invalid var a of type int.
+                \t- Invalid var b of type int.
+                """), None, 4],
+                [textwrap.dedent("""\
+                The function go is not supported:
+                \t- Invalid argument y of type int.
+                \t- Invalid return type x.
+                """), None, 9],
+                [textwrap.dedent("""\
+                The function main is not supported:
+                \t- Invalid return type int.
+                """), None, 14]
+            ]
+
+            self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
 
@@ -479,10 +497,31 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         # ----------------------------------------------------------------------
-        def onUnsupportedFunc(func, filename, line):
+        def onUnsupportedFunc(error_desc, filename, line):
             nonlocal was_called
             was_called = True
-            self.assertTrue([func, filename, line] in [['Point', None, 1], ['operator+', None, 11], ['main', None, 18]])
+
+            unsupported_list = [
+                [textwrap.dedent("""\
+                The struct Point is not supported:
+                \t- Invalid var x of type int.
+                \t- Invalid var y of type int.
+                \t- Invalid type int on constructor argument.
+                \t- Invalid type int on constructor argument.
+                \t- Struct doesn't have a move constructor.
+                """), None, 1],
+                [textwrap.dedent("""\
+                The function operator+ is not supported:
+                \t- Invalid argument a of type Point.
+                \t- Invalid argument b of type Point.
+                \t- Invalid return type Point.
+                """), None, 11],
+                [textwrap.dedent("""\
+                The function main is not supported:
+                \t- Invalid return type int.
+                """), None, 18]
+            ]
+            self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
@@ -628,10 +667,27 @@ class FuncTest(unittest.TestCase):
 
 
         # ----------------------------------------------------------------------
-        def onUnsupportedFunc(func, filename, line):
+        def onUnsupportedFunc(error_desc, filename, line):
             nonlocal was_called
             was_called = True
-            self.assertTrue([func, filename, line] in [["DataPipelines::Arithmetic::MyStruct", None, 6], ["DataPipelines::Arithmetic::Add", None, 11]])
+
+            unsupported_list = [
+                [textwrap.dedent("""\
+                The struct DataPipelines::Arithmetic::MyStruct is not supported:
+                \t- Invalid var a of type int64_t.
+                \t- Invalid var b of type int64_t.
+                \t- Invalid type int64_t on constructor argument.
+                \t- Invalid type int64_t on constructor argument.
+                \t- Struct doesn't have a move constructor.
+                """), None, 6],
+                [textwrap.dedent("""\
+                The function DataPipelines::Arithmetic::Add is not supported:
+                \t- Invalid argument s1 of type DataPipelines::Arithmetic::MyStruct.
+                \t- Invalid argument s2 of type DataPipelines::Arithmetic::MyStruct.
+                \t- Invalid return type DataPipelines::Arithmetic::MyStruct.
+                """), None, 11]
+            ]
+            self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
         func_list = self._GetFuncList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False))
@@ -665,10 +721,17 @@ class FuncTest(unittest.TestCase):
 
 
         # ----------------------------------------------------------------------
-        def onUnsupportedFunc(func, filename, line):
+        def onUnsupportedFunc(error_desc, filename, line):
             nonlocal was_called
             was_called = True
-            self.assertTrue([func, filename, line] in [["go", None, 7]])
+            
+            unsupported_list = [
+                [textwrap.dedent("""\
+                The function go is not supported:
+                \t- Invalid argument ya of type x.
+                """), None, 7]
+            ]
+            self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
         def Policy(var_type):
@@ -719,8 +782,8 @@ class FuncTest(unittest.TestCase):
 
 
         # ----------------------------------------------------------------------
-        def onUnsupportedFunc(func, filename, line):
-            self.assertFalse(False)
+        def onUnsupportedFunc(error_desc, filename, line):
+            self.assertTrue(False)
 
         # ----------------------------------------------------------------------
         def Policy(var_type):

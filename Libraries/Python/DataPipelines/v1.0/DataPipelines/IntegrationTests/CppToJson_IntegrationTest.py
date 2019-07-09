@@ -4,6 +4,8 @@ import sys
 import os
 import json
 import unittest
+import textwrap
+
 import CommonEnvironment
 
 from DataPipelines import CppToJson
@@ -108,8 +110,39 @@ class FileTest(unittest.TestCase):
         def onUnsupportedFunc(func, this_filename, line):
             nonlocal called_count
             called_count += 1
-            self.assertTrue([func, this_filename, line] in [['Point', filename, 5], ['operator+', filename, 15], ['sum', filename, 22], ['go', filename, 26], ['main', filename, 34]])
 
+            unsupported_list = [
+                [textwrap.dedent("""\
+                The struct Point is not supported:
+                \t- Invalid var x of type int.
+                \t- Invalid var y of type int.
+                \t- Invalid type int on constructor argument.
+                \t- Invalid type int on constructor argument.
+                \t- Struct doesn't have a move constructor.
+                """), this_filename, 5],
+                [textwrap.dedent("""\
+                The function operator+ is not supported:
+                \t- Invalid argument a of type Point.
+                \t- Invalid argument b of type Point.
+                \t- Invalid return type Point.
+                """), this_filename, 15],
+                [textwrap.dedent("""\
+                The function sum is not supported:
+                \t- Invalid argument a of type Point.
+                \t- Invalid return type int.
+                """), this_filename, 22],
+                [textwrap.dedent("""\
+                The function go is not supported:
+                \t- Invalid argument n of type int.
+                \t- Invalid return type vector<int>.
+                """), this_filename, 26],
+                [textwrap.dedent("""\
+                The function main is not supported:
+                \t- Invalid return type int.
+                """), this_filename, 34]
+            ]
+
+            self.assertTrue([func, this_filename, line] in unsupported_list)
         # ----------------------------------------------------------------------
 
         func_list = self._GetFuncList(filename, CppToJson.ObtainFunctions(filename, onUnsupportedFunc, lambda type: False))

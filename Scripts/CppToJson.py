@@ -23,14 +23,12 @@ def EntryPoint(
         pass
 
     def OnUnsupportedFunc(func, filename, line):
-        # TODO: Change this to be more specific.
-        # usupported function {} in {} <{}> because type {} is not supported.
         # Display error
         if treat_warnings_as_errors:
-            sys.stdout.write("Error: Unsupported function '{}' in {} <{}>\n".format(func, filename, line))
+            sys.stdout.write("Error: {} in {} <{}>\n".format(func, filename, line))
             raise UnsupportedException()
         else:
-            sys.stdout.write("Warning: Unsupported function '{}' in {} <{}>\n".format(func, filename, line))
+            sys.stdout.write("Warning: {} in {} <{}>\n".format(func, filename, line))
 
     # ----------------------------------------------------------------------
 

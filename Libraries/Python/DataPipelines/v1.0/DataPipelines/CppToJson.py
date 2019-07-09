@@ -16,7 +16,7 @@ import CommonEnvironment.Shell as CE_Shell
 # ----------------------------------------------------------------------
 def ObtainFunctions(
     input_filename,
-    on_unsupported_func,
+    on_unsupported,
     policy,
 ):
     """
@@ -89,7 +89,7 @@ def ObtainFunctions(
                 )"""
             )
         )
-        # TODO: Dont support pointers.
+        # TODO: Dont support pointers (that use the '*' notation).
         pattern_star  = re.compile(r"\**(\* )*")
         pattern_amper = re.compile("&*(& )*")
 
@@ -98,7 +98,7 @@ def ObtainFunctions(
             """
             Remove 'const', '*' and '&'
             """
-            # TODO: Dont support pointers.
+            # TODO: Dont support pointers (that use the '*' notation).
             name = re.sub(pattern_const,  "", name)
             name = re.sub(pattern_star,  "", name)
             name = re.sub(pattern_amper,  "", name)
@@ -185,10 +185,6 @@ def ObtainFunctions(
 
                     if obj_type:
                         object_type_list.append(obj_type)
-                    elif obj_type is None and node.location.file.name == filename:
-                        # TODO: Change this to not require that functions on the file are valid.
-                        # If None was returned, there was a problem with the ObjectType and it can't be processed
-                        on_unsupported_func(_FullName(node), filename if (not is_temp_file or filename != input_filename) else None, node.location.line)
 
             # ----------------------------------------------------------------------
             def EnumerateFuncs(node):
@@ -287,38 +283,72 @@ def ObtainFunctions(
                 return False
             if obj_type in needed_obj_type_list:
                 return True
-            for var_type in obj_type.EnumerateSimpleVarTypes():
+            invalid_reasons = []
+            for var_type, var_name in zip(obj_type.EnumerateSimpleVarTypes(), obj_type.EnumerateVarNames()):
                 if GetObjType(var_type) != obj_type and not IsValidObjType(GetObjType(var_type)) and not TestAndVerify(var_type):
-                    invalid_obj_type_list.append(obj_type)
-                    return False
+                    invalid_reasons.append("\t- Invalid var {} of type {}.".format(var_name, var_type))
+
             for constructor in obj_type.constructor_list:
                 for arg_type in constructor.EnumerateSimpleVarTypes():
                     if GetObjType(arg_type) != obj_type and not IsValidObjType(GetObjType(arg_type)) and not TestAndVerify(arg_type):
-                        invalid_obj_type_list.append(obj_type)
-                        return False
+                        invalid_reasons.append("\t- Invalid type {} on constructor argument.".format(arg_type))
 
+            if not obj_type.has_move_constructor:
+                invalid_reasons.append("\t- Struct doesn't have a move constructor.")
+            if obj_type.has_copy_constructor:
+                invalid_reasons.append("\t- Struct have a copy constructor.")
+            if obj_type.has_private:
+                invalid_reasons.append("\t- Struct has private variables.")
+            if obj_type.has_other:
+                invalid_reasons.append("\t- Struct has an unsupported definition.")
+
+            if invalid_reasons:
+                on_unsupported(textwrap.dedent(
+                    """\
+                        The struct {} is not supported:
+                        {}
+                    """
+                ).format(obj_type.Name, "\n".join(invalid_reasons)),
+                obj_type.Filename if (not is_temp_file or obj_type.Filename != input_filename) else None,
+                obj_type.DefinitionLine
+                )
+                invalid_obj_type_list.append(obj_type)
+                return False
             needed_obj_type_list.append(obj_type)
             return True
 
         # ----------------------------------------------------------------------
-        def IsValidFunc(func):
+        def IsValidFunc(func, filename):
             """
             A function is valid if all var types are valid.
             """
-            for var_type in func["simple_var_types"]:
+            invalid_reasons = []
+            for var_type, var_name in zip(func["simple_var_types"], func["var_names"]):
                 if not TestAndVerify(var_type):
-                    return False
-            if not IsValidObjType(GetObjType(func["simple_return_type"])) and not TestAndVerify(func["simple_return_type"]):
+                    invalid_reasons.append("\t- Invalid argument {} of type {}.".format(var_name, var_type))
+
+            return_type = func["simple_return_type"]
+            if not IsValidObjType(GetObjType(return_type)) and not TestAndVerify(return_type):
+                invalid_reasons.append("\t- Invalid return type {}.".format(return_type))
+
+            if invalid_reasons:
+                on_unsupported(textwrap.dedent(
+                    """\
+                        The function {} is not supported:
+                        {}
+                    """
+                ).format(func["func_name"], "\n".join(invalid_reasons)),
+                filename if (not is_temp_file or filename != input_filename) else None,
+                func["definition_line"]
+                )
                 return False
             return True
 
         # ----------------------------------------------------------------------
 
         for func in these_results["function_list"]:
-            if IsValidFunc(func):
+            if IsValidFunc(func, filename):
                 clean_results[filename].function_list.append(func)
-            else:
-                on_unsupported_func(func['func_name'], filename, func['definition_line'])
 
         # Add required ObjType to the clean_results list.
         for object_type in needed_obj_type_list:
@@ -382,6 +412,11 @@ class _FuncWithArguments(object):
             yield simple_var_type
 
     # ----------------------------------------------------------------------
+    def EnumerateVarNames(self):
+        for var_name, _, _ in self._variable_info:
+            yield var_name
+
+    # ----------------------------------------------------------------------
     def VariableLen(self):
         return len(self._variable_info)
 
@@ -398,6 +433,10 @@ class ClassLikeObject(_FuncWithArguments):
         filename,
         variable_info=None,
         constructor_list=None,
+        has_move_constructor=None,
+        has_copy_constructor=None,
+        has_private=None,
+        has_other=None
     ):
         super(ClassLikeObject, self).__init__(
             variable_info=variable_info,
@@ -408,6 +447,11 @@ class ClassLikeObject(_FuncWithArguments):
         self.Filename                       = filename
 
         self.constructor_list               = constructor_list or []
+        
+        self.has_move_constructor           = has_move_constructor or False
+        self.has_copy_constructor           = has_copy_constructor or False
+        self.has_private                    = has_private or False
+        self.has_other                      = has_other or False
 
     # ----------------------------------------------------------------------
     def __repr__(self):
@@ -554,8 +598,6 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
     errors.
     """
 
-    valid_object_type = True
-    has_move_constructor = False
     object_type = ClassLikeObject(_FullName(node), node.location.line, os.path.realpath(node.location.file.name))
 
     # The way to see if this is a definition or not, is to see if 'node' has any children.
@@ -591,7 +633,7 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
             object_type.constructor_list.append(constructor)
 
             if child.is_move_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
-                has_move_constructor = True
+                object_type.has_move_constructor = True
                 if DeleteDefault(child, "default"):
                     # If this is a default move constructor, there wont be a variable name for the
                     # argument in the function, so I create one when I return the dictionary representation.
@@ -599,13 +641,13 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
 
             elif child.is_copy_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
                 # No public copy constructors are allowed.
-                valid_object_type = False
+                object_type.has_copy_constructor = True
 
         elif child.kind == cindex.CursorKind.FIELD_DECL:
             var_type = FullVarType(child.type.spelling)
             object_type.AddVar(child.spelling, var_type, SimpleVarType(var_type))
             if child.access_specifier != cindex.AccessSpecifier.PUBLIC:
-                valid_object_type = False
+                object_type.has_private = True
 
         elif child.kind == cindex.CursorKind.CXX_METHOD:
             # If this method ends in "=delete", ignore it.
@@ -618,10 +660,10 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
                 for arg in child.get_arguments():
                     # Check the arguments to verify that this is a move operator.
                     if FullVarType(arg.type.spelling) != move_operator_arg_type:
-                        valid_object_type = False
+                        object_type.has_other = True
             else:
                 # No other functions besides move operators are allowed.
-                valid_object_type = False
+                object_type.has_other = True
 
         elif child.kind == cindex.CursorKind.CXX_BASE_SPECIFIER:
             # TODO: This means that this classLikeObject depends on another one
@@ -629,10 +671,9 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
             # Check that this is public.
             pass
         elif child.kind not in accepted_kinds:
-            valid_object_type = False
+            object_type.has_other = True
 
-    if not is_def and (not valid_object_type or not has_move_constructor):
-        return None
-    elif not is_def:
+    if not is_def:
         return object_type
-    return {}
+
+    return None
