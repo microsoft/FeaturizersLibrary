@@ -232,7 +232,12 @@ def ObtainFunctions(
             # ----------------------------------------------------------------------
 
             include_list = GetIncludeList(filename)
-            function_list = [func.ToDict(key["declaration_line"], key["definition_line"]) for func, key in funcs_list.items()]
+
+            function_list = []
+            for func, key in funcs_list.items():
+                func.declaration_line = key["declaration_line"]
+                func.definition_line  = key["definition_line"]
+                function_list.append(func)
 
             return {"function_list": function_list, "object_type_list": object_type_list, "include_list": include_list}
 
@@ -296,7 +301,7 @@ def ObtainFunctions(
             if not obj_type.has_move_constructor:
                 invalid_reasons.append("\t- Struct doesn't have a move constructor.")
             if obj_type.has_copy_constructor:
-                invalid_reasons.append("\t- Struct have a copy constructor.")
+                invalid_reasons.append("\t- Struct has a copy constructor.")
             if obj_type.has_private:
                 invalid_reasons.append("\t- Struct has private variables.")
             if obj_type.has_other:
@@ -323,11 +328,11 @@ def ObtainFunctions(
             A function is valid if all var types are valid.
             """
             invalid_reasons = []
-            for var_type, var_name in zip(func["simple_var_types"], func["var_names"]):
+            for var_type, var_name in zip(func.EnumerateSimpleVarTypes(), func.EnumerateVarNames()):
                 if not TestAndVerify(var_type):
                     invalid_reasons.append("\t- Invalid argument {} of type {}.".format(var_name, var_type))
 
-            return_type = func["simple_return_type"]
+            return_type = func.SimpleReturnType
             if not IsValidObjType(GetObjType(return_type)) and not TestAndVerify(return_type):
                 invalid_reasons.append("\t- Invalid return type {}.".format(return_type))
 
@@ -337,9 +342,9 @@ def ObtainFunctions(
                         The function {} is not supported:
                         {}
                     """
-                ).format(func["func_name"], "\n".join(invalid_reasons)),
+                ).format(func.Name, "\n".join(invalid_reasons)),
                 filename if (not is_temp_file or filename != input_filename) else None,
-                func["definition_line"]
+                func.definition_line
                 )
                 return False
             return True
@@ -348,7 +353,7 @@ def ObtainFunctions(
 
         for func in these_results["function_list"]:
             if IsValidFunc(func, filename):
-                clean_results[filename].function_list.append(func)
+                clean_results[filename].function_list.append(func.ToDict())
 
         # Add required ObjType to the clean_results list.
         for object_type in needed_obj_type_list:
@@ -487,32 +492,37 @@ class Function(_FuncWithArguments):
         raw_return_type,
         simple_return_type,
         variable_info=None,
+        definition_line=None,
+        declaration_line=None,
     ):
         super(Function, self).__init__(
             variable_info=variable_info,
         )
 
-        self.FuncName                     = func_name
-        self.RawReturnType               = raw_return_type
-        self.SimpleReturnType            = simple_return_type
+        self.Name                       = func_name
+        self.RawReturnType              = raw_return_type
+        self.SimpleReturnType           = simple_return_type
+
+        self.definition_line            = definition_line
+        self.declaration_line           = declaration_line
 
     # ----------------------------------------------------------------------
     def __hash__(self):
-        return hash((self.FuncName, self.RawReturnType, self.SimpleReturnType, super(Function, self).__hash__()))
+        return hash((self.Name, self.RawReturnType, self.SimpleReturnType, super(Function, self).__hash__()))
 
     # ----------------------------------------------------------------------
-    def ToDict(self, declaration_line, definition_line):
+    def ToDict(self):
         new_dict = {}
 
-        new_dict["func_name"] = self.FuncName
+        new_dict["name"] = self.Name
         new_dict["raw_return_type"] = self.RawReturnType
         new_dict["simple_return_type"] = self.SimpleReturnType
 
         for k, v in super(Function, self).ToDict().items():
             new_dict[k] = v
 
-        new_dict['declaration_line'] = declaration_line
-        new_dict['definition_line'] = definition_line
+        new_dict['declaration_line'] = self.declaration_line
+        new_dict['definition_line'] = self.definition_line
 
         return new_dict
 
@@ -667,7 +677,7 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
 
         elif child.kind == cindex.CursorKind.CXX_BASE_SPECIFIER:
             # TODO: This means that this classLikeObject depends on another one
-            # there is the need to revify if the one that this one depends on is valid.
+            # there is the need to verify if the one that this one depends on is valid.
             # Check that this is public.
             pass
         elif child.kind not in accepted_kinds:
