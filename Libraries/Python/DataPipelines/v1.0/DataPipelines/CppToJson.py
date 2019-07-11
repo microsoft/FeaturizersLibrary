@@ -172,7 +172,7 @@ def ObtainFunctions(
             # ----------------------------------------------------------------------
 
             object_type_list = []
-            funcs_list = {}
+            function_dict = {}
 
             # ----------------------------------------------------------------------
             def EnumerateObjType(node):
@@ -194,23 +194,32 @@ def ObtainFunctions(
 
                 if node.kind == cindex.CursorKind.FUNCTION_DECL and node.location.file.name == filename:
                     ret_type = FullVarType(node.result_type.spelling)
-                    func = Function(_FullName(node), ret_type, SimpleVarType(ret_type))
-
+                    
+                    arg_list = []
                     for arg in node.get_arguments():
                         arg_type = FullVarType(arg.type.spelling)
-                        func.AddVar(arg.displayname, arg_type, SimpleVarType(arg_type))
+                        arg_list.append(arg_type)
 
-                    if func not in funcs_list.keys():
-                        funcs_list[func] = {'definition_line': None, 'declaration_line': None}
+                    # There is the need for arg_list to be a tuple here, because this will be the key
+                    # to the dictionary of functions, and tuple are hashable unlike lists.
+                    func_key = (_FullName(node), ret_type, tuple(arg_list))
+
                     is_def = False
                     for child in node.get_children():
                         if child.kind == cindex.CursorKind.COMPOUND_STMT:
                             is_def = True
+                    
+                    if func_key not in function_dict.keys():
+                        variable_info = []
+                        for arg in node.get_arguments():
+                            arg_type = FullVarType(arg.type.spelling)
+                            variable_info.append((arg.displayname, arg_type, SimpleVarType(arg_type)))
 
+                        # Create the instance of the function
+                        function_dict[func_key] = Function(_FullName(node), ret_type, SimpleVarType(ret_type), variable_info, node.location.line)
+                    
                     if is_def:
-                        funcs_list[func]['definition_line'] = node.location.line
-                    else:
-                        funcs_list[func]['declaration_line'] = node.location.line
+                        function_dict[func_key].definition_line = node.location.line
 
             # ----------------------------------------------------------------------
 
@@ -232,13 +241,8 @@ def ObtainFunctions(
             # ----------------------------------------------------------------------
 
             include_list = GetIncludeList(filename)
-
-            function_list = []
-            for func, key in funcs_list.items():
-                func.declaration_line = key["declaration_line"]
-                func.definition_line  = key["definition_line"]
-                function_list.append(func)
-
+            
+            function_list = [func for func in function_dict.values()]
             return {"function_list": function_list, "object_type_list": object_type_list, "include_list": include_list}
 
         clean_results = OrderedDict()
@@ -278,7 +282,7 @@ def ObtainFunctions(
             return None
 
         # ----------------------------------------------------------------------
-        def IsValidObjType(obj_type):
+        def VerifyObjType(obj_type):
             """
             Check all var types in this ObjType, this ObjType is valid if they are all valid. There is an assumption that
             this function will only be called for an ObjType that is required. If this ObjType depends on another ObjType,
@@ -290,12 +294,12 @@ def ObtainFunctions(
                 return True
             invalid_reasons = []
             for var_type, var_name in zip(obj_type.EnumerateSimpleVarTypes(), obj_type.EnumerateVarNames()):
-                if GetObjType(var_type) != obj_type and not IsValidObjType(GetObjType(var_type)) and not TestAndVerify(var_type):
+                if GetObjType(var_type) != obj_type and not VerifyObjType(GetObjType(var_type)) and not TestAndVerify(var_type):
                     invalid_reasons.append("\t- Invalid var {} of type {}.".format(var_name, var_type))
 
             for constructor in obj_type.constructor_list:
                 for arg_type in constructor.EnumerateSimpleVarTypes():
-                    if GetObjType(arg_type) != obj_type and not IsValidObjType(GetObjType(arg_type)) and not TestAndVerify(arg_type):
+                    if GetObjType(arg_type) != obj_type and not VerifyObjType(GetObjType(arg_type)) and not TestAndVerify(arg_type):
                         invalid_reasons.append("\t- Invalid type {} on constructor argument.".format(arg_type))
 
             if not obj_type.has_move_constructor:
@@ -323,7 +327,7 @@ def ObtainFunctions(
             return True
 
         # ----------------------------------------------------------------------
-        def IsValidFunc(func, filename):
+        def VerifyFunction(func, filename):
             """
             A function is valid if all var types are valid.
             """
@@ -333,7 +337,7 @@ def ObtainFunctions(
                     invalid_reasons.append("\t- Invalid argument {} of type {}.".format(var_name, var_type))
 
             return_type = func.SimpleReturnType
-            if not IsValidObjType(GetObjType(return_type)) and not TestAndVerify(return_type):
+            if not VerifyObjType(GetObjType(return_type)) and not TestAndVerify(return_type):
                 invalid_reasons.append("\t- Invalid return type {}.".format(return_type))
 
             if invalid_reasons:
@@ -352,7 +356,7 @@ def ObtainFunctions(
         # ----------------------------------------------------------------------
 
         for func in these_results["function_list"]:
-            if IsValidFunc(func, filename):
+            if VerifyFunction(func, filename):
                 clean_results[filename].function_list.append(func.ToDict())
 
         # Add required ObjType to the clean_results list.
@@ -381,9 +385,9 @@ class _FuncWithArguments(object):
     # ----------------------------------------------------------------------
     def __init__(
         self,
-        variable_info=None,
+        variable_info,
     ):
-        self._variable_info                 = variable_info or []
+        self.VariableInfo                 = variable_info or []
 
     # ----------------------------------------------------------------------
     def __repr__(self):
@@ -391,7 +395,7 @@ class _FuncWithArguments(object):
 
     # ----------------------------------------------------------------------
     def __hash__(self):
-        return hash(tuple(self._variable_info))
+        return hash(tuple(self.VariableInfo))
 
     # ----------------------------------------------------------------------
     def __eq__(self, other):
@@ -399,32 +403,31 @@ class _FuncWithArguments(object):
 
     # ----------------------------------------------------------------------
     def AddVar(self, var_name, raw_var_type, simple_var_type):
-        self._variable_info.append((var_name, raw_var_type, simple_var_type))
+        self.VariableInfo.append((var_name, raw_var_type, simple_var_type))
 
     # ----------------------------------------------------------------------
     def ToDict(self):
         new_dict = {}
 
-        new_dict["var_names"] = [name for name, _, _ in self._variable_info]
-        new_dict["raw_var_types"] = [type_ for _, type_, _ in self._variable_info]
-        new_dict["simple_var_types"] = [simple for _, _, simple in self._variable_info]
+        new_dict["var_names"] = [name for name, _, _ in self.VariableInfo]
+        new_dict["raw_var_types"] = [type_ for _, type_, _ in self.VariableInfo]
+        new_dict["simple_var_types"] = [simple for _, _, simple in self.VariableInfo]
 
         return new_dict
+    # ----------------------------------------------------------------------
+    def EnumerateRawVarTypes(self):
+        for _, raw_var_type, _ in self.VariableInfo:
+            yield raw_var_type
 
     # ----------------------------------------------------------------------
     def EnumerateSimpleVarTypes(self):
-        for _, _, simple_var_type in self._variable_info:
+        for _, _, simple_var_type in self.VariableInfo:
             yield simple_var_type
 
     # ----------------------------------------------------------------------
     def EnumerateVarNames(self):
-        for var_name, _, _ in self._variable_info:
+        for var_name, _, _ in self.VariableInfo:
             yield var_name
-
-    # ----------------------------------------------------------------------
-    def VariableLen(self):
-        return len(self._variable_info)
-
 
 # ----------------------------------------------------------------------
 class ClassLikeObject(_FuncWithArguments):
@@ -491,9 +494,9 @@ class Function(_FuncWithArguments):
         func_name,
         raw_return_type,
         simple_return_type,
-        variable_info=None,
+        variable_info,
+        declaration_line,
         definition_line=None,
-        declaration_line=None,
     ):
         super(Function, self).__init__(
             variable_info=variable_info,
@@ -502,13 +505,24 @@ class Function(_FuncWithArguments):
         self.Name                       = func_name
         self.RawReturnType              = raw_return_type
         self.SimpleReturnType           = simple_return_type
+        self.DeclarationLine            = declaration_line
 
-        self.definition_line            = definition_line
-        self.declaration_line           = declaration_line
+        self._definition_line            = definition_line
+        
 
     # ----------------------------------------------------------------------
     def __hash__(self):
         return hash((self.Name, self.RawReturnType, self.SimpleReturnType, super(Function, self).__hash__()))
+    
+    # ----------------------------------------------------------------------
+    @property
+    def definition_line(self):
+        return self._definition_line
+
+    # ----------------------------------------------------------------------
+    @definition_line.setter
+    def definition_line(self, line):
+        self._definition_line = line
 
     # ----------------------------------------------------------------------
     def ToDict(self):
@@ -521,7 +535,7 @@ class Function(_FuncWithArguments):
         for k, v in super(Function, self).ToDict().items():
             new_dict[k] = v
 
-        new_dict['declaration_line'] = self.declaration_line
+        new_dict['declaration_line'] = self.DeclarationLine
         new_dict['definition_line'] = self.definition_line
 
         return new_dict
@@ -647,7 +661,7 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
                 if DeleteDefault(child, "default"):
                     # If this is a default move constructor, there wont be a variable name for the
                     # argument in the function, so I create one when I return the dictionary representation.
-                    assert constructor.VariableLen() == 1
+                    assert len(constructor.VariableInfo) == 1
 
             elif child.is_copy_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
                 # No public copy constructors are allowed.

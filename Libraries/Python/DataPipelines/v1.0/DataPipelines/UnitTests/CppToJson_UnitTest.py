@@ -29,7 +29,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], ['int', 'int'])
         self.assertEqual(func_list[0]['simple_var_types'], ['int', 'int'])
         self.assertEqual(func_list[0]['definition_line'], 1)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 1)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'int')
@@ -38,7 +38,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 4)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 4)
 
         self.assertEqual(obj_type_list, [])
         self.assertEqual(include_list, [])
@@ -70,7 +70,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], ['std::vector<float>', 'float'])
         self.assertEqual(func_list[0]['simple_var_types'], ['std::vector<float>', 'float'])
         self.assertEqual(func_list[0]['definition_line'], 2)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 2)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'int')
@@ -79,7 +79,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 10)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 10)
 
         self.assertEqual(obj_type_list, [])
         self.assertEqual(len(include_list), 1)
@@ -111,7 +111,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], ['vector<float>', 'float'])
         self.assertEqual(func_list[0]['simple_var_types'], ['vector<float>', 'float'])
         self.assertEqual(func_list[0]['definition_line'], 3)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 3)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'int')
@@ -120,7 +120,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 10)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 10)
 
         self.assertEqual(obj_type_list, [])
         self.assertEqual(len(include_list), 1)
@@ -152,7 +152,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], ['vector<map<float, int> >', 'float'])
         self.assertEqual(func_list[0]['simple_var_types'], ['vector<map<float, int> >', 'float'])
         self.assertEqual(func_list[0]['definition_line'], 4)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 4)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'int')
@@ -161,7 +161,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 11)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 11)
 
         self.assertEqual(obj_type_list, [])
         self.assertEqual(len(include_list), 2)
@@ -189,7 +189,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], ['int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int'])
         self.assertEqual(func_list[0]['simple_var_types'], ['int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int'])
         self.assertEqual(func_list[0]['definition_line'], 1)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 1)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'int')
@@ -198,7 +198,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 7)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 7)
 
         self.assertEqual(obj_type_list, [])
         self.assertEqual(include_list, [])
@@ -226,7 +226,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], ['int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **', 'int **'])
         self.assertEqual(func_list[0]['simple_var_types'], ['int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int', 'int'])
         self.assertEqual(func_list[0]['definition_line'], 1)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 1)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'int')
@@ -235,7 +235,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 7)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 7)
 
         self.assertEqual(obj_type_list, [])
         self.assertEqual(include_list, [])
@@ -261,7 +261,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], ['float'])
         self.assertEqual(func_list[0]['simple_var_types'], ['float'])
         self.assertEqual(func_list[0]['definition_line'], 1)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 1)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'int')
@@ -270,7 +270,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 5)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 5)
 
         self.assertEqual(obj_type_list, [])
         self.assertEqual(include_list, [])
@@ -295,7 +295,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], ['const float', 'const int'])
         self.assertEqual(func_list[0]['simple_var_types'], ['float', 'int'])
         self.assertEqual(func_list[0]['definition_line'], 1)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 1)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'int')
@@ -304,7 +304,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 4)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 4)
 
         self.assertEqual(obj_type_list, [])
         self.assertEqual(include_list, [])
@@ -336,7 +336,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], ['vector<int> &', 'map<bool, bool> *'])
         self.assertEqual(func_list[0]['simple_var_types'], ['vector<int>', 'map<bool, bool>'])
         self.assertEqual(func_list[0]['definition_line'], 6)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 6)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'int')
@@ -345,7 +345,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 11)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 11)
 
         self.assertEqual(obj_type_list, [])
         self.assertEqual(len(include_list), 2)
@@ -445,7 +445,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], ['int'])
         self.assertEqual(func_list[0]['simple_var_types'], ['int'])
         self.assertEqual(func_list[0]['definition_line'], 9)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 9)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'int')
@@ -454,7 +454,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 14)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 14)
 
         self.assertEqual(obj_type_list[0]['name'], 'x')
         self.assertEqual(obj_type_list[0]['var_names'], ['a', 'b'])
@@ -567,7 +567,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 6)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 6)
 
         self.assertEqual(obj_type_list, [])
         self.assertEqual(include_list, [])
@@ -610,7 +610,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 11)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 11)
 
         self.assertEqual(obj_type_list, [])
         self.assertEqual(include_list, [])
@@ -639,7 +639,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], ['const int64_t', 'const int64_t'])
         self.assertEqual(func_list[0]['simple_var_types'], ['int64_t', 'int64_t'])
         self.assertEqual(func_list[0]['definition_line'], 6)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 6)
 
         self.assertEqual(obj_type_list, [])
         self.assertEqual(len(include_list), 1)
@@ -754,7 +754,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], [])
         self.assertEqual(func_list[0]['simple_var_types'], [])
         self.assertEqual(func_list[0]['definition_line'], 11)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 11)
         
         self.assertEqual(obj_type_list, [])
         self.assertEqual(len(include_list), 1)
@@ -804,7 +804,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['raw_var_types'], ['int'])
         self.assertEqual(func_list[0]['simple_var_types'], ['int'])
         self.assertEqual(func_list[0]['definition_line'], 9)
-        self.assertEqual(func_list[0]['declaration_line'], None)
+        self.assertEqual(func_list[0]['declaration_line'], 9)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'int')
@@ -813,7 +813,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
         self.assertEqual(func_list[1]['definition_line'], 14)
-        self.assertEqual(func_list[1]['declaration_line'], None)
+        self.assertEqual(func_list[1]['declaration_line'], 14)
 
         self.assertEqual(obj_type_list[0]['name'], 'x')
         self.assertEqual(obj_type_list[0]['var_names'], ['a', 'b'])
