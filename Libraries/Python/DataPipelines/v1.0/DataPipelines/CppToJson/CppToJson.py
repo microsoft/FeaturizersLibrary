@@ -12,6 +12,7 @@ import CommonEnvironment.CallOnExit as callOnExit
 from CommonEnvironment.Shell.All import CurrentShell
 import CommonEnvironment.Shell as CE_Shell
 
+from DataPipelines.CppToJson.Impl.ArgumentInfo import ArgumentInfo
 
 # ----------------------------------------------------------------------
 def ObtainFunctions(
@@ -107,7 +108,7 @@ def ObtainFunctions(
         # ----------------------------------------------------------------------
         def ParseFile(filename):
             """
-            Clang opens all files that are included in 'filename' at the same time. Only the functions on 
+            Clang opens all files that are included in 'filename' at the same time. Only the functions on
             'filename' are processed, but all class-like objects are processed, because one of the functions
             in 'filename' might need to use it. The ones that are not in 'filename' and are not used are not
             exported.
@@ -194,7 +195,7 @@ def ObtainFunctions(
 
                 if node.kind == cindex.CursorKind.FUNCTION_DECL and node.location.file.name == filename:
                     ret_type = FullVarType(node.result_type.spelling)
-                    
+
                     arg_list = []
                     for arg in node.get_arguments():
                         arg_type = FullVarType(arg.type.spelling)
@@ -208,7 +209,7 @@ def ObtainFunctions(
                     for child in node.get_children():
                         if child.kind == cindex.CursorKind.COMPOUND_STMT:
                             is_def = True
-                    
+
                     if func_key not in function_dict.keys():
                         variable_info = []
                         for arg in node.get_arguments():
@@ -217,7 +218,7 @@ def ObtainFunctions(
 
                         # Create the instance of the function
                         function_dict[func_key] = Function(_FullName(node), ret_type, SimpleVarType(ret_type), variable_info, node.location.line)
-                    
+
                     if is_def:
                         function_dict[func_key].definition_line = node.location.line
 
@@ -241,12 +242,12 @@ def ObtainFunctions(
             # ----------------------------------------------------------------------
 
             include_list = GetIncludeList(filename)
-            
+
             function_list = [func for func in function_dict.values()]
             return {"function_list": function_list, "object_type_list": object_type_list, "include_list": include_list}
 
         clean_results = OrderedDict()
-        
+
         # ----------------------------------------------------------------------
         def InitializeCleanResults(filename, raw_includes):
             clean_results[filename] = Results()
@@ -380,57 +381,7 @@ def ObtainFunctions(
 # |  Private Types
 # |
 # ----------------------------------------------------------------------
-
-class _FuncWithArguments(object):
-    """\
-    Functionality common to C++ functions and constructors
-    """
-
-    # ----------------------------------------------------------------------
-    def __init__(
-        self,
-        variable_info,
-    ):
-        self.VariableInfo                 = variable_info or []
-
-    # ----------------------------------------------------------------------
-    def __repr__(self):
-        return CommonEnvironment.ObjectReprImpl(self)
-
-    # ----------------------------------------------------------------------
-    def __hash__(self):
-        return hash(tuple(self.VariableInfo))
-
-    # ----------------------------------------------------------------------
-    def __eq__(self, other):
-        return self.__hash__() == other.__hash__()
-
-    # ----------------------------------------------------------------------
-    def ToDict(self):
-        new_dict = {}
-
-        new_dict["var_names"] = [name for name, _, _ in self.VariableInfo]
-        new_dict["raw_var_types"] = [type_ for _, type_, _ in self.VariableInfo]
-        new_dict["simple_var_types"] = [simple for _, _, simple in self.VariableInfo]
-
-        return new_dict
-    # ----------------------------------------------------------------------
-    def EnumerateRawVarTypes(self):
-        for _, raw_var_type, _ in self.VariableInfo:
-            yield raw_var_type
-
-    # ----------------------------------------------------------------------
-    def EnumerateSimpleVarTypes(self):
-        for _, _, simple_var_type in self.VariableInfo:
-            yield simple_var_type
-
-    # ----------------------------------------------------------------------
-    def EnumerateVarNames(self):
-        for var_name, _, _ in self.VariableInfo:
-            yield var_name
-
-# ----------------------------------------------------------------------
-class ClassLikeObject(_FuncWithArguments):
+class ClassLikeObject(ArgumentInfo):
     """Captures information about a C++ class or struct"""
 
     # ----------------------------------------------------------------------
@@ -457,7 +408,7 @@ class ClassLikeObject(_FuncWithArguments):
 
         self.constructor_list               = constructor_list or []
         self.base_structs                   = base_structs or []
-        
+
         self.has_move_constructor           = has_move_constructor or False
         self.has_copy_constructor           = has_copy_constructor or False
         self.has_private                    = has_private or False
@@ -473,7 +424,7 @@ class ClassLikeObject(_FuncWithArguments):
 
         results["name"] = self.Name
         results["definition_line"] = self.DefinitionLine
-            
+
         for k, v in super(ClassLikeObject, self).ToDict().items():
             results[k] = v
 
@@ -484,7 +435,7 @@ class ClassLikeObject(_FuncWithArguments):
 
 
 # ----------------------------------------------------------------------
-class Function(_FuncWithArguments):
+class Function(ArgumentInfo):
     """\
     This class will hold a function's information, it provides __hash__ and __eq__ functions.
     It is needed so that its possible to have a dictionary using this class as a key, to keep
@@ -511,12 +462,12 @@ class Function(_FuncWithArguments):
         self.DeclarationLine            = declaration_line
 
         self._definition_line            = definition_line
-        
+
 
     # ----------------------------------------------------------------------
     def __hash__(self):
         return hash((self.Name, self.RawReturnType, self.SimpleReturnType, super(Function, self).__hash__()))
-    
+
     # ----------------------------------------------------------------------
     @property
     def definition_line(self):
@@ -545,7 +496,7 @@ class Function(_FuncWithArguments):
 
 
 # ----------------------------------------------------------------------
-class Constructor(_FuncWithArguments):
+class Constructor(ArgumentInfo):
     """Captures information about a C++ constructor"""
 
     # ----------------------------------------------------------------------
@@ -566,7 +517,7 @@ class Constructor(_FuncWithArguments):
     # ----------------------------------------------------------------------
     def ToDict(self):
         new_dict = super(Constructor, self).ToDict()
-        
+
         # If the var name is "", it means that this is a default constructor.
         if len(new_dict["var_names"]) == 1 and not new_dict["var_names"][0]:
             new_dict["var_names"] = ["other"]
