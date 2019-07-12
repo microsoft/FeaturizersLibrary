@@ -839,7 +839,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(None, list(results.keys())[0])
 
-        return results[None]['object_type_list']
+        return results[None]['struct_list']
 
     def _GetIncludeList(self, results):
         self.assertEqual(len(results), 1)

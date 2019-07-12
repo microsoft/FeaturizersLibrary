@@ -9,6 +9,7 @@ import textwrap
 import CommonEnvironment
 
 from DataPipelines import CppToJson
+from DataPipelines.GeneratedCode.CppToJson_PythonJsonSerialization import *
 
 
 # ----------------------------------------------------------------------
@@ -184,7 +185,7 @@ class FileTest(unittest.TestCase):
         self.assertEqual(func_list[0], {'name': 'go', 'raw_return_type': 'x *', 'simple_return_type': 'x', 'var_names': ['y'], 'raw_var_types': ['int'], 'simple_var_types': ['int'], 'declaration_line': 12, 'definition_line': 12})
         self.assertEqual(func_list[1], {'name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'declaration_line': 17, 'definition_line': 17})
 
-        self.assertEqual(obj_type_list[0], {'name': 'x', 'var_names': ['a', 'b'], 'raw_var_types': ['int', 'int'], 'simple_var_types': ['int', 'int'], 'definition_line': 3, 'constructor_list': [{'var_names': ['other'], 'raw_var_types': ['x &&'], 'simple_var_types': ['x'], 'definition_line': 5}, {'var_names': ['xa', 'xb'], 'raw_var_types': ['int', 'int'], 'simple_var_types': ['int', 'int'], 'definition_line': 6}]})
+        self.assertEqual(obj_type_list[0], {'name': 'x', 'var_names': ['a', 'b'], 'raw_var_types': ['int', 'int'], 'simple_var_types': ['int', 'int'], 'definition_line': 3, 'base_structs': [], 'constructor_list': [{'var_names': ['other'], 'raw_var_types': ['x &&'], 'simple_var_types': ['x'], 'definition_line': 5}, {'var_names': ['xa', 'xb'], 'raw_var_types': ['int', 'int'], 'simple_var_types': ['int', 'int'], 'definition_line': 6}]})
 
         self.assertEqual(len(include_list), 2)
 
@@ -208,21 +209,21 @@ class FileTest(unittest.TestCase):
         self.assertEqual(filename, list(all_results.keys())[0])
         self.assertEqual(all_results[filename]["function_list"][0], {'name': 'gox', 'raw_return_type': 'go *', 'simple_return_type': 'go', 'var_names': ['y'], 'raw_var_types': ['int'], 'simple_var_types': ['int'], 'declaration_line': 4, 'definition_line': 4})
         self.assertEqual(all_results[filename]["function_list"][1], {'name': 'main', 'raw_return_type': 'int', 'simple_return_type': 'int', 'var_names': [], 'raw_var_types': [], 'simple_var_types': [], 'declaration_line': 9, 'definition_line': 9})
-        self.assertEqual(all_results[filename]["object_type_list"], [])
+        self.assertEqual(all_results[filename]["struct_list"], [])
         self.assertEqual(len(all_results[filename]["include_list"]), 1)
 
         header2 = os.path.realpath(os.path.join(_script_dir, "header2.hpp"))
         self.assertEqual(header2, list(all_results.keys())[1])
         self.assertEqual(all_results[header2]["function_list"], [])
-        self.assertEqual(len(all_results[header2]["object_type_list"]), 1)
-        self.assertEqual(all_results[header2]["object_type_list"][0], {'name': 'go2', 'var_names': ['a', 'b'], 'raw_var_types': ['int', 'int'], 'simple_var_types': ['int', 'int'], 'definition_line': 5, 'constructor_list': [{'var_names': ['other'], 'raw_var_types': ['go2 &&'], 'simple_var_types': ['go2'], 'definition_line': 7}]})
+        self.assertEqual(len(all_results[header2]["struct_list"]), 1)
+        self.assertEqual(all_results[header2]["struct_list"][0], {'name': 'go2', 'var_names': ['a', 'b'], 'raw_var_types': ['int', 'int'], 'simple_var_types': ['int', 'int'], 'definition_line': 5, 'base_structs': [], 'constructor_list': [{'var_names': ['other'], 'raw_var_types': ['go2 &&'], 'simple_var_types': ['go2'], 'definition_line': 7}]})
         self.assertEqual(len(all_results[header2]["include_list"]), 1)
 
         header1 = os.path.realpath(os.path.join(_script_dir, "header1.hpp"))
         self.assertEqual(header1, list(all_results.keys())[2])
         self.assertEqual(all_results[header1]["function_list"], [])
-        self.assertEqual(len(all_results[header2]["object_type_list"]), 1)
-        self.assertEqual(all_results[header1]["object_type_list"][0], {'name': 'go', 'var_names': ['a', 'b', 'x'], 'raw_var_types': ['int', 'int', 'go2'], 'simple_var_types': ['int', 'int', 'go2'], 'definition_line': 5, 'constructor_list': [{'var_names': ['other'], 'raw_var_types': ['go &&'], 'simple_var_types': ['go'], 'definition_line': 8}]})
+        self.assertEqual(len(all_results[header2]["struct_list"]), 1)
+        self.assertEqual(all_results[header1]["struct_list"][0], {'name': 'go', 'var_names': ['a', 'b', 'x'], 'raw_var_types': ['int', 'int', 'go2'], 'simple_var_types': ['int', 'int', 'go2'], 'definition_line': 5, 'base_structs': [], 'constructor_list': [{'var_names': ['other'], 'raw_var_types': ['go &&'], 'simple_var_types': ['go'], 'definition_line': 8}]})
         self.assertEqual(len(all_results[header1]["include_list"]), 1)
 
     def _GetFuncList(self, filename, results):
@@ -235,13 +236,95 @@ class FileTest(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(filename, list(results.keys())[0])
 
-        return results[filename]['object_type_list']
+        return results[filename]['struct_list']
 
     def _GetIncludeList(self, filename, results):
         self.assertEqual(len(results), 1)
         self.assertEqual(filename, list(results.keys())[0])
 
         return results[filename]['include_list']
+
+class Deserialization(unittest.TestCase):
+    """
+    This test will make sure that the output from my function matches the SimpleSchema format.
+    """
+    def test_deserialization(self):
+        filename = os.path.join(_script_dir, "deserialization.cpp")
+        results = CppToJson.ObtainFunctions(filename, None, lambda type: True)
+
+        deserialized_result = Deserialize([results[filename]])
+        
+        self.assertEqual(len(deserialized_result), 1)
+
+        self.assertEqual(deserialized_result[0].function_list[0].name, "goooo")
+        self.assertEqual(deserialized_result[0].function_list[0].raw_return_type, "oth")
+        self.assertEqual(deserialized_result[0].function_list[0].simple_return_type, "oth")
+        self.assertEqual(deserialized_result[0].function_list[0].var_names, ["a", "b"])
+        self.assertEqual(deserialized_result[0].function_list[0].raw_var_types, ["int", "float"])
+        self.assertEqual(deserialized_result[0].function_list[0].simple_var_types, ["int", "float"])
+        self.assertEqual(deserialized_result[0].function_list[0].declaration_line, 30)
+        self.assertEqual(deserialized_result[0].function_list[0].definition_line, 30)
+
+        self.assertEqual(deserialized_result[0].struct_list[0].name, "go")
+        self.assertEqual(deserialized_result[0].struct_list[0].var_names, ["a", "b"])
+        self.assertEqual(deserialized_result[0].struct_list[0].raw_var_types, ["int", "bool"])
+        self.assertEqual(deserialized_result[0].struct_list[0].simple_var_types, ["int", "bool"])
+        self.assertEqual(deserialized_result[0].struct_list[0].definition_line, 3)
+
+        """
+        TODO: The following commented code is here because there is a problem on Deserialize, that 
+        it does not export fields that only have an empty list. Once that is fixed, the
+        code should be uncommented.
+        """
+
+        # self.assertEqual(deserialized_result[0].struct_list[0].base_structs, [])
+        self.assertEqual(len(deserialized_result[0].struct_list[0].constructor_list), 2)
+
+        # self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[0].var_names, [])
+        # self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[0].raw_var_types, [])
+        # self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[0].simple_var_types, [])
+        self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[0].definition_line, 6)
+
+        self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[1].var_names, ["other"])
+        self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[1].raw_var_types, ["go &&"])
+        self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[1].simple_var_types, ["go"])
+        self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[1].definition_line, 9)
+
+        self.assertEqual(deserialized_result[0].struct_list[1].name, "go2")
+        self.assertEqual(deserialized_result[0].struct_list[1].var_names, ["a", "b"])
+        self.assertEqual(deserialized_result[0].struct_list[1].raw_var_types, ["int", "float"])
+        self.assertEqual(deserialized_result[0].struct_list[1].simple_var_types, ["int", "float"])
+        self.assertEqual(deserialized_result[0].struct_list[1].definition_line, 12)
+        # self.assertEqual(deserialized_result[0].struct_list[1].base_structs, [])
+        self.assertEqual(len(deserialized_result[0].struct_list[1].constructor_list), 2)
+
+        # self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[0].var_names, [])
+        # self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[0].raw_var_types, [])
+        # self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[0].simple_var_types, [])
+        self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[0].definition_line, 15)
+
+        self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[1].var_names, ["other"])
+        self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[1].raw_var_types, ["go2 &&"])
+        self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[1].simple_var_types, ["go2"])
+        self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[1].definition_line, 18)
+
+        self.assertEqual(deserialized_result[0].struct_list[2].name, "oth")
+        self.assertEqual(deserialized_result[0].struct_list[2].var_names, ["x"])
+        self.assertEqual(deserialized_result[0].struct_list[2].raw_var_types, ["int"])
+        self.assertEqual(deserialized_result[0].struct_list[2].simple_var_types, ["int"])
+        self.assertEqual(deserialized_result[0].struct_list[2].definition_line, 21)
+        self.assertEqual(deserialized_result[0].struct_list[2].base_structs, ["go", "go2"])
+        self.assertEqual(len(deserialized_result[0].struct_list[2].constructor_list), 2)
+
+        # self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[0].var_names, [])
+        # self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[0].raw_var_types, [])
+        # self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[0].simple_var_types, [])
+        self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[0].definition_line, 23)
+
+        self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[1].var_names, ["other"])
+        self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[1].raw_var_types, ["oth &&"])
+        self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[1].simple_var_types, ["oth"])
+        self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[1].definition_line, 26)
 
 if __name__ == '__main__':
     unittest.main()

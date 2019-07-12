@@ -29,7 +29,7 @@ class TestSuite(unittest.TestCase):
                 {
                     "function_list": [
                         {
-                            "func_name": "Name",
+                            "name": "Name",
                             "raw_return_type": "int1",
                             "simple_return_type": "int2",
                         }
@@ -39,7 +39,7 @@ class TestSuite(unittest.TestCase):
         )
         
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].function_list[0].func_name, "Name")
+        self.assertEqual(result[0].function_list[0].name, "Name")
         self.assertEqual(result[0].function_list[0].raw_return_type, "int1")
         self.assertEqual(result[0].function_list[0].simple_return_type, "int2")
         self.assertTrue(not hasattr(result[0].function_list[0], "var_names"))
@@ -58,7 +58,7 @@ class TestSuite(unittest.TestCase):
                 {
                     "function_list": [
                         {
-                            "func_name": "Name",
+                            "name": "Name",
                             "raw_return_type": "int1",
                             "simple_return_type": "int2",
                             "var_names": ["a", "b",],
@@ -73,7 +73,7 @@ class TestSuite(unittest.TestCase):
         )
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].function_list[0].func_name, "Name")
+        self.assertEqual(result[0].function_list[0].name, "Name")
         self.assertEqual(result[0].function_list[0].raw_return_type, "int1")
         self.assertEqual(result[0].function_list[0].simple_return_type, "int2")
         self.assertEqual(result[0].function_list[0].var_names, ["a", "b",])
@@ -92,13 +92,13 @@ class TestSuite(unittest.TestCase):
                 {
                     "function_list": [
                         {
-                            "func_name": "Name1",
+                            "name": "Name1",
                             "raw_return_type": "int1",
                             "simple_return_type": "int2",
                             "definition_line": 12,
                         },
                         {
-                            "func_name": "Name2",
+                            "name": "Name2",
                             "raw_return_type": "int3",
                             "simple_return_type": "int4",
                             "definition_line": 34,
@@ -110,7 +110,7 @@ class TestSuite(unittest.TestCase):
 
         self.assertEqual(len(result[0].function_list), 2)
 
-        self.assertEqual(result[0].function_list[0].func_name, "Name1")
+        self.assertEqual(result[0].function_list[0].name, "Name1")
         self.assertEqual(result[0].function_list[0].raw_return_type, "int1")
         self.assertEqual(result[0].function_list[0].simple_return_type, "int2")
         self.assertEqual(result[0].function_list[0].definition_line, 12)
@@ -119,7 +119,7 @@ class TestSuite(unittest.TestCase):
         self.assertTrue(not hasattr(result[0].function_list[0], "simple_var_types"))
         self.assertTrue(not hasattr(result[0].function_list[0], "declaration_line"))
 
-        self.assertEqual(result[0].function_list[1].func_name, "Name2")
+        self.assertEqual(result[0].function_list[1].name, "Name2")
         self.assertEqual(result[0].function_list[1].raw_return_type, "int3")
         self.assertEqual(result[0].function_list[1].simple_return_type, "int4")
         self.assertEqual(result[0].function_list[1].definition_line, 34)
@@ -138,7 +138,7 @@ class TestSuite(unittest.TestCase):
                 {
                     "struct_list": [
                         {
-                            "struct_name": "Name",
+                            "name": "Name",
                             "var_names": ["a", "b",],
                             "raw_var_types": ["c", "d",],
                             "simple_var_types": ["e", "f",],
@@ -150,7 +150,7 @@ class TestSuite(unittest.TestCase):
         )
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].struct_list[0].struct_name, "Name")
+        self.assertEqual(result[0].struct_list[0].name, "Name")
         self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
         self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
         self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
@@ -167,7 +167,7 @@ class TestSuite(unittest.TestCase):
                 {
                     "struct_list": [
                         {
-                            "struct_name": "Name",
+                            "name": "Name",
                             "var_names": ["a", "b",],
                             "raw_var_types": ["c", "d",],
                             "simple_var_types": ["e", "f",],
@@ -187,7 +187,7 @@ class TestSuite(unittest.TestCase):
         )
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].struct_list[0].struct_name, "Name")
+        self.assertEqual(result[0].struct_list[0].name, "Name")
         self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
         self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
         self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
@@ -201,14 +201,14 @@ class TestSuite(unittest.TestCase):
         self.assertTrue(not hasattr(result[0], "function_list"))
         self.assertTrue(not hasattr(result[0], "include_list"))
 
-        # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
     def test_WithMultipleConstructors(self):
         result = Deserialize(
             [
                 {
                     "struct_list": [
                         {
-                            "struct_name": "Name",
+                            "name": "Name",
                             "var_names": ["a", "b",],
                             "raw_var_types": ["c", "d",],
                             "simple_var_types": ["e", "f",],
@@ -234,7 +234,7 @@ class TestSuite(unittest.TestCase):
         )
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].struct_list[0].struct_name, "Name")
+        self.assertEqual(result[0].struct_list[0].name, "Name")
         self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
         self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
         self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
@@ -253,6 +253,67 @@ class TestSuite(unittest.TestCase):
         self.assertTrue(not hasattr(result[0], "function_list"))
         self.assertTrue(not hasattr(result[0], "include_list"))
 
+    # ----------------------------------------------------------------------
+    def test_WithBaseStruct(self):
+        result = Deserialize(
+            [
+                {
+                    "struct_list": [
+                        {
+                            "name": "Name",
+                            "var_names": ["a", "b",],
+                            "raw_var_types": ["c", "d",],
+                            "simple_var_types": ["e", "f",],
+                            "definition_line": 7,
+                            "base_structs": ["struct1"],
+                        }
+                    ]
+                },
+            ],
+        )
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].struct_list[0].name, "Name")
+        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
+        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
+        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].struct_list[0].definition_line, 7)
+        self.assertTrue(not hasattr(result[0].struct_list[0], "constructor_list"))
+        self.assertEqual(result[0].struct_list[0].base_structs, ["struct1"])
+
+        self.assertTrue(not hasattr(result[0], "function_list"))
+        self.assertTrue(not hasattr(result[0], "include_list"))
+
+    # ----------------------------------------------------------------------
+    def test_WithMultipleBaseStruct(self):
+        result = Deserialize(
+            [
+                {
+                    "struct_list": [
+                        {
+                            "name": "Name",
+                            "var_names": ["a", "b",],
+                            "raw_var_types": ["c", "d",],
+                            "simple_var_types": ["e", "f",],
+                            "definition_line": 7,
+                            "base_structs": ["struct1", "struct2", "struct3"],
+                        }
+                    ]
+                },
+            ],
+        )
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].struct_list[0].name, "Name")
+        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
+        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
+        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].struct_list[0].definition_line, 7)
+        self.assertTrue(not hasattr(result[0].struct_list[0], "constructor_list"))
+        self.assertEqual(result[0].struct_list[0].base_structs, ["struct1", "struct2", "struct3"])
+
+        self.assertTrue(not hasattr(result[0], "function_list"))
+        self.assertTrue(not hasattr(result[0], "include_list"))
 
     # ----------------------------------------------------------------------
     def test_include(self):
@@ -269,8 +330,8 @@ class TestSuite(unittest.TestCase):
 
         self.assertTrue(not hasattr(result[0], "function_list"))
         self.assertTrue(not hasattr(result[0], "struct_list"))
-    # ----------------------------------------------------------------------
 
+    # ----------------------------------------------------------------------
     def test_multiple_includes(self):
         result = Deserialize(
             [
@@ -287,8 +348,6 @@ class TestSuite(unittest.TestCase):
         self.assertTrue(not hasattr(result[0], "struct_list"))
 
     # ----------------------------------------------------------------------
-
-    
     def test_InvalidName(self):
         self.assertRaisesRegex(
             Exception,
@@ -298,7 +357,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": None,
+                                "name": None,
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
                             },
@@ -316,7 +375,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "",
+                                "name": "",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
                             },
@@ -336,7 +395,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": None,
                                 "simple_return_type": "int2",
                             },
@@ -354,7 +413,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "",
                                 "simple_return_type": "int2",
                             },
@@ -374,7 +433,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": None,
                             },
@@ -392,7 +451,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "",
                             },
@@ -412,7 +471,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
                                 "var_names": [None, "b",],
@@ -433,7 +492,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
                                 "var_names": ["", "b",],
@@ -456,7 +515,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
                                 "var_names": ["a", "b",],
@@ -477,7 +536,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
                                 "var_names": ["a", "b",],
@@ -500,7 +559,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
                                 "var_names": ["a", "b",],
@@ -521,7 +580,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
                                 "var_names": ["", "b",],
@@ -533,6 +592,7 @@ class TestSuite(unittest.TestCase):
                 ],
             )
         )
+
      # ----------------------------------------------------------------------
     def test_InvalidDeclarationLine(self):
         self.assertRaisesRegex(
@@ -543,7 +603,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int1",
                                 "declaration_line": 0,
@@ -561,7 +621,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int1",
                                 "declaration_line": "String",
@@ -571,6 +631,7 @@ class TestSuite(unittest.TestCase):
                 ],
             )
         )
+
      # ----------------------------------------------------------------------
     def test_InvalidDefinitionLine(self):
         self.assertRaisesRegex(
@@ -581,7 +642,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int1",
                                 "definition_line": 0,
@@ -599,7 +660,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "function_list": [
                             {
-                                "func_name": "Name",
+                                "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int1",
                                 "definition_line": "String",
@@ -611,7 +672,6 @@ class TestSuite(unittest.TestCase):
         )
 
     # ----------------------------------------------------------------------
-
     def test_InvalidNameStruct(self):
         self.assertRaisesRegex(
             Exception,
@@ -621,7 +681,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": None,
+                                "name": None,
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -641,7 +701,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "",
+                                "name": "",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -654,7 +714,6 @@ class TestSuite(unittest.TestCase):
         )
 
     # ----------------------------------------------------------------------
-
     def test_InvalidVarNameStruct(self):
         self.assertRaisesRegex(
             Exception,
@@ -664,7 +723,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": [None, "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -684,7 +743,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -697,7 +756,6 @@ class TestSuite(unittest.TestCase):
         )
 
     # ----------------------------------------------------------------------
-    
     def test_InvalidRawVarTypeStruct(self):
         self.assertRaisesRegex(
             Exception,
@@ -707,7 +765,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": [None, "d",],
                                 "simple_var_types": ["e", "f",],
@@ -727,7 +785,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -740,8 +798,6 @@ class TestSuite(unittest.TestCase):
         )
 
     # ----------------------------------------------------------------------
-
-    
     def test_InvalidSimpleVarTypeStruct(self):
         self.assertRaisesRegex(
             Exception,
@@ -751,7 +807,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": [None, "f",],
@@ -771,7 +827,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["", "f",],
@@ -784,7 +840,6 @@ class TestSuite(unittest.TestCase):
         )
 
     # ----------------------------------------------------------------------
-
     def test_InvalidDefinitionLineStruct(self):
         self.assertRaisesRegex(
             Exception,
@@ -794,7 +849,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -814,7 +869,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -827,7 +882,50 @@ class TestSuite(unittest.TestCase):
         )
 
     # ----------------------------------------------------------------------
+    def test_InvalidBaseStructs(self):
+        self.assertRaisesRegex(
+            Exception,
+            "expected string or bytes-like object",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                                "base_structs": [None, "struct2"],
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
 
+        self.assertRaisesRegex(
+            Exception,
+            "'' is not a valid 'String' string - Value must have at least 1 character",
+            lambda: Deserialize(
+                [
+                    {
+                        "struct_list": [
+                            {
+                                "name": "name",
+                                "var_names": ["a", "b",],
+                                "raw_var_types": ["c", "d",],
+                                "simple_var_types": ["e", "f",],
+                                "definition_line": 7,
+                                "base_structs": ["", "struct2"],
+                            }
+                        ]
+                    },
+                ],
+            )
+        )
+
+    # ----------------------------------------------------------------------
     def test_InvalidArgNamesConstructor(self):
         self.assertRaisesRegex(
             Exception,
@@ -837,7 +935,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -865,7 +963,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -886,7 +984,6 @@ class TestSuite(unittest.TestCase):
         )
 
     # ----------------------------------------------------------------------
-
     def test_InvalidRawArgTypesConstructor(self):
         self.assertRaisesRegex(
             Exception,
@@ -896,7 +993,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -924,7 +1021,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -945,7 +1042,6 @@ class TestSuite(unittest.TestCase):
         )
 
     # ----------------------------------------------------------------------
-
     def test_InvalidSimpleArgTypesConstructor(self):
         self.assertRaisesRegex(
             Exception,
@@ -955,7 +1051,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -983,7 +1079,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -1004,7 +1100,6 @@ class TestSuite(unittest.TestCase):
         )
 
     # ----------------------------------------------------------------------
-
     def test_InvalidDefinitionLineConstructor(self):
         self.assertRaisesRegex(
             Exception,
@@ -1014,7 +1109,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -1042,7 +1137,7 @@ class TestSuite(unittest.TestCase):
                     {
                         "struct_list": [
                             {
-                                "struct_name": "name",
+                                "name": "name",
                                 "var_names": ["a", "b",],
                                 "raw_var_types": ["c", "d",],
                                 "simple_var_types": ["e", "f",],
@@ -1063,7 +1158,6 @@ class TestSuite(unittest.TestCase):
         )
 
     # ----------------------------------------------------------------------
-
     def test_InvalidIncludeList(self):
         self.assertRaisesRegex(
             Exception,
@@ -1090,12 +1184,10 @@ class TestSuite(unittest.TestCase):
         )
 
     # ----------------------------------------------------------------------
-    
-    
     def test_ProcessAdditionalData(self):
         input = [
             {
-                "func_name": "Name",
+                "name": "Name",
                 "raw_return_type": "int1",
                 "simple_return_type": "int2",
                 "another_value": {"hello": "world",},

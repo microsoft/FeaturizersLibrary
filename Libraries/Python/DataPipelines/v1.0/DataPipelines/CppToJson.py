@@ -257,7 +257,7 @@ def ObtainFunctions(
 
         # ----------------------------------------------------------------------
 
-        filename = input_filename
+        filename = os.path.realpath(input_filename)
         these_results = ParseFile(filename)
 
         # If the original file was a temp file, make the key None rather than
@@ -302,12 +302,16 @@ def ObtainFunctions(
                     if GetObjType(arg_type) != obj_type and not VerifyObjType(GetObjType(arg_type)) and not TestAndVerify(arg_type):
                         invalid_reasons.append("\t- Invalid type {} on constructor argument.".format(arg_type))
 
+            for parent_struct in obj_type.base_structs:
+                if not VerifyObjType(GetObjType(parent_struct)):
+                    invalid_reasons.append("\t- Invalid base struct {}".format(parent_struct))
+
             if not obj_type.has_move_constructor:
                 invalid_reasons.append("\t- Struct doesn't have a move constructor.")
             if obj_type.has_copy_constructor:
                 invalid_reasons.append("\t- Struct has a copy constructor.")
             if obj_type.has_private:
-                invalid_reasons.append("\t- Struct has private variables.")
+                invalid_reasons.append("\t- Struct has a private variable or inherits from a private struct.")
             if obj_type.has_other:
                 invalid_reasons.append("\t- Struct has an unsupported definition.")
 
@@ -402,10 +406,6 @@ class _FuncWithArguments(object):
         return self.__hash__() == other.__hash__()
 
     # ----------------------------------------------------------------------
-    def AddVar(self, var_name, raw_var_type, simple_var_type):
-        self.VariableInfo.append((var_name, raw_var_type, simple_var_type))
-
-    # ----------------------------------------------------------------------
     def ToDict(self):
         new_dict = {}
 
@@ -439,7 +439,8 @@ class ClassLikeObject(_FuncWithArguments):
         name,
         definition_line,
         filename,
-        variable_info=None,
+        variable_info,
+        base_structs=None,
         constructor_list=None,
         has_move_constructor=None,
         has_copy_constructor=None,
@@ -455,6 +456,7 @@ class ClassLikeObject(_FuncWithArguments):
         self.Filename                       = filename
 
         self.constructor_list               = constructor_list or []
+        self.base_structs                   = base_structs or []
         
         self.has_move_constructor           = has_move_constructor or False
         self.has_copy_constructor           = has_copy_constructor or False
@@ -476,6 +478,7 @@ class ClassLikeObject(_FuncWithArguments):
             results[k] = v
 
         results["constructor_list"] = [constructor.ToDict() for constructor in self.constructor_list]
+        results["base_structs"] = self.base_structs
 
         return results
 
@@ -549,16 +552,16 @@ class Constructor(_FuncWithArguments):
     def __init__(
         self,
         definition_line,
-        variable_info=None,
+        variable_info,
     ):
-        self._definition_line               = definition_line
+        self.DefinitionLine               = definition_line
         super(Constructor, self).__init__(
             variable_info=variable_info,
         )
 
     # ----------------------------------------------------------------------
     def __hash__(self):
-        return hash((self._definition_line, super(Constructor, self).__hash__()))
+        return hash((self.DefinitionLine, super(Constructor, self).__hash__()))
 
     # ----------------------------------------------------------------------
     def ToDict(self):
@@ -568,7 +571,7 @@ class Constructor(_FuncWithArguments):
         if len(new_dict["var_names"]) == 1 and not new_dict["var_names"][0]:
             new_dict["var_names"] = ["other"]
 
-        new_dict["definition_line"] = self._definition_line
+        new_dict["definition_line"] = self.DefinitionLine
 
         return new_dict
 
@@ -592,7 +595,7 @@ class Results(object):
         new_dict = {}
 
         new_dict["function_list"] = self.function_list
-        new_dict["object_type_list"] = self.object_type_list
+        new_dict["struct_list"] = self.object_type_list
         new_dict["include_list"] = self.include_list
 
         return new_dict
@@ -621,10 +624,14 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
     This function will return the Object Type that this node refers to. It will return None if there were
     errors.
     """
-
-    object_type = ClassLikeObject(_FullName(node), node.location.line, os.path.realpath(node.location.file.name))
-
-    # The way to see if this is a definition or not, is to see if 'node' has any children.
+    struct_class_pattern = re.compile(
+        textwrap.dedent(
+            r"""(?#
+            Not a letter)(?<!\w)(?#
+            Keyword with a space)(?P<keyword>struct\s|class\s)(?#
+            )"""
+        )
+    )
     is_def = True
     # There are a few kinds that are supported, even though they are not directly exposed.
     accepted_kinds = [cindex.CursorKind.CXX_ACCESS_SPEC_DECL]
@@ -642,17 +649,28 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
 
     # ----------------------------------------------------------------------
 
+    object_vars = []
     for child in node.get_children():
+        if child.kind == cindex.CursorKind.FIELD_DECL:
+            var_type = FullVarType(child.type.spelling)
+            object_vars.append((child.spelling, var_type, SimpleVarType(var_type)))
+
+    object_type = ClassLikeObject(_FullName(node), node.location.line, os.path.realpath(node.location.file.name), object_vars)
+
+    for child in node.get_children():
+        # The way to see if this is a definition or not, is to see if 'node' has any children.
         is_def = False
         if child.kind == cindex.CursorKind.CONSTRUCTOR:
             # If this constructor ends in "=delete", ignore it.
             if DeleteDefault(child, "delete"):
                 continue
 
-            constructor = Constructor(child.location.line)
+            constructor_args = []
             for arg in child.get_arguments():
                 arg_type = FullVarType(arg.type.spelling)
-                constructor.AddVar(arg.spelling, arg_type, SimpleVarType(arg_type))
+                constructor_args.append((arg.spelling, arg_type, SimpleVarType(arg_type)))
+
+            constructor = Constructor(child.location.line, constructor_args)
 
             object_type.constructor_list.append(constructor)
 
@@ -668,8 +686,6 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
                 object_type.has_copy_constructor = True
 
         elif child.kind == cindex.CursorKind.FIELD_DECL:
-            var_type = FullVarType(child.type.spelling)
-            object_type.AddVar(child.spelling, var_type, SimpleVarType(var_type))
             if child.access_specifier != cindex.AccessSpecifier.PUBLIC:
                 object_type.has_private = True
 
@@ -690,10 +706,13 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
                 object_type.has_other = True
 
         elif child.kind == cindex.CursorKind.CXX_BASE_SPECIFIER:
-            # TODO: This means that this classLikeObject depends on another one
-            # there is the need to verify if the one that this one depends on is valid.
-            # Check that this is public.
-            pass
+            if child.access_specifier != cindex.AccessSpecifier.PUBLIC:
+                object_type.has_private = True
+            struct_name = child.spelling
+            struct_name = struct_class_pattern.sub(r'', struct_name)
+
+            object_type.base_structs.append(struct_name.strip())
+
         elif child.kind not in accepted_kinds:
             object_type.has_other = True
 

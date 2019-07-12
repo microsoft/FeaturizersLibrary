@@ -1,6 +1,6 @@
 <FileInfo *>:
     <function_list *>:
-        <func_name string>
+        <name string>
 
         <raw_return_type string>
         <simple_return_type string>
@@ -13,13 +13,15 @@
         <definition_line int min=1 ?>
 
     <struct_list *>:
-        <struct_name string>
+        <name string>
 
         <var_names string *>
         <raw_var_types string *>
         <simple_var_types string *>
 
         <definition_line int min=1 ?>
+
+        <base_structs string *>
 
         <constructor_list *>:
             <var_names string *>
