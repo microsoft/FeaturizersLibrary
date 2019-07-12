@@ -8,8 +8,8 @@ import textwrap
 
 import CommonEnvironment
 
-from DataPipelines import CppToJson
-from DataPipelines.GeneratedCode.CppToJson_PythonJsonSerialization import *
+from DataPipelines.CppToJson import CppToJson
+from DataPipelines.CppToJson.GeneratedCode.CppToJson_PythonJsonSerialization import *
 
 
 # ----------------------------------------------------------------------
@@ -253,7 +253,7 @@ class Deserialization(unittest.TestCase):
         results = CppToJson.ObtainFunctions(filename, None, lambda type: True)
 
         deserialized_result = Deserialize([results[filename]])
-        
+
         self.assertEqual(len(deserialized_result), 1)
 
         self.assertEqual(deserialized_result[0].function_list[0].name, "goooo")
@@ -272,7 +272,7 @@ class Deserialization(unittest.TestCase):
         self.assertEqual(deserialized_result[0].struct_list[0].definition_line, 3)
 
         """
-        TODO: The following commented code is here because there is a problem on Deserialize, that 
+        TODO: The following commented code is here because there is a problem on Deserialize, that
         it does not export fields that only have an empty list. Once that is fixed, the
         code should be uncommented.
         """

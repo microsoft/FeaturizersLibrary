@@ -5,7 +5,7 @@ import json
 import unittest
 import textwrap
 
-from DataPipelines import CppToJson
+from DataPipelines.CppToJson import CppToJson
 
 class FuncTest(unittest.TestCase):
 
@@ -713,7 +713,7 @@ class FuncTest(unittest.TestCase):
             int go(x ya){
                 return 2;
             }
-            
+
             int main(){
                 return 0;
             }
@@ -724,7 +724,7 @@ class FuncTest(unittest.TestCase):
         def onUnsupportedFunc(error_desc, filename, line):
             nonlocal was_called
             was_called = True
-            
+
             unsupported_list = [
                 [textwrap.dedent("""\
                 The function go is not supported:
@@ -746,7 +746,7 @@ class FuncTest(unittest.TestCase):
         include_list = self._GetIncludeList(CppToJson.ObtainFunctions(s, onUnsupportedFunc, Policy))
 
         self.assertEqual(was_called, True)
-        
+
         self.assertEqual(func_list[0]['name'], 'main')
         self.assertEqual(func_list[0]['raw_return_type'], 'int')
         self.assertEqual(func_list[0]['simple_return_type'], 'int')
@@ -755,7 +755,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['simple_var_types'], [])
         self.assertEqual(func_list[0]['definition_line'], 11)
         self.assertEqual(func_list[0]['declaration_line'], 11)
-        
+
         self.assertEqual(obj_type_list, [])
         self.assertEqual(len(include_list), 1)
 
@@ -764,7 +764,7 @@ class FuncTest(unittest.TestCase):
         s = textwrap.dedent('''\
             #include <utility>
             #include <cstdio>
-            
+
             struct x{
                 int a, b;
                 x(x &&other): a(std::move(other.a)), b(std::move(other.b)){}

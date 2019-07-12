@@ -3,7 +3,7 @@
 import sys
 import unittest
 
-from DataPipelines import CheckPolicy
+from DataPipelines.CppToJson import CheckPolicy
 
 class FuncTest(unittest.TestCase):
     def testInt(self):

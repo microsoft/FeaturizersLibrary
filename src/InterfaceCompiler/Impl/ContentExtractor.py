@@ -11,8 +11,8 @@ import six
 
 import CommonEnvironment
 
-from DataPipelines.CheckPolicy import Policy as CheckPolicy
-from DataPipelines.CppToJson import ObtainFunctions
+from DataPipelines.CppToJson.CheckPolicy import Policy as CheckPolicy
+from DataPipelines.CppToJson.CppToJson import ObtainFunctions
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()

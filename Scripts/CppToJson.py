@@ -2,9 +2,10 @@ import sys
 import json
 import re
 
-from DataPipelines import CppToJson
 from CommonEnvironment import CommandLine
-from DataPipelines.CheckPolicy import Policy
+
+from DataPipelines.CppToJson import CppToJson
+from DataPipelines.CppToJson.CheckPolicy import Policy
 
 @CommandLine.EntryPoint
 @CommandLine.Constraints(

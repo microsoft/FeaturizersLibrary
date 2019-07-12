@@ -9,7 +9,7 @@ import sys
 import unittest
 
 import CommonEnvironment
-from DataPipelines.GeneratedCode.CppToJson_PythonJsonSerialization import *
+from DataPipelines.CppToJson.GeneratedCode.CppToJson_PythonJsonSerialization import *
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -33,11 +33,11 @@ class TestSuite(unittest.TestCase):
                             "raw_return_type": "int1",
                             "simple_return_type": "int2",
                         }
-                    ]
+                    ],
                 },
             ],
         )
-        
+
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].function_list[0].name, "Name")
         self.assertEqual(result[0].function_list[0].raw_return_type, "int1")
@@ -56,18 +56,16 @@ class TestSuite(unittest.TestCase):
         result = Deserialize(
             [
                 {
-                    "function_list": [
-                        {
-                            "name": "Name",
-                            "raw_return_type": "int1",
-                            "simple_return_type": "int2",
-                            "var_names": ["a", "b",],
-                            "raw_var_types": ["c", "d",],
-                            "simple_var_types": ["e", "f",],
-                            "declaration_line": 3,
-                            "definition_line": 7,
-                        }
-                    ]
+                    "function_list": [{
+                        "name": "Name",
+                        "raw_return_type": "int1",
+                        "simple_return_type": "int2",
+                        "var_names": ["a", "b"],
+                        "raw_var_types": ["c", "d"],
+                        "simple_var_types": ["e", "f"],
+                        "declaration_line": 3,
+                        "definition_line": 7,
+                    }],
                 },
             ],
         )
@@ -76,9 +74,9 @@ class TestSuite(unittest.TestCase):
         self.assertEqual(result[0].function_list[0].name, "Name")
         self.assertEqual(result[0].function_list[0].raw_return_type, "int1")
         self.assertEqual(result[0].function_list[0].simple_return_type, "int2")
-        self.assertEqual(result[0].function_list[0].var_names, ["a", "b",])
-        self.assertEqual(result[0].function_list[0].raw_var_types, ["c", "d",])
-        self.assertEqual(result[0].function_list[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].function_list[0].var_names, ["a", "b"])
+        self.assertEqual(result[0].function_list[0].raw_var_types, ["c", "d"])
+        self.assertEqual(result[0].function_list[0].simple_var_types, ["e", "f"])
         self.assertEqual(result[0].function_list[0].declaration_line, 3)
         self.assertEqual(result[0].function_list[0].definition_line, 7)
 
@@ -103,7 +101,7 @@ class TestSuite(unittest.TestCase):
                             "simple_return_type": "int4",
                             "definition_line": 34,
                         },
-                    ]
+                    ],
                 },
             ],
         )
@@ -136,24 +134,22 @@ class TestSuite(unittest.TestCase):
         result = Deserialize(
             [
                 {
-                    "struct_list": [
-                        {
-                            "name": "Name",
-                            "var_names": ["a", "b",],
-                            "raw_var_types": ["c", "d",],
-                            "simple_var_types": ["e", "f",],
-                            "definition_line": 7,
-                        }
-                    ]
+                    "struct_list": [{
+                        "name": "Name",
+                        "var_names": ["a", "b"],
+                        "raw_var_types": ["c", "d"],
+                        "simple_var_types": ["e", "f"],
+                        "definition_line": 7,
+                    }],
                 },
             ],
         )
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].struct_list[0].name, "Name")
-        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
-        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
-        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b"])
+        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d"])
+        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f"])
         self.assertEqual(result[0].struct_list[0].definition_line, 7)
         self.assertTrue(not hasattr(result[0].struct_list[0], "constructor_list"))
 
@@ -165,37 +161,42 @@ class TestSuite(unittest.TestCase):
         result = Deserialize(
             [
                 {
-                    "struct_list": [
-                        {
-                            "name": "Name",
-                            "var_names": ["a", "b",],
-                            "raw_var_types": ["c", "d",],
-                            "simple_var_types": ["e", "f",],
-                            "definition_line": 7,
-                            "constructor_list": [
-                                {
-                                    "var_names": ['arg1', 'arg2'],
-                                    "raw_var_types": ['a', 'b'],
-                                    "simple_var_types": ['c', 'd'],
-                                    "definition_line": 13,
-                                }
-                            ]
-                        }
-                    ]
+                    "struct_list": [{
+                        "name": "Name",
+                        "var_names": ["a", "b"],
+                        "raw_var_types": ["c", "d"],
+                        "simple_var_types": ["e", "f"],
+                        "definition_line": 7,
+                        "constructor_list": [{
+                            "var_names": ["arg1", "arg2"],
+                            "raw_var_types": ["a", "b"],
+                            "simple_var_types": ["c", "d"],
+                            "definition_line": 13,
+                        }],
+                    }],
                 },
             ],
         )
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].struct_list[0].name, "Name")
-        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
-        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
-        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b"])
+        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d"])
+        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f"])
         self.assertEqual(result[0].struct_list[0].definition_line, 7)
 
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].var_names, ['arg1', 'arg2'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].raw_var_types, ['a', 'b'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].simple_var_types, ['c', 'd'])
+        self.assertEqual(
+            result[0].struct_list[0].constructor_list[0].var_names,
+            ["arg1", "arg2"],
+        )
+        self.assertEqual(
+            result[0].struct_list[0].constructor_list[0].raw_var_types,
+            ["a", "b"],
+        )
+        self.assertEqual(
+            result[0].struct_list[0].constructor_list[0].simple_var_types,
+            ["c", "d"],
+        )
         self.assertEqual(result[0].struct_list[0].constructor_list[0].definition_line, 13)
 
         self.assertTrue(not hasattr(result[0], "function_list"))
@@ -206,49 +207,68 @@ class TestSuite(unittest.TestCase):
         result = Deserialize(
             [
                 {
-                    "struct_list": [
-                        {
-                            "name": "Name",
-                            "var_names": ["a", "b",],
-                            "raw_var_types": ["c", "d",],
-                            "simple_var_types": ["e", "f",],
-                            "definition_line": 7,
-                            "constructor_list": [
-                                {
-                                    "var_names": ['arg1', 'arg2'],
-                                    "raw_var_types": ['a', 'b'],
-                                    "simple_var_types": ['c', 'd'],
-                                    "definition_line": 13,
-                                },
-                                {
-                                    "var_names": ['arg12', 'arg22'],
-                                    "raw_var_types": ['a2', 'b2'],
-                                    "simple_var_types": ['c2', 'd2'],
-                                    "definition_line": 132,
-                                },
-                            ]
-                        }
-                    ]
+                    "struct_list": [{
+                        "name": "Name",
+                        "var_names": ["a", "b"],
+                        "raw_var_types": ["c", "d"],
+                        "simple_var_types": ["e", "f"],
+                        "definition_line": 7,
+                        "constructor_list": [
+                            {
+                                "var_names": ["arg1", "arg2"],
+                                "raw_var_types": ["a", "b"],
+                                "simple_var_types": ["c", "d"],
+                                "definition_line": 13,
+                            },
+                            {
+                                "var_names": ["arg12", "arg22"],
+                                "raw_var_types": ["a2", "b2"],
+                                "simple_var_types": ["c2", "d2"],
+                                "definition_line": 132,
+                            },
+                        ],
+                    }],
                 },
             ],
         )
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].struct_list[0].name, "Name")
-        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
-        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
-        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b"])
+        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d"])
+        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f"])
         self.assertEqual(result[0].struct_list[0].definition_line, 7)
 
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].var_names, ['arg1', 'arg2'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].raw_var_types, ['a', 'b'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[0].simple_var_types, ['c', 'd'])
+        self.assertEqual(
+            result[0].struct_list[0].constructor_list[0].var_names,
+            ["arg1", "arg2"],
+        )
+        self.assertEqual(
+            result[0].struct_list[0].constructor_list[0].raw_var_types,
+            ["a", "b"],
+        )
+        self.assertEqual(
+            result[0].struct_list[0].constructor_list[0].simple_var_types,
+            ["c", "d"],
+        )
         self.assertEqual(result[0].struct_list[0].constructor_list[0].definition_line, 13)
 
-        self.assertEqual(result[0].struct_list[0].constructor_list[1].var_names, ['arg12', 'arg22'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[1].raw_var_types, ['a2', 'b2'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[1].simple_var_types, ['c2', 'd2'])
-        self.assertEqual(result[0].struct_list[0].constructor_list[1].definition_line, 132)
+        self.assertEqual(
+            result[0].struct_list[0].constructor_list[1].var_names,
+            ["arg12", "arg22"],
+        )
+        self.assertEqual(
+            result[0].struct_list[0].constructor_list[1].raw_var_types,
+            ["a2", "b2"],
+        )
+        self.assertEqual(
+            result[0].struct_list[0].constructor_list[1].simple_var_types,
+            ["c2", "d2"],
+        )
+        self.assertEqual(
+            result[0].struct_list[0].constructor_list[1].definition_line,
+            132,
+        )
 
         self.assertTrue(not hasattr(result[0], "function_list"))
         self.assertTrue(not hasattr(result[0], "include_list"))
@@ -258,25 +278,23 @@ class TestSuite(unittest.TestCase):
         result = Deserialize(
             [
                 {
-                    "struct_list": [
-                        {
-                            "name": "Name",
-                            "var_names": ["a", "b",],
-                            "raw_var_types": ["c", "d",],
-                            "simple_var_types": ["e", "f",],
-                            "definition_line": 7,
-                            "base_structs": ["struct1"],
-                        }
-                    ]
+                    "struct_list": [{
+                        "name": "Name",
+                        "var_names": ["a", "b"],
+                        "raw_var_types": ["c", "d"],
+                        "simple_var_types": ["e", "f"],
+                        "definition_line": 7,
+                        "base_structs": ["struct1"],
+                    }],
                 },
             ],
         )
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].struct_list[0].name, "Name")
-        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
-        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
-        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b"])
+        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d"])
+        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f"])
         self.assertEqual(result[0].struct_list[0].definition_line, 7)
         self.assertTrue(not hasattr(result[0].struct_list[0], "constructor_list"))
         self.assertEqual(result[0].struct_list[0].base_structs, ["struct1"])
@@ -289,42 +307,37 @@ class TestSuite(unittest.TestCase):
         result = Deserialize(
             [
                 {
-                    "struct_list": [
-                        {
-                            "name": "Name",
-                            "var_names": ["a", "b",],
-                            "raw_var_types": ["c", "d",],
-                            "simple_var_types": ["e", "f",],
-                            "definition_line": 7,
-                            "base_structs": ["struct1", "struct2", "struct3"],
-                        }
-                    ]
+                    "struct_list": [{
+                        "name": "Name",
+                        "var_names": ["a", "b"],
+                        "raw_var_types": ["c", "d"],
+                        "simple_var_types": ["e", "f"],
+                        "definition_line": 7,
+                        "base_structs": ["struct1", "struct2", "struct3"],
+                    }],
                 },
             ],
         )
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].struct_list[0].name, "Name")
-        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b",])
-        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d",])
-        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f",])
+        self.assertEqual(result[0].struct_list[0].var_names, ["a", "b"])
+        self.assertEqual(result[0].struct_list[0].raw_var_types, ["c", "d"])
+        self.assertEqual(result[0].struct_list[0].simple_var_types, ["e", "f"])
         self.assertEqual(result[0].struct_list[0].definition_line, 7)
         self.assertTrue(not hasattr(result[0].struct_list[0], "constructor_list"))
-        self.assertEqual(result[0].struct_list[0].base_structs, ["struct1", "struct2", "struct3"])
+        self.assertEqual(
+            result[0].struct_list[0].base_structs,
+            ["struct1", "struct2", "struct3"],
+        )
 
         self.assertTrue(not hasattr(result[0], "function_list"))
         self.assertTrue(not hasattr(result[0], "include_list"))
 
     # ----------------------------------------------------------------------
     def test_include(self):
-        result = Deserialize(
-            [
-                {
-                    "include_list": ["vector"]
-                },
-            ],
-        )
-        
+        result = Deserialize([{"include_list": ["vector"]}])
+
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].include_list, ["vector"])
 
@@ -336,13 +349,26 @@ class TestSuite(unittest.TestCase):
         result = Deserialize(
             [
                 {
-                    "include_list": ["vector", "a", "b", "c"]
+                    "include_list": [
+                        "vector",
+                        "a",
+                        "b",
+                        "c",
+                    ],
                 },
             ],
         )
-        
+
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].include_list, ["vector", "a", "b", "c"])
+        self.assertEqual(
+            result[0].include_list,
+            [
+                "vector",
+                "a",
+                "b",
+                "c",
+            ],
+        )
 
         self.assertTrue(not hasattr(result[0], "function_list"))
         self.assertTrue(not hasattr(result[0], "struct_list"))
@@ -361,10 +387,10 @@ class TestSuite(unittest.TestCase):
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -379,10 +405,10 @@ class TestSuite(unittest.TestCase):
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -399,10 +425,10 @@ class TestSuite(unittest.TestCase):
                                 "raw_return_type": None,
                                 "simple_return_type": "int2",
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -417,10 +443,10 @@ class TestSuite(unittest.TestCase):
                                 "raw_return_type": "",
                                 "simple_return_type": "int2",
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -437,10 +463,10 @@ class TestSuite(unittest.TestCase):
                                 "raw_return_type": "int1",
                                 "simple_return_type": None,
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -455,17 +481,17 @@ class TestSuite(unittest.TestCase):
                                 "raw_return_type": "int1",
                                 "simple_return_type": "",
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
     def test_InvalidVarName(self):
         self.assertRaisesRegex(
             Exception,
-            "expected string or bytes-like object", # TODO
+            "expected string or bytes-like object",                         # TODO
             lambda: Deserialize(
                 [
                     {
@@ -474,14 +500,14 @@ class TestSuite(unittest.TestCase):
                                 "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
-                                "var_names": [None, "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
+                                "var_names": [None, "b"],
+                                "raw_var_types": ["c", "d"],
+                                "simple_var_types": ["e", "f"],
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -495,21 +521,21 @@ class TestSuite(unittest.TestCase):
                                 "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
-                                "var_names": ["", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
+                                "var_names": ["", "b"],
+                                "raw_var_types": ["c", "d"],
+                                "simple_var_types": ["e", "f"],
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
     def test_InvalidRawVarType(self):
         self.assertRaisesRegex(
             Exception,
-            "expected string or bytes-like object", # TODO
+            "expected string or bytes-like object",                         # TODO
             lambda: Deserialize(
                 [
                     {
@@ -518,14 +544,14 @@ class TestSuite(unittest.TestCase):
                                 "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", None,],
-                                "simple_var_types": ["e", "f",],
+                                "var_names": ["a", "b"],
+                                "raw_var_types": ["c", None],
+                                "simple_var_types": ["e", "f"],
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -539,21 +565,21 @@ class TestSuite(unittest.TestCase):
                                 "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "",],
-                                "simple_var_types": ["e", "f",],
+                                "var_names": ["a", "b"],
+                                "raw_var_types": ["c", ""],
+                                "simple_var_types": ["e", "f"],
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
     def test_InvalidSimpleVarType(self):
         self.assertRaisesRegex(
             Exception,
-            "expected string or bytes-like object", # TODO
+            "expected string or bytes-like object",                         # TODO
             lambda: Deserialize(
                 [
                     {
@@ -562,14 +588,14 @@ class TestSuite(unittest.TestCase):
                                 "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", None, "g",],
+                                "var_names": ["a", "b"],
+                                "raw_var_types": ["c", "d"],
+                                "simple_var_types": ["e", None, "g"],
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -583,17 +609,17 @@ class TestSuite(unittest.TestCase):
                                 "name": "Name",
                                 "raw_return_type": "int1",
                                 "simple_return_type": "int2",
-                                "var_names": ["", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "", "g",],
+                                "var_names": ["", "b"],
+                                "raw_var_types": ["c", "d"],
+                                "simple_var_types": ["e", "", "g"],
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
-     # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
     def test_InvalidDeclarationLine(self):
         self.assertRaisesRegex(
             Exception,
@@ -608,10 +634,10 @@ class TestSuite(unittest.TestCase):
                                 "simple_return_type": "int1",
                                 "declaration_line": 0,
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
         self.assertRaisesRegex(
             Exception,
@@ -626,13 +652,13 @@ class TestSuite(unittest.TestCase):
                                 "simple_return_type": "int1",
                                 "declaration_line": "String",
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
-     # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
     def test_InvalidDefinitionLine(self):
         self.assertRaisesRegex(
             Exception,
@@ -647,10 +673,10 @@ class TestSuite(unittest.TestCase):
                                 "simple_return_type": "int1",
                                 "definition_line": 0,
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
         self.assertRaisesRegex(
             Exception,
@@ -665,10 +691,10 @@ class TestSuite(unittest.TestCase):
                                 "simple_return_type": "int1",
                                 "definition_line": "String",
                             },
-                        ]
+                        ],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -679,18 +705,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": None,
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": None,
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -699,18 +723,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -721,18 +743,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": [None, "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": [None, "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -741,18 +761,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -763,18 +781,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": [None, "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": [None, "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -783,18 +799,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -805,18 +819,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": [None, "f",],
-                                "definition_line": 7,
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": [None, "f"],
+                            "definition_line": 7,
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -825,18 +837,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["", "f",],
-                                "definition_line": 7,
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["", "f"],
+                            "definition_line": 7,
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -847,18 +857,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 0,
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 0,
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -867,18 +875,16 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": "String",
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": "String",
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -889,19 +895,17 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                                "base_structs": [None, "struct2"],
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                            "base_structs": [None, "struct2"],
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -910,19 +914,17 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                                "base_structs": ["", "struct2"],
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                            "base_structs": ["", "struct2"],
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -933,26 +935,22 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                                "constructor_list": [
-                                    {
-                                        "var_names": [None, "cb"],
-                                        "raw_var_types": ["cc", "cd"],
-                                        "simple_var_types": ["ce", "cf"],
-                                        "definition_line": 14
-                                    }
-                                ]
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                            "constructor_list": [{
+                                "var_names": [None, "cb"],
+                                "raw_var_types": ["cc", "cd"],
+                                "simple_var_types": ["ce", "cf"],
+                                "definition_line": 14,
+                            }],
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -961,26 +959,22 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                                "constructor_list": [
-                                    {
-                                        "var_names": ["", "cb"],
-                                        "raw_var_types": ["cc", "cd"],
-                                        "simple_var_types": ["ce", "cf"],
-                                        "definition_line": 14
-                                    }
-                                ]
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                            "constructor_list": [{
+                                "var_names": ["", "cb"],
+                                "raw_var_types": ["cc", "cd"],
+                                "simple_var_types": ["ce", "cf"],
+                                "definition_line": 14,
+                            }],
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -991,26 +985,22 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                                "constructor_list": [
-                                    {
-                                        "var_names": ["ca", "cb"],
-                                        "raw_var_types": [None, "cd"],
-                                        "simple_var_types": ["ce", "cf"],
-                                        "definition_line": 14
-                                    }
-                                ]
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                            "constructor_list": [{
+                                "var_names": ["ca", "cb"],
+                                "raw_var_types": [None, "cd"],
+                                "simple_var_types": ["ce", "cf"],
+                                "definition_line": 14,
+                            }],
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -1019,26 +1009,22 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                                "constructor_list": [
-                                    {
-                                        "var_names": ["ca", "cb"],
-                                        "raw_var_types": ["", "cd"],
-                                        "simple_var_types": ["ce", "cf"],
-                                        "definition_line": 14
-                                    }
-                                ]
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                            "constructor_list": [{
+                                "var_names": ["ca", "cb"],
+                                "raw_var_types": ["", "cd"],
+                                "simple_var_types": ["ce", "cf"],
+                                "definition_line": 14,
+                            }],
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -1049,26 +1035,22 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                                "constructor_list": [
-                                    {
-                                        "var_names": ["ca", "cb"],
-                                        "raw_var_types": ["cc", "cd"],
-                                        "simple_var_types": [None, "cf"],
-                                        "definition_line": 14
-                                    }
-                                ]
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                            "constructor_list": [{
+                                "var_names": ["ca", "cb"],
+                                "raw_var_types": ["cc", "cd"],
+                                "simple_var_types": [None, "cf"],
+                                "definition_line": 14,
+                            }],
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -1077,26 +1059,22 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
-                                "definition_line": 7,
-                                "constructor_list": [
-                                    {
-                                        "var_names": ["ca", "cb"],
-                                        "raw_var_types": ["cc", "cd"],
-                                        "simple_var_types": ["", "cf"],
-                                        "definition_line": 14
-                                    }
-                                ]
-                            }
-                        ]
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 7,
+                            "constructor_list": [{
+                                "var_names": ["ca", "cb"],
+                                "raw_var_types": ["cc", "cd"],
+                                "simple_var_types": ["", "cf"],
+                                "definition_line": 14,
+                            }],
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -1107,26 +1085,22 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": 0,
+                            "constructor_list": [{
+                                "var_names": ["ca", "cb"],
+                                "raw_var_types": ["cc", "cd"],
+                                "simple_var_types": ["ce", "cf"],
                                 "definition_line": 0,
-                                "constructor_list": [
-                                    {
-                                        "var_names": ["ca", "cb"],
-                                        "raw_var_types": ["cc", "cd"],
-                                        "simple_var_types": ["ce", "cf"],
-                                        "definition_line": 0
-                                    }
-                                ]
-                            }
-                        ]
+                            }],
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
         self.assertRaisesRegex(
@@ -1135,26 +1109,22 @@ class TestSuite(unittest.TestCase):
             lambda: Deserialize(
                 [
                     {
-                        "struct_list": [
-                            {
-                                "name": "name",
-                                "var_names": ["a", "b",],
-                                "raw_var_types": ["c", "d",],
-                                "simple_var_types": ["e", "f",],
+                        "struct_list": [{
+                            "name": "name",
+                            "var_names": ["a", "b"],
+                            "raw_var_types": ["c", "d"],
+                            "simple_var_types": ["e", "f"],
+                            "definition_line": "String",
+                            "constructor_list": [{
+                                "var_names": ["ca", "cb"],
+                                "raw_var_types": ["cc", "cd"],
+                                "simple_var_types": ["ce", "cf"],
                                 "definition_line": "String",
-                                "constructor_list": [
-                                    {
-                                        "var_names": ["ca", "cb"],
-                                        "raw_var_types": ["cc", "cd"],
-                                        "simple_var_types": ["ce", "cf"],
-                                        "definition_line": "String"
-                                    }
-                                ]
-                            }
-                        ]
+                            }],
+                        }],
                     },
                 ],
-            )
+            ),
         )
 
     # ----------------------------------------------------------------------
@@ -1162,25 +1132,13 @@ class TestSuite(unittest.TestCase):
         self.assertRaisesRegex(
             Exception,
             "expected string or bytes-like object",
-            lambda: Deserialize(
-                [
-                    {
-                        "include_list": [None, "vector"]
-                    },
-                ],
-            )
+            lambda: Deserialize([{"include_list": [None, "vector"]}]),
         )
 
         self.assertRaisesRegex(
             Exception,
             "'' is not a valid 'String' string - Value must have at least 1 character",
-            lambda: Deserialize(
-                [
-                    {
-                        "include_list": ["", "vector"]
-                    },
-                ],
-            )
+            lambda: Deserialize([{"include_list": ["", "vector"]}]),
         )
 
     # ----------------------------------------------------------------------
@@ -1190,7 +1148,7 @@ class TestSuite(unittest.TestCase):
                 "name": "Name",
                 "raw_return_type": "int1",
                 "simple_return_type": "int2",
-                "another_value": {"hello": "world",},
+                "another_value": {"hello": "world"},
                 "another_value2": "a string",
                 "optional_list": [1, 2, 3],
             },
@@ -1209,13 +1167,18 @@ class TestSuite(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].another_value.hello, "world")
         self.assertEqual(result[0].another_value2, "a string")
-        self.assertEqual(result[0].optional_list, [1, 2, 3,])
+        self.assertEqual(result[0].optional_list, [1, 2, 3])
+
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 if __name__ == "__main__":
     try:
-        sys.exit(unittest.main(verbosity=2))
+        sys.exit(
+            unittest.main(
+                verbosity=2,
+            ),
+        )
     except KeyboardInterrupt:
         pass
