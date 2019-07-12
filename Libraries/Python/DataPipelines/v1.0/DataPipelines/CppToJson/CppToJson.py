@@ -12,7 +12,9 @@ import CommonEnvironment.CallOnExit as callOnExit
 from CommonEnvironment.Shell.All import CurrentShell
 import CommonEnvironment.Shell as CE_Shell
 
-from DataPipelines.CppToJson.Impl.ArgumentInfo import ArgumentInfo
+from DataPipelines.CppToJson.Impl.ClassLikeObject import ClassLikeObject
+from DataPipelines.CppToJson.Impl.Constructor import Constructor
+from DataPipelines.CppToJson.Impl.Function import Function
 
 # ----------------------------------------------------------------------
 def ObtainFunctions(
@@ -380,152 +382,6 @@ def ObtainFunctions(
 # |
 # |  Private Types
 # |
-# ----------------------------------------------------------------------
-class ClassLikeObject(ArgumentInfo):
-    """Captures information about a C++ class or struct"""
-
-    # ----------------------------------------------------------------------
-    def __init__(
-        self,
-        name,
-        definition_line,
-        filename,
-        variable_info,
-        base_structs=None,
-        constructor_list=None,
-        has_move_constructor=None,
-        has_copy_constructor=None,
-        has_private=None,
-        has_other=None
-    ):
-        super(ClassLikeObject, self).__init__(
-            variable_info=variable_info,
-        )
-
-        self.Name                           = name
-        self.DefinitionLine                 = definition_line
-        self.Filename                       = filename
-
-        self.constructor_list               = constructor_list or []
-        self.base_structs                   = base_structs or []
-
-        self.has_move_constructor           = has_move_constructor or False
-        self.has_copy_constructor           = has_copy_constructor or False
-        self.has_private                    = has_private or False
-        self.has_other                      = has_other or False
-
-    # ----------------------------------------------------------------------
-    def __repr__(self):
-        return CommonEnvironment.ObjectReprImpl(self)
-
-    # ----------------------------------------------------------------------
-    def ToDict(self):
-        results = {}
-
-        results["name"] = self.Name
-        results["definition_line"] = self.DefinitionLine
-
-        for k, v in super(ClassLikeObject, self).ToDict().items():
-            results[k] = v
-
-        results["constructor_list"] = [constructor.ToDict() for constructor in self.constructor_list]
-        results["base_structs"] = self.base_structs
-
-        return results
-
-
-# ----------------------------------------------------------------------
-class Function(ArgumentInfo):
-    """\
-    This class will hold a function's information, it provides __hash__ and __eq__ functions.
-    It is needed so that its possible to have a dictionary using this class as a key, to keep
-    track of the declaration and implementation lines and have fast lookup.
-    """
-
-    # ----------------------------------------------------------------------
-    def __init__(
-        self,
-        func_name,
-        raw_return_type,
-        simple_return_type,
-        variable_info,
-        declaration_line,
-        definition_line=None,
-    ):
-        super(Function, self).__init__(
-            variable_info=variable_info,
-        )
-
-        self.Name                       = func_name
-        self.RawReturnType              = raw_return_type
-        self.SimpleReturnType           = simple_return_type
-        self.DeclarationLine            = declaration_line
-
-        self._definition_line            = definition_line
-
-
-    # ----------------------------------------------------------------------
-    def __hash__(self):
-        return hash((self.Name, self.RawReturnType, self.SimpleReturnType, super(Function, self).__hash__()))
-
-    # ----------------------------------------------------------------------
-    @property
-    def definition_line(self):
-        return self._definition_line
-
-    # ----------------------------------------------------------------------
-    @definition_line.setter
-    def definition_line(self, line):
-        self._definition_line = line
-
-    # ----------------------------------------------------------------------
-    def ToDict(self):
-        new_dict = {}
-
-        new_dict["name"] = self.Name
-        new_dict["raw_return_type"] = self.RawReturnType
-        new_dict["simple_return_type"] = self.SimpleReturnType
-
-        for k, v in super(Function, self).ToDict().items():
-            new_dict[k] = v
-
-        new_dict['declaration_line'] = self.DeclarationLine
-        new_dict['definition_line'] = self.definition_line
-
-        return new_dict
-
-
-# ----------------------------------------------------------------------
-class Constructor(ArgumentInfo):
-    """Captures information about a C++ constructor"""
-
-    # ----------------------------------------------------------------------
-    def __init__(
-        self,
-        definition_line,
-        variable_info,
-    ):
-        self.DefinitionLine               = definition_line
-        super(Constructor, self).__init__(
-            variable_info=variable_info,
-        )
-
-    # ----------------------------------------------------------------------
-    def __hash__(self):
-        return hash((self.DefinitionLine, super(Constructor, self).__hash__()))
-
-    # ----------------------------------------------------------------------
-    def ToDict(self):
-        new_dict = super(Constructor, self).ToDict()
-
-        # If the var name is "", it means that this is a default constructor.
-        if len(new_dict["var_names"]) == 1 and not new_dict["var_names"][0]:
-            new_dict["var_names"] = ["other"]
-
-        new_dict["definition_line"] = self.DefinitionLine
-
-        return new_dict
-
 # ----------------------------------------------------------------------
 class Results(object):
     """Stores final versions of Includes, Functions and Class-like objects"""
