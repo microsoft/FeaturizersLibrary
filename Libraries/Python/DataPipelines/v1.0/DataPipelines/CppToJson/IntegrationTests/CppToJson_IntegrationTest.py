@@ -252,8 +252,8 @@ class Deserialization(unittest.TestCase):
         filename = os.path.join(_script_dir, "deserialization.cpp")
         results = CppToJson.ObtainFunctions(filename, None, lambda type: True)
 
-        deserialized_result = Deserialize([results[filename]])
-
+        deserialized_result = Deserialize([results[filename]], always_include_optional=True)
+        
         self.assertEqual(len(deserialized_result), 1)
 
         self.assertEqual(deserialized_result[0].function_list[0].name, "goooo")
@@ -271,18 +271,12 @@ class Deserialization(unittest.TestCase):
         self.assertEqual(deserialized_result[0].struct_list[0].simple_var_types, ["int", "bool"])
         self.assertEqual(deserialized_result[0].struct_list[0].definition_line, 3)
 
-        """
-        TODO: The following commented code is here because there is a problem on Deserialize, that
-        it does not export fields that only have an empty list. Once that is fixed, the
-        code should be uncommented.
-        """
-
-        # self.assertEqual(deserialized_result[0].struct_list[0].base_structs, [])
+        self.assertEqual(deserialized_result[0].struct_list[0].base_structs, [])
         self.assertEqual(len(deserialized_result[0].struct_list[0].constructor_list), 2)
 
-        # self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[0].var_names, [])
-        # self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[0].raw_var_types, [])
-        # self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[0].simple_var_types, [])
+        self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[0].var_names, [])
+        self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[0].raw_var_types, [])
+        self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[0].simple_var_types, [])
         self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[0].definition_line, 6)
 
         self.assertEqual(deserialized_result[0].struct_list[0].constructor_list[1].var_names, ["other"])
@@ -295,12 +289,12 @@ class Deserialization(unittest.TestCase):
         self.assertEqual(deserialized_result[0].struct_list[1].raw_var_types, ["int", "float"])
         self.assertEqual(deserialized_result[0].struct_list[1].simple_var_types, ["int", "float"])
         self.assertEqual(deserialized_result[0].struct_list[1].definition_line, 12)
-        # self.assertEqual(deserialized_result[0].struct_list[1].base_structs, [])
+        self.assertEqual(deserialized_result[0].struct_list[1].base_structs, [])
         self.assertEqual(len(deserialized_result[0].struct_list[1].constructor_list), 2)
 
-        # self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[0].var_names, [])
-        # self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[0].raw_var_types, [])
-        # self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[0].simple_var_types, [])
+        self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[0].var_names, [])
+        self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[0].raw_var_types, [])
+        self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[0].simple_var_types, [])
         self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[0].definition_line, 15)
 
         self.assertEqual(deserialized_result[0].struct_list[1].constructor_list[1].var_names, ["other"])
@@ -316,9 +310,9 @@ class Deserialization(unittest.TestCase):
         self.assertEqual(deserialized_result[0].struct_list[2].base_structs, ["go", "go2"])
         self.assertEqual(len(deserialized_result[0].struct_list[2].constructor_list), 2)
 
-        # self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[0].var_names, [])
-        # self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[0].raw_var_types, [])
-        # self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[0].simple_var_types, [])
+        self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[0].var_names, [])
+        self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[0].raw_var_types, [])
+        self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[0].simple_var_types, [])
         self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[0].definition_line, 23)
 
         self.assertEqual(deserialized_result[0].struct_list[2].constructor_list[1].var_names, ["other"])

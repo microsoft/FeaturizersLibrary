@@ -50,17 +50,10 @@ def ObtainFunctions(
     pattern_words = re.compile(r"[\w']+")
     def TestAndVerify(types):
         """
-        This is an early version of TestAndVerify that checks if a type should be accepted or not.
-        It will find all words in the type and check them against a policy. This will be adapted as we
-        get more information about what is supported and what is not.
+        This function will test if the type is valid or not.
+        TODO: add support to verify struct here.
         """
-
-        type_list = re.findall(pattern_words, types)
-
-        for var_type in type_list:
-            if not policy(var_type):
-                return False
-        return True
+        return policy(types)
     # ----------------------------------------------------------------------
 
     with callOnExit.CallOnExit(DeleteFile):
@@ -307,7 +300,7 @@ def ObtainFunctions(
 
             for parent_struct in obj_type.base_structs:
                 if not VerifyObjType(GetObjType(parent_struct)):
-                    invalid_reasons.append("\t- Invalid base struct {}".format(parent_struct))
+                    invalid_reasons.append("\t- Invalid base struct {}.".format(parent_struct))
 
             if not obj_type.has_move_constructor:
                 invalid_reasons.append("\t- Struct doesn't have a move constructor.")
