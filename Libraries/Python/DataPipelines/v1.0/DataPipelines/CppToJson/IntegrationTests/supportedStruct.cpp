@@ -9,8 +9,8 @@ struct x{
     }
 };
 
-struct x *go(int y){
-    x *ret = NULL;
+x go(int y){
+    x ret = x(1, 2);
     return ret;
 }
 

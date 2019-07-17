@@ -1,8 +1,8 @@
 #include "header1.hpp"
 
 
-struct go *gox(int y){
-    struct go* ret = NULL;
+go gox(int y){
+    go ret = go();
     return ret;
 }
 

@@ -42,7 +42,7 @@ class Function(ArgumentInfo):
         self.SimpleReturnType           = simple_return_type
         self.DeclarationLine            = declaration_line
 
-        self._definition_line            = definition_line
+        self._definition_line           = definition_line
 
 
     # ----------------------------------------------------------------------
@@ -63,14 +63,14 @@ class Function(ArgumentInfo):
     def ToDict(self):
         new_dict = {}
 
-        new_dict["name"] = self.Name
-        new_dict["raw_return_type"] = self.RawReturnType
-        new_dict["simple_return_type"] = self.SimpleReturnType
+        new_dict["name"]                = self.Name
+        new_dict["raw_return_type"]     = self.RawReturnType
+        new_dict["simple_return_type"]  = self.SimpleReturnType
 
         for k, v in super(Function, self).ToDict().items():
             new_dict[k] = v
 
-        new_dict['declaration_line'] = self.DeclarationLine
-        new_dict['definition_line'] = self.definition_line
+        new_dict['declaration_line']    = self.DeclarationLine
+        new_dict['definition_line']     = self.definition_line
 
         return new_dict

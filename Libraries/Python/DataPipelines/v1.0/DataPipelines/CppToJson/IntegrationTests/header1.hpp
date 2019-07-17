@@ -5,6 +5,7 @@
 struct go{
     int a, b;
     go2 x;
+    go(){}
     go(go &&other): a(std::move(other.a)), b(std::move(other.b)), x(std::move(other.x)){}
 };
 

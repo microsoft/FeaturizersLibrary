@@ -22,7 +22,7 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'add')
@@ -43,7 +43,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 5)
         self.assertEqual(func_list[1]['declaration_line'], 5)
 
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 1)
 
 
@@ -66,7 +66,7 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'counting')
@@ -87,7 +87,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 11)
         self.assertEqual(func_list[1]['declaration_line'], 11)
 
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         # TODO: include list length diverges between OS
         # self.assertEqual(len(include_list), 2)
 
@@ -111,7 +111,7 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'counting')
@@ -132,7 +132,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 11)
         self.assertEqual(func_list[1]['declaration_line'], 11)
 
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         # TODO: include list length diverges between OS
         # self.assertEqual(len(include_list), 2)
 
@@ -155,7 +155,7 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'counting')
@@ -176,7 +176,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 11)
         self.assertEqual(func_list[1]['declaration_line'], 11)
 
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 2)
 
     def test_many_arguments(self):
@@ -195,7 +195,7 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'two')
@@ -216,15 +216,15 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 8)
         self.assertEqual(func_list[1]['declaration_line'], 8)
 
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 1)
 
     def test_many_arguments_ref(self):
         s = textwrap.dedent('''\
             #include <cstdint>
-            std::int32_t two(std::int32_t **a, std::int32_t **b, std::int32_t **c, std::int32_t **d, std::int32_t **e, std::int32_t **f, std::int32_t **g, std::int32_t **h,
-                std::int32_t **i, std::int32_t **j, std::int32_t **k, std::int32_t **l, std::int32_t **m, std::int32_t **n, std::int32_t **o, std::int32_t **p, std::int32_t **q,
-                std::int32_t **r, std::int32_t **s, std::int32_t **t, std::int32_t **u, std::int32_t **v, std::int32_t **w, std::int32_t **x, std::int32_t **y, std::int32_t **z){
+            std::int32_t two(std::int32_t &&a, std::int32_t &&b, std::int32_t &&c, std::int32_t &&d, std::int32_t &&e, std::int32_t &&f, std::int32_t &&g, std::int32_t &&h,
+                std::int32_t &&i, std::int32_t &&j, std::int32_t &&k, std::int32_t &&l, std::int32_t &&m, std::int32_t &&n, std::int32_t &&o, std::int32_t &&p, std::int32_t &&q,
+                std::int32_t &&r, std::int32_t &&s, std::int32_t &&t, std::int32_t &&u, std::int32_t &&v, std::int32_t &&w, std::int32_t &&x, std::int32_t &&y, std::int32_t &&z){
 
                 return 2;
             }
@@ -235,14 +235,14 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'two')
         self.assertEqual(func_list[0]['raw_return_type'], 'std::int32_t')
         self.assertEqual(func_list[0]['simple_return_type'], 'std::int32_t')
         self.assertEqual(func_list[0]['var_names'], ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
-        self.assertEqual(func_list[0]['raw_var_types'], ['std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **', 'std::int32_t **'])
+        self.assertEqual(func_list[0]['raw_var_types'], ['std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&', 'std::int32_t &&'])
         self.assertEqual(func_list[0]['simple_var_types'], ['std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t', 'std::int32_t'])
         self.assertEqual(func_list[0]['definition_line'], 2)
         self.assertEqual(func_list[0]['declaration_line'], 2)
@@ -256,7 +256,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 8)
         self.assertEqual(func_list[1]['declaration_line'], 8)
 
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 1)
 
     def test_const_ret(self):
@@ -273,7 +273,7 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'square')
@@ -294,7 +294,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 6)
         self.assertEqual(func_list[1]['declaration_line'], 6)
 
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 1)
 
     def test_const_arg(self):
@@ -310,7 +310,7 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'sum')
@@ -331,7 +331,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 5)
         self.assertEqual(func_list[1]['declaration_line'], 5)
 
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 1)
 
     def test_map_vec_ref(self):
@@ -353,15 +353,15 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'nonsense')
         self.assertEqual(func_list[0]['raw_return_type'], 'std::vector<map<std::int32_t, float> > *')
-        self.assertEqual(func_list[0]['simple_return_type'], 'std::vector<map<std::int32_t, float> >')
+        self.assertEqual(func_list[0]['simple_return_type'], 'std::vector<map<std::int32_t, float> > *')
         self.assertEqual(func_list[0]['var_names'], ['v', 'mp'])
         self.assertEqual(func_list[0]['raw_var_types'], ['std::vector<std::int32_t> &', 'map<bool, bool> *'])
-        self.assertEqual(func_list[0]['simple_var_types'], ['std::vector<std::int32_t>', 'map<bool, bool>'])
+        self.assertEqual(func_list[0]['simple_var_types'], ['std::vector<std::int32_t>', 'map<bool, bool> *'])
         self.assertEqual(func_list[0]['definition_line'], 6)
         self.assertEqual(func_list[0]['declaration_line'], 6)
 
@@ -374,7 +374,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 11)
         self.assertEqual(func_list[1]['declaration_line'], 11)
 
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 2)
 
     def test_struct_unsupported(self):
@@ -387,11 +387,12 @@ class FuncTest(unittest.TestCase):
 
             struct x{
                 std::int32_t a, b;
+                x(){}
                 x(x &&other): a(std::move(other.a)), b(std::move(other.b)){}
             };
 
-            x *go(std::int32_t y){
-                x *ret = NULL;
+            x go(std::int32_t y){
+                x ret = x();
                 return ret;
             }
 
@@ -414,11 +415,11 @@ class FuncTest(unittest.TestCase):
                 The function go is not supported:
                 \t- Invalid argument y of type std::int32_t.
                 \t- Invalid return type x.
-                """), None, 10],
+                """), None, 11],
                 [textwrap.dedent("""\
                 The function main is not supported:
                 \t- Invalid return type std::int32_t.
-                """), None, 15]
+                """), None, 16]
             ]
 
             self.assertTrue([error_desc, filename, line] in unsupported_list)
@@ -427,14 +428,14 @@ class FuncTest(unittest.TestCase):
 
         result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
 
         self.assertEqual(times_called, 3)
 
         self.assertEqual(func_list, [])
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 3)
 
     def test_struct_supported(self):
@@ -446,11 +447,12 @@ class FuncTest(unittest.TestCase):
 
             struct x{
                 std::int32_t a, b;
+                x(){}
                 x(x &&other): a(std::move(other.a)), b(std::move(other.b)){}
             };
 
-            x *go(std::int32_t y){
-                x *ret = NULL;
+            x go(std::int32_t y){
+                x ret = x();
                 return ret;
             }
 
@@ -465,17 +467,17 @@ class FuncTest(unittest.TestCase):
         ''')
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'go')
-        self.assertEqual(func_list[0]['raw_return_type'], 'x *')
+        self.assertEqual(func_list[0]['raw_return_type'], 'x')
         self.assertEqual(func_list[0]['simple_return_type'], 'x')
         self.assertEqual(func_list[0]['var_names'], ['y'])
         self.assertEqual(func_list[0]['raw_var_types'], ['std::int32_t'])
         self.assertEqual(func_list[0]['simple_var_types'], ['std::int32_t'])
-        self.assertEqual(func_list[0]['definition_line'], 10)
-        self.assertEqual(func_list[0]['declaration_line'], 10)
+        self.assertEqual(func_list[0]['definition_line'], 11)
+        self.assertEqual(func_list[0]['declaration_line'], 11)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'std::int32_t')
@@ -483,20 +485,26 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['var_names'], [])
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
-        self.assertEqual(func_list[1]['definition_line'], 15)
-        self.assertEqual(func_list[1]['declaration_line'], 15)
+        self.assertEqual(func_list[1]['definition_line'], 16)
+        self.assertEqual(func_list[1]['declaration_line'], 16)
 
-        self.assertEqual(obj_type_list[0]['name'], 'x')
-        self.assertEqual(obj_type_list[0]['var_names'], ['a', 'b'])
-        self.assertEqual(obj_type_list[0]['raw_var_types'], ['std::int32_t', 'std::int32_t'])
-        self.assertEqual(obj_type_list[0]['simple_var_types'], ['std::int32_t', 'std::int32_t'])
-        self.assertEqual(obj_type_list[0]['definition_line'], 5)
+        self.assertEqual(struct_list[0]['name'], 'x')
+        self.assertEqual(struct_list[0]['var_names'], ['a', 'b'])
+        self.assertEqual(struct_list[0]['raw_var_types'], ['std::int32_t', 'std::int32_t'])
+        self.assertEqual(struct_list[0]['simple_var_types'], ['std::int32_t', 'std::int32_t'])
+        self.assertEqual(struct_list[0]['definition_line'], 5)
 
-        self.assertEqual(len(obj_type_list[0]['constructor_list']), 1)
-        self.assertEqual(obj_type_list[0]['constructor_list'][0]['var_names'], ['other'])
-        self.assertEqual(obj_type_list[0]['constructor_list'][0]['raw_var_types'], ['x &&'])
-        self.assertEqual(obj_type_list[0]['constructor_list'][0]['simple_var_types'], ['x'])
-        self.assertEqual(obj_type_list[0]['constructor_list'][0]['definition_line'], 7)
+        self.assertEqual(len(struct_list[0]['constructor_list']), 2)
+
+        self.assertEqual(struct_list[0]['constructor_list'][0]['var_names'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['raw_var_types'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['simple_var_types'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['definition_line'], 7)
+
+        self.assertEqual(struct_list[0]['constructor_list'][1]['var_names'], ['other'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['raw_var_types'], ['x &&'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['simple_var_types'], ['x'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['definition_line'], 8)
 
         self.assertEqual(len(include_list), 3)
 
@@ -534,14 +542,6 @@ class FuncTest(unittest.TestCase):
 
             unsupported_list = [
                 [textwrap.dedent("""\
-                The struct Point is not supported:
-                \t- Invalid var x of type std::int32_t.
-                \t- Invalid var y of type std::int32_t.
-                \t- Invalid type std::int32_t on constructor argument.
-                \t- Invalid type std::int32_t on constructor argument.
-                \t- Struct doesn't have a move constructor.
-                """), None, 2],
-                [textwrap.dedent("""\
                 The function operator+ is not supported:
                 \t- Invalid argument a of type Point.
                 \t- Invalid argument b of type Point.
@@ -557,13 +557,13 @@ class FuncTest(unittest.TestCase):
         # ----------------------------------------------------------------------
         result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
-        self.assertEqual(times_called, 3)
+        self.assertEqual(times_called, 2)
 
         self.assertEqual(func_list, [])
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 1)
 
     def test_declaration(self):
@@ -581,7 +581,7 @@ class FuncTest(unittest.TestCase):
 
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'add')
@@ -602,7 +602,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 7)
         self.assertEqual(func_list[1]['declaration_line'], 7)
 
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 1)
 
     def test_namespace_declaration(self):
@@ -625,7 +625,7 @@ class FuncTest(unittest.TestCase):
 
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'DataPipelines::Arithmetic::thisGuy')
@@ -633,7 +633,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['simple_return_type'], 'void')
         self.assertEqual(func_list[0]['var_names'], ['x'])
         self.assertEqual(func_list[0]['raw_var_types'], ['std::int32_t *'])
-        self.assertEqual(func_list[0]['simple_var_types'], ['std::int32_t'])
+        self.assertEqual(func_list[0]['simple_var_types'], ['std::int32_t *'])
         self.assertEqual(func_list[0]['definition_line'], 8)
         self.assertEqual(func_list[0]['declaration_line'], 4)
 
@@ -646,7 +646,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['definition_line'], 12)
         self.assertEqual(func_list[1]['declaration_line'], 12)
 
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 1)
 
     def test_namespace_func(self):
@@ -664,7 +664,7 @@ class FuncTest(unittest.TestCase):
 
         result = CppToJson.ObtainFunctions(s, None, lambda type: True)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'DataPipelines::Arithmetic::Add')
@@ -676,7 +676,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['definition_line'], 7)
         self.assertEqual(func_list[0]['declaration_line'], 7)
 
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 2)
 
     def test_namespace_unsupported(self):
@@ -728,13 +728,13 @@ class FuncTest(unittest.TestCase):
         # ----------------------------------------------------------------------
         result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(times_called, 2)
 
         self.assertEqual(func_list, [])
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 2)
 
     def test_func_unsupported(self):
@@ -781,7 +781,7 @@ class FuncTest(unittest.TestCase):
 
         result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, Policy)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(times_called, 1)
@@ -795,7 +795,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[0]['definition_line'], 12)
         self.assertEqual(func_list[0]['declaration_line'], 12)
         
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(len(include_list), 2)
 
     def test_func_supported(self):
@@ -807,11 +807,12 @@ class FuncTest(unittest.TestCase):
             
             struct x{
                 bool a, b;
+                x(){}
                 x(x &&other): a(std::move(other.a)), b(std::move(other.b)){}
             };
 
-            x *go(bool y){
-                x *ret = NULL;
+            x go(bool y){
+                x ret = x();
                 return ret;
             }
 
@@ -835,17 +836,17 @@ class FuncTest(unittest.TestCase):
 
         result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, Policy)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list[0]['name'], 'go')
-        self.assertEqual(func_list[0]['raw_return_type'], 'x *')
+        self.assertEqual(func_list[0]['raw_return_type'], 'x')
         self.assertEqual(func_list[0]['simple_return_type'], 'x')
         self.assertEqual(func_list[0]['var_names'], ['y'])
         self.assertEqual(func_list[0]['raw_var_types'], ['bool'])
         self.assertEqual(func_list[0]['simple_var_types'], ['bool'])
-        self.assertEqual(func_list[0]['definition_line'], 10)
-        self.assertEqual(func_list[0]['declaration_line'], 10)
+        self.assertEqual(func_list[0]['definition_line'], 11)
+        self.assertEqual(func_list[0]['declaration_line'], 11)
 
         self.assertEqual(func_list[1]['name'], 'main')
         self.assertEqual(func_list[1]['raw_return_type'], 'int')
@@ -853,20 +854,26 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list[1]['var_names'], [])
         self.assertEqual(func_list[1]['raw_var_types'], [])
         self.assertEqual(func_list[1]['simple_var_types'], [])
-        self.assertEqual(func_list[1]['definition_line'], 15)
-        self.assertEqual(func_list[1]['declaration_line'], 15)
+        self.assertEqual(func_list[1]['definition_line'], 16)
+        self.assertEqual(func_list[1]['declaration_line'], 16)
 
-        self.assertEqual(obj_type_list[0]['name'], 'x')
-        self.assertEqual(obj_type_list[0]['var_names'], ['a', 'b'])
-        self.assertEqual(obj_type_list[0]['raw_var_types'], ['bool', 'bool'])
-        self.assertEqual(obj_type_list[0]['simple_var_types'], ['bool', 'bool'])
-        self.assertEqual(obj_type_list[0]['definition_line'], 5)
+        self.assertEqual(struct_list[0]['name'], 'x')
+        self.assertEqual(struct_list[0]['var_names'], ['a', 'b'])
+        self.assertEqual(struct_list[0]['raw_var_types'], ['bool', 'bool'])
+        self.assertEqual(struct_list[0]['simple_var_types'], ['bool', 'bool'])
+        self.assertEqual(struct_list[0]['definition_line'], 5)
 
-        self.assertEqual(len(obj_type_list[0]['constructor_list']), 1)
-        self.assertEqual(obj_type_list[0]['constructor_list'][0]['var_names'], ['other'])
-        self.assertEqual(obj_type_list[0]['constructor_list'][0]['raw_var_types'], ['x &&'])
-        self.assertEqual(obj_type_list[0]['constructor_list'][0]['simple_var_types'], ['x'])
-        self.assertEqual(obj_type_list[0]['constructor_list'][0]['definition_line'], 7)
+        self.assertEqual(len(struct_list[0]['constructor_list']), 2)
+
+        self.assertEqual(struct_list[0]['constructor_list'][0]['var_names'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['raw_var_types'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['simple_var_types'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['definition_line'], 7)
+
+        self.assertEqual(struct_list[0]['constructor_list'][1]['var_names'], ['other'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['raw_var_types'], ['x &&'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['simple_var_types'], ['x'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['definition_line'], 8)   
 
         self.assertEqual(len(include_list), 3)
 
@@ -896,12 +903,12 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(times_called, 1)
         self.assertEqual(func_list, [])
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(include_list, [])
 
     def test_warning_2(self):
@@ -920,11 +927,11 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(func_list, [])
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(include_list, [])
 
     def test_warning_3(self):
@@ -965,13 +972,13 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(times_called, 2)
 
         self.assertEqual(func_list, [])
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(include_list, [])
 
     def test_warning_4(self):
@@ -1021,13 +1028,13 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(times_called, 3)
 
         self.assertEqual(func_list, [])
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(include_list, [])
 
 
@@ -1098,13 +1105,13 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(times_called, 5)
 
         self.assertEqual(func_list, [])
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(include_list, [])
 
     def test_warning_6(self):
@@ -1177,13 +1184,13 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(times_called, 5)
 
         self.assertEqual(func_list, [])
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(include_list, [])
 
     def test_warning_7(self):
@@ -1270,13 +1277,13 @@ class FuncTest(unittest.TestCase):
         
         result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
         func_list = self._GetFuncList(result)
-        obj_type_list = self._GetObjList(result)
+        struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
 
         self.assertEqual(times_called, 7)
 
         self.assertEqual(func_list, [])
-        self.assertEqual(obj_type_list, [])
+        self.assertEqual(struct_list, [])
         self.assertEqual(include_list, [])
     
 
@@ -1286,7 +1293,7 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(None, list(results.keys())[0])
 
         return results[None]['function_list']
-    def _GetObjList(self, results):
+    def _GetStructList(self, results):
         self.assertEqual(len(results), 1)
         self.assertEqual(None, list(results.keys())[0])
 

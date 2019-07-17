@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the ClassLikeObject object"""
+"""Contains the Struct object"""
 
 import os
 
@@ -16,7 +16,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 #  ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
-class ClassLikeObject(ArgumentInfo):
+class Struct(ArgumentInfo):
     """Captures information about a C++ class or struct"""
 
     # ----------------------------------------------------------------------
@@ -33,7 +33,7 @@ class ClassLikeObject(ArgumentInfo):
         has_private=None,
         has_other=None
     ):
-        super(ClassLikeObject, self).__init__(
+        super(Struct, self).__init__(
             variable_info=variable_info,
         )
 
@@ -57,13 +57,13 @@ class ClassLikeObject(ArgumentInfo):
     def ToDict(self):
         results = {}
 
-        results["name"] = self.Name
-        results["definition_line"] = self.DefinitionLine
+        results["name"]                     = self.Name
+        results["definition_line"]          = self.DefinitionLine
 
-        for k, v in super(ClassLikeObject, self).ToDict().items():
+        for k, v in super(Struct, self).ToDict().items():
             results[k] = v
 
-        results["constructor_list"] = [constructor.ToDict() for constructor in self.constructor_list]
-        results["base_structs"] = self.base_structs
+        results["constructor_list"]         = [constructor.ToDict() for constructor in self.constructor_list]
+        results["base_structs"]             = self.base_structs
 
         return results

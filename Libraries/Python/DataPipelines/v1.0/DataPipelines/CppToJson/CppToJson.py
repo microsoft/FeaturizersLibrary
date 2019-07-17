@@ -12,7 +12,7 @@ import CommonEnvironment.CallOnExit as callOnExit
 from CommonEnvironment.Shell.All import CurrentShell
 import CommonEnvironment.Shell as CE_Shell
 
-from DataPipelines.CppToJson.Impl.ClassLikeObject import ClassLikeObject
+from DataPipelines.CppToJson.Impl.Struct import Struct
 from DataPipelines.CppToJson.Impl.Constructor import Constructor
 from DataPipelines.CppToJson.Impl.Function import Function
 
@@ -47,13 +47,14 @@ def ObtainFunctions(
             os.remove(input_filename)
 
     # ----------------------------------------------------------------------
-    pattern_words = re.compile(r"[\w']+")
+    
     def TestAndVerify(types):
         """
         This function will test if the type is valid or not.
         TODO: add support to verify struct here.
         """
         return policy(types)
+
     # ----------------------------------------------------------------------
 
     with callOnExit.CallOnExit(DeleteFile):
@@ -85,26 +86,24 @@ def ObtainFunctions(
                 )"""
             )
         )
-        # TODO: Dont support pointers (that use the '*' notation).
-        pattern_star  = re.compile(r"\**(\* )*")
+        
         pattern_amper = re.compile("&*(& )*")
 
         # ----------------------------------------------------------------------
         def SimpleVarType(name):
             """
-            Remove 'const', '*' and '&'
+            Remove 'const' and '&'
             """
-            # TODO: Dont support pointers (that use the '*' notation).
+
             name = re.sub(pattern_const,  "", name)
-            name = re.sub(pattern_star,  "", name)
             name = re.sub(pattern_amper,  "", name)
             return name.strip()
 
         # ----------------------------------------------------------------------
         def ParseFile(filename):
             """
-            Clang opens all files that are included in 'filename' at the same time. Only the functions on
-            'filename' are processed, but all class-like objects are processed, because one of the functions
+            Clang opens all files that are included in 'filename' at the same time. Only the functions on 
+            'filename' are processed, but all structs are processed, because one of the functions
             in 'filename' might need to use it. The ones that are not in 'filename' and are not used are not
             exported.
             """
@@ -143,11 +142,11 @@ def ObtainFunctions(
                 ).format("|".join([re.escape(key) for key in alias.keys()]))
             )
 
-            struct_class_pattern = re.compile(
+            struct_pattern = re.compile(
                 textwrap.dedent(
                     r"""(?#
                     Not a letter)(?<!\w)(?#
-                    Keyword with a space)(?P<keyword>struct\s|class\s)(?#
+                    Keyword with a space)(?P<keyword>struct\s)(?#
                     )"""
                 )
             )
@@ -156,31 +155,31 @@ def ObtainFunctions(
             def FullVarType(types):
                 """
                 This will undo all 'typedef' and 'using' by looking for the items in the 'alias' dict and substituting
-                the corresponding definitions. It will also remove all occurences of the words 'struct' and 'class'.
+                the corresponding definitions. It will also remove all occurences of the words 'struct'.
                 """
                 num_subs = True
                 while num_subs and alias:
                     types, num_subs = re.subn(alias_regex, lambda k: alias[k.group(1)], types)
 
-                types = struct_class_pattern.sub(r'', types)
+                types = struct_pattern.sub(r'', types)
                 return types
 
             # ----------------------------------------------------------------------
 
-            object_type_list = []
+            struct_list = []
             function_dict = {}
 
             # ----------------------------------------------------------------------
-            def EnumerateObjType(node):
+            def EnumerateStruct(node):
                 if node.kind == cindex.CursorKind.NAMESPACE:
                     for child in node.get_children():
-                        EnumerateObjType(child)
+                        EnumerateStruct(child)
 
-                if node.kind == cindex.CursorKind.STRUCT_DECL or node.kind == cindex.CursorKind.CLASS_DECL:
-                    obj_type = _GetObjectType(node, SimpleVarType, FullVarType)
+                if node.kind == cindex.CursorKind.STRUCT_DECL:
+                    this_struct = _GetStruct(node, SimpleVarType, FullVarType)
 
-                    if obj_type:
-                        object_type_list.append(obj_type)
+                    if this_struct:
+                        struct_list.append(this_struct)
 
             # ----------------------------------------------------------------------
             def EnumerateFuncs(node):
@@ -190,7 +189,7 @@ def ObtainFunctions(
 
                 if node.kind == cindex.CursorKind.FUNCTION_DECL and node.location.file.name == filename:
                     ret_type = FullVarType(node.result_type.spelling)
-
+                    
                     arg_list = []
                     for arg in node.get_arguments():
                         arg_type = FullVarType(arg.type.spelling)
@@ -204,7 +203,7 @@ def ObtainFunctions(
                     for child in node.get_children():
                         if child.kind == cindex.CursorKind.COMPOUND_STMT:
                             is_def = True
-
+                    
                     if func_key not in function_dict.keys():
                         variable_info = []
                         for arg in node.get_arguments():
@@ -213,16 +212,16 @@ def ObtainFunctions(
 
                         # Create the instance of the function
                         function_dict[func_key] = Function(_FullName(node), ret_type, SimpleVarType(ret_type), variable_info, node.location.line)
-
+                    
                     if is_def:
                         function_dict[func_key].definition_line = node.location.line
 
             # ----------------------------------------------------------------------
 
-            # EnumerateObjType needs to be separated from EnumerateFuncs because of constructors that might be out
+            # EnumerateStruct needs to be separated from EnumerateFuncs because of constructors that might be out
             # of the function.
             for child in cursor.get_children():
-                EnumerateObjType(child)
+                EnumerateStruct(child)
 
             for child in cursor.get_children():
                 EnumerateFuncs(child)
@@ -237,12 +236,12 @@ def ObtainFunctions(
             # ----------------------------------------------------------------------
 
             include_list = GetIncludeList(filename)
-
+            
             function_list = [func for func in function_dict.values()]
-            return {"function_list": function_list, "object_type_list": object_type_list, "include_list": include_list}
+            return {"function_list": function_list, "struct_list": struct_list, "include_list": include_list}
 
         clean_results = OrderedDict()
-
+        
         # ----------------------------------------------------------------------
         def InitializeCleanResults(filename, raw_includes):
             clean_results[filename] = Results()
@@ -264,51 +263,51 @@ def ObtainFunctions(
         if not clean_results:
             InitializeCleanResults(filename, these_results["include_list"])
 
-        needed_obj_type_list = []
-        invalid_obj_type_list = []
+        needed_struct_list = []
+        invalid_struct_list = []
 
         # ----------------------------------------------------------------------
-        def GetObjType(obj_type_name):
+        def GetStruct(this_struct_name):
             """
-            Get ObjType from its name.
+            Get Struct from its name.
             """
-            for obj_type in these_results["object_type_list"]:
-                if obj_type.Name == obj_type_name:
-                    return obj_type
+            for this_struct in these_results["struct_list"]:
+                if this_struct.Name == this_struct_name:
+                    return this_struct
             return None
 
         # ----------------------------------------------------------------------
-        def VerifyObjType(obj_type):
+        def VerifyStruct(this_struct):
             """
-            Check all var types in this ObjType, this ObjType is valid if they are all valid. There is an assumption that
-            this function will only be called for an ObjType that is required. If this ObjType depends on another ObjType,
-            that means that the other ObjType is also required.
+            Check all var types in this Struct, this Struct is valid if they are all valid. There is an assumption that
+            this function will only be called for an Struct that is required. If this Struct depends on another Struct,
+            that means that the other Struct is also required.
             """
-            if obj_type is None or obj_type in invalid_obj_type_list:
+            if this_struct is None or this_struct in invalid_struct_list:
                 return False
-            if obj_type in needed_obj_type_list:
+            if this_struct in needed_struct_list:
                 return True
             invalid_reasons = []
-            for var_type, var_name in zip(obj_type.EnumerateSimpleVarTypes(), obj_type.EnumerateVarNames()):
-                if GetObjType(var_type) != obj_type and not VerifyObjType(GetObjType(var_type)) and not TestAndVerify(var_type):
+            for var_type, var_name in zip(this_struct.EnumerateSimpleVarTypes(), this_struct.EnumerateVarNames()):
+                if GetStruct(var_type) != this_struct and not VerifyStruct(GetStruct(var_type)) and not TestAndVerify(var_type):
                     invalid_reasons.append("\t- Invalid var {} of type {}.".format(var_name, var_type))
 
-            for constructor in obj_type.constructor_list:
+            for constructor in this_struct.constructor_list:
                 for arg_type in constructor.EnumerateSimpleVarTypes():
-                    if GetObjType(arg_type) != obj_type and not VerifyObjType(GetObjType(arg_type)) and not TestAndVerify(arg_type):
+                    if GetStruct(arg_type) != this_struct and not VerifyStruct(GetStruct(arg_type)) and not TestAndVerify(arg_type):
                         invalid_reasons.append("\t- Invalid type {} on constructor argument.".format(arg_type))
 
-            for parent_struct in obj_type.base_structs:
-                if not VerifyObjType(GetObjType(parent_struct)):
+            for parent_struct in this_struct.base_structs:
+                if not VerifyStruct(GetStruct(parent_struct)):
                     invalid_reasons.append("\t- Invalid base struct {}.".format(parent_struct))
 
-            if not obj_type.has_move_constructor:
+            if not this_struct.has_move_constructor:
                 invalid_reasons.append("\t- Struct doesn't have a move constructor.")
-            if obj_type.has_copy_constructor:
+            if this_struct.has_copy_constructor:
                 invalid_reasons.append("\t- Struct has a copy constructor.")
-            if obj_type.has_private:
+            if this_struct.has_private:
                 invalid_reasons.append("\t- Struct has a private variable or inherits from a private struct.")
-            if obj_type.has_other:
+            if this_struct.has_other:
                 invalid_reasons.append("\t- Struct has an unsupported definition.")
 
             if invalid_reasons:
@@ -317,13 +316,13 @@ def ObtainFunctions(
                         The struct {} is not supported:
                         {}
                     """
-                ).format(obj_type.Name, "\n".join(invalid_reasons)),
-                obj_type.Filename if (not is_temp_file or obj_type.Filename != input_filename) else None,
-                obj_type.DefinitionLine
+                ).format(this_struct.Name, "\n".join(invalid_reasons)),
+                this_struct.Filename if (not is_temp_file or this_struct.Filename != input_filename) else None,
+                this_struct.DefinitionLine
                 )
-                invalid_obj_type_list.append(obj_type)
+                invalid_struct_list.append(this_struct)
                 return False
-            needed_obj_type_list.append(obj_type)
+            needed_struct_list.append(this_struct)
             return True
 
         # ----------------------------------------------------------------------
@@ -337,7 +336,7 @@ def ObtainFunctions(
                     invalid_reasons.append("\t- Invalid argument {} of type {}.".format(var_name, var_type))
 
             return_type = func.SimpleReturnType
-            if not VerifyObjType(GetObjType(return_type)) and not TestAndVerify(return_type):
+            if not VerifyStruct(GetStruct(return_type)) and not TestAndVerify(return_type):
                 invalid_reasons.append("\t- Invalid return type {}.".format(return_type))
 
             if invalid_reasons:
@@ -359,15 +358,15 @@ def ObtainFunctions(
             if VerifyFunction(func, filename):
                 clean_results[filename].function_list.append(func.ToDict())
 
-        # Add required ObjType to the clean_results list.
-        for object_type in needed_obj_type_list:
-            this_file_name = object_type.Filename
+        # Add required Struct to the clean_results list.
+        for this_struct in needed_struct_list:
+            this_file_name = this_struct.Filename
 
             if is_temp_file:
                 this_file_name = None
             if this_file_name not in clean_results:
                 InitializeCleanResults(this_file_name, these_results["include_list"])
-            clean_results[this_file_name].object_type_list.append(object_type.ToDict())
+            clean_results[this_file_name].struct_list.append(this_struct.ToDict())
 
         return dict([(filename, result.ToDict()) for  filename, result in clean_results.items()])
 
@@ -377,26 +376,26 @@ def ObtainFunctions(
 # |
 # ----------------------------------------------------------------------
 class Results(object):
-    """Stores final versions of Includes, Functions and Class-like objects"""
+    """Stores final versions of Includes, Functions and Struct objects"""
 
     # ----------------------------------------------------------------------
     def __init__(
         self,
         function_list=None,
-        object_type_list=None,
+        struct_list=None,
         include_list=None,
     ):
-        self.function_list                 = function_list or []
-        self.object_type_list              = object_type_list or []
-        self.include_list                  = include_list or []
+        self.function_list                  = function_list or []
+        self.struct_list                    = struct_list or []
+        self.include_list                   = include_list or []
 
     # ----------------------------------------------------------------------
     def ToDict(self):
         new_dict = {}
 
-        new_dict["function_list"] = self.function_list
-        new_dict["struct_list"] = self.object_type_list
-        new_dict["include_list"] = self.include_list
+        new_dict["function_list"]           = self.function_list
+        new_dict["struct_list"]             = self.struct_list
+        new_dict["include_list"]            = self.include_list
 
         return new_dict
 
@@ -419,16 +418,16 @@ def _FullName(node):
 
 # ----------------------------------------------------------------------
 
-def _GetObjectType(node, SimpleVarType, FullVarType):
+def _GetStruct(node, SimpleVarType, FullVarType):
     """
     This function will return the Object Type that this node refers to. It will return None if there were
     errors.
     """
-    struct_class_pattern = re.compile(
+    struct_pattern = re.compile(
         textwrap.dedent(
             r"""(?#
             Not a letter)(?<!\w)(?#
-            Keyword with a space)(?P<keyword>struct\s|class\s)(?#
+            Keyword with a space)(?P<keyword>struct\s)(?#
             )"""
         )
     )
@@ -449,13 +448,13 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
 
     # ----------------------------------------------------------------------
 
-    object_vars = []
+    struct_vars = []
     for child in node.get_children():
         if child.kind == cindex.CursorKind.FIELD_DECL:
             var_type = FullVarType(child.type.spelling)
-            object_vars.append((child.spelling, var_type, SimpleVarType(var_type)))
+            struct_vars.append((child.spelling, var_type, SimpleVarType(var_type)))
 
-    object_type = ClassLikeObject(_FullName(node), node.location.line, os.path.realpath(node.location.file.name), object_vars)
+    this_struct = Struct(_FullName(node), node.location.line, os.path.realpath(node.location.file.name), struct_vars)
 
     for child in node.get_children():
         # The way to see if this is a definition or not, is to see if 'node' has any children.
@@ -472,10 +471,10 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
 
             constructor = Constructor(child.location.line, constructor_args)
 
-            object_type.constructor_list.append(constructor)
+            this_struct.constructor_list.append(constructor)
 
             if child.is_move_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
-                object_type.has_move_constructor = True
+                this_struct.has_move_constructor = True
                 if DeleteDefault(child, "default"):
                     # If this is a default move constructor, there wont be a variable name for the
                     # argument in the function, so I create one when I return the dictionary representation.
@@ -483,11 +482,11 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
 
             elif child.is_copy_constructor() and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
                 # No public copy constructors are allowed.
-                object_type.has_copy_constructor = True
+                this_struct.has_copy_constructor = True
 
         elif child.kind == cindex.CursorKind.FIELD_DECL:
             if child.access_specifier != cindex.AccessSpecifier.PUBLIC:
-                object_type.has_private = True
+                this_struct.has_private = True
 
         elif child.kind == cindex.CursorKind.CXX_METHOD:
             # If this method ends in "=delete", ignore it.
@@ -500,23 +499,23 @@ def _GetObjectType(node, SimpleVarType, FullVarType):
                 for arg in child.get_arguments():
                     # Check the arguments to verify that this is a move operator.
                     if FullVarType(arg.type.spelling) != move_operator_arg_type:
-                        object_type.has_other = True
+                        this_struct.has_other = True
             else:
                 # No other functions besides move operators are allowed.
-                object_type.has_other = True
+                this_struct.has_other = True
 
         elif child.kind == cindex.CursorKind.CXX_BASE_SPECIFIER:
             if child.access_specifier != cindex.AccessSpecifier.PUBLIC:
-                object_type.has_private = True
+                this_struct.has_private = True
             struct_name = child.spelling
-            struct_name = struct_class_pattern.sub(r'', struct_name)
+            struct_name = struct_pattern.sub(r'', struct_name)
 
-            object_type.base_structs.append(struct_name.strip())
+            this_struct.base_structs.append(struct_name.strip())
 
         elif child.kind not in accepted_kinds:
-            object_type.has_other = True
+            this_struct.has_other = True
 
     if not is_def:
-        return object_type
+        return this_struct
 
     return None
