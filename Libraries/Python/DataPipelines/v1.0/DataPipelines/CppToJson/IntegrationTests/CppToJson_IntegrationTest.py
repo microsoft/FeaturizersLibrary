@@ -25,7 +25,7 @@ class FileTest(unittest.TestCase):
     '''
     def test_basic_file(self):
         filename = os.path.join(_script_dir, "basicFunc.cpp")
-        result = CppToJson.ObtainFunctions(filename, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(filename, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(filename, result)
         struct_list = self._GetStructList(filename, result)
         include_list = self._GetIncludeList(filename, result)
@@ -43,7 +43,7 @@ class FileTest(unittest.TestCase):
 
     def test_medium_file(self):
         filename = os.path.join(_script_dir, "mediumFunc.cpp")
-        result = CppToJson.ObtainFunctions(filename, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(filename, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(filename, result)
         struct_list = self._GetStructList(filename, result)
         include_list = self._GetIncludeList(filename, result)
@@ -59,7 +59,7 @@ class FileTest(unittest.TestCase):
 
     def test_hard_file(self):
         filename = os.path.join(_script_dir, "hardFunc.cpp")
-        result = CppToJson.ObtainFunctions(filename, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(filename, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(filename, result)
         struct_list = self._GetStructList(filename, result)
         include_list = self._GetIncludeList(filename, result)
@@ -76,7 +76,7 @@ class FileTest(unittest.TestCase):
 
     def test_convoluted_file(self):
         filename = os.path.join(_script_dir, "convolutedFunc.cpp")
-        result = CppToJson.ObtainFunctions(filename, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(filename, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(filename, result)
         struct_list = self._GetStructList(filename, result)
         include_list = self._GetIncludeList(filename, result)
@@ -92,7 +92,7 @@ class FileTest(unittest.TestCase):
 
     def test_mix_file(self):
         filename = os.path.join(_script_dir, "mixFunc.cpp")
-        result = CppToJson.ObtainFunctions(filename, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(filename, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(filename, result)
         struct_list = self._GetStructList(filename, result)
         include_list = self._GetIncludeList(filename, result)
@@ -142,8 +142,14 @@ class FileTest(unittest.TestCase):
 
             self.assertTrue([error_desc, this_filename, line] in unsupported_list)
         # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if verifyStruct(var_type):
+                return True
+            return False
 
-        result = CppToJson.ObtainFunctions(filename, onUnsupportedFunc, lambda type: False)
+        # ----------------------------------------------------------------------
+
+        result = CppToJson.ObtainFunctions(filename, onUnsupportedFunc, Policy)
         func_list = self._GetFuncList(filename, result)
         struct_list = self._GetStructList(filename, result)
         include_list = self._GetIncludeList(filename, result)
@@ -156,7 +162,7 @@ class FileTest(unittest.TestCase):
 
     def test_namespace_file(self):
         filename = os.path.join(_script_dir, "arithmetic.cpp")
-        result = CppToJson.ObtainFunctions(filename, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(filename, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(filename, result)
         struct_list = self._GetStructList(filename, result)
         include_list = self._GetIncludeList(filename, result)
@@ -177,7 +183,16 @@ class FileTest(unittest.TestCase):
 
     def test_supported_struct(self):
         filename = os.path.join(_script_dir, "supportedStruct.cpp")
-        result = CppToJson.ObtainFunctions(filename, None, lambda type: True)
+
+        # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if verifyStruct(var_type):
+                return True
+            return True
+
+        # ----------------------------------------------------------------------
+
+        result = CppToJson.ObtainFunctions(filename, None, Policy)
         func_list = self._GetFuncList(filename, result)
         struct_list = self._GetStructList(filename, result)
         include_list = self._GetIncludeList(filename, result)
@@ -193,11 +208,11 @@ class FileTest(unittest.TestCase):
         filename = os.path.join(_script_dir, "includes.cpp")
 
         # ----------------------------------------------------------------------
-        def Policy(var_type):
+        def Policy(var_type, verifyStruct):
             accepted_list = ['double', 'int32_t', 'int64_t','uint32_t','uint64_t','int', 'bool', 'float', 'char', 'vector', 'map', 'pair', 'tuple', 'string', 'void']
             ignored_list = ['const', 'signed', 'unsigned', 'std']
 
-            if var_type not in accepted_list and var_type not in ignored_list:
+            if var_type not in accepted_list and var_type not in ignored_list and not verifyStruct(var_type):
                 return False
             return True
         # ----------------------------------------------------------------------
@@ -250,7 +265,16 @@ class Deserialization(unittest.TestCase):
     """
     def test_deserialization(self):
         filename = os.path.join(_script_dir, "deserialization.cpp")
-        results = CppToJson.ObtainFunctions(filename, None, lambda type: True)
+
+        # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if verifyStruct(var_type):
+                return True
+            return True
+
+        # ----------------------------------------------------------------------
+
+        results = CppToJson.ObtainFunctions(filename, None, Policy)
 
         deserialized_result = Deserialize([results[filename]], always_include_optional=True)
         

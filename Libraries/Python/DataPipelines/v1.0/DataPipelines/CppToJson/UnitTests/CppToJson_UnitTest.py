@@ -19,8 +19,8 @@ class FuncTest(unittest.TestCase):
                 return 0;
             }
         ''')
-        
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+
+        result = CppToJson.ObtainFunctions(s, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -64,7 +64,7 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(s, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -109,7 +109,7 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(s, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -153,7 +153,7 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(s, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -193,7 +193,7 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(s, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -233,7 +233,7 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(s, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -271,7 +271,7 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(s, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -308,7 +308,7 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(s, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -351,7 +351,7 @@ class FuncTest(unittest.TestCase):
             }
         ''')
         
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(s, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -425,8 +425,14 @@ class FuncTest(unittest.TestCase):
             self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if verifyStruct(var_type):
+                return True
+            return False
 
-        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
+        # ----------------------------------------------------------------------
+
+        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, Policy)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -465,7 +471,16 @@ class FuncTest(unittest.TestCase):
                 y(y &&other): a(std::move(other.a)), b(std::move(other.b)){}
             };
         ''')
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+
+        # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if var_type == "std::int32_t" or verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
+
+        result = CppToJson.ObtainFunctions(s, None, Policy)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -555,7 +570,7 @@ class FuncTest(unittest.TestCase):
             self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
-        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
+        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type, verifyStruct: False)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -579,7 +594,7 @@ class FuncTest(unittest.TestCase):
             }
         ''')
 
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(s, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -623,7 +638,7 @@ class FuncTest(unittest.TestCase):
             }
         ''')
 
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(s, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -662,7 +677,7 @@ class FuncTest(unittest.TestCase):
             }
         ''')
 
-        result = CppToJson.ObtainFunctions(s, None, lambda type: True)
+        result = CppToJson.ObtainFunctions(s, None, lambda type, verifyStruct: True)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -726,7 +741,13 @@ class FuncTest(unittest.TestCase):
             self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
-        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
+        def Policy(var_type, verifyStruct):
+            if verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
+        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, Policy)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -772,7 +793,7 @@ class FuncTest(unittest.TestCase):
             self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
-        def Policy(var_type):
+        def Policy(var_type, verifyStruct):
             if var_type == "bool" or var_type == "int":
                return True
             return False
@@ -827,8 +848,8 @@ class FuncTest(unittest.TestCase):
             self.assertTrue(False)
 
         # ----------------------------------------------------------------------
-        def Policy(var_type):
-            if var_type == "bool" or var_type == "int":
+        def Policy(var_type, verifyStruct):
+            if var_type == "bool" or var_type == "int" or verifyStruct(var_type):
                return True
             return False
 
@@ -901,7 +922,7 @@ class FuncTest(unittest.TestCase):
 
         # ----------------------------------------------------------------------
         
-        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
+        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type, verifyStruct: False)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -925,7 +946,7 @@ class FuncTest(unittest.TestCase):
 
         # ----------------------------------------------------------------------
         
-        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
+        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type, verifyStruct: False)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -969,8 +990,14 @@ class FuncTest(unittest.TestCase):
             self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
         
-        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
+        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, Policy)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -1025,8 +1052,14 @@ class FuncTest(unittest.TestCase):
             self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
         
-        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
+        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, Policy)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -1102,8 +1135,14 @@ class FuncTest(unittest.TestCase):
             self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
         
-        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
+        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, Policy)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -1181,8 +1220,14 @@ class FuncTest(unittest.TestCase):
             self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
         
-        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
+        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, Policy)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)
@@ -1274,8 +1319,14 @@ class FuncTest(unittest.TestCase):
             self.assertTrue([error_desc, filename, line] in unsupported_list)
 
         # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
         
-        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, lambda type: False)
+        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, Policy)
         func_list = self._GetFuncList(result)
         struct_list = self._GetStructList(result)
         include_list = self._GetIncludeList(result)

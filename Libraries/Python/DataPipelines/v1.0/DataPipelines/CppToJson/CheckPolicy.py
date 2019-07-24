@@ -1,7 +1,7 @@
 import re
 import textwrap
 
-def Policy(var_type):
+def Policy(var_type, verifyStruct):
     # Basic Types that don't require recursion
     int_types = ["std::int8_t", "std::int16_t", "std::int32_t", "std::int64_t","std::uint8_t", "std::uint16_t", "std::uint32_t", "std::uint64_t"]
     number_types = ["float16", "float32", "float64", "complex64", "complex128", "bfloat16"]
@@ -17,8 +17,6 @@ def Policy(var_type):
     function_special = ["std::function"]
 
     modifier_types = ["&", "const"]
-
-    # TODO: Support structs here, add them to the basic types.
 
     # Step 1: Remove modifiers
     pattern_modifier = re.compile(
@@ -126,6 +124,10 @@ def Policy(var_type):
         # This is a special case, since the only time that 'char' or a number are acceptable is 
         # when its preciding 'std::array'
         if type_list[parent_index] == "std::array" and (type_list[index] == "char" or type_list[index].isdigit()):
+            return True, index + 1
+
+        # Check to see if this is a valid Struct.
+        if verifyStruct(type_list[index]):
             return True, index + 1
 
         return False, index + 1

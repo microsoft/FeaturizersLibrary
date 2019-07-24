@@ -47,13 +47,8 @@ def ObtainFunctions(
             os.remove(input_filename)
 
     # ----------------------------------------------------------------------
-    
-    def TestAndVerify(types):
-        """
-        This function will test if the type is valid or not.
-        TODO: add support to verify struct here.
-        """
-        return policy(types)
+    def TestAndVerify(types, verifyStruct):
+        return policy(types, verifyStruct)
 
     # ----------------------------------------------------------------------
 
@@ -277,28 +272,29 @@ def ObtainFunctions(
             return None
 
         # ----------------------------------------------------------------------
-        def VerifyStruct(this_struct):
+        def VerifyStruct(struct_name):
             """
             Check all var types in this Struct, this Struct is valid if they are all valid. There is an assumption that
             this function will only be called for an Struct that is required. If this Struct depends on another Struct,
             that means that the other Struct is also required.
             """
+            this_struct = GetStruct(struct_name)
             if this_struct is None or this_struct in invalid_struct_list:
                 return False
             if this_struct in needed_struct_list:
                 return True
             invalid_reasons = []
             for var_type, var_name in zip(this_struct.EnumerateSimpleVarTypes(), this_struct.EnumerateVarNames()):
-                if GetStruct(var_type) != this_struct and not VerifyStruct(GetStruct(var_type)) and not TestAndVerify(var_type):
+                if GetStruct(var_type) != this_struct and not TestAndVerify(var_type, VerifyStruct):
                     invalid_reasons.append("\t- Invalid var {} of type {}.".format(var_name, var_type))
 
             for constructor in this_struct.constructor_list:
                 for arg_type in constructor.EnumerateSimpleVarTypes():
-                    if GetStruct(arg_type) != this_struct and not VerifyStruct(GetStruct(arg_type)) and not TestAndVerify(arg_type):
+                    if GetStruct(arg_type) != this_struct and not TestAndVerify(arg_type, VerifyStruct):
                         invalid_reasons.append("\t- Invalid type {} on constructor argument.".format(arg_type))
 
             for parent_struct in this_struct.base_structs:
-                if not VerifyStruct(GetStruct(parent_struct)):
+                if not VerifyStruct(parent_struct):
                     invalid_reasons.append("\t- Invalid base struct {}.".format(parent_struct))
 
             if not this_struct.has_move_constructor:
@@ -332,11 +328,11 @@ def ObtainFunctions(
             """
             invalid_reasons = []
             for var_type, var_name in zip(func.EnumerateSimpleVarTypes(), func.EnumerateVarNames()):
-                if not TestAndVerify(var_type):
+                if not TestAndVerify(var_type, lambda struct: False):
                     invalid_reasons.append("\t- Invalid argument {} of type {}.".format(var_name, var_type))
 
             return_type = func.SimpleReturnType
-            if not VerifyStruct(GetStruct(return_type)) and not TestAndVerify(return_type):
+            if not TestAndVerify(return_type, VerifyStruct):
                 invalid_reasons.append("\t- Invalid return type {}.".format(return_type))
 
             if invalid_reasons:
