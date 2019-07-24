@@ -1336,7 +1336,439 @@ class FuncTest(unittest.TestCase):
         self.assertEqual(func_list, [])
         self.assertEqual(struct_list, [])
         self.assertEqual(include_list, [])
+
+    def test_alias(self):
+        s = textwrap.dedent('''\
+            #include <cstdint>
+            using int_t = std::int32_t;
+            typedef std::int32_t i_t;
+
+            int_t add(i_t a, int_t b){
+                return a+b;
+            }
+            i_t main(){
+                return 0;
+            }
+        ''')
+
+        # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if var_type == "std::int32_t" or verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
+
+        result = CppToJson.ObtainFunctions(s, None, Policy)
+        func_list = self._GetFuncList(result)
+        struct_list = self._GetStructList(result)
+        include_list = self._GetIncludeList(result)
+
+        self.assertEqual(func_list[0]['name'], 'add')
+        self.assertEqual(func_list[0]['raw_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[0]['simple_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[0]['var_names'], ['a', 'b'])
+        self.assertEqual(func_list[0]['raw_var_types'], ['std::int32_t', 'std::int32_t'])
+        self.assertEqual(func_list[0]['simple_var_types'], ['std::int32_t', 'std::int32_t'])
+        self.assertEqual(func_list[0]['definition_line'], 5)
+        self.assertEqual(func_list[0]['declaration_line'], 5)
+
+        self.assertEqual(func_list[1]['name'], 'main')
+        self.assertEqual(func_list[1]['raw_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[1]['simple_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[1]['var_names'], [])
+        self.assertEqual(func_list[1]['raw_var_types'], [])
+        self.assertEqual(func_list[1]['simple_var_types'], [])
+        self.assertEqual(func_list[1]['definition_line'], 8)
+        self.assertEqual(func_list[1]['declaration_line'], 8)
+
+        self.assertEqual(struct_list, [])
+        self.assertEqual(len(include_list), 1)
     
+    def test_alias_namespace(self):
+        s = textwrap.dedent('''\
+            #include <cstdint>
+            #include <utility>
+
+            namespace DataPipelines {
+                namespace Arithmetic {
+                    struct R{
+                        std::int32_t a;
+                        R(){}
+                        R(R && other): a(std::move(other.a)){}
+                    };
+                    R thisGuy(std::int32_t x);
+                }
+            }
+            using Rx = DataPipelines::Arithmetic::R;
+
+            Rx DataPipelines::Arithmetic::thisGuy(std::int32_t x){
+                Rx y;
+                return y;
+            }
+
+            std::int32_t main(){
+                return 0;
+            }
+        ''')
+
+        # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if var_type == "std::int32_t" or verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
+
+        result = CppToJson.ObtainFunctions(s, None, Policy)
+        func_list = self._GetFuncList(result)
+        struct_list = self._GetStructList(result)
+        include_list = self._GetIncludeList(result)
+
+        self.assertEqual(func_list[0]['name'], 'DataPipelines::Arithmetic::thisGuy')
+        self.assertEqual(func_list[0]['raw_return_type'], 'DataPipelines::Arithmetic::R')
+        self.assertEqual(func_list[0]['simple_return_type'], 'DataPipelines::Arithmetic::R')
+        self.assertEqual(func_list[0]['var_names'], ['x'])
+        self.assertEqual(func_list[0]['raw_var_types'], ['std::int32_t'])
+        self.assertEqual(func_list[0]['simple_var_types'], ['std::int32_t'])
+        self.assertEqual(func_list[0]['definition_line'], 16)
+        self.assertEqual(func_list[0]['declaration_line'], 11)
+
+        self.assertEqual(func_list[1]['name'], 'main')
+        self.assertEqual(func_list[1]['raw_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[1]['simple_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[1]['var_names'], [])
+        self.assertEqual(func_list[1]['raw_var_types'], [])
+        self.assertEqual(func_list[1]['simple_var_types'], [])
+        self.assertEqual(func_list[1]['definition_line'], 21)
+        self.assertEqual(func_list[1]['declaration_line'], 21)
+
+        self.assertEqual(struct_list[0]['name'], 'DataPipelines::Arithmetic::R')
+        self.assertEqual(struct_list[0]['var_names'], ['a'])
+        self.assertEqual(struct_list[0]['raw_var_types'], ['std::int32_t'])
+        self.assertEqual(struct_list[0]['simple_var_types'], ['std::int32_t'])
+        self.assertEqual(struct_list[0]['definition_line'], 6)
+        self.assertEqual(struct_list[0]['base_structs'], [])
+
+        self.assertEqual(len(struct_list[0]['constructor_list']), 2)
+
+        self.assertEqual(struct_list[0]['constructor_list'][0]['var_names'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['raw_var_types'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['simple_var_types'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['definition_line'], 8)
+
+        self.assertEqual(struct_list[0]['constructor_list'][1]['var_names'], ['other'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['raw_var_types'], ['DataPipelines::Arithmetic::R &&'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['simple_var_types'], ['DataPipelines::Arithmetic::R'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['definition_line'], 9)
+
+        self.assertEqual(len(include_list), 2)
+
+    def test_copy_constructor(self):
+        times_called = 0
+
+        s = textwrap.dedent( '''\
+            #include <utility>
+            #include <cstdio>
+            #include <cstdint>
+
+            struct x{
+                std::int32_t a, b;
+                x(){}
+                x(x &&other): a(std::move(other.a)), b(std::move(other.b)){}
+                // Copy constructor
+                x(x& other){}
+            };
+
+            x go(std::int32_t y){
+                x ret = x();
+                return ret;
+            }
+
+            std::int32_t main(){
+                return 0;
+            }
+
+            struct y{
+                std::int32_t a, b;
+                y(y &&other): a(std::move(other.a)), b(std::move(other.b)){}
+            };
+        ''')
+
+        # ----------------------------------------------------------------------
+        def onUnsupportedFunc(error_desc, filename, line):
+            nonlocal times_called
+            times_called = times_called + 1
+
+            unsupported_list = [
+                [textwrap.dedent("""\
+                The struct x is not supported:
+                \t- Struct has a copy constructor.
+                """), None, 5],
+                [textwrap.dedent("""\
+                The function go is not supported:
+                \t- Invalid return type x.
+                """), None, 13]
+            ]
+
+            self.assertTrue([error_desc, filename, line] in unsupported_list)
+
+        # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if var_type == "std::int32_t" or verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
+
+        result = CppToJson.ObtainFunctions(s, onUnsupportedFunc, Policy)
+        func_list = self._GetFuncList(result)
+        struct_list = self._GetStructList(result)
+        include_list = self._GetIncludeList(result)
+
+        self.assertEqual(func_list[0]['name'], 'main')
+        self.assertEqual(func_list[0]['raw_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[0]['simple_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[0]['var_names'], [])
+        self.assertEqual(func_list[0]['raw_var_types'], [])
+        self.assertEqual(func_list[0]['simple_var_types'], [])
+        self.assertEqual(func_list[0]['definition_line'], 18)
+        self.assertEqual(func_list[0]['declaration_line'], 18)
+
+        self.assertEqual(len(include_list), 3)
+
+        self.assertEqual(times_called, 2)
+
+    def test_copy_constructor_deleted(self):
+
+        s = textwrap.dedent( '''\
+            #include <utility>
+            #include <cstdio>
+            #include <cstdint>
+
+            struct x{
+                std::int32_t a, b;
+                x(){}
+                x(x &&other): a(std::move(other.a)), b(std::move(other.b)){}
+                // Copy constructor
+                x(x& other)=delete;
+            };
+
+            x go(std::int32_t y){
+                x ret = x();
+                return ret;
+            }
+
+            std::int32_t main(){
+                return 0;
+            }
+
+            struct y{
+                std::int32_t a, b;
+                y(y &&other): a(std::move(other.a)), b(std::move(other.b)){}
+            };
+        ''')
+
+        # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if var_type == "std::int32_t" or verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
+
+        result = CppToJson.ObtainFunctions(s, None, Policy)
+        func_list = self._GetFuncList(result)
+        struct_list = self._GetStructList(result)
+        include_list = self._GetIncludeList(result)
+
+        self.assertEqual(func_list[0]['name'], 'go')
+        self.assertEqual(func_list[0]['raw_return_type'], 'x')
+        self.assertEqual(func_list[0]['simple_return_type'], 'x')
+        self.assertEqual(func_list[0]['var_names'], ['y'])
+        self.assertEqual(func_list[0]['raw_var_types'], ['std::int32_t'])
+        self.assertEqual(func_list[0]['simple_var_types'], ['std::int32_t'])
+        self.assertEqual(func_list[0]['definition_line'], 13)
+        self.assertEqual(func_list[0]['declaration_line'], 13)
+
+        self.assertEqual(func_list[1]['name'], 'main')
+        self.assertEqual(func_list[1]['raw_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[1]['simple_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[1]['var_names'], [])
+        self.assertEqual(func_list[1]['raw_var_types'], [])
+        self.assertEqual(func_list[1]['simple_var_types'], [])
+        self.assertEqual(func_list[1]['definition_line'], 18)
+        self.assertEqual(func_list[1]['declaration_line'], 18)
+
+        self.assertEqual(struct_list[0]['name'], 'x')
+        self.assertEqual(struct_list[0]['var_names'], ['a', 'b'])
+        self.assertEqual(struct_list[0]['raw_var_types'], ['std::int32_t', 'std::int32_t'])
+        self.assertEqual(struct_list[0]['simple_var_types'], ['std::int32_t', 'std::int32_t'])
+        self.assertEqual(struct_list[0]['definition_line'], 5)
+
+        self.assertEqual(len(struct_list[0]['constructor_list']), 2)
+
+        self.assertEqual(struct_list[0]['constructor_list'][0]['var_names'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['raw_var_types'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['simple_var_types'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['definition_line'], 7)
+
+        self.assertEqual(struct_list[0]['constructor_list'][1]['var_names'], ['other'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['raw_var_types'], ['x &&'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['simple_var_types'], ['x'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['definition_line'], 8)
+
+        self.assertEqual(len(include_list), 3)
+
+    def test_operator_equal(self):
+
+        s = textwrap.dedent( '''\
+            #include <utility>
+            #include <cstdio>
+            #include <cstdint>
+
+            struct x{
+                std::int32_t a, b;
+                x(){}
+                x(x &&other): a(std::move(other.a)), b(std::move(other.b)){}
+                x& operator=(x&& y){
+                    return *this;
+                }
+            };
+
+            x go(std::int32_t y){
+                x ret = x();
+                return ret;
+            }
+
+            std::int32_t main(){
+                return 0;
+            }
+
+            struct y{
+                std::int32_t a, b;
+                y(y &&other): a(std::move(other.a)), b(std::move(other.b)){}
+            };
+        ''')
+
+        # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if var_type == "std::int32_t" or verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
+
+        result = CppToJson.ObtainFunctions(s, None, Policy)
+        func_list = self._GetFuncList(result)
+        struct_list = self._GetStructList(result)
+        include_list = self._GetIncludeList(result)
+
+        self.assertEqual(func_list[0]['name'], 'go')
+        self.assertEqual(func_list[0]['raw_return_type'], 'x')
+        self.assertEqual(func_list[0]['simple_return_type'], 'x')
+        self.assertEqual(func_list[0]['var_names'], ['y'])
+        self.assertEqual(func_list[0]['raw_var_types'], ['std::int32_t'])
+        self.assertEqual(func_list[0]['simple_var_types'], ['std::int32_t'])
+        self.assertEqual(func_list[0]['definition_line'], 14)
+        self.assertEqual(func_list[0]['declaration_line'], 14)
+
+        self.assertEqual(func_list[1]['name'], 'main')
+        self.assertEqual(func_list[1]['raw_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[1]['simple_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[1]['var_names'], [])
+        self.assertEqual(func_list[1]['raw_var_types'], [])
+        self.assertEqual(func_list[1]['simple_var_types'], [])
+        self.assertEqual(func_list[1]['definition_line'], 19)
+        self.assertEqual(func_list[1]['declaration_line'], 19)
+
+        self.assertEqual(struct_list[0]['name'], 'x')
+        self.assertEqual(struct_list[0]['var_names'], ['a', 'b'])
+        self.assertEqual(struct_list[0]['raw_var_types'], ['std::int32_t', 'std::int32_t'])
+        self.assertEqual(struct_list[0]['simple_var_types'], ['std::int32_t', 'std::int32_t'])
+        self.assertEqual(struct_list[0]['definition_line'], 5)
+
+        self.assertEqual(len(struct_list[0]['constructor_list']), 2)
+
+        self.assertEqual(struct_list[0]['constructor_list'][0]['var_names'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['raw_var_types'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['simple_var_types'], [])
+        self.assertEqual(struct_list[0]['constructor_list'][0]['definition_line'], 7)
+
+        self.assertEqual(struct_list[0]['constructor_list'][1]['var_names'], ['other'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['raw_var_types'], ['x &&'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['simple_var_types'], ['x'])
+        self.assertEqual(struct_list[0]['constructor_list'][1]['definition_line'], 8)
+
+        self.assertEqual(len(include_list), 3)
+
+    def test_namespace_alias(self):
+        s = textwrap.dedent('''\
+            #include <stdint.h>
+            #include <cstdint>
+
+            /* Defined in enclosed namespace */
+            namespace Foo{
+                using Bar = std::int32_t;
+                Bar func1(){
+                    return 2;
+                }
+            }
+            namespace Baz{
+                using Bar = bool;
+                Bar func2(){
+                    return false;
+                }
+            }
+
+            namespace Foo{
+                Bar func3(){
+                    return 2;
+                }
+            }
+        ''')
+        # ----------------------------------------------------------------------
+        def Policy(var_type, verifyStruct):
+            if var_type == "std::int32_t" or var_type == "bool" or verifyStruct(var_type):
+                return True
+            return False
+
+        # ----------------------------------------------------------------------
+
+        result = CppToJson.ObtainFunctions(s, None, Policy)
+        func_list = self._GetFuncList(result)
+        struct_list = self._GetStructList(result)
+        include_list = self._GetIncludeList(result)
+
+        self.assertEqual(func_list[0]['name'], 'Foo::func1')
+        self.assertEqual(func_list[0]['raw_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[0]['simple_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[0]['var_names'], [])
+        self.assertEqual(func_list[0]['raw_var_types'], [])
+        self.assertEqual(func_list[0]['simple_var_types'], [])
+        self.assertEqual(func_list[0]['definition_line'], 7)
+        self.assertEqual(func_list[0]['declaration_line'], 7)
+
+        self.assertEqual(func_list[1]['name'], 'Baz::func2')
+        self.assertEqual(func_list[1]['raw_return_type'], 'bool')
+        self.assertEqual(func_list[1]['simple_return_type'], 'bool')
+        self.assertEqual(func_list[1]['var_names'], [])
+        self.assertEqual(func_list[1]['raw_var_types'], [])
+        self.assertEqual(func_list[1]['simple_var_types'], [])
+        self.assertEqual(func_list[1]['definition_line'], 13)
+        self.assertEqual(func_list[1]['declaration_line'], 13)
+
+        self.assertEqual(func_list[2]['name'], 'Foo::func3')
+        self.assertEqual(func_list[2]['raw_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[2]['simple_return_type'], 'std::int32_t')
+        self.assertEqual(func_list[2]['var_names'], [])
+        self.assertEqual(func_list[2]['raw_var_types'], [])
+        self.assertEqual(func_list[2]['simple_var_types'], [])
+        self.assertEqual(func_list[2]['definition_line'], 19)
+        self.assertEqual(func_list[2]['declaration_line'], 19)
+
+        self.assertEqual(struct_list, [])
+        self.assertEqual(len(include_list), 2)
 
 
     def _GetFuncList(self, results):

@@ -1,7 +1,7 @@
 import re
 import textwrap
 
-def Policy(var_type, verifyStruct):
+def Policy(var_type, verify_struct_func):
     # Basic Types that don't require recursion
     int_types = ["std::int8_t", "std::int16_t", "std::int32_t", "std::int64_t","std::uint8_t", "std::uint16_t", "std::uint32_t", "std::uint64_t"]
     number_types = ["float16", "float32", "float64", "complex64", "complex128", "bfloat16"]
@@ -43,9 +43,9 @@ def Policy(var_type, verifyStruct):
     pattern_words = re.compile(
         textwrap.dedent(
             r"""(?#
-            Keyword)[[\w:\[0-9\]]+(?#
-            Or closing brackets)|\)(?#
-            Or opening brackets)|\((?#
+            Keyword)[[\w:]+(?#
+            Or closing parenthesis)|\)(?#
+            Or opening parenthesis)|\((?#
             )"""
         )
     )
@@ -127,7 +127,7 @@ def Policy(var_type, verifyStruct):
             return True, index + 1
 
         # Check to see if this is a valid Struct.
-        if verifyStruct(type_list[index]):
+        if verify_struct_func(type_list[index]):
             return True, index + 1
 
         return False, index + 1

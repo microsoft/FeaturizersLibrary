@@ -6,7 +6,6 @@ from collections import OrderedDict
 
 import clang.cindex as cindex
 
-import CommonEnvironment
 import CommonEnvironment.FileSystem as fileSystem
 import CommonEnvironment.CallOnExit as callOnExit
 from CommonEnvironment.Shell.All import CurrentShell
@@ -20,7 +19,7 @@ from DataPipelines.CppToJson.Impl.Function import Function
 def ObtainFunctions(
     input_filename,
     on_unsupported,
-    policy,
+    policy_func,
 ):
     """
     This function will extract return value, name and parameters for every
@@ -47,8 +46,8 @@ def ObtainFunctions(
             os.remove(input_filename)
 
     # ----------------------------------------------------------------------
-    def TestAndVerify(types, verifyStruct):
-        return policy(types, verifyStruct)
+    def TestAndVerify(types, verify_struct_func):
+        return policy_func(types, verify_struct_func)
 
     # ----------------------------------------------------------------------
 
@@ -111,30 +110,47 @@ def ObtainFunctions(
 
             cursor = translation_unit.cursor
 
-            # ----------------------------------------------------------------------
-            def GetAlias():
+           # ----------------------------------------------------------------------
+            def GetAlias(node, prefix):
                 """
                 This function will process all 'typedef' and 'using' and it will map the underlying type to
                 its definition.
                 """
                 alias = {}
-                for child in cursor.get_children():
-                    if (child.kind == cindex.CursorKind.TYPEDEF_DECL or child.kind == cindex.CursorKind.TYPE_ALIAS_DECL) and child.location.file.name == input_filename:
-                        alias[child.spelling] = child.underlying_typedef_type.spelling
+                
+                if node.kind == cindex.CursorKind.NAMESPACE:
+                    for child in node.get_children():
+                        ret = GetAlias(child, prefix + node.spelling + "::")
+                        for a, b in ret.items():
+                            assert prefix + a not in alias.keys()
+                            alias[prefix + a] = b
+                
+                if (node.kind == cindex.CursorKind.TYPEDEF_DECL or node.kind == cindex.CursorKind.TYPE_ALIAS_DECL):
+                    alias[prefix + node.spelling] = node.underlying_typedef_type.spelling
+
                 return alias
 
             # ----------------------------------------------------------------------
-
-            alias = GetAlias()
+            alias = {}
+            for node in cursor.get_children():
+                for before_type, after_type in GetAlias(node, "").items():
+                    assert before_type not in alias.keys()
+                    '''
+                    If TestAndVerify with no structs (lambda function is always False) is True, then it means
+                    that before_type is already an accepted type, so we don't want to extend it any further.
+                    '''
+                    if not TestAndVerify(before_type, lambda type: False):
+                        alias[before_type] = after_type
+                        
 
             alias_regex = re.compile(
                 textwrap.dedent(
                     r"""(?#
-                    Not a letter)(?<!\w)(?#
+                    Not a letter or a ':')(?<![:\w])(?#
                     Keyword)(?P<keyword>{})(?#
-                    Not a letter)(?!\w)(?#
+                    Not a letter or a ':')(?![:\w])(?#
                     )"""
-                ).format("|".join([re.escape(key) for key in alias.keys()]))
+                ).format("|".join([re.escape(key) for key in alias]))
             )
 
             struct_pattern = re.compile(
@@ -414,7 +430,7 @@ def _FullName(node):
 
 # ----------------------------------------------------------------------
 
-def _GetStruct(node, SimpleVarType, FullVarType):
+def _GetStruct(node, simple_var_type_func, full_var_type_func):
     """
     This function will return the Object Type that this node refers to. It will return None if there were
     errors.
@@ -447,8 +463,8 @@ def _GetStruct(node, SimpleVarType, FullVarType):
     struct_vars = []
     for child in node.get_children():
         if child.kind == cindex.CursorKind.FIELD_DECL:
-            var_type = FullVarType(child.type.spelling)
-            struct_vars.append((child.spelling, var_type, SimpleVarType(var_type)))
+            var_type = full_var_type_func(child.type.spelling)
+            struct_vars.append((child.spelling, var_type, simple_var_type_func(var_type)))
 
     this_struct = Struct(_FullName(node), node.location.line, os.path.realpath(node.location.file.name), struct_vars)
 
@@ -462,8 +478,8 @@ def _GetStruct(node, SimpleVarType, FullVarType):
 
             constructor_args = []
             for arg in child.get_arguments():
-                arg_type = FullVarType(arg.type.spelling)
-                constructor_args.append((arg.spelling, arg_type, SimpleVarType(arg_type)))
+                arg_type = full_var_type_func(arg.type.spelling)
+                constructor_args.append((arg.spelling, arg_type, simple_var_type_func(arg_type)))
 
             constructor = Constructor(child.location.line, constructor_args)
 
@@ -490,11 +506,11 @@ def _GetStruct(node, SimpleVarType, FullVarType):
                 continue
 
             # 'operator=' is supported as long as it is public and a move operator.
-            move_operator_arg_type = FullVarType(node.spelling) + " &&"
+            move_operator_arg_type = full_var_type_func(node.spelling) + " &&"
             if child.spelling == "operator=" and child.access_specifier == cindex.AccessSpecifier.PUBLIC:
                 for arg in child.get_arguments():
                     # Check the arguments to verify that this is a move operator.
-                    if FullVarType(arg.type.spelling) != move_operator_arg_type:
+                    if full_var_type_func(arg.type.spelling) != move_operator_arg_type:
                         this_struct.has_other = True
             else:
                 # No other functions besides move operators are allowed.
