@@ -12,8 +12,20 @@ stages:
         operating_system: Windows
         configuration: x64
 
+# TODO: Boost lib does not currently support Linux -   template: BuildAndTest.template.yaml
+# TODO: Boost lib does not currently support Linux     parameters:
+# TODO: Boost lib does not currently support Linux         agent_pool: ubuntu-16.04
+# TODO: Boost lib does not currently support Linux         operating_system: Linux
+# TODO: Boost lib does not currently support Linux         configuration: x64
+
 -   template: BuildAndTest.template.yaml
     parameters:
-        agent_pool: ubuntu-16.04
-        operating_system: Linux
-        configuration: x64
+        agent_pool: vs2015-win2012r2
+        operating_system: Windows
+        configuration: featurizer_prep
+
+# TODO: Boost lib does not currently support Linux -   template: BuildAndTest.template.yaml
+# TODO: Boost lib does not currently support Linux     parameters:
+# TODO: Boost lib does not currently support Linux         agent_pool: ubuntu-16.04
+# TODO: Boost lib does not currently support Linux         operating_system: Linux
+# TODO: Boost lib does not currently support Linux         configuration: featurizer_prep

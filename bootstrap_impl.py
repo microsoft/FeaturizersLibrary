@@ -45,6 +45,8 @@ _REPO_DATA                                  = [
     ("Common_cpp_Clang_8", 'git clone https://github.com/davidbrownell/Common_cpp_Clang_8 "{output_dir}"', None),
     ("Common_cpp_Clang_Common", 'git clone https://github.com/davidbrownell/Common_cpp_Clang_Common "{output_dir}"', None),
     ("Common_cpp_Common", 'git clone https://github.com/davidbrownell/Common_cpp_Common "{output_dir}"', None),
+    ("Common_cpp_boost_Common", 'git clone https://github.com/davidbrownell/Common_cpp_boost_Common "{output_dir}"', None),
+    ("Common_cpp_boost_1.70.0", 'git clone https://github.com/davidbrownell/Common_cpp_boost_1.70.0 "{output_dir}"', '"/configuration=standard" "/configuration=MSVC-2019-x64"'),
 ]
 
 if CurrentShell.CategoryName == "Linux":
@@ -61,7 +63,7 @@ elif CurrentShell.CategoryName == "Windows":
 else:
     raise Exception("'{}' is not supported OS".format(CurrentShell.CategoryName))
 
-_ACTIVATION_REPO_CONFIGURATION              = "x64"
+_ACTIVATION_REPO_CONFIGURATION              = "<x64|featurizer_prep>"
 
 # ----------------------------------------------------------------------
 inflect                                     = inflect_mod.engine()
@@ -177,9 +179,7 @@ def EntryPoint(
                             suffix=data[2] or "",
                         )
 
-                        if CurrentShell.CategoryName == "Windows":
-                            command_line = command_line.replace("=", "_EQ_")
-                        elif CurrentShell.CategoryName == "Linux":
+                        if CurrentShell.CategoryName == "Linux":
                             command_line = "./{}".format(command_line)
 
                         sink = six.moves.StringIO()

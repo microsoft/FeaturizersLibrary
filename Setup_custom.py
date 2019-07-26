@@ -22,6 +22,7 @@
 # |
 # ----------------------------------------------------------------------
 
+import copy
 import os
 import sys
 
@@ -106,8 +107,31 @@ def GetDependencies():
                     "{}-ex".format(architecture),
                     "https://github.com/davidbrownell/Common_cpp_Clang_8.git",
                 ),
+                # TODO: This configuration doesn't depend on boost, however there are some tests associated with the
+                #       `featurization_prep` configuration do. Include it for now, as there isn't a way to specify
+                #       configuration-specific tests at this time. Remove the following dependency once there is a
+                #       way to communicate this information.
+                Dependency(
+                    "407DD743110A4FB1871AEF60CBEC99A0",
+                    "Common_cpp_boost_1.70.0",
+                    "standard",
+                    "https://github.com/davidbrownell/Common_cpp_boost_1.70.0.git",
+                ),
             ],
         )
+
+    d["featurizer_prep"] = copy.deepcopy(d["x64"])
+
+    # TODO: Enable this once the TODO comment above is resolved.
+    #
+    # d["featurizer_prep"].Dependencies.append(
+    #     Dependency(
+    #         "407DD743110A4FB1871AEF60CBEC99A0",
+    #         "Common_cpp_boost_1.70.0",
+    #         "standard",
+    #         "https://github.com/davidbrownell/Common_cpp_boost_1.70.0.git",
+    #     ),
+    # )
 
     return d
 
@@ -117,7 +141,7 @@ def GetCustomActions(debug, verbose, explicit_configurations):
     """
     Returns an action or list of actions that should be invoked as part of the setup process.
 
-    Actions are generic command line statements defined in 
+    Actions are generic command line statements defined in
     <Common_Environment>/Libraries/Python/CommonEnvironment/v1.0/CommonEnvironment/Shell/Commands/__init__.py
     that are converted into statements appropriate for the current scripting language (in most
     cases, this is Bash on Linux systems and Batch or PowerShell on Windows systems.
