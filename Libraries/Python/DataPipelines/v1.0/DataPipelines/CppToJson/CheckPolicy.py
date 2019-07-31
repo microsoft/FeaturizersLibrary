@@ -39,7 +39,6 @@ def Policy(var_type, verify_struct_func):
         return False
 
     # Step 3: Get all words in the var_type
-
     pattern_words = re.compile(
         textwrap.dedent(
             r"""(?#
@@ -52,31 +51,20 @@ def Policy(var_type, verify_struct_func):
 
     type_list = re.findall(pattern_words, var_type)
 
-    # Step 4: Separate basic types and special (recursive ones)
-    basic_regex = re.compile(
-        textwrap.dedent(
-            r"""(?#
-            Keyword)(?P<keyword>{})(?#
-            )"""
-        ).format("|".join([re.escape(basic_type) for basic_type in basic_types]))
-    )
+    # Step 4: Associate how many template arguments each type has
+    # To add a new accepted type, simply add it to this dictionary associating it with how many template arguments it takes
+    type_to_template_count = {}
 
-    single_special_regex = re.compile(
-        textwrap.dedent(
-            r"""(?#
-            Keyword)(?P<keyword>{})(?#
-            )"""
-        ).format("|".join([re.escape(a_single_special) for a_single_special in single_special]))
-    )
+    for basic_type in basic_types:
+        type_to_template_count[basic_type] = 0
+    
+    for a_single_special in single_special:
+        type_to_template_count[a_single_special] = 1
 
-    double_special_regex = re.compile(
-        textwrap.dedent(
-            r"""(?#
-            Keyword)(?P<keyword>{})(?#
-            )"""
-        ).format("|".join([re.escape(a_double_special) for a_double_special in double_special]))
-    )
+    for a_double_special in double_special:
+        type_to_template_count[a_double_special] = 2 
 
+    # Step 5: Special case of functions
     function_special_regex = re.compile(
         textwrap.dedent(
             r"""(?#
@@ -93,20 +81,14 @@ def Policy(var_type, verify_struct_func):
         that made the call to the current type It will return True/False
         meaning if the string was accepted or not, and also return the index it stopped looking at.
         """
+        if type_list[index] in type_to_template_count:
+            valid, new_index = True, index + 1
+            counter = 0
+            while valid and counter < type_to_template_count[type_list[index]]:
+                valid, new_index = VerifyType(new_index, index)
+                counter = counter + 1
+            return valid, new_index
 
-        if basic_regex.match(type_list[index]):
-            # If this is a basic type, then there is no recursion and this part
-            # of it is valid
-            return True, index + 1
-        
-        if single_special_regex.match(type_list[index]):
-            return VerifyType(index + 1, index)
-        
-        if double_special_regex.match(type_list[index]):
-            valid, new_index = VerifyType(index + 1, index)
-            if valid:
-                return VerifyType(new_index, index)
-        
         if function_special_regex.match(type_list[index]):
             # This is a special case, there is going to be one type, then opening
             # parentesis, then a list of types, then closing parentesis.
@@ -120,7 +102,7 @@ def Policy(var_type, verify_struct_func):
 
             if valid:
                 return True, new_index + 1
-
+        
         # This is a special case, since the only time that 'char' or a number are acceptable is 
         # when its preciding 'std::array'
         if type_list[parent_index] == "std::array" and (type_list[index] == "char" or type_list[index].isdigit()):
