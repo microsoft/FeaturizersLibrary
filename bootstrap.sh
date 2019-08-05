@@ -70,8 +70,8 @@ then
         name_arg=""
     fi
 
-    "$1/Common/Environment/Setup.sh" ${name_arg} ${ARGS[@]}
-    
+    "$1/Common/Environment/Setup.sh" ${name_arg}
+
     # Write the environment activation and python execution statements to a temporary
     # file so this environment remains unactivated (by doing this, the current script
     # can be invoked multiple times from the same environment).
