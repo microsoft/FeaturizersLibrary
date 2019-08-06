@@ -29,6 +29,7 @@ add_library(libFeaturizers STATIC
     ../SampleAdd.cpp
     ../DateTimeFeaturizer.h
     ../DateTimeFeaturizer.cpp
+    ../StringTransformer.h
 )
 
 enable_testing()
@@ -36,6 +37,7 @@ enable_testing()
 foreach(_test_name IN ITEMS
     SampleAdd_UnitTest
     DateTimeFeaturizer_UnitTests
+    StringTransformer_UnitTest
 )
     add_executable(${_test_name} ${_test_name}.cpp)
 
