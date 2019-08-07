@@ -242,12 +242,32 @@ struct Traits <boost::optional<T>> : public TraitsImpl<boost::optional<T>> {
     }
 };
 
-//TODO:Tuple implementation
 template <typename ... Types>
 struct Traits <std::tuple<Types...>> : public TraitsImpl<std::tuple<Types...>> {
-    //static std::string ToString(std::tuple<Types ...> const& value) {
-         
-    //}
+    static std::string ToString(std::tuple<Types ...> const& value) {
+        std::ostringstream streamObj;
+        streamObj << "(";
+        ToStringHelper(value, streamObj);
+        streamObj << ")";
+        return streamObj.str();
+    }
+
+private:
+    template<std::size_t N = 0, typename ... Types>
+    static inline typename std::enable_if<N < sizeof...(Types) - 1, void>::type
+    ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj) {
+        using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
+        streamObj << Traits<type>::ToString(std::get<N>(value)) << ",";
+        ToStringHelper<N+1, Types...>(value, streamObj);
+    }
+
+    template<std::size_t N = 0, typename ... Types>
+    static inline typename std::enable_if<N == (sizeof...(Types) - 1), void>::type
+    ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj)
+    {
+        using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
+        streamObj << Traits<type>::ToString(std::get<N>(value));
+    }
 };
 
 } // namespace Traits

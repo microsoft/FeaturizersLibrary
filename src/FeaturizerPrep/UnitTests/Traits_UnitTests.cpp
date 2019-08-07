@@ -146,6 +146,14 @@ TEST_CASE("Transformer_Maps") {
 	CHECK(map_res == map_s);  
 }
 
+TEST_CASE("Transformer_Tuples") {
+    std::tuple<int, std::string, double> tu(42, "hi", -3.14);
+    std::string tu_res = Traits<std::tuple<int, std::string, double>>::ToString(tu);
+    std::string tu_s{"(42,hi,-3.14)"};
+    std::cout << tu_res;
+    CHECK(tu_res == tu_s);
+}
+
 
 
 
