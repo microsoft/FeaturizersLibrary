@@ -223,14 +223,6 @@ struct Traits<std::map<KeyT, T, CompareT, AllocatorT>> : public TraitsImpl<std::
     }
 };
 
-template <typename ... Types>
-struct Traits <std::function<Types...>> : public TraitsImpl<std::function<Types...>> {
-    // static std::string ToString(std::function<Types ...> const& value) {
-    //     // Decide what to return here
-    //     throw std::logic_error("Function not yet implemented");
-    // }
-};
-
 template <typename T>
 struct Traits <boost::optional<T>> : public TraitsImpl<boost::optional<T>> {
     using nullable_type = boost::optional<T>;
@@ -269,6 +261,20 @@ private:
         streamObj << Traits<type>::ToString(std::get<N>(value));
     }
 };
+
+//TODO: Function Types:Estimator-to-Transformer Conversion
+template <typename ... Types>
+struct Traits <std::function<Types...>> : public TraitsImpl<std::function<Types...>> {
+    // static std::string ToString(std::function<Types ...> const& value) {
+    //     // Decide what to return here
+    //     throw std::logic_error("Function not yet implemented");
+    // }
+};
+
+//TODO:DateTime type (represented by 64bit delta from TBD epoch)
+//TODO:ONNX (Sparse) Tensor
+//TODO:Apache Arrow
+//TODO:Type Modifiers?
 
 } // namespace Traits
 } // namespace Featurizer
