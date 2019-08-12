@@ -8,15 +8,29 @@
 
 #include "../SampleAdd.h"
 
-TEST_CASE("Transformer") {
-    CHECK(Microsoft::Featurizer::SampleAdd::Transformer(10).transform(20) == 30);
-    CHECK(Microsoft::Featurizer::SampleAdd::Transformer(20).transform(1) == 21);
+// ----------------------------------------------------------------------
+using Microsoft::Featurizer::SampleAddFeaturizer;
+using Microsoft::Featurizer::CreateTestAnnotationMapsPtr;
+// ----------------------------------------------------------------------
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+
+SampleAddFeaturizer::TransformerPtr Train(std::vector<std::uint16_t> const &input) {
+    SampleAddFeaturizer                     featurizer(CreateTestAnnotationMapsPtr(2));
+
+    featurizer.fit(input.data(), input.size());
+    featurizer.complete_training();
+
+    return featurizer.create_transformer();
 }
 
-TEST_CASE("Estimator") {
-    CHECK(Microsoft::Featurizer::SampleAdd::Estimator().fit(10).commit()->transform(20) == 30);
-    CHECK(Microsoft::Featurizer::SampleAdd::Estimator().fit(20).commit()->transform(1) == 21);
+#pragma clang diagnostic pop
 
-    CHECK(Microsoft::Featurizer::SampleAdd::Estimator().fit(10).fit(20).commit()->transform(20) == 50);
-    CHECK(Microsoft::Featurizer::SampleAdd::Estimator().fit(10).fit(20).fit(30).commit()->transform(20) == 80);
+TEST_CASE("SampleAddFeaturizer") {
+    CHECK(Train({10})->execute(20) == 30);
+    CHECK(Train({20})->execute(1) == 21);
+
+    CHECK(Train({10, 20})->execute(20) == 50);
+    CHECK(Train({10, 20, 30})->execute(20) == 80);
 }

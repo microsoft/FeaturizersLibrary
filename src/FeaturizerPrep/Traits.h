@@ -20,17 +20,17 @@ namespace Traits {
 ///  \brief         We have a range of of types we are dealing with. Many types
 ///                 have different ways to represent what a `NULL` value is
 ///                 (float has NAN for example) as well as different ways to
-///                 convert the value to a string representation. By using 
+///                 convert the value to a string representation. By using
 ///                 templates combined with partial template specialization
 ///                 we can handle scenarios like these that vary based on the data type.
-///                 
+///
 ///                 Example: This allows us to do things like `Traits<std::int8_t>::IsNull()`
 ///                 and `Traits<float>::IsNull()` and let the trait itself deal with the
 ///                 actual implementation and allows us as developers to not worry about that.
-///                 
-///                 This benefit is magnified because we are also using templates for our 
+///
+///                 This benefit is magnified because we are also using templates for our
 ///                 transformers. When we declare that a transformer has type T = std::int8_t,
-///                 we can then also use `Traits<T>::IsNull()` and the compiler will know that 
+///                 we can then also use `Traits<T>::IsNull()` and the compiler will know that
 ///                 `T` is a `std::int8_t` and call the appropate template specialization.
 ///
 template <typename T>
@@ -44,7 +44,7 @@ struct Traits {};
 ///                 defined there. If you have methods defined in that base template,
 ///                 it makes it very difficult to debug what is going on. By
 ///                 putting no implementation in the `Traits<>` template and
-///                 having the real base struct be `TraitsImpl<>`, if you try and 
+///                 having the real base struct be `TraitsImpl<>`, if you try and
 ///                 specify a trait that doesn't have a specilization, the compiler
 ///                 can detect that and throw an error during compilation.
 ///
@@ -64,11 +64,14 @@ struct TraitsImpl {
 template <>
 struct Traits<bool> : public TraitsImpl<bool> {
     static std::string const & ToString(bool const& value) {
-        #pragma clang diagnostic push
-        #pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+
         static std::string const _TRUE_VALUE("True");
         static std::string const _FALSE_VALUE("False");
-        #pragma clang diagnostic pop
+
+#pragma clang diagnostic pop
+
         return value != 0 ? _TRUE_VALUE : _FALSE_VALUE;
     }
 };
@@ -178,7 +181,7 @@ struct Traits <std::array<T, size>> : public TraitsImpl<std::array<T, size>> {
     static std::string ToString(std::array<T, size> const& value) {
         std::ostringstream streamObj;
         streamObj << "[";
-        
+
         for (unsigned int count = 0; count < size - 1; ++count)
         {
             streamObj << Traits<T>::ToString (value[count]) << ",";
@@ -194,7 +197,7 @@ struct Traits<std::vector<T, AllocatorT>> : public TraitsImpl<std::vector<T, All
     static std::string ToString(std::vector<T, AllocatorT> const& value) {
         std::ostringstream streamObj;
         streamObj << "[";
-       
+
         for (unsigned int count = 0; count < value.size() - 1; ++count)
         {
             streamObj << Traits<T>::ToString(value.at(count)) << ",";
@@ -209,11 +212,11 @@ struct Traits<std::map<KeyT, T, CompareT, AllocatorT>> : public TraitsImpl<std::
     static std::string ToString(std::map<KeyT, T, CompareT, AllocatorT> const& value) {
         std::ostringstream streamObj;
         streamObj << "{";
-       
+
         for (auto it = value.cbegin(); it != value.cend(); ++it)
         {
             streamObj << Traits<KeyT>::ToString(it->first) << ":" <<  Traits<T>::ToString(it->second);
-            if (std::next(it) != value.cend()) 
+            if (std::next(it) != value.cend())
             {
                 streamObj << ",";
             }
@@ -229,7 +232,7 @@ struct Traits <boost::optional<T>> : public TraitsImpl<boost::optional<T>> {
     static std::string ToString(nullable_type const& value) {
     if (value) {
         return Traits<T>::ToString(value.get());
-    }   
+    }
         return "NULL";
     }
 };

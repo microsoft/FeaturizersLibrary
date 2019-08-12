@@ -6,35 +6,63 @@
 
 namespace Microsoft {
 namespace Featurizer {
-namespace SampleAdd {
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         SampleAddTransformer
+///  \brief         Adds a delta to the provided value.
+///
+class SampleAddTransformer : public SampleAddFeaturizer::BaseType::Transformer {
+public:
+    // ----------------------------------------------------------------------
+    // |  Public Data
+    std::uint32_t const                     Delta;
+
+    // ----------------------------------------------------------------------
+    // |  Public Methods
+    SampleAddTransformer(std::uint32_t delta) :
+        Delta(delta) {
+    }
+
+    ~SampleAddTransformer(void) override = default;
+
+    SampleAddTransformer(SampleAddTransformer const &) = delete;
+    SampleAddTransformer & operator =(SampleAddTransformer const &) = delete;
+
+    SampleAddTransformer(SampleAddTransformer &&) = default;
+    SampleAddTransformer & operator =(SampleAddTransformer &&) = delete;
+
+    TransformedType execute(InputType input) override {
+        return input + Delta;
+    }
+};
 
 // ----------------------------------------------------------------------
 // |
-// |  Transformer
+// |  SampleAddFeaturizer
 // |
 // ----------------------------------------------------------------------
-Transformer::Transformer(std::uint16_t delta) :
-    _delta(delta) {
+SampleAddFeaturizer::SampleAddFeaturizer(AnnotationMapsPtr pAllColumnAnnotations) :
+    BaseType("SampleAddFeaturizer", std::move(pAllColumnAnnotations)) {
 }
 
-Transformer::return_type Transformer::transform(arg_type const &arg) const /*override*/ {
-    return _delta + arg;
+SampleAddFeaturizer::FitResult SampleAddFeaturizer::fit_impl(InputType const *pBuffer, size_t cBuffer, boost::optional<std::uint64_t> const &) /*override*/ {
+    InputType const * const                 pEndBuffer(pBuffer + cBuffer);
+
+    while(pBuffer != pEndBuffer) {
+        _accumulated_delta += *pBuffer;
+        ++pBuffer;
+    }
+
+    return FitResult::Continue;
 }
 
-// ----------------------------------------------------------------------
-// |
-// |  Estimator
-// |
-// ----------------------------------------------------------------------
-Estimator & Estimator::fit_impl(apache_arrow const &data) /*override*/ {
-    _accumulated_delta += static_cast<std::uint16_t>(data);
-    return *this;
+void SampleAddFeaturizer::complete_training_impl(void) /*override*/ {
+    // Nothing to do here
 }
 
-Estimator::TransformerUniquePtr Estimator::commit_impl(void) /*override*/ {
-    return std::make_unique<SampleAdd::Transformer>(_accumulated_delta);
+SampleAddFeaturizer::TransformerPtr SampleAddFeaturizer::create_transformer_impl(void) /*override*/ {
+    return std::make_shared<SampleAddTransformer>(_accumulated_delta);
 }
 
-} // namespace SampleAdd
 } // namespace Featurizer
 } // namespace Microsoft

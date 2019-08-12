@@ -4,85 +4,103 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include "../Featurizer.h"
 #include <chrono>
 #include <ctime>
 #include <cstdint>
 #include <stdexcept>
 
+#include "../InferenceOnlyFeaturizerImpl.h"
+
 namespace Microsoft {
 namespace Featurizer {
 
 /////////////////////////////////////////////////////////////////////////
-///  \namespace     DateTimeTransformer
-///  \brief         A Transformer that takes a chrono::system_clock::time_point and
-///                 returns a struct with all the data split out. 
+///  \struct        TimePoint
+///  \brief         Struct to hold various components of DateTime information
 ///
-namespace DateTimeFeaturizer {
+struct TimePoint {
+    std::int32_t year = 0;
+    std::uint8_t month = 0;         /* 1-12 */
+    std::uint8_t day = 0;           /* 1-31 */
+    std::uint8_t hour = 0;          /* 0-23 */
+    std::uint8_t minute = 0;        /* 0-59 */
+    std::uint8_t second = 0;        /* 0-59 */
+    std::uint8_t dayOfWeek = 0;     /* 0-6 */
+    std::uint16_t dayOfYear = 0;    /* 0-365 */
+    std::uint8_t quarterOfYear = 0; /* 1-4 */
+    std::uint8_t weekOfMonth = 0;   /* 0-4 */
 
-    /////////////////////////////////////////////////////////////////////////
-    ///  \struct        TimePoint
-    ///  \brief         Struct to hold various components of DateTime information 
-    ///
-    struct TimePoint {
-        std::int32_t year = 0;
-        std::uint8_t month = 0;         /* 1-12 */
-        std::uint8_t day = 0;           /* 1-31 */
-        std::uint8_t hour = 0;          /* 0-23 */
-        std::uint8_t minute = 0;        /* 0-59 */
-        std::uint8_t second = 0;        /* 0-59 */
-        std::uint8_t dayOfWeek = 0;     /* 0-6 */
-        std::uint16_t dayOfYear = 0;    /* 0-365 */
-        std::uint8_t quarterOfYear = 0; /* 1-4 */
-        std::uint8_t weekOfMonth = 0;   /* 0-4 */
+    TimePoint(const std::chrono::system_clock::time_point& sysTime);
 
-        TimePoint(const std::chrono::system_clock::time_point& sysTime);
+    TimePoint(TimePoint const &) = delete;
+    TimePoint & operator =(TimePoint const &) = delete;
 
-        TimePoint(TimePoint&&) = default;
-        TimePoint(const TimePoint&) = delete;
-        TimePoint& operator=(const TimePoint&) = delete;
+    TimePoint(TimePoint &&) = default;
+    TimePoint & operator =(TimePoint &&) = delete;
 
-        enum { 
-            JANUARY = 1, FEBRUARY, MARCH, APRIL, MAY, JUNE, 
-            JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER
-        };
-        enum {
-            SUNDAY = 0, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY
-        };
+    enum {
+        JANUARY = 1, FEBRUARY, MARCH, APRIL, MAY, JUNE,
+        JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER
     };
-
-    inline TimePoint SystemToDPTimePoint(const std::chrono::system_clock::time_point& sysTime) {
-        return TimePoint (sysTime);
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-    ///  \class         DateTimeTransformer
-    ///  \brief         Transformer
-    ///
-    class Transformer : public Microsoft::Featurizer::Transformer<Microsoft::Featurizer::DateTimeFeaturizer::TimePoint, std::chrono::system_clock::time_point> {
-        public:
-            Transformer(void) = default;
-            ~Transformer(void) override = default;
-
-            Transformer(Transformer const &) = delete;
-            Transformer & operator =(Transformer const &) = delete;
-
-            Transformer(Transformer &&) = default;
-            Transformer & operator =(Transformer &&) = delete;
-
-            return_type transform(arg_type const &arg) const override;
-
-        private:
-        // ----------------------------------------------------------------------
-        // |  Relationships
-        friend class boost::serialization::access;
-
-        // ----------------------------------------------------------------------
-        // |  Private Methods
-        template <typename ArchiveT>
-        void serialize(ArchiveT &ar, unsigned int const version);
+    enum {
+        SUNDAY = 0, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY
     };
+};
 
-} // Namespace DateTimeFeaturizer
+/////////////////////////////////////////////////////////////////////////
+///  \class         DateTimeTransformer
+///  \brief         A Transformer that takes a chrono::system_clock::time_point and
+///                 returns a struct with all the data split out.
+///
+class DateTimeTransformer : public TransformerEstimator<std::chrono::system_clock::time_point, TimePoint>::Transformer {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = TransformerEstimator<std::chrono::system_clock::time_point, TimePoint>::Transformer;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    DateTimeTransformer(void) = default;
+    ~DateTimeTransformer(void) override = default;
+
+    DateTimeTransformer(DateTimeTransformer const &) = delete;
+    DateTimeTransformer & operator =(DateTimeTransformer const &) = delete;
+
+    DateTimeTransformer(DateTimeTransformer &&) = default;
+    DateTimeTransformer & operator =(DateTimeTransformer &&) = delete;
+
+    TransformedType execute(InputType input) override;
+};
+
+class DateTimeFeaturizer : public InferenceOnlyFeaturizerImpl<DateTimeTransformer> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = InferenceOnlyFeaturizerImpl<DateTimeTransformer>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    DateTimeFeaturizer(AnnotationMapsPtr pAllColumnAnnotations);
+    ~DateTimeFeaturizer(void) override = default;
+
+    DateTimeFeaturizer(DateTimeFeaturizer const &) = delete;
+    DateTimeFeaturizer & operator =(DateTimeFeaturizer const &) = delete;
+
+    DateTimeFeaturizer(DateTimeFeaturizer &&) = default;
+    DateTimeFeaturizer & operator =(DateTimeFeaturizer &&) = delete;
+};
+
 } // Namespace Featurizer
 } // Namespace Microsoft
