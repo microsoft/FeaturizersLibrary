@@ -54,6 +54,10 @@ TimePoint::TimePoint(const std::chrono::system_clock::time_point& sysTime) {
 // |  DateTimeTransformer
 // |
 // ----------------------------------------------------------------------
+DateTimeTransformer::DateTimeTransformer(Archive &ar) :
+    BaseType(ar) {
+}
+
 DateTimeTransformer::TransformedType DateTimeTransformer::execute(InputType input) /*override*/ {
     return TimePoint(input);
 }

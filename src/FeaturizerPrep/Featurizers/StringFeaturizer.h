@@ -15,7 +15,7 @@ namespace Featurizer {
 ///  \brief         Converts input into strings.
 ///
 template <typename T>
-class StringTransformer : public TransformerEstimator<T, std::string>::Transformer {
+class StringTransformer : public InferenceOnlyTransformerImpl<T, std::string> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -24,7 +24,7 @@ public:
     // ----------------------------------------------------------------------
     using Type                              = T;
     using ThisType                          = StringTransformer<Type>;
-    using BaseType                          = typename TransformerEstimator<Type, std::string>::Transformer;
+    using BaseType                          = InferenceOnlyTransformerImpl<Type, std::string>;
 
     // ----------------------------------------------------------------------
     // |
@@ -32,6 +32,8 @@ public:
     // |
     // ----------------------------------------------------------------------
     StringTransformer(void) = default;
+    StringTransformer(Archive &ar);
+
     ~StringTransformer(void) override = default;
 
     StringTransformer(StringTransformer const &) = delete;
@@ -86,8 +88,13 @@ public:
 // |
 // ----------------------------------------------------------------------
 template <typename T>
+StringTransformer<T>::StringTransformer(Archive &ar) :
+    BaseType(ar) {
+}
+
+template <typename T>
 typename StringTransformer<T>::BaseType::TransformedType StringTransformer<T>::execute(typename BaseType::InputType input) /*override*/ {
-    return Traits::Traits<T>::ToString(input);
+    return Traits<T>::ToString(input);
 }
 
 // ----------------------------------------------------------------------

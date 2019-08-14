@@ -13,6 +13,10 @@
 namespace Microsoft {
 namespace Featurizer {
 
+// ----------------------------------------------------------------------
+// |  Forward Declarations
+class Archive; // Defined in Archive.h
+
 /////////////////////////////////////////////////////////////////////////
 ///  \class         Annotation
 ///  \brief         Base class for an individual datum associated with a column that is produced
@@ -360,14 +364,9 @@ public:
 
         // ----------------------------------------------------------------------
         // |  Public Methods
-
-        // TODO: Add a method that can be used to create a derived transformer from
-        //       persistent state.
-        //
-        // template <typename DerivedTransformerT>
-        // static std::shared_ptr<DerivedTransformerT> Create(??? persisted_state);
-
         Transformer(void) = default;
+        Transformer(Archive &ar);
+
         virtual ~Transformer(void) = default;
 
         Transformer(Transformer const &) = delete;
@@ -382,9 +381,12 @@ public:
         ///
         virtual TransformedType execute(InputType input) = 0;
 
-        // TODO: Add a method that can be used to save state
-        //
-        //     virtual ??? PersistState(???) const = 0;
+        /////////////////////////////////////////////////////////////////////////
+        ///  \function      save
+        ///  \brief         Saves the state of the object so it can be reconstructed
+        ///                 at a later time.
+        ///
+        virtual void save(Archive &ar) const = 0;
     };
 
     using TransformerPtr                    = std::shared_ptr<Transformer>;

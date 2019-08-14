@@ -12,9 +12,13 @@
 using Microsoft::Featurizer::CreateTestAnnotationMapsPtr;
 // ----------------------------------------------------------------------
 
-class MyTransformer : public Microsoft::Featurizer::TransformerEstimator<int, bool>::Transformer {
+class MyTransformer : public Microsoft::Featurizer::InferenceOnlyTransformerImpl<int, bool> {
 public:
     MyTransformer(void) = default;
+    MyTransformer(Microsoft::Featurizer::Archive &ar) :
+        Microsoft::Featurizer::InferenceOnlyTransformerImpl<int, bool>(ar) {
+    }
+
     ~MyTransformer(void) override = default;
 
     MyTransformer(MyTransformer const &) = delete;

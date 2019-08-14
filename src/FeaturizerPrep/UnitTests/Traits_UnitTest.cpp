@@ -4,10 +4,13 @@
 // ----------------------------------------------------------------------
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+
 #include "../Traits.h"
+#include "../Archive.h"
+
 #include <type_traits>
 
-using namespace Microsoft::Featurizer::Traits;
+using namespace Microsoft::Featurizer;
 
 // Floating point values
 static_assert(std::is_same<Traits<float>::nullable_type, float>::value, "Incorrect nullable type for float");
@@ -29,7 +32,6 @@ static_assert(std::is_same<Traits<std::array<char, 4>>::nullable_type, boost::op
 static_assert(std::is_same<Traits<bool>::nullable_type, boost::optional<bool>>::value, "Incorrect nullable type for std::string");
 static_assert(std::is_same<Traits<std::map<int,int>>::nullable_type, boost::optional<std::map<int,int>>>::value, "Incorrect nullable type for std::string");
 static_assert(std::is_same<Traits<std::vector<int>>::nullable_type, boost::optional<std::vector<int>>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<std::function<int>>::nullable_type, boost::optional<std::function<int>>>::value, "Incorrect nullable type for std::string");
 static_assert(std::is_same<Traits<boost::optional<int>>::nullable_type, boost::optional<int>>::value, "Incorrect nullable type for std::string");
 static_assert(std::is_same<Traits<std::tuple<int>>::nullable_type, boost::optional<std::tuple<int>>>::value, "Incorrect nullable type for std::string");
 
@@ -89,7 +91,7 @@ TEST_CASE("Transformer_Numbers") {
 TEST_CASE("Transformer_Arrays") {
     std::array<std::double_t, 4> arr{ 1.3,2,-306.2,0.04 };
     std::string arr_s{ "[1.3,2,-306.2,0.04]" };
-    CHECK(Traits<std::array<std::double_t, 4>>::ToString(arr) == arr_s);  
+    CHECK(Traits<std::array<std::double_t, 4>>::ToString(arr) == arr_s);
 
     //array<optional>
     boost::optional<std::double_t> arg_null;
@@ -109,7 +111,7 @@ TEST_CASE("Transformer_Arrays") {
 TEST_CASE("Transformer_Vectors") {
     std::vector<std::double_t> vect{ 1.03, -20.1, 305.8 };
     std::string vect_s{ "[1.03,-20.1,305.8]" };
-	CHECK(Traits<std::vector<std::double_t>>::ToString(vect) == vect_s); 
+	CHECK(Traits<std::vector<std::double_t>>::ToString(vect) == vect_s);
 
 	//vector<optional>
 	boost::optional<std::int8_t> arg_null;
@@ -125,16 +127,16 @@ TEST_CASE("Transformer_Vectors") {
     std::string R2vect_res = Traits<std::vector<std::vector<std::vector<std::int16_t>>>>::ToString(R2vect);
     std::string Rvect_s{ "[[2,3,7,-9],[2,3,7,-9]]" };
     std::string R2vect_s{ "[[[2,3,7,-9],[2,3,7,-9]],[[2,3,7,-9],[2,3,7,-9]]]" };
-    CHECK( Rvect_res == Rvect_s);  
+    CHECK( Rvect_res == Rvect_s);
     CHECK( R2vect_res == R2vect_s);
 
-    //arrays in vectors  
+    //arrays in vectors
     std::array<std::double_t, 3> arrinvec{ 8.8,0.02,3643.7 };
     std::vector<std::array<std::double_t, 3>> vecwitharr;
     vecwitharr.push_back(arrinvec);
     std::string vecwitharr_s{"[[8.8,0.02,3643.7]]"};
     std::string vecwitharr_res = Traits<std::vector<std::array<std::double_t, 3>>>::ToString(vecwitharr);
-    CHECK(vecwitharr_res == vecwitharr_s); 
+    CHECK(vecwitharr_res == vecwitharr_s);
 }
 
 TEST_CASE("Transformer_Maps") {
@@ -143,17 +145,67 @@ TEST_CASE("Transformer_Maps") {
     m.insert(std::pair<std::int16_t, std::double_t>(93, 0.147));
     std::string map_res = Traits<std::map<std::int16_t, std::double_t>>::ToString(m);
     std::string map_s{ "{5:35.8,93:0.147}" };
-	CHECK(map_res == map_s);  
+	CHECK(map_res == map_s);
 }
 
 TEST_CASE("Transformer_Tuples") {
     std::tuple<int, std::string, double> tu(42, "hi", -3.14);
     std::string tu_res = Traits<std::tuple<int, std::string, double>>::ToString(tu);
     std::string tu_s{"(42,hi,-3.14)"};
-    std::cout << tu_res;
     CHECK(tu_res == tu_s);
 }
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
 
+template <typename T>
+bool SerializationTestImpl(T const &value) {
+    Archive                                 out;
 
+    Traits<T>::serialize(out, value);
 
+    Archive                                 in(out.commit());
+    T const                                 other(Traits<T>::deserialize(in));
+
+    return in.AtEnd() && other == value;
+}
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+
+TEST_CASE("Serialization") {
+    CHECK(SerializationTestImpl(true));
+    CHECK(SerializationTestImpl(static_cast<std::int8_t>(-23)));
+    CHECK(SerializationTestImpl(static_cast<std::int16_t>(-23)));
+    CHECK(SerializationTestImpl(static_cast<std::int32_t>(-23)));
+    CHECK(SerializationTestImpl(static_cast<std::int64_t>(-23)));
+    CHECK(SerializationTestImpl(static_cast<std::uint8_t>(23)));
+    CHECK(SerializationTestImpl(static_cast<std::uint16_t>(23)));
+    CHECK(SerializationTestImpl(static_cast<std::uint32_t>(23)));
+    CHECK(SerializationTestImpl(static_cast<std::uint64_t>(23)));
+    CHECK(SerializationTestImpl(static_cast<std::double_t>(3.14)));
+    CHECK(SerializationTestImpl(static_cast<std::float_t>(-3.14)));
+
+    CHECK(SerializationTestImpl(std::string()));
+    CHECK(SerializationTestImpl(std::string("Hello world!")));
+
+    CHECK(SerializationTestImpl(std::array<int, 2>{10, 20}));
+    CHECK(SerializationTestImpl(std::array<std::string, 2>{"1", "2"}));
+
+    CHECK(SerializationTestImpl(std::vector<int>()));
+    CHECK(SerializationTestImpl(std::vector<int>{1, 2, 3}));
+    CHECK(SerializationTestImpl(std::vector<std::string>{"one", "two", "three"}));
+
+    CHECK(SerializationTestImpl(std::map<int, std::string>()));
+    CHECK(SerializationTestImpl(std::map<int, std::string>{ {10, "ten"}, {20, "twenty"} }));
+    CHECK(SerializationTestImpl(std::map<std::string, int>{ {"ten", 10}, {"twenty", 20} }));
+
+    CHECK(SerializationTestImpl(boost::optional<int>()));
+    CHECK(SerializationTestImpl(boost::optional<int>(23)));
+    CHECK(SerializationTestImpl(boost::optional<std::string>("foo")));
+
+    CHECK(SerializationTestImpl(std::tuple<std::string, int, bool>("one", 2, true)));
+}

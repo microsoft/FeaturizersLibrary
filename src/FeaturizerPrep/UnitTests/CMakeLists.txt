@@ -27,9 +27,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 enable_testing()
 
 foreach(_test_name IN ITEMS
+    Archive_UnitTest
     Featurizer_UnitTest
     InferenceOnlyFeaturizerImpl_UnitTest
-    Traits_UnitTests
+    Traits_UnitTest
 )
     add_executable(${_test_name} ${_test_name}.cpp)
 

@@ -13,8 +13,10 @@ using Microsoft::Featurizer::SampleAddFeaturizer;
 using Microsoft::Featurizer::CreateTestAnnotationMapsPtr;
 // ----------------------------------------------------------------------
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wmissing-prototypes"
+#endif
 
 SampleAddFeaturizer::TransformerPtr Train(std::vector<std::uint16_t> const &input) {
     SampleAddFeaturizer                     featurizer(CreateTestAnnotationMapsPtr(2));
@@ -25,7 +27,9 @@ SampleAddFeaturizer::TransformerPtr Train(std::vector<std::uint16_t> const &inpu
     return featurizer.create_transformer();
 }
 
-#pragma clang diagnostic pop
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 TEST_CASE("SampleAddFeaturizer") {
     CHECK(Train({10})->execute(20) == 30);

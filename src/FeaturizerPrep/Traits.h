@@ -4,19 +4,25 @@
 // ----------------------------------------------------------------------
 
 #pragma once
+
+#include <array>
+#include <map>
+#include <string>
 #include <vector>
+
 #include <boost/optional.hpp>
 #include <boost/optional/optional_io.hpp>
-#include <map>
-#include <array>
-#include <string>
 
 namespace Microsoft {
 namespace Featurizer {
-namespace Traits {
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wdocumentation"
+#endif
 
 /////////////////////////////////////////////////////////////////////////
-///  \namespace     Traits
+///  \struct        Traits
 ///  \brief         We have a range of of types we are dealing with. Many types
 ///                 have different ways to represent what a `NULL` value is
 ///                 (float has NAN for example) as well as different ways to
@@ -31,21 +37,33 @@ namespace Traits {
 ///                 This benefit is magnified because we are also using templates for our
 ///                 transformers. When we declare that a transformer has type T = std::int8_t,
 ///                 we can then also use `Traits<T>::IsNull()` and the compiler will know that
-///                 `T` is a `std::int8_t` and call the appropate template specialization.
+///                 `T` is a `std::int8_t` and call the appropriate template specialization.
 ///
 template <typename T>
-struct Traits {};
+struct Traits {
+    // Each specialization should implement the following types and methods
+    //
+    //   // Types
+    //   - nullable_type
+    //
+    //   // Methods
+    //   - static bool IsNull(nullable_type const &value);
+    //   - static std::string ToString(T const &value);
+    //   - template <typename ArchiveT> static ArchiveT & serialize(ArchiveT &ar, T const &value);
+    //   - template <typename ArchiveT> static T deserialize(ArchiveT &ar);
+    //
+};
 
 /////////////////////////////////////////////////////////////////////////
-///  \namespace     Traits
-///  \brief         When using partial template specilization, if the compiler
-///                 cannot find a more specfic implementation of the template
+///  \struct        TraitsImpl
+///  \brief         When using partial template specialization, if the compiler
+///                 cannot find a more specific implementation of the template
 ///                 it will fall back to the base template and use whatever is
 ///                 defined there. If you have methods defined in that base template,
 ///                 it makes it very difficult to debug what is going on. By
 ///                 putting no implementation in the `Traits<>` template and
 ///                 having the real base struct be `TraitsImpl<>`, if you try and
-///                 specify a trait that doesn't have a specilization, the compiler
+///                 specify a trait that doesn't have a specialization, the compiler
 ///                 can detect that and throw an error during compilation.
 ///
 ///                 Example: There is no template `Traits<char>`. If you try and use it
@@ -61,18 +79,37 @@ struct TraitsImpl {
     }
 };
 
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+
 template <>
 struct Traits<bool> : public TraitsImpl<bool> {
     static std::string const & ToString(bool const& value) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wexit-time-destructors"
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
 
         static std::string const _TRUE_VALUE("True");
         static std::string const _FALSE_VALUE("False");
 
-#pragma clang diagnostic pop
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
         return value != 0 ? _TRUE_VALUE : _FALSE_VALUE;
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, bool const &value) {
+        return ar.serialize(value);
+    }
+
+    template <typename ArchiveT>
+    static bool deserialize(ArchiveT &ar) {
+        return ar.template deserialize<bool>();
     }
 };
 
@@ -81,12 +118,32 @@ struct Traits<std::int8_t> : public TraitsImpl<std::int8_t> {
     static std::string ToString(std::int8_t const& value) {
         return std::to_string(value);
     }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::int8_t const &value) {
+        return ar.serialize(value);
+    }
+
+    template <typename ArchiveT>
+    static std::int8_t deserialize(ArchiveT &ar) {
+        return ar.template deserialize<std::int8_t>();
+    }
 };
 
 template <>
 struct Traits<std::int16_t> : public TraitsImpl<std::int16_t> {
     static std::string ToString(std::int16_t const& value) {
         return std::to_string(value);
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::int16_t const &value) {
+        return ar.serialize(value);
+    }
+
+    template <typename ArchiveT>
+    static std::int16_t deserialize(ArchiveT &ar) {
+        return ar.template deserialize<std::int16_t>();
     }
 };
 
@@ -95,12 +152,32 @@ struct Traits<std::int32_t> : public TraitsImpl<std::int32_t> {
     static std::string ToString(std::int32_t const& value) {
         return std::to_string(value);
     }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::int32_t const &value) {
+        return ar.serialize(value);
+    }
+
+    template <typename ArchiveT>
+    static std::int32_t deserialize(ArchiveT &ar) {
+        return ar.template deserialize<std::int32_t>();
+    }
 };
 
 template <>
 struct Traits<std::int64_t> : public TraitsImpl<std::int64_t> {
     static std::string ToString(std::int64_t const& value) {
         return std::to_string(value);
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::int64_t const &value) {
+        return ar.serialize(value);
+    }
+
+    template <typename ArchiveT>
+    static std::int64_t deserialize(ArchiveT &ar) {
+        return ar.template deserialize<std::int64_t>();
     }
 };
 
@@ -109,12 +186,32 @@ struct Traits<std::uint8_t> : public TraitsImpl<std::uint8_t> {
     static std::string ToString(std::uint8_t const& value) {
         return std::to_string(value);
     }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::uint8_t const &value) {
+        return ar.serialize(value);
+    }
+
+    template <typename ArchiveT>
+    static std::uint8_t deserialize(ArchiveT &ar) {
+        return ar.template deserialize<std::uint8_t>();
+    }
 };
 
 template <>
 struct Traits<std::uint16_t> : public TraitsImpl<std::uint16_t> {
     static std::string ToString(std::uint16_t const& value) {
          return std::to_string(value);
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::uint16_t const &value) {
+        return ar.serialize(value);
+    }
+
+    template <typename ArchiveT>
+    static std::uint16_t deserialize(ArchiveT &ar) {
+        return ar.template deserialize<std::uint16_t>();
     }
 };
 
@@ -123,12 +220,32 @@ struct Traits<std::uint32_t> : public TraitsImpl<std::uint32_t> {
     static std::string ToString(std::uint32_t const& value) {
         return std::to_string(value);
     }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::uint32_t const &value) {
+        return ar.serialize(value);
+    }
+
+    template <typename ArchiveT>
+    static std::uint32_t deserialize(ArchiveT &ar) {
+        return ar.template deserialize<std::uint32_t>();
+    }
 };
 
 template <>
 struct Traits<std::uint64_t> : public TraitsImpl<std::uint64_t> {
     static std::string ToString(std::uint64_t const& value) {
         return std::to_string(value);
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::uint64_t const &value) {
+        return ar.serialize(value);
+    }
+
+    template <typename ArchiveT>
+    static std::uint64_t deserialize(ArchiveT &ar) {
+        return ar.template deserialize<std::uint64_t>();
     }
 };
 
@@ -148,6 +265,16 @@ struct Traits<std::float_t> : public TraitsImpl<std::float_t> {
         streamObj << value;
         return streamObj.str();
     }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::float_t const &value) {
+        return ar.serialize(value);
+    }
+
+    template <typename ArchiveT>
+    static std::float_t deserialize(ArchiveT &ar) {
+        return ar.template deserialize<std::float_t>();
+    }
 };
 
 template <>
@@ -166,6 +293,16 @@ struct Traits<std::double_t> : public TraitsImpl<std::double_t> {
         streamObj << value;
         return streamObj.str();
     }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::double_t const &value) {
+        return ar.serialize(value);
+    }
+
+    template <typename ArchiveT>
+    static std::double_t deserialize(ArchiveT &ar) {
+        return ar.template deserialize<std::double_t>();
+    }
 };
 
 template <>
@@ -173,37 +310,118 @@ struct Traits<std::string> : public TraitsImpl<std::string> {
     static std::string const & ToString(std::string const& value) {
         return value;
     }
-};
 
-//TODO:unify vector and array
-template <typename T, size_t size>
-struct Traits <std::array<T, size>> : public TraitsImpl<std::array<T, size>> {
-    static std::string ToString(std::array<T, size> const& value) {
-        std::ostringstream streamObj;
-        streamObj << "[";
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::string const &value) {
+        ar.serialize(static_cast<std::uint32_t>(value.size()));
 
-        for (unsigned int count = 0; count < size - 1; ++count)
-        {
-            streamObj << Traits<T>::ToString (value[count]) << ",";
+        if(value.empty() == false)
+            ar.serialize(reinterpret_cast<unsigned char const *>(value.data()), value.size());
+
+        return ar;
+    }
+
+    template <typename ArchiveT>
+    static std::string deserialize(ArchiveT &ar) {
+        std::string                         result;
+        std::uint32_t const                 size(ar.template deserialize<std::uint32_t>());
+
+        if(size != 0) {
+            char const * const     pBuffer(reinterpret_cast<char const *>(ar.get_buffer_ptr()));
+
+            ar.update_buffer_ptr(size);
+
+            std::copy(pBuffer, pBuffer + size, std::back_inserter(result));
         }
-        streamObj << Traits<T>::ToString (value.back()) << "]";
-        return streamObj.str();
+
+        return result;
     }
 };
 
-//TODO:unify vector and array
+namespace {
+
+template <typename T>
+std::string ToStringImpl(T const *pBuffer, size_t cBuffer) {
+    std::ostringstream streamObj;
+
+    streamObj << "[";
+
+    if(cBuffer != 0) {
+        T const * const                     pNextToLastElement(pBuffer + cBuffer - 1);
+
+        while(pBuffer != pNextToLastElement) {
+            streamObj << Traits<T>::ToString(*pBuffer) << ",";
+            ++pBuffer;
+        }
+
+        streamObj << Traits<T>::ToString(*pBuffer);
+    }
+
+    streamObj << "]";
+    return streamObj.str();
+}
+
+} // anonymous namespace
+
+template <typename T, size_t ArrayV>
+struct Traits<std::array<T, ArrayV>> : public TraitsImpl<std::array<T, ArrayV>> {
+    static std::string ToString(std::array<T, ArrayV> const& value) {
+        return ToStringImpl(value.data(), value.size());
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::array<T, ArrayV> const &value) {
+        for(auto const &item : value) {
+            Traits<T>::serialize(ar, item);
+        }
+
+        return ar;
+    }
+
+    template <typename ArchiveT>
+    static std::array<T, ArrayV> deserialize(ArchiveT &ar) {
+        std::array<T, ArrayV>               result;
+
+        for(auto &item : result) {
+            item = Traits<T>::deserialize(ar);
+        }
+
+        return result;
+    }
+};
+
 template <typename T, typename AllocatorT>
 struct Traits<std::vector<T, AllocatorT>> : public TraitsImpl<std::vector<T, AllocatorT>> {
     static std::string ToString(std::vector<T, AllocatorT> const& value) {
-        std::ostringstream streamObj;
-        streamObj << "[";
+        return ToStringImpl(value.data(), value.size());
+    }
 
-        for (unsigned int count = 0; count < value.size() - 1; ++count)
-        {
-            streamObj << Traits<T>::ToString(value.at(count)) << ",";
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::vector<T, AllocatorT> const &value) {
+        ar.serialize(static_cast<std::uint32_t>(value.size()));
+
+        for(auto const &item: value) {
+            Traits<T>::serialize(ar, item);
         }
-        streamObj << Traits<T>::ToString(value.back()) << "]";
-        return streamObj.str();
+
+        return ar;
+    }
+
+    template <typename ArchiveT>
+    static std::vector<T, AllocatorT> deserialize(ArchiveT &ar) {
+        std::vector<T, AllocatorT>          result;
+        std::uint32_t                       size(ar.template deserialize<std::uint32_t>());
+
+        if(size != 0) {
+            result.reserve(size);
+
+            while(size) {
+                result.emplace_back(Traits<T>::deserialize(ar));
+                --size;
+            }
+        }
+
+        return result;
     }
 };
 
@@ -224,54 +442,143 @@ struct Traits<std::map<KeyT, T, CompareT, AllocatorT>> : public TraitsImpl<std::
         streamObj << "}";
         return streamObj.str();
     }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::map<KeyT, T, CompareT, AllocatorT> const &value) {
+        ar.serialize(static_cast<std::uint32_t>(value.size()));
+
+        for(auto const &kvp : value) {
+            Traits<KeyT>::serialize(ar, kvp.first);
+            Traits<T>::serialize(ar, kvp.second);
+        }
+
+        return ar;
+    }
+
+    template <typename ArchiveT>
+    static std::map<KeyT, T, CompareT, AllocatorT> deserialize(ArchiveT &ar) {
+        using MapType                       = std::map<KeyT, T, CompareT, AllocatorT>;
+
+        MapType                             result;
+        std::uint32_t                       size(ar.template deserialize<std::uint32_t>());
+
+        while(size) {
+            std::pair<typename MapType::iterator, bool> const               rval(
+                result.emplace(
+                    [&ar](void) -> std::pair<KeyT, T> {
+                        KeyT                key(Traits<KeyT>::deserialize(ar));
+                        T                   value(Traits<T>::deserialize(ar));
+
+                        return std::make_pair(std::move(key), std::move(value));
+                    }()
+                )
+            );
+
+            if(rval.first == result.end() || rval.second == false)
+                throw std::runtime_error("Invalid map insertion");
+
+            --size;
+        }
+
+        return result;
+    }
 };
 
 template <typename T>
-struct Traits <boost::optional<T>> : public TraitsImpl<boost::optional<T>> {
+struct Traits<boost::optional<T>> : public TraitsImpl<boost::optional<T>> {
     using nullable_type = boost::optional<T>;
+
     static std::string ToString(nullable_type const& value) {
-    if (value) {
-        return Traits<T>::ToString(value.get());
-    }
+        if (value) {
+            return Traits<T>::ToString(value.get());
+        }
         return "NULL";
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, boost::optional<T> const &value) {
+        ar.serialize(static_cast<bool>(value));
+
+        if(value)
+            Traits<T>::serialize(ar, *value);
+
+        return ar;
+    }
+
+    template <typename ArchiveT>
+    static boost::optional<T> deserialize(ArchiveT &ar) {
+        boost::optional<T>                  result;
+
+        if(ar.template deserialize<bool>())
+            result = Traits<T>::deserialize(ar);
+
+        return result;
     }
 };
 
-template <typename ... Types>
-struct Traits <std::tuple<Types...>> : public TraitsImpl<std::tuple<Types...>> {
+template <typename... Types>
+struct Traits<std::tuple<Types...>> : public TraitsImpl<std::tuple<Types...>> {
     static std::string ToString(std::tuple<Types ...> const& value) {
         std::ostringstream streamObj;
         streamObj << "(";
-        ToStringHelper(value, streamObj);
+        ToStringHelper<0>(value, streamObj);
         streamObj << ")";
         return streamObj.str();
     }
 
-private:
-    template<std::size_t N = 0, typename ... Types>
-    static inline typename std::enable_if<N < sizeof...(Types) - 1, void>::type
-    ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj) {
-        using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
-        streamObj << Traits<type>::ToString(std::get<N>(value)) << ",";
-        ToStringHelper<N+1, Types...>(value, streamObj);
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::tuple<Types...> const &value) {
+        SerializeHelper<0>(ar, value);
+        return ar;
     }
 
-    template<std::size_t N = 0, typename ... Types>
-    static inline typename std::enable_if<N == (sizeof...(Types) - 1), void>::type
-    ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj)
-    {
+    template <typename ArchiveT>
+    static std::tuple<Types...> deserialize(ArchiveT &ar) {
+        std::tuple<Types...>                result;
+
+        DeserializeHelper<0>(ar, result);
+        return result;
+    }
+
+private:
+    template<std::size_t N> static inline std::enable_if_t<N < sizeof...(Types) - 1> ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
+
+        streamObj << Traits<type>::ToString(std::get<N>(value)) << ",";
+        ToStringHelper<N + 1>(value, streamObj);
+    }
+
+    template<std::size_t N> static inline std::enable_if_t<N == (sizeof...(Types) - 1)> ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj) {
+        using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
+
         streamObj << Traits<type>::ToString(std::get<N>(value));
     }
-};
 
-//TODO: Function Types:Estimator-to-Transformer Conversion
-template <typename ... Types>
-struct Traits <std::function<Types...>> : public TraitsImpl<std::function<Types...>> {
-    // static std::string ToString(std::function<Types ...> const& value) {
-    //     // Decide what to return here
-    //     throw std::logic_error("Function not yet implemented");
-    // }
+    template <std::size_t N, typename ArchiveT> static inline std::enable_if_t<N < sizeof...(Types) - 1> SerializeHelper(ArchiveT &ar, std::tuple<Types...> const &value) {
+        using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
+
+        Traits<type>::serialize(ar, std::get<N>(value));
+        SerializeHelper<N + 1>(ar, value);
+    }
+
+    template <std::size_t N, typename ArchiveT> static inline std::enable_if_t<N == sizeof...(Types) - 1> SerializeHelper(ArchiveT &ar, std::tuple<Types...> const &value) {
+        using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
+
+        Traits<type>::serialize(ar, std::get<N>(value));
+    }
+
+    template <std::size_t N, typename ArchiveT> static inline std::enable_if_t<N < sizeof...(Types) - 1> DeserializeHelper(ArchiveT &ar, std::tuple<Types...> &value) {
+        using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
+
+        std::get<N>(value) = Traits<type>::deserialize(ar);
+        DeserializeHelper<N + 1>(ar, value);
+    }
+
+    template <std::size_t N, typename ArchiveT> static inline std::enable_if_t<N == sizeof...(Types) - 1> DeserializeHelper(ArchiveT &ar, std::tuple<Types...> &value) {
+        using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
+
+        std::get<N>(value) = Traits<type>::deserialize(ar);
+    }
 };
 
 //TODO:DateTime type (represented by 64bit delta from TBD epoch)
@@ -279,6 +586,5 @@ struct Traits <std::function<Types...>> : public TraitsImpl<std::function<Types.
 //TODO:Apache Arrow
 //TODO:Type Modifiers?
 
-} // namespace Traits
 } // namespace Featurizer
 } // namespace Microsoft

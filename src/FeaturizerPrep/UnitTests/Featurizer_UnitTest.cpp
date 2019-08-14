@@ -186,6 +186,10 @@ public:
         bool execute(int value) override {
             return value & 1;
         }
+
+        void save(Microsoft::Featurizer::Archive &) const override {
+            // Nothing to do here
+        }
     };
 
     // ----------------------------------------------------------------------

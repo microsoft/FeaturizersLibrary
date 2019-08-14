@@ -4,6 +4,8 @@
 // ----------------------------------------------------------------------
 #include "SampleAdd.h"
 
+#include "../Archive.h"
+
 namespace Microsoft {
 namespace Featurizer {
 
@@ -23,6 +25,10 @@ public:
         Delta(delta) {
     }
 
+    SampleAddTransformer(Archive &ar) :
+        Delta(ar.deserialize<decltype(Delta)>()) {
+    }
+
     ~SampleAddTransformer(void) override = default;
 
     SampleAddTransformer(SampleAddTransformer const &) = delete;
@@ -33,6 +39,10 @@ public:
 
     TransformedType execute(InputType input) override {
         return input + Delta;
+    }
+
+    void save(Archive &ar) const override {
+        ar.serialize(Delta);
     }
 };
 

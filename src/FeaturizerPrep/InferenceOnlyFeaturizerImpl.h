@@ -10,6 +10,45 @@ namespace Microsoft {
 namespace Featurizer {
 
 /////////////////////////////////////////////////////////////////////////
+///  \class         InferenceOnlyTransformerImpl
+///  \brief         Implements functionality common to a `Transformer`
+///                 associated with a `Featurizer` that doesn't generate
+///                 state during training.
+///
+template <typename InputT, typename TransformedT>
+class InferenceOnlyTransformerImpl : public TransformerEstimator<InputT, TransformedT>::Transformer {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using InputType                         = InputT;
+    using TransformedType                   = TransformedT;
+
+    using ThisType                          = InferenceOnlyTransformerImpl<InputType, TransformedType>;
+    using BaseType                          = typename TransformerEstimator<InputType, TransformedType>::Transformer;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    InferenceOnlyTransformerImpl(void) = default;
+    InferenceOnlyTransformerImpl(Archive &ar);
+
+    ~InferenceOnlyTransformerImpl(void) override = default;
+
+    InferenceOnlyTransformerImpl(InferenceOnlyTransformerImpl const &) = delete;
+    InferenceOnlyTransformerImpl & operator =(InferenceOnlyTransformerImpl const &) = delete;
+
+    InferenceOnlyTransformerImpl(InferenceOnlyTransformerImpl &&) = default;
+    InferenceOnlyTransformerImpl & operator =(InferenceOnlyTransformerImpl &&) = delete;
+
+    void save(Archive &ar) const override;
+};
+
+/////////////////////////////////////////////////////////////////////////
 ///  \class         InferenceOnlyFeaturizerImpl
 ///  \brief         Featurizer that only participates in inferencing
 ///                 activities - no training is required. This class implement
@@ -67,6 +106,27 @@ private:
 // |
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+
+// ----------------------------------------------------------------------
+// |
+// |  InferenceOnlyTransformerImpl
+// |
+// ----------------------------------------------------------------------
+template <typename InputT, typename TransformedT>
+InferenceOnlyTransformerImpl<InputT, TransformedT>::InferenceOnlyTransformerImpl(Archive &) {
+    // Nothing to do here
+}
+
+template <typename InputT, typename TransformedT>
+void InferenceOnlyTransformerImpl<InputT, TransformedT>::save(Archive &) const /*override*/ {
+    // Nothing to do here
+}
+
+// ----------------------------------------------------------------------
+// |
+// |  InferenceOnlyFeaturizerImpl
+// |
 // ----------------------------------------------------------------------
 template <typename TransformerT, typename InputT, typename TransformedT>
 InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::InferenceOnlyFeaturizerImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations) :
