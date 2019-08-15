@@ -1,13 +1,13 @@
 parameters:
     agent_pool: ''
-    
+
     operating_system: ''    # Windows|Linux
     configuration: ''
 
     # This is a parameter not because it will be configued by the caller, but rather because arrays can be
     # defined here and not in variables.
-    test_types: 
-        'UnitTests': ' /code_coverage'
+    test_types:
+        'UnitTests': ' $(azure_code_coverage_arg)'
         'FunctionalTests': ''
         'IntegrationTests': ''
         'SystemTests': ''
@@ -20,7 +20,7 @@ stages:
 -   stage: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration}}_Stage
     displayName: "${{ parameters.operating_system }} - ${{ parameters.configuration }}: "
     dependsOn: [] # No dependencies
-    
+
     jobs:
     -   job: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration}}_Job
 
@@ -48,6 +48,9 @@ stages:
                     set _AZURE_BOOTSTRAP_COMMAND=bootstrap.cmd
                     echo ##vso[task.setvariable variable=azure_bootstrap_command]%_AZURE_BOOTSTRAP_COMMAND%
 
+                    set _AZURE_CODE_COVERAGE_ARG=/code_coverage
+                    echo ##vso[task.setvariable variable=azure_code_coverage_arg]%_AZURE_CODE_COVERAGE_ARG%
+
                     echo ##vso[task.setvariable variable=azure_agent_temp_directory]%AGENT_TEMPDIRECTORY%
                     echo ##vso[task.setvariable variable=azure_artifacts_directory]%BUILD_ARTIFACTSTAGINGDIRECTORY%
 
@@ -67,16 +70,19 @@ stages:
                     export _AZURE_BOOTSTRAP_COMMAND="sudo ./bootstrap.sh"
                     echo "##vso[task.setvariable variable=azure_bootstrap_command]${_AZURE_BOOTSTRAP_COMMAND}"
 
+                    export _AZURE_CODE_COVERAGE_ARG=
+                    echo "##vso[task.setvariable variable=azure_code_coverage_arg]${_AZURE_CODE_COVERAGE_ARG}"
+
                     echo "##vso[task.setvariable variable=azure_agent_temp_directory]${AGENT_TEMPDIRECTORY}"
                     echo "##vso[task.setvariable variable=azure_artifacts_directory]${BUILD_ARTIFACTSTAGINGDIRECTORY}"
 
                 displayName: "[IMPL] Environment-Specific Variables"
-        
+
         # Continue with standard processing
         -   script: |-
                 echo "operating_system - ${{ parameters.operating_system }}"
                 echo "configuration - ${{ parameters.configuration }}"
-                
+
                 echo "activate_script - $(azure_activate_script)"
                 echo "script_extension - $(azure_script_extension)"
                 echo "display_all_environment_vars - $(azure_display_all_environment_vars)"

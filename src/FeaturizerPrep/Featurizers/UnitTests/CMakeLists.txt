@@ -15,10 +15,8 @@ if(NOT WIN32)
 endif()
 
 set(CppCommon_STATIC_CRT ON CACHE BOOL "" FORCE)
-set(BoostCommon_HEADER_ONLY ON CACHE BOOL "" FORCE)
 
 include(CppCommon)
-include(BoostCommon)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -44,7 +42,7 @@ foreach(_test_name IN ITEMS
     target_include_directories(${_test_name} PRIVATE ${_includes})
     target_link_directories(${_test_name} PRIVATE ${_libs})
 
-    target_link_libraries(${_test_name} PRIVATE ${Boost_LIBRARIES} libFeaturizers)
+    target_link_libraries(${_test_name} PRIVATE libFeaturizers)
 
     add_test(NAME ${_test_name} COMMAND ${_test_name} --success)
 endforeach()

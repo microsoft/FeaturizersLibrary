@@ -17,27 +17,27 @@ static_assert(std::is_same<Traits<float>::nullable_type, float>::value, "Incorre
 static_assert(std::is_same<Traits<double>::nullable_type, double>::value, "Incorrect nullable type for double");
 
 // Int values
-static_assert(std::is_same<Traits<std::int8_t>::nullable_type, boost::optional<std::int8_t>>::value, "Incorrect nullable type for std::int8_t");
-static_assert(std::is_same<Traits<std::int16_t>::nullable_type, boost::optional<std::int16_t>>::value, "Incorrect nullable type for std::int16_t");
-static_assert(std::is_same<Traits<std::int32_t>::nullable_type, boost::optional<std::int32_t>>::value, "Incorrect nullable type for std::int32_t");
-static_assert(std::is_same<Traits<std::int64_t>::nullable_type, boost::optional<std::int64_t>>::value, "Incorrect nullable type for std::int64_t");
-static_assert(std::is_same<Traits<std::uint8_t>::nullable_type, boost::optional<std::uint8_t>>::value, "Incorrect nullable type for std::uint8_t");
-static_assert(std::is_same<Traits<std::uint16_t>::nullable_type, boost::optional<std::uint16_t>>::value, "Incorrect nullable type for std::uint16_t");
-static_assert(std::is_same<Traits<std::uint32_t>::nullable_type, boost::optional<std::uint32_t>>::value, "Incorrect nullable type for std::uint32_t");
-static_assert(std::is_same<Traits<std::uint64_t>::nullable_type, boost::optional<std::uint64_t>>::value, "Incorrect nullable type for std::uint64_t");
+static_assert(std::is_same<Traits<std::int8_t>::nullable_type, nonstd::optional<std::int8_t>>::value, "Incorrect nullable type for std::int8_t");
+static_assert(std::is_same<Traits<std::int16_t>::nullable_type, nonstd::optional<std::int16_t>>::value, "Incorrect nullable type for std::int16_t");
+static_assert(std::is_same<Traits<std::int32_t>::nullable_type, nonstd::optional<std::int32_t>>::value, "Incorrect nullable type for std::int32_t");
+static_assert(std::is_same<Traits<std::int64_t>::nullable_type, nonstd::optional<std::int64_t>>::value, "Incorrect nullable type for std::int64_t");
+static_assert(std::is_same<Traits<std::uint8_t>::nullable_type, nonstd::optional<std::uint8_t>>::value, "Incorrect nullable type for std::uint8_t");
+static_assert(std::is_same<Traits<std::uint16_t>::nullable_type, nonstd::optional<std::uint16_t>>::value, "Incorrect nullable type for std::uint16_t");
+static_assert(std::is_same<Traits<std::uint32_t>::nullable_type, nonstd::optional<std::uint32_t>>::value, "Incorrect nullable type for std::uint32_t");
+static_assert(std::is_same<Traits<std::uint64_t>::nullable_type, nonstd::optional<std::uint64_t>>::value, "Incorrect nullable type for std::uint64_t");
 
 // Others
-static_assert(std::is_same<Traits<std::string>::nullable_type, boost::optional<std::string>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<std::array<char, 4>>::nullable_type, boost::optional<std::array<char, 4>>>::value, "Incorrect nullable type for std::array");
-static_assert(std::is_same<Traits<bool>::nullable_type, boost::optional<bool>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<std::map<int,int>>::nullable_type, boost::optional<std::map<int,int>>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<std::vector<int>>::nullable_type, boost::optional<std::vector<int>>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<boost::optional<int>>::nullable_type, boost::optional<int>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<std::tuple<int>>::nullable_type, boost::optional<std::tuple<int>>>::value, "Incorrect nullable type for std::string");
+static_assert(std::is_same<Traits<std::string>::nullable_type, nonstd::optional<std::string>>::value, "Incorrect nullable type for std::string");
+static_assert(std::is_same<Traits<std::array<char, 4>>::nullable_type, nonstd::optional<std::array<char, 4>>>::value, "Incorrect nullable type for std::array");
+static_assert(std::is_same<Traits<bool>::nullable_type, nonstd::optional<bool>>::value, "Incorrect nullable type for std::string");
+static_assert(std::is_same<Traits<std::map<int,int>>::nullable_type, nonstd::optional<std::map<int,int>>>::value, "Incorrect nullable type for std::string");
+static_assert(std::is_same<Traits<std::vector<int>>::nullable_type, nonstd::optional<std::vector<int>>>::value, "Incorrect nullable type for std::string");
+static_assert(std::is_same<Traits<nonstd::optional<int>>::nullable_type, nonstd::optional<int>>::value, "Incorrect nullable type for std::string");
+static_assert(std::is_same<Traits<std::tuple<int>>::nullable_type, nonstd::optional<std::tuple<int>>>::value, "Incorrect nullable type for std::string");
 
 TEST_CASE("Transformer_Nullable") {
-    boost::optional<std::int8_t> arg_null;
-    CHECK(Traits<boost::optional<std::int8_t>>::ToString(arg_null) == "NULL");
+    nonstd::optional<std::int8_t> arg_null;
+    CHECK(Traits<nonstd::optional<std::int8_t>>::ToString(arg_null) == "NULL");
 }
 
 TEST_CASE("Transformer_Binary") {
@@ -94,10 +94,10 @@ TEST_CASE("Transformer_Arrays") {
     CHECK(Traits<std::array<std::double_t, 4>>::ToString(arr) == arr_s);
 
     //array<optional>
-    boost::optional<std::double_t> arg_null;
-	std::array<boost::optional<std::double_t>, 3> arr_hasnull{1.5,arg_null,-47.1};
+    nonstd::optional<std::double_t> arg_null;
+	std::array<nonstd::optional<std::double_t>, 3> arr_hasnull{1.5,arg_null,-47.1};
 	std::string arr_hasnull_s{"[1.5,NULL,-47.1]"};
-	CHECK(Traits<std::array<boost::optional<std::double_t>, 3>>::ToString(arr_hasnull) == arr_hasnull_s);
+	CHECK(Traits<std::array<nonstd::optional<std::double_t>, 3>>::ToString(arr_hasnull) == arr_hasnull_s);
 
     //vectors in arrays
     std::vector<std::double_t> vect{ 1.03, -20.1, 305.8 };
@@ -114,10 +114,10 @@ TEST_CASE("Transformer_Vectors") {
 	CHECK(Traits<std::vector<std::double_t>>::ToString(vect) == vect_s);
 
 	//vector<optional>
-	boost::optional<std::int8_t> arg_null;
-	std::vector<boost::optional<std::int8_t>> vect_hasnull{1,2,arg_null,4};
+	nonstd::optional<std::int8_t> arg_null;
+	std::vector<nonstd::optional<std::int8_t>> vect_hasnull{static_cast<std::int8_t>(1), static_cast<std::int8_t>(2), arg_null, static_cast<std::int8_t>(4)};
 	std::string vect_hasnull_s{"[1,2,NULL,4]"};
-	CHECK(Traits<std::vector<boost::optional<std::int8_t>>>::ToString(vect_hasnull) == vect_hasnull_s);
+	CHECK(Traits<std::vector<nonstd::optional<std::int8_t>>>::ToString(vect_hasnull) == vect_hasnull_s);
 
 	//vectors in vectors
 	std::vector<std::int16_t> Bvect{2, 3, 7, -9};
@@ -203,9 +203,9 @@ TEST_CASE("Serialization") {
     CHECK(SerializationTestImpl(std::map<int, std::string>{ {10, "ten"}, {20, "twenty"} }));
     CHECK(SerializationTestImpl(std::map<std::string, int>{ {"ten", 10}, {"twenty", 20} }));
 
-    CHECK(SerializationTestImpl(boost::optional<int>()));
-    CHECK(SerializationTestImpl(boost::optional<int>(23)));
-    CHECK(SerializationTestImpl(boost::optional<std::string>("foo")));
+    CHECK(SerializationTestImpl(nonstd::optional<int>()));
+    CHECK(SerializationTestImpl(nonstd::optional<int>(23)));
+    CHECK(SerializationTestImpl(nonstd::optional<std::string>("foo")));
 
     CHECK(SerializationTestImpl(std::tuple<std::string, int, bool>("one", 2, true)));
 }

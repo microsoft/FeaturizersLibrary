@@ -6,12 +6,12 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <map>
 #include <string>
 #include <vector>
 
-#include <boost/optional.hpp>
-#include <boost/optional/optional_io.hpp>
+#include "Shared/optional.h"
 
 namespace Microsoft {
 namespace Featurizer {
@@ -73,7 +73,7 @@ struct Traits {
 ///
 template <typename T>
 struct TraitsImpl {
-    using nullable_type = boost::optional<T>;
+    using nullable_type = nonstd::optional<T>;
     static bool IsNull(nullable_type const& value) {
         return !value.is_initialized();
     }
@@ -253,7 +253,7 @@ template <>
 struct Traits<std::float_t> : public TraitsImpl<std::float_t> {
     using nullable_type = std::float_t;
     static bool IsNull(nullable_type const& value) {
-        return isnan(value);
+        return std::isnan(value);
     }
 
     static std::string ToString(nullable_type const& value) {
@@ -281,7 +281,7 @@ template <>
 struct Traits<std::double_t> : public TraitsImpl<std::double_t> {
     using nullable_type = std::double_t;
     static bool IsNull(nullable_type const& value) {
-        return isnan(value);
+        return std::isnan(value);
     }
 
     static std::string ToString(nullable_type const& value) {
@@ -485,18 +485,18 @@ struct Traits<std::map<KeyT, T, CompareT, AllocatorT>> : public TraitsImpl<std::
 };
 
 template <typename T>
-struct Traits<boost::optional<T>> : public TraitsImpl<boost::optional<T>> {
-    using nullable_type = boost::optional<T>;
+struct Traits<nonstd::optional<T>> : public TraitsImpl<nonstd::optional<T>> {
+    using nullable_type = nonstd::optional<T>;
 
     static std::string ToString(nullable_type const& value) {
         if (value) {
-            return Traits<T>::ToString(value.get());
+            return Traits<T>::ToString(*value);
         }
         return "NULL";
     }
 
     template <typename ArchiveT>
-    static ArchiveT & serialize(ArchiveT &ar, boost::optional<T> const &value) {
+    static ArchiveT & serialize(ArchiveT &ar, nonstd::optional<T> const &value) {
         ar.serialize(static_cast<bool>(value));
 
         if(value)
@@ -506,8 +506,8 @@ struct Traits<boost::optional<T>> : public TraitsImpl<boost::optional<T>> {
     }
 
     template <typename ArchiveT>
-    static boost::optional<T> deserialize(ArchiveT &ar) {
-        boost::optional<T>                  result;
+    static nonstd::optional<T> deserialize(ArchiveT &ar) {
+        nonstd::optional<T>                 result;
 
         if(ar.template deserialize<bool>())
             result = Traits<T>::deserialize(ar);
@@ -581,10 +581,8 @@ private:
     }
 };
 
-//TODO:DateTime type (represented by 64bit delta from TBD epoch)
-//TODO:ONNX (Sparse) Tensor
-//TODO:Apache Arrow
-//TODO:Type Modifiers?
+// TODO: ONNX (Sparse) Tensor
+// TODO: Apache Arrow
 
 } // namespace Featurizer
 } // namespace Microsoft

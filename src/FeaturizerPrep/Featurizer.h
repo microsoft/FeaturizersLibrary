@@ -8,7 +8,7 @@
 #include <map>
 #include <vector>
 
-#include <boost/optional.hpp>
+#include "Shared/optional.h"
 
 namespace Microsoft {
 namespace Featurizer {
@@ -188,8 +188,13 @@ protected:
     ///  \brief         Helper method that can be used by derived class when implementation functionality
     ///                 to retrieve `Annotation` data created by the derived class itself.
     ///
+    ///                 Note that the return type of this function used to be
+    ///                 boost::optional<DerivedAnnotationT &> then nonstd::optional<DerivedAnnotationT &>.
+    ///                 Unfortunately, nonstd::optional doesn't support reference types.
+    ///                 Consider the return value to be a potentially null pointer.
+    ///
     template <typename DerivedAnnotationT>
-    boost::optional<DerivedAnnotationT &> get_annotation_impl(size_t col_index) const;
+    DerivedAnnotationT * get_annotation_impl(size_t col_index) const;
 
 private:
     // ----------------------------------------------------------------------
@@ -258,7 +263,7 @@ public:
     ///                 has already been completed.
     ///
     FitResult fit(InputType value);
-    FitResult fit(InputType const *pInputBuffer, size_t cInputBuffer, boost::optional<std::uint64_t> const &optionalNumTrailingNulls=boost::optional<std::uint64_t>());
+    FitResult fit(InputType const *pInputBuffer, size_t cInputBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls=nonstd::optional<std::uint64_t>());
 
     /////////////////////////////////////////////////////////////////////////
     ///  \function      complete_training
@@ -287,7 +292,7 @@ private:
     ///  \brief         `fit` performs common object state and parameter validation before invoking
     ///                 this abstract method.
     ///
-    virtual FitResult fit_impl(InputType const *pBuffer, size_t cBuffer, boost::optional<std::uint64_t> const &optionalNumTrailingNulls) = 0;
+    virtual FitResult fit_impl(InputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) = 0;
 
     /////////////////////////////////////////////////////////////////////////
     ///  \function      complete_training_impl
@@ -464,7 +469,7 @@ inline Annotation::Annotation(EstimatorUniqueId creator_id) :
     CreatorId(
         [&creator_id]() {
             if(creator_id == nullptr)
-                throw std::runtime_error("Invalid id");
+                throw std::invalid_argument("Invalid id");
 
             return creator_id;
         }()
@@ -500,7 +505,7 @@ inline Estimator::Estimator(std::string name, AnnotationMapsPtr pAllColumnAnnota
         std::move(
             [&name](void) -> std::string & {
                 if(name.empty())
-                    throw std::runtime_error("Invalid name");
+                    throw std::invalid_argument("Invalid name");
 
                 return name;
             }()
@@ -510,7 +515,7 @@ inline Estimator::Estimator(std::string name, AnnotationMapsPtr pAllColumnAnnota
         std::move(
             [&pAllColumnAnnotations](void) -> AnnotationMapsPtr & {
                 if(!pAllColumnAnnotations || pAllColumnAnnotations->empty())
-                    throw std::runtime_error("Empty annotations");
+                    throw std::invalid_argument("Empty annotations");
 
                 return pAllColumnAnnotations;
             }()
@@ -520,12 +525,12 @@ inline Estimator::Estimator(std::string name, AnnotationMapsPtr pAllColumnAnnota
 
 inline void Estimator::add_annotation(AnnotationPtr pAnnotation, size_t col_index) const {
     if(!pAnnotation)
-        throw std::runtime_error("Invalid annotation");
+        throw std::invalid_argument("Invalid annotation");
 
     AnnotationMaps &                        all_annotations(*_all_column_annotations);
 
     if(col_index >= all_annotations.size())
-        throw std::runtime_error("Invalid annotation index");
+        throw std::invalid_argument("Invalid annotation index");
 
     AnnotationPtrs &                        annotations(
         [&all_annotations, &col_index, this](void) -> AnnotationPtrs & {
@@ -552,11 +557,11 @@ inline void Estimator::add_annotation(AnnotationPtr pAnnotation, size_t col_inde
 }
 
 template <typename DerivedAnnotationT>
-boost::optional<DerivedAnnotationT &> Estimator::get_annotation_impl(size_t col_index) const {
+DerivedAnnotationT * Estimator::get_annotation_impl(size_t col_index) const {
     AnnotationMaps const &                  all_annotations(*_all_column_annotations);
 
     if(col_index >= all_annotations.size())
-        throw std::runtime_error("Invalid annotation index");
+        throw std::invalid_argument("Invalid annotation index");
 
     AnnotationMap const &                   column_annotations(all_annotations[col_index]);
 
@@ -569,12 +574,12 @@ boost::optional<DerivedAnnotationT &> Estimator::get_annotation_impl(size_t col_
         // TODO: Acquire vector read lock
         for(auto const & annotation : annotations) {
             if(annotation->CreatorId == this) {
-                return static_cast<DerivedAnnotationT &>(*annotation);
+                return &static_cast<DerivedAnnotationT &>(*annotation);
             }
         }
     }
 
-    return boost::optional<DerivedAnnotationT &>();
+    return nullptr;
 }
 
 // ----------------------------------------------------------------------
@@ -599,21 +604,21 @@ typename FitEstimatorImpl<InputT>::FitResult FitEstimatorImpl<InputT>::fit(Input
 }
 
 template <typename InputT>
-typename FitEstimatorImpl<InputT>::FitResult FitEstimatorImpl<InputT>::fit(InputType const *pInputBuffer, size_t cInputBuffer, boost::optional<std::uint64_t> const &optionalNumTrailingNulls) {
+typename FitEstimatorImpl<InputT>::FitResult FitEstimatorImpl<InputT>::fit(InputType const *pInputBuffer, size_t cInputBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) {
     if(_is_training_complete)
         throw std::runtime_error("`fit` should not be invoked on an estimator that is already complete");
 
     if(pInputBuffer && cInputBuffer == 0)
-        throw std::runtime_error("Invalid buffer");
+        throw std::invalid_argument("Invalid buffer");
 
     if(pInputBuffer == nullptr && cInputBuffer != 0)
-        throw std::runtime_error("Invalid buffer");
+        throw std::invalid_argument("Invalid buffer");
 
     if(pInputBuffer == nullptr && cInputBuffer == 0 && !optionalNumTrailingNulls)
-        throw std::runtime_error("Invalid invocation");
+        throw std::invalid_argument("Invalid invocation");
 
     if(optionalNumTrailingNulls && *optionalNumTrailingNulls == 0)
-        throw std::runtime_error("Invalid number of nulls");
+        throw std::invalid_argument("Invalid number of nulls");
 
     FitResult                               result(fit_impl(pInputBuffer, cInputBuffer, optionalNumTrailingNulls));
 

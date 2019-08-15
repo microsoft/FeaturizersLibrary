@@ -51,7 +51,7 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    FitResult fit_impl(InputType const *pBuffer, size_t cBuffer, boost::optional<std::uint64_t> const &optionalNumTrailingNulls) override;
+    FitResult fit_impl(InputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) override;
     void complete_training_impl(void) override;
     TransformerPtr create_transformer_impl(void) override;
 };

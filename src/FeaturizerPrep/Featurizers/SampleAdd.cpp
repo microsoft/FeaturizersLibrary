@@ -55,7 +55,7 @@ SampleAddFeaturizer::SampleAddFeaturizer(AnnotationMapsPtr pAllColumnAnnotations
     BaseType("SampleAddFeaturizer", std::move(pAllColumnAnnotations)) {
 }
 
-SampleAddFeaturizer::FitResult SampleAddFeaturizer::fit_impl(InputType const *pBuffer, size_t cBuffer, boost::optional<std::uint64_t> const &) /*override*/ {
+SampleAddFeaturizer::FitResult SampleAddFeaturizer::fit_impl(InputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &) /*override*/ {
     InputType const * const                 pEndBuffer(pBuffer + cBuffer);
 
     while(pBuffer != pEndBuffer) {

@@ -93,7 +93,7 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    typename BaseType::FitResult fit_impl(InputType const *pBuffer, size_t cBuffer, boost::optional<std::uint64_t> const &optionalNumTrailingNulls) override;
+    typename BaseType::FitResult fit_impl(InputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) override;
     void complete_training_impl(void) override;
     typename BaseType::TransformerPtr create_transformer_impl(void) override;
 };
@@ -137,7 +137,7 @@ InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::InferenceOnlyFe
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename TransformerT, typename InputT, typename TransformedT>
-typename InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::BaseType::FitResult InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::fit_impl(InputType const *, size_t, boost::optional<std::uint64_t> const &) /*override*/ {
+typename InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::BaseType::FitResult InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::fit_impl(InputType const *, size_t, nonstd::optional<std::uint64_t> const &) /*override*/ {
     throw std::runtime_error("This should never be called");
 }
 

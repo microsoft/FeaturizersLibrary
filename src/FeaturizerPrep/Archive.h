@@ -123,7 +123,7 @@ inline Archive::Archive(unsigned char const *pBuffer, size_t cbBuffer) :
     _pEndBuffer(_pBuffer + cbBuffer)
 {
     if((pBuffer == nullptr && cbBuffer != 0) || (pBuffer != nullptr && cbBuffer == 0))
-        throw std::runtime_error("Invalid input buffer");
+        throw std::invalid_argument("Invalid input buffer");
 }
 
 inline Archive & Archive::serialize(unsigned char const *pBuffer, size_t cBuffer) {
@@ -131,7 +131,7 @@ inline Archive & Archive::serialize(unsigned char const *pBuffer, size_t cBuffer
         throw std::runtime_error("Invalid mode");
 
     if((pBuffer == nullptr && cBuffer != 0) || (pBuffer != nullptr && cBuffer == 0))
-        throw std::runtime_error("Invalid buffer");
+        throw std::invalid_argument("Invalid buffer");
 
     std::copy(pBuffer, pBuffer + cBuffer, std::back_inserter(_buffer));
 
@@ -184,7 +184,7 @@ inline Archive & Archive::update_buffer_ptr(size_t cDelta) {
     unsigned char const *                   pNewBuffer(_pBuffer + cDelta);
 
     if(pNewBuffer > _pEndBuffer)
-        throw std::runtime_error("Invalid delta");
+        throw std::invalid_argument("Invalid delta");
 
     _pBuffer = pNewBuffer;
     return *this;

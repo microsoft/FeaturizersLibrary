@@ -66,7 +66,7 @@ public:
         Microsoft::Featurizer::Estimator::add_annotation(invalid_add ? AnnotationPtr() : std::make_shared<MyAnnotation>(this, state), col_index);
     }
 
-    boost::optional<MyAnnotation &> get_annotation(size_t col_index) const {
+    MyAnnotation * get_annotation(size_t col_index) const {
         return get_annotation_impl<MyAnnotation>(col_index);
     }
 };
@@ -124,7 +124,7 @@ private:
 
     // ----------------------------------------------------------------------
     // |  Private Methods
-    FitResult fit_impl(InputType const *, size_t, boost::optional<std::uint64_t> const &) override {
+    FitResult fit_impl(InputType const *, size_t, nonstd::optional<std::uint64_t> const &) override {
         return _return_complete_from_fit ? FitResult::Complete : FitResult::Continue;
     }
 
@@ -149,10 +149,10 @@ TEST_CASE("FitEstimatorImpl") {
     CHECK_THROWS_WITH(manual_complete.fit(reinterpret_cast<int *>(&manual_complete), 0), "Invalid buffer");
     CHECK_THROWS_WITH(manual_complete.fit(nullptr, 10), "Invalid buffer");
     CHECK_THROWS_WITH(manual_complete.fit(nullptr, 0), "Invalid invocation");
-    CHECK_THROWS_WITH(manual_complete.fit(reinterpret_cast<int *>(&manual_complete), 1, 0), "Invalid number of nulls");
+    CHECK_THROWS_WITH(manual_complete.fit(reinterpret_cast<int *>(&manual_complete), 1, static_cast<std::uint64_t>(0)), "Invalid number of nulls");
 
     CHECK(manual_complete.fit(reinterpret_cast<int *>(&manual_complete), 1) == MyFitEstimator::FitResult::Continue);
-    CHECK(manual_complete.fit(nullptr, 0, 1) == MyFitEstimator::FitResult::Continue);
+    CHECK(manual_complete.fit(nullptr, 0, static_cast<std::uint64_t>(1)) == MyFitEstimator::FitResult::Continue);
 
     CHECK(manual_complete.is_training_complete() == false);
     manual_complete.complete_training();
@@ -214,7 +214,7 @@ private:
 
     // ----------------------------------------------------------------------
     // |  Private Methods
-    FitResult fit_impl(InputType const *, size_t, boost::optional<std::uint64_t> const &) override {
+    FitResult fit_impl(InputType const *, size_t, nonstd::optional<std::uint64_t> const &) override {
         throw std::runtime_error("This should never be called");
     }
 
