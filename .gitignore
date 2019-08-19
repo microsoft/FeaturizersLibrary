@@ -13,6 +13,7 @@ Activate.*.sh
 
 .coverage
 coverage.xml
+CmakeSettings.json
 
 **/.vscode/*
 **/build/*
