@@ -135,6 +135,16 @@ public:
     // ----------------------------------------------------------------------
     using AnnotationMapsPtr                 = AnnotationMapsPtr;
 
+    /////////////////////////////////////////////////////////////////////////
+    ///  \enum          FitResult
+    ///  \brief         Result returned by the `fit` method.
+    ///
+    enum class FitResult {
+        Complete,                           /// Fitting is complete and there is no need to call `fit` on this `Estimator` any more.
+        Continue,                           /// Continue providing data to `fit` (if such data is available).
+        ResetAndContinue                    /// Reset the data back to the beginning and continue training.
+    };
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
@@ -221,16 +231,9 @@ public:
     // |
     // ----------------------------------------------------------------------
     using InputType                         = InputT;
-    using ThisType                          = FitEstimatorImpl<InputType>;
+    using FitBufferInputType                = std::remove_reference_t<InputType>;
 
-    /////////////////////////////////////////////////////////////////////////
-    ///  \enum          FitResult
-    ///  \brief         Result returned by the `fit` method.
-    ///
-    enum class FitResult {
-        Complete,                           /// Fitting is complete and there is no need to call `fit` on this `Estimator` any more.
-        Continue                            /// Continue providing data to `fit` (if such data is available).
-    };
+    using ThisType                          = FitEstimatorImpl<InputType>;
 
     // ----------------------------------------------------------------------
     // |
@@ -263,7 +266,7 @@ public:
     ///                 has already been completed.
     ///
     FitResult fit(InputType value);
-    FitResult fit(InputType const *pInputBuffer, size_t cInputBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls=nonstd::optional<std::uint64_t>());
+    FitResult fit(FitBufferInputType const *pInputBuffer, size_t cInputBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls=nonstd::optional<std::uint64_t>());
 
     /////////////////////////////////////////////////////////////////////////
     ///  \function      complete_training
@@ -271,7 +274,7 @@ public:
     ///                 that is used in calls to `transform` or to add `Annotations` for a column. This method should not be
     ///                 invoked on an object that has already been completed.
     ///
-    FitEstimatorImpl & complete_training(void);
+    FitResult complete_training(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -292,14 +295,14 @@ private:
     ///  \brief         `fit` performs common object state and parameter validation before invoking
     ///                 this abstract method.
     ///
-    virtual FitResult fit_impl(InputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) = 0;
+    virtual FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) = 0;
 
     /////////////////////////////////////////////////////////////////////////
     ///  \function      complete_training_impl
     ///  \brief         `complete_training` performs common object state validation before invoking this
     ///                 abstract method.
     ///
-    virtual void complete_training_impl(void) = 0;
+    virtual FitResult complete_training_impl(void) = 0;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -367,6 +370,8 @@ public:
         using InputType                     = InputType;
         using TransformedType               = TransformedType;
 
+        using Archive                       = Archive;
+
         // ----------------------------------------------------------------------
         // |  Public Methods
         Transformer(void) = default;
@@ -409,8 +414,6 @@ public:
 
     TransformerEstimator(TransformerEstimator &&) = default;
     TransformerEstimator & operator =(TransformerEstimator &&) = delete;
-
-    ThisType & complete_training(void);
 
     /////////////////////////////////////////////////////////////////////////
     ///  \function      has_created_transformer
@@ -599,12 +602,12 @@ bool FitEstimatorImpl<InputT>::is_training_complete(void) const {
 }
 
 template <typename InputT>
-typename FitEstimatorImpl<InputT>::FitResult FitEstimatorImpl<InputT>::fit(InputType value) {
+Estimator::FitResult FitEstimatorImpl<InputT>::fit(InputType value) {
     return fit(&value, 1);
 }
 
 template <typename InputT>
-typename FitEstimatorImpl<InputT>::FitResult FitEstimatorImpl<InputT>::fit(InputType const *pInputBuffer, size_t cInputBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) {
+Estimator::FitResult FitEstimatorImpl<InputT>::fit(FitBufferInputType const *pInputBuffer, size_t cInputBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) {
     if(_is_training_complete)
         throw std::runtime_error("`fit` should not be invoked on an estimator that is already complete");
 
@@ -623,20 +626,22 @@ typename FitEstimatorImpl<InputT>::FitResult FitEstimatorImpl<InputT>::fit(Input
     FitResult                               result(fit_impl(pInputBuffer, cInputBuffer, optionalNumTrailingNulls));
 
     if(result == FitResult::Complete)
-        complete_training();
+        result = complete_training();
 
     return result;
 }
 
 template <typename InputT>
-FitEstimatorImpl<InputT> & FitEstimatorImpl<InputT>::complete_training(void) {
+Estimator::FitResult FitEstimatorImpl<InputT>::complete_training(void) {
     if(_is_training_complete)
         throw std::runtime_error("`complete_training` should not be invoked on an estimator that is already complete");
 
-    complete_training_impl();
-    _is_training_complete = true;
+    FitResult                               result(complete_training_impl());
 
-    return *this;
+    if(result == FitResult::Complete)
+        _is_training_complete = true;
+
+    return result;
 }
 
 // ----------------------------------------------------------------------
@@ -644,11 +649,6 @@ FitEstimatorImpl<InputT> & FitEstimatorImpl<InputT>::complete_training(void) {
 // |  TransformerEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename InputT, typename TransformedT>
-TransformerEstimator<InputT, TransformedT> & TransformerEstimator<InputT, TransformedT>::complete_training(void) {
-    return static_cast<ThisType &>(BaseType::complete_training());
-}
-
 template <typename InputT, typename TransformedT>
 bool TransformerEstimator<InputT, TransformedT>::has_created_transformer(void) const {
     return _created_transformer;

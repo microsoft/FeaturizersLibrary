@@ -128,7 +128,8 @@ private:
         return _return_complete_from_fit ? FitResult::Complete : FitResult::Continue;
     }
 
-    void complete_training_impl(void) override {
+    FitResult complete_training_impl(void) override {
+        return FitResult::Complete;
     }
 };
 
@@ -218,7 +219,7 @@ private:
         throw std::runtime_error("This should never be called");
     }
 
-    void complete_training_impl(void) override {
+    FitResult complete_training_impl(void) override {
         throw std::runtime_error("This should never be called");
     }
 

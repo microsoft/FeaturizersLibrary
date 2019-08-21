@@ -66,8 +66,8 @@ SampleAddFeaturizer::FitResult SampleAddFeaturizer::fit_impl(InputType const *pB
     return FitResult::Continue;
 }
 
-void SampleAddFeaturizer::complete_training_impl(void) /*override*/ {
-    // Nothing to do here
+SampleAddFeaturizer::FitResult SampleAddFeaturizer::complete_training_impl(void) /*override*/ {
+    return FitResult::Complete;
 }
 
 SampleAddFeaturizer::TransformerPtr SampleAddFeaturizer::create_transformer_impl(void) /*override*/ {

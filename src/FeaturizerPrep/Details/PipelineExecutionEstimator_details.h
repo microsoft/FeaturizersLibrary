@@ -1,0 +1,1085 @@
+// ----------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License
+// ----------------------------------------------------------------------
+#pragma once
+
+#include "../InferenceOnlyFeaturizerImpl.h"
+
+namespace Microsoft {
+namespace Featurizer {
+namespace Details {
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         EstimatorChainSuffixTransformer
+///  \brief         `Transformer` that converts from a const reference object
+///                 to a non-reference type. This will be used by pipeline
+///                 that end with `AnnotationEstimators` (who, by default,
+///                 only operator on reference types).
+///
+template <typename InputT>
+class EstimatorChainSuffixTransformer : public InferenceOnlyTransformerImpl<InputT, std::remove_const_t<std::remove_reference_t<InputT>>> {
+public:
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    using BaseType                          = InferenceOnlyTransformerImpl<InputT, std::remove_const_t<std::remove_reference_t<InputT>>>;
+
+    // ----------------------------------------------------------------------
+    // |  Public Methods
+    EstimatorChainSuffixTransformer(void) = default;
+    EstimatorChainSuffixTransformer(Archive &) {}
+
+    ~EstimatorChainSuffixTransformer(void) override = default;
+
+    EstimatorChainSuffixTransformer(EstimatorChainSuffixTransformer const &) = delete;
+    EstimatorChainSuffixTransformer & operator =(EstimatorChainSuffixTransformer const &) = delete;
+
+    EstimatorChainSuffixTransformer(EstimatorChainSuffixTransformer &&) = default;
+    EstimatorChainSuffixTransformer & operator =(EstimatorChainSuffixTransformer &&) = delete;
+
+    typename BaseType::TransformedType execute(typename BaseType::InputType value) override {
+        return std::move(const_cast<typename BaseType::TransformedType &>(value));
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         EstimatorChainSuffixEstimator
+///  \brief         Estimator for use with the `EstimatorChainSuffixTransformer`.
+///
+template <typename InputT>
+class EstimatorChainSuffixEstimator : public InferenceOnlyFeaturizerImpl<EstimatorChainSuffixTransformer<InputT>> {
+public:
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    using BaseType                          = InferenceOnlyFeaturizerImpl<EstimatorChainSuffixTransformer<InputT>>;
+
+    // ----------------------------------------------------------------------
+    // |  Public Methods
+    EstimatorChainSuffixEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+        BaseType("EstimatorChainSuffixEstimator", std::move(pAllColumnAnnotations)) {
+    }
+
+    ~EstimatorChainSuffixEstimator(void) override = default;
+
+    EstimatorChainSuffixEstimator(EstimatorChainSuffixEstimator const &) = delete;
+    EstimatorChainSuffixEstimator & operator =(EstimatorChainSuffixEstimator const &) = delete;
+
+    EstimatorChainSuffixEstimator(EstimatorChainSuffixEstimator &&) = default;
+    EstimatorChainSuffixEstimator & operator =(EstimatorChainSuffixEstimator &&) = delete;
+};
+
+namespace {
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         IsTransformerEstimator
+///  \brief         Contains a constexpr value that is true if T is a
+///                 `TransformerEstimator`.
+///
+template <typename T>
+class IsTransformerEstimator {
+private:
+    // ----------------------------------------------------------------------
+    // |  Private Methods
+    template <typename U> static std::true_type check(typename U::TransformedType const *);
+    template <typename U> static std::false_type check(...);
+
+public:
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    static constexpr bool const             value = std::is_same<std::true_type, decltype(check<T>(nullptr))>::value;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         HasTransformerType
+///  \brief         Contains a constexpr value that is true if T has a
+///                 nested `Transformer` type.
+///
+template <typename T>
+class HasTransformerType {
+private:
+    // ----------------------------------------------------------------------
+    // |  Private Methods
+    template <typename U> static std::true_type check(typename U::Transformer *);
+    template <typename U> static std::false_type check(...);
+
+public:
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    static constexpr bool const             value = std::is_same<std::true_type, decltype(check<T>(nullptr))>::value;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         HasFitBufferInputType
+///  \brief         Contains a constexpr value that is true if T has a
+///                 `FitBufferInputType` type.
+///
+template <typename T>
+class HasFitBufferInputType {
+private:
+    // ----------------------------------------------------------------------
+    // |  Private Methods
+    template <typename U> static std::true_type check(typename U::FitBufferInputType *);
+    template <typename U> static std::false_type check(...);
+
+public:
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    static constexpr bool const             value = std::is_same<std::true_type, decltype(check<T>(nullptr))>::value;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         NormalizePipeline
+///  \brief         Potentially modifies a pipeline to ensure that the
+///                 final element in the pipeline returns a value
+///                 (rather than a reference, which is what would be
+///                 returned by an `AnnotationEstimator`).
+///
+template <typename PipelineT, bool IsLastElementTransformerEstimator>
+struct NormalizePipeline {
+    using type                              = PipelineT;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         NormalizePipeline<PipelineT,
+///  \brief         Overload for a Pipeline that ends with an `AnnotationEstimator`.
+///                 For these types of pipeline, we need to add a final element
+///                 in the chain to ensure that we aren't returning a reference.
+///
+template <typename PipelineT>
+struct NormalizePipeline<PipelineT, false> {
+    using LastInputType                     = typename std::tuple_element<std::tuple_size<PipelineT>::value - 1, PipelineT>::type::InputType;
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wold-style-cast"
+#endif
+
+    // Note that we are using an old-style cast here as clang was generating errors
+    // with reinterpret_cast.
+    using type                              = decltype(std::tuple_cat(*(PipelineT *)(nullptr), std::make_tuple(*(EstimatorChainSuffixEstimator<LastInputType> const *)(nullptr))));
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         LastTransformerEstimatorIndexImpl
+///  \brief         Contains a constexpr value of N if the associated
+///                 `Estimator` is a `TransformerEstimator` or -1.
+///
+template <int N, typename PipelineT>
+struct LastTransformerEstimatorIndexImpl {
+    static constexpr int const              value = IsTransformerEstimator<typename std::tuple_element<N, PipelineT>::type>::value ? N : -1;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         LastTransformerEstimatorIndex
+///  \brief         Contains a constexpr value that is the index of the
+///                 last `TransformerEstimator` in the list. A value of
+///                 -1 indicates that no `TransformerEstimators` were found.
+///
+template <int N, typename PipelineT, typename EnableT=void>
+struct LastTransformerEstimatorIndex {};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         LastTransformerEstimatorIndex
+///  \brief         Overload for any element other than the last
+///
+template <int N, typename PipelineT>
+struct LastTransformerEstimatorIndex<
+    N,
+    PipelineT,
+    std::enable_if_t<N != std::tuple_size<PipelineT>::value - 1>
+> {
+    static constexpr int const              value = std::max(LastTransformerEstimatorIndex<N + 1, PipelineT>::value, LastTransformerEstimatorIndexImpl<N, PipelineT>::value);
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         LastTransformerEstimatorIndex
+///  \brief         Overload for the last element
+///
+template <int N, typename PipelineT>
+struct LastTransformerEstimatorIndex<
+    N,
+    PipelineT,
+    std::enable_if_t<N == std::tuple_size<PipelineT>::value - 1>
+> {
+    static constexpr int const              value = LastTransformerEstimatorIndexImpl<N, PipelineT>::value;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ValidateEstimator
+///  \brief         Validates that the `Estimator` is valid `TransformerEstimator`.
+///
+template <typename TransformerEstimatorT, bool IsTransformerEstimatorV>
+class ValidateEstimatorImpl {
+public:
+    static_assert(
+        (
+            std::is_lvalue_reference<typename TransformerEstimatorT::TransformedType>::value == false
+            && std::is_rvalue_reference<typename TransformerEstimatorT::TransformedType>::value == false
+        ),
+        "`TransformerEstimators` should not return reference types"
+    );
+
+    static_assert(HasTransformerType<TransformerEstimatorT>::value, "`TransformerEstimators` must contain a type named `Transformer` to support construction via `Archive` objects");
+};
+
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ValidateEstimatorImpl
+///  \brief         Validates that the `Estimator` is a valid `AnnotationEstimator`.
+///
+template <typename AnnotationEstimatorT>
+struct ValidateEstimatorImpl<
+    AnnotationEstimatorT,
+    false
+> {
+    static_assert(std::is_lvalue_reference<typename AnnotationEstimatorT::InputType>::value, "`InputType` should be a reference");
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ValidateEstimator
+///  \brief         Validates that the `Estimator` is a valid `Estimator`
+///                 by invoking type-specific functionality.
+///
+template <typename EstimatorT>
+struct ValidateEstimator :
+    public ValidateEstimatorImpl<EstimatorT, IsTransformerEstimator<EstimatorT>::value>
+{
+    static_assert(HasFitBufferInputType<EstimatorT>::value, "This doesn't appear to be an `Estimator`; did you pass a `Transformer` object instead?");
+
+    static constexpr bool const             value = true;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ValidatePipelineEstimatorsImpl
+///  \brief         Validates an `Estimator` within a pipeline. This is a
+///                 default implementation to setup partial template instantiation
+///
+template <int N, typename PipelineT, typename EnableT=void>
+struct ValidatePipelineEstimatorsImpl {};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ValidatePipelineEstimatorsImpl
+///  \brief         Overload for the first element in a single-estimator pipeline
+///
+template <int N, typename PipelineT>
+struct ValidatePipelineEstimatorsImpl<
+    N,
+    PipelineT,
+    std::enable_if_t<
+        N == 0
+        && std::tuple_size<PipelineT>::value == 1
+    >
+> {
+    using EstimatorType                     = typename std::tuple_element<N, PipelineT>::type;
+
+    static_assert(IsTransformerEstimator<EstimatorType>::value, "The `Estimator` in a single-estimator pipeline must be a `TransformerEstimator`");
+    static_assert(ValidateEstimator<EstimatorType>::value, "");
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ValidatePipelineEstimatorsImpl_Chained
+///  \brief         Overload for any `Estimator` other than the last in a multi-estimator pipeline
+///                 that is a `TransformerEstimator`.
+///
+template <typename EstimatorT, typename NextEstimatorT, bool IsTransformerEsitmatorV>
+struct ValidatePipelineEstimatorsImpl_Chained {
+private:
+    using RawNextType                       = std::remove_const_t<std::remove_reference_t<typename NextEstimatorT::InputType>>;
+
+public:
+    static_assert(std::is_same<typename EstimatorT::TransformedType, RawNextType>::value, "The `InputType` of the next `Estimator` must match the `TransformedType` of this `Estimator`");
+
+    static constexpr bool const             value = true;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ValidatePipelineEstimatorsImpl_Chained
+///  \brief         Overload for any `Estimator` other than the last in a multi-estimator pipeline
+///                 that is not a `TransfomerEstimator`.
+///
+template <typename EstimatorT, typename NextEstimatorT>
+struct ValidatePipelineEstimatorsImpl_Chained<
+    EstimatorT,
+    NextEstimatorT,
+    false
+> {
+    static_assert(std::is_same<typename EstimatorT::InputType, typename NextEstimatorT::InputType>::value, "The `InputType` of the next `Estimator` must match the `TransformedType` of this `Estimator`");
+
+    static constexpr bool const             value = true;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ValidatePipelineEstimatorsImpl
+///  \brief         Overload for any `Estimator` other than the last one
+///                 in a multi-estimator pipeline.
+///
+template <int N, typename PipelineT>
+struct ValidatePipelineEstimatorsImpl<
+    N,
+    PipelineT,
+    std::enable_if_t<
+        std::tuple_size<PipelineT>::value != 1
+        && N != std::tuple_size<PipelineT>::value - 1
+    >
+> {
+    using EstimatorType                     = typename std::tuple_element<N, PipelineT>::type;
+    using NextEstimator                     = typename std::tuple_element<N + 1, PipelineT>::type;
+
+    static_assert(ValidateEstimator<EstimatorType>::value, "");
+
+    static_assert(
+        ValidatePipelineEstimatorsImpl_Chained<
+            EstimatorType,
+            NextEstimator,
+            IsTransformerEstimator<EstimatorType>::value
+        >::value,
+        ""
+    );
+
+    static_assert(ValidatePipelineEstimatorsImpl<N + 1, PipelineT>::value, "");
+
+    static constexpr bool const             value = true;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ValidatePipelineEstimatorsImpl<
+///  \brief         Overload for the last `Estimator` in a multi-estimator
+///                 pipeline.
+///
+template <int N, typename PipelineT>
+struct ValidatePipelineEstimatorsImpl<
+    N,
+    PipelineT,
+    std::enable_if_t<
+        std::tuple_size<PipelineT>::value != 1
+        && N == std::tuple_size<PipelineT>::value - 1
+    >
+> {
+    static_assert(ValidateEstimator<typename std::tuple_element<N, PipelineT>::type>::value, "");
+
+    static constexpr bool const             value = true;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ValidatePipelineEstimators
+///  \brief         Validates that `Estimators` in the pipeline are valid
+///                 relative to each other.
+///
+template <typename PipelineT>
+struct ValidatePipelineEstimators :
+    private ValidatePipelineEstimatorsImpl<0, PipelineT>
+{
+    static constexpr bool const             value = true;
+};
+
+} // anonymous namespace
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         PipelineTraits
+///  \brief         Contains compile-time trait information about a pipeline
+///                 of `Estimators`.
+///
+template <typename... Ts>
+struct PipelineTraits {
+    static_assert(LastTransformerEstimatorIndex<0, std::tuple<Ts...>>::value != -1, "There must be at least one `TransformerEstimator` in the pipeline");
+    static_assert(ValidatePipelineEstimators<std::tuple<Ts...>>::value, "");
+
+    // Ensure that the pipeline doesn't return a reference (which can happen
+    // when the last `Estimator` in the pipeline is an `AnnotationEstimator`.
+    using Pipeline                          =
+        typename NormalizePipeline<
+            std::tuple<Ts...>,
+            IsTransformerEstimator<
+                typename std::tuple_element<
+                    sizeof...(Ts) - 1,
+                    std::tuple<Ts...>
+                >::type
+            >::value
+        >::type;
+
+    using InputType                         = typename std::tuple_element<0, Pipeline>::type::InputType;
+    using TransformedType                   = typename std::tuple_element<std::tuple_size<Pipeline>::value - 1, Pipeline>::type::TransformedType;
+};
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+namespace {
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         EstimatorChainElementBase
+///  \brief         Functionality common to all `TransformerEstimator` chain elements
+///                 within a pipeline.
+///
+template <
+    typename EstimatorChainElementT,        // Curiously Recurring Template Pattern
+    int N,
+    typename PipelineT,
+    bool IsTransformerEstimatorV
+>
+class EstimatorChainElementBase :
+    public std::tuple_element<N, PipelineT>::type {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorType                     = typename std::tuple_element<N, PipelineT>::type;
+    using TransformerPtr                    = typename EstimatorType::TransformerPtr;
+    using Transformer                       = typename TransformerPtr::element_type;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    template <typename... ArgsT>
+    EstimatorChainElementBase(ArgsT &&... args) :
+        EstimatorType(std::forward<ArgsT>(args)...) {
+            // Ensure that transformers are populated for inference-only `Estimators`, as
+            // `complete_training` will not be called for these objects.
+            if(EstimatorType::is_training_complete())
+                init_transformer();
+    }
+
+    void complete_training(void) {
+        EstimatorType::complete_training();
+        init_transformer();
+    }
+
+    Transformer & get_transformer(void) const {
+        assert(_pTransformer);
+        return *_pTransformer;
+    }
+
+    TransformerPtr move_transformer(void) {
+        assert(_pTransformer);
+        return std::move(_pTransformer);
+    }
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+    TransformerPtr                          _pTransformer;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    void init_transformer(void) {
+        // ----------------------------------------------------------------------
+        using EstimatorChainElementBase     = typename EstimatorChainElementT::EstimatorChainElementBase;
+        // ----------------------------------------------------------------------
+
+        assert(!_pTransformer);
+
+        EstimatorChainElementT &            parent(static_cast<EstimatorChainElementT &>(*this));
+        EstimatorChainElementBase &         base(static_cast<EstimatorChainElementBase &>(parent));
+
+        _pTransformer = base.create_transformer();
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         EstimatorChainElementBase
+///  \brief         Functionality common to all `AnnotationEstimator` chain
+///                 elements within a pipeline.
+///
+template <typename EstimatorChainElementT, int N, typename PipelineT>
+class EstimatorChainElementBase<
+    EstimatorChainElementT,                 // Curiously Recurring Template Pattern
+    N,
+    PipelineT,
+    false
+> :
+    public std::tuple_element<N, PipelineT>::type {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorType                     = typename std::tuple_element<N, PipelineT>::type;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorType::EstimatorType;
+};
+
+// ----------------------------------------------------------------------
+// |  Forward Declaration
+template <int N, typename PipelineT, typename EnableT>
+struct EstimatorChainElement;
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         EstimatorChainElementInterFitter
+///  \brief         Functionality common to `TransformerEstimators` that
+///                 are chained elements (other than the last) in a multi-
+///                 chain pipeline.
+///
+template <
+    typename EstimatorChainElementT,        // Curiously Recurring Template Pattern
+    int N,
+    typename PipelineT,
+    bool IsTransformerEstimatorV
+>
+class EstimatorChainElementInterFitter {
+protected:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Protected Types
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorType                     = typename std::tuple_element<N, PipelineT>::type;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Protected Methods
+    // |
+    // ----------------------------------------------------------------------
+    inline Estimator::FitResult fit(typename EstimatorType::InputType value) {
+        return fit(&value, 1), nonstd::optional<std::uint64_t>();
+    }
+
+    inline Estimator::FitResult fit(typename EstimatorType::FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) {
+        // ----------------------------------------------------------------------
+        using EstimatorChainElementBase     = typename EstimatorChainElementT::EstimatorChainElementBase;
+        using NextEstimatorChainElement     = typename EstimatorChainElementT::NextEstimatorChainElement;
+        // ----------------------------------------------------------------------
+
+        EstimatorChainElementT &                                            parent(static_cast<EstimatorChainElementT &>(*this));
+        EstimatorChainElementBase &                                         base(static_cast<EstimatorChainElementBase &>(parent));
+        NextEstimatorChainElement &                                         next(static_cast<NextEstimatorChainElement &>(parent));
+        typename EstimatorChainElementBase::Transformer &                   transformer(base.get_transformer());
+
+        // Transform each value in the buffer before invoking the next Estimator
+        typename EstimatorType::FitBufferInputType const * const            pEndBuffer(pBuffer + cBuffer);
+
+        while(pBuffer < pEndBuffer) {
+            Estimator::FitResult const      result(next.fit(transformer.execute(*pBuffer++)));
+
+            if(result != Estimator::FitResult::Continue)
+                return result;
+        }
+
+        if(optionalNumTrailingNulls) {
+            // ----------------------------------------------------------------------
+            using InputType                 = std::remove_const_t<std::remove_reference_t<typename EstimatorType::InputType>>;
+            // ----------------------------------------------------------------------
+
+            return fit_nulls<InputType>(*optionalNumTrailingNulls, transformer, next, std::integral_constant<bool, std::is_default_constructible<InputType>::value>());
+        }
+
+        return Estimator::FitResult::Continue;
+    }
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \function      fit_nulls
+    ///  \brief         Implements training for null values when the
+    ///                 input types are default constructible.
+    ///
+    template <typename InputT, typename TransformerT, typename NextT>
+    inline Estimator::FitResult fit_nulls(std::uint64_t remaining, TransformerT &transformer, NextT &next, std::true_type /*is_default_constructible*/) {
+        // Transform an empty input type and invoke the next Estimator N times
+        typename EstimatorType::TransformedType const                   value(transformer.execute(InputT()));
+
+        while(remaining--) {
+            typename Estimator::FitResult const                         result(next.fit(value));
+
+            if(result != Estimator::FitResult::Continue)
+                return result;
+        }
+
+        return Estimator::FitResult::Continue;
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \function      fit_nulls
+    ///  \brief         Throws an exception when null values are provided for
+    ///                 items that are not default constructible.
+    ///
+    template <typename InputT, typename TransformerT, typename NextT>
+    inline Estimator::FitResult fit_nulls(std::uint64_t, TransformerT &, NextT &, std::false_type /*is_default_constructible*/) {
+        throw std::runtime_error("Nulls cannot be provided when the input type is not default constrictible");
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         EstimatorChainElementInterFitter
+///  \brief         Functionality common to `AnnotationEstimators` that
+///                 are chained elements (other than the last) in a multi-
+///                 chain pipeline.
+///
+template <typename EstimatorChainElementT, int N, typename PipelineT>
+class EstimatorChainElementInterFitter<
+    EstimatorChainElementT,                 // Curiously Recurring Template Pattern
+    N,
+    PipelineT,
+    false
+> {
+protected:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Protected Types
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorType                     = typename std::tuple_element<N, PipelineT>::type;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Protected Methods
+    // |
+    // ----------------------------------------------------------------------
+    inline typename Estimator::FitResult fit(typename EstimatorType::InputType value) {
+        return fit(&value, 1), nonstd::optional<std::uint64_t>();
+    }
+
+    inline typename Estimator::FitResult fit(typename EstimatorType::FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) {
+        // ----------------------------------------------------------------------
+        using NextEstimatorChainElement     = typename EstimatorChainElementT::NextEstimatorChainElement;
+        // ----------------------------------------------------------------------
+
+        EstimatorChainElementT &            parent(static_cast<EstimatorChainElementT &>(*this));
+        NextEstimatorChainElement &         next(static_cast<NextEstimatorChainElement &>(parent));
+
+        // Since we don't have to perform any transformations, we can send the
+        // entire buffer to the next Estimator.
+        return next.fit(pBuffer, cBuffer, optionalNumTrailingNulls);
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         EstimatorChainElement
+///  \brief         An `Estimator` within a pipeline. This is a default
+///                 implementation to setup partial template instantiation.
+///
+template <int N, typename PipelineT, typename EnableT=void>
+struct EstimatorChainElement {};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         EstimatorChainElement
+///  \brief         Overload for any element other than the last in a pipeline.
+///
+template <int N, typename PipelineT>
+class EstimatorChainElement<
+    N,
+    PipelineT,
+    std::enable_if_t<N != std::tuple_size<PipelineT>::value - 1>
+> :
+    public EstimatorChainElementBase<
+        EstimatorChainElement<N, PipelineT>,
+        N,
+        PipelineT,
+        IsTransformerEstimator<typename std::tuple_element<N, PipelineT>::type>::value
+    >,
+    public EstimatorChainElement<N + 1, PipelineT>,
+    public EstimatorChainElementInterFitter<
+        EstimatorChainElement<N, PipelineT>,
+        N,
+        PipelineT,
+        IsTransformerEstimator<typename std::tuple_element<N, PipelineT>::type>::value
+    >
+{
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorType                     = typename std::tuple_element<N, PipelineT>::type;
+    using EstimatorChainElementBase         = EstimatorChainElementBase<EstimatorChainElement<N, PipelineT>, N, PipelineT, IsTransformerEstimator<EstimatorType>::value>;
+    using EstimatorChainElementInterFitter  = EstimatorChainElementInterFitter<EstimatorChainElement<N, PipelineT>, N, PipelineT, IsTransformerEstimator<EstimatorType>::value>;
+
+    using NextEstimatorChainElement         = EstimatorChainElement<N + 1, PipelineT>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    EstimatorChainElement(AnnotationMapsPtr pAllColumnAnnotaitons) :
+        EstimatorChainElementBase(pAllColumnAnnotaitons),
+        NextEstimatorChainElement(pAllColumnAnnotaitons) {
+    }
+
+    bool is_all_training_complete() const {
+        return EstimatorChainElementBase::is_training_complete() && NextEstimatorChainElement::is_all_training_complete();
+    }
+
+    Estimator::FitResult fit(typename EstimatorType::InputType value) {
+        return fit(&value, 1, nonstd::optional<std::uint64_t>());
+    }
+
+    Estimator::FitResult fit(typename EstimatorType::FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) {
+        // Perform local training (if necessary)
+        if(EstimatorChainElementBase::is_training_complete() == false) {
+            Estimator::FitResult            result(EstimatorChainElementBase::fit(pBuffer, cBuffer, optionalNumTrailingNulls));
+
+            if(result == Estimator::FitResult::Complete && NextEstimatorChainElement::is_all_training_complete() == false)
+                result = Estimator::FitResult::ResetAndContinue;
+
+            return result;
+        }
+
+        // Invoke the next Estimator
+        return EstimatorChainElementInterFitter::fit(pBuffer, cBuffer, optionalNumTrailingNulls);
+    }
+
+    Estimator::FitResult complete_training(bool is_forceful_completion) {
+        if(EstimatorChainElementBase::is_training_complete() == false) {
+            if(is_forceful_completion) {
+                // If here, the completion event generated by a call to complete outside
+                // of the pipeline. Force complete this estimator and reset the flag so
+                // downstream estimators aren't forced to complete as well.
+                EstimatorChainElementBase::complete_training();
+
+                is_forceful_completion = false;
+                _received_forceful_completion = true;
+            } else
+                return Estimator::FitResult::ResetAndContinue;
+        }
+
+        // If this is a forceful creation but we haven't received a forceful creation
+        // notification yet, this current event is due to an internal estimator completing
+        // themselves. Unset the flag so any downstream estimators aren't forced to
+        // complete incorrectly.
+        if(is_forceful_completion && _received_forceful_completion == false) {
+            is_forceful_completion = false;
+            _received_forceful_completion = true;
+        }
+
+        return NextEstimatorChainElement::complete_training(is_forceful_completion);
+    }
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+    bool                                    _received_forceful_completion = false;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         EstimatorChainElement
+///  \brief         Overload for the last element in a pipeline.
+///
+template <int N, typename PipelineT>
+class EstimatorChainElement<
+    N,
+    PipelineT,
+    std::enable_if_t<N == std::tuple_size<PipelineT>::value - 1>
+> :
+    public EstimatorChainElementBase<
+        EstimatorChainElement<N, PipelineT>,
+        N,
+        PipelineT,
+        IsTransformerEstimator<typename std::tuple_element<N, PipelineT>::type>::value
+    >
+{
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorType                     = typename std::tuple_element<N, PipelineT>::type;
+    using EstimatorChainElementBase         = EstimatorChainElementBase<EstimatorChainElement<N, PipelineT>, N, PipelineT, IsTransformerEstimator<EstimatorType>::value>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorChainElementBase::EstimatorChainElementBase;
+
+    bool is_all_training_complete(void) const {
+        return EstimatorChainElementBase::is_training_complete();
+    }
+
+    Estimator::FitResult complete_training(bool is_forceful_completion) {
+        if(is_forceful_completion && EstimatorChainElementBase::is_training_complete() == false)
+            EstimatorChainElementBase::complete_training();
+
+        // While this chained element may be complete, we want to return a value that captures the
+        // state of the entire chain.
+        return EstimatorChainElementBase::is_training_complete() ? Estimator::FitResult::Complete : Estimator::FitResult::ResetAndContinue;
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         TransformerChainElementBase
+///  \brief         Implements functionality common to all `TransformerEstimator`-
+///                 based `Transformers`.
+///
+template <
+    int N,
+    typename PipelineT,
+    bool IsTransformerEstimatorT
+>
+class TransformerChainElementBase {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorChainElement             = EstimatorChainElement<N, PipelineT>;
+    using EstimatorChainElementBase         = typename EstimatorChainElement::EstimatorChainElementBase;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    TransformerChainElementBase(EstimatorChainElement &estimator) :
+        _pTransformer(static_cast<EstimatorChainElementBase &>(estimator).move_transformer()) {
+    }
+
+    TransformerChainElementBase(Archive &ar) :
+        _pTransformer(std::make_shared<EstimatorChainElement::EstimatorType::Transformer>(ar)) {
+    }
+
+    inline typename EstimatorChainElement::EstimatorType::TransformedType execute(typename EstimatorChainElement::EstimatorType::InputType value) {
+        return _pTransformer->execute(value);
+    }
+
+    inline void save(Archive &ar) const {
+        _pTransformer->save(ar);
+    }
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+    typename EstimatorChainElement::EstimatorType::TransformerPtr const     _pTransformer;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         TransformerChainElementBase
+///  \brief         Implements functionality common to all `AttributeEstimator`-
+///                 based `Transformers` (which don't do anything when invoked).
+///
+template <int N, typename PipelineT>
+class TransformerChainElementBase<N, PipelineT, false> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorChainElement             = EstimatorChainElement<N, PipelineT>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    inline TransformerChainElementBase(EstimatorChainElement &) {}
+    inline TransformerChainElementBase(Archive &) {}
+
+    inline typename EstimatorChainElement::EstimatorType::InputType execute(typename EstimatorChainElement::EstimatorType::InputType value) {
+        // No change
+        return value;
+    }
+
+    inline void save(Archive &) const {
+        // Nothing to do, as these `Transformers` will never have any state.
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         TransformerChainElement
+///  \brief         A single `Transformer` within a chain of
+///                 `Transformers`. This is a default implementation
+///                 to setup partial template specialization.
+///
+template <int N, typename PipelineT, typename EnableT=void>
+struct TransformerChainElement {};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         TransformerChainElement
+///  \brief         Overload for any element other than the last in a
+///                 pipeline.
+///
+template <int N, typename PipelineT>
+class TransformerChainElement<
+    N,
+    PipelineT,
+    std::enable_if_t<N != std::tuple_size<PipelineT>::value - 1>
+> :
+    public TransformerChainElementBase<
+        N,
+        PipelineT,
+        IsTransformerEstimator<typename std::tuple_element<N, PipelineT>::type>::value
+    >,
+    public TransformerChainElement<N + 1, PipelineT>
+{
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using NextEstimatorChainElement         = EstimatorChainElement<N + 1, PipelineT>;
+    using EstimatorChainElement             = EstimatorChainElement<N, PipelineT>;
+    using NextTransformerChainElement       = TransformerChainElement<N + 1, PipelineT>;
+
+    using TransformerType                   = TransformerChainElementBase<
+        N,
+        PipelineT,
+        IsTransformerEstimator<typename std::tuple_element<N, PipelineT>::type>::value
+    >;
+
+    using TransformedType                   = typename std::tuple_element<std::tuple_size<PipelineT>::value - 1, PipelineT>::type::TransformedType;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    TransformerChainElement(EstimatorChainElement &element) :
+        TransformerType(element),
+        NextTransformerChainElement(static_cast<NextEstimatorChainElement &>(element)) {
+    }
+
+    TransformerChainElement(Archive &ar) :
+        TransformerType(ar),
+        NextTransformerChainElement(ar) {
+    }
+
+    inline TransformedType execute(typename EstimatorChainElement::EstimatorType::InputType value) {
+        return NextTransformerChainElement::execute(TransformerType::execute(value));
+    }
+
+    inline void save(Archive &ar) const {
+        TransformerType::save(ar);
+        NextTransformerChainElement::save(ar);
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         TransformerChainElement
+///  \brief         Overload for the last element in a pipeline.
+///
+template <int N, typename PipelineT>
+class TransformerChainElement<
+    N,
+    PipelineT,
+    std::enable_if_t<N == std::tuple_size<PipelineT>::value - 1>
+> :
+    public TransformerChainElementBase<
+        N,
+        PipelineT,
+        IsTransformerEstimator<typename std::tuple_element<N, PipelineT>::type>::value
+    >
+{
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorChainElement             = EstimatorChainElement<N, PipelineT>;
+
+    using TransformerType                   = TransformerChainElementBase<
+        N,
+        PipelineT,
+        IsTransformerEstimator<typename std::tuple_element<N, PipelineT>::type>::value
+    >;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    TransformerChainElement(EstimatorChainElement &element) :
+        TransformerType(element) {
+    }
+
+    TransformerChainElement(Archive &ar) :
+        TransformerType(ar) {
+    }
+
+    // Use the `execute` and `save` methods from the base class.
+};
+
+} // anonymous namespace
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         EstimatorChain
+///  \brief         Chain of `Estimators`.
+///
+template <typename PipelineT>
+class EstimatorChain : public EstimatorChainElement<0, PipelineT> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = EstimatorChainElement<0, PipelineT>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    EstimatorChain(AnnotationMapsPtr pAllColumnAnnotations) :
+        BaseType(std::move(pAllColumnAnnotations)) {
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         TransformerChain
+///  \brief         Chain of `Transformers`.
+///
+template <typename PipelineT>
+class TransformerChain : public TransformerChainElement<0, PipelineT> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorChain                    = EstimatorChain<PipelineT>;
+    using BaseType                          = TransformerChainElement<0, PipelineT>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    TransformerChain(EstimatorChain &estimators) :
+        BaseType(static_cast<EstimatorChainElement<0, PipelineT> &>(estimators)) {
+    }
+
+    TransformerChain(Archive &ar) :
+        BaseType(ar) {
+    }
+};
+
+} // namespace Details
+} // namespace Featurizer
+} // namespace Microsoft

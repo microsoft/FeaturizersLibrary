@@ -73,6 +73,8 @@ public:
     using ThisType                          = InferenceOnlyFeaturizerImpl<TransformerType, InputType, TransformedType>;
     using BaseType                          = TransformerEstimator<InputType, TransformedType>;
 
+    using FitBufferInputType                = typename BaseType::FitBufferInputType;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -93,9 +95,13 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    typename BaseType::FitResult fit_impl(InputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) override;
-    void complete_training_impl(void) override;
-    typename BaseType::TransformerPtr create_transformer_impl(void) override;
+    Estimator::FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) override;
+    Estimator::FitResult complete_training_impl(void) override;
+
+    // MSVC has problems when the definition for the func is separated from its declaration.
+    inline typename BaseType::TransformerPtr create_transformer_impl(void) override {
+        return std::make_shared<TransformerT>();
+    }
 };
 
 // ----------------------------------------------------------------------
@@ -137,18 +143,13 @@ InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::InferenceOnlyFe
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename TransformerT, typename InputT, typename TransformedT>
-typename InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::BaseType::FitResult InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::fit_impl(InputType const *, size_t, nonstd::optional<std::uint64_t> const &) /*override*/ {
+Estimator::FitResult InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::fit_impl(FitBufferInputType const *, size_t, nonstd::optional<std::uint64_t> const &) /*override*/ {
     throw std::runtime_error("This should never be called");
 }
 
 template <typename TransformerT, typename InputT, typename TransformedT>
-void InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::complete_training_impl(void) /*override*/ {
+Estimator::FitResult InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::complete_training_impl(void) /*override*/ {
     throw std::runtime_error("This should never be called");
-}
-
-template <typename TransformerT, typename InputT, typename TransformedT>
-typename InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::BaseType::TransformerPtr InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::create_transformer_impl(void) /*override*/ {
-    return std::make_shared<TransformerT>();
 }
 
 } // namespace Featurizer
