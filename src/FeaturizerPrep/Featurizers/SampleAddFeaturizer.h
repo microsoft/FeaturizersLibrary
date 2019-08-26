@@ -32,11 +32,7 @@ public:
     SampleAddEstimator(AnnotationMapsPtr pAllColumnAnnotations);
     ~SampleAddEstimator(void) override = default;
 
-    SampleAddEstimator(SampleAddEstimator const &) = delete;
-    SampleAddEstimator & operator =(SampleAddEstimator const &) = delete;
-
-    SampleAddEstimator(SampleAddEstimator &&) = default;
-    SampleAddEstimator & operator =(SampleAddEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SampleAddEstimator);
 
 private:
     // ----------------------------------------------------------------------
@@ -51,9 +47,9 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    FitResult fit_impl(InputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) override;
+    FitResult fit_impl(InputType const *pBuffer, size_t cBuffer) override;
     FitResult complete_training_impl(void) override;
-    TransformerPtr create_transformer_impl(void) override;
+    TransformerUniquePtr create_transformer_impl(void) override;
 };
 
 } // namespace Featurizer

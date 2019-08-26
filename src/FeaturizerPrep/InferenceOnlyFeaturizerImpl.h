@@ -39,11 +39,7 @@ public:
 
     ~InferenceOnlyTransformerImpl(void) override = default;
 
-    InferenceOnlyTransformerImpl(InferenceOnlyTransformerImpl const &) = delete;
-    InferenceOnlyTransformerImpl & operator =(InferenceOnlyTransformerImpl const &) = delete;
-
-    InferenceOnlyTransformerImpl(InferenceOnlyTransformerImpl &&) = default;
-    InferenceOnlyTransformerImpl & operator =(InferenceOnlyTransformerImpl &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(InferenceOnlyTransformerImpl);
 
     void save(Archive &ar) const override;
 };
@@ -83,11 +79,7 @@ public:
     InferenceOnlyEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
     ~InferenceOnlyEstimatorImpl(void) override = default;
 
-    InferenceOnlyEstimatorImpl(InferenceOnlyEstimatorImpl const &) = delete;
-    InferenceOnlyEstimatorImpl & operator =(InferenceOnlyEstimatorImpl const &) = delete;
-
-    InferenceOnlyEstimatorImpl(InferenceOnlyEstimatorImpl &&) = default;
-    InferenceOnlyEstimatorImpl & operator =(InferenceOnlyEstimatorImpl &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(InferenceOnlyEstimatorImpl);
 
 private:
     // ----------------------------------------------------------------------
@@ -98,12 +90,12 @@ private:
 
     // Note that the following training methods aren't used, but need to be overridden as
     // the base implementations are abstract. The noop definitions are below.
-    Estimator::FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) override;
+    Estimator::FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer) override;
     Estimator::FitResult complete_training_impl(void) override;
 
     // MSVC has problems when the definition for the func is separated from its declaration.
-    inline typename BaseType::TransformerPtr create_transformer_impl(void) override {
-        return std::make_shared<TransformerT>();
+    inline typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
+        return std::make_unique<TransformerT>();
     }
 };
 
@@ -146,7 +138,7 @@ InferenceOnlyEstimatorImpl<TransformerT, InputT, TransformedT>::InferenceOnlyEst
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename TransformerT, typename InputT, typename TransformedT>
-Estimator::FitResult InferenceOnlyEstimatorImpl<TransformerT, InputT, TransformedT>::fit_impl(FitBufferInputType const *, size_t, nonstd::optional<std::uint64_t> const &) /*override*/ {
+Estimator::FitResult InferenceOnlyEstimatorImpl<TransformerT, InputT, TransformedT>::fit_impl(FitBufferInputType const *, size_t) /*override*/ {
     throw std::runtime_error("This should never be called as this class will not be used during training");
 }
 

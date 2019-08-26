@@ -67,11 +67,7 @@ public:
     TrainingOnlyEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations);
     ~TrainingOnlyEstimatorImpl(void) override = default;
 
-    TrainingOnlyEstimatorImpl(TrainingOnlyEstimatorImpl const &) = delete;
-    TrainingOnlyEstimatorImpl & operator =(TrainingOnlyEstimatorImpl const &) = delete;
-
-    TrainingOnlyEstimatorImpl(TrainingOnlyEstimatorImpl &&) = default;
-    TrainingOnlyEstimatorImpl & operator =(TrainingOnlyEstimatorImpl &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TrainingOnlyEstimatorImpl);
 
     using BaseType::fit;
     using BaseType::complete_training;
@@ -96,11 +92,7 @@ private:
 
         ~AnnotationImpl(void) override = default;
 
-        AnnotationImpl(AnnotationImpl const &) = delete;
-        AnnotationImpl & operator =(AnnotationImpl const &) = delete;
-
-        AnnotationImpl(AnnotationImpl &&) = default;
-        AnnotationImpl & operator =(AnnotationImpl &&) = delete;
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(AnnotationImpl);
     };
 
     // ----------------------------------------------------------------------
@@ -115,7 +107,7 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    Estimator::FitResult fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) override;
+    Estimator::FitResult fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) override;
     Estimator::FitResult complete_training_impl(void) override;
 };
 
@@ -168,22 +160,11 @@ typename TrainingOnlyEstimatorImpl<EstimatorPolicyT, ColIndexV>::AnnotationData 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename EstimatorPolicyT, size_t ColIndexV>
-Estimator::FitResult TrainingOnlyEstimatorImpl<EstimatorPolicyT, ColIndexV>::fit_impl(
-    typename BaseType::FitBufferInputType const *pBuffer,
-    size_t cBuffer,
-    nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls
-) /*override*/ {
+Estimator::FitResult TrainingOnlyEstimatorImpl<EstimatorPolicyT, ColIndexV>::fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) /*override*/ {
     if(cBuffer) {
         size_t const                        cItemsToProcess(std::min(_cRemainingTrainingItems, cBuffer));
 
         EstimatorPolicyT::fit_items(pBuffer, cItemsToProcess);
-        _cRemainingTrainingItems -= cItemsToProcess;
-    }
-
-    if(cBuffer && optionalNumTrailingNulls) {
-        size_t const                        cItemsToProcess(std::min(_cRemainingTrainingItems, static_cast<size_t>(*optionalNumTrailingNulls)));
-
-        EstimatorPolicyT::fit_nulls(cItemsToProcess);
         _cRemainingTrainingItems -= cItemsToProcess;
     }
 

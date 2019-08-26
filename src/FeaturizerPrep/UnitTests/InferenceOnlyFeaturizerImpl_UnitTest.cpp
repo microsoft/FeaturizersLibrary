@@ -21,11 +21,7 @@ public:
 
     ~MyTransformer(void) override = default;
 
-    MyTransformer(MyTransformer const &) = delete;
-    MyTransformer & operator =(MyTransformer const &) = delete;
-
-    MyTransformer(MyTransformer &&) = default;
-    MyTransformer & operator =(MyTransformer &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyTransformer);
 
     TransformedType execute(InputType input) override {
         return input & 1;
@@ -46,11 +42,7 @@ public:
 
     ~MyEstimator(void) override = default;
 
-    MyEstimator(MyEstimator const &) = delete;
-    MyEstimator & operator =(MyEstimator const &) = delete;
-
-    MyEstimator(MyEstimator &&) = default;
-    MyEstimator & operator =(MyEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyEstimator);
 };
 
 TEST_CASE("MyEstimator") {

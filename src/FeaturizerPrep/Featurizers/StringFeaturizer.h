@@ -36,11 +36,7 @@ public:
 
     ~StringTransformer(void) override = default;
 
-    StringTransformer(StringTransformer const &) = delete;
-    StringTransformer & operator =(StringTransformer const &) = delete;
-
-    StringTransformer(StringTransformer && other) = default;
-    StringTransformer & operator =(StringTransformer &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StringTransformer);
 
     typename BaseType::TransformedType execute(typename BaseType::InputType input) override;
 };
@@ -65,11 +61,7 @@ public:
     StringEstimator(AnnotationMapsPtr pAllCoumnAnnotations);
     ~StringEstimator(void) override = default;
 
-    StringEstimator(StringEstimator const &) = delete;
-    StringEstimator & operator =(StringEstimator const &) = delete;
-
-    StringEstimator(StringEstimator &&) = default;
-    StringEstimator & operator =(StringEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StringEstimator);
 };
 
 // ----------------------------------------------------------------------

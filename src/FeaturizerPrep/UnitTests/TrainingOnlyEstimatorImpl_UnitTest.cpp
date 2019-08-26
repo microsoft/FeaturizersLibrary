@@ -43,11 +43,7 @@ public:
 
         Results(CountMap counts) : Counts(std::move(counts)) {}
 
-        Results(Results const &) = delete;
-        Results & operator =(Results const &) = delete;
-
-        Results(Results &&) = default;
-        Results & operator =(Results &&) = delete;
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Results);
     };
 
     // ----------------------------------------------------------------------

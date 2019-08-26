@@ -18,7 +18,7 @@ using Microsoft::Featurizer::CreateTestAnnotationMapsPtr;
 #   pragma clang diagnostic ignored "-Wmissing-prototypes"
 #endif
 
-SampleAddEstimator::TransformerPtr Train(std::vector<std::uint16_t> const &input) {
+SampleAddEstimator::TransformerUniquePtr Train(std::vector<std::uint16_t> const &input) {
     SampleAddEstimator                      estimator(CreateTestAnnotationMapsPtr(2));
 
     estimator.fit(input.data(), input.size());

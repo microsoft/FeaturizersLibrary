@@ -14,6 +14,30 @@ namespace Microsoft {
 namespace Featurizer {
 
 // ----------------------------------------------------------------------
+// |
+// |  Preprocessor Definitions
+// |
+// ----------------------------------------------------------------------
+// TODO: During a future refactor, this preprocessor definition(s) should be
+// moved to a different file.
+
+/////////////////////////////////////////////////////////////////////////
+///  \def           FEATURIZER_MOVE_CONSTRUCTOR_ONLY
+///  \brief         Disables the methods below, while setting the move
+///                 constructor to default.
+///
+///                 Disables:
+///                     - Copy constructor
+///                     - Copy assignment
+///                     - Move assignment
+///
+#define FEATURIZER_MOVE_CONSTRUCTOR_ONLY(ClassName)     \
+    ClassName(ClassName const &) = delete;              \
+    ClassName & operator =(ClassName const &) = delete; \
+    ClassName(ClassName &&) = default;                  \
+    ClassName & operator =(ClassName &&) = delete;
+
+// ----------------------------------------------------------------------
 // |  Forward Declarations
 class Archive; // Defined in Archive.h
 
@@ -76,11 +100,7 @@ public:
     // ----------------------------------------------------------------------
     virtual ~Annotation(void) = default;
 
-    Annotation(Annotation const &) = delete;
-    Annotation & operator =(Annotation const &) = delete;
-
-    Annotation(Annotation &&) = default;
-    Annotation & operator =(Annotation &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Annotation);
 
 protected:
     // ----------------------------------------------------------------------
@@ -140,7 +160,7 @@ public:
     ///  \brief         Result returned by the `fit` method.
     ///
     enum class FitResult {
-        Complete,                           /// Fitting is complete and there is no need to call `fit` on this `Estimator` any more.
+        Complete = 0,                       /// Fitting is complete and there is no need to call `fit` on this `Estimator` any more.
         Continue,                           /// Continue providing data to `fit` (if such data is available).
         ResetAndContinue                    /// Reset the data back to the beginning and continue training.
     };
@@ -159,11 +179,7 @@ public:
     // ----------------------------------------------------------------------
     virtual ~Estimator(void) = default;
 
-    Estimator(Estimator const &) = delete;
-    Estimator & operator =(Estimator const &) = delete;
-
-    Estimator(Estimator &&) = default;
-    Estimator & operator =(Estimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Estimator);
 
     /////////////////////////////////////////////////////////////////////////
     ///  \function      get_column_annotations
@@ -243,11 +259,7 @@ public:
     FitEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations, bool is_training_complete=false);
     ~FitEstimatorImpl(void) override = default;
 
-    FitEstimatorImpl(FitEstimatorImpl const &) = delete;
-    FitEstimatorImpl & operator =(FitEstimatorImpl const &) = delete;
-
-    FitEstimatorImpl(FitEstimatorImpl &&) = default;
-    FitEstimatorImpl & operator =(FitEstimatorImpl &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FitEstimatorImpl);
 
     /////////////////////////////////////////////////////////////////////////
     ///  \function      is_training_complete
@@ -266,7 +278,7 @@ public:
     ///                 has already been completed.
     ///
     FitResult fit(InputType value);
-    FitResult fit(FitBufferInputType const *pInputBuffer, size_t cInputBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls=nonstd::optional<std::uint64_t>());
+    FitResult fit(FitBufferInputType const *pInputBuffer, size_t cInputBuffer);
 
     /////////////////////////////////////////////////////////////////////////
     ///  \function      complete_training
@@ -295,7 +307,7 @@ private:
     ///  \brief         `fit` performs common object state and parameter validation before invoking
     ///                 this abstract method.
     ///
-    virtual FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) = 0;
+    virtual FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer) = 0;
 
     /////////////////////////////////////////////////////////////////////////
     ///  \function      complete_training_impl
@@ -331,11 +343,7 @@ public:
     using BaseType::BaseType;
     ~AnnotationEstimator(void) override = default;
 
-    AnnotationEstimator(AnnotationEstimator const &) = delete;
-    AnnotationEstimator & operator =(AnnotationEstimator const &) = delete;
-
-    AnnotationEstimator(AnnotationEstimator &&) = default;
-    AnnotationEstimator & operator =(AnnotationEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(AnnotationEstimator);
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -379,11 +387,7 @@ public:
 
         virtual ~Transformer(void) = default;
 
-        Transformer(Transformer const &) = delete;
-        Transformer & operator =(Transformer const &) = delete;
-
-        Transformer(Transformer &&) = default;
-        Transformer & operator =(Transformer &&) = delete;
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Transformer);
 
         /////////////////////////////////////////////////////////////////////////
         ///  \function      execute
@@ -399,7 +403,7 @@ public:
         virtual void save(Archive &ar) const = 0;
     };
 
-    using TransformerPtr                    = std::shared_ptr<Transformer>;
+    using TransformerUniquePtr              = std::unique_ptr<Transformer>;
 
     // ----------------------------------------------------------------------
     // |
@@ -409,11 +413,7 @@ public:
     using BaseType::BaseType;
     ~TransformerEstimator(void) override = default;
 
-    TransformerEstimator(TransformerEstimator const &) = delete;
-    TransformerEstimator & operator =(TransformerEstimator const &) = delete;
-
-    TransformerEstimator(TransformerEstimator &&) = default;
-    TransformerEstimator & operator =(TransformerEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TransformerEstimator);
 
     /////////////////////////////////////////////////////////////////////////
     ///  \function      has_created_transformer
@@ -429,7 +429,7 @@ public:
     ///                 object. No methods should be called on the object once
     ///                 it has been used to create a transformer.
     ///
-    TransformerPtr create_transformer(void);
+    TransformerUniquePtr create_transformer(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -450,7 +450,7 @@ private:
     ///  \brief         `create_transformer` performs common object state validation before
     ///                 calling this method.
     ///
-    virtual TransformerPtr create_transformer_impl(void) = 0;
+    virtual TransformerUniquePtr create_transformer_impl(void) = 0;
 };
 
 // ----------------------------------------------------------------------
@@ -607,23 +607,17 @@ Estimator::FitResult FitEstimatorImpl<InputT>::fit(InputType value) {
 }
 
 template <typename InputT>
-Estimator::FitResult FitEstimatorImpl<InputT>::fit(FitBufferInputType const *pInputBuffer, size_t cInputBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) {
+Estimator::FitResult FitEstimatorImpl<InputT>::fit(FitBufferInputType const *pInputBuffer, size_t cInputBuffer) {
     if(_is_training_complete)
         throw std::runtime_error("`fit` should not be invoked on an estimator that is already complete");
 
-    if(pInputBuffer && cInputBuffer == 0)
+    if(pInputBuffer == nullptr)
         throw std::invalid_argument("Invalid buffer");
 
-    if(pInputBuffer == nullptr && cInputBuffer != 0)
+    if(cInputBuffer == 0)
         throw std::invalid_argument("Invalid buffer");
 
-    if(pInputBuffer == nullptr && cInputBuffer == 0 && !optionalNumTrailingNulls)
-        throw std::invalid_argument("Invalid invocation");
-
-    if(optionalNumTrailingNulls && *optionalNumTrailingNulls == 0)
-        throw std::invalid_argument("Invalid number of nulls");
-
-    FitResult                               result(fit_impl(pInputBuffer, cInputBuffer, optionalNumTrailingNulls));
+    FitResult                               result(fit_impl(pInputBuffer, cInputBuffer));
 
     if(result == FitResult::Complete)
         result = complete_training();
@@ -655,14 +649,14 @@ bool TransformerEstimator<InputT, TransformedT>::has_created_transformer(void) c
 }
 
 template <typename InputT, typename TransformedT>
-typename TransformerEstimator<InputT, TransformedT>::TransformerPtr TransformerEstimator<InputT, TransformedT>::create_transformer(void) {
+typename TransformerEstimator<InputT, TransformedT>::TransformerUniquePtr TransformerEstimator<InputT, TransformedT>::create_transformer(void) {
     if(!BaseType::is_training_complete())
         throw std::runtime_error("`create_transformer` should not be invoked on an estimator that is not yet complete");
 
     if(_created_transformer)
         throw std::runtime_error("`create_transformer` should not be invoked on an estimator that has been used to create a `Transformer`");
 
-    TransformerPtr                          result(create_transformer_impl());
+    TransformerUniquePtr                    result(create_transformer_impl());
 
     if(!result)
         throw std::runtime_error("Invalid result");

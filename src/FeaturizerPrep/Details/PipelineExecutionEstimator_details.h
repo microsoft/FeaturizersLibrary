@@ -39,11 +39,7 @@ public:
 
     ~EstimatorChainSuffixTransformer(void) override = default;
 
-    EstimatorChainSuffixTransformer(EstimatorChainSuffixTransformer const &) = delete;
-    EstimatorChainSuffixTransformer & operator =(EstimatorChainSuffixTransformer const &) = delete;
-
-    EstimatorChainSuffixTransformer(EstimatorChainSuffixTransformer &&) = default;
-    EstimatorChainSuffixTransformer & operator =(EstimatorChainSuffixTransformer &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(EstimatorChainSuffixTransformer);
 
     typename BaseType::TransformedType execute(typename BaseType::InputType value) override {
         // This code is removing the const-ness of the object and then moving the value to
@@ -82,11 +78,7 @@ public:
 
     ~EstimatorChainSuffixEstimator(void) override = default;
 
-    EstimatorChainSuffixEstimator(EstimatorChainSuffixEstimator const &) = delete;
-    EstimatorChainSuffixEstimator & operator =(EstimatorChainSuffixEstimator const &) = delete;
-
-    EstimatorChainSuffixEstimator(EstimatorChainSuffixEstimator &&) = default;
-    EstimatorChainSuffixEstimator & operator =(EstimatorChainSuffixEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(EstimatorChainSuffixEstimator);
 };
 
 namespace {
@@ -438,8 +430,8 @@ public:
     // |
     // ----------------------------------------------------------------------
     using EstimatorType                     = typename std::tuple_element<N, PipelineT>::type;
-    using TransformerPtr                    = typename EstimatorType::TransformerPtr;
-    using Transformer                       = typename TransformerPtr::element_type;
+    using TransformerUniquePtr              = typename EstimatorType::TransformerUniquePtr;
+    using Transformer                       = typename TransformerUniquePtr::element_type;
 
     // ----------------------------------------------------------------------
     // |
@@ -465,7 +457,7 @@ public:
         return *_pTransformer;
     }
 
-    TransformerPtr move_transformer(void) {
+    TransformerUniquePtr move_transformer(void) {
         assert(_pTransformer);
         return std::move(_pTransformer);
     }
@@ -476,7 +468,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    TransformerPtr                          _pTransformer;
+    TransformerUniquePtr                    _pTransformer;
 
     // ----------------------------------------------------------------------
     // |
@@ -549,10 +541,10 @@ protected:
     // |
     // ----------------------------------------------------------------------
     inline Estimator::FitResult fit(typename EstimatorType::InputType value) {
-        return fit(&value, 1, nonstd::optional<std::uint64_t>());
+        return fit(&value, 1);
     }
 
-    inline Estimator::FitResult fit(typename EstimatorType::FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) {
+    inline Estimator::FitResult fit(typename EstimatorType::FitBufferInputType const *pBuffer, size_t cBuffer) {
         // ----------------------------------------------------------------------
         using EstimatorChainElementBase     = typename EstimatorChainElementT::EstimatorChainElementBase;
         using NextEstimatorChainElement     = typename EstimatorChainElementT::NextEstimatorChainElement;
@@ -579,14 +571,6 @@ protected:
 
             if(result != Estimator::FitResult::Continue)
                 return result;
-        }
-
-        if(optionalNumTrailingNulls) {
-            // ----------------------------------------------------------------------
-            using InputType                 = std::remove_cv_t<std::remove_reference_t<typename EstimatorType::InputType>>;
-            // ----------------------------------------------------------------------
-
-            return fit_nulls<InputType>(*optionalNumTrailingNulls, transformer, next, std::integral_constant<bool, std::is_default_constructible<InputType>::value>());
         }
 
         return Estimator::FitResult::Continue;
@@ -657,10 +641,10 @@ protected:
     // |
     // ----------------------------------------------------------------------
     inline typename Estimator::FitResult fit(typename EstimatorType::InputType value) {
-        return fit(&value, 1, nonstd::optional<std::uint64_t>());
+        return fit(&value, 1);
     }
 
-    inline typename Estimator::FitResult fit(typename EstimatorType::FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) {
+    inline typename Estimator::FitResult fit(typename EstimatorType::FitBufferInputType const *pBuffer, size_t cBuffer) {
         // ----------------------------------------------------------------------
         using NextEstimatorChainElement     = typename EstimatorChainElementT::NextEstimatorChainElement;
         // ----------------------------------------------------------------------
@@ -670,7 +654,7 @@ protected:
 
         // Since we don't have to perform any transformations, we can send the
         // entire buffer to the next Estimator.
-        return next.fit(pBuffer, cBuffer, optionalNumTrailingNulls);
+        return next.fit(pBuffer, cBuffer);
     }
 };
 
@@ -732,13 +716,13 @@ public:
     }
 
     Estimator::FitResult fit(typename EstimatorType::InputType value) {
-        return fit(&value, 1, nonstd::optional<std::uint64_t>());
+        return fit(&value, 1);
     }
 
-    Estimator::FitResult fit(typename EstimatorType::FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) {
+    Estimator::FitResult fit(typename EstimatorType::FitBufferInputType const *pBuffer, size_t cBuffer) {
         // Perform local training (if necessary)
         if(EstimatorChainElementBase::is_training_complete() == false) {
-            Estimator::FitResult            result(EstimatorChainElementBase::fit(pBuffer, cBuffer, optionalNumTrailingNulls));
+            Estimator::FitResult            result(EstimatorChainElementBase::fit(pBuffer, cBuffer));
 
             if(result == Estimator::FitResult::Complete && NextEstimatorChainElement::is_all_training_complete() == false)
                 result = Estimator::FitResult::ResetAndContinue;
@@ -747,7 +731,7 @@ public:
         }
 
         // Invoke the next Estimator
-        return EstimatorChainElementInterFitter::fit(pBuffer, cBuffer, optionalNumTrailingNulls);
+        return EstimatorChainElementInterFitter::fit(pBuffer, cBuffer);
     }
 
     Estimator::FitResult complete_training(bool is_forceful_completion) {
@@ -878,7 +862,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    typename EstimatorChainElement::EstimatorType::TransformerPtr const     _pTransformer;
+    typename EstimatorChainElement::EstimatorType::TransformerUniquePtr const   _pTransformer;
 };
 
 /////////////////////////////////////////////////////////////////////////

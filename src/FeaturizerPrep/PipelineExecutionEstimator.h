@@ -35,7 +35,7 @@ public:
     using InputType                         = typename BaseType::InputType;
     using FitBufferInputType                = typename BaseType::FitBufferInputType;
     using FitResult                         = typename BaseType::FitResult;
-    using TransformerPtr                    = typename BaseType::TransformerPtr;
+    using TransformerUniquePtr              = typename BaseType::TransformerUniquePtr;
     using TransformedType                   = typename BaseType::TransformedType;
 
     // ----------------------------------------------------------------------
@@ -66,11 +66,7 @@ private:
 
         ~Transformer(void) override = default;
 
-        Transformer(Transformer const &) = delete;
-        Transformer & operator =(Transformer const &) = delete;
-
-        Transformer(Transformer &&) = default;
-        Transformer & operator =(Transformer &&) = delete;
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Transformer);
 
         TransformedType execute(InputType input) override;
         void save(Archive &ar) const override;
@@ -97,9 +93,9 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) override;
+    FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer) override;
     FitResult complete_training_impl(void) override;
-    TransformerPtr create_transformer_impl(void) override;
+    TransformerUniquePtr create_transformer_impl(void) override;
 };
 
 // ----------------------------------------------------------------------
@@ -126,8 +122,8 @@ PipelineExecutionEstimator<EstimatorT...>::PipelineExecutionEstimator(std::strin
 }
 
 template <typename... EstimatorT>
-typename PipelineExecutionEstimator<EstimatorT...>::FitResult PipelineExecutionEstimator<EstimatorT...>::fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) /*override*/ {
-    return _estimator_chain.fit(pBuffer, cBuffer, optionalNumTrailingNulls);
+typename PipelineExecutionEstimator<EstimatorT...>::FitResult PipelineExecutionEstimator<EstimatorT...>::fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer) /*override*/ {
+    return _estimator_chain.fit(pBuffer, cBuffer);
 }
 
 template <typename... EstimatorT>
@@ -136,8 +132,8 @@ typename PipelineExecutionEstimator<EstimatorT...>::FitResult PipelineExecutionE
 }
 
 template <typename... EstimatorT>
-typename PipelineExecutionEstimator<EstimatorT...>::TransformerPtr PipelineExecutionEstimator<EstimatorT...>::create_transformer_impl(void) /*override*/ {
-    return std::make_shared<Transformer>(_estimator_chain);
+typename PipelineExecutionEstimator<EstimatorT...>::TransformerUniquePtr PipelineExecutionEstimator<EstimatorT...>::create_transformer_impl(void) /*override*/ {
+    return std::make_unique<Transformer>(_estimator_chain);
 }
 
 // ----------------------------------------------------------------------

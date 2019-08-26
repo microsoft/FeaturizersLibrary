@@ -32,11 +32,7 @@ struct TimePoint {
 
     TimePoint(const std::chrono::system_clock::time_point& sysTime);
 
-    TimePoint(TimePoint const &) = delete;
-    TimePoint & operator =(TimePoint const &) = delete;
-
-    TimePoint(TimePoint &&) = default;
-    TimePoint & operator =(TimePoint &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TimePoint);
 
     enum {
         JANUARY = 1, FEBRUARY, MARCH, APRIL, MAY, JUNE,
@@ -71,11 +67,7 @@ public:
 
     ~DateTimeTransformer(void) override = default;
 
-    DateTimeTransformer(DateTimeTransformer const &) = delete;
-    DateTimeTransformer & operator =(DateTimeTransformer const &) = delete;
-
-    DateTimeTransformer(DateTimeTransformer &&) = default;
-    DateTimeTransformer & operator =(DateTimeTransformer &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DateTimeTransformer);
 
     TransformedType execute(InputType input) override;
 };
@@ -97,11 +89,7 @@ public:
     DateTimeEstimator(AnnotationMapsPtr pAllColumnAnnotations);
     ~DateTimeEstimator(void) override = default;
 
-    DateTimeEstimator(DateTimeEstimator const &) = delete;
-    DateTimeEstimator & operator =(DateTimeEstimator const &) = delete;
-
-    DateTimeEstimator(DateTimeEstimator &&) = default;
-    DateTimeEstimator & operator =(DateTimeEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DateTimeEstimator);
 };
 
 } // Namespace Featurizer

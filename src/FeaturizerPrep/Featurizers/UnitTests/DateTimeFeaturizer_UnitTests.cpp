@@ -16,7 +16,7 @@ using SysClock = std::chrono::system_clock;
 TEST_CASE("DateTimeEstimator") {
     CHECK(DateTimeEstimator(CreateTestAnnotationMapsPtr(2)).Name == "DateTimeEstimator");
     CHECK(DateTimeEstimator(CreateTestAnnotationMapsPtr(2)).is_training_complete());
-    CHECK(std::dynamic_pointer_cast<DateTimeTransformer>(DateTimeEstimator(CreateTestAnnotationMapsPtr(2)).create_transformer()));
+    CHECK(dynamic_cast<DateTimeTransformer *>(DateTimeEstimator(CreateTestAnnotationMapsPtr(2)).create_transformer().get()));
 }
 
 TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {

@@ -19,11 +19,7 @@ struct NonCopyable {
     NonCopyable(T value) : Value(std::move(value)) {}
     ~NonCopyable(void) = default;
 
-    NonCopyable(NonCopyable const &) = delete;
-    NonCopyable & operator =(NonCopyable const &) = delete;
-
-    NonCopyable(NonCopyable &&) = default;
-    NonCopyable & operator =(NonCopyable &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(NonCopyable);
 
     bool operator ==(NonCopyable const &other) const {
         return Value == other.Value;
@@ -77,11 +73,7 @@ public:
 
     ~MyAnnotation(void) override = default;
 
-    MyAnnotation(MyAnnotation const &) = delete;
-    MyAnnotation & operator =(MyAnnotation const &) = delete;
-
-    MyAnnotation(MyAnnotation &&) = default;
-    MyAnnotation & operator =(MyAnnotation &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyAnnotation);
 };
 
 template <typename T, size_t ColIndexV, size_t MaxRowsV=100000>
@@ -139,7 +131,7 @@ private:
 
     // ----------------------------------------------------------------------
     // |  Private Methods
-    NS::Estimator::FitResult fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &) override {
+    NS::Estimator::FitResult fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) override {
         typename BaseType::FitBufferInputType const * const                 pEndBuffer(pBuffer + cBuffer);
 
         while(pBuffer != pEndBuffer) {
@@ -200,11 +192,7 @@ public:
         NS::InferenceOnlyEstimatorImpl<StringToIntTransformer>("StringToIntEstimator", std::move(pAllColumnAnnotations)) {
     }
 
-    StringToIntEstimator(StringToIntEstimator const &) = delete;
-    StringToIntEstimator & operator =(StringToIntEstimator const &) = delete;
-
-    StringToIntEstimator(StringToIntEstimator &&) = default;
-    StringToIntEstimator & operator =(StringToIntEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StringToIntEstimator);
 };
 
 class IntToStringTransformer : public NS::InferenceOnlyTransformerImpl<NonCopyable<size_t> const &, NonCopyable<std::string>> {
@@ -222,11 +210,7 @@ public:
         NS::InferenceOnlyEstimatorImpl<IntToStringTransformer>("IntToStringEstimator", std::move(pAllColumnAnnotations)) {
     }
 
-    IntToStringEstimator(IntToStringEstimator const &) = delete;
-    IntToStringEstimator & operator =(IntToStringEstimator const &) = delete;
-
-    IntToStringEstimator(IntToStringEstimator &&) = default;
-    IntToStringEstimator & operator =(IntToStringEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(IntToStringEstimator);
 };
 
 template <typename PipelineT>
@@ -264,7 +248,7 @@ std::vector<typename PipelineT::TransformedType> Test(
 
     assert(pipeline.is_training_complete());
 
-    typename PipelineT::TransformerPtr                  pTransformer(pipeline.create_transformer());
+    typename PipelineT::TransformerUniquePtr            pTransformer(pipeline.create_transformer());
     std::vector<typename PipelineT::TransformedType>    output;
 
     output.reserve(data.size());
@@ -545,11 +529,7 @@ public:
 
     ~SimpleEstimator(void) override = default;
 
-    SimpleEstimator(SimpleEstimator const &) = delete;
-    SimpleEstimator & operator =(SimpleEstimator const &) = delete;
-
-    SimpleEstimator(SimpleEstimator &&) = default;
-    SimpleEstimator & operator =(SimpleEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SimpleEstimator);
 
 private:
     // ----------------------------------------------------------------------
@@ -561,7 +541,7 @@ private:
 
     // ----------------------------------------------------------------------
     // |  Private Methods
-    NS::Estimator::FitResult fit_impl(FitBufferInputType *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &) override {
+    NS::Estimator::FitResult fit_impl(FitBufferInputType *pBuffer, size_t cBuffer) override {
         FitBufferInputType const * const    pEndBuffer(pBuffer + cBuffer);
 
         while(pBuffer != pEndBuffer) {
@@ -578,8 +558,8 @@ private:
         return NS::Estimator::FitResult::Complete;
     }
 
-    TransformerPtr create_transformer_impl(void) override {
-        return std::make_shared<Transformer>(_result);
+    TransformerUniquePtr create_transformer_impl(void) override {
+        return std::make_unique<Transformer>(_result);
     }
 };
 

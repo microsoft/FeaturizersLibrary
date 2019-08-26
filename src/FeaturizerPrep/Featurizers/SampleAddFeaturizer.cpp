@@ -31,11 +31,7 @@ public:
 
     ~SampleAddTransformer(void) override = default;
 
-    SampleAddTransformer(SampleAddTransformer const &) = delete;
-    SampleAddTransformer & operator =(SampleAddTransformer const &) = delete;
-
-    SampleAddTransformer(SampleAddTransformer &&) = default;
-    SampleAddTransformer & operator =(SampleAddTransformer &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SampleAddTransformer);
 
     TransformedType execute(InputType input) override {
         return input + Delta;
@@ -55,7 +51,7 @@ SampleAddEstimator::SampleAddEstimator(AnnotationMapsPtr pAllColumnAnnotations) 
     BaseType("SampleAddEstimator", std::move(pAllColumnAnnotations)) {
 }
 
-SampleAddEstimator::FitResult SampleAddEstimator::fit_impl(InputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &) /*override*/ {
+SampleAddEstimator::FitResult SampleAddEstimator::fit_impl(InputType const *pBuffer, size_t cBuffer) /*override*/ {
     InputType const * const                 pEndBuffer(pBuffer + cBuffer);
 
     while(pBuffer != pEndBuffer) {
@@ -70,8 +66,8 @@ SampleAddEstimator::FitResult SampleAddEstimator::complete_training_impl(void) /
     return FitResult::Complete;
 }
 
-SampleAddEstimator::TransformerPtr SampleAddEstimator::create_transformer_impl(void) /*override*/ {
-    return std::make_shared<SampleAddTransformer>(_accumulated_delta);
+SampleAddEstimator::TransformerUniquePtr SampleAddEstimator::create_transformer_impl(void) /*override*/ {
+    return std::make_unique<SampleAddTransformer>(_accumulated_delta);
 }
 
 } // namespace Featurizer

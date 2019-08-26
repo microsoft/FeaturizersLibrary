@@ -17,7 +17,7 @@ using namespace Microsoft::Featurizer;
 TEST_CASE("StringEstimator") {
     CHECK(StringEstimator<int>(CreateTestAnnotationMapsPtr(2)).Name == "StringEstimator");
     CHECK(StringEstimator<int>(CreateTestAnnotationMapsPtr(2)).is_training_complete());
-    CHECK(std::dynamic_pointer_cast<StringTransformer<int>>(StringEstimator<int>(CreateTestAnnotationMapsPtr(2)).create_transformer()));
+    CHECK(dynamic_cast<StringTransformer<int> *>(StringEstimator<int>(CreateTestAnnotationMapsPtr(2)).create_transformer().get()));
 }
 
 TEST_CASE("Transformer_Binary") {

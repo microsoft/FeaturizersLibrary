@@ -30,11 +30,7 @@ public:
 
     ~MyAnnotation(void) override = default;
 
-    MyAnnotation(MyAnnotation const &) = delete;
-    MyAnnotation & operator =(MyAnnotation const &) = delete;
-
-    MyAnnotation(MyAnnotation &&) = default;
-    MyAnnotation & operator =(MyAnnotation &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyAnnotation);
 };
 
 TEST_CASE("Annotation") {
@@ -56,11 +52,7 @@ public:
 
     ~MyEstimator(void) override = default;
 
-    MyEstimator(MyEstimator const &) = delete;
-    MyEstimator & operator =(MyEstimator const &) = delete;
-
-    MyEstimator(MyEstimator &&) = default;
-    MyEstimator & operator =(MyEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyEstimator);
 
     void add_annotation(size_t col_index, int state, bool invalid_add=false) const {
         Microsoft::Featurizer::Estimator::add_annotation(invalid_add ? AnnotationPtr() : std::make_shared<MyAnnotation>(this, state), col_index);
@@ -111,11 +103,7 @@ public:
 
     ~MyFitEstimator(void) override = default;
 
-    MyFitEstimator(MyFitEstimator const &) = delete;
-    MyFitEstimator & operator =(MyFitEstimator const &) = delete;
-
-    MyFitEstimator(MyFitEstimator &&) = default;
-    MyFitEstimator & operator =(MyFitEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyFitEstimator);
 
 private:
     // ----------------------------------------------------------------------
@@ -124,7 +112,7 @@ private:
 
     // ----------------------------------------------------------------------
     // |  Private Methods
-    FitResult fit_impl(InputType const *, size_t, nonstd::optional<std::uint64_t> const &) override {
+    FitResult fit_impl(InputType const *, size_t) override {
         return _return_complete_from_fit ? FitResult::Complete : FitResult::Continue;
     }
 
@@ -149,11 +137,8 @@ TEST_CASE("FitEstimatorImpl") {
     // Invalid invocation
     CHECK_THROWS_WITH(manual_complete.fit(reinterpret_cast<int *>(&manual_complete), 0), "Invalid buffer");
     CHECK_THROWS_WITH(manual_complete.fit(nullptr, 10), "Invalid buffer");
-    CHECK_THROWS_WITH(manual_complete.fit(nullptr, 0), "Invalid invocation");
-    CHECK_THROWS_WITH(manual_complete.fit(reinterpret_cast<int *>(&manual_complete), 1, static_cast<std::uint64_t>(0)), "Invalid number of nulls");
 
     CHECK(manual_complete.fit(reinterpret_cast<int *>(&manual_complete), 1) == MyFitEstimator::FitResult::Continue);
-    CHECK(manual_complete.fit(nullptr, 0, static_cast<std::uint64_t>(1)) == MyFitEstimator::FitResult::Continue);
 
     CHECK(manual_complete.is_training_complete() == false);
     manual_complete.complete_training();
@@ -178,11 +163,7 @@ public:
         MyTransformer(void) = default;
         ~MyTransformer(void) override = default;
 
-        MyTransformer(MyTransformer const &) = delete;
-        MyTransformer & operator =(MyTransformer const &) = delete;
-
-        MyTransformer(MyTransformer &&) = default;
-        MyTransformer & operator =(MyTransformer &&) = delete;
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyTransformer);
 
         bool execute(int value) override {
             return value & 1;
@@ -202,11 +183,7 @@ public:
 
     ~MyTransformerEstimator(void) override = default;
 
-    MyTransformerEstimator(MyTransformerEstimator const &) = delete;
-    MyTransformerEstimator & operator =(MyTransformerEstimator const &) = delete;
-
-    MyTransformerEstimator(MyTransformerEstimator &&) = default;
-    MyTransformerEstimator & operator =(MyTransformerEstimator &&) = delete;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyTransformerEstimator);
 
 private:
     // ----------------------------------------------------------------------
@@ -215,7 +192,7 @@ private:
 
     // ----------------------------------------------------------------------
     // |  Private Methods
-    FitResult fit_impl(InputType const *, size_t, nonstd::optional<std::uint64_t> const &) override {
+    FitResult fit_impl(InputType const *, size_t) override {
         throw std::runtime_error("This should never be called");
     }
 
@@ -223,8 +200,8 @@ private:
         throw std::runtime_error("This should never be called");
     }
 
-    TransformerPtr create_transformer_impl(void) override {
-        return _return_invalid_transformer ? TransformerPtr() : std::make_shared<MyTransformer>();
+    TransformerUniquePtr create_transformer_impl(void) override {
+        return _return_invalid_transformer ? TransformerUniquePtr() : std::make_unique<MyTransformer>();
     }
 };
 
