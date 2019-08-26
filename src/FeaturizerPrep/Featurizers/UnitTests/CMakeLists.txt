@@ -23,17 +23,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(libFeaturizers STATIC
-    ../SampleAdd.h
-    ../SampleAdd.cpp
     ../DateTimeFeaturizer.h
     ../DateTimeFeaturizer.cpp
+    ../SampleAddFeaturizer.h
+    ../SampleAddFeaturizer.cpp
     ../StringFeaturizer.h
 )
 
 enable_testing()
 
 foreach(_test_name IN ITEMS
-    SampleAdd_UnitTest
+    SampleAddFeaturizer_UnitTest
     DateTimeFeaturizer_UnitTests
     StringFeaturizer_UnitTest
 )

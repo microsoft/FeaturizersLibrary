@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License
 // ----------------------------------------------------------------------
-#include "SampleAdd.h"
+#include "SampleAddFeaturizer.h"
 
 #include "../Archive.h"
 
@@ -13,7 +13,7 @@ namespace Featurizer {
 ///  \class         SampleAddTransformer
 ///  \brief         Adds a delta to the provided value.
 ///
-class SampleAddTransformer : public SampleAddFeaturizer::BaseType::Transformer {
+class SampleAddTransformer : public SampleAddEstimator::BaseType::Transformer {
 public:
     // ----------------------------------------------------------------------
     // |  Public Data
@@ -48,14 +48,14 @@ public:
 
 // ----------------------------------------------------------------------
 // |
-// |  SampleAddFeaturizer
+// |  SampleAddEstimator
 // |
 // ----------------------------------------------------------------------
-SampleAddFeaturizer::SampleAddFeaturizer(AnnotationMapsPtr pAllColumnAnnotations) :
-    BaseType("SampleAddFeaturizer", std::move(pAllColumnAnnotations)) {
+SampleAddEstimator::SampleAddEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+    BaseType("SampleAddEstimator", std::move(pAllColumnAnnotations)) {
 }
 
-SampleAddFeaturizer::FitResult SampleAddFeaturizer::fit_impl(InputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &) /*override*/ {
+SampleAddEstimator::FitResult SampleAddEstimator::fit_impl(InputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &) /*override*/ {
     InputType const * const                 pEndBuffer(pBuffer + cBuffer);
 
     while(pBuffer != pEndBuffer) {
@@ -66,11 +66,11 @@ SampleAddFeaturizer::FitResult SampleAddFeaturizer::fit_impl(InputType const *pB
     return FitResult::Continue;
 }
 
-SampleAddFeaturizer::FitResult SampleAddFeaturizer::complete_training_impl(void) /*override*/ {
+SampleAddEstimator::FitResult SampleAddEstimator::complete_training_impl(void) /*override*/ {
     return FitResult::Complete;
 }
 
-SampleAddFeaturizer::TransformerPtr SampleAddFeaturizer::create_transformer_impl(void) /*override*/ {
+SampleAddEstimator::TransformerPtr SampleAddEstimator::create_transformer_impl(void) /*override*/ {
     return std::make_shared<SampleAddTransformer>(_accumulated_delta);
 }
 

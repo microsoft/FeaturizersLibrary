@@ -10,12 +10,12 @@ namespace Microsoft {
 namespace Featurizer {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         SampleAddFeaturizer
+///  \class         SampleAddEstimator
 ///  \brief         A Transformer and Estimator that add values. This is a
 ///                 sample intended to demonstrate patterns within the
 ///                 implementation of these types.
 ///
-class SampleAddFeaturizer : public TransformerEstimator<std::uint16_t, std::uint32_t> {
+class SampleAddEstimator : public TransformerEstimator<std::uint16_t, std::uint32_t> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -29,14 +29,14 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    SampleAddFeaturizer(AnnotationMapsPtr pAllColumnAnnotations);
-    ~SampleAddFeaturizer(void) override = default;
+    SampleAddEstimator(AnnotationMapsPtr pAllColumnAnnotations);
+    ~SampleAddEstimator(void) override = default;
 
-    SampleAddFeaturizer(SampleAddFeaturizer const &) = delete;
-    SampleAddFeaturizer & operator =(SampleAddFeaturizer const &) = delete;
+    SampleAddEstimator(SampleAddEstimator const &) = delete;
+    SampleAddEstimator & operator =(SampleAddEstimator const &) = delete;
 
-    SampleAddFeaturizer(SampleAddFeaturizer &&) = default;
-    SampleAddFeaturizer & operator =(SampleAddFeaturizer &&) = delete;
+    SampleAddEstimator(SampleAddEstimator &&) = default;
+    SampleAddEstimator & operator =(SampleAddEstimator &&) = delete;
 
 private:
     // ----------------------------------------------------------------------

@@ -46,7 +46,7 @@ public:
 };
 
 template <typename T>
-class StringFeaturizer : public InferenceOnlyFeaturizerImpl<StringTransformer<T>> {
+class StringEstimator : public InferenceOnlyEstimatorImpl<StringTransformer<T>> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -54,22 +54,22 @@ public:
     // |
     // ----------------------------------------------------------------------
     using Type                              = T;
-    using ThisType                          = StringFeaturizer<Type>;
-    using BaseType                          = InferenceOnlyFeaturizerImpl<StringTransformer<Type>>;
+    using ThisType                          = StringEstimator<Type>;
+    using BaseType                          = InferenceOnlyEstimatorImpl<StringTransformer<Type>>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    StringFeaturizer(AnnotationMapsPtr pAllCoumnAnnotations);
-    ~StringFeaturizer(void) override = default;
+    StringEstimator(AnnotationMapsPtr pAllCoumnAnnotations);
+    ~StringEstimator(void) override = default;
 
-    StringFeaturizer(StringFeaturizer const &) = delete;
-    StringFeaturizer & operator =(StringFeaturizer const &) = delete;
+    StringEstimator(StringEstimator const &) = delete;
+    StringEstimator & operator =(StringEstimator const &) = delete;
 
-    StringFeaturizer(StringFeaturizer &&) = default;
-    StringFeaturizer & operator =(StringFeaturizer &&) = delete;
+    StringEstimator(StringEstimator &&) = default;
+    StringEstimator & operator =(StringEstimator &&) = delete;
 };
 
 // ----------------------------------------------------------------------
@@ -99,12 +99,12 @@ typename StringTransformer<T>::BaseType::TransformedType StringTransformer<T>::e
 
 // ----------------------------------------------------------------------
 // |
-// |  StringFeaturizer
+// |  StringEstimator
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-StringFeaturizer<T>::StringFeaturizer(AnnotationMapsPtr pAllColumnAnnotations) :
-    BaseType("StringFeaturizer", std::move(pAllColumnAnnotations)) {
+StringEstimator<T>::StringEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+    BaseType("StringEstimator", std::move(pAllColumnAnnotations)) {
 }
 
 } // namespace Featurizer

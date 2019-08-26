@@ -463,19 +463,14 @@ struct Traits<std::map<KeyT, T, CompareT, AllocatorT>> : public TraitsImpl<std::
         std::uint32_t                       size(ar.template deserialize<std::uint32_t>());
 
         while(size) {
-            std::pair<typename MapType::iterator, bool> const               rval(
-                result.emplace(
-                    [&ar](void) -> std::pair<KeyT, T> {
-                        KeyT                key(Traits<KeyT>::deserialize(ar));
-                        T                   value(Traits<T>::deserialize(ar));
+            result.emplace(
+                [&ar](void) -> std::pair<KeyT, T> {
+                    KeyT                    key(Traits<KeyT>::deserialize(ar));
+                    T                       value(Traits<T>::deserialize(ar));
 
-                        return std::make_pair(std::move(key), std::move(value));
-                    }()
-                )
+                    return std::make_pair(std::move(key), std::move(value));
+                }()
             );
-
-            if(rval.first == result.end() || rval.second == false)
-                throw std::runtime_error("Invalid map insertion");
 
             --size;
         }

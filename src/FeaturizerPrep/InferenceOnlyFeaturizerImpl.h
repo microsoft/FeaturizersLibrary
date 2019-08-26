@@ -12,7 +12,7 @@ namespace Featurizer {
 /////////////////////////////////////////////////////////////////////////
 ///  \class         InferenceOnlyTransformerImpl
 ///  \brief         Implements functionality common to a `Transformer`
-///                 associated with a `Featurizer` that doesn't generate
+///                 associated with a `Estimator` that doesn't generate
 ///                 state during training.
 ///
 template <typename InputT, typename TransformedT>
@@ -49,8 +49,8 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         InferenceOnlyFeaturizerImpl
-///  \brief         Featurizer that only participates in inferencing
+///  \class         InferenceOnlyEstimatorImpl
+///  \brief         Estimator that only participates in inferencing
 ///                 activities - no training is required. This class implement
 ///                 the scaffolding necessary to produce a transformer.
 ///
@@ -59,7 +59,7 @@ template <
     typename InputT=typename TransformerT::InputType,
     typename TransformedT=typename TransformerT::TransformedType
 >
-class InferenceOnlyFeaturizerImpl : public TransformerEstimator<InputT, TransformedT> {
+class InferenceOnlyEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -70,7 +70,7 @@ public:
     using InputType                         = InputT;
     using TransformedType                   = TransformedT;
 
-    using ThisType                          = InferenceOnlyFeaturizerImpl<TransformerType, InputType, TransformedType>;
+    using ThisType                          = InferenceOnlyEstimatorImpl<TransformerType, InputType, TransformedType>;
     using BaseType                          = TransformerEstimator<InputType, TransformedType>;
 
     using FitBufferInputType                = typename BaseType::FitBufferInputType;
@@ -80,14 +80,14 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    InferenceOnlyFeaturizerImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
-    ~InferenceOnlyFeaturizerImpl(void) override = default;
+    InferenceOnlyEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
+    ~InferenceOnlyEstimatorImpl(void) override = default;
 
-    InferenceOnlyFeaturizerImpl(InferenceOnlyFeaturizerImpl const &) = delete;
-    InferenceOnlyFeaturizerImpl & operator =(InferenceOnlyFeaturizerImpl const &) = delete;
+    InferenceOnlyEstimatorImpl(InferenceOnlyEstimatorImpl const &) = delete;
+    InferenceOnlyEstimatorImpl & operator =(InferenceOnlyEstimatorImpl const &) = delete;
 
-    InferenceOnlyFeaturizerImpl(InferenceOnlyFeaturizerImpl &&) = default;
-    InferenceOnlyFeaturizerImpl & operator =(InferenceOnlyFeaturizerImpl &&) = delete;
+    InferenceOnlyEstimatorImpl(InferenceOnlyEstimatorImpl &&) = default;
+    InferenceOnlyEstimatorImpl & operator =(InferenceOnlyEstimatorImpl &&) = delete;
 
 private:
     // ----------------------------------------------------------------------
@@ -95,6 +95,9 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
+
+    // Note that the following training methods aren't used, but need to be overridden as
+    // the base implementations are abstract. The noop definitions are below.
     Estimator::FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer, nonstd::optional<std::uint64_t> const &optionalNumTrailingNulls) override;
     Estimator::FitResult complete_training_impl(void) override;
 
@@ -131,11 +134,11 @@ void InferenceOnlyTransformerImpl<InputT, TransformedT>::save(Archive &) const /
 
 // ----------------------------------------------------------------------
 // |
-// |  InferenceOnlyFeaturizerImpl
+// |  InferenceOnlyEstimatorImpl
 // |
 // ----------------------------------------------------------------------
 template <typename TransformerT, typename InputT, typename TransformedT>
-InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::InferenceOnlyFeaturizerImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations) :
+InferenceOnlyEstimatorImpl<TransformerT, InputT, TransformedT>::InferenceOnlyEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations) :
     BaseType(std::move(name), std::move(pAllColumnAnnotations), true) {
 }
 
@@ -143,13 +146,13 @@ InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::InferenceOnlyFe
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename TransformerT, typename InputT, typename TransformedT>
-Estimator::FitResult InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::fit_impl(FitBufferInputType const *, size_t, nonstd::optional<std::uint64_t> const &) /*override*/ {
-    throw std::runtime_error("This should never be called");
+Estimator::FitResult InferenceOnlyEstimatorImpl<TransformerT, InputT, TransformedT>::fit_impl(FitBufferInputType const *, size_t, nonstd::optional<std::uint64_t> const &) /*override*/ {
+    throw std::runtime_error("This should never be called as this class will not be used during training");
 }
 
 template <typename TransformerT, typename InputT, typename TransformedT>
-Estimator::FitResult InferenceOnlyFeaturizerImpl<TransformerT, InputT, TransformedT>::complete_training_impl(void) /*override*/ {
-    throw std::runtime_error("This should never be called");
+Estimator::FitResult InferenceOnlyEstimatorImpl<TransformerT, InputT, TransformedT>::complete_training_impl(void) /*override*/ {
+    throw std::runtime_error("This should never be called as this class will not be used during training");
 }
 
 } // namespace Featurizer

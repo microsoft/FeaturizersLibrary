@@ -29,6 +29,7 @@ foreach(_test_name IN ITEMS
     Featurizer_UnitTest
     InferenceOnlyFeaturizerImpl_UnitTest
     PipelineExecutionEstimator_UnitTest
+    TrainingOnlyEstimatorImpl_UnitTest
     Traits_UnitTest
 )
     add_executable(${_test_name} ${_test_name}.cpp)

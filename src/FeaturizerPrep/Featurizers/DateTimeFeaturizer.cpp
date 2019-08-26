@@ -64,11 +64,11 @@ DateTimeTransformer::TransformedType DateTimeTransformer::execute(InputType inpu
 
 // ----------------------------------------------------------------------
 // |
-// |  DateTimeFeaturizer
+// |  DateTimeEstimator
 // |
 // ----------------------------------------------------------------------
-DateTimeFeaturizer::DateTimeFeaturizer(AnnotationMapsPtr pAllColumnAnnotations) :
-    BaseType("DateTimeFeaturizer", std::move(pAllColumnAnnotations)) {
+DateTimeEstimator::DateTimeEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+    BaseType("DateTimeEstimator", std::move(pAllColumnAnnotations)) {
 }
 
 } // namespace Featurizer

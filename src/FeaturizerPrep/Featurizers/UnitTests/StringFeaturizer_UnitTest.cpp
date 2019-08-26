@@ -14,10 +14,10 @@
 ///
 using namespace Microsoft::Featurizer;
 
-TEST_CASE("StringFeaturizer") {
-    CHECK(StringFeaturizer<int>(CreateTestAnnotationMapsPtr(2)).Name == "StringFeaturizer");
-    CHECK(StringFeaturizer<int>(CreateTestAnnotationMapsPtr(2)).is_training_complete());
-    CHECK(std::dynamic_pointer_cast<StringTransformer<int>>(StringFeaturizer<int>(CreateTestAnnotationMapsPtr(2)).create_transformer()));
+TEST_CASE("StringEstimator") {
+    CHECK(StringEstimator<int>(CreateTestAnnotationMapsPtr(2)).Name == "StringEstimator");
+    CHECK(StringEstimator<int>(CreateTestAnnotationMapsPtr(2)).is_training_complete());
+    CHECK(std::dynamic_pointer_cast<StringTransformer<int>>(StringEstimator<int>(CreateTestAnnotationMapsPtr(2)).create_transformer()));
 }
 
 TEST_CASE("Transformer_Binary") {
@@ -82,6 +82,3 @@ TEST_CASE("Transformer_Maps") {
     std::string map_s{ "{5:35.8,93:0.147}" };
     CHECK(StringTransformer<std::map<std::int16_t, std::double_t>>().execute(m) == map_s);
 }
-
-
-

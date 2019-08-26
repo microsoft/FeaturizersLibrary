@@ -32,31 +32,31 @@ public:
     }
 };
 
-class MyFeaturizer : public Microsoft::Featurizer::InferenceOnlyFeaturizerImpl<MyTransformer> {
+class MyEstimator : public Microsoft::Featurizer::InferenceOnlyEstimatorImpl<MyTransformer> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Types
-    using BaseType                          = Microsoft::Featurizer::InferenceOnlyFeaturizerImpl<MyTransformer>;
+    using BaseType                          = Microsoft::Featurizer::InferenceOnlyEstimatorImpl<MyTransformer>;
 
     // ----------------------------------------------------------------------
     // |  Public Methods
-    MyFeaturizer(AnnotationMapsPtr pAllColumnAnnotations) :
-        BaseType("MyFeaturizer", std::move(pAllColumnAnnotations)) {
+    MyEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+        BaseType("MyEstimator", std::move(pAllColumnAnnotations)) {
     }
 
-    ~MyFeaturizer(void) override = default;
+    ~MyEstimator(void) override = default;
 
-    MyFeaturizer(MyFeaturizer const &) = delete;
-    MyFeaturizer & operator =(MyFeaturizer const &) = delete;
+    MyEstimator(MyEstimator const &) = delete;
+    MyEstimator & operator =(MyEstimator const &) = delete;
 
-    MyFeaturizer(MyFeaturizer &&) = default;
-    MyFeaturizer & operator =(MyFeaturizer &&) = delete;
+    MyEstimator(MyEstimator &&) = default;
+    MyEstimator & operator =(MyEstimator &&) = delete;
 };
 
-TEST_CASE("MyFeaturizer") {
-    MyFeaturizer                            featurizer(CreateTestAnnotationMapsPtr(2));
+TEST_CASE("MyEstimator") {
+    MyEstimator                            featurizer(CreateTestAnnotationMapsPtr(2));
 
-    CHECK(featurizer.Name == "MyFeaturizer");
+    CHECK(featurizer.Name == "MyEstimator");
     CHECK(featurizer.is_training_complete());
     CHECK(featurizer.has_created_transformer() == false);
 

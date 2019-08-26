@@ -6,10 +6,10 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "../SampleAdd.h"
+#include "../SampleAddFeaturizer.h"
 
 // ----------------------------------------------------------------------
-using Microsoft::Featurizer::SampleAddFeaturizer;
+using Microsoft::Featurizer::SampleAddEstimator;
 using Microsoft::Featurizer::CreateTestAnnotationMapsPtr;
 // ----------------------------------------------------------------------
 
@@ -18,13 +18,13 @@ using Microsoft::Featurizer::CreateTestAnnotationMapsPtr;
 #   pragma clang diagnostic ignored "-Wmissing-prototypes"
 #endif
 
-SampleAddFeaturizer::TransformerPtr Train(std::vector<std::uint16_t> const &input) {
-    SampleAddFeaturizer                     featurizer(CreateTestAnnotationMapsPtr(2));
+SampleAddEstimator::TransformerPtr Train(std::vector<std::uint16_t> const &input) {
+    SampleAddEstimator                      estimator(CreateTestAnnotationMapsPtr(2));
 
-    featurizer.fit(input.data(), input.size());
-    featurizer.complete_training();
+    estimator.fit(input.data(), input.size());
+    estimator.complete_training();
 
-    return featurizer.create_transformer();
+    return estimator.create_transformer();
 }
 
 #if (defined __clang__)

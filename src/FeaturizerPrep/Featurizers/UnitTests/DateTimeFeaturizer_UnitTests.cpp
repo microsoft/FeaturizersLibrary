@@ -13,13 +13,13 @@ namespace Featurizer {
 
 using SysClock = std::chrono::system_clock;
 
-TEST_CASE("DateTimeFeaturizer") {
-    CHECK(DateTimeFeaturizer(CreateTestAnnotationMapsPtr(2)).Name == "DateTimeFeaturizer");
-    CHECK(DateTimeFeaturizer(CreateTestAnnotationMapsPtr(2)).is_training_complete());
-    CHECK(std::dynamic_pointer_cast<DateTimeTransformer>(DateTimeFeaturizer(CreateTestAnnotationMapsPtr(2)).create_transformer()));
+TEST_CASE("DateTimeEstimator") {
+    CHECK(DateTimeEstimator(CreateTestAnnotationMapsPtr(2)).Name == "DateTimeEstimator");
+    CHECK(DateTimeEstimator(CreateTestAnnotationMapsPtr(2)).is_training_complete());
+    CHECK(std::dynamic_pointer_cast<DateTimeTransformer>(DateTimeEstimator(CreateTestAnnotationMapsPtr(2)).create_transformer()));
 }
 
-TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeFeaturizer][DateTime]") {
+TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {
     const time_t date = 217081624;
     SysClock::time_point stp = SysClock::from_time_t(date);
 
@@ -49,7 +49,7 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeFeaturizer][DateTime]") {
     CHECK(tp2.day == 17);
 }
 
-TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeFeaturizer][DateTimeTransformer]") {
+TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeTransformer][DateTimeTransformer]") {
     const time_t date = 217081625;
     SysClock::time_point stp = SysClock::from_time_t(date);
 
@@ -68,7 +68,7 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeFeaturizer][DateTimeTransfor
 
 }
 
-TEST_CASE("Future - 2025 June 30", "[DateTimeFeaturizer][DateTimeTransformer]") {
+TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]") {
     const time_t date = 1751241600;
     SysClock::time_point stp = SysClock::from_time_t(date);
 
@@ -89,7 +89,7 @@ TEST_CASE("Future - 2025 June 30", "[DateTimeFeaturizer][DateTimeTransformer]") 
 #ifdef _MSC_VER
 // others define system_clock::time_point as nanoseconds (64-bit),
 // which rolls over somewhere around 2260. Still a couple hundred years!
-TEST_CASE("Far Future - 2998 March 2, 14:03:02", "[DateTimeFeaturizer][DateTimeTransformer]") {
+TEST_CASE("Far Future - 2998 March 2, 14:03:02", "[DateTimeTransformer][DateTimeTransformer]") {
     const time_t date = 32445842582;
     SysClock::time_point stp = SysClock::from_time_t(date);
 
@@ -110,7 +110,7 @@ TEST_CASE("Far Future - 2998 March 2, 14:03:02", "[DateTimeFeaturizer][DateTimeT
 #else
 
 // msvcrt doesn't support negative time_t, so nothing before 1970
-TEST_CASE("Pre-Epoch - 1776 July 4", "[DateTimeFeaturizer][DateTimeTransformer]")
+TEST_CASE("Pre-Epoch - 1776 July 4", "[DateTimeTransformer][DateTimeTransformer]")
 {
     const time_t date = -6106060800;
     SysClock::time_point stp = SysClock::from_time_t(date);

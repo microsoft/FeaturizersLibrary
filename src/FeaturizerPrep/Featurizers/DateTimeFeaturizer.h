@@ -80,28 +80,28 @@ public:
     TransformedType execute(InputType input) override;
 };
 
-class DateTimeFeaturizer : public InferenceOnlyFeaturizerImpl<DateTimeTransformer> {
+class DateTimeEstimator : public InferenceOnlyEstimatorImpl<DateTimeTransformer> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = InferenceOnlyFeaturizerImpl<DateTimeTransformer>;
+    using BaseType                          = InferenceOnlyEstimatorImpl<DateTimeTransformer>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    DateTimeFeaturizer(AnnotationMapsPtr pAllColumnAnnotations);
-    ~DateTimeFeaturizer(void) override = default;
+    DateTimeEstimator(AnnotationMapsPtr pAllColumnAnnotations);
+    ~DateTimeEstimator(void) override = default;
 
-    DateTimeFeaturizer(DateTimeFeaturizer const &) = delete;
-    DateTimeFeaturizer & operator =(DateTimeFeaturizer const &) = delete;
+    DateTimeEstimator(DateTimeEstimator const &) = delete;
+    DateTimeEstimator & operator =(DateTimeEstimator const &) = delete;
 
-    DateTimeFeaturizer(DateTimeFeaturizer &&) = default;
-    DateTimeFeaturizer & operator =(DateTimeFeaturizer &&) = delete;
+    DateTimeEstimator(DateTimeEstimator &&) = default;
+    DateTimeEstimator & operator =(DateTimeEstimator &&) = delete;
 };
 
 } // Namespace Featurizer

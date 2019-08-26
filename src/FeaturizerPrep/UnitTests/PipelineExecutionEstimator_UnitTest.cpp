@@ -153,9 +153,6 @@ private:
 
                     std::pair<typename CountMap::iterator, bool> const      result(_map.insert(std::make_pair(InternalValueTraits<T>::get_value(input), 0)));
 
-                    if(result.first == _map.end() || result.second == false)
-                        throw std::runtime_error("Invalid map insertion");
-
                     return result.first;
                 }()
             );
@@ -195,12 +192,12 @@ public:
     }
 };
 
-class StringToIntEstimator : public NS::InferenceOnlyFeaturizerImpl<StringToIntTransformer> {
+class StringToIntEstimator : public NS::InferenceOnlyEstimatorImpl<StringToIntTransformer> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Methods
     StringToIntEstimator(NS::AnnotationMapsPtr pAllColumnAnnotations) :
-        NS::InferenceOnlyFeaturizerImpl<StringToIntTransformer>("StringToIntEstimator", std::move(pAllColumnAnnotations)) {
+        NS::InferenceOnlyEstimatorImpl<StringToIntTransformer>("StringToIntEstimator", std::move(pAllColumnAnnotations)) {
     }
 
     StringToIntEstimator(StringToIntEstimator const &) = delete;
@@ -217,12 +214,12 @@ public:
     }
 };
 
-class IntToStringEstimator : public NS::InferenceOnlyFeaturizerImpl<IntToStringTransformer> {
+class IntToStringEstimator : public NS::InferenceOnlyEstimatorImpl<IntToStringTransformer> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Methods
     IntToStringEstimator(NS::AnnotationMapsPtr pAllColumnAnnotations) :
-        NS::InferenceOnlyFeaturizerImpl<IntToStringTransformer>("IntToStringEstimator", std::move(pAllColumnAnnotations)) {
+        NS::InferenceOnlyEstimatorImpl<IntToStringTransformer>("IntToStringEstimator", std::move(pAllColumnAnnotations)) {
     }
 
     IntToStringEstimator(IntToStringEstimator const &) = delete;
