@@ -441,15 +441,20 @@ public:
     template <typename... ArgsT>
     EstimatorChainElementBase(ArgsT &&... args) :
         EstimatorType(std::forward<ArgsT>(args)...) {
-            // Ensure that transformers are populated for inference-only `Estimators`, as
-            // `complete_training` will not be called for these objects.
-            if(EstimatorType::is_training_complete())
-                init_transformer();
     }
 
     void complete_training(void) {
         EstimatorType::complete_training();
         init_transformer();
+    }
+
+    bool has_created_transformer(void) const {
+        return EstimatorType::has_created_transformer();
+    }
+
+    void init_transformer(void) {
+        assert(!_pTransformer);
+        _pTransformer = EstimatorType::create_transformer();
     }
 
     Transformer & get_transformer(void) const {
@@ -469,16 +474,6 @@ private:
     // |
     // ----------------------------------------------------------------------
     TransformerUniquePtr                    _pTransformer;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Methods
-    // |
-    // ----------------------------------------------------------------------
-    void init_transformer(void) {
-        assert(!_pTransformer);
-        _pTransformer = EstimatorType::create_transformer();
-    }
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -507,6 +502,14 @@ public:
     // |
     // ----------------------------------------------------------------------
     using EstimatorType::EstimatorType;
+
+    inline bool has_created_transformer(void) const {
+        // This will never create a transformer, but return true so we don't get
+        // spurious attempts to create one.
+        return true;
+    }
+
+    inline void init_transformer(void) {}
 };
 
 // ----------------------------------------------------------------------
@@ -574,43 +577,6 @@ protected:
         }
 
         return Estimator::FitResult::Continue;
-    }
-
-private:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Methods
-    // |
-    // ----------------------------------------------------------------------
-
-    /////////////////////////////////////////////////////////////////////////
-    ///  \function      fit_nulls
-    ///  \brief         Implements training for null values when the
-    ///                 input types are default constructible.
-    ///
-    template <typename InputT, typename TransformerT, typename NextT>
-    inline Estimator::FitResult fit_nulls(std::uint64_t remaining, TransformerT &transformer, NextT &next, std::true_type /*is_default_constructible*/) {
-        // Transform an empty input type and invoke the next Estimator N times
-        typename EstimatorType::TransformedType const                   value(transformer.execute(InputT()));
-
-        while(remaining--) {
-            typename Estimator::FitResult const                         result(next.fit(value));
-
-            if(result != Estimator::FitResult::Continue)
-                return result;
-        }
-
-        return Estimator::FitResult::Continue;
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-    ///  \function      fit_nulls
-    ///  \brief         Throws an exception when null values are provided for
-    ///                 items that are not default constructible.
-    ///
-    template <typename InputT, typename TransformerT, typename NextT>
-    inline Estimator::FitResult fit_nulls(std::uint64_t, TransformerT &, NextT &, std::false_type /*is_default_constructible*/) {
-        throw std::runtime_error("Nulls cannot be provided when the input type is not default constrictible");
     }
 };
 
@@ -724,8 +690,13 @@ public:
         if(EstimatorChainElementBase::is_training_complete() == false) {
             Estimator::FitResult            result(EstimatorChainElementBase::fit(pBuffer, cBuffer));
 
-            if(result == Estimator::FitResult::Complete && NextEstimatorChainElement::is_all_training_complete() == false)
-                result = Estimator::FitResult::ResetAndContinue;
+            if(result == Estimator::FitResult::Complete) {
+                _received_forceful_completion = true;
+                NextEstimatorChainElement::complete_training(false);
+
+                if(NextEstimatorChainElement::is_all_training_complete() == false)
+                    result = Estimator::FitResult::ResetAndContinue;
+            }
 
             return result;
         }
@@ -746,6 +717,13 @@ public:
                 _received_forceful_completion = true;
             } else
                 return Estimator::FitResult::ResetAndContinue;
+        } else {
+            if(EstimatorChainElementBase::has_created_transformer() == false) {
+                // If here, we are looking at an inference-only estimator. Create the
+                // transformer now that the ancestor state data is available.
+                EstimatorChainElementBase::init_transformer();
+                _received_forceful_completion = true;
+            }
         }
 
         // If this is a forceful completion but we haven't received a forceful creation
@@ -806,8 +784,13 @@ public:
     }
 
     Estimator::FitResult complete_training(bool is_forceful_completion) {
-        if(is_forceful_completion && EstimatorChainElementBase::is_training_complete() == false)
-            EstimatorChainElementBase::complete_training();
+        if(is_forceful_completion) {
+            if(EstimatorChainElementBase::is_training_complete() == false)
+                EstimatorChainElementBase::complete_training();
+        } else {
+            if(EstimatorChainElementBase::has_created_transformer() == false)
+                EstimatorChainElementBase::init_transformer();
+        }
 
         // While this chained element may be complete, we want to return a value that captures the
         // state of the entire chain.
@@ -1017,6 +1000,35 @@ public:
 } // anonymous namespace
 
 /////////////////////////////////////////////////////////////////////////
+///  \class         TransformerChain
+///  \brief         Chain of `Transformers`.
+///
+template <typename PipelineT>
+class TransformerChain : public TransformerChainElement<0, PipelineT> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = TransformerChainElement<0, PipelineT>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    template <typename EstimatorChainT>
+    TransformerChain(EstimatorChainT &estimators) :
+        BaseType(static_cast<EstimatorChainElement<0, PipelineT> &>(estimators)) {
+    }
+
+    TransformerChain(Archive &ar) :
+        BaseType(ar) {
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////
 ///  \class         EstimatorChain
 ///  \brief         Chain of `Estimators`.
 ///
@@ -1029,6 +1041,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = EstimatorChainElement<0, PipelineT>;
+    using TransformerType                   = TransformerChain<PipelineT>;
 
     // ----------------------------------------------------------------------
     // |
@@ -1037,35 +1050,8 @@ public:
     // ----------------------------------------------------------------------
     EstimatorChain(AnnotationMapsPtr pAllColumnAnnotations) :
         BaseType(std::move(pAllColumnAnnotations)) {
-    }
-};
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         TransformerChain
-///  \brief         Chain of `Transformers`.
-///
-template <typename PipelineT>
-class TransformerChain : public TransformerChainElement<0, PipelineT> {
-public:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    using EstimatorChain                    = EstimatorChain<PipelineT>;
-    using BaseType                          = TransformerChainElement<0, PipelineT>;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-    TransformerChain(EstimatorChain &estimators) :
-        BaseType(static_cast<EstimatorChainElement<0, PipelineT> &>(estimators)) {
-    }
-
-    TransformerChain(Archive &ar) :
-        BaseType(ar) {
+            // Give initial inference-only estimators an opportunity to create transformers
+            BaseType::complete_training(false);
     }
 };
 
