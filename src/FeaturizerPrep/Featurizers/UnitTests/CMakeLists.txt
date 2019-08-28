@@ -28,6 +28,7 @@ add_library(libFeaturizers STATIC
     ../SampleAddFeaturizer.h
     ../SampleAddFeaturizer.cpp
     ../StringFeaturizer.h
+    ../CatImputerFeaturizer.h
 )
 
 enable_testing()
@@ -36,6 +37,7 @@ foreach(_test_name IN ITEMS
     SampleAddFeaturizer_UnitTest
     DateTimeFeaturizer_UnitTests
     StringFeaturizer_UnitTest
+    CatImputerFeaturizer_UnitTests
 )
     add_executable(${_test_name} ${_test_name}.cpp)
 
