@@ -48,14 +48,15 @@ struct TimePoint {
 ///  \brief         A Transformer that takes a chrono::system_clock::time_point and
 ///                 returns a struct with all the data split out.
 ///
-class DateTimeTransformer : public InferenceOnlyTransformerImpl<std::chrono::system_clock::time_point, TimePoint> {
+//std::chrono::system_clock::time_point
+class DateTimeTransformer : public InferenceOnlyTransformerImpl<std::int64_t, TimePoint> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = InferenceOnlyTransformerImpl<std::chrono::system_clock::time_point, TimePoint>;
+    using BaseType                          = InferenceOnlyTransformerImpl<std::int64_t, TimePoint>;
 
     // ----------------------------------------------------------------------
     // |

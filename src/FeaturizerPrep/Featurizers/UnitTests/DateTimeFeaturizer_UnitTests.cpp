@@ -50,11 +50,8 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {
 }
 
 TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeTransformer][DateTimeTransformer]") {
-    const time_t date = 217081625;
-    SysClock::time_point stp = SysClock::from_time_t(date);
-
     DateTimeTransformer dt;
-    TimePoint tp = dt.execute(stp);
+    TimePoint tp = dt.execute(217081625);
     CHECK(tp.year == 1976);
     CHECK(tp.month == TimePoint::NOVEMBER);
     CHECK(tp.day == 17);
@@ -65,15 +62,13 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeTransformer][DateTimeTransfo
     CHECK(tp.dayOfYear == 321);
     CHECK(tp.quarterOfYear == 4);
     CHECK(tp.weekOfMonth == 2);
+    CHECK(true);
 
 }
 
 TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]") {
-    const time_t date = 1751241600;
-    SysClock::time_point stp = SysClock::from_time_t(date);
-
     DateTimeTransformer dt;
-    TimePoint tp = dt.execute(stp);
+    TimePoint tp = dt.execute(1751241600);
     CHECK(tp.year == 2025);
     CHECK(tp.month == TimePoint::JUNE);
     CHECK(tp.day == 30);
@@ -90,11 +85,9 @@ TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]")
 // others define system_clock::time_point as nanoseconds (64-bit),
 // which rolls over somewhere around 2260. Still a couple hundred years!
 TEST_CASE("Far Future - 2998 March 2, 14:03:02", "[DateTimeTransformer][DateTimeTransformer]") {
-    const time_t date = 32445842582;
-    SysClock::time_point stp = SysClock::from_time_t(date);
 
     DateTimeTransformer dt;
-    TimePoint tp = dt.execute(stp);
+    TimePoint tp = dt.execute(32445842582);
     CHECK(tp.year == 2998);
     CHECK(tp.month == TimePoint::MARCH);
     CHECK(tp.day == 2);
@@ -112,12 +105,10 @@ TEST_CASE("Far Future - 2998 March 2, 14:03:02", "[DateTimeTransformer][DateTime
 // msvcrt doesn't support negative time_t, so nothing before 1970
 TEST_CASE("Pre-Epoch - 1776 July 4", "[DateTimeTransformer][DateTimeTransformer]")
 {
-    const time_t date = -6106060800;
-    SysClock::time_point stp = SysClock::from_time_t(date);
 
     // Constructor
     DateTimeTransformer dt;
-    TimePoint tp = dt.execute(stp);
+    TimePoint tp = dt.execute(-6106060800);
     CHECK(tp.year == 1776);
     CHECK(tp.month == TimePoint::JULY);
     CHECK(tp.day == 4);

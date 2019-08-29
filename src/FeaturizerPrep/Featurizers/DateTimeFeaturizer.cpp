@@ -59,7 +59,8 @@ DateTimeTransformer::DateTimeTransformer(Archive &ar) :
 }
 
 DateTimeTransformer::TransformedType DateTimeTransformer::execute(InputType input) /*override*/ {
-    return TimePoint(input);
+    std::chrono::time_point<std::chrono::system_clock> time(std::chrono::seconds {input} );
+    return TimePoint(time);
 }
 
 // ----------------------------------------------------------------------
