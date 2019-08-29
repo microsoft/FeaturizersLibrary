@@ -7,7 +7,9 @@
 
 #include <array>
 #include <cmath>
+#include <limits>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -47,6 +49,7 @@ struct Traits {
     //   - nullable_type
     //
     //   // Methods
+    //   - static nullable_type CreateNullValue(void);
     //   - static bool IsNull(nullable_type const &value);
     //   - static std::string ToString(T const &value);
     //   - template <typename ArchiveT> static ArchiveT & serialize(ArchiveT &ar, T const &value);
@@ -74,6 +77,11 @@ struct Traits {
 template <typename T>
 struct TraitsImpl {
     using nullable_type = nonstd::optional<T>;
+
+    static nullable_type CreateNullValue(void) {
+        return nullable_type();
+    }
+
     static bool IsNull(nullable_type const& value) {
         return !value.has_value();
     }
@@ -252,16 +260,23 @@ struct Traits<std::uint64_t> : public TraitsImpl<std::uint64_t> {
 template <>
 struct Traits<std::float_t> {
     using nullable_type = std::float_t;
+
+    static nullable_type CreateNullValue(void) {
+        // Note that std::numeric_limits doesn't seem to be specialized for std::float_t
+        // on some systems - using float_t instead.
+        return std::numeric_limits<float_t>::quiet_NaN();
+    }
+
     static bool IsNull(nullable_type const& value) {
         return std::isnan(value);
     }
-	
-	static std::float_t const & GetValue(nullable_type const& value) {
-		if (IsNull(value))
-			throw std::runtime_error("GetValue attempt on float_t null.");
-		
-		return value;
-	}
+
+    static std::float_t const & GetValue(nullable_type const& value) {
+        if (IsNull(value))
+            throw std::runtime_error("GetValue attempt on float_t null.");
+
+        return value;
+    }
 
     static std::string ToString(nullable_type const& value) {
         if (IsNull(value))
@@ -287,16 +302,21 @@ struct Traits<std::float_t> {
 template <>
 struct Traits<std::double_t>  {
     using nullable_type = std::double_t;
+
+    static nullable_type CreateNullValue(void) {
+        return std::numeric_limits<std::double_t>::quiet_NaN();
+    }
+
     static bool IsNull(nullable_type const& value) {
         return std::isnan(value);
     }
 
-	static std::double_t const & GetValue(nullable_type const& value) {
-		if (IsNull(value))
-			throw std::runtime_error("GetValue attempt on double_t null.");
-		
-		return value;
-	}
+    static std::double_t const & GetValue(nullable_type const& value) {
+        if (IsNull(value))
+            throw std::runtime_error("GetValue attempt on double_t null.");
+
+        return value;
+    }
 
     static std::string ToString(nullable_type const& value) {
         if (IsNull(value))
@@ -496,10 +516,14 @@ struct Traits<std::map<KeyT, T, CompareT, AllocatorT>> : public TraitsImpl<std::
 template <typename T>
 struct Traits<nonstd::optional<T>>  {
     using nullable_type = nonstd::optional<T>;
-	
-	static bool IsNull(nullable_type const& value) {
-		return !value.has_value();
-	}
+
+    static nullable_type CreateNullValue(void) {
+        return nullable_type();
+    }
+
+    static bool IsNull(nullable_type const& value) {
+        return !value.has_value();
+    }
 
     static std::string ToString(nullable_type const& value) {
         if (value) {
@@ -507,14 +531,14 @@ struct Traits<nonstd::optional<T>>  {
         }
         return "NULL";
     }
-	
-	static T const & GetValue(nullable_type const& value) {
-		if (value){
-			return value.value();
-		}
-		else
-			throw std::runtime_error("GetValue attempt on Optional type null.");
-	}
+
+    static T const & GetValue(nullable_type const& value) {
+        if (value){
+            return value.value();
+        }
+        else
+            throw std::runtime_error("GetValue attempt on Optional type null.");
+    }
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, nonstd::optional<T> const &value) {

@@ -6,6 +6,8 @@
 
 #include "../InferenceOnlyFeaturizerImpl.h"
 
+#include <algorithm>
+
 namespace Microsoft {
 namespace Featurizer {
 namespace Details {
@@ -116,7 +118,7 @@ class HasTransformerType {
 private:
     // ----------------------------------------------------------------------
     // |  Private Methods
-    template <typename U> static std::true_type check(typename U::Transformer *);
+    template <typename U> static std::true_type check(typename U::TransformerType *);
     template <typename U> static std::false_type check(...);
 
 public:
@@ -249,7 +251,7 @@ public:
         "`TransformerEstimators` should not return reference types"
     );
 
-    static_assert(HasTransformerType<TransformerEstimatorT>::value, "`TransformerEstimators` must contain a type named `Transformer` to support construction via `Archive` objects");
+    static_assert(HasTransformerType<TransformerEstimatorT>::value, "`TransformerEstimators` must contain a type named `TransformerType` to support construction via `Archive` objects");
 };
 
 
@@ -828,7 +830,7 @@ public:
     }
 
     TransformerChainElementBase(Archive &ar) :
-        _pTransformer(std::make_shared<EstimatorChainElement::EstimatorType::Transformer>(ar)) {
+        _pTransformer(std::make_unique<typename EstimatorChainElement::EstimatorType::TransformerType>(ar)) {
     }
 
     inline typename EstimatorChainElement::EstimatorType::TransformedType execute(typename EstimatorChainElement::EstimatorType::InputType value) {

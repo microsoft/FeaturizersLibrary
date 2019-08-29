@@ -521,6 +521,8 @@ public:
         double                              _delta;
     };
 
+    using TransformerType                   = Transformer;
+
     // ----------------------------------------------------------------------
     // |  Public Methods
     SimpleEstimator(NS::AnnotationMapsPtr pAllColumnAnnotations) :

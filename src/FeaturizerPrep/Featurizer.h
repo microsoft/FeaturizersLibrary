@@ -159,7 +159,7 @@ public:
     ///  \enum          FitResult
     ///  \brief         Result returned by the `fit` method.
     ///
-    enum class FitResult {
+    enum class FitResult: unsigned char {
         Complete = 0,                       /// Fitting is complete and there is no need to call `fit` on this `Estimator` any more.
         Continue,                           /// Continue providing data to `fit` (if such data is available).
         ResetAndContinue                    /// Reset the data back to the beginning and continue training.

@@ -85,46 +85,32 @@ std::vector<typename PipelineT::TransformedType> Test(
     return output;
 }
 
-template <typename A>
-struct InternalValueTraits {
-	using Type = A;
-	static A GetNullvalue() { return A{}; }
-};
-
-template <>
-struct InternalValueTraits<float> {
-	static float GetNullvalue() { return std::numeric_limits<float>::quiet_NaN(); }
-};
-
-template <>
-struct InternalValueTraits<double> {
-	static double GetNullvalue() { return std::numeric_limits<double>::quiet_NaN(); }
-};
-
-template<typename inputType, typename transformedType, typename castType = uint8_t>
+template<typename transformedType, typename castType = uint8_t>
 void NumericTestWrapper(){
-	inputType null = InternalValueTraits<inputType>::GetNullvalue();
-	
-	// Passing int values to make_vector for an optional type gives following error
-	// error: implicit conversion loses integer precision: 'int' to 'nonstd::optional_lite::
-	// Hence explicit cast to uint8_t.
-	auto trainingBatches = 	make_vector<std::vector<inputType>>(
-                make_vector<inputType>(static_cast<castType>(10),static_cast<castType>(20),null),
-				make_vector<inputType>(static_cast<castType>(10),static_cast<castType>(30),null),
-				make_vector<inputType>(static_cast<castType>(10),static_cast<castType>(10),null),
-				make_vector<inputType>(static_cast<castType>(11),static_cast<castType>(15),null),
-				make_vector<inputType>(static_cast<castType>(18),static_cast<castType>(8),null));
-	
-	auto inferencingInput = make_vector<inputType>(static_cast<castType>(5),static_cast<castType>(8),static_cast<castType>(20)
-				,null,null,null,null);
-								
-	auto inferencingOutput = make_vector<transformedType>(5,8,20,10,10,10,10);
-	
-	NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    using inputType = typename NS::Traits<transformedType>::nullable_type;
 
-	CHECK(
+    inputType null = NS::Traits<transformedType>::CreateNullValue();
+
+    // Passing int values to make_vector for an optional type gives following error
+    // error: implicit conversion loses integer precision: 'int' to 'nonstd::optional_lite::
+    // Hence explicit cast to uint8_t.
+    auto trainingBatches = 	make_vector<std::vector<inputType>>(
+                make_vector<inputType>(static_cast<castType>(10),static_cast<castType>(20),null),
+                make_vector<inputType>(static_cast<castType>(10),static_cast<castType>(30),null),
+                make_vector<inputType>(static_cast<castType>(10),static_cast<castType>(10),null),
+                make_vector<inputType>(static_cast<castType>(11),static_cast<castType>(15),null),
+                make_vector<inputType>(static_cast<castType>(18),static_cast<castType>(8),null));
+
+    auto inferencingInput = make_vector<inputType>(static_cast<castType>(5),static_cast<castType>(8),static_cast<castType>(20)
+                ,null,null,null,null);
+
+    auto inferencingOutput = make_vector<transformedType>(5,8,20,10,10,10,10);
+
+    NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+
+    CHECK(
         Test(
-            NS::CatImputerEstimator<inputType,transformedType>(pAllColumnAnnotations),
+            NS::CatImputerEstimator<transformedType>(pAllColumnAnnotations),
             trainingBatches,
             inferencingInput
         ) == inferencingOutput
@@ -132,80 +118,72 @@ void NumericTestWrapper(){
 }
 
 TEST_CASE("CatImputer- int8_t") {
-	using type = nonstd::optional<std::int8_t>;
-	using transformedType = std::int8_t;
+    using transformedType = std::int8_t;
 
-	// With default castType of uint8_t we get following error
-	// error: implicit conversion changes signedness: 'unsigned char' to 'nonstd::optional_lite::detail::storage_t<signed char>::value_type' (aka 'signed char')
-	NumericTestWrapper<type,transformedType,std::int8_t>();
+    // With default castType of uint8_t we get following error
+    // error: implicit conversion changes signedness: 'unsigned char' to 'nonstd::optional_lite::detail::storage_t<signed char>::value_type' (aka 'signed char')
+    NumericTestWrapper<transformedType,std::int8_t>();
 }
 
 TEST_CASE("CatImputer- uint8_t") {
-	using type = nonstd::optional<std::uint8_t>;
-	using transformedType = std::uint8_t;
+    using transformedType = std::uint8_t;
 
-	NumericTestWrapper<type,transformedType>();
+    NumericTestWrapper<transformedType>();
 }
 
 TEST_CASE("CatImputer- uint16_t") {
-	using type = nonstd::optional<std::uint16_t>;
-	using transformedType = std::uint16_t;
+    using transformedType = std::uint16_t;
 
-	NumericTestWrapper<type,transformedType>();
+    NumericTestWrapper<transformedType>();
 }
 
 TEST_CASE("CatImputer- int16_t") {
-	using type = nonstd::optional<std::int16_t>;
-	using transformedType = std::int16_t;
+    using transformedType = std::int16_t;
 
-	NumericTestWrapper<type,transformedType>();
+    NumericTestWrapper<transformedType>();
 }
 
 TEST_CASE("CatImputer- uint32_t") {
-	using type = nonstd::optional<std::uint32_t>;
-	using transformedType = std::uint32_t;
+    using transformedType = std::uint32_t;
 
-	NumericTestWrapper<type,transformedType>();
+    NumericTestWrapper<transformedType>();
 }
 
 TEST_CASE("CatImputer- int32_t") {
-	using type = nonstd::optional<std::int32_t>;
-	using transformedType = std::int32_t;
+    using transformedType = std::int32_t;
 
-	NumericTestWrapper<type,transformedType>();
+    NumericTestWrapper<transformedType>();
 }
 
 TEST_CASE("CatImputer- uint64_t") {
-	using type = nonstd::optional<std::uint64_t>;
-	using transformedType = std::uint64_t;
-	
-	NumericTestWrapper<type,transformedType>();
+    using transformedType = std::uint64_t;
+
+    NumericTestWrapper<transformedType>();
 }
 
 TEST_CASE("CatImputer- int64_t") {
-	using type = nonstd::optional<std::int64_t>;
-	using transformedType = std::int64_t;
+    using transformedType = std::int64_t;
 
-	NumericTestWrapper<type,transformedType>();
+    NumericTestWrapper<transformedType>();
 }
 
 TEST_CASE("CatImputer- float") {
-	NumericTestWrapper<std::float_t,std::float_t>();
+    NumericTestWrapper<std::float_t>();
 }
 
 TEST_CASE("CatImputer- double") {
-	NumericTestWrapper<std::double_t,std::double_t>();
+    NumericTestWrapper<std::double_t,std::double_t>();
 }
 
 TEST_CASE("CatImputer- string") {
-	using type = nonstd::optional<std::string>;
-	using transformedType = std::string;
+    using type = nonstd::optional<std::string>;
+    using transformedType = std::string;
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
     CHECK(
         Test(
-            NS::CatImputerEstimator<type,transformedType>(pAllColumnAnnotations),
+            NS::CatImputerEstimator<transformedType>(pAllColumnAnnotations),
             make_vector<std::vector<type>>(
                 make_vector<type>("one", "one", "one",type{},type{},"two", "three")
             ),
@@ -215,49 +193,49 @@ TEST_CASE("CatImputer- string") {
 }
 
 TEST_CASE("CatImputer- All values Null") {
-	using type = nonstd::optional<std::int64_t>;
-	using transformedType = std::int64_t;
+    using type = nonstd::optional<std::int64_t>;
+    using transformedType = std::int64_t;
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
-	CHECK_THROWS_WITH(Test(
-            NS::CatImputerEstimator<type,transformedType>(pAllColumnAnnotations),
+    CHECK_THROWS_WITH(Test(
+            NS::CatImputerEstimator<transformedType>(pAllColumnAnnotations),
             make_vector<std::vector<type>>(
                 make_vector<type>(type{},type{},type{},type{},type{},type{})),
-				make_vector<type>(5, 8, 20,type{}))
-				, Catch::Contains("All null values or empty training set."));
+                make_vector<type>(5, 8, 20,type{}))
+                , Catch::Contains("All null values or empty training set."));
 }
 
 TEST_CASE("Serialization/Deserialization- Numeric") {
-	using type = nonstd::optional<std::int64_t>;
-	using transformedType = std::int64_t;
-	using transformerType = NS::HistogramConsumerEstimator<type,transformedType>::Transformer;
-	auto model = std::make_shared<transformerType>(10);
-	
-	NS::Archive archive;
-	model->save(archive);
-	std::vector<unsigned char> vec = archive.commit();
-	CHECK(vec.size() == 8);
-	
-	NS::Archive loader(vec);
-	transformerType modelLoaded(loader);
-	CHECK(modelLoaded.get_most_frequent_value() == 10);
+    using type = nonstd::optional<std::int64_t>;
+    using transformedType = std::int64_t;
+    using transformerType = NS::HistogramConsumerEstimator<type,transformedType>::Transformer;
+    auto model = std::make_shared<transformerType>(10);
+
+    NS::Archive archive;
+    model->save(archive);
+    std::vector<unsigned char> vec = archive.commit();
+    CHECK(vec.size() == 9);
+
+    NS::Archive loader(vec);
+    transformerType modelLoaded(loader);
+    CHECK(modelLoaded.get_most_frequent_value() == 10);
 }
 
 TEST_CASE("Serialization/Deserialization- string") {
-	using type = nonstd::optional<std::string>;
-	using transformedType = std::string;
-	using transformerType = NS::HistogramConsumerEstimator<type,transformedType>::Transformer;
-	auto model = std::make_shared<transformerType>("one");
-	
-	NS::Archive archive;
-	model->save(archive);
-	std::vector<unsigned char> vec = archive.commit();
-	
-	NS::Archive loader(vec);
-	transformerType modelLoaded(loader);
-	CHECK(modelLoaded.get_most_frequent_value() == "one");
-	
+    using type = nonstd::optional<std::string>;
+    using transformedType = std::string;
+    using transformerType = NS::HistogramConsumerEstimator<type,transformedType>::Transformer;
+    auto model = std::make_shared<transformerType>("one");
+
+    NS::Archive archive;
+    model->save(archive);
+    std::vector<unsigned char> vec = archive.commit();
+
+    NS::Archive loader(vec);
+    transformerType modelLoaded(loader);
+    CHECK(modelLoaded.get_most_frequent_value() == "one");
+
 }
 
 

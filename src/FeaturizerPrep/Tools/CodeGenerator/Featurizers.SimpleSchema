@@ -1,0 +1,25 @@
+<featurizers +>:
+    [name string]
+    [estimator_name string]
+    [num_output_columns number min=1]
+
+    <custom_structs *>:
+        [name string]
+        <members +>:
+            <type string>
+            <name string>
+
+    <configuration_params *>:
+        <type string>
+        <name string>
+        <is_optional bool default="false" ?>
+
+    <template ?>:
+        [name string]
+        <types string +>
+
+    <input_type string>
+    <is_input_optional bool default=false ?>
+
+    <transformed_type string>
+    <is_output_optional bool default=false ?>

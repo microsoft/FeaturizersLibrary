@@ -39,16 +39,16 @@ TEST_CASE("Transformer_Nullable") {
     nonstd::optional<std::int8_t> arg_null;
 	std::float_t arg_f_ini = std::numeric_limits<std::float_t>::quiet_NaN();
 	std::double_t arg_d_ini = std::numeric_limits<std::double_t>::quiet_NaN();
-	
+
 	nonstd::optional<std::int64_t> arg_64(-7799);
     std::float_t arg_f = 123;
     std::double_t arg_d = 123.45;
-	
+
     CHECK(Traits<nonstd::optional<std::int8_t>>::ToString(arg_null) == "NULL");
 	CHECK(Traits<std::float_t>::ToString(Traits<std::float_t>::GetValue(arg_f)) == "123");
 	CHECK(Traits<nonstd::optional<std::int64_t>>::GetValue(arg_64) == -7799);
 	CHECK(Traits<std::double_t>::ToString(Traits<std::double_t>::GetValue(arg_d)) == "123.45");
-	
+
 	CHECK_THROWS_WITH(Traits<nonstd::optional<std::int8_t>>::GetValue(arg_null)
 				, Catch::Contains("GetValue attempt on Optional type null."));
 	CHECK_THROWS_WITH(Traits<float_t>::GetValue(arg_f_ini)
@@ -225,4 +225,27 @@ TEST_CASE("Serialization") {
     CHECK(SerializationTestImpl(nonstd::optional<std::string>("foo")));
 
     CHECK(SerializationTestImpl(std::tuple<std::string, int, bool>("one", 2, true)));
+}
+
+template <typename T>
+bool TestCreateNullValue(void) {
+    return Traits<T>::IsNull(Traits<T>::CreateNullValue());
+}
+
+TEST_CASE("CreateNullValue") {
+    CHECK(TestCreateNullValue<std::int8_t>());
+    CHECK(TestCreateNullValue<std::int16_t>());
+    CHECK(TestCreateNullValue<std::int32_t>());
+    CHECK(TestCreateNullValue<std::int64_t>());
+    CHECK(TestCreateNullValue<std::uint8_t>());
+    CHECK(TestCreateNullValue<std::uint16_t>());
+    CHECK(TestCreateNullValue<std::uint32_t>());
+    CHECK(TestCreateNullValue<std::uint64_t>());
+    CHECK(TestCreateNullValue<std::float_t>());
+    CHECK(TestCreateNullValue<std::double_t>());
+    CHECK(TestCreateNullValue<bool>());
+    CHECK(TestCreateNullValue<std::string>());
+    CHECK(TestCreateNullValue<std::vector<std::string>>());
+    CHECK(TestCreateNullValue<std::map<std::string, std::uint32_t>>());
+    CHECK(TestCreateNullValue<nonstd::optional<std::int8_t>>());
 }

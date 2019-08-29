@@ -38,19 +38,6 @@ public:
     using TransformerUniquePtr              = typename BaseType::TransformerUniquePtr;
     using TransformedType                   = typename BaseType::TransformedType;
 
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-    PipelineExecutionEstimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
-
-private:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Types
-    // |
-    // ----------------------------------------------------------------------
     using EstimatorChain                    = Details::EstimatorChain<typename PipelineTraits::Pipeline>;
 
     class Transformer : public BaseType::Transformer {
@@ -81,6 +68,16 @@ private:
         TransformerChain                    _transformer_chain;
     };
 
+    using TransformerType                   = Transformer;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    PipelineExecutionEstimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
+
+private:
     // ----------------------------------------------------------------------
     // |
     // |  Private Data

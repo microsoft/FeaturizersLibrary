@@ -4,7 +4,9 @@
 // ----------------------------------------------------------------------
 #pragma once
 
+#include "Archive.h"
 #include "Featurizer.h"
+#include "Traits.h"
 
 namespace Microsoft {
 namespace Featurizer {
@@ -115,13 +117,14 @@ private:
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
-InferenceOnlyTransformerImpl<InputT, TransformedT>::InferenceOnlyTransformerImpl(Archive &) {
-    // Nothing to do here
+InferenceOnlyTransformerImpl<InputT, TransformedT>::InferenceOnlyTransformerImpl(Archive &ar) {
+    if(Traits<std::uint8_t>::deserialize(ar) != 1)
+        throw std::runtime_error("Invalid transformer version");
 }
 
 template <typename InputT, typename TransformedT>
-void InferenceOnlyTransformerImpl<InputT, TransformedT>::save(Archive &) const /*override*/ {
-    // Nothing to do here
+void InferenceOnlyTransformerImpl<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
+    Traits<std::uint8_t>::serialize(ar, 1); // Current version
 }
 
 // ----------------------------------------------------------------------
