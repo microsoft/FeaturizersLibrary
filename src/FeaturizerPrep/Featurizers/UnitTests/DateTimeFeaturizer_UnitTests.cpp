@@ -35,6 +35,17 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {
     CHECK(tp.dayOfYear == 321);
     CHECK(tp.quarterOfYear == 4);
     CHECK(tp.weekOfMonth == 2);
+    CHECK(tp.amPm == 1);
+    CHECK(tp.hour12 == 12);
+    CHECK(tp.dayOfQuarter == 48);
+    CHECK(tp.halfOfYear == 2);
+    CHECK(tp.weekIso == 47);
+    CHECK(tp.yearIso == 1976);
+    CHECK(tp.monthLabel == "November");
+    CHECK(tp.amPmLabel == "pm");
+    CHECK(tp.dayOfWeekLabel == "Wednesday");
+    CHECK(tp.holidayName == "NOT IMPLEMENTED");
+    CHECK(tp.isPaidTimeOff == 0);
 
     // assignment
     TimePoint tp1 = stp;
@@ -79,6 +90,17 @@ TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]")
     CHECK(tp.dayOfYear == 180);
     CHECK(tp.quarterOfYear == 2);
     CHECK(tp.weekOfMonth == 4);
+    CHECK(tp.amPm == 0);
+    CHECK(tp.hour12 == 0);
+    CHECK(tp.dayOfQuarter == 91);
+    CHECK(tp.halfOfYear == 1);
+    CHECK(tp.weekIso == 27);
+    CHECK(tp.yearIso == 2025);
+    CHECK(tp.monthLabel == "June");
+    CHECK(tp.amPmLabel == "am");
+    CHECK(tp.dayOfWeekLabel == "Monday");
+    CHECK(tp.holidayName == "NOT IMPLEMENTED");
+    CHECK(tp.isPaidTimeOff == 0);
 }
 
 #ifdef _MSC_VER
