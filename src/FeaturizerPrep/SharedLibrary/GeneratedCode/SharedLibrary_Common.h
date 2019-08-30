@@ -14,12 +14,23 @@
 #       define FEATURIZER_LIBRARY_API __declspec(dllimport)
 #   endif
 
+#   define FEATURIZER_LIBRARY_API_PACK_PREFIX               \
+    __pragma(pack(push))                                    \
+    __pragma(pack(1))
+
+#   define FEATURIZER_LIBRARY_API_PACK_SUFFIX               __pragma(pack(pop))
+#   define FEATURIZER_LIBRARY_API_PACK_INLINE
+
 #elif (defined __GNUC__ || defined __clang__)
 #   if (defined DLL_EXPORT_COMPILE)
 #       define FEATURIZER_LIBRARY_API __attribute__((visibility("default")))
 #   else
 #       define FEATURIZER_LIBRARY_API
 #   endif
+
+#   define FEATURIZER_LIBRARY_API_PACK_PREFIX
+#   define FEATURIZER_LIBRARY_API_PACK_SUFFIX
+#   define FEATURIZER_LIBRARY_API_PACK_INLINE               __attribute__((packed))
 
 #else
 #   error Unrecognized compiler!

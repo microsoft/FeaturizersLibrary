@@ -10,6 +10,8 @@ extern "C" {
 
 /* ---------------------------------------------------------------------- */
 /* |  DateTimeFeaturizer */
+FEATURIZER_LIBRARY_API_PACK_PREFIX
+
 struct TimePoint {
     /*out*/ int32_t year;
     /*out*/ uint8_t month;
@@ -36,7 +38,9 @@ struct TimePoint {
     /*out*/ char const * holidayName_ptr;
     /*out*/ std::size_t holidayName_items;
     /*out*/ uint8_t isPaidTimeOff;
-};
+} FEATURIZER_LIBRARY_API_PACK_INLINE;
+
+FEATURIZER_LIBRARY_API_PACK_SUFFIX
 
 struct DateTimeFeaturizer_EstimatorHandle {};
 struct DateTimeFeaturizer_TransformerHandle {};

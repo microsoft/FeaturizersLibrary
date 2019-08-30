@@ -211,12 +211,23 @@ def _GenerateCommonFiles(output_dir, output_stream):
                 #       define FEATURIZER_LIBRARY_API __declspec(dllimport)
                 #   endif
 
+                #   define FEATURIZER_LIBRARY_API_PACK_PREFIX               \\
+                    __pragma(pack(push))                                    \\
+                    __pragma(pack(1))
+
+                #   define FEATURIZER_LIBRARY_API_PACK_SUFFIX               __pragma(pack(pop))
+                #   define FEATURIZER_LIBRARY_API_PACK_INLINE
+
                 #elif (defined __GNUC__ || defined __clang__)
                 #   if (defined DLL_EXPORT_COMPILE)
                 #       define FEATURIZER_LIBRARY_API __attribute__((visibility("default")))
                 #   else
                 #       define FEATURIZER_LIBRARY_API
                 #   endif
+
+                #   define FEATURIZER_LIBRARY_API_PACK_PREFIX
+                #   define FEATURIZER_LIBRARY_API_PACK_SUFFIX
+                #   define FEATURIZER_LIBRARY_API_PACK_INLINE               __attribute__((packed))
 
                 #else
                 #   error Unrecognized compiler!
@@ -390,9 +401,13 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                 custom_structs.append(
                     textwrap.dedent(
                         """\
+                        FEATURIZER_LIBRARY_API_PACK_PREFIX
+
                         struct {} {{
                             {}
-                        }};
+                        }} FEATURIZER_LIBRARY_API_PACK_INLINE;
+
+                        FEATURIZER_LIBRARY_API_PACK_SUFFIX
 
                         """,
                     ).format(
@@ -1246,7 +1261,7 @@ class _StringTypeInfo(TypeInfo):
         if is_optional:
             validation = ""
             invocation = invocation_template.format(
-                "{name} ? std::string({name}) : std::string()".format(
+                "{name} ? std::string({name}) : nonstd::optional<std::string>()".format(
                     name=arg_name,
                 ),
             )

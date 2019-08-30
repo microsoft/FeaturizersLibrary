@@ -3271,7 +3271,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_Fit(/*in*/ CatImputerFea
 
         Microsoft::Featurizer::CatImputerEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::string> *>(pHandle));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input ? std::string(input) : std::string()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input ? std::string(input) : nonstd::optional<std::string>()));
     
         return true;
     }
@@ -3470,7 +3470,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_Transform(/*in*/ CatImpu
         Microsoft::Featurizer::CatImputerEstimator<std::string>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::string>::TransformerType *>(pHandle));
 
         // Input
-        auto result(transformer.execute(input ? std::string(input) : std::string()));
+        auto result(transformer.execute(input ? std::string(input) : nonstd::optional<std::string>()));
 
         // Output
         if(result.empty()) {
