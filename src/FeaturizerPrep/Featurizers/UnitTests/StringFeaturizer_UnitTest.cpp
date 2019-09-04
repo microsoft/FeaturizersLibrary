@@ -58,20 +58,20 @@ TEST_CASE("Transformer_Numbers") {
     std::double_t arg_d1 = 123.45;
     std::double_t arg_d2 = 135453984983490.5473;
 
-    CHECK(StringTransformer<std::float_t>().execute(arg_f) == "123");
-    CHECK(StringTransformer<std::double_t>().execute(arg_d1) == "123.45");
-    CHECK(StringTransformer<std::double_t>().execute(arg_d2) == "1.35454e+14");
+    CHECK(StringTransformer<std::float_t>().execute(arg_f) == "123.000000");
+    CHECK(StringTransformer<std::double_t>().execute(arg_d1) == "123.450000");
+    CHECK(StringTransformer<std::double_t>().execute(arg_d2) == "135453984983490.546875"); // TODO: This value is changing due to precision and not being able to represent the input exactly.
 }
 
 TEST_CASE("Transformer_Array") {
     std::array<std::double_t, 4> arr{ 1.3,2,-306.2,0.04 };
-    std::string arr_s{ "[1.3,2,-306.2,0.04]" };
+    std::string arr_s{ "[1.300000,2.000000,-306.200000,0.040000]" };
     CHECK(StringTransformer<std::array<std::double_t, 4>>().execute(arr) == arr_s);
 }
 
 TEST_CASE("Transformer_Vector") {
     std::vector<std::double_t> vect{ 1.03, -20.1, 305.8 };
-    std::string vect_s{ "[1.03,-20.1,305.8]" };
+    std::string vect_s{ "[1.030000,-20.100000,305.800000]" };
 	CHECK(StringTransformer<std::vector<std::double_t>>().execute(vect) == vect_s);
 }
 
@@ -79,6 +79,6 @@ TEST_CASE("Transformer_Maps") {
     std::map<std::int16_t, std::double_t> m;
     m.insert(std::pair<std::int16_t, std::double_t>(5, 35.8));
     m.insert(std::pair<std::int16_t, std::double_t>(93, 0.147));
-    std::string map_s{ "{5:35.8,93:0.147}" };
+    std::string map_s{ "{5:35.800000,93:0.147000}" };
     CHECK(StringTransformer<std::map<std::int16_t, std::double_t>>().execute(m) == map_s);
 }

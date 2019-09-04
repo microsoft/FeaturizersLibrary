@@ -291,9 +291,8 @@ struct Traits<std::float_t> {
         {
             return "NaN";
         }
-        std::ostringstream streamObj;
-        streamObj << value;
-        return streamObj.str();
+
+        return std::to_string(value);
     }
 
     template <typename ArchiveT>
@@ -331,9 +330,8 @@ struct Traits<std::double_t>  {
         {
             return "NaN";
         }
-        std::ostringstream streamObj;
-        streamObj << value;
-        return streamObj.str();
+
+        return std::to_string(value);
     }
 
     template <typename ArchiveT>

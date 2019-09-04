@@ -45,9 +45,9 @@ TEST_CASE("Transformer_Nullable") {
     std::double_t arg_d = 123.45;
 
     CHECK(Traits<nonstd::optional<std::int8_t>>::ToString(arg_null) == "NULL");
-	CHECK(Traits<std::float_t>::ToString(Traits<std::float_t>::GetNullableValue(arg_f)) == "123");
+	CHECK(Traits<std::float_t>::ToString(Traits<std::float_t>::GetNullableValue(arg_f)) == "123.000000");
 	CHECK(Traits<nonstd::optional<std::int64_t>>::GetNullableValue(arg_64) == -7799);
-	CHECK(Traits<std::double_t>::ToString(Traits<std::double_t>::GetNullableValue(arg_d)) == "123.45");
+	CHECK(Traits<std::double_t>::ToString(Traits<std::double_t>::GetNullableValue(arg_d)) == "123.450000");
 
 	CHECK_THROWS_WITH(Traits<nonstd::optional<std::int8_t>>::GetNullableValue(arg_null)
 				, Catch::Contains("GetNullableValue attempt on Optional type null."));
@@ -100,34 +100,34 @@ TEST_CASE("Transformer_Numbers") {
 
     CHECK(Traits<std::float_t>::ToString(arg_f_ini) == "NaN");
     CHECK(Traits<std::double_t>::ToString(arg_d_ini) == "NaN");
-    CHECK(Traits<std::float_t>::ToString(arg_f) == "123");
-    CHECK(Traits<std::double_t>::ToString(arg_d1) == "123.45");
-    CHECK(Traits<std::double_t>::ToString(arg_d2) == "1.35454e+14");
+    CHECK(Traits<std::float_t>::ToString(arg_f) == "123.000000");
+    CHECK(Traits<std::double_t>::ToString(arg_d1) == "123.450000");
+    CHECK(Traits<std::double_t>::ToString(arg_d2) == "135453984983490.546875");
 }
 
 TEST_CASE("Transformer_Arrays") {
     std::array<std::double_t, 4> arr{ 1.3,2,-306.2,0.04 };
-    std::string arr_s{ "[1.3,2,-306.2,0.04]" };
+    std::string arr_s{ "[1.300000,2.000000,-306.200000,0.040000]" };
     CHECK(Traits<std::array<std::double_t, 4>>::ToString(arr) == arr_s);
 
     //array<optional>
     nonstd::optional<std::double_t> arg_null;
 	std::array<nonstd::optional<std::double_t>, 3> arr_hasnull{1.5,arg_null,-47.1};
-	std::string arr_hasnull_s{"[1.5,NULL,-47.1]"};
+	std::string arr_hasnull_s{"[1.500000,NULL,-47.100000]"};
 	CHECK(Traits<std::array<nonstd::optional<std::double_t>, 3>>::ToString(arr_hasnull) == arr_hasnull_s);
 
     //vectors in arrays
     std::vector<std::double_t> vect{ 1.03, -20.1, 305.8 };
     std::array< std::vector<std::double_t>, 2> vecinarr{vect, vect};
     std::string vecinarr_res = Traits<std::array< std::vector<std::double_t>, 2>>::ToString(vecinarr);
-    std::string vecinarr_s{"[[1.03,-20.1,305.8],[1.03,-20.1,305.8]]"};
+    std::string vecinarr_s{"[[1.030000,-20.100000,305.800000],[1.030000,-20.100000,305.800000]]"};
     CHECK(vecinarr_res == vecinarr_s);
 
 }
 
 TEST_CASE("Transformer_Vectors") {
     std::vector<std::double_t> vect{ 1.03, -20.1, 305.8 };
-    std::string vect_s{ "[1.03,-20.1,305.8]" };
+    std::string vect_s{ "[1.030000,-20.100000,305.800000]" };
 	CHECK(Traits<std::vector<std::double_t>>::ToString(vect) == vect_s);
 
 	//vector<optional>
@@ -151,7 +151,7 @@ TEST_CASE("Transformer_Vectors") {
     std::array<std::double_t, 3> arrinvec{ 8.8,0.02,3643.7 };
     std::vector<std::array<std::double_t, 3>> vecwitharr;
     vecwitharr.push_back(arrinvec);
-    std::string vecwitharr_s{"[[8.8,0.02,3643.7]]"};
+    std::string vecwitharr_s{"[[8.800000,0.020000,3643.700000]]"};
     std::string vecwitharr_res = Traits<std::vector<std::array<std::double_t, 3>>>::ToString(vecwitharr);
     CHECK(vecwitharr_res == vecwitharr_s);
 }
@@ -161,14 +161,14 @@ TEST_CASE("Transformer_Maps") {
     m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(5), 35.8));
     m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(93), 0.147));
     std::string map_res = Traits<std::map<std::int16_t, std::double_t>>::ToString(m);
-    std::string map_s{ "{5:35.8,93:0.147}" };
+    std::string map_s{ "{5:35.800000,93:0.147000}" };
 	CHECK(map_res == map_s);
 }
 
 TEST_CASE("Transformer_Tuples") {
     std::tuple<int, std::string, double> tu(42, "hi", -3.14);
     std::string tu_res = Traits<std::tuple<int, std::string, double>>::ToString(tu);
-    std::string tu_s{"(42,hi,-3.14)"};
+    std::string tu_s{"(42,hi,-3.140000)"};
     CHECK(tu_res == tu_s);
 }
 

@@ -93,7 +93,7 @@ TEST_CASE("float") {
         std::vector<std::float_t>(),
         {1.1f, 2.22f, -3.333f, 4.4444f},
         [](std::vector<std::string> const &args) {
-            return args == std::vector<std::string>{"1.1", "2.22", "-3.333", "4.4444"};
+            return args == std::vector<std::string>{"1.100000", "2.220000", "-3.333000", "4.444400"};
         }
     );
 }
@@ -103,7 +103,7 @@ TEST_CASE("double") {
         std::vector<std::double_t>(),
         {1.1, 2.22, -3.333, 4.4444},
         [](std::vector<std::string> const &args) {
-            return args == std::vector<std::string>{"1.1", "2.22", "-3.333", "4.4444"};
+            return args == std::vector<std::string>{"1.100000", "2.220000", "-3.333000", "4.444400"};
         }
     );
 }
