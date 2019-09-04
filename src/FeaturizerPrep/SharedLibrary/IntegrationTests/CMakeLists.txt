@@ -4,7 +4,7 @@
 # ----------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.5.0)
 
-project(Featurizers LANGUAGES CXX)
+project(SharedLibrary_IntegrationTests LANGUAGES CXX)
 
 set(CMAKE_MODULE_PATH "$ENV{DEVELOPMENT_ENVIRONMENT_CMAKE_MODULE_PATH}")
 
@@ -24,6 +24,34 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
-set(CMAKE_MODULE_PATH ${_this_path}/cmake)
-
+set(CMAKE_MODULE_PATH ${_this_path}/../cmake)
 include(Featurizers)
+
+enable_testing()
+
+foreach(_test_name IN ITEMS
+    SharedLibrary_CatImputerFeaturizer_IntegrationTest
+    SharedLibrary_DateTimeFeaturizer_IntegrationTest
+    SharedLibrary_StringFeaturizer_IntegrationTest
+)
+    add_executable(${_test_name} ${_test_name}.cpp)
+
+    target_include_directories(
+        ${_test_name} PRIVATE
+        ${_includes}
+        ${_this_path}/../GeneratedCode
+        ${_this_path}/../..
+    )
+
+    target_link_directories(
+        ${_test_name} PRIVATE
+        ${_libs}
+    )
+
+    target_link_libraries(
+        ${_test_name} PRIVATE
+        Featurizers
+    )
+
+    add_test(NAME ${_test_name} COMMAND ${_test_name} --success)
+endforeach()

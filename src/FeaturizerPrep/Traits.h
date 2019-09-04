@@ -51,6 +51,7 @@ struct Traits {
     //   // Methods
     //   - static nullable_type CreateNullValue(void);
     //   - static bool IsNull(nullable_type const &value);
+    //   - static T const & GetNullableValue(nullable_type const &value);
     //   - static std::string ToString(T const &value);
     //   - template <typename ArchiveT> static ArchiveT & serialize(ArchiveT &ar, T const &value);
     //   - template <typename ArchiveT> static T deserialize(ArchiveT &ar);
@@ -84,6 +85,13 @@ struct TraitsImpl {
 
     static bool IsNull(nullable_type const& value) {
         return !value.has_value();
+    }
+
+    static T const & GetNullableValue(nullable_type const &value) {
+        if (IsNull(value))
+            throw std::runtime_error("GetNullableValue attempt on float_t null.");
+
+        return *value;
     }
 };
 
@@ -271,9 +279,9 @@ struct Traits<std::float_t> {
         return std::isnan(value);
     }
 
-    static std::float_t const & GetValue(nullable_type const& value) {
+    static std::float_t const & GetNullableValue(nullable_type const& value) {
         if (IsNull(value))
-            throw std::runtime_error("GetValue attempt on float_t null.");
+            throw std::runtime_error("GetNullableValue attempt on float_t null.");
 
         return value;
     }
@@ -311,9 +319,9 @@ struct Traits<std::double_t>  {
         return std::isnan(value);
     }
 
-    static std::double_t const & GetValue(nullable_type const& value) {
+    static std::double_t const & GetNullableValue(nullable_type const& value) {
         if (IsNull(value))
-            throw std::runtime_error("GetValue attempt on double_t null.");
+            throw std::runtime_error("GetNullableValue attempt on double_t null.");
 
         return value;
     }
@@ -525,19 +533,18 @@ struct Traits<nonstd::optional<T>>  {
         return !value.has_value();
     }
 
+    static T const & GetNullableValue(nullable_type const& value) {
+        if (IsNull(value))
+            throw std::runtime_error("GetNullableValue attempt on Optional type null.");
+
+        return *value;
+    }
+
     static std::string ToString(nullable_type const& value) {
         if (value) {
             return Traits<T>::ToString(*value);
         }
         return "NULL";
-    }
-
-    static T const & GetValue(nullable_type const& value) {
-        if (value){
-            return value.value();
-        }
-        else
-            throw std::runtime_error("GetValue attempt on Optional type null.");
     }
 
     template <typename ArchiveT>

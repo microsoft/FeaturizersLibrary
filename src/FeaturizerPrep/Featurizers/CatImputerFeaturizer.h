@@ -39,11 +39,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    HistogramAnnotation(Histogram value) :
-        Annotation(this),
-        Value(std::move(value)) {
-    }
-
+    HistogramAnnotation(Histogram value);
     ~HistogramAnnotation(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(HistogramAnnotation);
@@ -62,9 +58,8 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    HistogramEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-        AnnotationEstimator<InputT const &>("HistogramEstimator", std::move(pAllColumnAnnotations)){
-    }
+    HistogramEstimator(AnnotationMapsPtr pAllColumnAnnotations);
+    ~HistogramEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(HistogramEstimator);
 
@@ -119,8 +114,9 @@ public:
         // |  Public Methods
         // |
         // ----------------------------------------------------------------------
-        Transformer(TransformedT mostFreq) : _mostFreq(std::move(mostFreq)) {}
+        Transformer(TransformedT mostFreq);
         Transformer(typename BaseType::Transformer::Archive & ar);
+        ~Transformer(void) override = default;
 
         FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Transformer);
 
@@ -146,10 +142,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    HistogramConsumerEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-        BaseType("HistogramConsumerEstimator", std::move(pAllColumnAnnotations), true) {
-    }
-
+    HistogramConsumerEstimator(AnnotationMapsPtr pAllColumnAnnotations);
     ~HistogramConsumerEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(HistogramConsumerEstimator);
@@ -167,9 +160,52 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    Estimator::FitResult fit_impl(typename BaseType::BaseType::FitBufferInputType *pBuffer, size_t cBuffer) override;
+
+    // MSVC has problems when the function is defined outside of the declaration
+    Estimator::FitResult fit_impl(typename BaseType::BaseType::FitBufferInputType *, size_t) override {
+        throw std::runtime_error("This should never be called as this class will not be used during training");
+    }
+
     Estimator::FitResult complete_training_impl(void) override;
-    typename BaseType::TransformerUniquePtr create_transformer_impl(void) override;
+
+    // MSVC has problems when the function is defined outside of the declaration
+    typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
+        // Retrieve Histogram from Annotation
+        AnnotationMaps const &                          maps(Estimator::get_column_annotations());
+        // Currently Annnotations are per output column index (0-based)
+        // Since we've only one column as output- hardcoding this to 0 now.
+        // Expect annotation design to be further rationalized in near future
+        // which will address this hard-coding.
+        AnnotationMap const &                           annotations(maps[0]);
+        AnnotationMap::const_iterator const &           iterAnnotations(annotations.find("HistogramEstimator"));
+
+        if(iterAnnotations == annotations.end())
+            throw std::runtime_error("Couldn't retrieve HistogramAnnotation.");
+
+        // An output column can have multiple annotations from same 'kind' of estimator.
+        // However, since we have only one estimator- hence the hard-coded value of 0 for retrieval.
+        // Expect annotation design to be further rationalized in near future
+        // which will address this hard-coding.
+        Annotation const &                              annotation(*iterAnnotations->second[0]);
+
+        assert(dynamic_cast<HistogramAnnotation<TransformedT> const *>(&annotation));
+
+        HistogramAnnotation<TransformedT> const &       histogramAnnotation(static_cast<HistogramAnnotation<TransformedT> const &>(annotation));
+        Histogram const &                               histogram(histogramAnnotation.Value);
+
+        // Compute most frequent value from Histogram
+        typename Histogram::const_iterator              iMostCommon(histogram.end());
+
+        for(typename Histogram::const_iterator iter=histogram.begin(); iter != histogram.end(); ++iter) {
+            if(iMostCommon == histogram.end() || iter->second > iMostCommon->second) {
+                iMostCommon = iter;
+            }
+        }
+        if(iMostCommon == histogram.end())
+            throw std::runtime_error("All null values or empty training set.");
+
+        return std::make_unique<Transformer>(iMostCommon->first);
+    }
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -217,9 +253,25 @@ public:
 
 // ----------------------------------------------------------------------
 // |
+// |  HistogramAnnotation
+// |
+// ----------------------------------------------------------------------
+template <typename T>
+HistogramAnnotation<T>::HistogramAnnotation(Histogram value) :
+    Annotation(this),
+    Value(std::move(value)) {
+}
+
+// ----------------------------------------------------------------------
+// |
 // |  HistogramEstimator
 // |
 // ----------------------------------------------------------------------
+template <typename InputT,typename TransformedT, size_t ColIndexV>
+HistogramEstimator<InputT,TransformedT,ColIndexV>::HistogramEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+    AnnotationEstimator<InputT const &>("HistogramEstimator", std::move(pAllColumnAnnotations)){
+}
+
 template <typename InputT,typename TransformedT, size_t ColIndexV>
 Estimator::FitResult HistogramEstimator<InputT,TransformedT,ColIndexV>::fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) {
 
@@ -232,7 +284,7 @@ Estimator::FitResult HistogramEstimator<InputT,TransformedT,ColIndexV>::fit_impl
 
         typename Histogram::iterator const           iter(
             [this, &input](void) -> typename Histogram::iterator {
-                auto value = TraitsT::GetValue(input);
+                auto const &value = TraitsT::GetNullableValue(input);
                 typename Histogram::iterator const   i(_histogram.find(value));
 
                 if(i != _histogram.end())
@@ -263,6 +315,25 @@ Estimator::FitResult HistogramEstimator<InputT,TransformedT,ColIndexV>::complete
 // |  HistogramConsumerEstimator
 // |
 // ----------------------------------------------------------------------
+template <typename InputT,typename TransformedT>
+HistogramConsumerEstimator<InputT,TransformedT>::HistogramConsumerEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+    BaseType("HistogramConsumerEstimator", std::move(pAllColumnAnnotations), true) {
+}
+
+template <typename InputT,typename TransformedT>
+Estimator::FitResult HistogramConsumerEstimator<InputT,TransformedT>::complete_training_impl(void) {
+    throw std::runtime_error("This should never be called as this class will not be used during training");
+}
+
+// ----------------------------------------------------------------------
+// |
+// |  HistogramConsumerEstimator::Transformer
+// |
+// ----------------------------------------------------------------------
+template <typename InputT,typename TransformedT>
+HistogramConsumerEstimator<InputT,TransformedT>::Transformer::Transformer(TransformedT mostFreq) :
+    _mostFreq(std::move(mostFreq)) {
+}
 
 template <typename InputT,typename TransformedT>
 HistogramConsumerEstimator<InputT,TransformedT>::Transformer::Transformer(typename BaseType::Transformer::Archive & ar) {
@@ -278,7 +349,7 @@ typename HistogramConsumerEstimator<InputT,TransformedT>::BaseType::TransformedT
     if(TraitsT::IsNull(input))
         return _mostFreq;
 
-    return TraitsT::GetValue(input);
+    return TraitsT::GetNullableValue(input);
 }
 
 template <typename InputT,typename TransformedT>
@@ -290,54 +361,6 @@ void HistogramConsumerEstimator<InputT,TransformedT>::Transformer::save(typename
 template <typename InputT,typename TransformedT>
 TransformedT const & HistogramConsumerEstimator<InputT,TransformedT>::Transformer::get_most_frequent_value() const {
     return _mostFreq;
-}
-
-template <typename InputT,typename TransformedT>
-Estimator::FitResult HistogramConsumerEstimator<InputT,TransformedT>::fit_impl(typename BaseType::BaseType::FitBufferInputType *, size_t ) {
-    throw std::runtime_error("This should never be called as this class will not be used during training");
-}
-
-template <typename InputT,typename TransformedT>
-Estimator::FitResult HistogramConsumerEstimator<InputT,TransformedT>::complete_training_impl(void) {
-    throw std::runtime_error("This should never be called as this class will not be used during training");
-}
-
-template <typename InputT,typename TransformedT>
-typename HistogramConsumerEstimator<InputT,TransformedT>::BaseType::TransformerUniquePtr HistogramConsumerEstimator<InputT,TransformedT>::create_transformer_impl(void)  {
-
-    // Retrieve Histogram from Annotation
-    AnnotationMaps const &                        maps(Estimator::get_column_annotations());
-    // Currently Annnotations are per output column index (0-based)
-    // Since we've only one column as output- hardcoding this to 0 now.
-    // Expect annotation design to be further rationalized in near future
-    // which will address this hard-coding.
-    AnnotationMap const &                        annotations(maps[0]);
-    AnnotationMap::const_iterator const &       iterAnnotations(annotations.find("HistogramEstimator"));
-
-    if(iterAnnotations == annotations.end())
-        throw std::runtime_error("Couldn't retrieve HistogramAnnotation.");
-
-    // An output column can have multiple annotations from same 'kind' of estimator.
-    // However, since we have only one estimator- hence the hard-coded value of 0 for retrieval.
-    // Expect annotation design to be further rationalized in near future
-    // which will address this hard-coding.
-    Annotation const &                          annotation(*iterAnnotations->second[0]);
-    assert(dynamic_cast<HistogramAnnotation<TransformedT> const *>(&annotation));
-    HistogramAnnotation<TransformedT> const &   histogramAnnotation(static_cast<HistogramAnnotation<TransformedT> const &>(annotation));
-    Histogram const &                            histogram(histogramAnnotation.Value);
-
-    // Compute most frequent value from Histogram
-    typename Histogram::const_iterator          iMostCommon(histogram.end());
-
-    for(typename Histogram::const_iterator iter=histogram.begin(); iter != histogram.end(); ++iter) {
-        if(iMostCommon == histogram.end() || iter->second > iMostCommon->second) {
-            iMostCommon = iter;
-        }
-    }
-    if(iMostCommon == histogram.end())
-        throw std::runtime_error("All null values or empty training set.");
-
-    return std::make_unique<Transformer>(iMostCommon->first);
 }
 
 // ----------------------------------------------------------------------

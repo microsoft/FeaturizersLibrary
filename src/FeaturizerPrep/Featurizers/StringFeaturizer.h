@@ -38,7 +38,10 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StringTransformer);
 
-    typename BaseType::TransformedType execute(typename BaseType::InputType input) override;
+    // MSVC has problems when the function is defined outside of the declaration
+    typename BaseType::TransformedType execute(typename BaseType::InputType input) override {
+        return Traits<T>::ToString(input);
+    }
 };
 
 template <typename T>
@@ -82,11 +85,6 @@ public:
 template <typename T>
 StringTransformer<T>::StringTransformer(Archive &ar) :
     BaseType(ar) {
-}
-
-template <typename T>
-typename StringTransformer<T>::BaseType::TransformedType StringTransformer<T>::execute(typename BaseType::InputType input) /*override*/ {
-    return Traits<T>::ToString(input);
 }
 
 // ----------------------------------------------------------------------

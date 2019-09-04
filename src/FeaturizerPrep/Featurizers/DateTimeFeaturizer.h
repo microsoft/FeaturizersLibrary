@@ -15,12 +15,17 @@
 #   pragma clang diagnostic ignored "-Wold-style-cast"
 #   pragma clang diagnostic ignored "-Wshift-sign-overflow"
 #   pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#elif (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4244) // conversion from 'unsigned int' to 'unsigned char', possible loss of data
 #endif
 
 #include "../Shared/iso_week.h"
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
+#elif (defined _MSC_VER)
+#   pragma warning(pop)
 #endif
 
 #include "../InferenceOnlyFeaturizerImpl.h"
@@ -39,7 +44,7 @@ struct TimePoint {
     std::uint8_t hour = 0;          // hour of day, 0 through 23
     std::uint8_t minute = 0;        // minute of day, 0 through 59
     std::uint8_t second = 0;        // second of day, 0 through 59
-    std::uint8_t amPm = 0;          // 0 if hour is before noon (12 pm), 1 otherwise 
+    std::uint8_t amPm = 0;          // 0 if hour is before noon (12 pm), 1 otherwise
     std::uint8_t hour12 = 0;        // hour of day on a 12 basis, without the AM/PM piece
     std::uint8_t dayOfWeek = 0;     // day of week, 0 (Monday) through 6 (Sunday)
     std::uint8_t dayOfQuarter = 0;  // day of quarter, 1 through 92
@@ -54,7 +59,7 @@ struct TimePoint {
     std::string dayOfWeekLabel = "";// day of week as string
     std::string holidayName = "";   // If a country is provided, we check if the date is a holiday
     std::uint8_t isPaidTimeOff = 0; // If its a holiday, is it PTO
-    
+
     // ISO year and week are defined in ISO 8601, see Wikipedia.ISO for details.
     // In short, ISO weeks always start on Monday and last 7 days.
     // ISO years start on the first week of year that has a Thursday.
@@ -72,7 +77,7 @@ struct TimePoint {
     enum {
         SUNDAY = 0, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY
     };
-    
+
 private:
     const std::string _weekDays[7] = {
         "Sunday", "Monday", "Tuesday", "Wednesday",

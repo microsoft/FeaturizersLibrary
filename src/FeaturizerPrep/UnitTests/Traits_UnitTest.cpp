@@ -45,16 +45,16 @@ TEST_CASE("Transformer_Nullable") {
     std::double_t arg_d = 123.45;
 
     CHECK(Traits<nonstd::optional<std::int8_t>>::ToString(arg_null) == "NULL");
-	CHECK(Traits<std::float_t>::ToString(Traits<std::float_t>::GetValue(arg_f)) == "123");
-	CHECK(Traits<nonstd::optional<std::int64_t>>::GetValue(arg_64) == -7799);
-	CHECK(Traits<std::double_t>::ToString(Traits<std::double_t>::GetValue(arg_d)) == "123.45");
+	CHECK(Traits<std::float_t>::ToString(Traits<std::float_t>::GetNullableValue(arg_f)) == "123");
+	CHECK(Traits<nonstd::optional<std::int64_t>>::GetNullableValue(arg_64) == -7799);
+	CHECK(Traits<std::double_t>::ToString(Traits<std::double_t>::GetNullableValue(arg_d)) == "123.45");
 
-	CHECK_THROWS_WITH(Traits<nonstd::optional<std::int8_t>>::GetValue(arg_null)
-				, Catch::Contains("GetValue attempt on Optional type null."));
-	CHECK_THROWS_WITH(Traits<float_t>::GetValue(arg_f_ini)
-				, Catch::Contains("GetValue attempt on float_t null."));
-	CHECK_THROWS_WITH(Traits<double_t>::GetValue(arg_d_ini)
-				, Catch::Contains("GetValue attempt on double_t null"));
+	CHECK_THROWS_WITH(Traits<nonstd::optional<std::int8_t>>::GetNullableValue(arg_null)
+				, Catch::Contains("GetNullableValue attempt on Optional type null."));
+	CHECK_THROWS_WITH(Traits<float_t>::GetNullableValue(arg_f_ini)
+				, Catch::Contains("GetNullableValue attempt on float_t null."));
+	CHECK_THROWS_WITH(Traits<double_t>::GetNullableValue(arg_d_ini)
+				, Catch::Contains("GetNullableValue attempt on double_t null"));
 }
 
 TEST_CASE("Transformer_Binary") {

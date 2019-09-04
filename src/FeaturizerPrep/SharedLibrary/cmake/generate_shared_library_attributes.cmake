@@ -2,6 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
+get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
 # This code is based on code by halex2005, available at https://github.com/halex2005/CMakeHelpers/blob/master/generate_product_version.cmake,
 # which is distributed under the MIT license (https://github.com/halex2005/CMakeHelpers/blob/master/LICENSE).
@@ -102,13 +103,13 @@ function(generate_shared_library_attributes outfiles)
     set (_SharedLibraryResourceFile ${CMAKE_CURRENT_BINARY_DIR}/SharedLibraryAttributes.rc)
 
     configure_file(
-        ${CMAKE_CURRENT_LIST_DIR}/SharedLibraryAttributes.h.in
+        ${_this_path}/../SharedLibraryAttributes.h.in
         ${_SharedLibraryHeaderFile}
         @ONLY
     )
 
     configure_file(
-        ${CMAKE_CURRENT_LIST_DIR}/SharedLibraryAttributes.rc
+        ${_this_path}/../SharedLibraryAttributes.rc
         ${_SharedLibraryResourceFile}
         COPYONLY
     )

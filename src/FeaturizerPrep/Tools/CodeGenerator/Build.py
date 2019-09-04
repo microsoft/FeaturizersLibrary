@@ -24,6 +24,10 @@ _PLUGINS                                    = [
         "SharedLibrary",
         os.path.join(_script_dir, "..", "..", "SharedLibrary", "GeneratedCode"),
     ),
+    (
+        "SharedLibraryTests",
+        os.path.join(_script_dir, "..", "..", "SharedLibrary", "IntegrationTests", "GeneratedCode"),
+    ),
 ]
 
 
@@ -49,7 +53,9 @@ def Build(
             dm.stream.write(
                 "Generating '{}' ({} of {})...".format(plugin, index + 1, len(_PLUGINS)),
             )
-            with dm.stream.DoneManager() as this_dm:
+            with dm.stream.DoneManager(
+                suffix="\n",
+            ) as this_dm:
                 this_dm.result = Process.Execute(
                     command_line_template.format(
                         plugin=plugin,
