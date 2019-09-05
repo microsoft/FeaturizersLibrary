@@ -8,6 +8,7 @@
 
 namespace Microsoft {
 namespace Featurizer {
+namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         SampleAddTransformer
@@ -70,5 +71,6 @@ SampleAddEstimator::TransformerUniquePtr SampleAddEstimator::create_transformer_
     return std::make_unique<SampleAddTransformer>(_accumulated_delta);
 }
 
+} // namespace Featurizers
 } // namespace Featurizer
 } // namespace Microsoft

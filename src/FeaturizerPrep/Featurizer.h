@@ -8,7 +8,7 @@
 #include <map>
 #include <vector>
 
-#include "Shared/optional.h"
+#include "3rdParty/optional.h"
 
 namespace Microsoft {
 namespace Featurizer {

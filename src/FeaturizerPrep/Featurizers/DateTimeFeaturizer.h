@@ -20,7 +20,7 @@
 #   pragma warning(disable: 4244) // conversion from 'unsigned int' to 'unsigned char', possible loss of data
 #endif
 
-#include "../Shared/iso_week.h"
+#include "../3rdParty/iso_week.h"
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
@@ -28,10 +28,11 @@
 #   pragma warning(pop)
 #endif
 
-#include "../InferenceOnlyFeaturizerImpl.h"
+#include "Components/InferenceOnlyFeaturizerImpl.h"
 
 namespace Microsoft {
 namespace Featurizer {
+namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \struct        TimePoint
@@ -96,14 +97,14 @@ private:
 ///                 returns a struct with all the data split out.
 ///
 //std::chrono::system_clock::time_point
-class DateTimeTransformer : public InferenceOnlyTransformerImpl<std::int64_t, TimePoint> {
+class DateTimeTransformer : public Components::InferenceOnlyTransformerImpl<std::int64_t, TimePoint> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = InferenceOnlyTransformerImpl<std::int64_t, TimePoint>;
+    using BaseType                          = Components::InferenceOnlyTransformerImpl<std::int64_t, TimePoint>;
 
     // ----------------------------------------------------------------------
     // |
@@ -120,14 +121,14 @@ public:
     TransformedType execute(InputType input) override;
 };
 
-class DateTimeEstimator : public InferenceOnlyEstimatorImpl<DateTimeTransformer> {
+class DateTimeEstimator : public Components::InferenceOnlyEstimatorImpl<DateTimeTransformer> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = InferenceOnlyEstimatorImpl<DateTimeTransformer>;
+    using BaseType                          = Components::InferenceOnlyEstimatorImpl<DateTimeTransformer>;
 
     // ----------------------------------------------------------------------
     // |
@@ -140,5 +141,6 @@ public:
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DateTimeEstimator);
 };
 
-} // Namespace Featurizer
-} // Namespace Microsoft
+} // namespace Featurizers
+} // namespace Featurizer
+} // namespace Microsoft

@@ -592,7 +592,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                         {method_prefix}
                             {validation}
 
-                            *ppHandle = reinterpret_cast<{name}{suffix}EstimatorHandle *>(new Microsoft::Featurizer::{estimator_name}{cpp_template_suffix}({args}std::make_shared<Microsoft::Featurizer::AnnotationMaps>({num_output_columns})));
+                            *ppHandle = reinterpret_cast<{name}{suffix}EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}({args}std::make_shared<Microsoft::Featurizer::AnnotationMaps>({num_output_columns})));
                         {method_suffix}
                     }}
 
@@ -620,7 +620,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                         {method_prefix}
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-                            delete reinterpret_cast<Microsoft::Featurizer::{estimator_name}{cpp_template_suffix} *>(pHandle);
+                            delete reinterpret_cast<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} *>(pHandle);
                         {method_suffix}
                     }}
 
@@ -637,7 +637,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
                             if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-                            Microsoft::Featurizer::{estimator_name}{cpp_template_suffix} const & estimator(*reinterpret_cast<Microsoft::Featurizer::{estimator_name}{cpp_template_suffix} *>(pHandle));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} *>(pHandle));
 
                             *pIsTrainingComplete = estimator.is_training_complete();
                         {method_suffix}
@@ -663,7 +663,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
                             {validation}
 
-                            Microsoft::Featurizer::{estimator_name}{cpp_template_suffix} & estimator(*reinterpret_cast<Microsoft::Featurizer::{estimator_name}{cpp_template_suffix} *>(pHandle));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} *>(pHandle));
 
                             {statement}
                         {method_suffix}
@@ -700,7 +700,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
                             {validation}
 
-                            Microsoft::Featurizer::{estimator_name}{cpp_template_suffix} & estimator(*reinterpret_cast<Microsoft::Featurizer::{estimator_name}{cpp_template_suffix} *>(pHandle));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} *>(pHandle));
 
                             {statement}
                         {method_suffix}
@@ -730,7 +730,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
                             if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-                            Microsoft::Featurizer::{estimator_name}{cpp_template_suffix} & estimator(*reinterpret_cast<Microsoft::Featurizer::{estimator_name}{cpp_template_suffix} *>(pHandle));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} *>(pHandle));
 
                             *pFitResult = static_cast<unsigned char>(estimator.complete_training());
                         {method_suffix}
@@ -749,7 +749,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
                             if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-                            Microsoft::Featurizer::{estimator_name}{cpp_template_suffix} & estimator(*reinterpret_cast<Microsoft::Featurizer::{estimator_name}{cpp_template_suffix} *>(pEstimatorHandle));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} *>(pEstimatorHandle));
 
                             *ppTransformerHandle = reinterpret_cast<{name}{suffix}TransformerHandle *>(estimator.create_transformer().release());
                         {method_suffix}
@@ -771,7 +771,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
 
                             Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-                            *ppTransformerHandle = reinterpret_cast<{name}{suffix}TransformerHandle *>(std::make_unique<Microsoft::Featurizer::{estimator_name}{cpp_template_suffix}::TransformerType>(archive).release());
+                            *ppTransformerHandle = reinterpret_cast<{name}{suffix}TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(archive).release());
                         {method_suffix}
                     }}
 
@@ -787,7 +787,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                         {method_prefix}
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-                            delete reinterpret_cast<Microsoft::Featurizer::{estimator_name}{cpp_template_suffix}::TransformerType *>(pHandle);
+                            delete reinterpret_cast<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType *>(pHandle);
                         {method_suffix}
                     }}
 
@@ -805,7 +805,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
                             if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-                            Microsoft::Featurizer::{estimator_name}{cpp_template_suffix}::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::{estimator_name}{cpp_template_suffix}::TransformerType *>(pHandle));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType *>(pHandle));
                             Microsoft::Featurizer::Archive archive;
 
                             transformer.save(archive);
@@ -860,7 +860,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             {input_validation}
                             {output_validation}
 
-                            Microsoft::Featurizer::{estimator_name}{cpp_template_suffix}::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::{estimator_name}{cpp_template_suffix}::TransformerType *>(pHandle));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType *>(pHandle));
 
                             // Input
                             {input_statement}

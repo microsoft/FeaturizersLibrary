@@ -4,7 +4,7 @@
 # ----------------------------------------------------------------------
 get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
-include(generate_shared_library_attributes)
+include(${_this_path}/generate_shared_library_attributes.cmake)
 
 generate_shared_library_attributes(
     _shared_library_attributes_sources
@@ -18,6 +18,7 @@ generate_shared_library_attributes(
 )
 
 add_library(Featurizers SHARED
+    ${_this_path}/../../Featurizers/CatImputerFeaturizer.h
     ${_this_path}/../../Featurizers/DateTimeFeaturizer.h
     ${_this_path}/../../Featurizers/DateTimeFeaturizer.cpp
     ${_this_path}/../../Featurizers/StringFeaturizer.h

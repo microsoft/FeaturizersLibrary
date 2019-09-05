@@ -28,7 +28,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_CreateEstimator(/*out*/ 
 
         // No validation
 
-        *ppHandle = reinterpret_cast<CatImputerFeaturizer_int8_t_EstimatorHandle *>(new Microsoft::Featurizer::CatImputerEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+        *ppHandle = reinterpret_cast<CatImputerFeaturizer_int8_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
     
         return true;
     }
@@ -47,7 +47,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_DestroyEstimator(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int8_t> *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t> *>(pHandle);
     
         return true;
     }
@@ -67,7 +67,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_IsTrainingComplete(/*in*
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int8_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t> *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -90,7 +90,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_Fit(/*in*/ CatImputerFea
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int8_t>::CreateNullValue()));
     
@@ -125,7 +125,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_FitBuffer(/*in*/ CatImpu
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -147,7 +147,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_CompleteTraining(/*in*/ 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -169,7 +169,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_CreateTransformerFromEst
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int8_t> *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t> *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_int8_t_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -194,7 +194,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_CreateTransformerFromSav
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_int8_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::CatImputerEstimator<std::int8_t>::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_int8_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t>::TransformerType>(archive).release());
     
         return true;
     }
@@ -213,7 +213,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_DestroyTransformer(/*in*
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int8_t>::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t>::TransformerType *>(pHandle);
     
         return true;
     }
@@ -234,7 +234,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_CreateTransformerSaveDat
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int8_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int8_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t>::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -287,7 +287,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_Transform(/*in*/ CatImpu
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int8_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int8_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t>::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int8_t>::CreateNullValue()));
@@ -317,7 +317,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_CreateEstimator(/*out*/
 
         // No validation
 
-        *ppHandle = reinterpret_cast<CatImputerFeaturizer_int16_t_EstimatorHandle *>(new Microsoft::Featurizer::CatImputerEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+        *ppHandle = reinterpret_cast<CatImputerFeaturizer_int16_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
     
         return true;
     }
@@ -336,7 +336,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_DestroyEstimator(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int16_t> *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t> *>(pHandle);
     
         return true;
     }
@@ -356,7 +356,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_IsTrainingComplete(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int16_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t> *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -379,7 +379,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_Fit(/*in*/ CatImputerFe
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int16_t>::CreateNullValue()));
     
@@ -414,7 +414,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_FitBuffer(/*in*/ CatImp
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -436,7 +436,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_CompleteTraining(/*in*/
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -458,7 +458,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_CreateTransformerFromEs
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int16_t> *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t> *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_int16_t_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -483,7 +483,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_CreateTransformerFromSa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_int16_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::CatImputerEstimator<std::int16_t>::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_int16_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t>::TransformerType>(archive).release());
     
         return true;
     }
@@ -502,7 +502,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_DestroyTransformer(/*in
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int16_t>::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t>::TransformerType *>(pHandle);
     
         return true;
     }
@@ -523,7 +523,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_CreateTransformerSaveDa
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int16_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int16_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t>::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -576,7 +576,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_Transform(/*in*/ CatImp
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int16_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int16_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t>::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int16_t>::CreateNullValue()));
@@ -606,7 +606,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_CreateEstimator(/*out*/
 
         // No validation
 
-        *ppHandle = reinterpret_cast<CatImputerFeaturizer_int32_t_EstimatorHandle *>(new Microsoft::Featurizer::CatImputerEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+        *ppHandle = reinterpret_cast<CatImputerFeaturizer_int32_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
     
         return true;
     }
@@ -625,7 +625,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_DestroyEstimator(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int32_t> *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t> *>(pHandle);
     
         return true;
     }
@@ -645,7 +645,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_IsTrainingComplete(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int32_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t> *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -668,7 +668,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_Fit(/*in*/ CatImputerFe
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int32_t>::CreateNullValue()));
     
@@ -703,7 +703,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_FitBuffer(/*in*/ CatImp
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -725,7 +725,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_CompleteTraining(/*in*/
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -747,7 +747,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_CreateTransformerFromEs
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int32_t> *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t> *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_int32_t_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -772,7 +772,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_CreateTransformerFromSa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_int32_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::CatImputerEstimator<std::int32_t>::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_int32_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t>::TransformerType>(archive).release());
     
         return true;
     }
@@ -791,7 +791,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_DestroyTransformer(/*in
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int32_t>::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t>::TransformerType *>(pHandle);
     
         return true;
     }
@@ -812,7 +812,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_CreateTransformerSaveDa
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int32_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int32_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t>::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -865,7 +865,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_Transform(/*in*/ CatImp
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int32_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int32_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t>::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int32_t>::CreateNullValue()));
@@ -895,7 +895,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_CreateEstimator(/*out*/
 
         // No validation
 
-        *ppHandle = reinterpret_cast<CatImputerFeaturizer_int64_t_EstimatorHandle *>(new Microsoft::Featurizer::CatImputerEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+        *ppHandle = reinterpret_cast<CatImputerFeaturizer_int64_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
     
         return true;
     }
@@ -914,7 +914,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_DestroyEstimator(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int64_t> *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t> *>(pHandle);
     
         return true;
     }
@@ -934,7 +934,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_IsTrainingComplete(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int64_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t> *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -957,7 +957,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_Fit(/*in*/ CatImputerFe
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int64_t>::CreateNullValue()));
     
@@ -992,7 +992,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_FitBuffer(/*in*/ CatImp
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -1014,7 +1014,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_CompleteTraining(/*in*/
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -1036,7 +1036,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_CreateTransformerFromEs
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int64_t> *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t> *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_int64_t_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -1061,7 +1061,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_CreateTransformerFromSa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_int64_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::CatImputerEstimator<std::int64_t>::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_int64_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t>::TransformerType>(archive).release());
     
         return true;
     }
@@ -1080,7 +1080,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_DestroyTransformer(/*in
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int64_t>::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t>::TransformerType *>(pHandle);
     
         return true;
     }
@@ -1101,7 +1101,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_CreateTransformerSaveDa
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int64_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int64_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t>::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -1154,7 +1154,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_Transform(/*in*/ CatImp
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::int64_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::int64_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t>::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int64_t>::CreateNullValue()));
@@ -1184,7 +1184,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_CreateEstimator(/*out*/
 
         // No validation
 
-        *ppHandle = reinterpret_cast<CatImputerFeaturizer_uint8_t_EstimatorHandle *>(new Microsoft::Featurizer::CatImputerEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+        *ppHandle = reinterpret_cast<CatImputerFeaturizer_uint8_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
     
         return true;
     }
@@ -1203,7 +1203,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_DestroyEstimator(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint8_t> *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t> *>(pHandle);
     
         return true;
     }
@@ -1223,7 +1223,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_IsTrainingComplete(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint8_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t> *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -1246,7 +1246,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_Fit(/*in*/ CatImputerFe
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint8_t>::CreateNullValue()));
     
@@ -1281,7 +1281,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_FitBuffer(/*in*/ CatImp
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -1303,7 +1303,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_CompleteTraining(/*in*/
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -1325,7 +1325,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_CreateTransformerFromEs
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint8_t> *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t> *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_uint8_t_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -1350,7 +1350,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_CreateTransformerFromSa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_uint8_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::CatImputerEstimator<std::uint8_t>::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_uint8_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t>::TransformerType>(archive).release());
     
         return true;
     }
@@ -1369,7 +1369,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_DestroyTransformer(/*in
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint8_t>::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t>::TransformerType *>(pHandle);
     
         return true;
     }
@@ -1390,7 +1390,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_CreateTransformerSaveDa
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint8_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint8_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t>::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -1443,7 +1443,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_Transform(/*in*/ CatImp
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint8_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint8_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t>::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint8_t>::CreateNullValue()));
@@ -1473,7 +1473,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_CreateEstimator(/*out*
 
         // No validation
 
-        *ppHandle = reinterpret_cast<CatImputerFeaturizer_uint16_t_EstimatorHandle *>(new Microsoft::Featurizer::CatImputerEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+        *ppHandle = reinterpret_cast<CatImputerFeaturizer_uint16_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
     
         return true;
     }
@@ -1492,7 +1492,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_DestroyEstimator(/*in*
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint16_t> *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t> *>(pHandle);
     
         return true;
     }
@@ -1512,7 +1512,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_IsTrainingComplete(/*i
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint16_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t> *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -1535,7 +1535,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_Fit(/*in*/ CatImputerF
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint16_t>::CreateNullValue()));
     
@@ -1570,7 +1570,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_FitBuffer(/*in*/ CatIm
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -1592,7 +1592,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_CompleteTraining(/*in*
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -1614,7 +1614,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_CreateTransformerFromE
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint16_t> *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t> *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_uint16_t_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -1639,7 +1639,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_CreateTransformerFromS
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_uint16_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::CatImputerEstimator<std::uint16_t>::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_uint16_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t>::TransformerType>(archive).release());
     
         return true;
     }
@@ -1658,7 +1658,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_DestroyTransformer(/*i
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint16_t>::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t>::TransformerType *>(pHandle);
     
         return true;
     }
@@ -1679,7 +1679,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_CreateTransformerSaveD
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint16_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint16_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t>::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -1732,7 +1732,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_Transform(/*in*/ CatIm
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint16_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint16_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t>::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint16_t>::CreateNullValue()));
@@ -1762,7 +1762,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_CreateEstimator(/*out*
 
         // No validation
 
-        *ppHandle = reinterpret_cast<CatImputerFeaturizer_uint32_t_EstimatorHandle *>(new Microsoft::Featurizer::CatImputerEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+        *ppHandle = reinterpret_cast<CatImputerFeaturizer_uint32_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
     
         return true;
     }
@@ -1781,7 +1781,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_DestroyEstimator(/*in*
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint32_t> *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t> *>(pHandle);
     
         return true;
     }
@@ -1801,7 +1801,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_IsTrainingComplete(/*i
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint32_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t> *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -1824,7 +1824,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_Fit(/*in*/ CatImputerF
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue()));
     
@@ -1859,7 +1859,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_FitBuffer(/*in*/ CatIm
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -1881,7 +1881,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_CompleteTraining(/*in*
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -1903,7 +1903,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_CreateTransformerFromE
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint32_t> *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t> *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_uint32_t_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -1928,7 +1928,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_CreateTransformerFromS
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_uint32_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::CatImputerEstimator<std::uint32_t>::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_uint32_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t>::TransformerType>(archive).release());
     
         return true;
     }
@@ -1947,7 +1947,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_DestroyTransformer(/*i
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint32_t>::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t>::TransformerType *>(pHandle);
     
         return true;
     }
@@ -1968,7 +1968,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_CreateTransformerSaveD
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint32_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint32_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t>::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -2021,7 +2021,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_Transform(/*in*/ CatIm
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint32_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint32_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t>::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue()));
@@ -2051,7 +2051,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_CreateEstimator(/*out*
 
         // No validation
 
-        *ppHandle = reinterpret_cast<CatImputerFeaturizer_uint64_t_EstimatorHandle *>(new Microsoft::Featurizer::CatImputerEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+        *ppHandle = reinterpret_cast<CatImputerFeaturizer_uint64_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
     
         return true;
     }
@@ -2070,7 +2070,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_DestroyEstimator(/*in*
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint64_t> *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t> *>(pHandle);
     
         return true;
     }
@@ -2090,7 +2090,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_IsTrainingComplete(/*i
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint64_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t> *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -2113,7 +2113,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_Fit(/*in*/ CatImputerF
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint64_t>::CreateNullValue()));
     
@@ -2148,7 +2148,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_FitBuffer(/*in*/ CatIm
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -2170,7 +2170,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_CompleteTraining(/*in*
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -2192,7 +2192,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_CreateTransformerFromE
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint64_t> *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t> *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_uint64_t_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -2217,7 +2217,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_CreateTransformerFromS
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_uint64_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::CatImputerEstimator<std::uint64_t>::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_uint64_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t>::TransformerType>(archive).release());
     
         return true;
     }
@@ -2236,7 +2236,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_DestroyTransformer(/*i
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint64_t>::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t>::TransformerType *>(pHandle);
     
         return true;
     }
@@ -2257,7 +2257,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_CreateTransformerSaveD
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint64_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint64_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t>::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -2310,7 +2310,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_Transform(/*in*/ CatIm
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::uint64_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::uint64_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t>::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint64_t>::CreateNullValue()));
@@ -2340,7 +2340,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_CreateEstimator(/*out*/
 
         // No validation
 
-        *ppHandle = reinterpret_cast<CatImputerFeaturizer_float_t_EstimatorHandle *>(new Microsoft::Featurizer::CatImputerEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+        *ppHandle = reinterpret_cast<CatImputerFeaturizer_float_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
     
         return true;
     }
@@ -2359,7 +2359,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_DestroyEstimator(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::float_t> *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t> *>(pHandle);
     
         return true;
     }
@@ -2379,7 +2379,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_IsTrainingComplete(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::float_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::float_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t> *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -2402,7 +2402,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_Fit(/*in*/ CatImputerFe
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::CatImputerEstimator<std::float_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::float_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
     
@@ -2437,7 +2437,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_FitBuffer(/*in*/ CatImp
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::CatImputerEstimator<std::float_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::float_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -2459,7 +2459,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_CompleteTraining(/*in*/
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::float_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::float_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -2481,7 +2481,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_CreateTransformerFromEs
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::float_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::float_t> *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t> *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_float_t_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -2506,7 +2506,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_CreateTransformerFromSa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_float_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::CatImputerEstimator<std::float_t>::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_float_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>::TransformerType>(archive).release());
     
         return true;
     }
@@ -2525,7 +2525,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_DestroyTransformer(/*in
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::float_t>::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>::TransformerType *>(pHandle);
     
         return true;
     }
@@ -2546,7 +2546,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_CreateTransformerSaveDa
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::float_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::float_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -2599,7 +2599,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_Transform(/*in*/ CatImp
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::float_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::float_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
@@ -2629,7 +2629,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_CreateEstimator(/*out*
 
         // No validation
 
-        *ppHandle = reinterpret_cast<CatImputerFeaturizer_double_t_EstimatorHandle *>(new Microsoft::Featurizer::CatImputerEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+        *ppHandle = reinterpret_cast<CatImputerFeaturizer_double_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
     
         return true;
     }
@@ -2648,7 +2648,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_DestroyEstimator(/*in*
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::double_t> *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t> *>(pHandle);
     
         return true;
     }
@@ -2668,7 +2668,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_IsTrainingComplete(/*i
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::double_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::double_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t> *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -2691,7 +2691,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_Fit(/*in*/ CatImputerF
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::CatImputerEstimator<std::double_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::double_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
     
@@ -2726,7 +2726,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_FitBuffer(/*in*/ CatIm
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::CatImputerEstimator<std::double_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::double_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -2748,7 +2748,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_CompleteTraining(/*in*
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::double_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::double_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -2770,7 +2770,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_CreateTransformerFromE
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::double_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::double_t> *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t> *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_double_t_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -2795,7 +2795,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_CreateTransformerFromS
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_double_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::CatImputerEstimator<std::double_t>::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_double_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>::TransformerType>(archive).release());
     
         return true;
     }
@@ -2814,7 +2814,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_DestroyTransformer(/*i
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::double_t>::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>::TransformerType *>(pHandle);
     
         return true;
     }
@@ -2835,7 +2835,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_CreateTransformerSaveD
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::double_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::double_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -2888,7 +2888,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_Transform(/*in*/ CatIm
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::double_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::double_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
@@ -2918,7 +2918,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_CreateEstimator(/*out*/ Ca
 
         // No validation
 
-        *ppHandle = reinterpret_cast<CatImputerFeaturizer_bool_EstimatorHandle *>(new Microsoft::Featurizer::CatImputerEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+        *ppHandle = reinterpret_cast<CatImputerFeaturizer_bool_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
     
         return true;
     }
@@ -2937,7 +2937,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_DestroyEstimator(/*in*/ Ca
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<bool> *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool> *>(pHandle);
     
         return true;
     }
@@ -2957,7 +2957,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_IsTrainingComplete(/*in*/ 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<bool> const & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<bool> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool> *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -2980,7 +2980,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_Fit(/*in*/ CatImputerFeatu
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::CatImputerEstimator<bool> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<bool> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<bool>::CreateNullValue()));
     
@@ -3015,7 +3015,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_FitBuffer(/*in*/ CatImpute
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::CatImputerEstimator<bool> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<bool> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -3037,7 +3037,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_CompleteTraining(/*in*/ Ca
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<bool> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<bool> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -3059,7 +3059,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_CreateTransformerFromEstim
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<bool> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<bool> *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool> *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_bool_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -3084,7 +3084,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_CreateTransformerFromSaved
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_bool_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::CatImputerEstimator<bool>::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_bool_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool>::TransformerType>(archive).release());
     
         return true;
     }
@@ -3103,7 +3103,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_DestroyTransformer(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<bool>::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool>::TransformerType *>(pHandle);
     
         return true;
     }
@@ -3124,7 +3124,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_CreateTransformerSaveData(
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<bool>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<bool>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool>::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -3177,7 +3177,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_Transform(/*in*/ CatImpute
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<bool>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<bool>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool>::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<bool>::CreateNullValue()));
@@ -3207,7 +3207,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_CreateEstimator(/*out*/ 
 
         // No validation
 
-        *ppHandle = reinterpret_cast<CatImputerFeaturizer_string_EstimatorHandle *>(new Microsoft::Featurizer::CatImputerEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+        *ppHandle = reinterpret_cast<CatImputerFeaturizer_string_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
     
         return true;
     }
@@ -3226,7 +3226,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_DestroyEstimator(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::string> *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string> *>(pHandle);
     
         return true;
     }
@@ -3246,7 +3246,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_IsTrainingComplete(/*in*
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::string> const & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::string> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string> *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -3269,7 +3269,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_Fit(/*in*/ CatImputerFea
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::CatImputerEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::string> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input ? std::string(input) : nonstd::optional<std::string>()));
     
@@ -3304,7 +3304,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_FitBuffer(/*in*/ CatImpu
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::CatImputerEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::string> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -3326,7 +3326,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_CompleteTraining(/*in*/ 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::string> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string> *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -3348,7 +3348,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_CreateTransformerFromEst
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::string> *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string> *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_string_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -3373,7 +3373,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_CreateTransformerFromSav
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_string_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::CatImputerEstimator<std::string>::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<CatImputerFeaturizer_string_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string>::TransformerType>(archive).release());
     
         return true;
     }
@@ -3392,7 +3392,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_DestroyTransformer(/*in*
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::string>::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string>::TransformerType *>(pHandle);
     
         return true;
     }
@@ -3413,7 +3413,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_CreateTransformerSaveDat
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::string>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::string>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string>::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -3467,7 +3467,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_Transform(/*in*/ CatImpu
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::CatImputerEstimator<std::string>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::CatImputerEstimator<std::string>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string>::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input ? std::string(input) : nonstd::optional<std::string>()));

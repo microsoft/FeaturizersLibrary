@@ -8,15 +8,14 @@
 #include <cstdio>
 #include "../DateTimeFeaturizer.h"
 
-namespace Microsoft {
-namespace Featurizer {
+namespace NS = Microsoft::Featurizer;
 
 using SysClock = std::chrono::system_clock;
 
 TEST_CASE("DateTimeEstimator") {
-    CHECK(DateTimeEstimator(CreateTestAnnotationMapsPtr(2)).Name == "DateTimeEstimator");
-    CHECK(DateTimeEstimator(CreateTestAnnotationMapsPtr(2)).is_training_complete());
-    CHECK(dynamic_cast<DateTimeTransformer *>(DateTimeEstimator(CreateTestAnnotationMapsPtr(2)).create_transformer().get()));
+    CHECK(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2)).Name == "DateTimeEstimator");
+    CHECK(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2)).is_training_complete());
+    CHECK(dynamic_cast<NS::Featurizers::DateTimeTransformer *>(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2)).create_transformer().get()));
 }
 
 TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {
@@ -24,14 +23,14 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {
     SysClock::time_point stp = SysClock::from_time_t(date);
 
     // Constructor
-    TimePoint tp(stp);
+    NS::Featurizers::TimePoint tp(stp);
     CHECK(tp.year == 1976);
-    CHECK(tp.month == TimePoint::NOVEMBER);
+    CHECK(tp.month == NS::Featurizers::TimePoint::NOVEMBER);
     CHECK(tp.day == 17);
     CHECK(tp.hour == 12);
     CHECK(tp.minute == 27);
     CHECK(tp.second == 4);
-    CHECK(tp.dayOfWeek == TimePoint::WEDNESDAY);
+    CHECK(tp.dayOfWeek == NS::Featurizers::TimePoint::WEDNESDAY);
     CHECK(tp.dayOfYear == 321);
     CHECK(tp.quarterOfYear == 4);
     CHECK(tp.weekOfMonth == 2);
@@ -48,28 +47,28 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {
     CHECK(tp.isPaidTimeOff == 0);
 
     // assignment
-    TimePoint tp1 = stp;
+    NS::Featurizers::TimePoint tp1 = stp;
     CHECK(tp1.year == 1976);
-    CHECK(tp1.month == TimePoint::NOVEMBER);
+    CHECK(tp1.month == NS::Featurizers::TimePoint::NOVEMBER);
     CHECK(tp1.day == 17);
 
     // function
-    TimePoint tp2 = TimePoint(stp);
+    NS::Featurizers::TimePoint tp2 = NS::Featurizers::TimePoint(stp);
     CHECK(tp2.year == 1976);
-    CHECK(tp2.month == TimePoint::NOVEMBER);
+    CHECK(tp2.month == NS::Featurizers::TimePoint::NOVEMBER);
     CHECK(tp2.day == 17);
 }
 
 TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeTransformer][DateTimeTransformer]") {
-    DateTimeTransformer dt;
-    TimePoint tp = dt.execute(217081625);
+    NS::Featurizers::DateTimeTransformer dt;
+    NS::Featurizers::TimePoint tp = dt.execute(217081625);
     CHECK(tp.year == 1976);
-    CHECK(tp.month == TimePoint::NOVEMBER);
+    CHECK(tp.month == NS::Featurizers::TimePoint::NOVEMBER);
     CHECK(tp.day == 17);
     CHECK(tp.hour == 12);
     CHECK(tp.minute == 27);
     CHECK(tp.second == 5);
-    CHECK(tp.dayOfWeek == TimePoint::WEDNESDAY);
+    CHECK(tp.dayOfWeek == NS::Featurizers::TimePoint::WEDNESDAY);
     CHECK(tp.dayOfYear == 321);
     CHECK(tp.quarterOfYear == 4);
     CHECK(tp.weekOfMonth == 2);
@@ -78,15 +77,15 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeTransformer][DateTimeTransfo
 }
 
 TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]") {
-    DateTimeTransformer dt;
-    TimePoint tp = dt.execute(1751241600);
+    NS::Featurizers::DateTimeTransformer dt;
+    NS::Featurizers::TimePoint tp = dt.execute(1751241600);
     CHECK(tp.year == 2025);
-    CHECK(tp.month == TimePoint::JUNE);
+    CHECK(tp.month == NS::Featurizers::TimePoint::JUNE);
     CHECK(tp.day == 30);
     CHECK(tp.hour == 0);
     CHECK(tp.minute == 0);
     CHECK(tp.second == 0);
-    CHECK(tp.dayOfWeek == TimePoint::MONDAY);
+    CHECK(tp.dayOfWeek == NS::Featurizers::TimePoint::MONDAY);
     CHECK(tp.dayOfYear == 180);
     CHECK(tp.quarterOfYear == 2);
     CHECK(tp.weekOfMonth == 4);
@@ -108,15 +107,15 @@ TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]")
 // which rolls over somewhere around 2260. Still a couple hundred years!
 TEST_CASE("Far Future - 2998 March 2, 14:03:02", "[DateTimeTransformer][DateTimeTransformer]") {
 
-    DateTimeTransformer dt;
-    TimePoint tp = dt.execute(32445842582);
+    NS::Featurizers::DateTimeTransformer dt;
+    NS::Featurizers::TimePoint tp = dt.execute(32445842582);
     CHECK(tp.year == 2998);
-    CHECK(tp.month == TimePoint::MARCH);
+    CHECK(tp.month == NS::Featurizers::TimePoint::MARCH);
     CHECK(tp.day == 2);
     CHECK(tp.hour == 14);
     CHECK(tp.minute == 3);
     CHECK(tp.second == 2);
-    CHECK(tp.dayOfWeek == TimePoint::FRIDAY);
+    CHECK(tp.dayOfWeek == NS::Featurizers::TimePoint::FRIDAY);
     CHECK(tp.dayOfYear == 60);
     CHECK(tp.quarterOfYear == 1);
     CHECK(tp.weekOfMonth == 0);
@@ -129,13 +128,10 @@ TEST_CASE("Pre-Epoch - 1776 July 4", "[DateTimeTransformer][DateTimeTransformer]
 {
 
     // Constructor
-    DateTimeTransformer dt;
-    TimePoint tp = dt.execute(-6106060800);
+    NS::Featurizers::DateTimeTransformer dt;
+    NS::Featurizers::TimePoint tp = dt.execute(-6106060800);
     CHECK(tp.year == 1776);
-    CHECK(tp.month == TimePoint::JULY);
+    CHECK(tp.month == NS::Featurizers::TimePoint::JULY);
     CHECK(tp.day == 4);
 }
 #endif /* _MSVCRT */
-
-} // namespace Featurizer
-} // namespace Microsoft

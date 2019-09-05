@@ -13,6 +13,7 @@ inline struct tm *gmtime_r(time_t const* const timer, struct tm* const  result) 
 
 namespace Microsoft {
 namespace Featurizer {
+namespace Featurizers {
 
 // ----------------------------------------------------------------------
 // |
@@ -40,11 +41,11 @@ TimePoint::TimePoint(const std::chrono::system_clock::time_point& sysTime) {
         weekOfMonth = (day - 1) / 7;
         quarterOfYear = (month + 2) / 3;
         halfOfYear = month <= 6 ? 1 : 2;
-        
+
         date::year_month_day ymd = date::year_month_day{ date::year(year), date::month(month), date::day(day) };
         date::sys_days days(ymd);
         iso_week::year_weeknum_weekday iso_date = iso_week::year_weeknum_weekday{ days };
-        
+
         // calculate the day of the quarter
         if(month <= 3){
             date::year_month_day startOfQuarter = date::year_month_day{ date::year(year), date::month(1), date::day(1) };
@@ -105,5 +106,6 @@ DateTimeEstimator::DateTimeEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
     BaseType("DateTimeEstimator", std::move(pAllColumnAnnotations)) {
 }
 
+} // namespace Featurizers
 } // namespace Featurizer
 } // namespace Microsoft

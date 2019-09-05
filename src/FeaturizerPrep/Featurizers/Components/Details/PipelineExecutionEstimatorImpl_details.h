@@ -10,6 +10,8 @@
 
 namespace Microsoft {
 namespace Featurizer {
+namespace Featurizers {
+namespace Components {
 namespace Details {
 
 // IMPLEMENTATION NOTE
@@ -48,8 +50,8 @@ public:
         // another location. Generally speaking, this is a really bad idea. However,
         // it happens to work in this specific sceanrio because:
         //
-        //      - This object is only used with the PipelineExecutionEstimator
-        //      - There must be at least one TransformerEstimator in the PipelineExecutionEstimator chain
+        //      - This object is only used with the PipelineExecutionEstimatorImpl
+        //      - There must be at least one TransformerEstimator in the PipelineExecutionEstimatorImpl chain
         //        (this is verified at compile time by PipelineTraits)
         //      - A TransformerEstimator creates a new output item on execute
         //      - This transformer is only applied to chains that would otherwise end with AnnotationEstimators
@@ -1058,5 +1060,7 @@ public:
 };
 
 } // namespace Details
+} // namespace Components
+} // namespace Featurizers
 } // namespace Featurizer
 } // namespace Microsoft

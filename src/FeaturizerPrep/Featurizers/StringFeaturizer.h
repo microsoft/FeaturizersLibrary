@@ -4,18 +4,19 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include "../InferenceOnlyFeaturizerImpl.h"
 #include "../Traits.h"
+#include "Components/InferenceOnlyFeaturizerImpl.h"
 
 namespace Microsoft {
 namespace Featurizer {
+namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         StringTransformer
 ///  \brief         Converts input into strings.
 ///
 template <typename T>
-class StringTransformer : public InferenceOnlyTransformerImpl<T, std::string> {
+class StringTransformer : public Components::InferenceOnlyTransformerImpl<T, std::string> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -24,7 +25,7 @@ public:
     // ----------------------------------------------------------------------
     using Type                              = T;
     using ThisType                          = StringTransformer<Type>;
-    using BaseType                          = InferenceOnlyTransformerImpl<Type, std::string>;
+    using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, std::string>;
 
     // ----------------------------------------------------------------------
     // |
@@ -45,7 +46,7 @@ public:
 };
 
 template <typename T>
-class StringEstimator : public InferenceOnlyEstimatorImpl<StringTransformer<T>> {
+class StringEstimator : public Components::InferenceOnlyEstimatorImpl<StringTransformer<T>> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -54,7 +55,7 @@ public:
     // ----------------------------------------------------------------------
     using Type                              = T;
     using ThisType                          = StringEstimator<Type>;
-    using BaseType                          = InferenceOnlyEstimatorImpl<StringTransformer<Type>>;
+    using BaseType                          = Components::InferenceOnlyEstimatorImpl<StringTransformer<Type>>;
 
     // ----------------------------------------------------------------------
     // |
@@ -97,5 +98,6 @@ StringEstimator<T>::StringEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
     BaseType("StringEstimator", std::move(pAllColumnAnnotations)) {
 }
 
+} // namespace Featurizers
 } // namespace Featurizer
 } // namespace Microsoft

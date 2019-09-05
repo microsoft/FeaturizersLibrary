@@ -12,11 +12,11 @@
 using Microsoft::Featurizer::CreateTestAnnotationMapsPtr;
 // ----------------------------------------------------------------------
 
-class MyTransformer : public Microsoft::Featurizer::InferenceOnlyTransformerImpl<int, bool> {
+class MyTransformer : public Microsoft::Featurizer::Featurizers::Components::InferenceOnlyTransformerImpl<int, bool> {
 public:
     MyTransformer(void) = default;
     MyTransformer(Microsoft::Featurizer::Archive &ar) :
-        Microsoft::Featurizer::InferenceOnlyTransformerImpl<int, bool>(ar) {
+        Microsoft::Featurizer::Featurizers::Components::InferenceOnlyTransformerImpl<int, bool>(ar) {
     }
 
     ~MyTransformer(void) override = default;
@@ -28,11 +28,11 @@ public:
     }
 };
 
-class MyEstimator : public Microsoft::Featurizer::InferenceOnlyEstimatorImpl<MyTransformer> {
+class MyEstimator : public Microsoft::Featurizer::Featurizers::Components::InferenceOnlyEstimatorImpl<MyTransformer> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Types
-    using BaseType                          = Microsoft::Featurizer::InferenceOnlyEstimatorImpl<MyTransformer>;
+    using BaseType                          = Microsoft::Featurizer::Featurizers::Components::InferenceOnlyEstimatorImpl<MyTransformer>;
 
     // ----------------------------------------------------------------------
     // |  Public Methods

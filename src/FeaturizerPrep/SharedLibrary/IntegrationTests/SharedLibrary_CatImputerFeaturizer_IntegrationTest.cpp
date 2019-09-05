@@ -7,7 +7,7 @@
 
 #include "GeneratedCode/SharedLibraryTests_CatImputerFeaturizer.h"
 #include "../GeneratedCode/SharedLibrary_CatImputerFeaturizer.h"
-#include "../../Shared/optional.h"
+#include "../../3rdParty/optional.h"
 
 TEST_CASE("int8") {
     CatImputerFeaturizer_int8_t_Test(

@@ -5,7 +5,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "../PipelineExecutionEstimator.h"
+#include "../PipelineExecutionEstimatorImpl.h"
 #include "../InferenceOnlyFeaturizerImpl.h"
 
 namespace NS = Microsoft::Featurizer;
@@ -177,37 +177,37 @@ private:
     }
 };
 
-class StringToIntTransformer : public NS::InferenceOnlyTransformerImpl<NonCopyable<std::string> const &, NonCopyable<size_t>> {
+class StringToIntTransformer : public NS::Featurizers::Components::InferenceOnlyTransformerImpl<NonCopyable<std::string> const &, NonCopyable<size_t>> {
 public:
     TransformedType execute(InputType input) override {
         return input.Value.size();
     }
 };
 
-class StringToIntEstimator : public NS::InferenceOnlyEstimatorImpl<StringToIntTransformer> {
+class StringToIntEstimator : public NS::Featurizers::Components::InferenceOnlyEstimatorImpl<StringToIntTransformer> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Methods
     StringToIntEstimator(NS::AnnotationMapsPtr pAllColumnAnnotations) :
-        NS::InferenceOnlyEstimatorImpl<StringToIntTransformer>("StringToIntEstimator", std::move(pAllColumnAnnotations)) {
+        NS::Featurizers::Components::InferenceOnlyEstimatorImpl<StringToIntTransformer>("StringToIntEstimator", std::move(pAllColumnAnnotations)) {
     }
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StringToIntEstimator);
 };
 
-class IntToStringTransformer : public NS::InferenceOnlyTransformerImpl<NonCopyable<size_t> const &, NonCopyable<std::string>> {
+class IntToStringTransformer : public NS::Featurizers::Components::InferenceOnlyTransformerImpl<NonCopyable<size_t> const &, NonCopyable<std::string>> {
 public:
     TransformedType execute(InputType input) override {
         return std::to_string(input.Value);
     }
 };
 
-class IntToStringEstimator : public NS::InferenceOnlyEstimatorImpl<IntToStringTransformer> {
+class IntToStringEstimator : public NS::Featurizers::Components::InferenceOnlyEstimatorImpl<IntToStringTransformer> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Methods
     IntToStringEstimator(NS::AnnotationMapsPtr pAllColumnAnnotations) :
-        NS::InferenceOnlyEstimatorImpl<IntToStringTransformer>("IntToStringEstimator", std::move(pAllColumnAnnotations)) {
+        NS::Featurizers::Components::InferenceOnlyEstimatorImpl<IntToStringTransformer>("IntToStringEstimator", std::move(pAllColumnAnnotations)) {
     }
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(IntToStringEstimator);
@@ -260,7 +260,7 @@ std::vector<typename PipelineT::TransformedType> Test(
 }
 
 TEST_CASE("Single Transformer") {
-    using Estimator = NS::PipelineExecutionEstimator<
+    using Estimator = NS::Featurizers::Components::PipelineExecutionEstimatorImpl<
         StringToIntEstimator
     >;
 
@@ -277,7 +277,7 @@ TEST_CASE("Single Transformer") {
 }
 
 TEST_CASE("Annotation, Transformer") {
-    using Estimator = NS::PipelineExecutionEstimator<
+    using Estimator = NS::Featurizers::Components::PipelineExecutionEstimatorImpl<
         MyAnnotationEstimator<NonCopyable<std::string>, 0>,
         StringToIntEstimator
     >;
@@ -313,7 +313,7 @@ TEST_CASE("Annotation, Transformer") {
 }
 
 TEST_CASE("Annotation, Annotation, Transformer") {
-    using Estimator = NS::PipelineExecutionEstimator<
+    using Estimator = NS::Featurizers::Components::PipelineExecutionEstimatorImpl<
         MyAnnotationEstimator<NonCopyable<std::string>, 0>,
         MyAnnotationEstimator<NonCopyable<std::string>, 0, 3>,
         StringToIntEstimator
@@ -358,7 +358,7 @@ TEST_CASE("Annotation, Annotation, Transformer") {
 }
 
 TEST_CASE("Transformer, Transformer") {
-    using Estimator = NS::PipelineExecutionEstimator<
+    using Estimator = NS::Featurizers::Components::PipelineExecutionEstimatorImpl<
         StringToIntEstimator,
         IntToStringEstimator
     >;
@@ -376,7 +376,7 @@ TEST_CASE("Transformer, Transformer") {
 }
 
 TEST_CASE("Transformer, Annotation, Transformer") {
-    using Estimator = NS::PipelineExecutionEstimator<
+    using Estimator = NS::Featurizers::Components::PipelineExecutionEstimatorImpl<
         IntToStringEstimator,
         MyAnnotationEstimator<NonCopyable<std::string>, 0>,
         StringToIntEstimator
@@ -415,7 +415,7 @@ TEST_CASE("Transformer, Annotation, Transformer") {
 }
 
 TEST_CASE("Transformer, Annotation") {
-    using Estimator = NS::PipelineExecutionEstimator<
+    using Estimator = NS::Featurizers::Components::PipelineExecutionEstimatorImpl<
         IntToStringEstimator,
         MyAnnotationEstimator<NonCopyable<std::string>, 0>
     >;
@@ -452,7 +452,7 @@ TEST_CASE("Transformer, Annotation") {
 }
 
 TEST_CASE("Annotation, Annotation, Transformer, Annotation") {
-    using Estimator = NS::PipelineExecutionEstimator<
+    using Estimator = NS::Featurizers::Components::PipelineExecutionEstimatorImpl<
         MyAnnotationEstimator<NonCopyable<size_t>, 0>,
         MyAnnotationEstimator<NonCopyable<size_t>, 0, 3>,
         IntToStringEstimator,
@@ -566,7 +566,7 @@ private:
 };
 
 TEST_CASE("Transformer with Training") {
-    using Estimator = NS::PipelineExecutionEstimator<
+    using Estimator = NS::Featurizers::Components::PipelineExecutionEstimatorImpl<
         MyAnnotationEstimator<int, 0>,
         SimpleEstimator,
         MyAnnotationEstimator<double, 0>

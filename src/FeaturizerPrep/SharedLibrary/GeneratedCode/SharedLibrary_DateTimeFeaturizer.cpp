@@ -28,7 +28,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateEstimator(/*out*/ DateTimeF
 
         // No validation
 
-        *ppHandle = reinterpret_cast<DateTimeFeaturizer_EstimatorHandle *>(new Microsoft::Featurizer::DateTimeEstimator(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(21)));
+        *ppHandle = reinterpret_cast<DateTimeFeaturizer_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::DateTimeEstimator(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(21)));
     
         return true;
     }
@@ -47,7 +47,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyEstimator(/*in*/ DateTimeF
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::DateTimeEstimator *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::DateTimeEstimator *>(pHandle);
     
         return true;
     }
@@ -67,7 +67,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_IsTrainingComplete(/*in*/ DateTim
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::DateTimeEstimator const & estimator(*reinterpret_cast<Microsoft::Featurizer::DateTimeEstimator *>(pHandle));
+        Microsoft::Featurizer::Featurizers::DateTimeEstimator const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::DateTimeEstimator *>(pHandle));
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -90,7 +90,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Fit(/*in*/ DateTimeFeaturizer_Est
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
         // No validation
 
-        Microsoft::Featurizer::DateTimeEstimator & estimator(*reinterpret_cast<Microsoft::Featurizer::DateTimeEstimator *>(pHandle));
+        Microsoft::Featurizer::Featurizers::DateTimeEstimator & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::DateTimeEstimator *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -114,7 +114,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_FitBuffer(/*in*/ DateTimeFeaturiz
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::DateTimeEstimator & estimator(*reinterpret_cast<Microsoft::Featurizer::DateTimeEstimator *>(pHandle));
+        Microsoft::Featurizer::Featurizers::DateTimeEstimator & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::DateTimeEstimator *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -136,7 +136,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CompleteTraining(/*in*/ DateTimeF
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::DateTimeEstimator & estimator(*reinterpret_cast<Microsoft::Featurizer::DateTimeEstimator *>(pHandle));
+        Microsoft::Featurizer::Featurizers::DateTimeEstimator & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::DateTimeEstimator *>(pHandle));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -158,7 +158,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerFromEstimator(/*
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::DateTimeEstimator & estimator(*reinterpret_cast<Microsoft::Featurizer::DateTimeEstimator *>(pEstimatorHandle));
+        Microsoft::Featurizer::Featurizers::DateTimeEstimator & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::DateTimeEstimator *>(pEstimatorHandle));
 
         *ppTransformerHandle = reinterpret_cast<DateTimeFeaturizer_TransformerHandle *>(estimator.create_transformer().release());
     
@@ -183,7 +183,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerFromSavedData(/*
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<DateTimeFeaturizer_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::DateTimeEstimator::TransformerType>(archive).release());
+        *ppTransformerHandle = reinterpret_cast<DateTimeFeaturizer_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType>(archive).release());
     
         return true;
     }
@@ -202,7 +202,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyTransformer(/*in*/ DateTim
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::DateTimeEstimator::TransformerType *>(pHandle);
+        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType *>(pHandle);
     
         return true;
     }
@@ -223,7 +223,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerSaveData(/*in*/ 
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::DateTimeEstimator::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::DateTimeEstimator::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType *>(pHandle));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -276,7 +276,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturiz
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::DateTimeEstimator::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::DateTimeEstimator::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType *>(pHandle));
 
         // Input
         auto result(transformer.execute(input));

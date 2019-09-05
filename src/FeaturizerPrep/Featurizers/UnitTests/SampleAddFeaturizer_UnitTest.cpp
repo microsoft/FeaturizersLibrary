@@ -9,7 +9,7 @@
 #include "../SampleAddFeaturizer.h"
 
 // ----------------------------------------------------------------------
-using Microsoft::Featurizer::SampleAddEstimator;
+using Microsoft::Featurizer::Featurizers::SampleAddEstimator;
 using Microsoft::Featurizer::CreateTestAnnotationMapsPtr;
 // ----------------------------------------------------------------------
 

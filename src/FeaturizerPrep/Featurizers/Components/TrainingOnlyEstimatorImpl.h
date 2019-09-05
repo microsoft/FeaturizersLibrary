@@ -4,11 +4,12 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include "Featurizer.h"
+#include "../../Featurizer.h"
 
 namespace Microsoft {
 namespace Featurizer {
-namespace Details {
+namespace Featurizers {
+namespace Components {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         TrainingOnlyEstimatorImpl
@@ -189,6 +190,7 @@ TrainingOnlyEstimatorImpl<EstimatorPolicyT, ColIndexV>::AnnotationImpl::Annotati
     AnnotationData(std::forward<ArgsT>(args)...) {
 }
 
-} // namespace Details
+} // namespace Components
+} // namespace Featurizers
 } // namespace Featurizer
 } // namespace Microsoft

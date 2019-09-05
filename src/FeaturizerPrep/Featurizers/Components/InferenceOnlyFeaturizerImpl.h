@@ -4,12 +4,14 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include "Archive.h"
-#include "Featurizer.h"
-#include "Traits.h"
+#include "../../Archive.h"
+#include "../../Featurizer.h"
+#include "../../Traits.h"
 
 namespace Microsoft {
 namespace Featurizer {
+namespace Featurizers {
+namespace Components {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         InferenceOnlyTransformerImpl
@@ -150,5 +152,7 @@ Estimator::FitResult InferenceOnlyEstimatorImpl<TransformerT, InputT, Transforme
     throw std::runtime_error("This should never be called as this class will not be used during training");
 }
 
+} // namespace Components
+} // namespace Featruziers
 } // namespace Featurizer
 } // namespace Microsoft

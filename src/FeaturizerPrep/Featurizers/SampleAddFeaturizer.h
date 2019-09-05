@@ -8,6 +8,7 @@
 
 namespace Microsoft {
 namespace Featurizer {
+namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         SampleAddEstimator
@@ -52,5 +53,6 @@ private:
     TransformerUniquePtr create_transformer_impl(void) override;
 };
 
+} // namespace Featurizers
 } // namespace Featurizer
 } // namespace Microsoft

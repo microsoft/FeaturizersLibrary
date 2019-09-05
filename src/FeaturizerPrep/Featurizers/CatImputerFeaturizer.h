@@ -6,11 +6,12 @@
 
 #include "../Archive.h"
 #include "../Featurizer.h"
-#include "../PipelineExecutionEstimator.h"
 #include "../Traits.h"
+#include "Components/PipelineExecutionEstimatorImpl.h"
 
 namespace Microsoft {
 namespace Featurizer {
+namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         HistogramAnnotation
@@ -216,7 +217,7 @@ private:
 ///
 template <typename T>
 class CatImputerEstimator :
-    public PipelineExecutionEstimator<
+    public Components::PipelineExecutionEstimatorImpl<
         HistogramEstimator<typename Traits<T>::nullable_type, T, 0>,
         HistogramConsumerEstimator<typename Traits<T>::nullable_type, T>
     > {
@@ -226,7 +227,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType = PipelineExecutionEstimator<
+    using BaseType = Components::PipelineExecutionEstimatorImpl<
         HistogramEstimator<typename Traits<T>::nullable_type, T, 0>,
         HistogramConsumerEstimator<typename Traits<T>::nullable_type, T>
     >;
@@ -373,5 +374,6 @@ CatImputerEstimator<T>::CatImputerEstimator(AnnotationMapsPtr pAllColumnAnnotati
     BaseType("CatImputerEstimator", std::move(pAllColumnAnnotations)) {
 }
 
+} // namespace Featurizers
 } // namespace Featurizer
 } // namespace Microsoft

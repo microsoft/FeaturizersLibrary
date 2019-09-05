@@ -95,8 +95,8 @@ std::map<typename EstimatorPolicyT::InputType, std::uint32_t> Test(
     using FitResult                         = NS::Estimator::FitResult;
     using Batches                           = std::vector<std::vector<typename EstimatorPolicyT::InputType>>;
 
-    NS::AnnotationMapsPtr                                                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Details::TrainingOnlyEstimatorImpl<EstimatorPolicyT, 0>             estimator(pAllColumnAnnotations);
+    NS::AnnotationMapsPtr                                                           pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::Components::TrainingOnlyEstimatorImpl<EstimatorPolicyT, 0>     estimator(pAllColumnAnnotations);
 
     typename Batches::const_iterator                                        iter(inputBatches.begin());
 

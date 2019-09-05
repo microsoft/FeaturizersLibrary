@@ -4,20 +4,22 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include "Featurizer.h"
-#include "Details/PipelineExecutionEstimator_details.h"
+#include "../../Featurizer.h"
+#include "Details/PipelineExecutionEstimatorImpl_details.h"
 
 namespace Microsoft {
 namespace Featurizer {
+namespace Featurizers {
+namespace Components {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         PipelineExecutionEstimator
+///  \class         PipelineExecutionEstimatorImpl
 ///  \brief         Executes one or more `Estimators` in sequential
 ///                 order. This object is used to stich together individual
 ///                 `Estimators` into a larger directed acyclic graph (DAG).
 ///
 template <typename... EstimatorT>
-class PipelineExecutionEstimator : public TransformerEstimator<
+class PipelineExecutionEstimatorImpl : public TransformerEstimator<
     typename Details::PipelineTraits<EstimatorT...>::InputType,
     typename Details::PipelineTraits<EstimatorT...>::TransformedType
 > {
@@ -29,7 +31,7 @@ public:
     // ----------------------------------------------------------------------
     using PipelineTraits                    = Details::PipelineTraits<EstimatorT...>;
 
-    using ThisType                          = PipelineExecutionEstimator<EstimatorT...>;
+    using ThisType                          = PipelineExecutionEstimatorImpl<EstimatorT...>;
     using BaseType                          = TransformerEstimator<typename PipelineTraits::InputType, typename PipelineTraits::TransformedType>;
 
     using InputType                         = typename BaseType::InputType;
@@ -75,7 +77,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    PipelineExecutionEstimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
+    PipelineExecutionEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
 
 private:
     // ----------------------------------------------------------------------
@@ -107,11 +109,11 @@ private:
 
 // ----------------------------------------------------------------------
 // |
-// |  PipelineExecutionEstimator
+// |  PipelineExecutionEstimatorImpl
 // |
 // ----------------------------------------------------------------------
 template <typename... EstimatorT>
-PipelineExecutionEstimator<EstimatorT...>::PipelineExecutionEstimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations) :
+PipelineExecutionEstimatorImpl<EstimatorT...>::PipelineExecutionEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations) :
     BaseType(std::move(name), pAllColumnAnnotations),
     _estimator_chain(pAllColumnAnnotations) {
         if(_estimator_chain.is_all_training_complete())
@@ -119,44 +121,46 @@ PipelineExecutionEstimator<EstimatorT...>::PipelineExecutionEstimator(std::strin
 }
 
 template <typename... EstimatorT>
-typename PipelineExecutionEstimator<EstimatorT...>::FitResult PipelineExecutionEstimator<EstimatorT...>::fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer) /*override*/ {
+typename PipelineExecutionEstimatorImpl<EstimatorT...>::FitResult PipelineExecutionEstimatorImpl<EstimatorT...>::fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer) /*override*/ {
     return _estimator_chain.fit(pBuffer, cBuffer);
 }
 
 template <typename... EstimatorT>
-typename PipelineExecutionEstimator<EstimatorT...>::FitResult PipelineExecutionEstimator<EstimatorT...>::complete_training_impl(void) /*override*/ {
+typename PipelineExecutionEstimatorImpl<EstimatorT...>::FitResult PipelineExecutionEstimatorImpl<EstimatorT...>::complete_training_impl(void) /*override*/ {
     return _estimator_chain.complete_training(true);
 }
 
 template <typename... EstimatorT>
-typename PipelineExecutionEstimator<EstimatorT...>::TransformerUniquePtr PipelineExecutionEstimator<EstimatorT...>::create_transformer_impl(void) /*override*/ {
+typename PipelineExecutionEstimatorImpl<EstimatorT...>::TransformerUniquePtr PipelineExecutionEstimatorImpl<EstimatorT...>::create_transformer_impl(void) /*override*/ {
     return std::make_unique<Transformer>(_estimator_chain);
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  PipelineExecutionEstimator::Transformer
+// |  PipelineExecutionEstimatorImpl::Transformer
 // |
 // ----------------------------------------------------------------------
 template <typename... EstimatorT>
-PipelineExecutionEstimator<EstimatorT...>::Transformer::Transformer(EstimatorChain &estimator_chain) :
+PipelineExecutionEstimatorImpl<EstimatorT...>::Transformer::Transformer(EstimatorChain &estimator_chain) :
     _transformer_chain(estimator_chain) {
 }
 
 template <typename... EstimatorT>
-PipelineExecutionEstimator<EstimatorT...>::Transformer::Transformer(Archive &ar) :
+PipelineExecutionEstimatorImpl<EstimatorT...>::Transformer::Transformer(Archive &ar) :
     _transformer_chain(ar) {
 }
 
 template <typename... EstimatorT>
-typename PipelineExecutionEstimator<EstimatorT...>::TransformedType PipelineExecutionEstimator<EstimatorT...>::Transformer::execute(InputType input) /*override*/ {
+typename PipelineExecutionEstimatorImpl<EstimatorT...>::TransformedType PipelineExecutionEstimatorImpl<EstimatorT...>::Transformer::execute(InputType input) /*override*/ {
     return _transformer_chain.execute(input);
 }
 
 template <typename... EstimatorT>
-void PipelineExecutionEstimator<EstimatorT...>::Transformer::save(Archive &ar) const /*override*/ {
+void PipelineExecutionEstimatorImpl<EstimatorT...>::Transformer::save(Archive &ar) const /*override*/ {
     _transformer_chain.save(ar);
 }
 
+} // namespace Components
+} // namespace Featurizers
 } // namespace Featurizer
 } // namespace Microsoft

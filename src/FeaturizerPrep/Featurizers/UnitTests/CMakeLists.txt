@@ -6,6 +6,8 @@ cmake_minimum_required(VERSION 3.5.0)
 
 project(Featurizer_UnitTests LANGUAGES CXX)
 
+set(_includes "$ENV{INCLUDE}")
+set(_libs "$ENV{LIB}")
 set(CMAKE_MODULE_PATH "$ENV{DEVELOPMENT_ENVIRONMENT_CMAKE_MODULE_PATH}")
 
 if(NOT WIN32)

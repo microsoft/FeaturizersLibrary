@@ -5,10 +5,11 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "../../Shared/optional.h"
+#include "../../3rdParty/optional.h"
 #include "../../Featurizers/CatImputerFeaturizer.h"
 
 namespace NS = Microsoft::Featurizer;
+
 namespace {
 
 template <typename T, typename ArgT>
@@ -110,7 +111,7 @@ void NumericTestWrapper(){
 
     CHECK(
         Test(
-            NS::CatImputerEstimator<transformedType>(pAllColumnAnnotations),
+            NS::Featurizers::CatImputerEstimator<transformedType>(pAllColumnAnnotations),
             trainingBatches,
             inferencingInput
         ) == inferencingOutput
@@ -183,7 +184,7 @@ TEST_CASE("CatImputer- string") {
 
     CHECK(
         Test(
-            NS::CatImputerEstimator<transformedType>(pAllColumnAnnotations),
+            NS::Featurizers::CatImputerEstimator<transformedType>(pAllColumnAnnotations),
             make_vector<std::vector<type>>(
                 make_vector<type>("one", "one", "one",type{},type{},"two", "three")
             ),
@@ -199,7 +200,7 @@ TEST_CASE("CatImputer- All values Null") {
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
     CHECK_THROWS_WITH(Test(
-            NS::CatImputerEstimator<transformedType>(pAllColumnAnnotations),
+            NS::Featurizers::CatImputerEstimator<transformedType>(pAllColumnAnnotations),
             make_vector<std::vector<type>>(
                 make_vector<type>(type{},type{},type{},type{},type{},type{})),
                 make_vector<type>(5, 8, 20,type{}))
@@ -209,7 +210,7 @@ TEST_CASE("CatImputer- All values Null") {
 TEST_CASE("Serialization/Deserialization- Numeric") {
     using type = nonstd::optional<std::int64_t>;
     using transformedType = std::int64_t;
-    using transformerType = NS::HistogramConsumerEstimator<type,transformedType>::Transformer;
+    using transformerType = NS::Featurizers::HistogramConsumerEstimator<type,transformedType>::Transformer;
     auto model = std::make_shared<transformerType>(10);
 
     NS::Archive archive;
@@ -225,7 +226,7 @@ TEST_CASE("Serialization/Deserialization- Numeric") {
 TEST_CASE("Serialization/Deserialization- string") {
     using type = nonstd::optional<std::string>;
     using transformedType = std::string;
-    using transformerType = NS::HistogramConsumerEstimator<type,transformedType>::Transformer;
+    using transformerType = NS::Featurizers::HistogramConsumerEstimator<type,transformedType>::Transformer;
     auto model = std::make_shared<transformerType>("one");
 
     NS::Archive archive;
