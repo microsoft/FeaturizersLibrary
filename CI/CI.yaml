@@ -1,0 +1,58 @@
+name: $(TeamProject)-$(BuildDefinitionName)-$(SourceBranchName)-$(Date:yyyy.MM.dd)-$(Rev:rr)
+trigger:
+    batch: true
+    branches:
+        include:
+            - master
+
+stages:
+    - template: BuildAndTest.stage_template.yaml
+      parameters:
+          agent_pool: windows-2019
+          operating_system: Windows
+          configuration: x64
+          enable_code_coverage: True
+
+    - template: BuildAndTest.stage_template.yaml
+      parameters:
+          agent_pool: windows-2019
+          operating_system: Windows
+          configuration: x64_MSVC
+          enable_code_coverage: False
+
+    - template: BuildAndTest.stage_template.yaml
+      parameters:
+          agent_pool: ubuntu-16.04
+          operating_system: Linux
+          configuration: x64
+          enable_code_coverage: False
+
+    # TODO: Add a build based on custom image
+    # - template: BuildAndTest.stage_template.yaml
+    #   parameters:
+    #       agent_pool: <Docker Container>
+    #       operating_system: Linux
+    #       configuration: system_compiler
+    #       enable_code_coverage: False
+
+    - template: Documentation.stage_template.yaml
+      parameters:
+          agent_pool: "windows-2019"
+          operating_system: "Windows"
+          configuration: "system_compiler"
+          dependencies:
+              - BuildAndTest_Windows_x64_Stage
+              - BuildAndTest_Windows_x64_MSVC_Stage
+              - BuildAndTest_Linux_x64_Stage
+              # TODO - BuildAndTest_Linux_system_compiler_Stage
+
+    - template: Package.stage_template.yaml
+      parameters:
+          agent_pool: "windows-2019"
+          operating_system: "Windows"
+          configuration: "x64"
+          dependencies:
+              - BuildAndTest_Windows_x64_Stage
+              - BuildAndTest_Windows_x64_MSVC_Stage
+              - BuildAndTest_Linux_x64_Stage
+              # TODO - BuildAndTest_Linux_system_compiler_Stage

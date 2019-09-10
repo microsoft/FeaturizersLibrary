@@ -42,23 +42,53 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 # Tuples in the form:
 #   ("<repo name>", "<clone command line>", "<setup command suffix>" or None)
 _REPO_DATA                                  = [
-    ("Common_cpp_Clang_8", 'git clone https://github.com/davidbrownell/Common_cpp_Clang_8 "{output_dir}"', None),
-    ("Common_cpp_Clang_Common", 'git clone https://github.com/davidbrownell/Common_cpp_Clang_Common "{output_dir}"', None),
-    ("Common_cpp_Common", 'git clone https://github.com/davidbrownell/Common_cpp_Common "{output_dir}"', None),
-    ("Common_cpp_boost_Common", 'git clone https://github.com/davidbrownell/Common_cpp_boost_Common "{output_dir}"', None),
-    ("Common_cpp_boost_1.70.0", 'git clone https://github.com/davidbrownell/Common_cpp_boost_1.70.0 "{output_dir}"', '"/configuration=standard" "/configuration=MSVC-2019-x64"'),
+    (
+        "Common_cpp_Clang_8",
+        'git clone https://github.com/davidbrownell/Common_cpp_Clang_8 "{output_dir}"',
+        None,
+    ),
+    (
+        "Common_cpp_Clang_Common",
+        'git clone https://github.com/davidbrownell/Common_cpp_Clang_Common "{output_dir}"',
+        None,
+    ),
+    (
+        "Common_cpp_Common",
+        'git clone https://github.com/davidbrownell/Common_cpp_Common "{output_dir}"',
+        None,
+    ),
 ]
 
 if CurrentShell.CategoryName == "Linux":
     _REPO_DATA += [
-        ("Common_cpp_binutils", 'git clone https://github.com/davidbrownell/Common_cpp_binutils "{output_dir}"', None),
-        ("Common_cpp_GCC", 'git clone https://github.com/davidbrownell/Common_cpp_GCC "{output_dir}"', None),
+        (
+            "Common_cpp_binutils",
+            'git clone https://github.com/davidbrownell/Common_cpp_binutils "{output_dir}"',
+            None,
+        ),
+        (
+            "Common_cpp_GCC",
+            'git clone https://github.com/davidbrownell/Common_cpp_GCC "{output_dir}"',
+            None,
+        ),
     ]
 elif CurrentShell.CategoryName == "Windows":
     _REPO_DATA += [
-        ("Common_cpp_MSVC_2019", 'git clone https://github.com/davidbrownell/Common_cpp_MSVC_2019 "{output_dir}"', None),
-        ("Common_cpp_MSVC_Common", 'git clone https://github.com/davidbrownell/Common_cpp_MSVC_Common "{output_dir}"', None),
-        ("Common_cpp_MSVC_WindowsKits_10", 'git clone https://github.com/davidbrownell/Common_cpp_MSVC_WindowsKits_10 "{output_dir}"', None),
+        (
+            "Common_cpp_MSVC_2019",
+            'git clone https://github.com/davidbrownell/Common_cpp_MSVC_2019 "{output_dir}"',
+            None,
+        ),
+        (
+            "Common_cpp_MSVC_Common",
+            'git clone https://github.com/davidbrownell/Common_cpp_MSVC_Common "{output_dir}"',
+            None,
+        ),
+        (
+            "Common_cpp_MSVC_WindowsKits_10",
+            'git clone https://github.com/davidbrownell/Common_cpp_MSVC_WindowsKits_10 "{output_dir}"',
+            None,
+        ),
     ]
 else:
     raise Exception("'{}' is not supported OS".format(CurrentShell.CategoryName))
@@ -70,7 +100,9 @@ inflect                                     = inflect_mod.engine()
 
 # ----------------------------------------------------------------------
 @CommandLine.EntryPoint(
-    setup_args=CommandLine.EntryPoint.Parameter("Optional arguments passed to this repository's setup command"),
+    setup_args=CommandLine.EntryPoint.Parameter(
+        "Optional arguments passed to this repository's setup command",
+    ),
 )
 @CommandLine.Constraints(
     output_dir=CommandLine.DirectoryTypeInfo(),
@@ -96,13 +128,18 @@ def EntryPoint(
 
         dm.stream.write("Calculating enlistment repositories...")
         with dm.stream.DoneManager(
-            done_suffix=lambda: "{} found for enlistment".format(inflect.no("repository", len(enlistment_repositories))),
+            done_suffix=lambda: "{} found for enlistment".format(
+                inflect.no("repository", len(enlistment_repositories)),
+            ),
             suffix="\n",
         ) as this_dm:
             for data in _REPO_DATA:
                 repo_name = data[0]
 
-                repo_output_dir = os.path.join(output_dir, repo_name.replace("_", os.path.sep))
+                repo_output_dir = os.path.join(
+                    output_dir,
+                    repo_name.replace("_", os.path.sep),
+                )
                 if not os.path.isdir(repo_output_dir):
                     enlistment_repositories.append((repo_output_dir, data))
                 else:
@@ -113,12 +150,22 @@ def EntryPoint(
         repo_data[_script_dir] = (_script_dir, None, setup_args)
 
         if enlistment_repositories:
-            dm.stream.write("Enlisting in {}...".format(inflect.no("repository", len(enlistment_repositories))))
+            dm.stream.write(
+                "Enlisting in {}...".format(
+                    inflect.no("repository", len(enlistment_repositories)),
+                ),
+            )
             with dm.stream.DoneManager(
                 suffix="\n",
             ) as enlist_dm:
                 for index, (repo_output_dir, data) in enumerate(enlistment_repositories):
-                    enlist_dm.stream.write("'{}' ({} of {})...".format(data[0], index + 1, len(enlistment_repositories)))
+                    enlist_dm.stream.write(
+                        "'{}' ({} of {})...".format(
+                            data[0],
+                            index + 1,
+                            len(enlistment_repositories),
+                        ),
+                    )
                     with enlist_dm.stream.DoneManager() as this_dm:
                         FileSystem.MakeDirs(os.path.dirname(repo_output_dir))
 
@@ -152,30 +199,48 @@ def EntryPoint(
                     CurrentShell.UpdateOwnership(output_dir)
 
         if sync_repositories:
-            dm.stream.write("Syncing {}...".format(inflect.no("repository", len(sync_repositories))))
+            dm.stream.write(
+                "Syncing {}...".format(inflect.no("repository", len(sync_repositories))),
+            )
             with dm.stream.DoneManager(
                 suffix="\n",
             ) as sync_dm:
-                sync_command_template = '{} PullAndUpdate "/directory={{}}"'.format(CurrentShell.CreateScriptName("SCM"))
+                sync_command_template = '{} PullAndUpdate "/directory={{}}"'.format(
+                    CurrentShell.CreateScriptName("SCM"),
+                )
 
                 for index, (repo_output_dir, data) in enumerate(sync_repositories):
-                    sync_dm.stream.write("'{}' ({} of {})...".format(data[0], index + 1, len(sync_repositories)))
+                    sync_dm.stream.write(
+                        "'{}' ({} of {})...".format(
+                            data[0],
+                            index + 1,
+                            len(sync_repositories),
+                        ),
+                    )
                     with sync_dm.stream.DoneManager() as this_dm:
-                        this_dm.result, output = Process.Execute(sync_command_template.format(repo_output_dir))
+                        this_dm.result, output = Process.Execute(
+                            sync_command_template.format(repo_output_dir),
+                        )
                         if this_dm.result != 0:
                             this_dm.stream.write(output)
 
                 if sync_dm.result != 0:
                     return sync_dm.result
 
-        dm.stream.write("Setting up {}...".format(inflect.no("repository", len(repo_data))))
+        dm.stream.write(
+            "Setting up {}...".format(inflect.no("repository", len(repo_data))),
+        )
         with dm.stream.DoneManager(
             suffix="\n",
         ) as setup_dm:
-            command_line_template = "Setup{} {{suffix}}".format(CurrentShell.ScriptExtension)
+            command_line_template = "Setup{} {{suffix}}".format(
+                CurrentShell.ScriptExtension,
+            )
 
             for index, (repo_output_dir, data) in enumerate(six.iteritems(repo_data)):
-                setup_dm.stream.write("'{}' ({} of {})...".format(data[0], index + 1, len(repo_data)))
+                setup_dm.stream.write(
+                    "'{}' ({} of {})...".format(data[0], index + 1, len(repo_data)),
+                )
                 with setup_dm.stream.DoneManager() as this_dm:
                     prev_dir = os.getcwd()
                     os.chdir(repo_output_dir)
@@ -238,7 +303,12 @@ def EntryPoint(
                     os.path.join(
                         _script_dir,
                         "Activate{}{}".format(
-                            ".{}".format(os.getenv("DEVELOPMENT_ENVIRONMENT_ENVIRONMENT_NAME")) if os.getenv("DEVELOPMENT_ENVIRONMENT_ENVIRONMENT_NAME") != "DefaultEnv" else "",
+                            ".{}".format(
+                                os.getenv("DEVELOPMENT_ENVIRONMENT_ENVIRONMENT_NAME"),
+                            )
+                            if os.getenv("DEVELOPMENT_ENVIRONMENT_ENVIRONMENT_NAME")
+                            != "DefaultEnv"
+                            else "",
                             CurrentShell.ScriptExtension,
                         ),
                     ),

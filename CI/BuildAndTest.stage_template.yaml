@@ -1,6 +1,3 @@
-# TODO: Remove this once these changes have been moved to master. This file exists as we need to ensure the the point
-#       continues to function while this change is in flight.
-
 parameters:
     operating_system: "" # Windows|Linux
     enable_code_coverage: "" # True|False

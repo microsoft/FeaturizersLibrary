@@ -43,7 +43,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 # <Wildcard import> pylint: disable = W0401
 # <Unused argument> pylint: disable = W0613
 
-fundamental_repo                                                            = os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL")
+fundamental_repo                            = os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL")
 assert os.path.isdir(fundamental_repo), fundamental_repo
 
 sys.path.insert(0, fundamental_repo)
@@ -97,41 +97,42 @@ def GetDependencies():
 
     d = OrderedDict()
 
-    for architecture in ["x64",]:
-        d[architecture] = Configuration(
-            architecture,
+    d["x64"] = Configuration(
+        "Builds using Clang on an x64 architecture",
+        [
+            Dependency(
+                "3DE9F3430E494A6C8429B26A1503C895",
+                "Common_cpp_Clang_8",
+                "x64-ex",
+                "https://github.com/davidbrownell/Common_cpp_Clang_8.git",
+            ),
+        ],
+    )
+
+    if CurrentShell.CategoryName == "Windows":
+        d["x64_MSVC"] = Configuration(
+            "Builds using MSVC 2019 on an x64 architecture",
             [
                 Dependency(
-                    "3DE9F3430E494A6C8429B26A1503C895",
-                    "Common_cpp_Clang_8",
-                    "{}-ex".format(architecture),
-                    "https://github.com/davidbrownell/Common_cpp_Clang_8.git",
-                ),
-                # TODO: This configuration doesn't depend on boost, however there are some tests associated with the
-                #       `featurization_prep` configuration do. Include it for now, as there isn't a way to specify
-                #       configuration-specific tests at this time. Remove the following dependency once there is a
-                #       way to communicate this information.
-                Dependency(
-                    "407DD743110A4FB1871AEF60CBEC99A0",
-                    "Common_cpp_boost_1.70.0",
-                    "standard",
-                    "https://github.com/davidbrownell/Common_cpp_boost_1.70.0.git",
+                    "AB7D87C49C2449F79D9F42E5195030FD",
+                    "Common_cpp_MSVC_2019",
+                    "x64",
+                    "https://github.com/davidbrownell/Common_cpp_MSVC_2019.git",
                 ),
             ],
         )
 
-    d["featurizer_prep"] = copy.deepcopy(d["x64"])
-
-    # TODO: Enable this once the TODO comment above is resolved.
-    #
-    # d["featurizer_prep"].Dependencies.append(
-    #     Dependency(
-    #         "407DD743110A4FB1871AEF60CBEC99A0",
-    #         "Common_cpp_boost_1.70.0",
-    #         "standard",
-    #         "https://github.com/davidbrownell/Common_cpp_boost_1.70.0.git",
-    #     ),
-    # )
+    d["system_compiler"] = Configuration(
+        "Builds using the system-installed compiler on an x64 architecture (this will typically be used in a container with dependencies preinstalled)",
+        [
+            Dependency(
+                "F33C43DA6BB54336A7573B39509CDAD7",
+                "Common_cpp_Common",
+                "x64",
+                "https://github.com/davidbrownell/Common_cpp_Common.git",
+            ),
+        ],
+    )
 
     return d
 

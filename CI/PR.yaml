@@ -1,0 +1,31 @@
+name: $(TeamProject)-$(BuildDefinitionName)-$(SourceBranchName)-$(Date:yyyy.MM.dd)-$(Rev:rr)
+
+stages:
+  - template: BuildAndTest.stage_template.yaml
+    parameters:
+      agent_pool: windows-2019
+      operating_system: Windows
+      configuration: x64
+      enable_code_coverage: True
+
+  - template: BuildAndTest.stage_template.yaml
+    parameters:
+      agent_pool: windows-2019
+      operating_system: Windows
+      configuration: x64_MSVC
+      enable_code_coverage: False
+
+  - template: BuildAndTest.stage_template.yaml
+    parameters:
+      agent_pool: ubuntu-16.04
+      operating_system: Linux
+      configuration: x64
+      enable_code_coverage: True
+
+  # TODO: Add a build based on custom image
+  # - template: BuildAndTest.stage_template.yaml
+  #   parameters:
+  #       operating_system: Linux
+  #       configuration: system_compiler
+  #       enable_code_coverage: False
+  #       agent_pool: <Docker Container>

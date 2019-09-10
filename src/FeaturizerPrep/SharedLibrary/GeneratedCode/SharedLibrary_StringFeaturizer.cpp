@@ -14,6 +14,13 @@ ErrorInfoHandle * CreateErrorInfo(std::exception const &ex);
 
 extern "C" {
 
+// I don't know why MSVC thinks that there is unreachable
+// code in these methods during release builds.
+#if (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4702) // Unreachable code
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
 /* |  StringFeaturizer <int8_t> */
@@ -3756,5 +3763,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_DestroyTransformedData(/*in*
         return false;
     }
 }
+
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
 
 } // extern "C"

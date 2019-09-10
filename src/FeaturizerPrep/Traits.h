@@ -2,7 +2,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License
 // ----------------------------------------------------------------------
-
 #pragma once
 
 #include <array>
@@ -26,7 +25,7 @@ namespace Featurizer {
 /////////////////////////////////////////////////////////////////////////
 ///  \struct        Traits
 ///  \brief         We have a range of of types we are dealing with. Many types
-///                 have different ways to represent what a `NULL` value is
+///                 have different ways to represent what a 'NULL' value is
 ///                 (float has NAN for example) as well as different ways to
 ///                 convert the value to a string representation. By using
 ///                 templates combined with partial template specialization

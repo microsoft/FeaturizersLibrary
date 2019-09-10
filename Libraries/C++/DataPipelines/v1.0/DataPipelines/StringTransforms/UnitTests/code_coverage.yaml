@@ -1,7 +1,0 @@
-filter:
-  includes: 
-    - DataPipelines::StringTransforms::RegEx::*
-  excludes:
-    - Catch2::*
-    - std::*
-

@@ -412,7 +412,10 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                         """,
                     ).format(
                         struct_name,
-                        StringHelpers.LeftJustify("\n".join(["{};".format(member) for member in members]), 4).strip(),
+                        StringHelpers.LeftJustify(
+                            "\n".join(["{};".format(member) for member in members]),
+                            4,
+                        ).strip(),
                     ),
                 )
 
@@ -447,7 +450,9 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                     {delete_transformed_method}
                     """,
                 ).format(
-                    custom_structs="" if not custom_structs else "{}\n\n".format(custom_structs.strip()),
+                    custom_structs="" if not custom_structs else "{}\n\n".format(
+                        custom_structs.strip(),
+                    ),
                     construct_params="{}, ".format(
                         ", ".join(construct_params),
                     ) if construct_params else "",
@@ -466,9 +471,7 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                         ).ParameterDecl,
                     ),
                     transform_output_param=", ".join(
-                        c_data.TransformedTypeInfo.GetOutputInfo(
-                            "output",
-                        ).ParameterDecl,
+                        c_data.TransformedTypeInfo.GetOutputInfo("output").ParameterDecl,
                     ),
                     delete_transformed_method=delete_transformed_method,
                     **d
@@ -508,6 +511,13 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                 ErrorInfoHandle * CreateErrorInfo(std::exception const &ex);
 
                 extern "C" {{
+
+                // I don't know why MSVC thinks that there is unreachable
+                // code in these methods during release builds.
+                #if (defined _MSC_VER)
+                #   pragma warning(push)
+                #   pragma warning(disable: 4702) // Unreachable code
+                #endif
 
                 """,
             ).format(
@@ -926,6 +936,11 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
         f.write(
             textwrap.dedent(
                 """\
+
+                #if (defined _MSC_VER)
+                #   pragma warning(pop)
+                #endif
+
                 } // extern "C"
                 """,
             ),
@@ -1233,11 +1248,7 @@ class _ScalarTypeInfo(TypeInfo):
             """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
                 name=arg_name,
             ),
-            "{}{} = {};".format(
-                "" if is_struct else "*",
-                arg_name,
-                result_name,
-            ),
+            "{}{} = {};".format("" if is_struct else "*", arg_name, result_name),
         )
 
     # ----------------------------------------------------------------------
@@ -1271,7 +1282,11 @@ class _StringTypeInfo(TypeInfo):
             )
             invocation = invocation_template.format(arg_name)
 
-        return cls.Info(["/*in*/ char const *{}".format(arg_name)], validation, invocation)
+        return cls.Info(
+            ["/*in*/ char const *{}".format(arg_name)],
+            validation,
+            invocation,
+        )
 
     # ----------------------------------------------------------------------
     @classmethod
@@ -1357,7 +1372,7 @@ class _StringTypeInfo(TypeInfo):
                 ),
                 "/*out*/ std::size_t{pointer} {name}_items".format(
                     name=arg_name,
-                    pointer=""if is_struct else " *",
+                    pointer="" if is_struct else " *",
                 ),
             ],
             textwrap.dedent(
@@ -1461,25 +1476,14 @@ class _TimePointTypeInfo(TypeInfo):
         for member_name, member_info in six.iteritems(self._member_info):
             member_statements.append(
                 member_info.GetOutputInfo(
-                    "{}.{}".format(
-                        result_time_point_name,
-                        member_name,
-                    ),
-                    "{}.{}".format(
-                        result_name,
-                        member_name,
-                    ),
+                    "{}.{}".format(result_time_point_name, member_name),
+                    "{}.{}".format(result_name, member_name),
                     is_struct=True,
                 ).InvocationStatement,
             )
 
         return self.Info(
-            [
-                "/*out*/ TimePoint *{} {}".format(
-                    "" if is_struct else "*",
-                    arg_name,
-                ),
-            ],
+            ["/*out*/ TimePoint *{} {}".format("" if is_struct else "*", arg_name)],
             """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
                 name=arg_name,
             ),

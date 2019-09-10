@@ -131,7 +131,7 @@ using AnnotationMapsPtr                     = std::shared_ptr<AnnotationMaps>;
 // TODO: Expect more classes with regards to Annotation as we use the functionality more.
 
 /////////////////////////////////////////////////////////////////////////
-///  \function      CreateTestAnnotationMapsPtr
+///  \fn            CreateTestAnnotationMapsPtr
 ///  \brief         An `Estimator` requires an `AnnotationMapsPtr` upon
 ///                 construction. This method can be used to quickly create
 ///                 one of these objects during testing.
@@ -182,7 +182,7 @@ public:
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Estimator);
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \function      get_column_annotations
+    ///  \fn            get_column_annotations
     ///  \brief         Returns the column annotations for all columns. Note
     ///                 that this information is shared across all `Estimators`
     ///                 with the DAG.
@@ -204,13 +204,13 @@ protected:
     Estimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \function      add_annotation
+    ///  \fn            add_annotation
     ///  \brief         Adds an `Annotation` to the specified column.
     ///
     void add_annotation(AnnotationPtr pAnnotation, size_t col_index) const;
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \function      get_annotation_impl
+    ///  \fn            get_annotation_impl
     ///  \brief         Helper method that can be used by derived class when implementation functionality
     ///                 to retrieve `Annotation` data created by the derived class itself.
     ///
@@ -262,7 +262,7 @@ public:
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FitEstimatorImpl);
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \function      is_training_complete
+    ///  \fn            is_training_complete
     ///  \brief         Returns true if the `complete_training` method has been called
     ///                 for this `Estimator`. `fit` should not be invoked on
     ///                 an `Estimator` where training has been completed.
@@ -270,7 +270,7 @@ public:
     bool is_training_complete(void) const;
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \function      fit
+    ///  \fn            fit
     ///  \brief         Method invoked during training. This method will be invoked until it returns `FitResult::Complete`
     ///                 or no additional data is available. Derived classes should use this columnar data to create
     ///                 state (either in the form of `Annotations`) used during the training process or state data that
@@ -281,7 +281,7 @@ public:
     FitResult fit(FitBufferInputType const *pInputBuffer, size_t cInputBuffer);
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \function      complete_training
+    ///  \fn            complete_training
     ///  \brief         Completes the training process. Derived classes should use this method to produce any final state
     ///                 that is used in calls to `transform` or to add `Annotations` for a column. This method should not be
     ///                 invoked on an object that has already been completed.
@@ -303,14 +303,14 @@ private:
     // ----------------------------------------------------------------------
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \function      fit_impl
+    ///  \fn            fit_impl
     ///  \brief         `fit` performs common object state and parameter validation before invoking
     ///                 this abstract method.
     ///
     virtual FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer) = 0;
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \function      complete_training_impl
+    ///  \fn            complete_training_impl
     ///  \brief         `complete_training` performs common object state validation before invoking this
     ///                 abstract method.
     ///
@@ -390,13 +390,13 @@ public:
         FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Transformer);
 
         /////////////////////////////////////////////////////////////////////////
-        ///  \function      execute
+        ///  \fn            execute
         ///  \brief         Produces a result for a given input.
         ///
         virtual TransformedType execute(InputType input) = 0;
 
         /////////////////////////////////////////////////////////////////////////
-        ///  \function      save
+        ///  \fn            save
         ///  \brief         Saves the state of the object so it can be reconstructed
         ///                 at a later time.
         ///
@@ -416,7 +416,7 @@ public:
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TransformerEstimator);
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \function      has_created_transformer
+    ///  \fn            has_created_transformer
     ///  \brief         Returns true if this object has been used to create
     ///                 a `Transformer`. No methods should be called on the object
     ///                 once it has been used to create a transformer.
@@ -424,7 +424,7 @@ public:
     bool has_created_transformer(void) const;
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \function      create_transformer
+    ///  \fn            create_transformer
     ///  \brief         Creates a `Transformer` using the trained state of the
     ///                 object. No methods should be called on the object once
     ///                 it has been used to create a transformer.
@@ -446,7 +446,7 @@ private:
     // ----------------------------------------------------------------------
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \function      create_transformer_impl
+    ///  \fn            create_transformer_impl
     ///  \brief         `create_transformer` performs common object state validation before
     ///                 calling this method.
     ///
@@ -606,6 +606,13 @@ Estimator::FitResult FitEstimatorImpl<InputT>::fit(InputType value) {
     return fit(&value, 1);
 }
 
+// I'm not sure why MSVC thinks that the following code is unreachable
+// with release builds.
+#if (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4702) // Unreachable code
+#endif
+
 template <typename InputT>
 Estimator::FitResult FitEstimatorImpl<InputT>::fit(FitBufferInputType const *pInputBuffer, size_t cInputBuffer) {
     if(_is_training_complete)
@@ -624,6 +631,10 @@ Estimator::FitResult FitEstimatorImpl<InputT>::fit(FitBufferInputType const *pIn
 
     return result;
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
 
 template <typename InputT>
 Estimator::FitResult FitEstimatorImpl<InputT>::complete_training(void) {

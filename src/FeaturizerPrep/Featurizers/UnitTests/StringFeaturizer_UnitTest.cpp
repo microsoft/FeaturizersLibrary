@@ -77,8 +77,8 @@ TEST_CASE("Transformer_Vector") {
 
 TEST_CASE("Transformer_Maps") {
     std::map<std::int16_t, std::double_t> m;
-    m.insert(std::pair<std::int16_t, std::double_t>(5, 35.8));
-    m.insert(std::pair<std::int16_t, std::double_t>(93, 0.147));
+    m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(5), 35.8));
+    m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(93), 0.147));
     std::string map_s{ "{5:35.800000,93:0.147000}" };
     CHECK(NS::Featurizers::StringTransformer<std::map<std::int16_t, std::double_t>>().execute(m) == map_s);
 }

@@ -105,7 +105,15 @@ void NumericTestWrapper(){
     auto inferencingInput = make_vector<inputType>(static_cast<castType>(5),static_cast<castType>(8),static_cast<castType>(20)
                 ,null,null,null,null);
 
-    auto inferencingOutput = make_vector<transformedType>(5,8,20,10,10,10,10);
+    auto inferencingOutput = make_vector<transformedType>(
+        static_cast<castType>(5),
+        static_cast<castType>(8),
+        static_cast<castType>(20),
+        static_cast<castType>(10),
+        static_cast<castType>(10),
+        static_cast<castType>(10),
+        static_cast<castType>(10)
+    );
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 

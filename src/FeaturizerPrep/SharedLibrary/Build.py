@@ -43,6 +43,8 @@ def Build(
     output_stream=sys.stdout,
     verbose=False,
 ):
+    """Builds the Featurizer Shared Library"""
+
     with StreamDecorator(output_stream).DoneManager(
         line_prefix="",
         prefix="\nResults: ",
@@ -53,7 +55,9 @@ def Build(
         # ----------------------------------------------------------------------
         def CleanupTempDir():
             if keep_temp_dir:
-                dm.stream.write("\nCMake output has been written to '{}'.\n".format(temp_directory))
+                dm.stream.write(
+                    "\nCMake output has been written to '{}'.\n".format(temp_directory),
+                )
                 return
 
             FileSystem.RemoveTree(temp_directory)
@@ -75,22 +79,15 @@ def Build(
                             this_dir=_script_dir,
                         ),
                     ),
-                    (
-                        "Building",
-                        "cmake --build .",
-                    ),
-                    (
-                        "Copying Binaries",
-                        _CopyBinaries,
-                    ),
-                    (
-                        "Copying Headers",
-                        _CopyHeaders,
-                    ),
+                    ("Building", "cmake --build ."),
+                    ("Copying Binaries", _CopyBinaries),
+                    ("Copying Headers", _CopyHeaders),
                 ]
 
                 for index, (activity, command_line) in enumerate(activities):
-                    dm.stream.write("{} ({} of {})...".format(activity, index + 1, len(activities)))
+                    dm.stream.write(
+                        "{} ({} of {})...".format(activity, index + 1, len(activities)),
+                    )
                     with dm.stream.DoneManager(
                         suffix="\n" if verbose else None,
                     ) as this_dm:
@@ -109,9 +106,16 @@ def Build(
                         this_output_stream = StreamDecorator(output_streams)
 
                         if callable(command_line):
-                            this_dm.result = command_line(temp_directory, output_dir, this_output_stream)
+                            this_dm.result = command_line(
+                                temp_directory,
+                                output_dir,
+                                this_output_stream,
+                            )
                         else:
-                            this_dm.result = Process.Execute(command_line, this_output_stream)
+                            this_dm.result = Process.Execute(
+                                command_line,
+                                this_output_stream,
+                            )
 
                         if this_dm.result != 0:
                             if not verbose:
@@ -134,6 +138,8 @@ def Clean(
     output_dir,
     output_stream=sys.stdout,
 ):
+    """Cleans previously built content"""
+
     with StreamDecorator(output_stream).DoneManager(
         line_prefix="",
         prefix="\nResults: ",
@@ -150,25 +156,56 @@ def Clean(
 
 
 # ----------------------------------------------------------------------
+@CommandLine.EntryPoint(
+    # TODO
+)
+@CommandLine.Constraints(
+    windows_build_dir=CommandLine.DirectoryTypeInfo(),
+    linux_build_dir=CommandLine.DirectoryTypeInfo(),
+    output_dir=CommandLine.DirectoryTypeInfo(
+        ensure_exists=False,
+    ),
+    output_stream=None,
+)
+def Package(
+    windows_build_dir,
+    linux_build_dir,
+    output_dir,
+    output_stream=sys.stdout,
+    verbose=False,
+):
+    """Packages previously built content"""
+
+    with StreamDecorator(output_stream).DoneManager(
+        line_prefix="",
+        prefix="\nResults: ",
+        suffix="\n",
+    ) as dm:
+
+        # TODO: Implement this
+
+        return dm.result
+
+# ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 def _CopyBinaries(temp_directory, output_dir, output_stream):
     if CurrentShell.CategoryName == "Windows":
-        output_files = [
-            "Featurizers.dll",
-            "Featurizers.pdb",
-        ]
+        output_files = ["Featurizers.dll", "Featurizers.pdb"]
     elif CurrentShell.CategoryName == "Linux":
-        output_files = [
-            "libFeaturizers.so",
-        ]
+        output_files = ["libFeaturizers.so"]
     else:
         raise Exception("The Current Shell is not supported")
 
     for index, output_file in enumerate(output_files):
-        output_stream.write("Copying '{}' ({} of {})...".format(output_file, index + 1, len(output_files)))
+        output_stream.write(
+            "Copying '{}' ({} of {})...".format(output_file, index + 1, len(output_files)),
+        )
         with output_stream.DoneManager():
-            shutil.copyfile(os.path.join(temp_directory, output_file), os.path.join(output_dir, output_file))
+            shutil.copyfile(
+                os.path.join(temp_directory, output_file),
+                os.path.join(output_dir, output_file),
+            )
 
     return 0
 
@@ -183,9 +220,14 @@ def _CopyHeaders(temp_directory, output_dir, output_stream):
     )
 
     for index, output_file in enumerate(output_files):
-        output_stream.write("Copying '{}' ({} of {})...".format(output_file, index + 1, len(output_files)))
+        output_stream.write(
+            "Copying '{}' ({} of {})...".format(output_file, index + 1, len(output_files)),
+        )
         with output_stream.DoneManager():
-            shutil.copyfile(output_file, os.path.join(output_dir, os.path.basename(output_file)))
+            shutil.copyfile(
+                output_file,
+                os.path.join(output_dir, os.path.basename(output_file)),
+            )
 
     return 0
 
