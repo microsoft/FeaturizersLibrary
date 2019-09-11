@@ -1,56 +1,59 @@
 parameters:
-    operating_system: "" # Windows|Linux
+  operating_system: "" # Windows|Linux
 
-    dependencies: []
-    configuration: ""
-    agent_pool: ""
+  dependencies: []
+  configuration: ""
+  agent_pool: ""
 
 stages:
-    - stage: Package_${{ parameters.operating_system }}_${{ parameters.configuration }}_Stage
-      displayName: "${{ parameters.operating_system }} - ${{ parameters.configuration }}: "
-      dependsOn: ${{ parameters.dependencies }}
+  - stage: Package_${{ parameters.operating_system }}_${{ parameters.configuration }}_Stage
+    displayName: "Package"
+    dependsOn: ${{ parameters.dependencies }}
 
-      jobs:
-          - job: Package_${{ parameters.operating_system }}_${{ parameters.configuration }}_Job
-            displayName: "Package: (${{ parameters.operating_system }} - ${{ parameters.configuration }})"
-            pool:
-                vmImage: "${{ parameters.agent_pool }}"
-            workspace:
-                clean: all
+    jobs:
+      - job: Package_${{ parameters.operating_system }}_${{ parameters.configuration }}_Job
 
-            steps:
-                - template: Initialize.steps_template.yaml
-                  parameters:
-                      operating_system: ${{ parameters.operating_system }}
-                      enable_code_coverage: False
+        # In the UX, this display name contains redundant info (the OS and config appear twice). However, it
+        # needs to be here to ensure that the information appears in the status email messages.
+        displayName: "Package (${{ parameters.operating_system }} - ${{ parameters.configuration }})"
+        pool:
+          vmImage: "${{ parameters.agent_pool }}"
+        workspace:
+          clean: all
 
-                - script: |-
-                      echo "dependencies - ${{ join(', ', parameters.dependencies) }}"
-                      echo "configuration - ${{ parameters.configuration }}"
-                      echo "agent_pool - ${{ parameters.agent_pool }}
-                  displayName: "[DEBUG] Display Package Variables"
+        steps:
+          - template: Initialize.steps_template.yaml
+            parameters:
+              operating_system: ${{ parameters.operating_system }}
+              enable_code_coverage: False
 
-                - script: |-
-                      $(azure_display_all_environment_vars)
-                  displayName: "[DEBUG] Environment Variables (Before Activation)"
+          - script: |-
+              echo "dependencies - ${{ join(', ', parameters.dependencies) }}"
+              echo "configuration - ${{ parameters.configuration }}"
+              echo "agent_pool - ${{ parameters.agent_pool }}
+            displayName: "[DEBUG] Display Package Variables"
 
-                - script: |-
-                      $(azure_bootstrap_command) $(azure_agent_temp_directory) /verbose
-                  displayName: "<Bootstrap>"
-                  timeoutInMinutes: 180
+          - script: |-
+              $(azure_display_all_environment_vars)
+            displayName: "[DEBUG] Environment Variables (Before Activation)"
 
-                - script: |-
-                      $(azure_activate_script) ${{ parameters.configuration }} && $(azure_display_all_environment_vars)
-                  displayName: "[DEBUG] Environment Variables (After Activation)"
+          - script: |-
+              $(azure_bootstrap_command) $(azure_agent_temp_directory) /verbose
+            displayName: "<Bootstrap>"
+            timeoutInMinutes: 180
 
-                - script: |-
-                      echo "TODO: Package"
-                  displayName: "<Package>"
-                  timeoutInMinutes: 180
+          - script: |-
+              $(azure_activate_script) ${{ parameters.configuration }} && $(azure_display_all_environment_vars)
+            displayName: "[DEBUG] Environment Variables (After Activation)"
 
-                - task: PublishPipelineArtifact@0
-                  displayName: "Publish Artifacts"
-                  inputs:
-                      targetPath: $(azure_artifacts_directory)
-                      artifactName: "Package"
-                  timeoutInMinutes: 180
+          - script: |-
+              echo "TODO: Package"
+            displayName: "<Package>"
+            timeoutInMinutes: 180
+
+          - task: PublishPipelineArtifact@0
+            displayName: "Publish Artifacts"
+            inputs:
+              targetPath: $(azure_artifacts_directory)
+              artifactName: "Package"
+            timeoutInMinutes: 180

@@ -7,12 +7,15 @@ parameters:
 
 stages:
     - stage: Documentation_${{ parameters.operating_system }}_${{ parameters.configuration }}_Stage
-      displayName: "${{ parameters.operating_system }} - ${{ parameters.configuration }}: "
+      displayName: "Documentation"
       dependsOn: ${{ parameters.dependencies }}
 
       jobs:
           - job: Documentation_${{ parameters.operating_system }}_${{ parameters.configuration }}_Job
-            displayName: "Documentation: (${{ parameters.operating_system }} - ${{ parameters.configuration }})"
+
+            # In the UX, this display name contains redundant info (the OS and config appear twice). However, it
+            # needs to be here to ensure that the information appears in the status email messages.
+            displayName: "Documentation (${{ parameters.operating_system }} - ${{ parameters.configuration }})"
             pool:
                 vmImage: "${{ parameters.agent_pool }}"
             workspace:
