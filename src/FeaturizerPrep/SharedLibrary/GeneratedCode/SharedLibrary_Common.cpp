@@ -8,6 +8,7 @@
 #include <string>
 
 #include "SharedLibrary_Common.h"
+#include "SharedLibrary_PointerTable.h"
 
 extern "C" {
 
@@ -15,7 +16,7 @@ FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, 
     if(pHandle == nullptr || output_ptr == nullptr || output_items == nullptr)
         return false;
 
-    std::string const & str(*reinterpret_cast<std::string *>(pHandle));
+    std::string const & str(*sg_pointerTable.Get<std::string>(reinterpret_cast<size_t>(pHandle)));
 
     char * string_buffer(new char[str.size() + 1]);
 
@@ -41,7 +42,11 @@ FEATURIZER_LIBRARY_API bool DestroyErrorInfo(/*in*/ ErrorInfoHandle *pHandle) {
     if(pHandle == nullptr)
         return false;
 
-    std::string & str(*reinterpret_cast<std::string *>(pHandle));
+    size_t index = reinterpret_cast<size_t>(pHandle);
+
+    std::string & str(*sg_pointerTable.Get<std::string>(index));
+
+    sg_pointerTable.Remove(index);
 
     delete &str;
 
@@ -54,6 +59,7 @@ FEATURIZER_LIBRARY_API bool DestroyErrorInfo(/*in*/ ErrorInfoHandle *pHandle) {
 ErrorInfoHandle * CreateErrorInfo(std::exception const &ex) {
     std::unique_ptr<std::string> result(std::make_unique<std::string>(ex.what()));
 
-    return reinterpret_cast<ErrorInfoHandle *>(result.release());
+    size_t index = sg_pointerTable.Add(result.release());
+    return reinterpret_cast<ErrorInfoHandle *>(index);
 }
 

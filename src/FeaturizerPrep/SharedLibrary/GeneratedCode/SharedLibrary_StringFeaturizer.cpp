@@ -5,6 +5,7 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_StringFeaturizer.h"
+#include "SharedLibrary_PointerTable.h"
 
 #include "Archive.h"
 #include "StringFeaturizer.h"
@@ -34,8 +35,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateEstimator(/*out*/ Stri
         *ppErrorInfo = nullptr;
 
         // No validation
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        size_t index(sg_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<StringFeaturizer_int8_t_EstimatorHandle*>(index);
 
-        *ppHandle = reinterpret_cast<StringFeaturizer_int8_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+
     
         return true;
     }
@@ -54,7 +58,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyEstimator(/*in*/ Stri
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>>(index);
+        sg_pointerTable.Remove(index);
+
+        delete pEstimator;
     
         return true;
     }
@@ -74,7 +82,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_IsTrainingComplete(/*in*/ St
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -95,9 +104,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_Fit(/*in*/ StringFeaturizer_
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
         // No validation
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -118,10 +130,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_FitBuffer(/*in*/ StringFeatu
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -143,7 +158,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CompleteTraining(/*in*/ Stri
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> *>(pHandle));
+
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -165,9 +182,15 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerFromEstimat
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> *>(pEstimatorHandle));
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int8_t_TransformerHandle *>(estimator.create_transformer().release());
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int8_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -190,7 +213,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerFromSavedDa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int8_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType>(archive).release());
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int8_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -209,7 +235,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyTransformer(/*in*/ St
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType>(index);
+        sg_pointerTable.Remove(index);
+
+
+        delete pTransformer;
     
         return true;
     }
@@ -230,7 +261,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerSaveData(/*
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -280,11 +311,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_Transform(/*in*/ StringFeatu
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
         // No input validation
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -345,8 +378,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateEstimator(/*out*/ Str
         *ppErrorInfo = nullptr;
 
         // No validation
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        size_t index(sg_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<StringFeaturizer_int16_t_EstimatorHandle*>(index);
 
-        *ppHandle = reinterpret_cast<StringFeaturizer_int16_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+
     
         return true;
     }
@@ -365,7 +401,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyEstimator(/*in*/ Str
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>>(index);
+        sg_pointerTable.Remove(index);
+
+        delete pEstimator;
     
         return true;
     }
@@ -385,7 +425,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_IsTrainingComplete(/*in*/ S
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -406,9 +447,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_Fit(/*in*/ StringFeaturizer
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
         // No validation
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -429,10 +473,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_FitBuffer(/*in*/ StringFeat
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -454,7 +501,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CompleteTraining(/*in*/ Str
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> *>(pHandle));
+
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -476,9 +525,15 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerFromEstima
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> *>(pEstimatorHandle));
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int16_t_TransformerHandle *>(estimator.create_transformer().release());
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int16_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -501,7 +556,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerFromSavedD
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int16_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType>(archive).release());
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int16_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -520,7 +578,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyTransformer(/*in*/ S
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType>(index);
+        sg_pointerTable.Remove(index);
+
+
+        delete pTransformer;
     
         return true;
     }
@@ -541,7 +604,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerSaveData(/
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -591,11 +654,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_Transform(/*in*/ StringFeat
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
         // No input validation
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -656,8 +721,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateEstimator(/*out*/ Str
         *ppErrorInfo = nullptr;
 
         // No validation
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        size_t index(sg_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<StringFeaturizer_int32_t_EstimatorHandle*>(index);
 
-        *ppHandle = reinterpret_cast<StringFeaturizer_int32_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+
     
         return true;
     }
@@ -676,7 +744,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyEstimator(/*in*/ Str
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>>(index);
+        sg_pointerTable.Remove(index);
+
+        delete pEstimator;
     
         return true;
     }
@@ -696,7 +768,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_IsTrainingComplete(/*in*/ S
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -717,9 +790,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_Fit(/*in*/ StringFeaturizer
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
         // No validation
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -740,10 +816,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_FitBuffer(/*in*/ StringFeat
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -765,7 +844,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CompleteTraining(/*in*/ Str
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> *>(pHandle));
+
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -787,9 +868,15 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerFromEstima
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> *>(pEstimatorHandle));
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int32_t_TransformerHandle *>(estimator.create_transformer().release());
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int32_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -812,7 +899,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerFromSavedD
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int32_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType>(archive).release());
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int32_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -831,7 +921,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyTransformer(/*in*/ S
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType>(index);
+        sg_pointerTable.Remove(index);
+
+
+        delete pTransformer;
     
         return true;
     }
@@ -852,7 +947,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerSaveData(/
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -902,11 +997,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_Transform(/*in*/ StringFeat
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
         // No input validation
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -967,8 +1064,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateEstimator(/*out*/ Str
         *ppErrorInfo = nullptr;
 
         // No validation
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        size_t index(sg_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<StringFeaturizer_int64_t_EstimatorHandle*>(index);
 
-        *ppHandle = reinterpret_cast<StringFeaturizer_int64_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+
     
         return true;
     }
@@ -987,7 +1087,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyEstimator(/*in*/ Str
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>>(index);
+        sg_pointerTable.Remove(index);
+
+        delete pEstimator;
     
         return true;
     }
@@ -1007,7 +1111,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_IsTrainingComplete(/*in*/ S
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -1028,9 +1133,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_Fit(/*in*/ StringFeaturizer
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
         // No validation
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -1051,10 +1159,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_FitBuffer(/*in*/ StringFeat
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -1076,7 +1187,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CompleteTraining(/*in*/ Str
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> *>(pHandle));
+
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -1098,9 +1211,15 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerFromEstima
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> *>(pEstimatorHandle));
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int64_t_TransformerHandle *>(estimator.create_transformer().release());
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int64_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -1123,7 +1242,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerFromSavedD
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int64_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType>(archive).release());
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int64_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -1142,7 +1264,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyTransformer(/*in*/ S
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType>(index);
+        sg_pointerTable.Remove(index);
+
+
+        delete pTransformer;
     
         return true;
     }
@@ -1163,7 +1290,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerSaveData(/
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -1213,11 +1340,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_Transform(/*in*/ StringFeat
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
         // No input validation
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -1278,8 +1407,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateEstimator(/*out*/ Str
         *ppErrorInfo = nullptr;
 
         // No validation
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        size_t index(sg_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<StringFeaturizer_uint8_t_EstimatorHandle*>(index);
 
-        *ppHandle = reinterpret_cast<StringFeaturizer_uint8_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+
     
         return true;
     }
@@ -1298,7 +1430,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyEstimator(/*in*/ Str
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>>(index);
+        sg_pointerTable.Remove(index);
+
+        delete pEstimator;
     
         return true;
     }
@@ -1318,7 +1454,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_IsTrainingComplete(/*in*/ S
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -1339,9 +1476,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_Fit(/*in*/ StringFeaturizer
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
         // No validation
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -1362,10 +1502,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_FitBuffer(/*in*/ StringFeat
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -1387,7 +1530,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CompleteTraining(/*in*/ Str
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> *>(pHandle));
+
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -1409,9 +1554,15 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerFromEstima
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> *>(pEstimatorHandle));
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint8_t_TransformerHandle *>(estimator.create_transformer().release());
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint8_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -1434,7 +1585,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerFromSavedD
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint8_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType>(archive).release());
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint8_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -1453,7 +1607,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyTransformer(/*in*/ S
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType>(index);
+        sg_pointerTable.Remove(index);
+
+
+        delete pTransformer;
     
         return true;
     }
@@ -1474,7 +1633,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerSaveData(/
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -1524,11 +1683,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_Transform(/*in*/ StringFeat
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
         // No input validation
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -1589,8 +1750,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateEstimator(/*out*/ St
         *ppErrorInfo = nullptr;
 
         // No validation
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        size_t index(sg_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<StringFeaturizer_uint16_t_EstimatorHandle*>(index);
 
-        *ppHandle = reinterpret_cast<StringFeaturizer_uint16_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+
     
         return true;
     }
@@ -1609,7 +1773,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyEstimator(/*in*/ St
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>>(index);
+        sg_pointerTable.Remove(index);
+
+        delete pEstimator;
     
         return true;
     }
@@ -1629,7 +1797,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_IsTrainingComplete(/*in*/ 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -1650,9 +1819,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_Fit(/*in*/ StringFeaturize
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
         // No validation
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -1673,10 +1845,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_FitBuffer(/*in*/ StringFea
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -1698,7 +1873,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CompleteTraining(/*in*/ St
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> *>(pHandle));
+
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -1720,9 +1897,15 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerFromEstim
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> *>(pEstimatorHandle));
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint16_t_TransformerHandle *>(estimator.create_transformer().release());
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint16_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -1745,7 +1928,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerFromSaved
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint16_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType>(archive).release());
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint16_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -1764,7 +1950,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyTransformer(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType>(index);
+        sg_pointerTable.Remove(index);
+
+
+        delete pTransformer;
     
         return true;
     }
@@ -1785,7 +1976,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerSaveData(
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -1835,11 +2026,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_Transform(/*in*/ StringFea
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
         // No input validation
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -1900,8 +2093,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateEstimator(/*out*/ St
         *ppErrorInfo = nullptr;
 
         // No validation
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        size_t index(sg_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<StringFeaturizer_uint32_t_EstimatorHandle*>(index);
 
-        *ppHandle = reinterpret_cast<StringFeaturizer_uint32_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+
     
         return true;
     }
@@ -1920,7 +2116,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyEstimator(/*in*/ St
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>>(index);
+        sg_pointerTable.Remove(index);
+
+        delete pEstimator;
     
         return true;
     }
@@ -1940,7 +2140,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_IsTrainingComplete(/*in*/ 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -1961,9 +2162,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_Fit(/*in*/ StringFeaturize
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
         // No validation
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -1984,10 +2188,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_FitBuffer(/*in*/ StringFea
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -2009,7 +2216,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CompleteTraining(/*in*/ St
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> *>(pHandle));
+
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -2031,9 +2240,15 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerFromEstim
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> *>(pEstimatorHandle));
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint32_t_TransformerHandle *>(estimator.create_transformer().release());
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint32_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -2056,7 +2271,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerFromSaved
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint32_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType>(archive).release());
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint32_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -2075,7 +2293,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyTransformer(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType>(index);
+        sg_pointerTable.Remove(index);
+
+
+        delete pTransformer;
     
         return true;
     }
@@ -2096,7 +2319,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerSaveData(
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -2146,11 +2369,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_Transform(/*in*/ StringFea
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
         // No input validation
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -2211,8 +2436,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateEstimator(/*out*/ St
         *ppErrorInfo = nullptr;
 
         // No validation
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        size_t index(sg_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<StringFeaturizer_uint64_t_EstimatorHandle*>(index);
 
-        *ppHandle = reinterpret_cast<StringFeaturizer_uint64_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+
     
         return true;
     }
@@ -2231,7 +2459,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyEstimator(/*in*/ St
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>>(index);
+        sg_pointerTable.Remove(index);
+
+        delete pEstimator;
     
         return true;
     }
@@ -2251,7 +2483,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_IsTrainingComplete(/*in*/ 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -2272,9 +2505,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_Fit(/*in*/ StringFeaturize
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
         // No validation
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -2295,10 +2531,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_FitBuffer(/*in*/ StringFea
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -2320,7 +2559,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CompleteTraining(/*in*/ St
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> *>(pHandle));
+
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -2342,9 +2583,15 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerFromEstim
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> *>(pEstimatorHandle));
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint64_t_TransformerHandle *>(estimator.create_transformer().release());
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint64_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -2367,7 +2614,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerFromSaved
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint64_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType>(archive).release());
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint64_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -2386,7 +2636,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyTransformer(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType>(index);
+        sg_pointerTable.Remove(index);
+
+
+        delete pTransformer;
     
         return true;
     }
@@ -2407,7 +2662,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerSaveData(
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -2457,11 +2712,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_Transform(/*in*/ StringFea
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
         // No input validation
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -2522,8 +2779,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateEstimator(/*out*/ Str
         *ppErrorInfo = nullptr;
 
         // No validation
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        size_t index(sg_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<StringFeaturizer_float_t_EstimatorHandle*>(index);
 
-        *ppHandle = reinterpret_cast<StringFeaturizer_float_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+
     
         return true;
     }
@@ -2542,7 +2802,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyEstimator(/*in*/ Str
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>>(index);
+        sg_pointerTable.Remove(index);
+
+        delete pEstimator;
     
         return true;
     }
@@ -2562,7 +2826,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_IsTrainingComplete(/*in*/ S
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -2583,9 +2848,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_Fit(/*in*/ StringFeaturizer
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
         // No validation
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -2606,10 +2874,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_FitBuffer(/*in*/ StringFeat
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -2631,7 +2902,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CompleteTraining(/*in*/ Str
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> *>(pHandle));
+
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -2653,9 +2926,15 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerFromEstima
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> *>(pEstimatorHandle));
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_float_t_TransformerHandle *>(estimator.create_transformer().release());
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_float_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -2678,7 +2957,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerFromSavedD
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_float_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType>(archive).release());
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_float_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -2697,7 +2979,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyTransformer(/*in*/ S
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType>(index);
+        sg_pointerTable.Remove(index);
+
+
+        delete pTransformer;
     
         return true;
     }
@@ -2718,7 +3005,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerSaveData(/
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -2768,11 +3055,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_Transform(/*in*/ StringFeat
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
         // No input validation
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -2833,8 +3122,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateEstimator(/*out*/ St
         *ppErrorInfo = nullptr;
 
         // No validation
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        size_t index(sg_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<StringFeaturizer_double_t_EstimatorHandle*>(index);
 
-        *ppHandle = reinterpret_cast<StringFeaturizer_double_t_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+
     
         return true;
     }
@@ -2853,7 +3145,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_DestroyEstimator(/*in*/ St
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>>(index);
+        sg_pointerTable.Remove(index);
+
+        delete pEstimator;
     
         return true;
     }
@@ -2873,7 +3169,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_IsTrainingComplete(/*in*/ 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -2894,9 +3191,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_Fit(/*in*/ StringFeaturize
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
         // No validation
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -2917,10 +3217,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_FitBuffer(/*in*/ StringFea
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -2942,7 +3245,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CompleteTraining(/*in*/ St
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> *>(pHandle));
+
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -2964,9 +3269,15 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerFromEstim
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> *>(pEstimatorHandle));
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_double_t_TransformerHandle *>(estimator.create_transformer().release());
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_double_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -2989,7 +3300,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerFromSaved
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_double_t_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType>(archive).release());
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_double_t_TransformerHandle*>(index);
     
         return true;
     }
@@ -3008,7 +3322,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_DestroyTransformer(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType>(index);
+        sg_pointerTable.Remove(index);
+
+
+        delete pTransformer;
     
         return true;
     }
@@ -3029,7 +3348,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerSaveData(
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -3079,11 +3398,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_Transform(/*in*/ StringFea
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
         // No input validation
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -3144,8 +3465,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateEstimator(/*out*/ String
         *ppErrorInfo = nullptr;
 
         // No validation
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        size_t index(sg_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<StringFeaturizer_bool_EstimatorHandle*>(index);
 
-        *ppHandle = reinterpret_cast<StringFeaturizer_bool_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::StringEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+
     
         return true;
     }
@@ -3164,7 +3488,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_DestroyEstimator(/*in*/ String
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<bool> *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool> * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<bool>>(index);
+        sg_pointerTable.Remove(index);
+
+        delete pEstimator;
     
         return true;
     }
@@ -3184,7 +3512,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_IsTrainingComplete(/*in*/ Stri
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<bool> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<bool> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool> const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -3205,9 +3534,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_Fit(/*in*/ StringFeaturizer_bo
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
         // No validation
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<bool> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<bool> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -3228,10 +3560,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_FitBuffer(/*in*/ StringFeaturi
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<bool> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<bool> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -3253,7 +3588,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CompleteTraining(/*in*/ String
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<bool> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<bool> *>(pHandle));
+
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -3275,9 +3612,15 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateTransformerFromEstimator
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<bool> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<bool> *>(pEstimatorHandle));
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_bool_TransformerHandle *>(estimator.create_transformer().release());
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<bool>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_bool_TransformerHandle*>(index);
     
         return true;
     }
@@ -3300,7 +3643,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateTransformerFromSavedData
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_bool_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType>(archive).release());
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_bool_TransformerHandle*>(index);
     
         return true;
     }
@@ -3319,7 +3665,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_DestroyTransformer(/*in*/ Stri
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType>(index);
+        sg_pointerTable.Remove(index);
+
+
+        delete pTransformer;
     
         return true;
     }
@@ -3340,7 +3691,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateTransformerSaveData(/*in
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -3390,11 +3741,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_Transform(/*in*/ StringFeaturi
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
         // No input validation
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -3455,8 +3808,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateEstimator(/*out*/ Stri
         *ppErrorInfo = nullptr;
 
         // No validation
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        size_t index(sg_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<StringFeaturizer_string_EstimatorHandle*>(index);
 
-        *ppHandle = reinterpret_cast<StringFeaturizer_string_EstimatorHandle *>(new Microsoft::Featurizer::Featurizers::StringEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1)));
+
     
         return true;
     }
@@ -3475,7 +3831,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_DestroyEstimator(/*in*/ Stri
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::string> *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string> * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>>(index);
+        sg_pointerTable.Remove(index);
+
+        delete pEstimator;
     
         return true;
     }
@@ -3495,7 +3855,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_IsTrainingComplete(/*in*/ St
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::string> const & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::string> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string> const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pIsTrainingComplete = estimator.is_training_complete();
     
@@ -3516,9 +3877,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_Fit(/*in*/ StringFeaturizer_
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
         if(input == nullptr) throw std::invalid_argument("'input' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::string> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
+
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -3539,6 +3903,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_FitBuffer(/*in*/ StringFeatu
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -3553,7 +3920,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_FitBuffer(/*in*/ StringFeatu
             ++input_ptr;
         }
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::string> *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -3575,7 +3942,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CompleteTraining(/*in*/ Stri
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::string> *>(pHandle));
+
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.complete_training());
     
@@ -3597,9 +3966,15 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateTransformerFromEstimat
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::string> & estimator(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::string> *>(pEstimatorHandle));
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_string_TransformerHandle *>(estimator.create_transformer().release());
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string> & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_string_TransformerHandle*>(index);
     
         return true;
     }
@@ -3622,7 +3997,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateTransformerFromSavedDa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_string_TransformerHandle *>(std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType>(archive).release());
+
+        size_t index = sg_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_string_TransformerHandle*>(index);
     
         return true;
     }
@@ -3641,7 +4019,12 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_DestroyTransformer(/*in*/ St
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        delete reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType *>(pHandle);
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType>(index);
+        sg_pointerTable.Remove(index);
+
+
+        delete pTransformer;
     
         return true;
     }
@@ -3662,7 +4045,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateTransformerSaveData(/*
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -3712,11 +4095,13 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_Transform(/*in*/ StringFeatu
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
         if(input == nullptr) throw std::invalid_argument("'input' is null");
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType & transformer(*reinterpret_cast<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType *>(pHandle));
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));

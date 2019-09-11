@@ -23,21 +23,21 @@ TEST_CASE("Add_Find_Remove") {
     int p0 = 0;
     int p1 = 1;
 
-    uint32_t i0 = TestTable.Add<int>(&p0);
-    CHECK(TestTable.Find<int>(i0) == &p0);
-    CHECK(*TestTable.Find<int>(i0) == p0);
+    size_t i0 = TestTable.Add<int>(&p0);
+    CHECK(TestTable.Get<int>(i0) == &p0);
+    CHECK(*TestTable.Get<int>(i0) == p0);
     
-    uint32_t i1 = TestTable.Add<int>(&p1);
-    CHECK(TestTable.Find<int>(i1) == &p1);
-    CHECK(*TestTable.Find<int>(i1) == p1);
+    size_t i1 = TestTable.Add<int>(&p1);
+    CHECK(TestTable.Get<int>(i1) == &p1);
+    CHECK(*TestTable.Get<int>(i1) == p1);
 
 
 
     TestTable.Remove(i1);
     // exceptions
     REQUIRE_THROWS_WITH(TestTable.Add<int>(nullptr),"Trying to add a null pointer to the table!");
-    REQUIRE_THROWS_WITH(TestTable.Find<int>(i1),"Invalid query to the Pointer table, index incorrect!");
-    REQUIRE_THROWS_WITH(TestTable.Find<int>(0),"Invalid query to the Pointer table, index cannot be zero!");
+    REQUIRE_THROWS_WITH(TestTable.Get<int>(i1),"Invalid query to the Pointer table, index incorrect!");
+    REQUIRE_THROWS_WITH(TestTable.Get<int>(0),"Invalid query to the Pointer table, index cannot be zero!");
     REQUIRE_THROWS_WITH(TestTable.Remove(i1),"Invalid remove from the Pointer table, index pointer not found!");
     REQUIRE_THROWS_WITH(TestTable.Remove(0),"Invalid remove from the Pointer table, index cannot be zero!");
 
@@ -52,15 +52,15 @@ TEST_CASE("Check_Randomness_Given_Seed") {
     int p1 = 1;
     int p2 = 2;
 
-    uint32_t i0 = TestTable.Add<int>(&p0);
-    CHECK(i0 == 953453412);
+    size_t i0 = TestTable.Add<int>(&p0);
+    CHECK(i0 == 4095051218741643471UL);
     
-    uint32_t i1 = TestTable.Add<int>(&p1);
-    CHECK(i1 == 236996815);
+    size_t i1 = TestTable.Add<int>(&p1);
+    CHECK(i1 == 16062175962503177918UL);
 
 
-    uint32_t i2 = TestTable.Add<int>(&p2);
-    CHECK(i2 == 3739766768);
+    size_t i2 = TestTable.Add<int>(&p2);
+    CHECK(i2 == 3813295331020233847UL);
     
 
 }

@@ -28,12 +28,12 @@ class PointerTable {
         PointerTable(unsigned int seed = (std::random_device())());
 
         template<typename T> 
-        uint32_t Add(const T* const toBeAdded);
+        size_t Add(const T* const toBeAdded);
 
         template<typename T> 
-        T* Find(uint32_t index);
+        T* Get(size_t index);
 
-        void Remove(uint32_t index);
+        void Remove(size_t index);
 
     private:
     // ----------------------------------------------------------------------
@@ -41,7 +41,7 @@ class PointerTable {
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-        std::unordered_map<std::uint32_t, const void*>   m_un;
+        std::unordered_map<std::size_t, const void*>   m_un;
         std::mt19937 m_mt;
 
     };
@@ -62,7 +62,7 @@ class PointerTable {
 
 
     template<typename T>
-    uint32_t PointerTable::Add(const T * const templatePointer) {
+    size_t PointerTable::Add(const T * const templatePointer) {
         if (templatePointer == nullptr) {
             throw std::invalid_argument("Trying to add a null pointer to the table!");
         }
@@ -81,14 +81,14 @@ class PointerTable {
             }
         #endif
 
-        uint32_t empty_index = 0;
+        size_t empty_index = 0;
 
         // size would be changing throughout the process
         // index zero is reserved
-        std::uniform_int_distribution<uint32_t> dist(1,UINT32_MAX);
+        std::uniform_int_distribution<size_t> dist(1,std::numeric_limits<std::size_t>::max());
 
         while(true) {
-            uint32_t rand_index = dist(m_mt);
+            size_t rand_index = dist(m_mt);
             if (m_un.find(rand_index) == m_un.end()) {
                 empty_index = rand_index;
                 break;
@@ -100,14 +100,14 @@ class PointerTable {
     }
     
     template<typename T>
-    T* PointerTable::Find(uint32_t index) {
+    T* PointerTable::Get(size_t index) {
         // pre-check
         if (index == 0) {
             throw std::invalid_argument("Invalid query to the Pointer table, index cannot be zero!");
         }
 
 
-        std::unordered_map<std::uint32_t, const void*>::const_iterator found = m_un.find(index);
+        std::unordered_map<std::size_t, const void*>::const_iterator found = m_un.find(index);
         if (found == m_un.end()) {
             throw std::invalid_argument("Invalid query to the Pointer table, index incorrect!");
         }
@@ -115,14 +115,14 @@ class PointerTable {
     }
 
 
-    inline void PointerTable::Remove(uint32_t index) {
+    inline void PointerTable::Remove(size_t index) {
         // pre-check
         if (index == 0) {
             throw std::invalid_argument("Invalid remove from the Pointer table, index cannot be zero!");
         }
 
 
-        std::unordered_map<std::uint32_t, const void*>::const_iterator found = m_un.find(index);
+        std::unordered_map<std::size_t, const void*>::const_iterator found = m_un.find(index);
         if (found == m_un.end()) {
             throw std::invalid_argument("Invalid remove from the Pointer table, index pointer not found!");
         }
