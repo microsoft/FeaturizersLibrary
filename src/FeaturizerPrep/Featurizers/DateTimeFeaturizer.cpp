@@ -3,6 +3,12 @@
 // Licensed under the MIT License
 // ----------------------------------------------------------------------
 #include "DateTimeFeaturizer.h"
+#ifdef _WIN32
+    #include <direct.h>
+    #include <Windows.h>
+#else
+    #include <unistd.h>
+#endif
 
 #ifdef _MSC_VER
 inline struct tm *gmtime_r(time_t const* const timer, struct tm* const  result) {
@@ -69,7 +75,7 @@ TimePoint::TimePoint(const std::chrono::system_clock::time_point& sysTime) {
         monthLabel = _months[month - 1];
         amPmLabel = amPm ? "pm" : "am";
         dayOfWeekLabel = _weekDays[dayOfWeek];
-        holidayName = "NOT IMPLEMENTED"; // TODO
+        holidayName = ""; 
         isPaidTimeOff = 0;               // TODO
     }
     else
@@ -88,13 +94,89 @@ TimePoint::TimePoint(const std::chrono::system_clock::time_point& sysTime) {
 // |  DateTimeTransformer
 // |
 // ----------------------------------------------------------------------
+namespace {
+    std::string GetBinaryPath() {
+        #ifdef _WIN32
+            char result[ MAX_PATH ];
+            std::string binaryPath = std::string( result, GetModuleFileName( nullptr, result, MAX_PATH ) );
+            unsigned long ret = GetLastError();
+            if (ret != 0) {
+                throw std::runtime_error(std::to_string(ret));
+            }
+        #else
+            char result[ PATH_MAX ];
+            ssize_t count = readlink( "/proc/self/exe", result, PATH_MAX );
+            if (count < 0) {
+                throw std::runtime_error("readlink");
+            } 
+            std::string binaryPath = std::string( result, (count > 0) ? count : 0 );
+        #endif
+        return binaryPath;
+    }
+
+    nlohmann::json GetJsonStream(std::string const & _countryName) {
+        nlohmann::json holidaysByCountry;
+
+        std::string jsonFilename = _countryName + ".json";
+        std::string binaryPath = GetBinaryPath();
+        #ifdef _WIN32
+            std::string path = binaryPath.substr(0, binaryPath.find_last_of("\\")) + "\\Json\\" + jsonFilename;
+        #else
+            std::string path = binaryPath.substr(0, binaryPath.find_last_of("/")) + "/Json/" + jsonFilename;
+        #endif
+
+        std::ifstream file(path);
+        file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+        if (file) {
+            holidaysByCountry = nlohmann::json::parse(file);
+        } 
+        return holidaysByCountry;
+    }
+}
+
 DateTimeTransformer::DateTimeTransformer(Archive &ar) :
-    BaseType(ar) {
+    _countryName(Traits<std::string>::deserialize(ar)) {
+    DateTimeTransformer(this->_countryName);
+}
+
+DateTimeTransformer::DateTimeTransformer(nonstd::optional<std::string> const & countryName):
+    _countryName(countryName.has_value() ? countryName.value() : std::string()) {
+    
+    if (!_countryName.empty()) {
+        JsonStream holidaysByCountry = GetJsonStream(_countryName);
+
+        //Convert Jsonstream to std::unordered_map
+        //Note that the map keys are generated with "Date" and "Holiday" so no need to check existence
+        std::vector<InputType> dateVector = holidaysByCountry.at("Date").get<std::vector<InputType>>();
+        std::vector<std::string> nameVector = holidaysByCountry.at("Holiday").get<std::vector<std::string>>();
+
+        assert(dateVector.size() == nameVector.size());
+        for (unsigned long iter = 0; iter < dateVector.size(); ++iter) {
+            _dateHolidayMap[dateVector[iter]] = nameVector[iter];
+        }
+    }
 }
 
 DateTimeTransformer::TransformedType DateTimeTransformer::execute(InputType input) /*override*/ {
     std::chrono::time_point<std::chrono::system_clock> time(std::chrono::seconds {input} );
-    return TimePoint(time);
+    TimePoint result = TimePoint(time);
+
+    if (!_dateHolidayMap.empty()) {
+        //Normalize dateKey by cast one day range of time into an exact time
+        //86400 is the total number of seconds in a day, and as the holiday time is provided in a manner(00:00:00 in one
+        //day, so we need to consider any time that falls into this day.
+        InputType dateKey = (input - input % 86400);
+
+        auto x = _dateHolidayMap.find(dateKey);
+        if (x != _dateHolidayMap.end()) {
+            result.holidayName = x->second;
+        }
+    }
+    return result;
+}
+
+void DateTimeTransformer::save(Archive & ar) const /*override*/ {
+    Traits<std::string>::serialize(ar, _countryName);
 }
 
 // ----------------------------------------------------------------------

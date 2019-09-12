@@ -50,3 +50,12 @@ foreach(_test_name IN ITEMS
 
     add_test(NAME ${_test_name} COMMAND ${_test_name} --success)
 endforeach()
+
+file(GLOB JSON_DATA "../Data/holidays_by_country/*.json")
+
+foreach(df ${JSON_DATA})
+    file(COPY ${df} DESTINATION Json)
+endforeach()
+
+
+

@@ -43,7 +43,7 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {
     CHECK(tp.monthLabel == "November");
     CHECK(tp.amPmLabel == "pm");
     CHECK(tp.dayOfWeekLabel == "Wednesday");
-    CHECK(tp.holidayName == "NOT IMPLEMENTED");
+    CHECK(tp.holidayName == "");
     CHECK(tp.isPaidTimeOff == 0);
 
     // assignment
@@ -60,7 +60,8 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {
 }
 
 TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeTransformer][DateTimeTransformer]") {
-    NS::Featurizers::DateTimeTransformer dt;
+    nonstd::optional<std::string> cn;
+    NS::Featurizers::DateTimeTransformer dt(cn);
     NS::Featurizers::TimePoint tp = dt.execute(217081625);
     CHECK(tp.year == 1976);
     CHECK(tp.month == NS::Featurizers::TimePoint::NOVEMBER);
@@ -77,7 +78,8 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeTransformer][DateTimeTransfo
 }
 
 TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]") {
-    NS::Featurizers::DateTimeTransformer dt;
+    nonstd::optional<std::string> cn;
+    NS::Featurizers::DateTimeTransformer dt(cn);
     NS::Featurizers::TimePoint tp = dt.execute(1751241600);
     CHECK(tp.year == 2025);
     CHECK(tp.month == NS::Featurizers::TimePoint::JUNE);
@@ -98,8 +100,50 @@ TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]")
     CHECK(tp.monthLabel == "June");
     CHECK(tp.amPmLabel == "am");
     CHECK(tp.dayOfWeekLabel == "Monday");
-    CHECK(tp.holidayName == "NOT IMPLEMENTED");
+    CHECK(tp.holidayName == "");
     CHECK(tp.isPaidTimeOff == 0);
+}
+
+TEST_CASE("Holidays - No CountryName input - No Holiday date", "[DateTimeTransformer][DateTimeTransformer]") {
+    nonstd::optional<std::string> cn;
+    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::TimePoint tp = dt.execute(157161600);
+    CHECK(tp.holidayName == "");
+}
+
+TEST_CASE("Holidays - Canada - Christmas Day", "[DateTimeTransformer][DateTimeTransformer]") {
+    nonstd::optional<std::string> cn = "Canada";
+    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::TimePoint tp = dt.execute(157161600);
+    CHECK(tp.holidayName == "Christmas Day");
+}
+
+TEST_CASE("Holidays - Canada - Christmas Day ++", "[DateTimeTransformer][DateTimeTransformer]") {
+    nonstd::optional<std::string> cn = "Canada";
+    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::TimePoint tp = dt.execute(157161650);
+    CHECK(tp.holidayName == "Christmas Day");
+}
+
+TEST_CASE("Holidays - Canada - 1 day before Christmas Day", "[DateTimeTransformer][DateTimeTransformer]") {
+    nonstd::optional<std::string> cn = "Canada";
+    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::TimePoint tp = dt.execute(157161599);
+    CHECK(tp.holidayName == "1 day before Christmas Day");
+}
+
+TEST_CASE("Holidays - Finland - 1 day before Juhannusaatto", "[DateTimeTransformer][DateTimeTransformer]") {
+    nonstd::optional<std::string> cn = "Finland";
+    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::TimePoint tp = dt.execute(1088035200);
+    CHECK(tp.holidayName == "1 day before Juhannusaatto");
+}
+
+TEST_CASE("Holidays - Finland - No Holiday date", "[DateTimeTransformer][DateTimeTransformer]") {
+    nonstd::optional<std::string> cn = "Finland";
+    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::TimePoint tp = dt.execute(227813600);
+    CHECK(tp.holidayName == "");
 }
 
 #ifdef _MSC_VER
@@ -107,7 +151,8 @@ TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]")
 // which rolls over somewhere around 2260. Still a couple hundred years!
 TEST_CASE("Far Future - 2998 March 2, 14:03:02", "[DateTimeTransformer][DateTimeTransformer]") {
 
-    NS::Featurizers::DateTimeTransformer dt;
+    nonstd::optional<std::string> cn;
+    NS::Featurizers::DateTimeTransformer dt(cn);
     NS::Featurizers::TimePoint tp = dt.execute(32445842582);
     CHECK(tp.year == 2998);
     CHECK(tp.month == NS::Featurizers::TimePoint::MARCH);

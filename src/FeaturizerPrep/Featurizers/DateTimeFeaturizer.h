@@ -7,8 +7,12 @@
 #include <chrono>
 #include <ctime>
 #include <cstdint>
+#include <fstream>
+#include <iostream>
 #include <stdexcept>
 #include <string>
+
+#include <stdio.h> 
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
@@ -21,6 +25,7 @@
 #endif
 
 #include "../3rdParty/iso_week.h"
+#include "../3rdParty/json.h"
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
@@ -28,7 +33,9 @@
 #   pragma warning(pop)
 #endif
 
+#include "../Archive.h"
 #include "Components/InferenceOnlyFeaturizerImpl.h"
+#include "../Traits.h"
 
 namespace Microsoft {
 namespace Featurizer {
@@ -105,13 +112,15 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = Components::InferenceOnlyTransformerImpl<std::int64_t, TimePoint>;
-
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    DateTimeTransformer(void) = default;
+    //DateTimeTransformer(void) = default;
+
+    DateTimeTransformer(nonstd::optional<std::string> const &countryName = nonstd::optional<std::string>());
+
     DateTimeTransformer(Archive &ar);
 
     ~DateTimeTransformer(void) override = default;
@@ -119,6 +128,26 @@ public:
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DateTimeTransformer);
 
     TransformedType execute(InputType input) override;
+
+    void save(Archive & ar) const override;
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Types
+    // |
+    // ----------------------------------------------------------------------
+    using JsonStream                        = nlohmann::json;
+
+    using HolidayMap                        = std::unordered_map<InputType, std::string>;
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Primitives
+    // |
+    // ----------------------------------------------------------------------
+    std::string const                         _countryName;
+
+    HolidayMap                                _dateHolidayMap;    
 };
 
 class DateTimeEstimator : public Components::InferenceOnlyEstimatorImpl<DateTimeTransformer> {
