@@ -6,7 +6,6 @@
 #include "catch.hpp"
 
 #include "GeneratedCode/SharedLibraryTests_DateTimeFeaturizer.h"
-#include "../GeneratedCode/SharedLibrary_DateTimeFeaturizer.h"
 
 TEST_CASE("Standard") {
     DateTimeFeaturizer_Test(

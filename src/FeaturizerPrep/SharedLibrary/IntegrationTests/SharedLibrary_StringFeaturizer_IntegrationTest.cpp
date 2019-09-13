@@ -6,7 +6,6 @@
 #include "catch.hpp"
 
 #include "GeneratedCode/SharedLibraryTests_StringFeaturizer.h"
-#include "../GeneratedCode/SharedLibrary_StringFeaturizer.h"
 
 TEST_CASE("int8") {
     StringFeaturizer_int8_t_Test(

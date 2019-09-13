@@ -4,13 +4,7 @@
 # ----------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.5.0)
 
-set(_project_name Featurizers_Components_UnitTest)
-set(_${_project_name}_version_major 1)
-set(_${_project_name}_version_minor 0)
-set(_${_project_name}_version_patch 0)
-set(_${_project_name}_version ${_${_project_name}_version_major}.${_${_project_name}_version_minor}.${_${_project_name}_version_patch})
-
-project(${_project_name} VERSION ${_${_project_name}_version} LANGUAGES CXX)
+project(Featurizers_Components_UnitTests LANGUAGES CXX)
 
 set(_includes "$ENV{INCLUDE}")
 set(_libs "$ENV{LIB}")
@@ -22,13 +16,14 @@ if(NOT WIN32)
     string(REPLACE ":" ";" _libs "${_libs}")
 endif()
 
+set(CppCommon_STATIC_CRT ON CACHE BOOL "" FORCE)
+
 include(CppCommon)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# All paths should be relative to `${_this_path}`
 get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
 enable_testing()
@@ -42,11 +37,6 @@ foreach(_test_name IN ITEMS
         ${_test_name}
         ${_test_name}.cpp
     )
-
-    # target_link_libraries(
-    #     ${_test_name}
-    #     <library_name>
-    # )
 
     target_include_directories(
         ${_test_name} PRIVATE

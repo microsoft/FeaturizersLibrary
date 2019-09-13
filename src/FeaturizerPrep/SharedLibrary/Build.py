@@ -71,7 +71,7 @@ def Build(
             with CallOnExit(lambda: os.chdir(prev_dir)):
                 activities = [
                     (
-                        "Generating",
+                        "Generating cmake Files",
                         'cmake -G "{generator}" -DCMAKE_BUILD_TYPE={configuration} "{this_dir}"'.format(
                             generator=cmake_generator,
                             temp_dir=temp_directory,
@@ -81,6 +81,7 @@ def Build(
                     ),
                     ("Building", "cmake --build ."),
                     ("Copying Binaries", _CopyBinaries),
+                    ("Copying Data", _CopyData),
                     ("Copying Headers", _CopyHeaders),
                 ]
 
@@ -193,7 +194,11 @@ def _CopyBinaries(temp_directory, output_dir, output_stream):
     if CurrentShell.CategoryName == "Windows":
         output_files = ["Featurizers.dll", "Featurizers.pdb"]
     elif CurrentShell.CategoryName == "Linux":
-        output_files = ["libFeaturizers.so"]
+        output_files = []
+
+        for item in os.listdir(temp_directory):
+            if item.startswith("libFeaturizers.so"):
+                output_files.append(item)
     else:
         raise Exception("The Current Shell is not supported")
 
@@ -206,6 +211,20 @@ def _CopyBinaries(temp_directory, output_dir, output_stream):
                 os.path.join(temp_directory, output_file),
                 os.path.join(output_dir, output_file),
             )
+
+    return 0
+
+
+# ----------------------------------------------------------------------
+def _CopyData(temp_directory, output_dir, output_stream):
+    output_dir = os.path.join(output_dir, "Data")
+
+    FileSystem.RemoveTree(output_dir)
+
+    FileSystem.CopyTree(
+        os.path.join(temp_directory, "Data"),
+        output_dir,
+    )
 
     return 0
 

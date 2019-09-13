@@ -1687,8 +1687,7 @@ JSON_HEDLEY_DIAGNOSTIC_POP
 #define JSON_INTERNAL_CATCH JSON_INTERNAL_CATCH_USER
 #endif
 
-#pragma warning(disable : 4068)
-
+#if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 
@@ -1697,6 +1696,9 @@ JSON_HEDLEY_DIAGNOSTIC_POP
 
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcovered-switch-default"
+#elif (defined _MSC_VER)
+#   pragma warning(disable : 4068)
+#endif
 
 
 /*!
@@ -22542,9 +22544,11 @@ object if no parse error occurred.
 @since version 2.0.0
 */
 
+#if (defined __clang__)
 #   pragma clang diagnostic pop
 #   pragma clang diagnostic pop
 #   pragma clang diagnostic pop
+#endif
 
 JSON_HEDLEY_NON_NULL(1)
 inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)

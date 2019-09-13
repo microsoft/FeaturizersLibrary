@@ -75,7 +75,7 @@ TimePoint::TimePoint(const std::chrono::system_clock::time_point& sysTime) {
         monthLabel = _months[month - 1];
         amPmLabel = amPm ? "pm" : "am";
         dayOfWeekLabel = _weekDays[dayOfWeek];
-        holidayName = ""; 
+        holidayName = "";
         isPaidTimeOff = 0;               // TODO
     }
     else
@@ -108,7 +108,7 @@ namespace {
             ssize_t count = readlink( "/proc/self/exe", result, PATH_MAX );
             if (count < 0) {
                 throw std::runtime_error("readlink");
-            } 
+            }
             std::string binaryPath = std::string( result, (count > 0) ? count : 0 );
         #endif
         return binaryPath;
@@ -120,16 +120,16 @@ namespace {
         std::string jsonFilename = _countryName + ".json";
         std::string binaryPath = GetBinaryPath();
         #ifdef _WIN32
-            std::string path = binaryPath.substr(0, binaryPath.find_last_of("\\")) + "\\Json\\" + jsonFilename;
+            std::string path = binaryPath.substr(0, binaryPath.find_last_of("\\")) + "\\Data\\DateTimeFeaturizer\\" + jsonFilename;
         #else
-            std::string path = binaryPath.substr(0, binaryPath.find_last_of("/")) + "/Json/" + jsonFilename;
+            std::string path = binaryPath.substr(0, binaryPath.find_last_of("/")) + "/Data/DateTimeFeaturizer/" + jsonFilename;
         #endif
 
         std::ifstream file(path);
         file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
         if (file) {
             holidaysByCountry = nlohmann::json::parse(file);
-        } 
+        }
         return holidaysByCountry;
     }
 }
@@ -141,7 +141,7 @@ DateTimeTransformer::DateTimeTransformer(Archive &ar) :
 
 DateTimeTransformer::DateTimeTransformer(nonstd::optional<std::string> const & countryName):
     _countryName(countryName.has_value() ? countryName.value() : std::string()) {
-    
+
     if (!_countryName.empty()) {
         JsonStream holidaysByCountry = GetJsonStream(_countryName);
 

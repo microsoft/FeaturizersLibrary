@@ -24,14 +24,9 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_library(libFeaturizers STATIC
-    ../DateTimeFeaturizer.h
-    ../DateTimeFeaturizer.cpp
-    ../SampleAddFeaturizer.h
-    ../SampleAddFeaturizer.cpp
-    ../StringFeaturizer.h
-    ../CatImputerFeaturizer.h
-)
+get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
+
+include(${_this_path}/../cmake/FeaturizersCode.cmake)
 
 enable_testing()
 
@@ -46,16 +41,9 @@ foreach(_test_name IN ITEMS
     target_include_directories(${_test_name} PRIVATE ${_includes})
     target_link_directories(${_test_name} PRIVATE ${_libs})
 
-    target_link_libraries(${_test_name} PRIVATE libFeaturizers)
+    target_link_libraries(${_test_name} PRIVATE
+        FeaturizersCode
+    )
 
     add_test(NAME ${_test_name} COMMAND ${_test_name} --success)
 endforeach()
-
-file(GLOB JSON_DATA "../Data/holidays_by_country/*.json")
-
-foreach(df ${JSON_DATA})
-    file(COPY ${df} DESTINATION Json)
-endforeach()
-
-
-

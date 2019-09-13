@@ -6,7 +6,6 @@
 #include "catch.hpp"
 
 #include "GeneratedCode/SharedLibraryTests_CatImputerFeaturizer.h"
-#include "../GeneratedCode/SharedLibrary_CatImputerFeaturizer.h"
 #include "../../3rdParty/optional.h"
 
 TEST_CASE("int8") {
