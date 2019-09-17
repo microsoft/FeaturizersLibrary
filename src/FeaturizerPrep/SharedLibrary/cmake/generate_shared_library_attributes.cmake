@@ -103,7 +103,13 @@ function(generate_shared_library_attributes outfiles)
     set (_SharedLibraryResourceFile ${CMAKE_CURRENT_BINARY_DIR}/SharedLibraryAttributes.rc)
 
     configure_file(
-        ${_this_path}/../SharedLibraryAttributes.h.in
+        ${_this_path}/../Featurizers.in.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Featurizers.json
+        @ONLY
+    )
+
+    configure_file(
+        ${_this_path}/../SharedLibraryAttributes.in.h
         ${_SharedLibraryHeaderFile}
         @ONLY
     )

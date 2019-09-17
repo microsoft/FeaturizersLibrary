@@ -5,9 +5,15 @@ parameters:
   configuration: ""
   agent_pool: ""
 
+  # These are parameters not because they will be configued by the caller, but rather because arrays can be
+  # defined here and not in variables.
+  build_configurations:
+    - Debug
+    - Release
+
 stages:
   - stage: Package_${{ parameters.operating_system }}_${{ parameters.configuration }}_Stage
-    displayName: "Package"
+    displayName: "Package Stage"
     dependsOn: ${{ parameters.dependencies }}
 
     jobs:
@@ -15,7 +21,7 @@ stages:
 
         # In the UX, this display name contains redundant info (the OS and config appear twice). However, it
         # needs to be here to ensure that the information appears in the status email messages.
-        displayName: "Package (${{ parameters.operating_system }} - ${{ parameters.configuration }})"
+        displayName: "Package Job"
         pool:
           vmImage: "${{ parameters.agent_pool }}"
         workspace:
@@ -46,14 +52,31 @@ stages:
               $(azure_activate_script) ${{ parameters.configuration }} && $(azure_display_all_environment_vars)
             displayName: "[DEBUG] Environment Variables (After Activation)"
 
-          - script: |-
-              echo "TODO: Package"
-            displayName: "<Package>"
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: current
+              artifactName: "Windows - x64"
+              targetPath: "$(Build.StagingDirectory)/Windows - x64"
+            displayName: 'Download "Windows - x64" Artifacts'
             timeoutInMinutes: 180
+
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: current
+              artifactName: "Linux - x64"
+              targetPath: "$(Build.StagingDirectory)/Linux - x64"
+            displayName: 'Download "Linux - x64" Artifacts'
+            timeoutInMinutes: 180
+
+          - ${{ each build_configuration in parameters.build_configurations }}:
+              - script: |-
+                  $(azure_activate_script) ${{ parameters.configuration }} && python src/FeaturizerPrep/SharedLibrary/Build.py Package "$(azure_artifacts_directory)/Package/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Windows - x64/Builder/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Linux - x64/Builder/${{ build_configuration }}" /verbose
+                displayName: "<Build.py Package - ${{ build_configuration }}>"
+                timeoutInMinutes: 180
 
           - task: PublishPipelineArtifact@0
             displayName: "Publish Artifacts"
             inputs:
-              targetPath: $(azure_artifacts_directory)
+              targetPath: "$(azure_artifacts_directory)/Package"
               artifactName: "Package"
             timeoutInMinutes: 180

@@ -26,6 +26,7 @@ generate_shared_library_attributes(
     VERSION_MAJOR ${_${_project_name}_version_major}
     VERSION_MINOR ${_${_project_name}_version_minor}
     VERSION_PATCH ${_${_project_name}_version_patch}
+    ICON "NA"
 )
 
 add_library(Featurizers SHARED

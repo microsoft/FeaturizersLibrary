@@ -1,0 +1,15 @@
+{
+    "product_name": "@PRODUCT_NAME@",
+    "product_bundle": "@PRODUCT_BUNDLE@",
+    "product_icon": "@PRODUCT_ICON@",
+    "product_version_major": "@PRODUCT_VERSION_MAJOR@",
+    "product_version_minor": "@PRODUCT_VERSION_MINOR@",
+    "product_version_patch": "@PRODUCT_VERSION_PATCH@",
+    "product_version_revision": "@PRODUCT_VERSION_REVISION@",
+    "product_company_name": "@PRODUCT_COMPANY_NAME@",
+    "product_company_copyright": "@PRODUCT_COMPANY_COPYRIGHT@",
+    "product_comments": "@PRODUCT_COMMENTS@",
+    "product_original_filename": "@PRODUCT_ORIGINAL_FILENAME@",
+    "product_internal_name": "@PRODUCT_INTERNAL_NAME@",
+    "product_file_description": "@PRODUCT_FILE_DESCRIPTION@"
+}

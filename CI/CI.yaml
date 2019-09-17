@@ -50,7 +50,7 @@ stages:
       parameters:
           agent_pool: windows-2019
           operating_system: "Windows"
-          configuration: "x64"
+          configuration: "system_compiler"
           dependencies:
               - BuildAndTest_Windows_x64_Stage
               - BuildAndTest_Windows_x64_MSVC_Stage

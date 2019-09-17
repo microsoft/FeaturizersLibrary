@@ -4,9 +4,12 @@
 # ----------------------------------------------------------------------
 """Builds the Shared Library"""
 
+import hashlib
+import json
 import os
 import shutil
 import sys
+import textwrap
 
 import six
 
@@ -161,41 +164,199 @@ def Clean(
     # TODO
 )
 @CommandLine.Constraints(
-    windows_build_dir=CommandLine.DirectoryTypeInfo(),
-    linux_build_dir=CommandLine.DirectoryTypeInfo(),
     output_dir=CommandLine.DirectoryTypeInfo(
         ensure_exists=False,
+    ),
+    build_dir=CommandLine.DirectoryTypeInfo(
+        arity="+",
     ),
     output_stream=None,
 )
 def Package(
-    windows_build_dir,
-    linux_build_dir,
     output_dir,
+    build_dir,
     output_stream=sys.stdout,
     verbose=False,
 ):
     """Packages previously built content"""
+
+    build_dirs = build_dir
+    del build_dir
 
     with StreamDecorator(output_stream).DoneManager(
         line_prefix="",
         prefix="\nResults: ",
         suffix="\n",
     ) as dm:
+        if len(build_dirs) > 1:
+            dm.stream.write("Ensuring that build data matches...")
+            with dm.stream.DoneManager() as ensure_dm:
+                ensure_dm.stream.write("Checking 'Featurizers.json'...")
+                with ensure_dm.stream.DoneManager() as this_dm:
+                    this_dm.result = (
+                        0
+                        if _CompareFiles(
+                            this_dm.stream,
+                            *[
+                                os.path.join(build_dir, "Featurizers.json")
+                                for build_dir in build_dirs
+                            ]
+                        )
+                        else -1
+                    )
+                    if this_dm.result != 0:
+                        return this_dm.result
 
-        # TODO: Implement this
+                ensure_dm.stream.write("Checking 'Data' directories...")
+                with ensure_dm.stream.DoneManager() as this_dm:
+                    this_dm.result = (
+                        0
+                        if _CompareDirectories(
+                            this_dm.stream,
+                            *[os.path.join(build_dir, "Data") for build_dir in build_dirs]
+                        )
+                        else -1
+                    )
+                    if this_dm.result != 0:
+                        return this_dm.result
+
+        dm.stream.write("Reading build configuration...")
+        with dm.stream.DoneManager() as this_dm:
+            json_filename = os.path.join(build_dirs[0], "Featurizers.json")
+            if not os.path.isfile(json_filename):
+                this_dm.stream.write(
+                    "ERROR: The filename '{}' does not exist.\n".format(json_filename),
+                )
+                this_dm.result = -1
+
+                return this_dm.result
+
+            with open(json_filename) as f:
+                build_config = json.load(f)
+
+            build_config["build_dir"] = build_dirs[0]
+            build_config["data_dir"] = os.path.join(build_dirs[0], "Data", "**", "*.*")
+            build_config["package_id"] = build_config["product_name"].replace(" ", "")
+
+        # Generate the correct nuget file statements based on output in the build_dir
+        dm.stream.write("Generating nuget file statements...")
+        with dm.stream.DoneManager() as this_dm:
+            nuget_file_statements = {}
+
+            statement_map = {
+                "Featurizers.dll": "runtimes/win-x64/native",
+                "libFeaturizers.so": "runtimes/linux/native",
+            }
+
+            for build_dir in build_dirs:
+                these_files = []
+                statements_value = None
+
+                for item in os.listdir(build_dir):
+                    for k, v in six.iteritems(statement_map):
+                        if item.startswith(k):
+                            if statements_value is not None and v != statements_value:
+                                this_dm.stream.write(
+                                    "ERROR: The item '{}' is not valid based on previously captured content ({}).\n".format(
+                                        item,
+                                        statements_value,
+                                    ),
+                                )
+                                this_dm.result = -1
+
+                                return this_dm.result
+
+                            these_files.append(os.path.join(build_dir, item))
+                            statements_value = v
+                            break
+
+                if statements_value in nuget_file_statements:
+                    this_dm.stream.write(
+                        "ERROR: The build directory '{}' overwrites previously captured content ({}: '{}').\n".format(
+                            build_dir,
+                            statements_value,
+                            nuget_file_statements[statements_value],
+                        ),
+                    )
+                    this_dm.result = -1
+
+                    return this_dm.result
+
+                nuget_file_statements[statements_value] = these_files
+
+            file_statements = []
+
+            for k, v in six.iteritems(nuget_file_statements):
+                for filename in v:
+                    file_statements.append(
+                        '<file src="{}" target="{}" />'.format(filename, k),
+                    )
+
+            build_config["file_statements"] = "\n".join(file_statements)
+
+        FileSystem.MakeDirs(output_dir)
+
+        dm.stream.write("Writing nuspec file...")
+        with dm.stream.DoneManager():
+            nuspec_filename = os.path.join(output_dir, "Featurizers.nuspec")
+            with open(nuspec_filename, "w") as f:
+                f.write(_nuget_template.format(**build_config))
+
+        dm.stream.write("Running nuget...")
+        with dm.stream.DoneManager() as this_dm:
+            prev_dir = os.getcwd()
+
+            os.chdir(output_dir)
+            with CallOnExit(lambda: os.chdir(prev_dir)):
+                this_dm.result = Process.Execute(
+                    'nuget.exe pack "{}"'.format(nuspec_filename),
+                    this_dm.stream,
+                )
+                if this_dm.result != 0:
+                    return this_dm.result
 
         return dm.result
 
+
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+
+# Note that in the following template, '<owners>microsoft</owners>' needs
+# to be lowercase to conform to nuget standards.
+_nuget_template                             = textwrap.dedent(
+    """\
+    <?xml version="1.0"?>
+    <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+        <metadata>
+            <id>{package_id}</id>
+            <version>{product_version_major}.{product_version_minor}.{product_version_patch}.{product_version_revision}</version>
+            <authors>Microsoft</authors>
+            <owners>microsoft</owners>
+            <license type="expression">MIT</license>
+            <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+            <requireLicenseAcceptance>true</requireLicenseAcceptance>
+            <copyright>{product_company_copyright}</copyright>
+
+            <description>{product_bundle}</description>
+            <projectUrl>https://www.microsoft.com</projectUrl>
+        </metadata>
+        <files>
+    <file src="{data_dir}" target="content" />
+    {file_statements}
+        </files>
+    </package>
+    """,
+)
+
+
 # ----------------------------------------------------------------------
 def _CopyBinaries(temp_directory, output_dir, output_stream):
-    if CurrentShell.CategoryName == "Windows":
-        output_files = ["Featurizers.dll", "Featurizers.pdb"]
-    elif CurrentShell.CategoryName == "Linux":
-        output_files = []
+    output_files = ["Featurizers.json"]
 
+    if CurrentShell.CategoryName == "Windows":
+        output_files += ["Featurizers.dll", "Featurizers.pdb"]
+    elif CurrentShell.CategoryName == "Linux":
         for item in os.listdir(temp_directory):
             if item.startswith("libFeaturizers.so"):
                 output_files.append(item)
@@ -221,10 +382,7 @@ def _CopyData(temp_directory, output_dir, output_stream):
 
     FileSystem.RemoveTree(output_dir)
 
-    FileSystem.CopyTree(
-        os.path.join(temp_directory, "Data"),
-        output_dir,
-    )
+    FileSystem.CopyTree(os.path.join(temp_directory, "Data"), output_dir)
 
     return 0
 
@@ -249,6 +407,84 @@ def _CopyHeaders(temp_directory, output_dir, output_stream):
             )
 
     return 0
+
+
+# ----------------------------------------------------------------------
+def _CalculateHash(filename):
+    hash = hashlib.sha256()
+
+    with open(filename, "rb") as f:
+        while True:
+            content = f.read(4096)
+            if not content:
+                break
+
+            # We need to remove carriage returns here to ensure that text content compares
+            # equally when produced by Linux ('\n') and Windows ('\r\n') builds.
+            content = content.replace(b"\r", b"")
+
+            hash.update(content)
+
+    return hash.hexdigest()
+
+
+# ----------------------------------------------------------------------
+def _CompareFiles(output_stream, *filenames):
+    assert len(filenames) > 1, filenames
+
+    if not os.path.isfile(filenames[0]):
+        return False
+
+    oracle = _CalculateHash(filenames[0])
+
+    for filename in filenames[1:]:
+        if not os.path.isfile(filename):
+            return False
+
+        if _CalculateHash(filename) != oracle:
+            output_stream.write(
+                "'{}' does not match '{}'.\n".format(filename, filenames[0]),
+            )
+            return False
+
+    return True
+
+
+# ----------------------------------------------------------------------
+def _CompareDirectories(output_stream, *dirs):
+    assert len(dirs) > 1, dirs
+
+    # ----------------------------------------------------------------------
+    def GetRelativeFiles(dir):
+        output_stream.write("Processing files in '{}'...".format(dir))
+        with output_stream.DoneManager():
+            results = {}
+
+            for filename in FileSystem.WalkFiles(dir):
+                assert filename.startswith(dir), (filename, dir)
+                results[FileSystem.TrimPath(filename, dir)] = _CalculateHash(filename)
+
+        return results
+
+    # ----------------------------------------------------------------------
+
+    if not os.path.isdir(dirs[0]):
+        return False
+
+    oracle = GetRelativeFiles(dirs[0])
+
+    for dir in dirs[1:]:
+        if not os.path.isdir(dir):
+            return False
+
+        these_relative_files = GetRelativeFiles(dir)
+        if these_relative_files != oracle:
+            outut_stream.write(
+                "The files in '{}' do not match the files in '{}'.\n".format(dir, dirs[0]),
+            )
+            return False
+
+    return True
 
 
 # ----------------------------------------------------------------------
