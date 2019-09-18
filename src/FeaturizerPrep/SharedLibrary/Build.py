@@ -340,9 +340,13 @@ _nuget_template                             = textwrap.dedent(
 
             <description>{product_bundle}</description>
             <projectUrl>https://www.microsoft.com</projectUrl>
+
+            <contentFiles>
+                <files include="any/any/Data/**/*.json" buildAction="None" copyToOutput="true" />
+            </contentFiles>
         </metadata>
         <files>
-    <file src="{data_dir}" target="content" />
+    <file src="{data_dir}" target="contentFiles/any/any/Data" />
     {file_statements}
         </files>
     </package>
@@ -479,7 +483,7 @@ def _CompareDirectories(output_stream, *dirs):
 
         these_relative_files = GetRelativeFiles(dir)
         if these_relative_files != oracle:
-            outut_stream.write(
+            output_stream.write(
                 "The files in '{}' do not match the files in '{}'.\n".format(dir, dirs[0]),
             )
             return False
