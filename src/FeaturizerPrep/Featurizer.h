@@ -453,6 +453,55 @@ private:
     virtual TransformerUniquePtr create_transformer_impl(void) = 0;
 };
 
+/////////////////////////////////////////////////////////////////////////
+///  \class         QueuedTransformer
+///  \brief         In most cases, input set to a Transformer is immediately
+///                 converted to transformed output - there is a 1:1 relationship
+///                 between input and output.
+///
+///                 However, in some rare circumstances, a Transformer may use
+///                 the relationship between consecutive rows to determine output.
+///                 In these scenarios, there is a 1:M relationship between input
+///                 and potential transformed output. Furthermore, input may
+///                 be queued until additional input is processes. this means that the
+///                 result returned by a call to execute may be an empty vector;
+///                 this is a valid result for these transformers.
+///
+///                 These types of transformers must implement additional functionality
+///                 (such as a flush method) to account for this behavior.
+///
+template <typename InputT, typename TransformedT>
+class QueuedTransformer : public TransformerEstimator<InputT, TransformedT>::Transformer {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = typename TransformerEstimator<InputT, TransformedT>::Transformer;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    QueuedTransformer(void) = default;
+    QueuedTransformer(Archive &archive);
+
+    ~QueuedTransformer(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(QueuedTransformer);
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \function      flush
+    ///  \brief         Return any pending results queued by the Transformer.
+    ///                 This method may return an empty vector when no results
+    ///                 are pending.
+    ///
+    virtual TransformedT flush(void) = 0;
+};
+
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -675,6 +724,17 @@ typename TransformerEstimator<InputT, TransformedT>::TransformerUniquePtr Transf
     _created_transformer = true;
     return result;
 }
+
+// ----------------------------------------------------------------------
+// |
+// |  QueuedTransformer
+// |
+// ----------------------------------------------------------------------
+template <typename InputT, typename TransformedT>
+QueuedTransformer<InputT, TransformedT>::QueuedTransformer(Archive &archive) :
+    BaseType(archive) {
+}
+
 
 } // namespace Featurizer
 } // namespace Microsoft

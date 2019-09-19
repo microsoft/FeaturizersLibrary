@@ -22,6 +22,45 @@ namespace Featurizer {
 #   pragma clang diagnostic ignored "-Wdocumentation"
 #endif
 
+
+enum class DataTypes : uint32_t {
+    // Enumeration values are in the following format:
+    //
+    //      0xVTTTXXXX
+    //        ^^^^^^^^
+    //        ||  |- Id
+    //        ||- Number of trailing types
+    //        |- Has trailing types
+    //
+    String = 0x00000001,
+    Int8,
+    Int16,
+    Int32,
+    Int64,
+    UInt8,
+    UInt16,
+    UInt32,
+    UInt64,
+    Float16,
+    Float32,
+    Float64,
+    Complex64,
+    Complex128,
+    BFloat16,
+    Bool,
+    Timepoint,
+    Duration,
+ 
+    // The following values have N number of trailing types
+    Tensor = 0x1001 | Duration,
+    SparseTensor = 0x1001 | Tensor,
+    Tabular = 0x1001 | SparseTensor,
+ 
+    Nullable = 0x1001 | Tabular,
+    Vector = 0x1001 | Nullable,
+    Map = 0x1002 | Vector
+};
+
 /////////////////////////////////////////////////////////////////////////
 ///  \struct        Traits
 ///  \brief         We have a range of of types we are dealing with. Many types

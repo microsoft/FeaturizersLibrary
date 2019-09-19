@@ -35,6 +35,7 @@ foreach(_test_name IN ITEMS
     DateTimeFeaturizer_UnitTests
     StringFeaturizer_UnitTest
     CatImputerFeaturizer_UnitTests
+	TimeSeriesImputerFeaturizer_UnitTest
 )
     add_executable(${_test_name} ${_test_name}.cpp)
 
