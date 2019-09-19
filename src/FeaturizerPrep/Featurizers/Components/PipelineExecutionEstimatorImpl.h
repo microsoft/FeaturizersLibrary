@@ -79,6 +79,53 @@ public:
     // ----------------------------------------------------------------------
     PipelineExecutionEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
 
+    /////////////////////////////////////////////////////////////////////////
+    ///  \fn            PipelineExecutionEstimatorImpl
+    ///  \brief         This constructor should be used when one or more of
+    ///                 the Estimators within the pipeline require custom
+    ///                 arguments during construction:
+    ///
+    ///                 Standard:
+    ///                     MyObject(AnnotationMapsPtr pAllColumnAnnotations);
+    ///
+    ///                 Custom (example):
+    ///                     MyObject(AnnotationMapsPtr pAllColumnAnnotations, int value1, bool value2);
+    ///
+    ///                 If any Estimator requires Custom constructor, then a ConstructFuncT
+    ///                 must be provided (even for those that may not require
+    ///                 custom construction.
+    ///
+    ///                 Example:
+    ///                     class MyEstimator :
+    ///                         public PipelineExecutionEstimator<
+    ///                             StandardEstimator1,
+    ///                             CustomEstimator1,
+    ///                             CustomEstimator2,
+    ///                             StandardEstimator2
+    ///                         > {
+    ///                     ...
+    ///
+    ///                         MyEstimator(AnnotationMapsPtr pAllColumnAnnotations, int customArg1, std::string customArg2A, int customArg2B) :
+    ///                             PipelineExecutionEstimator<
+    ///                                 StandardEstimator1,
+    ///                                 CustomEstimator1,
+    ///                                 CustomEsitmator2,
+    ///                                 StandardEstimator2,
+    ///                             >(
+    ///                                 "MyEstimator",
+    ///                                 pAllColumnAnnotations,
+    ///                                 [&pAllColumnAnnotations](void) { return StandardEstimator1(std::move(pAllColumnAnnotations)); },
+    ///                                 [&customArg1](void) { return CustomEstimator1(customArg1); },
+    ///                                 [&customArg2A, &customArg2B](void) { return CustomEstimator2(customArg2A, cutomArg2B); },
+    ///                                 [&pAllColumnAnnotations](void) { return StandardEstimator2(std::move(pAllColumnAnnotations)); }
+    ///                             ) {
+    ///                             ...
+    ///                         }
+    ///                     };
+    ///
+    template <typename... ConstructFuncTs>
+    PipelineExecutionEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations, ConstructFuncTs &&... args);
+
 private:
     // ----------------------------------------------------------------------
     // |
@@ -116,6 +163,17 @@ template <typename... EstimatorT>
 PipelineExecutionEstimatorImpl<EstimatorT...>::PipelineExecutionEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations) :
     BaseType(std::move(name), pAllColumnAnnotations),
     _estimator_chain(pAllColumnAnnotations) {
+        if(_estimator_chain.is_all_training_complete())
+            this->complete_training();
+}
+
+template <typename... EstimatorT>
+template <typename... ConstructFuncTs>
+PipelineExecutionEstimatorImpl<EstimatorT...>::PipelineExecutionEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations, ConstructFuncTs &&... args) :
+    BaseType(std::move(name), pAllColumnAnnotations),
+    _estimator_chain(pAllColumnAnnotations, std::forward<ConstructFuncTs>(args)...) {
+        static_assert(sizeof...(EstimatorT) == sizeof...(ConstructFuncTs), "The number of constructor creation args must be equal to the number of estimators");
+
         if(_estimator_chain.is_all_training_complete())
             this->complete_training();
 }

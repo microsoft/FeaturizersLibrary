@@ -620,3 +620,148 @@ TEST_CASE("Transformer with Training") {
 #   pragma clang diagnostic pop
 #endif
 }
+
+// ----------------------------------------------------------------------
+// |
+// |  Custom Constructor Tests
+// |
+// ----------------------------------------------------------------------
+class CustomComponentTransformer : public NS::Featurizers::Components::InferenceOnlyTransformerImpl<int, int> {
+public:
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    using BaseType                          = NS::Featurizers::Components::InferenceOnlyTransformerImpl<int, int>;
+
+    // ----------------------------------------------------------------------
+    // |  Public Data
+    bool const                              OperateOnOdd;
+    int const                               Delta;
+
+    // ----------------------------------------------------------------------
+    // |  Public Methods
+    CustomComponentTransformer(bool operateOnOdd, int delta) :
+        OperateOnOdd(std::move(operateOnOdd)),
+        Delta(std::move(delta)),
+        _executeCtr(0) {
+    }
+
+    CustomComponentTransformer(NS::Archive &archive) :
+        BaseType(archive),
+        OperateOnOdd(NS::Traits<bool>::deserialize(archive)),
+        Delta(NS::Traits<int>::deserialize(archive)),
+        _executeCtr(NS::Traits<size_t>::deserialize(archive)) {
+    }
+
+    ~CustomComponentTransformer(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(CustomComponentTransformer);
+
+    void save(NS::Archive &ar) const override {
+        BaseType::save(ar);
+
+        NS::Traits<bool>::serialize(ar, OperateOnOdd);
+        NS::Traits<int>::serialize(ar, Delta);
+        NS::Traits<size_t>::serialize(ar, _executeCtr);
+    }
+
+    typename BaseType::TransformedType execute(typename BaseType::InputType input) override {
+        bool const                          isOdd(_executeCtr++ & 1);
+
+        if((OperateOnOdd && isOdd) == false && (OperateOnOdd == false && isOdd == false) == false)
+            return input;
+
+        return input + Delta;
+    }
+
+private:
+    // ----------------------------------------------------------------------
+    // |  Private Data
+    size_t                                  _executeCtr;
+};
+
+class CustomComponentEstimator :
+    public NS::TransformerEstimator<
+        typename CustomComponentTransformer::InputType,
+        typename CustomComponentTransformer::TransformedType
+    > {
+public:
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    using BaseType = NS::TransformerEstimator<
+        typename CustomComponentTransformer::InputType,
+        typename CustomComponentTransformer::TransformedType
+    >;
+
+    using TransformerType                   = CustomComponentTransformer;
+
+    // ----------------------------------------------------------------------
+    // |  Public Data
+    bool const                              OperateOnOdd;
+    int const                               Delta;
+
+    // ----------------------------------------------------------------------
+    // |  Public Methods
+    CustomComponentEstimator(NS::AnnotationMapsPtr pAllColumnAnnotations, bool operateOnOdd, int delta) :
+        BaseType("CustomComponentEstimator", std::move(pAllColumnAnnotations), true),
+        OperateOnOdd(operateOnOdd),
+        Delta(delta) {
+    }
+
+    ~CustomComponentEstimator(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(CustomComponentEstimator);
+
+private:
+    // ----------------------------------------------------------------------
+    // |  Private Methods
+    Estimator::FitResult fit_impl(FitBufferInputType const *, size_t) override {
+        throw std::runtime_error("This should never be called as this class will not be used during training");
+    }
+
+    Estimator::FitResult complete_training_impl(void) override {
+        throw std::runtime_error("This should never be called as this class will not be used during training");
+    }
+
+    inline typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
+        return std::make_unique<CustomComponentTransformer>(OperateOnOdd, Delta);
+    }
+};
+
+class CustomEstimator :
+    public NS::Featurizers::Components::PipelineExecutionEstimatorImpl<
+        CustomComponentEstimator,
+        CustomComponentEstimator
+    > {
+public:
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    using BaseType = NS::Featurizers::Components::PipelineExecutionEstimatorImpl<
+        CustomComponentEstimator,
+        CustomComponentEstimator
+    >;
+
+    // ----------------------------------------------------------------------
+    // |  Public Methods
+    CustomEstimator(NS::AnnotationMapsPtr pAllColumnAnnotations, int oddDelta, int evenDelta) :
+        BaseType(
+            "CustomEstimator",
+            pAllColumnAnnotations,
+            [&pAllColumnAnnotations, &oddDelta](void) { return CustomComponentEstimator(pAllColumnAnnotations, true, oddDelta); },
+            [&pAllColumnAnnotations, &evenDelta](void) { return CustomComponentEstimator(pAllColumnAnnotations, false, evenDelta); }
+        ) {
+    }
+
+    ~CustomEstimator(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(CustomEstimator);
+};
+
+TEST_CASE("Custom Constructor") {
+    CustomEstimator                                     estimator(NS::CreateTestAnnotationMapsPtr(1), 10, 200);
+    CustomEstimator::TransformerUniquePtr const         pTransformer(estimator.create_transformer());
+
+    CHECK(pTransformer->execute(1) == 201);
+    CHECK(pTransformer->execute(2) == 12);
+    CHECK(pTransformer->execute(3) == 203);
+    CHECK(pTransformer->execute(4) == 14);
+}

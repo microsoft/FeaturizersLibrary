@@ -442,9 +442,13 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    template <typename... ArgsT>
-    EstimatorChainElementBase(ArgsT &&... args) :
-        EstimatorType(std::forward<ArgsT>(args)...) {
+    EstimatorChainElementBase(AnnotationMapsPtr pAllColumnAnnotations) :
+        EstimatorType(std::move(pAllColumnAnnotations)) {
+    }
+
+    template <typename ConstructFuncT>
+    EstimatorChainElementBase(AnnotationMapsPtr, ConstructFuncT && func) :
+        EstimatorType(func()) {
     }
 
     void complete_training(void) {
@@ -505,7 +509,14 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    using EstimatorType::EstimatorType;
+    EstimatorChainElementBase(AnnotationMapsPtr pAllColumnAnnotations) :
+        EstimatorType(std::move(pAllColumnAnnotations)) {
+    }
+
+    template <typename ConstructFuncT>
+    EstimatorChainElementBase(AnnotationMapsPtr, ConstructFuncT && func) :
+        EstimatorType(func()) {
+    }
 
     inline bool has_created_transformer(void) const {
         // This will never create a transformer, but return true so we don't get
@@ -679,6 +690,12 @@ public:
     EstimatorChainElement(AnnotationMapsPtr pAllColumnAnnotaitons) :
         EstimatorChainElementBase(pAllColumnAnnotaitons),
         NextEstimatorChainElement(pAllColumnAnnotaitons) {
+    }
+
+    template <typename ConstructFuncT, typename... ConstructFuncTs>
+    EstimatorChainElement(AnnotationMapsPtr pAllColumnAnnotations, ConstructFuncT && arg, ConstructFuncTs &&... args) :
+        EstimatorChainElementBase(pAllColumnAnnotations, std::forward<ConstructFuncT>(arg)),
+        NextEstimatorChainElement(pAllColumnAnnotations, std::forward<ConstructFuncTs>(args)...) {
     }
 
     bool is_all_training_complete() const {
@@ -1054,6 +1071,13 @@ public:
     // ----------------------------------------------------------------------
     EstimatorChain(AnnotationMapsPtr pAllColumnAnnotations) :
         BaseType(std::move(pAllColumnAnnotations)) {
+            // Give initial inference-only estimators an opportunity to create transformers
+            BaseType::complete_training(false);
+    }
+
+    template <typename... ConstructFuncTs>
+    EstimatorChain(AnnotationMapsPtr pAllColumnAnnotations, ConstructFuncTs &&... args) :
+        BaseType(std::move(pAllColumnAnnotations), std::forward<ConstructFuncTs>(args)...) {
             // Give initial inference-only estimators an opportunity to create transformers
             BaseType::complete_training(false);
     }
