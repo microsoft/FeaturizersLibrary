@@ -14,12 +14,12 @@ namespace Featurizer {
 namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         TimeSeriesImputerFeaturizerEstimator
+///  \class         TimeSeriesImputerEstimator
 ///  \brief         This class 'chains' TimeSeriesFrequencyEstimator and TimeSeriesImputerEstimator.
 ///                 TimeSeriesFrequencyEstimator generates Frequency Annotation which is consumed by
 ///                 TimeSeriesImputerEstimator to Impute data.
 ///
-class TimeSeriesImputerFeaturizerEstimator :
+class TimeSeriesImputerEstimator :
     public Components::PipelineExecutionEstimatorImpl<
         Components::TimeSeriesFrequencyEstimator,
         Components::TimeSeriesImputerEstimator
@@ -34,14 +34,14 @@ public:
         Components::TimeSeriesFrequencyEstimator,
         Components::TimeSeriesImputerEstimator
     >;
-    
-    TimeSeriesImputerFeaturizerEstimator(AnnotationMapsPtr pAllColumnAnnotations,std::vector<DataTypes> colsToImputeDataTypes, bool supressError = false, Components::TimeSeriesImputeStrategy tsImputeStrategy= Components::TimeSeriesImputeStrategy::Forward);
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TimeSeriesImputerFeaturizerEstimator);
+    TimeSeriesImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations,std::vector<TypeId> colsToImputeDataTypes, bool supressError = false, Components::TimeSeriesImputeStrategy tsImputeStrategy= Components::TimeSeriesImputeStrategy::Forward);
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TimeSeriesImputerEstimator);
 };
 
-TimeSeriesImputerFeaturizerEstimator::TimeSeriesImputerFeaturizerEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::vector<DataTypes> colsToImputeDataTypes, bool supressError, Components::TimeSeriesImputeStrategy tsImputeStrategy) :
-    BaseType("TimeSeriesImputerFeaturizerEstimator", std::move(pAllColumnAnnotations)) {
+TimeSeriesImputerEstimator::TimeSeriesImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::vector<TypeId> colsToImputeDataTypes, bool supressError, Components::TimeSeriesImputeStrategy tsImputeStrategy) :
+    BaseType("TimeSeriesImputerEstimator", std::move(pAllColumnAnnotations)) {
         //Once PipelineExector enables instantiating templates types with ctor args- we'll make use of this.
         std::ignore = colsToImputeDataTypes;
         std::ignore = tsImputeStrategy;

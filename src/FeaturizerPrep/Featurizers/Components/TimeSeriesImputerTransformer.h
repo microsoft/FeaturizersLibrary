@@ -23,6 +23,12 @@ enum class TimeSeriesImputeStrategy : unsigned char {
     NumValues
 };
 
+inline bool IsValid(TimeSeriesImputeStrategy value) {
+    return value == TimeSeriesImputeStrategy::Forward
+        || value == TimeSeriesImputeStrategy::Backward
+        || value == TimeSeriesImputeStrategy::Interpolate;
+}
+
 using TimeSeriesImputerEstimatorInputType = std::tuple<
     std::chrono::system_clock::time_point,
     std::vector<std::string>,
@@ -67,7 +73,7 @@ public:
         // |  Public Methods
         // |
         // ----------------------------------------------------------------------
-        Transformer(FrequencyType value, std::vector<DataTypes> colsToImputeDataTypes, TimeSeriesImputeStrategy tsImputeStrategy);
+        Transformer(FrequencyType value, std::vector<TypeId> colsToImputeDataTypes, TimeSeriesImputeStrategy tsImputeStrategy);
         Transformer(typename BaseType::Transformer::Archive & ar);
         ~Transformer(void) override = default;
 
@@ -86,7 +92,7 @@ public:
         // |
         // ----------------------------------------------------------------------
         FrequencyType const                           _frequency;
-        std::vector<DataTypes> const                  _colsToImputeDataTypes;
+        std::vector<TypeId> const                     _colsToImputeDataTypes;
         TimeSeriesImputeStrategy const                _tsImputeStrategy;
     };
 
@@ -97,7 +103,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    TimeSeriesImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations,std::vector<DataTypes> colsToImputeDataTypes={DataTypes::Float64},TimeSeriesImputeStrategy tsImputeStrategy = TimeSeriesImputeStrategy::Forward);
+    TimeSeriesImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations,std::vector<TypeId> colsToImputeDataTypes={TypeId::Float64},TimeSeriesImputeStrategy tsImputeStrategy = TimeSeriesImputeStrategy::Forward);
     ~TimeSeriesImputerEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TimeSeriesImputerEstimator);
@@ -114,7 +120,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    std::vector<DataTypes> const                    _colsToImputeDataTypes;
+    std::vector<TypeId> const                       _colsToImputeDataTypes;
     TimeSeriesImputeStrategy const                  _tsImputeStrategy;
 
     // ----------------------------------------------------------------------
@@ -161,7 +167,7 @@ private:
 // |  TimeSeriesImputerEstimator
 // |
 // ----------------------------------------------------------------------
-TimeSeriesImputerEstimator::TimeSeriesImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations,std::vector<DataTypes> colsToImputeDataTypes,TimeSeriesImputeStrategy tsImputeStrategy) :
+TimeSeriesImputerEstimator::TimeSeriesImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations,std::vector<TypeId> colsToImputeDataTypes,TimeSeriesImputeStrategy tsImputeStrategy) :
     BaseType("TimeSeriesImputerEstimator", std::move(pAllColumnAnnotations), true),
     _colsToImputeDataTypes(std::move(colsToImputeDataTypes)),
     _tsImputeStrategy(std::move(tsImputeStrategy)){
@@ -176,7 +182,7 @@ Estimator::FitResult TimeSeriesImputerEstimator::complete_training_impl(void) {
 // |  TimeSeriesImputerEstimator::Transformer
 // |
 // ----------------------------------------------------------------------
-TimeSeriesImputerEstimator::Transformer::Transformer(TimeSeriesImputerEstimator::FrequencyType value, std::vector<DataTypes> colsToImputeDataTypes,TimeSeriesImputeStrategy tsImputeStrategy) :
+TimeSeriesImputerEstimator::Transformer::Transformer(TimeSeriesImputerEstimator::FrequencyType value, std::vector<TypeId> colsToImputeDataTypes,TimeSeriesImputeStrategy tsImputeStrategy) :
     _frequency(std::move(value)),
     _colsToImputeDataTypes(std::move(colsToImputeDataTypes)),
     _tsImputeStrategy(std::move(tsImputeStrategy)) {
@@ -188,7 +194,7 @@ TimeSeriesImputerEstimator::Transformer::Transformer(TimeSeriesImputerEstimator:
 
 TimeSeriesImputerEstimator::Transformer::Transformer(typename BaseType::Transformer::Archive & ar) :
     _frequency(std::chrono::system_clock::duration::max().count()),
-    _colsToImputeDataTypes({DataTypes::Float64}),
+    _colsToImputeDataTypes({TypeId::Float64}),
     _tsImputeStrategy(TimeSeriesImputeStrategy::Forward) {
     if(Traits<std::uint8_t>::deserialize(ar) != 1)
         throw std::runtime_error("Invalid transformer version");

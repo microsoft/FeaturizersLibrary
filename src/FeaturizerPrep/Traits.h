@@ -5,12 +5,24 @@
 #pragma once
 
 #include <array>
+#include <chrono>
 #include <cmath>
 #include <limits>
 #include <map>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wshift-sign-overflow"
+#endif
+
+#include "3rdParty/date.h"
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #include "3rdParty/optional.h"
 
@@ -23,7 +35,7 @@ namespace Featurizer {
 #endif
 
 
-enum class DataTypes : uint32_t {
+enum class TypeId : uint32_t {
     // Enumeration values are in the following format:
     //
     //      0xVTTTXXXX
@@ -50,16 +62,45 @@ enum class DataTypes : uint32_t {
     Bool,
     Timepoint,
     Duration,
- 
+
+    LastStaticValue,
+
     // The following values have N number of trailing types
-    Tensor = 0x1001 | Duration,
-    SparseTensor = 0x1001 | Tensor,
-    Tabular = 0x1001 | SparseTensor,
- 
-    Nullable = 0x1001 | Tabular,
-    Vector = 0x1001 | Nullable,
-    Map = 0x1002 | Vector
+    Tensor = 0x1001 | LastStaticValue + 1,
+    SparseTensor = 0x1001 | LastStaticValue + 2,
+    Tabular = 0x1001 | LastStaticValue + 3,
+
+    Nullable = 0x1001 | LastStaticValue + 4,
+    Vector = 0x1001 | LastStaticValue + 5,
+    Map = 0x1002 | LastStaticValue + 6
 };
+
+inline bool IsValid(TypeId id) {
+    return id == TypeId::String
+        || id == TypeId::Int8
+        || id == TypeId::Int16
+        || id == TypeId::Int32
+        || id == TypeId::Int64
+        || id == TypeId::UInt8
+        || id == TypeId::UInt16
+        || id == TypeId::UInt32
+        || id == TypeId::UInt64
+        || id == TypeId::Float16
+        || id == TypeId::Float32
+        || id == TypeId::Float64
+        || id == TypeId::Complex64
+        || id == TypeId::Complex128
+        || id == TypeId::BFloat16
+        || id == TypeId::Bool
+        || id == TypeId::Timepoint
+        || id == TypeId::Duration
+        || id == TypeId::Tensor
+        || id == TypeId::SparseTensor
+        || id == TypeId::Tabular
+        || id == TypeId::Nullable
+        || id == TypeId::Vector
+        || id == TypeId::Map;
+}
 
 /////////////////////////////////////////////////////////////////////////
 ///  \struct        Traits
@@ -91,10 +132,22 @@ struct Traits {
     //   - static bool IsNull(nullable_type const &value);
     //   - static T const & GetNullableValue(nullable_type const &value);
     //   - static std::string ToString(T const &value);
-    //   - template <typename ArchiveT> static ArchiveT & serialize(ArchiveT &ar, T const &value);
+    //   - static T FromString(std::string const &value);    //   - template <typename ArchiveT> static ArchiveT & serialize(ArchiveT &ar, T const &value);
     //   - template <typename ArchiveT> static T deserialize(ArchiveT &ar);
     //
 };
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         Traits
+///  \brief         Strips references from types.
+///
+template <typename T> struct Traits<T &> : public Traits<T> {};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         Traits
+///  \brief         Strips const from types
+///
+template <typename T> struct Traits<T const> : public Traits<T> {};
 
 /////////////////////////////////////////////////////////////////////////
 ///  \struct        TraitsImpl
@@ -156,6 +209,10 @@ struct Traits<bool> : public TraitsImpl<bool> {
         return value != 0 ? _TRUE_VALUE : _FALSE_VALUE;
     }
 
+    static bool FromString(std::string const &value) {
+        return value == "True";
+    }
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, bool const &value) {
         return ar.serialize(value);
@@ -171,6 +228,15 @@ template <>
 struct Traits<std::int8_t> : public TraitsImpl<std::int8_t> {
     static std::string ToString(std::int8_t const& value) {
         return std::to_string(value);
+    }
+
+    static std::int8_t FromString(std::string const &value) {
+        int                                 v(std::stoi(value.c_str()));
+
+        if(v < std::numeric_limits<std::int8_t>::min() || v > std::numeric_limits<std::int8_t>::max())
+            throw std::invalid_argument("Invalid conversion");
+
+        return static_cast<std::int8_t>(v);
     }
 
     template <typename ArchiveT>
@@ -190,6 +256,15 @@ struct Traits<std::int16_t> : public TraitsImpl<std::int16_t> {
         return std::to_string(value);
     }
 
+    static std::int16_t FromString(std::string const &value) {
+        int                                 v(std::stoi(value.c_str()));
+
+        if(v < std::numeric_limits<std::int16_t>::min() || v > std::numeric_limits<std::int16_t>::max())
+            throw std::invalid_argument("Invalid conversion");
+
+        return static_cast<std::int16_t>(v);
+    }
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int16_t const &value) {
         return ar.serialize(value);
@@ -205,6 +280,11 @@ template <>
 struct Traits<std::int32_t> : public TraitsImpl<std::int32_t> {
     static std::string ToString(std::int32_t const& value) {
         return std::to_string(value);
+    }
+
+    static std::int32_t FromString(std::string const &value) {
+        static_assert(sizeof(std::int32_t) == sizeof(int), "This code expects that an int is 32 bits");
+        return std::stoi(value.c_str());
     }
 
     template <typename ArchiveT>
@@ -224,6 +304,33 @@ struct Traits<std::int64_t> : public TraitsImpl<std::int64_t> {
         return std::to_string(value);
     }
 
+    static std::int64_t FromString(std::string const &value) {
+        static_assert(sizeof(std::int64_t) <= sizeof(long long), "This code expects that long long >= 64 bits");
+
+        long long                           v(std::stoll(value.c_str()));
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wtautological-type-limit-compare"
+#elif (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4127) // Conditional expression is constant
+#endif
+
+        if(sizeof(long long) > sizeof(std::int64_t)) {
+            if(v < std::numeric_limits<std::int64_t>::min() || v > std::numeric_limits<std::int64_t>::max())
+                throw std::invalid_argument("Invalid conversion");
+        }
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#elif (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
+
+        return static_cast<std::int64_t>(v);
+    }
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int64_t const &value) {
         return ar.serialize(value);
@@ -239,6 +346,15 @@ template <>
 struct Traits<std::uint8_t> : public TraitsImpl<std::uint8_t> {
     static std::string ToString(std::uint8_t const& value) {
         return std::to_string(value);
+    }
+
+    static std::uint8_t FromString(std::string const &value) {
+        unsigned long                       v(std::stoul(value.c_str()));
+
+        if(v > std::numeric_limits<std::uint8_t>::max())
+            throw std::invalid_argument("Invalid conversion");
+
+        return static_cast<std::uint8_t>(v);
     }
 
     template <typename ArchiveT>
@@ -258,6 +374,15 @@ struct Traits<std::uint16_t> : public TraitsImpl<std::uint16_t> {
          return std::to_string(value);
     }
 
+    static std::uint16_t FromString(std::string const &value) {
+        unsigned long                       v(std::stoul(value.c_str()));
+
+        if(v > std::numeric_limits<std::uint16_t>::max())
+            throw std::invalid_argument("Invalid conversion");
+
+        return static_cast<std::uint16_t>(v);
+    }
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint16_t const &value) {
         return ar.serialize(value);
@@ -273,6 +398,33 @@ template <>
 struct Traits<std::uint32_t> : public TraitsImpl<std::uint32_t> {
     static std::string ToString(std::uint32_t const& value) {
         return std::to_string(value);
+    }
+
+    static std::uint32_t FromString(std::string const &value) {
+        static_assert(sizeof(std::uint32_t) <= sizeof(unsigned long), "This code assumes that a long is more 32 bits");
+
+        unsigned long                       v(std::stoul(value.c_str()));
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wtautological-type-limit-compare"
+#elif (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4127) // Conditional expression is constant
+#endif
+
+        if(sizeof(unsigned long) > sizeof(std::uint32_t)) {
+            if(v > std::numeric_limits<std::uint32_t>::max())
+                throw std::invalid_argument("Invalid conversion");
+        }
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#elif (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
+
+        return static_cast<std::uint32_t>(v);
     }
 
     template <typename ArchiveT>
@@ -292,6 +444,33 @@ struct Traits<std::uint64_t> : public TraitsImpl<std::uint64_t> {
         return std::to_string(value);
     }
 
+    static std::uint64_t FromString(std::string const &value) {
+        static_assert(sizeof(std::uint64_t) <= sizeof(unsigned long long), "This code expects that unsigned long long >= 64 bits");
+
+        unsigned long long                  v(std::stoull(value.c_str()));
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wtautological-type-limit-compare"
+#elif (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4127) // Conditional expression is constant
+#endif
+
+        if(sizeof(unsigned long long) > sizeof(std::uint64_t)) {
+            if(v > std::numeric_limits<std::uint64_t>::max())
+                throw std::invalid_argument("Invalid conversion");
+        }
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#elif (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
+
+        return static_cast<std::uint64_t>(v);
+    }
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint64_t const &value) {
         return ar.serialize(value);
@@ -308,9 +487,7 @@ struct Traits<std::float_t> {
     using nullable_type = std::float_t;
 
     static nullable_type CreateNullValue(void) {
-        // Note that std::numeric_limits doesn't seem to be specialized for std::float_t
-        // on some systems - using float_t instead.
-        return std::numeric_limits<float_t>::quiet_NaN();
+        return std::numeric_limits<std::float_t>::quiet_NaN();
     }
 
     static bool IsNull(nullable_type const& value) {
@@ -331,6 +508,13 @@ struct Traits<std::float_t> {
         }
 
         return std::to_string(value);
+    }
+
+    static std::float_t FromString(std::string const &value) {
+        if(value == "NaN")
+            return std::numeric_limits<std::float_t>::quiet_NaN();
+
+        return std::stof(value.c_str());
     }
 
     template <typename ArchiveT>
@@ -372,6 +556,13 @@ struct Traits<std::double_t>  {
         return std::to_string(value);
     }
 
+    static std::double_t FromString(std::string const &value) {
+        if(value == "NaN")
+            return std::numeric_limits<std::double_t>::quiet_NaN();
+
+        return std::stod(value.c_str());
+    }
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::double_t const &value) {
         return ar.serialize(value);
@@ -386,6 +577,10 @@ struct Traits<std::double_t>  {
 template <>
 struct Traits<std::string> : public TraitsImpl<std::string> {
     static std::string const & ToString(std::string const& value) {
+        return value;
+    }
+
+    static std::string const & FromString(std::string const &value) {
         return value;
     }
 
@@ -447,6 +642,10 @@ struct Traits<std::array<T, ArrayV>> : public TraitsImpl<std::array<T, ArrayV>> 
         return ToStringImpl(value.data(), value.size());
     }
 
+    static std::array<T, ArrayV> FromString(std::string const &value) {
+        std::ignore = value; throw std::logic_error("Not Implemented Yet");
+    }
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::array<T, ArrayV> const &value) {
         for(auto const &item : value) {
@@ -472,6 +671,10 @@ template <typename T, typename AllocatorT>
 struct Traits<std::vector<T, AllocatorT>> : public TraitsImpl<std::vector<T, AllocatorT>> {
     static std::string ToString(std::vector<T, AllocatorT> const& value) {
         return ToStringImpl(value.data(), value.size());
+    }
+
+    static std::vector<T, AllocatorT> FromString(std::string const &value) {
+        std::ignore = value; throw std::logic_error("Not Implemented Yet");
     }
 
     template <typename ArchiveT>
@@ -521,6 +724,10 @@ struct Traits<std::map<KeyT, T, CompareT, AllocatorT>> : public TraitsImpl<std::
         return streamObj.str();
     }
 
+    static std::map<KeyT, T, CompareT, AllocatorT> FromString(std::string const &value) {
+        std::ignore = value; throw std::logic_error("Not Implemented Yet");
+    }
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::map<KeyT, T, CompareT, AllocatorT> const &value) {
         ar.serialize(static_cast<std::uint32_t>(value.size()));
@@ -557,53 +764,6 @@ struct Traits<std::map<KeyT, T, CompareT, AllocatorT>> : public TraitsImpl<std::
     }
 };
 
-template <typename T>
-struct Traits<nonstd::optional<T>>  {
-    using nullable_type = nonstd::optional<T>;
-
-    static nullable_type CreateNullValue(void) {
-        return nullable_type();
-    }
-
-    static bool IsNull(nullable_type const& value) {
-        return !value.has_value();
-    }
-
-    static T const & GetNullableValue(nullable_type const& value) {
-        if (IsNull(value))
-            throw std::runtime_error("GetNullableValue attempt on Optional type null.");
-
-        return *value;
-    }
-
-    static std::string ToString(nullable_type const& value) {
-        if (value) {
-            return Traits<T>::ToString(*value);
-        }
-        return "NULL";
-    }
-
-    template <typename ArchiveT>
-    static ArchiveT & serialize(ArchiveT &ar, nonstd::optional<T> const &value) {
-        ar.serialize(static_cast<bool>(value));
-
-        if(value)
-            Traits<T>::serialize(ar, *value);
-
-        return ar;
-    }
-
-    template <typename ArchiveT>
-    static nonstd::optional<T> deserialize(ArchiveT &ar) {
-        nonstd::optional<T>                 result;
-
-        if(ar.template deserialize<bool>())
-            result = Traits<T>::deserialize(ar);
-
-        return result;
-    }
-};
-
 template <typename... Types>
 struct Traits<std::tuple<Types...>> : public TraitsImpl<std::tuple<Types...>> {
     static std::string ToString(std::tuple<Types ...> const& value) {
@@ -612,6 +772,10 @@ struct Traits<std::tuple<Types...>> : public TraitsImpl<std::tuple<Types...>> {
         ToStringHelper<0>(value, streamObj);
         streamObj << ")";
         return streamObj.str();
+    }
+
+    static std::tuple<Types...> FromString(std::string const &value) {
+        std::ignore = value; throw std::logic_error("Not Implemented Yet");
     }
 
     template <typename ArchiveT>
@@ -666,6 +830,114 @@ private:
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         std::get<N>(value) = Traits<type>::deserialize(ar);
+    }
+};
+
+template <typename RepT, typename PeriodT>
+struct Traits<std::chrono::duration<RepT, PeriodT>> : public TraitsImpl<std::chrono::duration<RepT, PeriodT>> {
+    static std::string ToString(std::chrono::duration<RepT, PeriodT> const &duration) {
+        std::ostringstream                  out;
+
+        // TODO: This returns an absolutely awful string, but there isn't time to fix it now.
+        //       Ideally, this should return something like HH:MM:SS[.Milliseconds]
+        date::operator <<(out, duration);
+        out.flush();
+
+        return out.str();
+    }
+
+    static std::chrono::duration<RepT, PeriodT> FromString(std::string const &value) {
+        std::ignore = value; throw std::logic_error("Not Implemented Yet");
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::chrono::duration<RepT, PeriodT> const &duration) {
+        return Traits<RepT>::serialize(ar, duration.count());
+    }
+
+    template <typename ArchiveT>
+    static std::chrono::duration<RepT, PeriodT> deserialize(ArchiveT &ar) {
+        return std::chrono::duration<RepT, PeriodT>(Traits<RepT>::deserialize(ar));
+    }
+};
+
+template <typename ClockT, typename DurationT>
+struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<std::chrono::time_point<ClockT, DurationT>> {
+    static std::string ToString(std::chrono::time_point<ClockT, DurationT> const &tp) {
+        std::ostringstream                  out;
+
+        date::operator <<(out, tp);
+        out.flush();
+
+        return out.str();
+    }
+
+    static std::chrono::time_point<ClockT, DurationT> FromString(std::string const &value) {
+        std::ignore = value; throw std::logic_error("Not Implemented Yet");
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::chrono::time_point<ClockT, DurationT> const &tp) {
+        return Traits<DurationT>::serialize(ar, tp.time_since_epoch());
+    }
+
+    template <typename ArchiveT>
+    static std::chrono::time_point<ClockT, DurationT> deserialize(ArchiveT &ar) {
+        return std::chrono::time_point<ClockT, DurationT>(Traits<DurationT>::deserialize(ar));
+    }
+};
+
+template <typename T>
+struct Traits<nonstd::optional<T>>  {
+    using nullable_type = nonstd::optional<T>;
+
+    static nullable_type CreateNullValue(void) {
+        return nullable_type();
+    }
+
+    static bool IsNull(nullable_type const& value) {
+        return !value.has_value();
+    }
+
+    static T const & GetNullableValue(nullable_type const& value) {
+        if (IsNull(value))
+            throw std::runtime_error("GetNullableValue attempt on Optional type null.");
+
+        return *value;
+    }
+
+    static std::string ToString(nullable_type const& value) {
+        if (value) {
+            return Traits<T>::ToString(*value);
+        }
+        return "NULL";
+    }
+
+    static nonstd::optional<T> FromString(std::string const &value) {
+        if(value == "NULL")
+            return nonstd::optional<T>();
+
+        return Traits<T>::FromString(value);
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, nonstd::optional<T> const &value) {
+        ar.serialize(static_cast<bool>(value));
+
+        if(value)
+            Traits<T>::serialize(ar, *value);
+
+        return ar;
+    }
+
+    template <typename ArchiveT>
+    static nonstd::optional<T> deserialize(ArchiveT &ar) {
+        nonstd::optional<T>                 result;
+
+        if(ar.template deserialize<bool>())
+            result = Traits<T>::deserialize(ar);
+
+        return result;
     }
 };
 

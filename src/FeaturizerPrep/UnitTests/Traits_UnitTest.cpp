@@ -89,6 +89,40 @@ TEST_CASE("Transformer_Integers") {
     CHECK(Traits<std::uint16_t>::ToString(arg_u16) == "250");
     CHECK(Traits<std::uint32_t>::ToString(arg_u32) == "480");
     CHECK(Traits<std::uint64_t>::ToString(arg_u64) == "7799");
+
+    CHECK(Traits<std::int8_t>::FromString("100") == 100);
+    CHECK(Traits<std::int8_t>::FromString("-100") == -100);
+    CHECK_THROWS(Traits<std::int8_t>::FromString("this is not valid"));
+    CHECK_THROWS_WITH(Traits<std::int8_t>::FromString("1000"), "Invalid conversion");
+    CHECK_THROWS_WITH(Traits<std::int8_t>::FromString("-1000"), "Invalid conversion");
+
+    CHECK(Traits<std::int16_t>::FromString("100") == 100);
+    CHECK(Traits<std::int16_t>::FromString("-100") == -100);
+    CHECK_THROWS(Traits<std::int16_t>::FromString("this is not valid"));
+    CHECK_THROWS_WITH(Traits<std::int16_t>::FromString("100000"), "Invalid conversion");
+    CHECK_THROWS_WITH(Traits<std::int16_t>::FromString("-100000"), "Invalid conversion");
+
+    CHECK(Traits<std::int32_t>::FromString("100") == 100);
+    CHECK(Traits<std::int32_t>::FromString("-100") == -100);
+    CHECK_THROWS(Traits<std::int32_t>::FromString("this is not valid"));
+
+    CHECK(Traits<std::int64_t>::FromString("100") == 100);
+    CHECK(Traits<std::int64_t>::FromString("-100") == -100);
+    CHECK_THROWS(Traits<std::int64_t>::FromString("this is not valid"));
+
+    CHECK(Traits<std::uint8_t>::FromString("100") == 100);
+    CHECK_THROWS(Traits<std::uint8_t>::FromString("this is not valid"));
+    CHECK_THROWS_WITH(Traits<std::uint8_t>::FromString("2000"), "Invalid conversion");
+
+    CHECK(Traits<std::uint16_t>::FromString("100") == 100);
+    CHECK_THROWS(Traits<std::uint16_t>::FromString("this is not valid"));
+    CHECK_THROWS_WITH(Traits<std::uint16_t>::FromString("200000"), "Invalid conversion");
+
+    CHECK(Traits<std::uint32_t>::FromString("100") == 100);
+    CHECK_THROWS(Traits<std::uint8_t>::FromString("this is not valid"));
+
+    CHECK(Traits<std::uint64_t>::FromString("100") == 100);
+    CHECK_THROWS(Traits<std::uint64_t>::FromString("this is not valid"));
 }
 
 TEST_CASE("Transformer_Numbers") {
@@ -103,6 +137,24 @@ TEST_CASE("Transformer_Numbers") {
     CHECK(Traits<std::float_t>::ToString(arg_f) == "123.000000");
     CHECK(Traits<std::double_t>::ToString(arg_d1) == "123.450000");
     CHECK(Traits<std::double_t>::ToString(arg_d2) == "135453984983490.546875");
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#endif
+
+    CHECK(Traits<std::float_t>::FromString("0.12345") == 0.12345f);
+    CHECK(std::isnan(Traits<std::float_t>::FromString("NaN")));
+    CHECK_THROWS(Traits<std::float_t>::FromString("this is not valid"));
+
+    CHECK(Traits<std::double_t>::FromString("0.12345") == 0.12345);
+    CHECK(std::isnan(Traits<std::double_t>::FromString("NaN")));
+    CHECK_THROWS(Traits<std::double_t>::FromString("this is not valid"));
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 }
 
 TEST_CASE("Transformer_Arrays") {
@@ -123,6 +175,7 @@ TEST_CASE("Transformer_Arrays") {
     std::string vecinarr_s{"[[1.030000,-20.100000,305.800000],[1.030000,-20.100000,305.800000]]"};
     CHECK(vecinarr_res == vecinarr_s);
 
+    CHECK_THROWS_WITH((Traits<std::array<std::double_t, 4>>::FromString(arr_hasnull_s)), "Not Implemented Yet");
 }
 
 TEST_CASE("Transformer_Vectors") {
@@ -154,6 +207,8 @@ TEST_CASE("Transformer_Vectors") {
     std::string vecwitharr_s{"[[8.800000,0.020000,3643.700000]]"};
     std::string vecwitharr_res = Traits<std::vector<std::array<std::double_t, 3>>>::ToString(vecwitharr);
     CHECK(vecwitharr_res == vecwitharr_s);
+
+    CHECK_THROWS_WITH(Traits<std::vector<int16_t>>::FromString(Rvect_s), "Not Implemented Yet");
 }
 
 TEST_CASE("Transformer_Maps") {
@@ -163,6 +218,8 @@ TEST_CASE("Transformer_Maps") {
     std::string map_res = Traits<std::map<std::int16_t, std::double_t>>::ToString(m);
     std::string map_s{ "{5:35.800000,93:0.147000}" };
 	CHECK(map_res == map_s);
+
+    CHECK_THROWS_WITH((Traits<std::map<std::int16_t, std::double_t>>::FromString(map_res)), "Not Implemented Yet");
 }
 
 TEST_CASE("Transformer_Tuples") {
@@ -170,6 +227,8 @@ TEST_CASE("Transformer_Tuples") {
     std::string tu_res = Traits<std::tuple<int, std::string, double>>::ToString(tu);
     std::string tu_s{"(42,hi,-3.140000)"};
     CHECK(tu_res == tu_s);
+
+    CHECK_THROWS_WITH((Traits<std::tuple<int, std::string, double>>::FromString(tu_s)), "Not Implemented Yet");
 }
 
 #if (defined __clang__)

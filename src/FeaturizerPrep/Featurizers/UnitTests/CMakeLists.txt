@@ -31,11 +31,11 @@ include(${_this_path}/../cmake/FeaturizersCode.cmake)
 enable_testing()
 
 foreach(_test_name IN ITEMS
-    SampleAddFeaturizer_UnitTest
-    DateTimeFeaturizer_UnitTests
-    StringFeaturizer_UnitTest
     CatImputerFeaturizer_UnitTests
-	TimeSeriesImputerFeaturizer_UnitTest
+	DateTimeFeaturizer_UnitTests
+    SampleAddFeaturizer_UnitTest
+    StringFeaturizer_UnitTest
+    TimeSeriesImputerFeaturizer_UnitTest
 )
     add_executable(${_test_name} ${_test_name}.cpp)
 

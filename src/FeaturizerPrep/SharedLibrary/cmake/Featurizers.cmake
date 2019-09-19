@@ -30,6 +30,9 @@ generate_shared_library_attributes(
 )
 
 add_library(Featurizers SHARED
+    ${_this_path}/../SharedLibrary_TimeSeriesImputerFeaturizer.h
+    ${_this_path}/../SharedLibrary_TimeSeriesImputerFeaturizer.cpp
+
     ${_this_path}/../GeneratedCode/SharedLibrary_CatImputerFeaturizer.h
     ${_this_path}/../GeneratedCode/SharedLibrary_CatImputerFeaturizer.cpp
     ${_this_path}/../GeneratedCode/SharedLibrary_Common.h
@@ -48,6 +51,7 @@ target_link_libraries(Featurizers PRIVATE
 )
 
 target_include_directories(Featurizers PRIVATE
+    ${_this_path}/../GeneratedCode
     ${_this_path}/../..
     ${_this_path}/../../Featurizers
     ${_includes}

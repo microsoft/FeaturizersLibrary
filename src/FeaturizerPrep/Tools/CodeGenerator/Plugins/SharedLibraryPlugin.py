@@ -246,11 +246,48 @@ def _GenerateCommonFiles(output_dir, output_stream):
                 FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr, /*in*/ std::size_t input_items);
                 FEATURIZER_LIBRARY_API bool DestroyErrorInfo(/*in*/ ErrorInfoHandle *pHandle);
 
+                // These values should match the values in Featurizer.h
+                enum FitResultValue {
+                    Complete = 1,
+                    Continue,
+                    ResetAndContinue
+                };
+
                 typedef unsigned char FitResult;
 
-                static FitResult const Complete = 0;
-                static FitResult const Continue = 1;
-                static FitResult const ResetAndContinue = 2;
+                // These values should match the values in Traits.h
+                enum TypeIdValue {
+                    StringId = 0x00000001,
+                    Int8Id,
+                    Int16Id,
+                    Int32Id,
+                    Int64Id,
+                    UInt8Id,
+                    UInt16Id,
+                    UInt32Id,
+                    UInt64Id,
+                    Float16Id,
+                    Float32Id,
+                    Float64Id,
+                    Complex64Id,
+                    Complex128Id,
+                    BFloat16Id,
+                    BoolId,
+                    TimepointId,
+                    DurationId,
+
+                    LastStaticValueId,
+
+                    TensorId = 0x1001 | LastStaticValueId + 1,
+                    SparseTensorId = 0x1001 | LastStaticValueId + 2,
+                    TabularId = 0x1001 | LastStaticValueId + 3,
+
+                    NullableId = 0x1001 | LastStaticValueId + 4,
+                    VectorId = 0x1001 | LastStaticValueId + 5,
+                    MapId = 0x1002 | LastStaticValueId + 6
+                };
+
+                typedef uint32_t TypeId;
 
                 } // extern "C"
 
@@ -335,7 +372,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
                     size_t index = reinterpret_cast<size_t>(pHandle);
 
                     std::string & str(*sg_pointerTable.Get<std::string>(index));
-                    
+
                     sg_pointerTable.Remove(index);
 
                     delete &str;
@@ -712,7 +749,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                         {method_prefix}
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
                             if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-                            
+
 
                             {validation}
 
@@ -753,7 +790,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
                             if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-                            
+
 
                             {validation}
 
@@ -787,7 +824,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
                             if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-                            
+
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
 
@@ -808,13 +845,13 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
                             if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-                            
+
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType*>(estimator.create_transformer().release());
 
-                            
+
                             size_t index = sg_pointerTable.Add(pTransformer);
                             *ppTransformerHandle = reinterpret_cast<{name}{suffix}TransformerHandle*>(index);
                         {method_suffix}
@@ -837,7 +874,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(archive).release());
-                        
+
                             size_t index = sg_pointerTable.Add(pTransformer);
                             *ppTransformerHandle = reinterpret_cast<{name}{suffix}TransformerHandle*>(index);
                         {method_suffix}
@@ -930,7 +967,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                     FEATURIZER_LIBRARY_API bool {name}{suffix}Transform(/*in*/ {name}{suffix}TransformerHandle *pHandle, {input_param}, {output_param}, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
                         {method_prefix}
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-                            
+
 
                             {input_validation}
                             {output_validation}

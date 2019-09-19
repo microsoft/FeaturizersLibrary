@@ -27,12 +27,12 @@ std::vector<std::tuple<bool,std::chrono::system_clock::time_point, std::vector<s
     using KeyT                      = std::vector<std::string>;
     using ColsToImputeT             = std::vector<nonstd::optional<std::string>>;
     using InputBatchesType          = std::vector<std::vector<std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, std::vector<nonstd::optional<std::string>>>>>;
-    using TSImputerEstimator        = NS::Featurizers::TimeSeriesImputerFeaturizerEstimator;
+    using TSImputerEstimator        = NS::Featurizers::TimeSeriesImputerEstimator;
     using TransformedType           = std::vector<std::tuple<bool,std::chrono::system_clock::time_point, std::vector<std::string>, std::vector<nonstd::optional<std::string>>>>;
 
     NS::AnnotationMapsPtr const     pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
-    TSImputerEstimator              estimator(pAllColumnAnnotations, {NS::DataTypes::Float64});
+    TSImputerEstimator              estimator(pAllColumnAnnotations, {NS::TypeId::Float64});
 
     typename InputBatchesType::const_iterator            iter(trainingBatches.begin());
     while(true) {
