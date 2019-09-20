@@ -782,90 +782,55 @@ Strings Serializer::_LoadKeyStrings(Microsoft::Featurizer::Archive &ar) const {
     return results;
 }
 
-OptionalStrings Serializer::_LoadDataStrings(Microsoft::Featurizer::Archive &ar) const {
+template <typename T>
+void _LoadDataString(Microsoft::Featurizer::Archive &ar, OptionalStrings &results) {
     // ----------------------------------------------------------------------
-    using namespace Microsoft::Featurizer;
+    using TheseTraits               = Microsoft::Featurizer::Traits<T>;
     // ----------------------------------------------------------------------
 
+    typename TheseTraits::nullable_type     value(Microsoft::Featurizer::Traits<typename TheseTraits::nullable_type>::deserialize(ar));
+
+    results.emplace_back(TheseTraits::IsNull(value) ? nonstd::optional<std::string>() : TheseTraits::ToString(TheseTraits::GetNullableValue(value)));
+}
+
+OptionalStrings Serializer::_LoadDataStrings(Microsoft::Featurizer::Archive &ar) const {
     OptionalStrings                         results;
 
     results.reserve(DataTypes.size());
 
     for(auto const & typeId : DataTypes) {
-        if(typeId == Microsoft::Featurizer::TypeId::String) {
-            nonstd::optional<std::string>   value(Traits<nonstd::optional<std::string>>::deserialize(ar));
-
-            results.emplace_back(std::move(value));
-        }
-        else if(typeId == Microsoft::Featurizer::TypeId::Int8) {
-            nonstd::optional<std::int8_t>   value(Traits<nonstd::optional<std::int8_t>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<std::int8_t>::ToString(*value) : nonstd::optional<std::string>());
-        }
-        else if(typeId == Microsoft::Featurizer::TypeId::Int16) {
-            nonstd::optional<std::int16_t>  value(Traits<nonstd::optional<std::int16_t>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<std::int16_t>::ToString(*value) : nonstd::optional<std::string>());
-        }
-        else if(typeId == Microsoft::Featurizer::TypeId::Int32) {
-            nonstd::optional<std::int32_t>  value(Traits<nonstd::optional<std::int32_t>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<std::int32_t>::ToString(*value) : nonstd::optional<std::string>());
-        }
-        else if(typeId == Microsoft::Featurizer::TypeId::Int64) {
-            nonstd::optional<std::int64_t>  value(Traits<nonstd::optional<std::int64_t>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<std::int64_t>::ToString(*value) : nonstd::optional<std::string>());
-        }
-        else if(typeId == Microsoft::Featurizer::TypeId::UInt8) {
-            nonstd::optional<std::uint8_t>  value(Traits<nonstd::optional<std::uint8_t>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<std::uint8_t>::ToString(*value) : nonstd::optional<std::string>());
-        }
-        else if(typeId == Microsoft::Featurizer::TypeId::UInt16) {
-            nonstd::optional<std::uint16_t>             value(Traits<nonstd::optional<std::uint16_t>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<std::uint16_t>::ToString(*value) : nonstd::optional<std::string>());
-        }
-        else if(typeId == Microsoft::Featurizer::TypeId::UInt32) {
-            nonstd::optional<std::uint32_t>             value(Traits<nonstd::optional<std::uint32_t>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<std::uint32_t>::ToString(*value) : nonstd::optional<std::string>());
-        }
-        else if(typeId == Microsoft::Featurizer::TypeId::UInt64) {
-            nonstd::optional<std::uint64_t>             value(Traits<nonstd::optional<std::uint64_t>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<std::uint64_t>::ToString(*value) : nonstd::optional<std::string>());
-        }
+        if(typeId == Microsoft::Featurizer::TypeId::String)
+            _LoadDataString<std::string>(ar, results);
+        else if(typeId == Microsoft::Featurizer::TypeId::Int8)
+            _LoadDataString<std::int8_t>(ar, results);
+        else if(typeId == Microsoft::Featurizer::TypeId::Int16)
+            _LoadDataString<std::int16_t>(ar, results);
+        else if(typeId == Microsoft::Featurizer::TypeId::Int32)
+            _LoadDataString<std::int32_t>(ar, results);
+        else if(typeId == Microsoft::Featurizer::TypeId::Int64)
+            _LoadDataString<std::int64_t>(ar, results);
+        else if(typeId == Microsoft::Featurizer::TypeId::UInt8)
+            _LoadDataString<std::uint8_t>(ar, results);
+        else if(typeId == Microsoft::Featurizer::TypeId::UInt16)
+            _LoadDataString<std::uint16_t>(ar, results);
+        else if(typeId == Microsoft::Featurizer::TypeId::UInt32)
+            _LoadDataString<std::uint32_t>(ar, results);
+        else if(typeId == Microsoft::Featurizer::TypeId::UInt64)
+            _LoadDataString<std::uint64_t>(ar, results);
         // Float16 is not supported yet
-        else if(typeId == Microsoft::Featurizer::TypeId::Float32) {
-            nonstd::optional<std::float_t>  value(Traits<nonstd::optional<std::float_t>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<std::float_t>::ToString(*value) : nonstd::optional<std::string>());
-        }
-        else if(typeId == Microsoft::Featurizer::TypeId::Float64) {
-            nonstd::optional<std::double_t>             value(Traits<nonstd::optional<std::double_t>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<std::double_t>::ToString(*value) : nonstd::optional<std::string>());
-        }
+        else if(typeId == Microsoft::Featurizer::TypeId::Float32)
+            _LoadDataString<std::float_t>(ar, results);
+        else if(typeId == Microsoft::Featurizer::TypeId::Float64)
+            _LoadDataString<std::double_t>(ar, results);
         // Complex64 is not supported yet
         // Complex128 is not supported yet
         // BFloat16 is not supported yet
-        else if(typeId == Microsoft::Featurizer::TypeId::Bool) {
-            nonstd::optional<bool>          value(Traits<nonstd::optional<bool>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<bool>::ToString(*value) : nonstd::optional<std::string>());
-        }
-        else if(typeId == Microsoft::Featurizer::TypeId::Timepoint) {
-            nonstd::optional<std::chrono::system_clock::time_point>         value(Traits<nonstd::optional<std::chrono::system_clock::time_point>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<std::chrono::system_clock::time_point>::ToString(*value) : nonstd::optional<std::string>());
-        }
-        else if(typeId == Microsoft::Featurizer::TypeId::Duration) {
-            nonstd::optional<std::chrono::system_clock::duration>           value(Traits<nonstd::optional<std::chrono::system_clock::duration>>::deserialize(ar));
-
-            results.emplace_back(value ? Traits<std::chrono::system_clock::duration>::ToString(*value) : nonstd::optional<std::string>());
-        }
+        else if(typeId == Microsoft::Featurizer::TypeId::Bool)
+            _LoadDataString<bool>(ar, results);
+        else if(typeId == Microsoft::Featurizer::TypeId::Timepoint)
+            _LoadDataString<std::chrono::system_clock::time_point>(ar, results);
+        else if(typeId == Microsoft::Featurizer::TypeId::Duration)
+            _LoadDataString<std::chrono::system_clock::duration>(ar, results);
         // Tensor is not supported yet
         // SparseTensor is not supported yet
         // Tabular is not supported yet
@@ -942,11 +907,25 @@ void Serializer::_SaveKeyStrings(Microsoft::Featurizer::Archive &ar, Strings con
     }
 }
 
-void Serializer::_SaveDataStrings(Microsoft::Featurizer::Archive &ar, OptionalStrings const &strings) const {
+template <typename T>
+void _SaveDataString(Microsoft::Featurizer::Archive &ar, nonstd::optional<std::string> const &s) {
     // ----------------------------------------------------------------------
-    using namespace Microsoft::Featurizer;
+    using TheseTraits                       = Microsoft::Featurizer::Traits<T>;
     // ----------------------------------------------------------------------
 
+    typename TheseTraits::nullable_type     value(
+        [&s](void) -> typename TheseTraits::nullable_type {
+            if(!s)
+                return TheseTraits::CreateNullValue();
+
+            return TheseTraits::FromString(*s);
+        }()
+    );
+
+    Microsoft::Featurizer::Traits<typename TheseTraits::nullable_type>::serialize(ar, value);
+}
+
+void Serializer::_SaveDataStrings(Microsoft::Featurizer::Archive &ar, OptionalStrings const &strings) const {
     assert(strings.size() == DataTypes.size());
 
     TypeIds::const_iterator                 iterTypeId(DataTypes.begin());
@@ -955,37 +934,37 @@ void Serializer::_SaveDataStrings(Microsoft::Featurizer::Archive &ar, OptionalSt
         Microsoft::Featurizer::TypeId       typeId(*iterTypeId++);
 
         if(typeId == Microsoft::Featurizer::TypeId::String)
-            Traits<nonstd::optional<std::string>>::serialize(ar, s ? nonstd::optional<std::string>(*s) : nonstd::optional<std::string>());
+            _SaveDataString<std::string>(ar, s);
         else if(typeId == Microsoft::Featurizer::TypeId::Int8)
-            Traits<nonstd::optional<std::int8_t>>::serialize(ar, s ? nonstd::optional<std::int8_t>(Traits<std::int8_t>::FromString(*s)) : nonstd::optional<std::int8_t>());
+            _SaveDataString<std::int8_t>(ar, s);
         else if(typeId == Microsoft::Featurizer::TypeId::Int16)
-            Traits<nonstd::optional<std::int16_t>>::serialize(ar, s ? nonstd::optional<std::int16_t>(Traits<std::int16_t>::FromString(*s)) : nonstd::optional<std::int16_t>());
+            _SaveDataString<std::int16_t>(ar, s);
         else if(typeId == Microsoft::Featurizer::TypeId::Int32)
-            Traits<nonstd::optional<std::int32_t>>::serialize(ar, s ? nonstd::optional<std::int32_t>(Traits<std::int32_t>::FromString(*s)) : nonstd::optional<std::int32_t>());
+            _SaveDataString<std::int32_t>(ar, s);
         else if(typeId == Microsoft::Featurizer::TypeId::Int64)
-            Traits<nonstd::optional<std::int64_t>>::serialize(ar, s ? nonstd::optional<std::int64_t>(Traits<std::int64_t>::FromString(*s)) : nonstd::optional<std::int64_t>());
+            _SaveDataString<std::int64_t>(ar, s);
         else if(typeId == Microsoft::Featurizer::TypeId::UInt8)
-            Traits<nonstd::optional<std::uint8_t>>::serialize(ar, s ? nonstd::optional<std::uint8_t>(Traits<std::uint8_t>::FromString(*s)) : nonstd::optional<std::uint8_t>());
+            _SaveDataString<std::uint8_t>(ar, s);
         else if(typeId == Microsoft::Featurizer::TypeId::UInt16)
-            Traits<nonstd::optional<std::uint16_t>>::serialize(ar, s ? nonstd::optional<std::uint16_t>(Traits<std::uint16_t>::FromString(*s)) : nonstd::optional<std::uint16_t>());
+            _SaveDataString<std::uint16_t>(ar, s);
         else if(typeId == Microsoft::Featurizer::TypeId::UInt32)
-            Traits<nonstd::optional<std::uint32_t>>::serialize(ar, s ? nonstd::optional<std::uint32_t>(Traits<std::uint32_t>::FromString(*s)) : nonstd::optional<std::uint32_t>());
+            _SaveDataString<std::uint32_t>(ar, s);
         else if(typeId == Microsoft::Featurizer::TypeId::UInt64)
-            Traits<nonstd::optional<std::uint64_t>>::serialize(ar, s ? nonstd::optional<std::uint64_t>(Traits<std::uint64_t>::FromString(*s)) : nonstd::optional<std::uint64_t>());
+            _SaveDataString<std::uint64_t>(ar, s);
         // Float16 is not supported yet
         else if(typeId == Microsoft::Featurizer::TypeId::Float32)
-            Traits<nonstd::optional<std::float_t>>::serialize(ar, s ? nonstd::optional<std::float_t>(Traits<std::float_t>::FromString(*s)) : nonstd::optional<std::float_t>());
+            _SaveDataString<std::float_t>(ar, s);
         else if(typeId == Microsoft::Featurizer::TypeId::Float64)
-            Traits<nonstd::optional<std::double_t>>::serialize(ar, s ? nonstd::optional<std::double_t>(Traits<std::double_t>::FromString(*s)) : nonstd::optional<std::double_t>());
+            _SaveDataString<std::double_t>(ar, s);
         // Complex64 is not supported yet
         // Complex128 is not supported yet
         // BFloat16 is not supported yet
         else if(typeId == Microsoft::Featurizer::TypeId::Bool)
-            Traits<nonstd::optional<bool>>::serialize(ar, s ? nonstd::optional<bool>(Traits<bool>::FromString(*s)) : nonstd::optional<bool>());
+            _SaveDataString<bool>(ar, s);
         else if(typeId == Microsoft::Featurizer::TypeId::Timepoint)
-            Traits<nonstd::optional<std::chrono::system_clock::time_point>>::serialize(ar, s ? nonstd::optional<std::chrono::system_clock::time_point>(Traits<std::chrono::system_clock::time_point>::FromString(*s)) : nonstd::optional<std::chrono::system_clock::time_point>());
+            _SaveDataString<std::chrono::system_clock::time_point>(ar, s);
         else if(typeId == Microsoft::Featurizer::TypeId::Duration)
-            Traits<nonstd::optional<std::chrono::system_clock::duration>>::serialize(ar, s ? nonstd::optional<std::chrono::system_clock::duration>(Traits<std::chrono::system_clock::duration>::FromString(*s)) : nonstd::optional<std::chrono::system_clock::duration>());
+            _SaveDataString<std::chrono::system_clock::duration>(ar, s);
         // Tensor is not supported yet
         // SparseTensor is not supported yet
         // Tabular is not supported yet

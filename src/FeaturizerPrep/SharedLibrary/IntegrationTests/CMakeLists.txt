@@ -34,12 +34,14 @@ foreach(_test_name IN ITEMS
     SharedLibrary_CatImputerFeaturizer_IntegrationTest
     SharedLibrary_DateTimeFeaturizer_IntegrationTest
     SharedLibrary_StringFeaturizer_IntegrationTest
+    SharedLibrary_TSIFeaturizer_IntegrationTest
 )
     add_executable(${_test_name} ${_test_name}.cpp)
 
     target_include_directories(
         ${_test_name} PRIVATE
         ${_includes}
+        ${_this_path}/..
         ${_this_path}/../GeneratedCode
         ${_this_path}/../..
     )
