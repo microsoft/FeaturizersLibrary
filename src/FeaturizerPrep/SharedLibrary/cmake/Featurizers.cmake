@@ -30,6 +30,8 @@ generate_shared_library_attributes(
 )
 
 add_library(Featurizers SHARED
+    ${_this_path}/../SharedLibrary_DateTimeFeaturizerCustom.h
+    ${_this_path}/../SharedLibrary_DateTimeFeaturizerCustom.cpp
     ${_this_path}/../SharedLibrary_TimeSeriesImputerFeaturizer.h
     ${_this_path}/../SharedLibrary_TimeSeriesImputerFeaturizer.cpp
 

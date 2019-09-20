@@ -53,6 +53,9 @@ def Build(
         prefix="\nResults: ",
         suffix="\n",
     ) as dm:
+        FileSystem.RemoveTree(output_dir)
+        FileSystem.MakeDirs(output_dir)
+
         temp_directory = CurrentShell.CreateTempDirectory()
 
         # ----------------------------------------------------------------------
@@ -393,10 +396,28 @@ def _CopyData(temp_directory, output_dir, output_stream):
 
 # ----------------------------------------------------------------------
 def _CopyHeaders(temp_directory, output_dir, output_stream):
-    output_files = list(
+    output_files = []
+
+    output_files += list(
+        FileSystem.WalkFiles(
+            _script_dir,
+            include_file_extensions=[".h"],
+            include_file_base_names=[
+                lambda basename: basename.startswith("SharedLibrary_")
+            ],
+            recurse=False,
+        ),
+    )
+
+    output_files += list(
         FileSystem.WalkFiles(
             os.path.join(_script_dir, "GeneratedCode"),
             include_file_extensions=[".h"],
+            include_file_base_names=[
+                lambda basename: basename.startswith("SharedLibrary_")
+            ],
+            exclude_file_names=["SharedLibrary_PointerTable.h"],
+            recurse=False,
         ),
     )
 

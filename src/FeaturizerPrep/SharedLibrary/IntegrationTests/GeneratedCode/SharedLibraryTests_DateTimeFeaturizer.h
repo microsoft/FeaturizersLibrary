@@ -9,18 +9,19 @@
 
 /* ---------------------------------------------------------------------- */
 /* |  DateTimeFeaturizer */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgsT>
 void DateTimeFeaturizer_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<TimePoint *> const &)> const &verify_func
+    std::function<bool (std::vector<TimePoint *> const &)> const &verify_func,
+    ConstructorArgsT &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     DateTimeFeaturizer_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(DateTimeFeaturizer_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(DateTimeFeaturizer_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 

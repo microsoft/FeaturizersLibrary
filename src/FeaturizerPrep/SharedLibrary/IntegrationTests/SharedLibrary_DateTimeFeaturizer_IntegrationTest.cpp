@@ -6,6 +6,7 @@
 #include "catch.hpp"
 
 #include "GeneratedCode/SharedLibraryTests_DateTimeFeaturizer.h"
+#include "../SharedLibrary_DateTimeFeaturizerCustom.h"
 
 TEST_CASE("Standard") {
     DateTimeFeaturizer_Test(
@@ -32,6 +33,50 @@ TEST_CASE("Standard") {
             if(strcmp(tp2.monthLabel_ptr, "November") != 0) return false;
 
             return true;
-        }
+        },
+        nullptr
     );
+}
+
+TEST_CASE("IsValidCountry") {
+    ErrorInfoHandle *                       pErrorInfo(nullptr);
+    bool                                    result;
+
+    result = false;
+    CHECK(DateTimeFeaturizer_IsValidCountry("United States", &result, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
+    CHECK(result);
+
+    result = false;
+    CHECK(DateTimeFeaturizer_IsValidCountry("united states", &result, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
+    CHECK(result);
+
+    result = false;
+    CHECK(DateTimeFeaturizer_IsValidCountry("unitedstates", &result, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
+    CHECK(result);
+
+    result = true;
+    CHECK(DateTimeFeaturizer_IsValidCountry("not a valid country", &result, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
+    CHECK(result == false);
+}
+
+TEST_CASE("GetSupportedCountries") {
+    ErrorInfoHandle *                       pErrorInfo(nullptr);
+    StringBuffer *                          pStringBuffers(nullptr);
+    size_t                                  numStringBuffers;
+
+    CHECK(DateTimeFeaturizer_GetSupportedCountries(&pStringBuffers, &numStringBuffers, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
+    REQUIRE(pStringBuffers != nullptr);
+    REQUIRE(numStringBuffers != 0);
+
+    // Spot check a few of the values
+    CHECK(strcmp(pStringBuffers->pString, "Argentina") == 0);
+    CHECK(strcmp((pStringBuffers + numStringBuffers - 1)->pString, "Wales") == 0);
+
+    CHECK(DateTimeFeaturizer_DestroyStringBuffers(pStringBuffers, numStringBuffers, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
 }

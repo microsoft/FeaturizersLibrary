@@ -30,6 +30,13 @@
         "num_output_columns": 21,
         "input_type": "std::int64_t",
         "transformed_type": "TimePoint",
+        "configuration_params": [
+            {
+                "type": "std::string",
+                "name": "optionalCountryName",
+                "is_optional": true
+            }
+        ],
         "custom_structs": [
             {
                 "name": "TimePoint",

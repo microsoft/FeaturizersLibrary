@@ -46,7 +46,7 @@ struct DateTimeFeaturizer_EstimatorHandle {};
 struct DateTimeFeaturizer_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateEstimator(/*out*/ DateTimeFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateEstimator(/*in*/ char const *optionalCountryName, /*out*/ DateTimeFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyEstimator(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_IsTrainingComplete(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);

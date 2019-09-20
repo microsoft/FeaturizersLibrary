@@ -27,7 +27,7 @@ extern "C" {
 /* |  DateTimeFeaturizer */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateEstimator(/*out*/ DateTimeFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateEstimator(/*in*/ char const *optionalCountryName, /*out*/ DateTimeFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -35,7 +35,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateEstimator(/*out*/ DateTimeF
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::DateTimeEstimator* pEstimator = new Microsoft::Featurizer::Featurizers::DateTimeEstimator(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(21));
+        Microsoft::Featurizer::Featurizers::DateTimeEstimator* pEstimator = new Microsoft::Featurizer::Featurizers::DateTimeEstimator(optionalCountryName ? std::string(optionalCountryName) : nonstd::optional<std::string>(), std::make_shared<Microsoft::Featurizer::AnnotationMaps>(21));
         size_t index(sg_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<DateTimeFeaturizer_EstimatorHandle*>(index);
 

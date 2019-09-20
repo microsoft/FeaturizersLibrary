@@ -50,9 +50,21 @@ class Plugin(PluginBase):
         supported_custom_types = set(six.iterkeys(_SUPPORTED_CUSTOM_TYPES))
 
         for index, items in enumerate(data):
-            status_stream.write("Processing '{}' ({} of {})...".format(items[0].name, index + 1, len(data)))
+            status_stream.write(
+                "Processing '{}' ({} of {})...".format(
+                    items[0].name,
+                    index + 1,
+                    len(data),
+                ),
+            )
             with status_stream.DoneManager() as this_dm:
-                with open(os.path.join(output_dir, "SharedLibraryTests_{}.h".format(items[0].name)), "w") as f:
+                with open(
+                    os.path.join(
+                        output_dir,
+                        "SharedLibraryTests_{}.h".format(items[0].name),
+                    ),
+                    "w",
+                ) as f:
                     f.write(
                         textwrap.dedent(
                             """\
@@ -100,9 +112,13 @@ class Plugin(PluginBase):
                             cpp_template_suffix = "<{}>".format(template)
 
                         if hasattr(item, "configuration_params"):
-                            constructor_template_params = ", typename... ConstructorArgsT>"
-                            constructor_params = ",\n    ConstructorArgsT &&... constructor_args"
-                            constructor_args = "std::forward<ConstructorArgsT>(constructor_args)..., "
+                            constructor_template_params = ", typename... ConstructorArgsT"
+                            constructor_params = (
+                                ",\n    ConstructorArgsT &&... constructor_args"
+                            )
+                            constructor_args = (
+                                "std::forward<ConstructorArgsT>(constructor_args)..., "
+                            )
                         else:
                             constructor_template_params = ""
                             constructor_params = ""
@@ -169,7 +185,7 @@ class Plugin(PluginBase):
                                     // Create the estimator
                                     {name}{suffix}EstimatorHandle *pEstimatorHandle(nullptr);
 
-                                    REQUIRE({name}{suffix}CreateEstimator({constructor_params}&pEstimatorHandle, &pErrorInfo));
+                                    REQUIRE({name}{suffix}CreateEstimator({constructor_args}&pEstimatorHandle, &pErrorInfo));
                                     REQUIRE(pEstimatorHandle != nullptr);
                                     REQUIRE(pErrorInfo == nullptr);
 
@@ -269,14 +285,27 @@ class Plugin(PluginBase):
                                 constructor_params=constructor_params,
                                 constructor_args=constructor_args,
                                 fit_input_args=transform_input_args,
-                                transform_vars=StringHelpers.LeftJustify(output_statement_info.TransformVars, 8),
+                                transform_vars=StringHelpers.LeftJustify(
+                                    output_statement_info.TransformVars,
+                                    8,
+                                ),
                                 transform_input_args=transform_input_args,
                                 transform_output_args=output_statement_info.TransformOutputArgs,
-                                transform_statement=StringHelpers.LeftJustify(output_statement_info.AppendResultStatement, 8),
-                                inline_destroy_statement=StringHelpers.LeftJustify(inline_destroy_statement.rstrip(), 8),
-                                trailing_destroy_statement=StringHelpers.LeftJustify(trailing_destroy_statement.rstrip(), 4),
+                                transform_statement=StringHelpers.LeftJustify(
+                                    output_statement_info.AppendResultStatement,
+                                    8,
+                                ),
+                                inline_destroy_statement=StringHelpers.LeftJustify(
+                                    inline_destroy_statement.rstrip(),
+                                    8,
+                                ),
+                                trailing_destroy_statement=StringHelpers.LeftJustify(
+                                    trailing_destroy_statement.rstrip(),
+                                    4,
+                                ),
                             ),
                         )
+
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
@@ -380,6 +409,7 @@ class _TypeInfoVisitor(TypeVisitorBase):
     def OnCustomType(type, *args, **kwargs):
         return _SUPPORTED_CUSTOM_TYPES[type](*args, **kwargs)
 
+
 # ----------------------------------------------------------------------
 class TypeInfo(Interface.Interface):
 
@@ -467,6 +497,7 @@ class _ScalarTypeInfo(TypeInfo):
             "results.emplace_back(std::move({}));".format(result_name),
         )
 
+
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class _StringTypeInfo(TypeInfo):
@@ -510,6 +541,7 @@ class _StringTypeInfo(TypeInfo):
             ),
             destroy_inline=True,
         )
+
 
 # ----------------------------------------------------------------------
 class _TimePointTypeInfo(TypeInfo):

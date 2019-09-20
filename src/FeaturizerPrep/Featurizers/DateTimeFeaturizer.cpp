@@ -7,6 +7,7 @@
     #include <direct.h>
     #include <Windows.h>
 #else
+    #include <dirent.h>
     #include <unistd.h>
 #endif
 
@@ -95,55 +96,176 @@ TimePoint::TimePoint(const std::chrono::system_clock::time_point& sysTime) {
 // |
 // ----------------------------------------------------------------------
 namespace {
-    std::string GetBinaryPath() {
-        #ifdef _WIN32
-            char result[ MAX_PATH ];
-            std::string binaryPath = std::string( result, GetModuleFileName( nullptr, result, MAX_PATH ) );
-            unsigned long ret = GetLastError();
-            if (ret != 0) {
-                throw std::runtime_error(std::to_string(ret));
-            }
-        #else
-            char result[ PATH_MAX ];
-            ssize_t count = readlink( "/proc/self/exe", result, PATH_MAX );
-            if (count < 0) {
-                throw std::runtime_error("readlink");
-            }
-            std::string binaryPath = std::string( result, (count > 0) ? count : 0 );
-        #endif
-        return binaryPath;
+
+#if (defined _WIN32)
+    std::string GetBinaryPath(void) {
+        char                                result[MAX_PATH];
+
+        GetModuleFileName(nullptr, result, sizeof(result));
+
+        unsigned long const                 error(GetLastError());
+
+        if(error != 0)
+            throw std::runtime_error(std::to_string(error));
+
+        return result;
     }
 
-    nlohmann::json GetJsonStream(std::string const & _countryName) {
-        nlohmann::json holidaysByCountry;
+    std::string GetDataDirectory(void) {
+        std::string const                   binaryPath(GetBinaryPath());
 
-        std::string jsonFilename = _countryName + ".json";
-        std::string binaryPath = GetBinaryPath();
-        #ifdef _WIN32
-            std::string path = binaryPath.substr(0, binaryPath.find_last_of("\\")) + "\\Data\\DateTimeFeaturizer\\" + jsonFilename;
-        #else
-            std::string path = binaryPath.substr(0, binaryPath.find_last_of("/")) + "/Data/DateTimeFeaturizer/" + jsonFilename;
-        #endif
+        return binaryPath.substr(0, binaryPath.find_last_of("\\")) + "\\Data\\DateTimeFeaturizer\\";
+    }
 
-        std::ifstream file(path);
-        file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        if (file) {
-            holidaysByCountry = nlohmann::json::parse(file);
+    bool EnumCountries(std::function<bool (std::string)> const &callback) {
+        // Note that this code is not exception safe!
+        std::string                         dataDir(GetDataDirectory() + "*");
+        WIN32_FIND_DATA                     data;
+        HANDLE                              handle;
+        bool                                result(true);
+
+        handle = FindFirstFile(dataDir.c_str(), &data);
+        if(handle == INVALID_HANDLE_VALUE)
+            return result;
+
+        while(true) {
+            if((data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+                if(callback(data.cFileName) == false) {
+                    result = false;
+                    break;
+                }
+            }
+
+            if(FindNextFile(handle, &data) == false)
+                break;
         }
-        return holidaysByCountry;
+
+        FindClose(handle);
+        return result;
     }
+
+#else
+    std::string GetBinaryPath(void) {
+        char                                result[PATH_MAX];
+
+        memset(result, 0x00, sizeof(result));
+
+        ssize_t const                       count(readlink("/proc/self/exe", result, sizeof(result)));
+
+        if(count < 0)
+            throw std::runtime_error("readlink");
+
+        return result;
+    }
+
+    std::string GetDataDirectory(void) {
+        std::string const                   binaryPath(GetBinaryPath());
+
+        return binaryPath.substr(0, binaryPath.find_last_of("/")) + "/Data/DateTimeFeaturizer/";
+    }
+
+    bool EnumCountries(std::function<bool (std::string)> const &callback) {
+        // Note that this code is not exception safe
+        bool                                result(true);
+        DIR *                               dir(opendir(GetDataDirectory().c_str()));
+
+        if(dir == nullptr)
+            return result;
+
+        dirent *                            info(nullptr);
+
+        while((info = readdir(dir)) != nullptr) {
+            // Skip directories
+            if(info->d_type == DT_DIR)
+                continue;
+
+            if(callback(info->d_name) == false)
+                return false;
+        }
+
+        closedir(dir);
+
+        return result;
+    }
+
+#endif
+
+nlohmann::json GetJsonStream(std::string const & jsonFilename) {
+    nlohmann::json                          holidaysByCountry;
+    std::ifstream                           file(jsonFilename);
+
+    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    if(file)
+        holidaysByCountry = nlohmann::json::parse(file);
+
+    return holidaysByCountry;
 }
+
+std::string RemoveCountryExtension(std::string const &country) {
+    std::string::size_type const            dot(country.find_last_of('.'));
+
+    if(dot == std::string::npos)
+        return country;
+
+    return country.substr(0, dot);
+}
+
+bool DoesCountryMatch(std::string const &country, std::string query) {
+    if(query == country)
+        return true;
+
+    // Remove the ext
+    query = RemoveCountryExtension(query);
+    if(query == country)
+        return true;
+
+    // Convert to lowercase
+    std::transform(query.begin(), query.end(), query.begin(), [](char c) { return std::tolower(c); });
+    if(query == country)
+        return true;
+
+    // Remove spaces
+    query.erase(std::remove_if(query.begin(), query.end(), [](char c) { return std::isspace(c); }), query.end());
+    if(query == country)
+        return true;
+
+    return false;
+}
+
+} // anonymous namespace
 
 DateTimeTransformer::DateTimeTransformer(Archive &ar) :
     _countryName(Traits<std::string>::deserialize(ar)) {
     DateTimeTransformer(this->_countryName);
 }
 
-DateTimeTransformer::DateTimeTransformer(nonstd::optional<std::string> const & countryName):
-    _countryName(countryName.has_value() ? countryName.value() : std::string()) {
+DateTimeTransformer::DateTimeTransformer(std::string countryName):
+    _countryName(std::move(countryName)) {
 
     if (!_countryName.empty()) {
-        JsonStream holidaysByCountry = GetJsonStream(_countryName);
+        // Get the corresponding file
+        std::string                         filename;
+
+        if(
+            EnumCountries(
+                [this, &filename](std::string country) {
+                    if(DoesCountryMatch(_countryName, country)) {
+                        filename = std::move(country);
+
+                        // Don't continue processing
+                        return false;
+                    }
+
+                    return true;
+                }
+            )
+        ) {
+            // A true return value means that we have enumerated through all of the country names and didn't find a match
+            throw std::invalid_argument(_countryName);
+        }
+
+        JsonStream holidaysByCountry = GetJsonStream(GetDataDirectory() + filename);
 
         //Convert Jsonstream to std::unordered_map
         //Note that the map keys are generated with "Date" and "Holiday" so no need to check existence
@@ -184,8 +306,57 @@ void DateTimeTransformer::save(Archive & ar) const /*override*/ {
 // |  DateTimeEstimator
 // |
 // ----------------------------------------------------------------------
-DateTimeEstimator::DateTimeEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    BaseType("DateTimeEstimator", std::move(pAllColumnAnnotations)) {
+/*static*/ bool DateTimeEstimator::IsValidCountry(std::string const &value) {
+    // EnumCountries will return true if the enumeration completes
+    // and false if it was terminated. In this case, termination means
+    // that the country was found.
+    return EnumCountries(
+        [&value](std::string country) {
+            // Continue if the countries don't match
+            return DoesCountryMatch(value, std::move(country)) == false;
+        }
+    ) == false;
+}
+
+/*static*/ std::vector<std::string> DateTimeEstimator::GetSupportedCountries(void) {
+    std::vector<std::string>                results;
+
+    EnumCountries(
+        [&results](std::string country) {
+            results.emplace_back(RemoveCountryExtension(country));
+            return true;
+        }
+    );
+
+    std::sort(results.begin(), results.end());
+
+    return results;
+}
+
+DateTimeEstimator::DateTimeEstimator(nonstd::optional<std::string> const &countryName, AnnotationMapsPtr pAllColumnAnnotations) :
+    BaseType("DateTimeEstimator", std::move(pAllColumnAnnotations), true),
+    Country(countryName) {
+        if(Country && DateTimeEstimator::IsValidCountry(*Country) == false) {
+            char                            buffer[1024];
+
+            snprintf(buffer, sizeof(buffer), "'%s' is not a supported country name", Country->c_str());
+            throw std::invalid_argument(buffer);
+        }
+}
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+Estimator::FitResult DateTimeEstimator::fit_impl(FitBufferInputType const *, size_t) /*override*/ {
+    throw std::runtime_error("This should never be called as this class will not be used during training");
+}
+
+Estimator::FitResult DateTimeEstimator::complete_training_impl(void) /*override*/ {
+    throw std::runtime_error("This should never be called as this class will not be used during training");
+}
+
+typename DateTimeEstimator::BaseType::TransformerUniquePtr DateTimeEstimator::create_transformer_impl(void) /*override*/ {
+    return std::make_unique<DateTimeTransformer>(Country ? *Country : std::string());
 }
 
 } // namespace Featurizers

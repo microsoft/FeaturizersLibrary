@@ -13,9 +13,84 @@ namespace NS = Microsoft::Featurizer;
 using SysClock = std::chrono::system_clock;
 
 TEST_CASE("DateTimeEstimator") {
-    CHECK(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2)).Name == "DateTimeEstimator");
-    CHECK(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2)).is_training_complete());
-    CHECK(dynamic_cast<NS::Featurizers::DateTimeTransformer *>(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2)).create_transformer().get()));
+    CHECK(NS::Featurizers::DateTimeEstimator(nonstd::optional<std::string>(), NS::CreateTestAnnotationMapsPtr(2)).Name == "DateTimeEstimator");
+    CHECK(NS::Featurizers::DateTimeEstimator(nonstd::optional<std::string>(), NS::CreateTestAnnotationMapsPtr(2)).is_training_complete());
+    CHECK(dynamic_cast<NS::Featurizers::DateTimeTransformer *>(NS::Featurizers::DateTimeEstimator(nonstd::optional<std::string>(), NS::CreateTestAnnotationMapsPtr(2)).create_transformer().get()));
+}
+
+TEST_CASE("DateTimeEstimator - IsValidCountry") {
+    CHECK(NS::Featurizers::DateTimeEstimator::IsValidCountry("United States"));
+    CHECK(NS::Featurizers::DateTimeEstimator::IsValidCountry("United States.json"));
+    CHECK(NS::Featurizers::DateTimeEstimator::IsValidCountry("united states"));
+    CHECK(NS::Featurizers::DateTimeEstimator::IsValidCountry("unitedstates"));
+
+    CHECK(NS::Featurizers::DateTimeEstimator::IsValidCountry("This is not a valid country") == false);
+}
+
+TEST_CASE("DateTimeEstimator - GetSupportedCountries") {
+    CHECK(
+        NS::Featurizers::DateTimeEstimator::GetSupportedCountries() ==
+        std::vector<std::string>{
+            "Argentina",
+            "Australia",
+            "Austria",
+            "Belarus",
+            "Belgium",
+            "Brazil",
+            "Canada",
+            "Colombia",
+            "Croatia",
+            "Czech",
+            "Denmark",
+            "England",
+            "Finland",
+            "France",
+            "Germany",
+            "Hungary",
+            "India",
+            "Ireland",
+            "Isle of Man",
+            "Italy",
+            "Japan",
+            "Mexico",
+            "Netherlands",
+            "New Zealand",
+            "Northern Ireland",
+            "Norway",
+            "Poland",
+            "Portugal",
+            "Scotland",
+            "Slovenia",
+            "South Africa",
+            "Spain",
+            "Sweden",
+            "Switzerland",
+            "Ukraine",
+            "United Kingdom",
+            "United States",
+            "Wales"
+        }
+    );
+}
+
+TEST_CASE("DateTimeTransformer - Countries") {
+    // CHECK needs a well-understood value to validate, and a DateTimeTransformer
+    // isn't one of those. Wrap the creation of the transformer in this method
+    // that returns a well-understood bool. This works because the object will
+    // either be created or it won't.
+    auto const                              creator(
+        [](std::string arg) {
+            NS::Featurizers::DateTimeTransformer(std::move(arg));
+            return true;
+        }
+    );
+
+    CHECK(creator(""));
+    CHECK(creator("United States"));
+    CHECK(creator("United States.json"));
+    CHECK(creator("united states"));
+    CHECK(creator("unitedstates"));
+    CHECK_THROWS(creator("This is not a valid country name"));
 }
 
 TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {
@@ -60,8 +135,7 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {
 }
 
 TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeTransformer][DateTimeTransformer]") {
-    nonstd::optional<std::string> cn;
-    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::DateTimeTransformer dt("");
     NS::Featurizers::TimePoint tp = dt.execute(217081625);
     CHECK(tp.year == 1976);
     CHECK(tp.month == NS::Featurizers::TimePoint::NOVEMBER);
@@ -78,8 +152,7 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeTransformer][DateTimeTransfo
 }
 
 TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]") {
-    nonstd::optional<std::string> cn;
-    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::DateTimeTransformer dt("");
     NS::Featurizers::TimePoint tp = dt.execute(1751241600);
     CHECK(tp.year == 2025);
     CHECK(tp.month == NS::Featurizers::TimePoint::JUNE);
@@ -105,43 +178,37 @@ TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]")
 }
 
 TEST_CASE("Holidays - No CountryName input - No Holiday date", "[DateTimeTransformer][DateTimeTransformer]") {
-    nonstd::optional<std::string> cn;
-    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::DateTimeTransformer dt("");
     NS::Featurizers::TimePoint tp = dt.execute(157161600);
     CHECK(tp.holidayName == "");
 }
 
 TEST_CASE("Holidays - Canada - Christmas Day", "[DateTimeTransformer][DateTimeTransformer]") {
-    nonstd::optional<std::string> cn = "Canada";
-    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::DateTimeTransformer dt("Canada");
     NS::Featurizers::TimePoint tp = dt.execute(157161600);
     CHECK(tp.holidayName == "Christmas Day");
 }
 
 TEST_CASE("Holidays - Canada - Christmas Day ++", "[DateTimeTransformer][DateTimeTransformer]") {
-    nonstd::optional<std::string> cn = "Canada";
-    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::DateTimeTransformer dt("Canada");
     NS::Featurizers::TimePoint tp = dt.execute(157161650);
     CHECK(tp.holidayName == "Christmas Day");
 }
 
 TEST_CASE("Holidays - Canada - 1 day before Christmas Day", "[DateTimeTransformer][DateTimeTransformer]") {
-    nonstd::optional<std::string> cn = "Canada";
-    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::DateTimeTransformer dt("Canada");
     NS::Featurizers::TimePoint tp = dt.execute(157161599);
     CHECK(tp.holidayName == "1 day before Christmas Day");
 }
 
 TEST_CASE("Holidays - Finland - 1 day before Juhannusaatto", "[DateTimeTransformer][DateTimeTransformer]") {
-    nonstd::optional<std::string> cn = "Finland";
-    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::DateTimeTransformer dt("Finland");
     NS::Featurizers::TimePoint tp = dt.execute(1088035200);
     CHECK(tp.holidayName == "1 day before Juhannusaatto");
 }
 
 TEST_CASE("Holidays - Finland - No Holiday date", "[DateTimeTransformer][DateTimeTransformer]") {
-    nonstd::optional<std::string> cn = "Finland";
-    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::DateTimeTransformer dt("Finland");
     NS::Featurizers::TimePoint tp = dt.execute(227813600);
     CHECK(tp.holidayName == "");
 }
@@ -151,8 +218,7 @@ TEST_CASE("Holidays - Finland - No Holiday date", "[DateTimeTransformer][DateTim
 // which rolls over somewhere around 2260. Still a couple hundred years!
 TEST_CASE("Far Future - 2998 March 2, 14:03:02", "[DateTimeTransformer][DateTimeTransformer]") {
 
-    nonstd::optional<std::string> cn;
-    NS::Featurizers::DateTimeTransformer dt(cn);
+    NS::Featurizers::DateTimeTransformer dt("");
     NS::Featurizers::TimePoint tp = dt.execute(32445842582);
     CHECK(tp.year == 2998);
     CHECK(tp.month == NS::Featurizers::TimePoint::MARCH);
@@ -173,7 +239,7 @@ TEST_CASE("Pre-Epoch - 1776 July 4", "[DateTimeTransformer][DateTimeTransformer]
 {
 
     // Constructor
-    NS::Featurizers::DateTimeTransformer dt;
+    NS::Featurizers::DateTimeTransformer dt("");
     NS::Featurizers::TimePoint tp = dt.execute(-6106060800);
     CHECK(tp.year == 1776);
     CHECK(tp.month == NS::Featurizers::TimePoint::JULY);

@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <stdio.h> 
+#include <stdio.h>
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
@@ -112,15 +112,13 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = Components::InferenceOnlyTransformerImpl<std::int64_t, TimePoint>;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    //DateTimeTransformer(void) = default;
-
-    DateTimeTransformer(nonstd::optional<std::string> const &countryName = nonstd::optional<std::string>());
-
+    DateTimeTransformer(std::string optionalCountryName);
     DateTimeTransformer(Archive &ar);
 
     ~DateTimeTransformer(void) override = default;
@@ -140,6 +138,7 @@ private:
     using JsonStream                        = nlohmann::json;
 
     using HolidayMap                        = std::unordered_map<InputType, std::string>;
+
     // ----------------------------------------------------------------------
     // |
     // |  Private Primitives
@@ -147,27 +146,59 @@ private:
     // ----------------------------------------------------------------------
     std::string const                         _countryName;
 
-    HolidayMap                                _dateHolidayMap;    
+    HolidayMap                                _dateHolidayMap;
 };
 
-class DateTimeEstimator : public Components::InferenceOnlyEstimatorImpl<DateTimeTransformer> {
+class DateTimeEstimator :
+    public TransformerEstimator<
+        typename DateTimeTransformer::InputType,
+        typename DateTimeTransformer::TransformedType
+    > {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = Components::InferenceOnlyEstimatorImpl<DateTimeTransformer>;
+    using BaseType = TransformerEstimator<
+        typename DateTimeTransformer::InputType,
+        typename DateTimeTransformer::TransformedType
+    >;
+
+    using TransformerType                   = DateTimeTransformer;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Data
+    // |
+    // ----------------------------------------------------------------------
+    nonstd::optional<std::string> const     Country;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    DateTimeEstimator(AnnotationMapsPtr pAllColumnAnnotations);
+    static bool IsValidCountry(std::string const &value);
+    static std::vector<std::string> GetSupportedCountries(void);
+
+    DateTimeEstimator(nonstd::optional<std::string> const &optionalCountryName, AnnotationMapsPtr pAllColumnAnnotations);
     ~DateTimeEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DateTimeEstimator);
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    // Note that the following training methods aren't used, but need to be overridden as
+    // the base implementations are abstract. The noop definitions are below.
+    Estimator::FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer) override;
+    Estimator::FitResult complete_training_impl(void) override;
+
+    typename BaseType::TransformerUniquePtr create_transformer_impl(void) override;
 };
 
 } // namespace Featurizers

@@ -98,7 +98,7 @@ private:
     Estimator::FitResult complete_training_impl(void) override;
 
     // MSVC has problems when the definition for the func is separated from its declaration.
-    inline typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
+    typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
         return std::make_unique<TransformerT>();
     }
 };
