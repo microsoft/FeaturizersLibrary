@@ -12,6 +12,7 @@ stages:
           operating_system: Windows
           configuration: x64
           enable_code_coverage: True
+          esrp_connected_service_name: "ESRP CodeSigning Connection"
 
     - template: BuildAndTest.stage_template.yaml
       parameters:
@@ -19,6 +20,7 @@ stages:
           operating_system: Windows
           configuration: x64_MSVC
           enable_code_coverage: False
+          # Note that this build doesn't produce "official" binaries and is here for a santity check only. Therefore, no code signing.
 
     - template: BuildAndTest.stage_template.yaml
       parameters:
@@ -26,6 +28,7 @@ stages:
           operating_system: Linux
           configuration: x64
           enable_code_coverage: False
+          esrp_connected_service_name: "ESRP CodeSigning Connection"
 
     # TODO: Add a build based on custom image
     # - template: BuildAndTest.stage_template.yaml
@@ -51,6 +54,8 @@ stages:
           agent_pool: windows-2019
           operating_system: "Windows"
           configuration: "system_compiler"
+          esrp_connected_service_name: "ESRP CodeSigning Connection"
+
           dependencies:
               - BuildAndTest_Windows_x64_Stage
               - BuildAndTest_Windows_x64_MSVC_Stage
