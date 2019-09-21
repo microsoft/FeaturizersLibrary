@@ -35,6 +35,7 @@ FEATURIZER_LIBRARY_API_PACK_SUFFIX
 enum ImputationStrategyValue {
     Forward = 1,
     Backward,
+    Median,
     Interpolate
 };
 

@@ -833,8 +833,14 @@ private:
     }
 };
 
+namespace {
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         CommonDurationTraits
+///  \brief         Traits that are common to all duration types
+///
 template <typename RepT, typename PeriodT>
-struct Traits<std::chrono::duration<RepT, PeriodT>> : public TraitsImpl<std::chrono::duration<RepT, PeriodT>> {
+struct CommonDurationTraits : public TraitsImpl<std::chrono::duration<RepT, PeriodT>> {
     static std::string ToString(std::chrono::duration<RepT, PeriodT> const &duration) {
         std::ostringstream                  out;
 
@@ -858,6 +864,43 @@ struct Traits<std::chrono::duration<RepT, PeriodT>> : public TraitsImpl<std::chr
     template <typename ArchiveT>
     static std::chrono::duration<RepT, PeriodT> deserialize(ArchiveT &ar) {
         return std::chrono::duration<RepT, PeriodT>(Traits<RepT>::deserialize(ar));
+    }
+};
+
+} // anonymous namespace
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         Traits
+///  \brief         Traits specific to any old duration (not clock-specific)
+///
+template <typename RepT, typename PeriodT>
+struct Traits<std::chrono::duration<RepT, PeriodT>> : public CommonDurationTraits<RepT, PeriodT> {};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         Traits
+///  \brief         These traits are specific to the system clock, which may be
+///                 different on different systems. This class contains functionality
+///                 that might be impacted by these differences.
+///
+template <>
+struct Traits<std::chrono::system_clock::duration> : public CommonDurationTraits<std::chrono::system_clock::rep, std::chrono::system_clock::period> {
+    // "std::chrono::system_clock::duration" is a specialization of std::chrono::system_clock::duration
+    // However it specializes differently on Windows(std::chrono::duration<int64_t, std::ratio<1,10000000>>)
+    // and Linux(std::chrono::duration<int64_t, std::ratio<1,1000000000>>). So for serDe, we cast input to a
+    // fixed specialization(SystemClockSerDeDurationType).
+    using SystemClockDurationRepType = decltype(std::chrono::system_clock::duration())::rep;
+    using SystemClockDurationPeriodType = decltype(std::chrono::system_clock::duration())::period;
+    using SystemClockSerDeDurationType = std::chrono::duration<int64_t, std::ratio<1,1000>>;
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::chrono::system_clock::duration const &duration) {
+        Traits<SystemClockSerDeDurationType>::serialize(ar,std::chrono::duration_cast<SystemClockSerDeDurationType>(duration));
+        return ar;
+    }
+
+    template <typename ArchiveT>
+    static std::chrono::system_clock::duration deserialize(ArchiveT &ar) {
+        return std::chrono::duration_cast<std::chrono::system_clock::duration>(Traits<SystemClockSerDeDurationType>::deserialize(ar));
     }
 };
 

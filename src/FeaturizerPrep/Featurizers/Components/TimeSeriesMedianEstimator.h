@@ -15,55 +15,55 @@ namespace Featurizers {
 namespace Components {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         TimeSeriesFrequencyAnnotation
-///  \brief         This is an annotation class which holds the frequency
-///                 of TimeSeries
+///  \class         TimeSeriesMedianAnnotation
+///  \brief         This is an annotation class which holds the Median
+///                 per grain for TimeSeries
 ///
-class TimeSeriesFrequencyAnnotation : public Annotation {
+class TimeSeriesMedianAnnotation : public Annotation {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using FrequencyType                     = std::chrono::system_clock::duration;
+    using KeyType                           = std::vector<std::string>;
+    using ValueType                         = std::vector<double_t>;
+    using MedianMapType                     = std::map<KeyType,ValueType>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
     // |
     // ----------------------------------------------------------------------
-    FrequencyType                           Value;
+    MedianMapType const                     Value;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    TimeSeriesFrequencyAnnotation(FrequencyType value);
-    ~TimeSeriesFrequencyAnnotation(void) override = default;
+    TimeSeriesMedianAnnotation(std::map<KeyType,ValueType> value);
+    ~TimeSeriesMedianAnnotation(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TimeSeriesFrequencyAnnotation);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TimeSeriesMedianAnnotation);
 };
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         TimeSeriesFrequencyEstimator
-///  \brief         This class computes the frequency of timeseries by keeping
-///                 track of minimum difference(frequency) observed between two
-///                 timepoints for a given grain. Note that frequency is same for
-///                 complete dataset.
+///  \class         TimeSeriesMedianEstimator
+///  \brief         This class computes the median per grain.
+///                 .
 ///
-class TimeSeriesFrequencyEstimator : public AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, std::vector<nonstd::optional<std::string>>> const &> {
+class TimeSeriesMedianEstimator : public AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, std::vector<nonstd::optional<std::string>>> const &> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    TimeSeriesFrequencyEstimator(AnnotationMapsPtr pAllColumnAnnotations);
-    ~TimeSeriesFrequencyEstimator(void) override = default;
+    TimeSeriesMedianEstimator(AnnotationMapsPtr pAllColumnAnnotations);
+    ~TimeSeriesMedianEstimator(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TimeSeriesFrequencyEstimator);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TimeSeriesMedianEstimator);
 
 private:
     // ----------------------------------------------------------------------
@@ -74,18 +74,19 @@ private:
     using KeyType                           = std::vector<std::string>;
     using ColsToImputeType                  = std::vector<nonstd::optional<std::string>>;
     using BaseType                          = AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType> const &>;
-    using FrequencyType                     = std::chrono::system_clock::duration;
-    using TimePointType                     = std::chrono::system_clock::time_point;
-    using MapType                           = std::map<KeyType, TimePointType>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    MapType                                 _grainTimePointTracker;
-    FrequencyType                           _minFrequency;
-
+    // _aggregateTracker is used to track sum in fit, while countTracker tracks count.
+    // However, in complete_training_impl, we divide values(sum) in _aggregateTracker
+    // by corresponding counts and after that it tracks median.
+    // Annotation is created using _aggregateTracker.
+    std::map<KeyType,std::vector<double_t>>  _aggregateTracker;
+    std::map<KeyType,std::vector<int64_t>>   _countTracker;
+    
     // ----------------------------------------------------------------------
     // |
     // |  Private Methods
@@ -110,54 +111,58 @@ private:
 
 // ----------------------------------------------------------------------
 // |
-// |  TimeSeriesFrequencyAnnotation
+// |  TimeSeriesMedianAnnotation
 // |
 // ----------------------------------------------------------------------
-TimeSeriesFrequencyAnnotation::TimeSeriesFrequencyAnnotation(TimeSeriesFrequencyAnnotation::FrequencyType value) :
+TimeSeriesMedianAnnotation::TimeSeriesMedianAnnotation(TimeSeriesMedianAnnotation::MedianMapType value) :
     Annotation(this),
     Value(std::move(value)) {
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  TimeSeriesFrequencyEstimator
+// |  TimeSeriesMedianEstimator
 // |
 // ----------------------------------------------------------------------
-TimeSeriesFrequencyEstimator::TimeSeriesFrequencyEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType> const &>("TimeSeriesFrequencyEstimator", std::move(pAllColumnAnnotations))
-    ,_minFrequency(std::chrono::system_clock::duration::max().count()){
+TimeSeriesMedianEstimator::TimeSeriesMedianEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+    AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType> const &>("TimeSeriesMedianEstimator", std::move(pAllColumnAnnotations))
+    {
 }
 
-Estimator::FitResult TimeSeriesFrequencyEstimator::fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) {
+Estimator::FitResult TimeSeriesMedianEstimator::fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) {
     typename BaseType::FitBufferInputType const * const                 pEndBuffer(pBuffer + cBuffer);
     while(pBuffer != pEndBuffer) {
         std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType> const &        input(*pBuffer++);
-        TimePointType const &                                           timeValue (std::get<0>(input));
-        KeyType const &                                                 keyValues (std::get<1>(input)); 
-        typename MapType::iterator const                                iter(_grainTimePointTracker.find(keyValues));
+        KeyType const &                                                 key (std::get<1>(input));
+        ColsToImputeType const &                                        colValues (std::get<2>(input));
 
-        if(iter == _grainTimePointTracker.end())
-            _grainTimePointTracker.insert(std::make_pair(keyValues, timeValue));
-        else
-        {
-            TimePointType const &                                       lastObservedTimeValue(iter->second);
-            if(lastObservedTimeValue >= timeValue)
-                throw std::runtime_error("Input stream not in chronological order.");
+        if(_aggregateTracker.find(key) == _aggregateTracker.end()) {
+            _aggregateTracker.insert(std::make_pair(key, std::vector<double_t>(colValues.size(), 0.0)));
+            _countTracker.insert(std::make_pair(key, std::vector<int64_t>(colValues.size(), 0)));
+        }
 
-            FrequencyType                                               currentFrequency(timeValue-lastObservedTimeValue);
-            if(currentFrequency <= _minFrequency)
-                _minFrequency = currentFrequency;
-				
-            iter->second = timeValue;
+        for(std::size_t i=0; i< colValues.size(); ++i) {
+            _aggregateTracker[key][i] += Traits<std::string>::IsNull(colValues[i]) ? 0.0 : Traits<std::double_t>::FromString(colValues[i].value());
+            _countTracker[key][i] += Traits<std::string>::IsNull(colValues[i]) ? 0 : 1;
         }
     }
 
     return Estimator::FitResult::Continue;
 }
 
-Estimator::FitResult TimeSeriesFrequencyEstimator::complete_training_impl(void) {
+Estimator::FitResult TimeSeriesMedianEstimator::complete_training_impl(void) {
+    for(auto & kvp: _aggregateTracker) {
+        KeyType const & key = kvp.first;
+        for(std::size_t i=0; i< kvp.second.size(); ++i) {
+            auto count = _countTracker[key][i];
+            if(count == 0)
+                throw std::runtime_error("No valid value found for median computation.");
+            kvp.second[i] /= count;
+        }
+    }
+    _countTracker.clear();
 
-    BaseType::add_annotation(std::make_shared<TimeSeriesFrequencyAnnotation>(std::move(_minFrequency)), 0);
+    BaseType::add_annotation(std::make_shared<TimeSeriesMedianAnnotation>(std::move(_aggregateTracker)), 0);
     return Estimator::FitResult::Complete;
 }
 

@@ -37,12 +37,14 @@ TEST_CASE("End-to-end") {
     CHECK(estimatorHandle != nullptr);
     CHECK(pErrorInfo == nullptr);
 
+    system_clock::time_point                originalTimePoint(system_clock::from_time_t(time_t(217081624)));
+
     // Fit
-    NS::Archive::ByteArray const            bytes(
-        [](void) {
+    NS::Archive::ByteArray const            bytes1(
+        [&originalTimePoint](void) {
             NS::Archive                         archive;
 
-            NS::Traits<system_clock::time_point>::serialize(archive, system_clock::from_time_t(time_t(217081624)));
+            NS::Traits<system_clock::time_point>::serialize(archive, originalTimePoint);
             NS::Traits<std::string>::serialize(archive, "Hello");
             NS::Traits<std::string>::serialize(archive, "World");
             NS::Traits<typename NS::Traits<std::int32_t>::nullable_type>::serialize(archive, 18);
@@ -53,28 +55,62 @@ TEST_CASE("End-to-end") {
         }()
     );
 
-    BinaryArchiveData                       data;
+    BinaryArchiveData                       bad1;
 
-    data.pBuffer = bytes.data();
-    data.cBuffer = bytes.size();
+    bad1.pBuffer = bytes1.data();
+    bad1.cBuffer = bytes1.size();
 
-    FitResult                               fitResult;
+    NS::Archive::ByteArray const            bytes2(
+        [&originalTimePoint](void) {
+            NS::Archive                         archive;
 
-    CHECK(
-        TimeSeriesImputerFeaturizer_BinaryArchive_Fit(
-            estimatorHandle,
-            data,
-            &fitResult,
-            &pErrorInfo
-        )
+            NS::Traits<system_clock::time_point>::serialize(archive, originalTimePoint + std::chrono::seconds(2));
+            NS::Traits<std::string>::serialize(archive, "Hello");
+            NS::Traits<std::string>::serialize(archive, "World");
+            NS::Traits<typename NS::Traits<std::int32_t>::nullable_type>::serialize(archive, 18);
+            NS::Traits<typename NS::Traits<std::float_t>::nullable_type>::serialize(archive, 2.0f);
+            NS::Traits<typename NS::Traits<std::uint32_t>::nullable_type>::serialize(archive, static_cast<std::uint32_t>(123456));
+
+            return archive.commit();
+        }()
     );
-    CHECK(fitResult == Continue);
-    CHECK(pErrorInfo == nullptr);
+
+    BinaryArchiveData                       bad2;
+
+    bad2.pBuffer = bytes2.data();
+    bad2.cBuffer = bytes2.size();
 
     // Complete training
-    CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_CompleteTraining(estimatorHandle, &fitResult, &pErrorInfo));
-    CHECK(fitResult == Complete);
-    CHECK(pErrorInfo == nullptr);
+    while(true) {
+        FitResult                               fitResult;
+
+        CHECK(
+            TimeSeriesImputerFeaturizer_BinaryArchive_Fit(
+                estimatorHandle,
+                bad1,
+                &fitResult,
+                &pErrorInfo
+            )
+        );
+        CHECK(fitResult == Continue);
+        CHECK(pErrorInfo == nullptr);
+
+        CHECK(
+            TimeSeriesImputerFeaturizer_BinaryArchive_Fit(
+                estimatorHandle,
+                bad2,
+                &fitResult,
+                &pErrorInfo
+            )
+        );
+        CHECK(fitResult == Continue);
+        CHECK(pErrorInfo == nullptr);
+
+        CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_CompleteTraining(estimatorHandle, &fitResult, &pErrorInfo));
+        CHECK(pErrorInfo == nullptr);
+        if(fitResult == Complete)
+            break;
+    }
 
     // Create Transformer
     TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle *           transformerHandle(nullptr);
@@ -94,7 +130,7 @@ TEST_CASE("End-to-end") {
     CHECK(
         TimeSeriesImputerFeaturizer_BinaryArchive_Transform(
             transformerHandle,
-            data,
+            bad1,
             &pTransformResults,
             &cNumResults,
             &pErrorInfo
@@ -124,6 +160,7 @@ TEST_CASE("End-to-end") {
 #endif
 
         CHECK(rowAdded == false);
+        CHECK(timePoint == originalTimePoint);
         CHECK(key1 == "Hello");
         CHECK(key2 == "World");
         REQUIRE(NS::Traits<decltype(data1)>::IsNull(data1) == false);
@@ -133,7 +170,6 @@ TEST_CASE("End-to-end") {
         REQUIRE(NS::Traits<decltype(data3)>::IsNull(data3) == false);
         CHECK(NS::Traits<decltype(data3)>::GetNullableValue(data3) == 123456);
 
-        std::ignore = timePoint; // BugBug
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
@@ -141,6 +177,19 @@ TEST_CASE("End-to-end") {
     }
 
     // Destroy the data
+    CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_DestroyTransformedData(pTransformResults, cNumResults, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
+
+    // Flush
+    pTransformResults = nullptr;
+    cNumResults = 0;
+
+    CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_Flush(transformerHandle, &pTransformResults, &cNumResults, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
+    CHECK(pTransformResults == nullptr);
+    CHECK(cNumResults == 0);
+
+    // Destroy the flush results (even though they are empty)
     CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_DestroyTransformedData(pTransformResults, cNumResults, &pErrorInfo));
     CHECK(pErrorInfo == nullptr);
 
