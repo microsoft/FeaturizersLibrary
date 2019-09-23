@@ -575,9 +575,15 @@ Serializer::TypeIds DeserializeTypeIds(Microsoft::Featurizer::Archive &ar) {
 
 Serializer::Serializer(Microsoft::Featurizer::Archive &ar) :
     Serializer(
-        DeserializeTypeIds(ar),
-        DeserializeTypeIds(ar),
-        PrivateConstructorTag()
+        [&ar](void) {
+            // We need to deserialize these ids in a very specific order, which means that we can't
+            // invoke DeserializeTypeIds inline as the order of invocation is not well-defined for
+            // parameter values.
+            TypeIds                         keyIds(DeserializeTypeIds(ar));
+            TypeIds                         dataIds(DeserializeTypeIds(ar));
+
+            return Serializer(std::move(keyIds), std::move(dataIds), PrivateConstructorTag());
+        }()
     ) {
 }
 

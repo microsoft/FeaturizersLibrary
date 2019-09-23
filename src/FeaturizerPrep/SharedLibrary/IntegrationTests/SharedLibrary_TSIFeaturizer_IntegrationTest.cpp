@@ -193,7 +193,85 @@ TEST_CASE("End-to-end") {
     CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_DestroyTransformedData(pTransformResults, cNumResults, &pErrorInfo));
     CHECK(pErrorInfo == nullptr);
 
+    // Create serialized data
+    unsigned char const *                   pSavedData(nullptr);
+    size_t                                  cSavedData(0);
+
+    CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_CreateTransformerSaveData(transformerHandle, &pSavedData, &cSavedData, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
+    CHECK(pSavedData != nullptr);
+    CHECK(cSavedData != 0);
+
     // Destroy the transformer
     CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_DestroyTransformer(transformerHandle, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
+
+    // Create a transformer based on the serialize data
+    TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle *           otherTransformerHandle(nullptr);
+
+    CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_CreateTransformerFromSavedData(pSavedData, cSavedData, &otherTransformerHandle, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
+    CHECK(otherTransformerHandle != nullptr);
+
+    // Destroy the serialized data
+    CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_DestroyTransformerSaveData(pSavedData, cSavedData, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
+
+    CHECK(
+        TimeSeriesImputerFeaturizer_BinaryArchive_Transform(
+            otherTransformerHandle,
+            bad1,
+            &pTransformResults,
+            &cNumResults,
+            &pErrorInfo
+        )
+    );
+
+    CHECK(pErrorInfo == nullptr);
+    REQUIRE(pTransformResults != nullptr);
+    REQUIRE(cNumResults != 0);
+
+    // Deserialize the data
+    REQUIRE(cNumResults == 1);
+
+    {
+        NS::Archive                         archive(pTransformResults->pBuffer, pTransformResults->cBuffer);
+
+        bool const                                                          rowAdded(NS::Traits<bool>::deserialize(archive));
+        system_clock::time_point const                                      timePoint(NS::Traits<system_clock::time_point>::deserialize(archive));
+        std::string const                                                   key1(NS::Traits<std::string>::deserialize(archive));
+        std::string const                                                   key2(NS::Traits<std::string>::deserialize(archive));
+        typename NS::Traits<int32_t>::nullable_type const                   data1(NS::Traits<typename NS::Traits<int32_t>::nullable_type>::deserialize(archive));
+        typename NS::Traits<float_t>::nullable_type const                   data2(NS::Traits<typename NS::Traits<float_t>::nullable_type>::deserialize(archive));
+        typename NS::Traits<uint32_t>::nullable_type const                  data3(NS::Traits<typename NS::Traits<uint32_t>::nullable_type>::deserialize(archive));
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
+
+        CHECK(rowAdded == false);
+        CHECK(timePoint == originalTimePoint);
+        CHECK(key1 == "Hello");
+        CHECK(key2 == "World");
+        REQUIRE(NS::Traits<decltype(data1)>::IsNull(data1) == false);
+        CHECK(NS::Traits<decltype(data1)>::GetNullableValue(data1) == 18);
+        REQUIRE(NS::Traits<decltype(data2)>::IsNull(data2) == false);
+        CHECK(NS::Traits<decltype(data2)>::GetNullableValue(data2) == 2.0f);
+        REQUIRE(NS::Traits<decltype(data3)>::IsNull(data3) == false);
+        CHECK(NS::Traits<decltype(data3)>::GetNullableValue(data3) == 123456);
+
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+    }
+
+    // Destroy the data
+    CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_DestroyTransformedData(pTransformResults, cNumResults, &pErrorInfo));
+    CHECK(pErrorInfo == nullptr);
+
+    // Destroy the transformer
+    CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_DestroyTransformer(otherTransformerHandle, &pErrorInfo));
     CHECK(pErrorInfo == nullptr);
 }
