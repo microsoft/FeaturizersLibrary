@@ -42,6 +42,7 @@ add_library(Featurizers SHARED
     ${_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.h
     ${_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.cpp
     ${_this_path}/../GeneratedCode/SharedLibrary_PointerTable.h
+    ${_this_path}/../GeneratedCode/SharedLibrary_PointerTable.cpp
     ${_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.h
     ${_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.cpp
 

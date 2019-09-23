@@ -307,12 +307,27 @@ def _GenerateCommonFiles(output_dir, output_stream):
 
                 #include "../PointerTable.h"
 
+                extern Microsoft::Featurizer::PointerTable g_pointerTable;
+                """,
+            ),
+        )
+
+    with open(os.path.join(output_dir, "SharedLibrary_PointerTable.cpp"), "w") as f:
+        f.write(
+            textwrap.dedent(
+                """\
+                /* ---------------------------------------------------------------------- */
+                /* Copyright (c) Microsoft Corporation. All rights reserved.              */
+                /* Licensed under the MIT License                                         */
+                /* ---------------------------------------------------------------------- */
+                #include "SharedLibrary_PointerTable.h"
+
                 #if (defined __clang__)
                 #   pragma clang diagnostic push
                 #   pragma clang diagnostic ignored "-Wexit-time-destructors"
                 #endif
 
-                static Microsoft::Featurizer::PointerTable sg_pointerTable;
+                Microsoft::Featurizer::PointerTable g_pointerTable;
 
                 #if (defined __clang__)
                 #   pragma clang diagnostic pop
@@ -343,7 +358,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
                     if(pHandle == nullptr || output_ptr == nullptr || output_items == nullptr)
                         return false;
 
-                    std::string const & str(*sg_pointerTable.Get<std::string>(reinterpret_cast<size_t>(pHandle)));
+                    std::string const & str(*g_pointerTable.Get<std::string>(reinterpret_cast<size_t>(pHandle)));
 
                     char * string_buffer(new char[str.size() + 1]);
 
@@ -371,9 +386,9 @@ def _GenerateCommonFiles(output_dir, output_stream):
 
                     size_t index = reinterpret_cast<size_t>(pHandle);
 
-                    std::string & str(*sg_pointerTable.Get<std::string>(index));
+                    std::string & str(*g_pointerTable.Get<std::string>(index));
 
-                    sg_pointerTable.Remove(index);
+                    g_pointerTable.Remove(index);
 
                     delete &str;
 
@@ -386,7 +401,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
                 ErrorInfoHandle * CreateErrorInfo(std::exception const &ex) {
                     std::unique_ptr<std::string> result(std::make_unique<std::string>(ex.what()));
 
-                    size_t index = sg_pointerTable.Add(result.release());
+                    size_t index = g_pointerTable.Add(result.release());
                     return reinterpret_cast<ErrorInfoHandle *>(index);
                 }
 
@@ -672,7 +687,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                         {method_prefix}
                             {validation}
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}* pEstimator = new Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}({args}std::make_shared<Microsoft::Featurizer::AnnotationMaps>({num_output_columns}));
-                            size_t index(sg_pointerTable.Add(pEstimator));
+                            size_t index(g_pointerTable.Add(pEstimator));
                             *ppHandle = reinterpret_cast<{name}{suffix}EstimatorHandle*>(index);
 
 
@@ -704,8 +719,8 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
                             size_t index = reinterpret_cast<size_t>(pHandle);
-                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} * pEstimator = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(index);
-                            sg_pointerTable.Remove(index);
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(index);
+                            g_pointerTable.Remove(index);
 
                             delete pEstimator;
                         {method_suffix}
@@ -724,7 +739,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
                             if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} const & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
 
 
                             *pIsTrainingComplete = estimator.is_training_complete();
@@ -753,7 +768,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
 
                             {validation}
 
-                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
 
 
                             {statement}
@@ -794,7 +809,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
 
                             {validation}
 
-                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
 
                             {statement}
                         {method_suffix}
@@ -826,7 +841,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
 
 
 
-                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
 
                             *pFitResult = static_cast<unsigned char>(estimator.complete_training());
                         {method_suffix}
@@ -847,12 +862,12 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
 
 
 
-                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pEstimatorHandle)));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType*>(estimator.create_transformer().release());
 
 
-                            size_t index = sg_pointerTable.Add(pTransformer);
+                            size_t index = g_pointerTable.Add(pTransformer);
                             *ppTransformerHandle = reinterpret_cast<{name}{suffix}TransformerHandle*>(index);
                         {method_suffix}
                     }}
@@ -875,7 +890,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(archive).release());
 
-                            size_t index = sg_pointerTable.Add(pTransformer);
+                            size_t index = g_pointerTable.Add(pTransformer);
                             *ppTransformerHandle = reinterpret_cast<{name}{suffix}TransformerHandle*>(index);
                         {method_suffix}
                     }}
@@ -893,8 +908,8 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
                             size_t index = reinterpret_cast<size_t>(pHandle);
-                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType* pTransformer = sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(index);
-                            sg_pointerTable.Remove(index);
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(index);
+                            g_pointerTable.Remove(index);
 
 
                             delete pTransformer;
@@ -915,7 +930,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
                             if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(reinterpret_cast<size_t>(pHandle)));
                             Microsoft::Featurizer::Archive archive;
 
                             transformer.save(archive);
@@ -972,7 +987,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             {input_validation}
                             {output_validation}
 
-                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType & transformer(*sg_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
                             // Input
                             {input_statement}

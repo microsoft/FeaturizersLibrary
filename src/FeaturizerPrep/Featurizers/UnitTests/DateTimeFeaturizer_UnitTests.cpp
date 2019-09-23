@@ -13,9 +13,9 @@ namespace NS = Microsoft::Featurizer;
 using SysClock = std::chrono::system_clock;
 
 TEST_CASE("DateTimeEstimator") {
-    CHECK(NS::Featurizers::DateTimeEstimator(nonstd::optional<std::string>(), NS::CreateTestAnnotationMapsPtr(2)).Name == "DateTimeEstimator");
-    CHECK(NS::Featurizers::DateTimeEstimator(nonstd::optional<std::string>(), NS::CreateTestAnnotationMapsPtr(2)).is_training_complete());
-    CHECK(dynamic_cast<NS::Featurizers::DateTimeTransformer *>(NS::Featurizers::DateTimeEstimator(nonstd::optional<std::string>(), NS::CreateTestAnnotationMapsPtr(2)).create_transformer().get()));
+    CHECK(NS::Featurizers::DateTimeEstimator(nonstd::optional<std::string>(), nonstd::optional<std::string>(), NS::CreateTestAnnotationMapsPtr(2)).Name == "DateTimeEstimator");
+    CHECK(NS::Featurizers::DateTimeEstimator(nonstd::optional<std::string>(), nonstd::optional<std::string>(), NS::CreateTestAnnotationMapsPtr(2)).is_training_complete());
+    CHECK(dynamic_cast<NS::Featurizers::DateTimeTransformer *>(NS::Featurizers::DateTimeEstimator(nonstd::optional<std::string>(), nonstd::optional<std::string>(), NS::CreateTestAnnotationMapsPtr(2)).create_transformer().get()));
 }
 
 TEST_CASE("DateTimeEstimator - IsValidCountry") {
@@ -25,6 +25,9 @@ TEST_CASE("DateTimeEstimator - IsValidCountry") {
     CHECK(NS::Featurizers::DateTimeEstimator::IsValidCountry("unitedstates"));
 
     CHECK(NS::Featurizers::DateTimeEstimator::IsValidCountry("This is not a valid country") == false);
+
+    // Invalid data root dir
+    CHECK_THROWS(NS::Featurizers::DateTimeEstimator::IsValidCountry("United States", "This is not a valid directory"));
 }
 
 TEST_CASE("DateTimeEstimator - GetSupportedCountries") {

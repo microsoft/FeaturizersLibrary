@@ -35,6 +35,11 @@
                 "type": "std::string",
                 "name": "optionalCountryName",
                 "is_optional": true
+            },
+            {
+                "type": "std::string",
+                "name": "optionalDataRootDir",
+                "is_optional": true
             }
         ],
         "custom_structs": [

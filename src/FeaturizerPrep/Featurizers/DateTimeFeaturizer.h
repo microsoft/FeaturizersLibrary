@@ -118,8 +118,12 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    DateTimeTransformer(std::string optionalCountryName);
+    DateTimeTransformer(std::string optionalCountryName, std::string optionalDataRootDir=std::string());
     DateTimeTransformer(Archive &ar);
+
+    // This constructor is necessary at the dataRootDir may be different between
+    // the machine that created the archive and this machine that is deserializing it.
+    DateTimeTransformer(Archive &ar, std::string dataRootDir);
 
     ~DateTimeTransformer(void) override = default;
 
@@ -173,16 +177,21 @@ public:
     // |
     // ----------------------------------------------------------------------
     nonstd::optional<std::string> const     Country;
+    nonstd::optional<std::string> const     DataRootDir;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    static bool IsValidCountry(std::string const &value);
-    static std::vector<std::string> GetSupportedCountries(void);
+    static bool IsValidCountry(std::string const &value, nonstd::optional<std::string> dataRootDir=nonstd::optional<std::string>());
+    static std::vector<std::string> GetSupportedCountries(nonstd::optional<std::string> dataRootDir=nonstd::optional<std::string>());
 
-    DateTimeEstimator(nonstd::optional<std::string> const &optionalCountryName, AnnotationMapsPtr pAllColumnAnnotations);
+    DateTimeEstimator(
+        nonstd::optional<std::string> const &optionalCountryName,
+        nonstd::optional<std::string> const &optionalDataRootDir,
+        AnnotationMapsPtr pAllColumnAnnotations
+    );
     ~DateTimeEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DateTimeEstimator);

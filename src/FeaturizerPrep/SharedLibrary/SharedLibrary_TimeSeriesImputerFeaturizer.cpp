@@ -187,7 +187,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateEsti
             )
         );
 
-        size_t                              index(sg_pointerTable.Add(pMemory.get()));
+        size_t                              index(g_pointerTable.Add(pMemory.get()));
 
         *ppHandle = reinterpret_cast<TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *>(index);
 
@@ -212,9 +212,9 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_DestroyEst
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t                              index(reinterpret_cast<size_t>(pHandle));
-        EstimatorMemory *                   pEstimatorMemory(sg_pointerTable.Get<EstimatorMemory>(index));
+        EstimatorMemory *                   pEstimatorMemory(g_pointerTable.Get<EstimatorMemory>(index));
 
-        sg_pointerTable.Remove(index);
+        g_pointerTable.Remove(index);
         delete pEstimatorMemory;
 
         return true;
@@ -235,7 +235,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_IsTraining
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        EstimatorMemory const &             memory(*sg_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
+        EstimatorMemory const &             memory(*g_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = memory.Estimator.is_training_complete();
 
@@ -259,7 +259,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_Fit(/*in*/
         if(data.cBuffer == 0) throw std::invalid_argument("'data' buffer size is 0");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        EstimatorMemory &                   memory(*sg_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
+        EstimatorMemory &                   memory(*g_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(memory.Estimator.fit(memory.Serializer.Deserialize(data.pBuffer, data.cBuffer)));
 
@@ -287,7 +287,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_FitBuffer(
         using InputTuples                   = std::vector<InputTuple>;
         // ----------------------------------------------------------------------
 
-        EstimatorMemory &                   memory(*sg_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
+        EstimatorMemory &                   memory(*g_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
 
         InputTuples                         input;
 
@@ -319,7 +319,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CompleteTr
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        EstimatorMemory &                   memory(*sg_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
+        EstimatorMemory &                   memory(*g_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(memory.Estimator.complete_training());
 
@@ -341,7 +341,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTran
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        EstimatorMemory &                   estimatorMemory(*sg_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        EstimatorMemory &                   estimatorMemory(*g_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pEstimatorHandle)));
         std::unique_ptr<TransformerMemory>  pTransformerMemory(
             std::make_unique<TransformerMemory>(
                 std::move(estimatorMemory.Serializer),
@@ -349,7 +349,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTran
             )
         );
 
-        size_t                              index(sg_pointerTable.Add(pTransformerMemory.get()));
+        size_t                              index(g_pointerTable.Add(pTransformerMemory.get()));
 
         *ppTransformerHandle = reinterpret_cast<TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle *>(index);
 
@@ -377,7 +377,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTran
 
         Microsoft::Featurizer::Archive      archive(pBuffer, cBufferSize);
         std::unique_ptr<TransformerMemory>  pTransformerMemory(std::make_unique<TransformerMemory>(archive));
-        size_t                              index(sg_pointerTable.Add(pTransformerMemory.get()));
+        size_t                              index(g_pointerTable.Add(pTransformerMemory.get()));
 
         *ppTransformerHandle = reinterpret_cast<TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle *>(index);
 
@@ -402,9 +402,9 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_DestroyTra
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t                              index(reinterpret_cast<size_t>(pHandle));
-        TransformerMemory *                 pTransformerMemory(sg_pointerTable.Get<TransformerMemory>(index));
+        TransformerMemory *                 pTransformerMemory(g_pointerTable.Get<TransformerMemory>(index));
 
-        sg_pointerTable.Remove(index);
+        g_pointerTable.Remove(index);
         delete pTransformerMemory;
 
         return true;
@@ -426,7 +426,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTran
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        TransformerMemory &                 memory(*sg_pointerTable.Get<TransformerMemory>(reinterpret_cast<size_t>(pHandle)));
+        TransformerMemory &                 memory(*g_pointerTable.Get<TransformerMemory>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive      archive;
 
         memory.save(archive);
@@ -481,7 +481,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_Transform(
         if(ppData == nullptr) throw std::invalid_argument("'ppData' is null");
         if(pNumDataElements == nullptr) throw std::invalid_argument("'pNumDataElements' is null");
 
-        TransformerMemory &                             memory(*sg_pointerTable.Get<TransformerMemory>(reinterpret_cast<size_t>(pHandle)));
+        TransformerMemory &                             memory(*g_pointerTable.Get<TransformerMemory>(reinterpret_cast<size_t>(pHandle)));
         TransformedTuples                               results(memory.Transformer->execute(memory.Serializer.Deserialize(data.pBuffer, data.cBuffer)));
 
         std::tie(*ppData, *pNumDataElements) = memory.Serializer.Serialize(results);
@@ -505,7 +505,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_Flush(/*in
         if(ppData == nullptr) throw std::invalid_argument("'ppData' is null");
         if(pNumDataElements == nullptr) throw std::invalid_argument("'pNumDataElements' is null");
 
-        TransformerMemory &                             memory(*sg_pointerTable.Get<TransformerMemory>(reinterpret_cast<size_t>(pHandle)));
+        TransformerMemory &                             memory(*g_pointerTable.Get<TransformerMemory>(reinterpret_cast<size_t>(pHandle)));
 
         // TODO assert(dynamic_cast<Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator::Transformer *>(memory.Transformer.get()));
         // TODO Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator::Transformer &   transformer(static_cast<Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator::Transformer &>(*memory.Transformer));

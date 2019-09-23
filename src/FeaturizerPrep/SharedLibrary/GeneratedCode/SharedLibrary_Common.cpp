@@ -16,7 +16,7 @@ FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, 
     if(pHandle == nullptr || output_ptr == nullptr || output_items == nullptr)
         return false;
 
-    std::string const & str(*sg_pointerTable.Get<std::string>(reinterpret_cast<size_t>(pHandle)));
+    std::string const & str(*g_pointerTable.Get<std::string>(reinterpret_cast<size_t>(pHandle)));
 
     char * string_buffer(new char[str.size() + 1]);
 
@@ -44,9 +44,9 @@ FEATURIZER_LIBRARY_API bool DestroyErrorInfo(/*in*/ ErrorInfoHandle *pHandle) {
 
     size_t index = reinterpret_cast<size_t>(pHandle);
 
-    std::string & str(*sg_pointerTable.Get<std::string>(index));
+    std::string & str(*g_pointerTable.Get<std::string>(index));
 
-    sg_pointerTable.Remove(index);
+    g_pointerTable.Remove(index);
 
     delete &str;
 
@@ -59,7 +59,7 @@ FEATURIZER_LIBRARY_API bool DestroyErrorInfo(/*in*/ ErrorInfoHandle *pHandle) {
 ErrorInfoHandle * CreateErrorInfo(std::exception const &ex) {
     std::unique_ptr<std::string> result(std::make_unique<std::string>(ex.what()));
 
-    size_t index = sg_pointerTable.Add(result.release());
+    size_t index = g_pointerTable.Add(result.release());
     return reinterpret_cast<ErrorInfoHandle *>(index);
 }
 

@@ -34,6 +34,7 @@ TEST_CASE("Standard") {
 
             return true;
         },
+        nullptr,
         nullptr
     );
 }
@@ -43,22 +44,22 @@ TEST_CASE("IsValidCountry") {
     bool                                    result;
 
     result = false;
-    CHECK(DateTimeFeaturizer_IsValidCountry("United States", &result, &pErrorInfo));
+    CHECK(DateTimeFeaturizer_IsValidCountry("United States", nullptr, &result, &pErrorInfo));
     CHECK(pErrorInfo == nullptr);
     CHECK(result);
 
     result = false;
-    CHECK(DateTimeFeaturizer_IsValidCountry("united states", &result, &pErrorInfo));
+    CHECK(DateTimeFeaturizer_IsValidCountry("united states", nullptr, &result, &pErrorInfo));
     CHECK(pErrorInfo == nullptr);
     CHECK(result);
 
     result = false;
-    CHECK(DateTimeFeaturizer_IsValidCountry("unitedstates", &result, &pErrorInfo));
+    CHECK(DateTimeFeaturizer_IsValidCountry("unitedstates", nullptr, &result, &pErrorInfo));
     CHECK(pErrorInfo == nullptr);
     CHECK(result);
 
     result = true;
-    CHECK(DateTimeFeaturizer_IsValidCountry("not a valid country", &result, &pErrorInfo));
+    CHECK(DateTimeFeaturizer_IsValidCountry("not a valid country", nullptr, &result, &pErrorInfo));
     CHECK(pErrorInfo == nullptr);
     CHECK(result == false);
 }
@@ -68,7 +69,7 @@ TEST_CASE("GetSupportedCountries") {
     StringBuffer *                          pStringBuffers(nullptr);
     size_t                                  numStringBuffers;
 
-    CHECK(DateTimeFeaturizer_GetSupportedCountries(&pStringBuffers, &numStringBuffers, &pErrorInfo));
+    CHECK(DateTimeFeaturizer_GetSupportedCountries(nullptr, &pStringBuffers, &numStringBuffers, &pErrorInfo));
     CHECK(pErrorInfo == nullptr);
     REQUIRE(pStringBuffers != nullptr);
     REQUIRE(numStringBuffers != 0);

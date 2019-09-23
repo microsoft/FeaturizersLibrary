@@ -9,6 +9,8 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_DateTimeFeaturizerCustom.h"
+#include "SharedLibrary_PointerTable.h"
+
 #include "DateTimeFeaturizer.h"
 
 // These method(s) are defined in SharedLibrary_Common.cpp
@@ -16,17 +18,25 @@ ErrorInfoHandle * CreateErrorInfo(std::exception const &ex);
 
 extern "C" {
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_IsValidCountry(/*in*/ char const *countryName, /*out*/ bool *isValid, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerFromSavedDataWithDataRoot(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*in*/ char const *dataRootDir, /*out*/ DateTimeFeaturizer_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(countryName == nullptr) throw std::invalid_argument("'countryName' is null");
-        if(isValid == nullptr) throw std::invalid_argument("'isValid' is null");
+        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
+        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
+        if(dataRootDir == nullptr) throw std::invalid_argument("'dataRootDir' is null");
 
-        *isValid = Microsoft::Featurizer::Featurizers::DateTimeEstimator::IsValidCountry(countryName);
+        if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
+
+        Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
+
+        Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType>(archive, std::string(dataRootDir)).release());
+
+        size_t index = g_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<DateTimeFeaturizer_TransformerHandle*>(index);
 
         return true;
     }
@@ -36,7 +46,27 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_IsValidCountry(/*in*/ char const 
     }
 }
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_GetSupportedCountries(/*out*/ StringBuffer ** ppStringBuffers, /*out*/ std::size_t * pNumStringBuffers, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_IsValidCountry(/*in*/ char const *countryName, /*in*/ char const *optionalDataRootDir, /*out*/ bool *isValid, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(countryName == nullptr) throw std::invalid_argument("'countryName' is null");
+        if(isValid == nullptr) throw std::invalid_argument("'isValid' is null");
+
+        *isValid = Microsoft::Featurizer::Featurizers::DateTimeEstimator::IsValidCountry(countryName, optionalDataRootDir ? std::string(optionalDataRootDir) : nonstd::optional<std::string>());
+
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_GetSupportedCountries(/*in*/ char const *optionalDataRootDir, /*out*/ StringBuffer ** ppStringBuffers, /*out*/ std::size_t * pNumStringBuffers, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -46,7 +76,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_GetSupportedCountries(/*out*/ Str
         if(ppStringBuffers == nullptr) throw std::invalid_argument("'ppStringBuffers' is null");
         if(pNumStringBuffers == nullptr) throw std::invalid_argument("'pNumStringBuffers' is null");
 
-        std::vector<std::string> const      countries(Microsoft::Featurizer::Featurizers::DateTimeEstimator::GetSupportedCountries());
+        std::vector<std::string> const      countries(Microsoft::Featurizer::Featurizers::DateTimeEstimator::GetSupportedCountries(optionalDataRootDir ? std::string(optionalDataRootDir) : nonstd::optional<std::string>()));
 
         if(countries.empty()) {
             *ppStringBuffers = nullptr;

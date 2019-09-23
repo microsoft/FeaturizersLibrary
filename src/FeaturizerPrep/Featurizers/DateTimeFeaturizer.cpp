@@ -111,15 +111,36 @@ namespace {
         return result;
     }
 
-    std::string GetDataDirectory(void) {
-        std::string const                   binaryPath(GetBinaryPath());
+    std::string GetDataDirectory(std::string optionalDataRootDir) {
+        std::string const                   binaryPath(
+            [&optionalDataRootDir](void) {
+                if(optionalDataRootDir.empty() == false) {
+                    if(*optionalDataRootDir.rbegin() == '\\')
+                        optionalDataRootDir.resize(optionalDataRootDir.size() - 1);
 
-        return binaryPath.substr(0, binaryPath.find_last_of("\\")) + "\\Data\\DateTimeFeaturizer\\";
+                    unsigned long const     attributes(GetFileAttributes(optionalDataRootDir.c_str()));
+
+                    if(attributes == INVALID_FILE_ATTRIBUTES || (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+                        throw std::invalid_argument("Invalid 'dataRootDir'");
+
+                    return optionalDataRootDir;
+                }
+
+                std::string                 result(GetBinaryPath());
+
+                return result.substr(0, result.find_last_of("\\"));
+            }()
+        );
+
+        return binaryPath + "\\Data\\DateTimeFeaturizer\\";
     }
 
-    bool EnumCountries(std::function<bool (std::string)> const &callback) {
+    bool EnumCountries(
+        std::function<bool (std::string)> const &callback,
+        std::string const &optionalDataRootDir
+    ) {
         // Note that this code is not exception safe!
-        std::string                         dataDir(GetDataDirectory() + "*");
+        std::string                         dataDir(GetDataDirectory(optionalDataRootDir) + "*");
         WIN32_FIND_DATA                     data;
         HANDLE                              handle;
         bool                                result(true);
@@ -158,16 +179,39 @@ namespace {
         return result;
     }
 
-    std::string GetDataDirectory(void) {
-        std::string const                   binaryPath(GetBinaryPath());
+    std::string GetDataDirectory(std::string optionalDataRootDir) {
+        std::string const                   binaryPath(
+            [&optionalDataRootDir](void) {
+                if(optionalDataRootDir.empty() == false) {
+                    if(*optionalDataRootDir.rbegin() == '/')
+                        optionalDataRootDir.resize(optionalDataRootDir.size() - 1);
 
-        return binaryPath.substr(0, binaryPath.find_last_of("/")) + "/Data/DateTimeFeaturizer/";
+                    DIR *                           dir(opendir(optionalDataRootDir.c_str()));
+
+                    if(dir == nullptr)
+                        throw std::invalid_argument("Invalid 'dataRootDir'");
+
+                    closedir(dir);
+
+                    return optionalDataRootDir;
+                }
+
+                std::string                 result(GetBinaryPath());
+
+                return result.substr(0, result.find_last_of("/"));
+            }()
+        );
+
+        return binaryPath + "/Data/DateTimeFeaturizer/";
     }
 
-    bool EnumCountries(std::function<bool (std::string)> const &callback) {
+    bool EnumCountries(
+        std::function<bool (std::string)> const &callback,
+        std::string const &optionalDataRootDir
+    ) {
         // Note that this code is not exception safe
         bool                                result(true);
-        DIR *                               dir(opendir(GetDataDirectory().c_str()));
+        DIR *                               dir(opendir(GetDataDirectory(optionalDataRootDir).c_str()));
 
         if(dir == nullptr)
             return result;
@@ -236,12 +280,15 @@ bool DoesCountryMatch(std::string const &country, std::string query) {
 } // anonymous namespace
 
 DateTimeTransformer::DateTimeTransformer(Archive &ar) :
-    _countryName(Traits<std::string>::deserialize(ar)) {
-    DateTimeTransformer(this->_countryName);
+    DateTimeTransformer(Traits<std::string>::deserialize(ar), "") {
 }
 
-DateTimeTransformer::DateTimeTransformer(std::string countryName):
-    _countryName(std::move(countryName)) {
+DateTimeTransformer::DateTimeTransformer(Archive &ar, std::string dataRootDir) :
+    DateTimeTransformer(Traits<std::string>::deserialize(ar), std::move(dataRootDir)) {
+}
+
+DateTimeTransformer::DateTimeTransformer(std::string optionalCountryName, std::string optionalDataRootDir):
+    _countryName(std::move(optionalCountryName)) {
 
     if (!_countryName.empty()) {
         // Get the corresponding file
@@ -258,14 +305,15 @@ DateTimeTransformer::DateTimeTransformer(std::string countryName):
                     }
 
                     return true;
-                }
+                },
+                optionalDataRootDir
             )
         ) {
             // A true return value means that we have enumerated through all of the country names and didn't find a match
             throw std::invalid_argument(_countryName);
         }
 
-        JsonStream holidaysByCountry = GetJsonStream(GetDataDirectory() + filename);
+        JsonStream holidaysByCountry = GetJsonStream(GetDataDirectory(optionalDataRootDir) + filename);
 
         //Convert Jsonstream to std::unordered_map
         //Note that the map keys are generated with "Date" and "Holiday" so no need to check existence
@@ -306,7 +354,7 @@ void DateTimeTransformer::save(Archive & ar) const /*override*/ {
 // |  DateTimeEstimator
 // |
 // ----------------------------------------------------------------------
-/*static*/ bool DateTimeEstimator::IsValidCountry(std::string const &value) {
+/*static*/ bool DateTimeEstimator::IsValidCountry(std::string const &value, nonstd::optional<std::string> dataRootDir) {
     // EnumCountries will return true if the enumeration completes
     // and false if it was terminated. In this case, termination means
     // that the country was found.
@@ -314,18 +362,20 @@ void DateTimeTransformer::save(Archive & ar) const /*override*/ {
         [&value](std::string country) {
             // Continue if the countries don't match
             return DoesCountryMatch(value, std::move(country)) == false;
-        }
+        },
+        dataRootDir ? *dataRootDir : std::string()
     ) == false;
 }
 
-/*static*/ std::vector<std::string> DateTimeEstimator::GetSupportedCountries(void) {
+/*static*/ std::vector<std::string> DateTimeEstimator::GetSupportedCountries(nonstd::optional<std::string> dataRootDir) {
     std::vector<std::string>                results;
 
     EnumCountries(
         [&results](std::string country) {
             results.emplace_back(RemoveCountryExtension(country));
             return true;
-        }
+        },
+        dataRootDir ? *dataRootDir : std::string()
     );
 
     std::sort(results.begin(), results.end());
@@ -333,10 +383,15 @@ void DateTimeTransformer::save(Archive & ar) const /*override*/ {
     return results;
 }
 
-DateTimeEstimator::DateTimeEstimator(nonstd::optional<std::string> const &countryName, AnnotationMapsPtr pAllColumnAnnotations) :
+DateTimeEstimator::DateTimeEstimator(
+    nonstd::optional<std::string> const &countryName,
+    nonstd::optional<std::string> const &dataRootDir,
+    AnnotationMapsPtr pAllColumnAnnotations
+) :
     BaseType("DateTimeEstimator", std::move(pAllColumnAnnotations), true),
-    Country(countryName) {
-        if(Country && DateTimeEstimator::IsValidCountry(*Country) == false) {
+    Country(countryName),
+    DataRootDir(dataRootDir) {
+        if(Country && DateTimeEstimator::IsValidCountry(*Country, DataRootDir) == false) {
             char                            buffer[1024];
 
             snprintf(buffer, sizeof(buffer), "'%s' is not a supported country name", Country->c_str());
@@ -356,7 +411,10 @@ Estimator::FitResult DateTimeEstimator::complete_training_impl(void) /*override*
 }
 
 typename DateTimeEstimator::BaseType::TransformerUniquePtr DateTimeEstimator::create_transformer_impl(void) /*override*/ {
-    return std::make_unique<DateTimeTransformer>(Country ? *Country : std::string());
+    return std::make_unique<DateTimeTransformer>(
+        Country ? *Country : std::string(),
+        DataRootDir ? *DataRootDir : std::string()
+    );
 }
 
 } // namespace Featurizers
