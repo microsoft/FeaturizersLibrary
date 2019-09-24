@@ -86,7 +86,7 @@ private:
     // Annotation is created using _aggregateTracker.
     std::map<KeyType,std::vector<double_t>>  _aggregateTracker;
     std::map<KeyType,std::vector<int64_t>>   _countTracker;
-    
+
     // ----------------------------------------------------------------------
     // |
     // |  Private Methods
@@ -142,8 +142,11 @@ Estimator::FitResult TimeSeriesMedianEstimator::fit_impl(typename BaseType::FitB
         }
 
         for(std::size_t i=0; i< colValues.size(); ++i) {
-            _aggregateTracker[key][i] += Traits<std::string>::IsNull(colValues[i]) ? 0.0 : Traits<std::double_t>::FromString(colValues[i].value());
-            _countTracker[key][i] += Traits<std::string>::IsNull(colValues[i]) ? 0 : 1;
+            if(Traits<std::string>::IsNull(colValues[i]))
+                continue;
+
+            _aggregateTracker[key][i] += Traits<std::double_t>::FromString(Traits<std::string>::GetNullableValue(colValues[i]));
+            _countTracker[key][i] += 1;
         }
     }
 
@@ -151,6 +154,8 @@ Estimator::FitResult TimeSeriesMedianEstimator::fit_impl(typename BaseType::FitB
 }
 
 Estimator::FitResult TimeSeriesMedianEstimator::complete_training_impl(void) {
+    // Note that this class reuses _aggregateTracker to calculate median values before
+    // moving it to the annotation.
     for(auto & kvp: _aggregateTracker) {
         KeyType const & key = kvp.first;
         for(std::size_t i=0; i< kvp.second.size(); ++i) {

@@ -989,3 +989,9 @@ struct Traits<nonstd::optional<T>>  {
 
 } // namespace Featurizer
 } // namespace Microsoft
+
+template <typename T>
+std::ostream & operator <<(std::ostream &os, nonstd::optional<T> const &value) {
+    os << Microsoft::Featurizer::Traits<nonstd::optional<T>>::ToString(value);
+    return os;
+}

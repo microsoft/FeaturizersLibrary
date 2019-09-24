@@ -41,13 +41,6 @@ public:
     TimeSeriesImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations,std::vector<TypeId> colsToImputeDataTypes, bool suppresserror = false, Components::TimeSeriesImputeStrategy tsImputeStrategy= Components::TimeSeriesImputeStrategy::Forward);
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TimeSeriesImputerEstimator);
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-    bool IsNumericTypeId(TypeId const & typeId);
 };
 
 // ----------------------------------------------------------------------
@@ -61,43 +54,12 @@ public:
 // ----------------------------------------------------------------------
 
 TimeSeriesImputerEstimator::TimeSeriesImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::vector<TypeId> colsToImputeDataTypes, bool suppresserror, Components::TimeSeriesImputeStrategy tsImputeStrategy) :
-    BaseType("TimeSeriesImputerEstimator", 
+    BaseType("TimeSeriesImputerEstimator",
         pAllColumnAnnotations,
         [&pAllColumnAnnotations](void) { return Components::TimeSeriesFrequencyEstimator(pAllColumnAnnotations); },
         [&pAllColumnAnnotations](void) { return Components::TimeSeriesMedianEstimator(pAllColumnAnnotations); },
-        [&pAllColumnAnnotations,colsToImputeDataTypes,tsImputeStrategy,suppresserror](void) { return Components::TimeSeriesImputerEstimator(pAllColumnAnnotations,colsToImputeDataTypes,tsImputeStrategy,suppresserror); }
-    ){
-        for(std::size_t i=0; i< colsToImputeDataTypes.size(); ++i) {
-          if(
-              tsImputeStrategy == Components::TimeSeriesImputeStrategy::Median &&
-              !IsNumericTypeId(colsToImputeDataTypes[i]) &&
-              suppresserror == false
-            )
-            throw std::runtime_error("Only Numeric type columns are supported for ImputationStrategy median. (use suppresserror flag to skip imputing non-numeric types)");                
-        }
-    }
-
-bool TimeSeriesImputerEstimator::IsNumericTypeId(TypeId const & id) {
-    if(
-        !(
-           id == TypeId::Int8
-        || id == TypeId::Int16
-        || id == TypeId::Int32
-        || id == TypeId::Int64
-        || id == TypeId::UInt8
-        || id == TypeId::UInt16
-        || id == TypeId::UInt32
-        || id == TypeId::UInt64
-        || id == TypeId::Float16
-        || id == TypeId::Float32
-        || id == TypeId::Float64
-        || id == TypeId::Complex64
-        || id == TypeId::Complex128
-        || id == TypeId::BFloat16
-        ))
-        return false;
-
-    return true;
+        [&pAllColumnAnnotations,&colsToImputeDataTypes,&tsImputeStrategy,&suppresserror](void) { return Components::TimeSeriesImputerEstimator(pAllColumnAnnotations,colsToImputeDataTypes,tsImputeStrategy,suppresserror); }
+    ) {
 }
 
 } // namespace Featurizers

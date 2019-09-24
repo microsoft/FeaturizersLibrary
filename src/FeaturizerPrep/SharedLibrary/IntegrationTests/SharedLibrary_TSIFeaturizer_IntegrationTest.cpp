@@ -17,7 +17,7 @@ using system_clock                          = std::chrono::system_clock;
 
 TEST_CASE("End-to-end") {
     std::vector<TypeId>                                                     keyIds{ StringId, StringId };
-    std::vector<TypeId>                                                     dataIds{ Int32Id, Float32Id, UInt32Id};
+    std::vector<TypeId>                                                     dataIds{ Int32Id, Float32Id, UInt32Id };
     TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *             estimatorHandle(nullptr);
     ErrorInfoHandle *                                                       pErrorInfo(nullptr);
     bool suppressErrors(false);
@@ -68,7 +68,7 @@ TEST_CASE("End-to-end") {
             NS::Traits<std::string>::serialize(archive, "Hello");
             NS::Traits<std::string>::serialize(archive, "World");
             NS::Traits<typename NS::Traits<std::int32_t>::nullable_type>::serialize(archive, 18);
-            NS::Traits<typename NS::Traits<std::float_t>::nullable_type>::serialize(archive, 2.0f);
+            NS::Traits<typename NS::Traits<std::float_t>::nullable_type>::serialize(archive, 4.0f);
             NS::Traits<typename NS::Traits<std::uint32_t>::nullable_type>::serialize(archive, static_cast<std::uint32_t>(123456));
 
             return archive.commit();
@@ -124,13 +124,33 @@ TEST_CASE("End-to-end") {
     CHECK(pErrorInfo == nullptr);
 
     // Transform
+    NS::Archive::ByteArray const            bytes3(
+        [&originalTimePoint](void) {
+            NS::Archive                         archive;
+
+            NS::Traits<system_clock::time_point>::serialize(archive, originalTimePoint);
+            NS::Traits<std::string>::serialize(archive, "Hello");
+            NS::Traits<std::string>::serialize(archive, "World");
+            NS::Traits<typename NS::Traits<std::int32_t>::nullable_type>::serialize(archive, 18);
+            NS::Traits<typename NS::Traits<std::float_t>::nullable_type>::serialize(archive, 3.0f);
+            NS::Traits<typename NS::Traits<std::uint32_t>::nullable_type>::serialize(archive, static_cast<std::uint32_t>(123456));
+
+            return archive.commit();
+        }()
+    );
+
+    BinaryArchiveData                       bad3;
+
+    bad3.pBuffer = bytes3.data();
+    bad3.cBuffer = bytes3.size();
+
     BinaryArchiveData *                     pTransformResults(nullptr);
     size_t                                  cNumResults(0);
 
     CHECK(
         TimeSeriesImputerFeaturizer_BinaryArchive_Transform(
             transformerHandle,
-            bad1,
+            bad3,
             &pTransformResults,
             &cNumResults,
             &pErrorInfo
@@ -166,7 +186,7 @@ TEST_CASE("End-to-end") {
         REQUIRE(NS::Traits<decltype(data1)>::IsNull(data1) == false);
         CHECK(NS::Traits<decltype(data1)>::GetNullableValue(data1) == 18);
         REQUIRE(NS::Traits<decltype(data2)>::IsNull(data2) == false);
-        CHECK(NS::Traits<decltype(data2)>::GetNullableValue(data2) == 2.0f);
+        CHECK(NS::Traits<decltype(data2)>::GetNullableValue(data2) == 3.0f);
         REQUIRE(NS::Traits<decltype(data3)>::IsNull(data3) == false);
         CHECK(NS::Traits<decltype(data3)>::GetNullableValue(data3) == 123456);
 
