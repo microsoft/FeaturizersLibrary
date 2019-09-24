@@ -248,7 +248,7 @@ def Package(
 
             statement_map = {
                 "Featurizers.dll": "runtimes/win-x64/native",
-                "libFeaturizers.so": "runtimes/linux/native",
+                "libFeaturizers.so": "runtimes/linux-x64/native",
             }
 
             for build_dir in build_dirs:
