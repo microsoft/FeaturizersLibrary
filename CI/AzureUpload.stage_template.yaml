@@ -1,0 +1,90 @@
+parameters:
+  agent_pool: "" # vs2017-win2016 (Linux not support in some task)
+  project: "" # 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32 (The project GUID from which to download the pipeline artifacts)
+  definition: "" # 717 (The definition ID of the build pipeline)
+  subscription: "" # AI Infra Build (00c06639-6ee4-454e-8058-8d8b1703bd87)
+  storage: "" # featurizersbuild (The name of storage account in Azure)
+  containerName: "" # Archive (The name of the container to which the files will be copied)
+
+stages:
+  - stage: AzureUpload_Stage
+
+    jobs:
+      - job: AzureUpload_Job
+
+        pool:
+          name: Azure Pipelines
+          demands: azureps
+          vmImage: "${{ parameters.agent_pool }}"
+
+        # This build task will try to download artifacts from the triggering build. 
+        # If there is no triggering build from the specified pipeline, it will download 
+        # artifacts from the build specified in the options below
+        steps:
+          - task: PythonScript@0
+            displayName: 'Check Variables'
+            inputs:
+              scriptSource: inline
+              script: |
+               import sys
+     
+               triggeredBuildNumber = sys.argv[1]
+               buildId = sys.argv[2]
+
+               # the intention here is to compare if var == '$(var)', but as the right side of == will be a string of
+               # "$(var)" if var is empty, or the exact value which is equal to var if var is assigned the value.
+               # Therefore, a non-standard comparison is necessary in this case
+               if triggeredBuildNumber == "{}(Build.TriggeredBy.BuildNumber)".format("$"):
+                 if buildId == "{}(buildId)".format("$"):
+                   raise ValueError('Please specify variable buildId since this is a publish with non-triggered build. e.g. set buildId = 104648')
+              arguments: '$(Build.TriggeredBy.BuildNumber) $(buildId)'
+
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Pipeline Artifact'
+            inputs:
+              buildType: 'specific'
+              project: "${{ parameters.project }}"
+              definition: "${{ parameters.definition }}"
+              specificBuildWithTriggering: true
+              buildVersionToDownload: specific
+              pipelineId: '$(buildId)'
+              artifactName: ''
+              targetPath: '$(Pipeline.Workspace)'
+
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(Pipeline.Workspace)/Documentation'
+              Contents: '**'
+              TargetFolder: '$(Pipeline.Workspace)/upload/$(Build.TriggeredBy.BuildNumber)/Documentation/'
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(Pipeline.Workspace)/Package'
+              Contents: '**'
+              TargetFolder: '$(Pipeline.Workspace)/upload/$(Build.TriggeredBy.BuildNumber)/Package/'
+
+          - task: PythonScript@0
+            displayName: 'Trim Directory Name'
+            inputs:
+              scriptSource: inline
+              script: |
+               import os
+               import sys
+     
+               basedir = sys.argv[1]
+               for fn in os.listdir(basedir):
+                 if not os.path.isdir(os.path.join(basedir, fn)):
+                   continue # Not a directory
+                 if fn == "{}(Build.TriggeredBy.BuildNumber)".format("$"):
+                   os.rename(os.path.join(basedir, fn), os.path.join(basedir, 'Independent Publish_' + sys.argv[2]))
+                 else:
+                   os.rename(os.path.join(basedir, fn), os.path.join(basedir, fn[-13:]))
+              arguments: '$(Pipeline.Workspace)\upload $(buildId)'
+
+          - task: AzureFileCopy@2
+            displayName: 'AzureBlob File Copy'
+            inputs:
+              SourcePath: '$(Pipeline.Workspace)/upload'
+              azureSubscription: "${{ parameters.subscription }}"
+              Destination: 'AzureBlob'
+              storage: "${{ parameters.storage }}"
+              ContainerName: "${{ parameters.containerName }}"
