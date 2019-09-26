@@ -248,9 +248,35 @@ bool SerializationTestImpl(T const &value) {
     return in.AtEnd() && other == value;
 }
 
+template <typename T>
+bool SerializeOnly(T const &value) {
+    Archive                                 out;
+
+    Traits<T>::serialize(out,value);
+
+    Archive                                 in(out.commit());
+
+    T const                                 other(in.template deserialize<T>());
+    return value == other;
+}
+
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
+
+
+/*
+There are three categories of tests about serialization:
+1. Round trip test
+2. Run time endianess check
+3. Big endianess serialization test
+*/
+
+bool TestLittleEndianess() {
+    uint32_t u = 0x01020304;
+    return (*(reinterpret_cast<uint8_t*>(&u))) == 4;
+}
+
 
 TEST_CASE("Serialization") {
     CHECK(SerializationTestImpl(true));
@@ -285,6 +311,26 @@ TEST_CASE("Serialization") {
 
     CHECK(SerializationTestImpl(std::tuple<std::string, int, bool>("one", 2, true)));
 }
+
+TEST_CASE("Run_Time_Check") {
+    CHECK(TestLittleEndianess() == is_little_endian); // ISLITTLEENDIAN in Traits.h is set incorrectly!
+}
+
+TEST_CASE("Serialization_Based_On_Endianess") {
+    // checks if serialized output == original
+    // expected result would be true for little endian and false for big endian
+    bool expected_result(TestLittleEndianess()?true:false);
+    CHECK(SerializeOnly(static_cast<std::int16_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::int32_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::int64_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::uint16_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::uint32_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::uint64_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::double_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::float_t>(-23)) == expected_result);
+}
+
+
 
 template <typename T>
 bool TestCreateNullValue(void) {

@@ -13,6 +13,12 @@
 #include <string>
 #include <vector>
 
+#if (!defined ISLITTLEENDIAN)
+# define ISLITTLEENDIAN 1
+#endif
+
+static bool constexpr is_little_endian = bool(ISLITTLEENDIAN);
+
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wshift-sign-overflow"
@@ -190,6 +196,41 @@ struct TraitsImpl {
 #   pragma clang diagnostic pop
 #endif
 
+namespace {
+
+template <typename T>
+static T swap_endian(T u)
+{
+    unsigned char* source(reinterpret_cast<unsigned char*>(&u));
+    unsigned char dest[sizeof(T)];
+
+    for (size_t k = 0; k < sizeof(T); k++)
+        dest[k] = *(source+sizeof(T) - k - 1);
+
+    return *reinterpret_cast<T*>(dest);
+}
+
+
+template <typename ArchiveT, typename TypeT>
+static ArchiveT & serialize_impl(ArchiveT &ar, TypeT const &value, std::true_type) {
+    return ar.serialize(value);
+}
+template <typename ArchiveT, typename TypeT>
+static ArchiveT & serialize_impl(ArchiveT &ar, TypeT const &value, std::false_type) {
+    return ar.serialize(swap_endian<TypeT>(value));
+}
+template <typename ArchiveT, typename TypeT>
+static TypeT deserialize_impl(ArchiveT &ar, std::true_type) {
+    return ar.template deserialize<TypeT>();
+}
+template <typename ArchiveT, typename TypeT>
+static TypeT deserialize_impl(ArchiveT &ar, std::false_type) {
+    return swap_endian<TypeT>(ar.template deserialize<TypeT>());
+}
+
+} //anonymous namespace
+
+
 template <>
 struct Traits<bool> : public TraitsImpl<bool> {
     static std::string const & ToString(bool const& value) {
@@ -267,12 +308,12 @@ struct Traits<std::int16_t> : public TraitsImpl<std::int16_t> {
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int16_t const &value) {
-        return ar.serialize(value);
+        return serialize_impl<ArchiveT, std::int16_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 
     template <typename ArchiveT>
     static std::int16_t deserialize(ArchiveT &ar) {
-        return ar.template deserialize<std::int16_t>();
+        return deserialize_impl<ArchiveT, std::int16_t>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 };
 
@@ -289,12 +330,12 @@ struct Traits<std::int32_t> : public TraitsImpl<std::int32_t> {
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int32_t const &value) {
-        return ar.serialize(value);
+        return serialize_impl<ArchiveT, std::int32_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 
     template <typename ArchiveT>
     static std::int32_t deserialize(ArchiveT &ar) {
-        return ar.template deserialize<std::int32_t>();
+        return deserialize_impl<ArchiveT, std::int32_t>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 };
 
@@ -333,12 +374,12 @@ struct Traits<std::int64_t> : public TraitsImpl<std::int64_t> {
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int64_t const &value) {
-        return ar.serialize(value);
+        return serialize_impl<ArchiveT, std::int64_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 
     template <typename ArchiveT>
     static std::int64_t deserialize(ArchiveT &ar) {
-        return ar.template deserialize<std::int64_t>();
+        return deserialize_impl<ArchiveT, std::int64_t>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 };
 
@@ -385,12 +426,12 @@ struct Traits<std::uint16_t> : public TraitsImpl<std::uint16_t> {
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint16_t const &value) {
-        return ar.serialize(value);
+        return serialize_impl<ArchiveT, std::uint16_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 
     template <typename ArchiveT>
     static std::uint16_t deserialize(ArchiveT &ar) {
-        return ar.template deserialize<std::uint16_t>();
+        return deserialize_impl<ArchiveT, std::uint16_t>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 };
 
@@ -429,12 +470,12 @@ struct Traits<std::uint32_t> : public TraitsImpl<std::uint32_t> {
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint32_t const &value) {
-        return ar.serialize(value);
+        return serialize_impl<ArchiveT, std::uint32_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 
     template <typename ArchiveT>
     static std::uint32_t deserialize(ArchiveT &ar) {
-        return ar.template deserialize<std::uint32_t>();
+        return deserialize_impl<ArchiveT, std::uint32_t>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 };
 
@@ -473,12 +514,12 @@ struct Traits<std::uint64_t> : public TraitsImpl<std::uint64_t> {
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint64_t const &value) {
-        return ar.serialize(value);
+        return serialize_impl<ArchiveT, std::uint64_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 
     template <typename ArchiveT>
     static std::uint64_t deserialize(ArchiveT &ar) {
-        return ar.template deserialize<std::uint64_t>();
+        return deserialize_impl<ArchiveT, std::uint64_t>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 };
 
@@ -518,13 +559,13 @@ struct Traits<std::float_t> {
     }
 
     template <typename ArchiveT>
-    static ArchiveT & serialize(ArchiveT &ar, std::float_t const &value) {
-        return ar.serialize(value);
+    static ArchiveT & serialize(ArchiveT &ar, nullable_type const &value) {
+        return serialize_impl<ArchiveT, nullable_type>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 
     template <typename ArchiveT>
-    static std::float_t deserialize(ArchiveT &ar) {
-        return ar.template deserialize<std::float_t>();
+    static nullable_type deserialize(ArchiveT &ar) {
+        return deserialize_impl<ArchiveT, nullable_type>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 };
 
@@ -564,13 +605,13 @@ struct Traits<std::double_t>  {
     }
 
     template <typename ArchiveT>
-    static ArchiveT & serialize(ArchiveT &ar, std::double_t const &value) {
-        return ar.serialize(value);
+    static ArchiveT & serialize(ArchiveT &ar, nullable_type const &value) {
+        return serialize_impl<ArchiveT, nullable_type>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 
     template <typename ArchiveT>
-    static std::double_t deserialize(ArchiveT &ar) {
-        return ar.template deserialize<std::double_t>();
+    static nullable_type deserialize(ArchiveT &ar) {
+        return deserialize_impl<ArchiveT, nullable_type>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
     }
 };
 
