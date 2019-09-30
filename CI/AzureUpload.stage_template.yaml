@@ -40,14 +40,27 @@ stages:
               arguments: '$(Build.TriggeredBy.BuildNumber) $(buildId)'
 
           - task: DownloadPipelineArtifact@2
-            displayName: 'Download Pipeline Artifact'
+            condition: eq(variables['Build.Reason'], 'Manual')
+            displayName: 'Download Pipeline Artifact for Mannual build'
+            inputs:
+              buildType: 'specific'
+              project: "${{ parameters.project }}"
+              definition: "${{ parameters.definition }}"
+              specificBuildWithTriggering: false
+              buildVersionToDownload: specific
+              pipelineId: '$(buildId)'
+              artifactName: ''
+              targetPath: '$(Pipeline.Workspace)'
+
+          - task: DownloadPipelineArtifact@2
+            condition: eq(variables['Build.Reason'], 'BuildCompletion')
+            displayName: 'Download Pipeline Artifact for Build triggered by BuildCompletion'
             inputs:
               buildType: 'specific'
               project: "${{ parameters.project }}"
               definition: "${{ parameters.definition }}"
               specificBuildWithTriggering: true
-              buildVersionToDownload: specific
-              pipelineId: '$(buildId)'
+              buildVersionToDownload: latestFromBranch
               artifactName: ''
               targetPath: '$(Pipeline.Workspace)'
 
