@@ -31,6 +31,8 @@ enable_testing()
 foreach(_test_name IN ITEMS
     InferenceOnlyFeaturizerImpl_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
+    RobustScalarNormEstimator_UnitTest
+    RobustScalarTransformer_UnitTest
     TrainingOnlyEstimatorImpl_UnitTest
 )
     add_executable(
