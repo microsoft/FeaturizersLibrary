@@ -48,8 +48,6 @@ _REPO_DATA                                  = [
 
 _ACTIVATION_REPO_CONFIGURATION              = "python"  # Can be None
 
-raise Exception("Remove this exception when '_REPO_DATA', '_ACTIVATION_REPO_CONFIGURATION' have been updated for your environment")
-
 # ----------------------------------------------------------------------
 inflect                                     = inflect_mod.engine()
 

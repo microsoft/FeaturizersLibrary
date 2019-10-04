@@ -14,12 +14,13 @@
         <name string>
         <is_optional bool default="false" ?>
 
-    <template ?>:
+    <templates *>:
         [name string]
         <types string +>
 
-    <input_type string>
-    <is_input_optional bool default=false ?>
-
-    <transformed_type string>
-    <is_output_optional bool default=false ?>
+    <transformed_type_mappings +>:
+        <input_type string>
+        <is_input_optional bool default=false ?>
+        
+        <transformed_type string>
+        <is_output_optional bool default=false ?>    

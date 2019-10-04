@@ -112,32 +112,51 @@ def EntryPoint(
             new_data = []
 
             for item in data:
-                if not hasattr(item, "template"):
-                    new_data.append([item])
+                if not hasattr(item, "templates"):
+                    for mapping in item.transformed_type_mappings:
+                        new_item = copy.deepcopy(item)
+
+                        new_item.input_type = mapping.input_type
+                        new_item.transformed_type = mapping.transformed_type
+                        new_item.is_input_optional = mapping.is_input_optional
+                        new_item.is_output_optional = mapping.is_output_optional
+                        
+                        new_data.append([new_item])
                     continue
-
-                regex = re.compile(r"\b{}\b".format(item.template.name))
-
                 new_data_items = []
+                for template in item.templates:
+                    regex = re.compile(r"\b{}\b".format(template.name))
 
-                for template_type in item.template.types:
-                    new_item = copy.deepcopy(item)
-                    new_item.template = template_type
+                    for template_type in template.types:
+                        new_item = copy.deepcopy(item)
+                        new_item.template = template_type
 
-                    for configuration_param in getattr(new_item, "configuration_params", []):
-                        configuration_param.type = regex.sub(template_type, configuration_param.type)
+                        # Remove the template mapping and list of templates
+                        del new_item.templates
+                        del new_item.transformed_type_mappings
 
-                    new_item.input_type = regex.sub(template_type, new_item.input_type)
-                    new_item.transformed_type = regex.sub(template_type, new_item.transformed_type)
+                        for configuration_param in getattr(new_item, "configuration_params", []):
+                            configuration_param.type = regex.sub(template_type, configuration_param.type)
 
-                    for custom_struct in getattr(new_item, "custom_structs", []):
-                        for member in custom_struct.members:
-                            member.type = regex.sub(template_type, member.type)
+                        for custom_struct in getattr(new_item, "custom_structs", []):
+                            for member in custom_struct.members:
+                                member.type = regex.sub(template_type, member.type)
 
-                    new_data_items.append(new_item)
+                        for mapping in item.transformed_type_mappings:
+                            # Since we can have multiple templates this is for when a mapping doesn't use a template or not the current template
+                            if mapping.input_type != template.name and mapping.transformed_type != template.name:
+                                continue
+                            
+                            new_item.input_type = regex.sub(template_type, mapping.input_type)
+                            new_item.transformed_type = regex.sub(template_type, mapping.transformed_type)
+                            new_item.is_input_optional = mapping.is_input_optional
+                            new_item.is_output_optional = mapping.is_output_optional
+
+                            # This will end up copying one more time than needed, but I couldn't think of a better way for now.
+                            new_data_items.append(copy.deepcopy(new_item))
 
                 new_data.append(new_data_items)
-
+            
             data = new_data
 
         dm.stream.write("Generating content...")
