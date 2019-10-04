@@ -9,6 +9,7 @@
 
 #include "../Components/TimeSeriesImputerTransformer.h"
 #include "../TimeSeriesImputerFeaturizer.h"
+#include "../TestHelpers.h"
 
 namespace NS = Microsoft::Featurizer;
 
@@ -38,7 +39,6 @@ using TransformedType = std::vector<
 
 TransformedType Test(std::vector<std::vector<InputType>> const &trainingBatches, std::vector<InputType> const &inferenceBatches
 ,std::vector<NS::TypeId> colsToImputeDataTypes, bool supressError, NS::Featurizers::Components::TimeSeriesImputeStrategy tsImputeStrategy) {
-    using FitResult                 = NS::Estimator::FitResult;
     using KeyT                      = std::vector<std::string>;
     using ColsToImputeT             = std::vector<nonstd::optional<std::string>>;
     using InputBatchesType          = std::vector<std::vector<InputType>>;
@@ -47,24 +47,7 @@ TransformedType Test(std::vector<std::vector<InputType>> const &trainingBatches,
     NS::AnnotationMapsPtr const     pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     TSImputerEstimator              estimator(pAllColumnAnnotations,colsToImputeDataTypes,supressError,tsImputeStrategy);
 
-
-    typename InputBatchesType::const_iterator            iter(trainingBatches.begin());
-    while(true) {
-        FitResult const                     result(estimator.fit(iter->data(), iter->size()));
-        if(result == FitResult::Complete)
-            break;
-        ++iter;
-
-        if(iter == trainingBatches.end()) {
-            if(estimator.complete_training() == FitResult::Complete)
-                break;
-
-            iter = trainingBatches.begin();
-        }
-    }
-
-    assert(estimator.is_training_complete());
-
+    NS::TestHelpers::Train<TSImputerEstimator, InputType>(estimator, trainingBatches);
     TSImputerEstimator::TransformerUniquePtr                  pTransformer(estimator.create_transformer());
     TransformedType   	  output;
 

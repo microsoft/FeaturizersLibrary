@@ -29,6 +29,7 @@ get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 enable_testing()
 
 foreach(_test_name IN ITEMS
+    HistogramEstimator_UnitTest
     InferenceOnlyFeaturizerImpl_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
     RobustScalarNormEstimator_UnitTest

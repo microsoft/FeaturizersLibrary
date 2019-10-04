@@ -5,6 +5,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
+#include "../../TestHelpers.h"
 #include "../TrainingOnlyEstimatorImpl.h"
 
 namespace NS = Microsoft::Featurizer;
@@ -92,33 +93,10 @@ template <typename EstimatorPolicyT>
 std::map<typename EstimatorPolicyT::InputType, std::uint32_t> Test(
     std::vector<std::vector<typename EstimatorPolicyT::InputType>> const &inputBatches
 ) {
-    using FitResult                         = NS::Estimator::FitResult;
-    using Batches                           = std::vector<std::vector<typename EstimatorPolicyT::InputType>>;
-
     NS::AnnotationMapsPtr                                                           pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::TrainingOnlyEstimatorImpl<EstimatorPolicyT, 0>     estimator(pAllColumnAnnotations);
 
-    typename Batches::const_iterator                                        iter(inputBatches.begin());
-
-    while(true) {
-        FitResult const                     result(estimator.fit(iter->data(), iter->size()));
-
-        if(result == FitResult::Complete)
-            break;
-
-        ++iter;
-
-        if(iter == inputBatches.end()) {
-            FitResult const                 completeResult(estimator.complete_training());
-
-            if(completeResult != FitResult::Complete)
-                throw std::runtime_error("Unexpected fit result");
-
-            break;
-        }
-    }
-
-    assert(estimator.is_training_complete());
+    NS::TestHelpers::Train< NS::Featurizers::Components::TrainingOnlyEstimatorImpl<EstimatorPolicyT, 0> ,typename EstimatorPolicyT::InputType>(estimator, inputBatches);
 
     typename EstimatorPolicyT::Results const &          results(estimator.get_annotation_data());
 

@@ -7,7 +7,7 @@
 
 #include "../PipelineExecutionEstimatorImpl.h"
 #include "../InferenceOnlyFeaturizerImpl.h"
-
+#include "../../TestHelpers.h"
 namespace NS = Microsoft::Featurizer;
 
 template <typename T>
@@ -29,36 +29,6 @@ struct NonCopyable {
 template <typename T>
 NonCopyable<T> make_noncopyable(T value) {
     return NonCopyable<T>(std::move(value));
-}
-
-namespace {
-
-template <typename T, typename ArgT>
-void make_vector(std::vector<T> & v, ArgT && arg) {
-    v.emplace_back(std::forward<ArgT>(arg));
-}
-
-template <typename T, typename ArgT, typename... ArgsT>
-void make_vector(std::vector<T> &v, ArgT && arg, ArgsT &&...args) {
-    make_vector(v, std::forward<ArgT>(arg));
-    make_vector(v, std::forward<ArgsT>(args)...);
-}
-
-} // anonymous namespace
-
-template <typename T, typename... ArgsT>
-std::vector<T> make_vector(ArgsT &&... args) {
-    std::vector<T>                          result;
-
-    result.reserve(sizeof...(ArgsT));
-
-    make_vector(result, std::forward<ArgsT>(args)...);
-    return result;
-}
-
-template <typename T>
-std::vector<T> make_vector(void) {
-    return std::vector<T>();
 }
 
 template <typename T>
@@ -219,31 +189,8 @@ std::vector<typename PipelineT::TransformedType> Test(
     std::vector<std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>>> const &inputBatches,
     std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>> const &data
 ) {
-    using FitResult                         = typename NS::Estimator::FitResult;
-    using Batches                           = std::vector<std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>>>;
-
     if(inputBatches.empty() == false) {
-        // Train the pipeline
-        typename Batches::const_iterator        iter(inputBatches.begin());
-
-        while(true) {
-            FitResult const                     result(pipeline.fit(iter->data(), iter->size()));
-
-            if(result == FitResult::Complete)
-                break;
-            else if(result == FitResult::ResetAndContinue)
-                iter = inputBatches.begin();
-            else if(result == FitResult::Continue) {
-                ++iter;
-
-                if(iter == inputBatches.end()) {
-                    if(pipeline.complete_training() == FitResult::Complete)
-                        break;
-
-                    iter = inputBatches.begin();
-                }
-            }
-        }
+        NS::TestHelpers::Train<PipelineT, typename PipelineT::InputType>(pipeline, inputBatches);
     }
 
     assert(pipeline.is_training_complete());
@@ -269,9 +216,9 @@ TEST_CASE("Single Transformer") {
     CHECK(
         Test(
             Estimator("Estimator", pAllColumnAnnotations),
-            make_vector<std::vector<NonCopyable<std::string>>>(),
-            make_vector<NonCopyable<std::string>>("one", "two", "three")
-        ) == make_vector<NonCopyable<size_t>>(3, 3, 5)
+            NS::TestHelpers::make_vector<std::vector<NonCopyable<std::string>>>(),
+            NS::TestHelpers::make_vector<NonCopyable<std::string>>("one", "two", "three")
+        ) == NS::TestHelpers::make_vector<NonCopyable<size_t>>(3, 3, 5)
     );
     CHECK((*pAllColumnAnnotations)[0].empty());
 }
@@ -287,11 +234,11 @@ TEST_CASE("Annotation, Transformer") {
     CHECK(
         Test(
             Estimator("Estimator", pAllColumnAnnotations),
-            make_vector<std::vector<NonCopyable<std::string>>>(
-                make_vector<NonCopyable<std::string>>("one", "two", "two", "one", "one")
+            NS::TestHelpers::make_vector<std::vector<NonCopyable<std::string>>>(
+                NS::TestHelpers::make_vector<NonCopyable<std::string>>("one", "two", "two", "one", "one")
             ),
-            make_vector<NonCopyable<std::string>>("one", "two", "three")
-        ) == make_vector<NonCopyable<size_t>>(3, 3, 5)
+            NS::TestHelpers::make_vector<NonCopyable<std::string>>("one", "two", "three")
+        ) == NS::TestHelpers::make_vector<NonCopyable<size_t>>(3, 3, 5)
     );
 
     NS::AnnotationMap const &               annotations((*pAllColumnAnnotations)[0]);
@@ -324,11 +271,11 @@ TEST_CASE("Annotation, Annotation, Transformer") {
     CHECK(
         Test(
             Estimator("Estimator", pAllColumnAnnotations),
-            make_vector<std::vector<NonCopyable<std::string>>>(
-                make_vector<NonCopyable<std::string>>("one", "two", "two", "one", "one")
+            NS::TestHelpers::make_vector<std::vector<NonCopyable<std::string>>>(
+                NS::TestHelpers::make_vector<NonCopyable<std::string>>("one", "two", "two", "one", "one")
             ),
-            make_vector<NonCopyable<std::string>>("one", "two", "three")
-        ) == make_vector<NonCopyable<size_t>>(3, 3, 5)
+            NS::TestHelpers::make_vector<NonCopyable<std::string>>("one", "two", "three")
+        ) == NS::TestHelpers::make_vector<NonCopyable<size_t>>(3, 3, 5)
     );
 
     NS::AnnotationMap const &               annotations((*pAllColumnAnnotations)[0]);
@@ -368,9 +315,9 @@ TEST_CASE("Transformer, Transformer") {
     CHECK(
         Test(
             Estimator("Estimator", pAllColumnAnnotations),
-            make_vector<std::vector<NonCopyable<std::string>>>(),
-            make_vector<NonCopyable<std::string>>("one", "two", "three")
-        ) == make_vector<NonCopyable<std::string>>("3", "3", "5")
+            NS::TestHelpers::make_vector<std::vector<NonCopyable<std::string>>>(),
+            NS::TestHelpers::make_vector<NonCopyable<std::string>>("one", "two", "three")
+        ) == NS::TestHelpers::make_vector<NonCopyable<std::string>>("3", "3", "5")
     );
     CHECK((*pAllColumnAnnotations)[0].empty());
 }
@@ -387,13 +334,13 @@ TEST_CASE("Transformer, Annotation, Transformer") {
     CHECK(
         Test(
             Estimator("Estimator", pAllColumnAnnotations),
-            make_vector<std::vector<NonCopyable<size_t>>>(
-                make_vector<NonCopyable<size_t>>(1000, 200, 30, 4),
-                make_vector<NonCopyable<size_t>>(1111, 222, 33, 4)
+            NS::TestHelpers::make_vector<std::vector<NonCopyable<size_t>>>(
+                NS::TestHelpers::make_vector<NonCopyable<size_t>>(1000, 200, 30, 4),
+                NS::TestHelpers::make_vector<NonCopyable<size_t>>(1111, 222, 33, 4)
             ),
-            make_vector<NonCopyable<size_t>>(1000, 200, 30, 4)
+            NS::TestHelpers::make_vector<NonCopyable<size_t>>(1000, 200, 30, 4)
              // The output will be the lengths of each number string
-        ) == make_vector<NonCopyable<size_t>>(4, 3, 2, 1)
+        ) == NS::TestHelpers::make_vector<NonCopyable<size_t>>(4, 3, 2, 1)
     );
 
     NS::AnnotationMap const &               annotations((*pAllColumnAnnotations)[0]);
@@ -425,12 +372,12 @@ TEST_CASE("Transformer, Annotation") {
     CHECK(
         Test(
             Estimator("Estimator", pAllColumnAnnotations),
-            make_vector<std::vector<NonCopyable<size_t>>>(
-                make_vector<NonCopyable<size_t>>(1000, 200, 30, 4),
-                make_vector<NonCopyable<size_t>>(1111, 222, 33, 4)
+            NS::TestHelpers::make_vector<std::vector<NonCopyable<size_t>>>(
+                NS::TestHelpers::make_vector<NonCopyable<size_t>>(1000, 200, 30, 4),
+                NS::TestHelpers::make_vector<NonCopyable<size_t>>(1111, 222, 33, 4)
             ),
-            make_vector<NonCopyable<size_t>>(1000, 200, 30, 4)
-        ) == make_vector<NonCopyable<std::string>>("1000", "200", "30", "4")
+            NS::TestHelpers::make_vector<NonCopyable<size_t>>(1000, 200, 30, 4)
+        ) == NS::TestHelpers::make_vector<NonCopyable<std::string>>("1000", "200", "30", "4")
     );
 
     NS::AnnotationMap const &               annotations((*pAllColumnAnnotations)[0]);
@@ -464,12 +411,12 @@ TEST_CASE("Annotation, Annotation, Transformer, Annotation") {
     CHECK(
         Test(
             Estimator("Estimator", pAllColumnAnnotations),
-            make_vector<std::vector<NonCopyable<size_t>>>(
-                make_vector<NonCopyable<size_t>>(1000, 200, 30, 4),
-                make_vector<NonCopyable<size_t>>(111, 222, 33, 4)
+            NS::TestHelpers::make_vector<std::vector<NonCopyable<size_t>>>(
+                NS::TestHelpers::make_vector<NonCopyable<size_t>>(1000, 200, 30, 4),
+                NS::TestHelpers::make_vector<NonCopyable<size_t>>(111, 222, 33, 4)
             ),
-            make_vector<NonCopyable<size_t>>(1000, 200, 30, 4)
-        ) == make_vector<NonCopyable<std::string>>("1000", "200", "30", "4")
+            NS::TestHelpers::make_vector<NonCopyable<size_t>>(1000, 200, 30, 4)
+        ) == NS::TestHelpers::make_vector<NonCopyable<std::string>>("1000", "200", "30", "4")
     );
 
     NS::AnnotationMap const &               annotations((*pAllColumnAnnotations)[0]);

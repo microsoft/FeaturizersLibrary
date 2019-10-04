@@ -7,84 +7,9 @@
 
 #include "../../3rdParty/optional.h"
 #include "../../Featurizers/CatImputerFeaturizer.h"
+#include "../TestHelpers.h"
 
 namespace NS = Microsoft::Featurizer;
-
-namespace {
-
-template <typename T, typename ArgT>
-void make_vector(std::vector<T> & v, ArgT && arg) {
-    v.emplace_back(std::forward<ArgT>(arg));
-}
-
-template <typename T, typename ArgT, typename... ArgsT>
-void make_vector(std::vector<T> &v, ArgT && arg, ArgsT &&...args) {
-    make_vector(v, std::forward<ArgT>(arg));
-    make_vector(v, std::forward<ArgsT>(args)...);
-}
-
-} // anonymous namespace
-
-template <typename T, typename... ArgsT>
-std::vector<T> make_vector(ArgsT &&... args) {
-    std::vector<T>                          result;
-
-    result.reserve(sizeof...(ArgsT));
-
-    make_vector(result, std::forward<ArgsT>(args)...);
-    return result;
-}
-
-template <typename T>
-std::vector<T> make_vector(void) {
-    return std::vector<T>();
-}
-
-template <typename PipelineT>
-std::vector<typename PipelineT::TransformedType> Test(
-    PipelineT pipeline,
-    std::vector<std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>>> const &inputBatches,
-    std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>> const &data
-) {
-    using FitResult                         = typename NS::Estimator::FitResult;
-    using Batches                           = std::vector<std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>>>;
-
-    if(inputBatches.empty() == false) {
-        // Train the pipeline
-        typename Batches::const_iterator        iter(inputBatches.begin());
-
-        while(true) {
-            FitResult const                     result(pipeline.fit(iter->data(), iter->size()));
-
-            if(result == FitResult::Complete)
-                break;
-            else if(result == FitResult::ResetAndContinue)
-                iter = inputBatches.begin();
-            else if(result == FitResult::Continue) {
-                ++iter;
-
-                if(iter == inputBatches.end()) {
-                    if(pipeline.complete_training() == FitResult::Complete)
-                        break;
-
-                    iter = inputBatches.begin();
-                }
-            }
-        }
-    }
-
-    assert(pipeline.is_training_complete());
-
-    typename PipelineT::TransformerUniquePtr                  pTransformer(pipeline.create_transformer());
-    std::vector<typename PipelineT::TransformedType>    	  output;
-
-    output.reserve(data.size());
-
-    for(auto const &item : data)
-        output.emplace_back(pTransformer->execute(item));
-
-    return output;
-}
 
 template<typename transformedType, typename castType = uint8_t>
 void NumericTestWrapper(){
@@ -95,17 +20,17 @@ void NumericTestWrapper(){
     // Passing int values to make_vector for an optional type gives following error
     // error: implicit conversion loses integer precision: 'int' to 'nonstd::optional_lite::
     // Hence explicit cast to uint8_t.
-    auto trainingBatches = 	make_vector<std::vector<inputType>>(
-                make_vector<inputType>(static_cast<castType>(10),static_cast<castType>(20),null),
-                make_vector<inputType>(static_cast<castType>(10),static_cast<castType>(30),null),
-                make_vector<inputType>(static_cast<castType>(10),static_cast<castType>(10),null),
-                make_vector<inputType>(static_cast<castType>(11),static_cast<castType>(15),null),
-                make_vector<inputType>(static_cast<castType>(18),static_cast<castType>(8),null));
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<inputType>>(
+                NS::TestHelpers::make_vector<inputType>(static_cast<castType>(10),static_cast<castType>(20),null),
+                NS::TestHelpers::make_vector<inputType>(static_cast<castType>(10),static_cast<castType>(30),null),
+                NS::TestHelpers::make_vector<inputType>(static_cast<castType>(10),static_cast<castType>(10),null),
+                NS::TestHelpers::make_vector<inputType>(static_cast<castType>(11),static_cast<castType>(15),null),
+                NS::TestHelpers::make_vector<inputType>(static_cast<castType>(18),static_cast<castType>(8),null));
 
-    auto inferencingInput = make_vector<inputType>(static_cast<castType>(5),static_cast<castType>(8),static_cast<castType>(20)
+    auto inferencingInput = NS::TestHelpers::make_vector<inputType>(static_cast<castType>(5),static_cast<castType>(8),static_cast<castType>(20)
                 ,null,null,null,null);
 
-    auto inferencingOutput = make_vector<transformedType>(
+    auto inferencingOutput = NS::TestHelpers::make_vector<transformedType>(
         static_cast<castType>(5),
         static_cast<castType>(8),
         static_cast<castType>(20),
@@ -116,10 +41,10 @@ void NumericTestWrapper(){
     );
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-
+    NS::Featurizers::CatImputerEstimator<transformedType>   estimator(pAllColumnAnnotations);
     CHECK(
-        Test(
-            NS::Featurizers::CatImputerEstimator<transformedType>(pAllColumnAnnotations),
+        NS::TestHelpers::TransformerEstimatorTest(
+            estimator,
             trainingBatches,
             inferencingInput
         ) == inferencingOutput
@@ -189,15 +114,15 @@ TEST_CASE("CatImputer- string") {
     using transformedType = std::string;
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-
+    NS::Featurizers::CatImputerEstimator<transformedType>    estimator(pAllColumnAnnotations);
     CHECK(
-        Test(
-            NS::Featurizers::CatImputerEstimator<transformedType>(pAllColumnAnnotations),
-            make_vector<std::vector<type>>(
-                make_vector<type>("one", "one", "one",type{},type{},"two", "three")
+        NS::TestHelpers::TransformerEstimatorTest(
+            estimator,
+            NS::TestHelpers::make_vector<std::vector<type>>(
+                NS::TestHelpers::make_vector<type>("one", "one", "one",type{},type{},"two", "three")
             ),
-            make_vector<type>("one", "two", "three",type{})
-        ) == make_vector<transformedType>("one","two","three","one")
+            NS::TestHelpers::make_vector<type>("one", "two", "three",type{})
+        ) == NS::TestHelpers::make_vector<transformedType>("one","two","three","one")
     );
 }
 
@@ -206,12 +131,14 @@ TEST_CASE("CatImputer- All values Null") {
     using transformedType = std::int64_t;
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::CatImputerEstimator<transformedType>    estimator(pAllColumnAnnotations);
 
-    CHECK_THROWS_WITH(Test(
-            NS::Featurizers::CatImputerEstimator<transformedType>(pAllColumnAnnotations),
-            make_vector<std::vector<type>>(
-                make_vector<type>(type{},type{},type{},type{},type{},type{})),
-                make_vector<type>(5, 8, 20,type{}))
+    CHECK_THROWS_WITH(
+        NS::TestHelpers::TransformerEstimatorTest(
+            estimator,
+            NS::TestHelpers::make_vector<std::vector<type>>(
+                NS::TestHelpers::make_vector<type>(type{},type{},type{},type{},type{},type{})),
+                NS::TestHelpers::make_vector<type>(5, 8, 20,type{}))
                 , Catch::Contains("All null values or empty training set."));
 }
 

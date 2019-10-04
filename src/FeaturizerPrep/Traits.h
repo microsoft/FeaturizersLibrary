@@ -179,7 +179,9 @@ struct TraitsImpl {
     static nullable_type CreateNullValue(void) {
         return nullable_type();
     }
-
+    static bool IsNull(T const&) {
+        return false;
+    }
     static bool IsNull(nullable_type const& value) {
         return !value.has_value();
     }
@@ -187,7 +189,6 @@ struct TraitsImpl {
     static T const & GetNullableValue(nullable_type const &value) {
         if (IsNull(value))
             throw std::runtime_error("GetNullableValue attempt on float_t null.");
-
         return *value;
     }
 };
@@ -197,7 +198,6 @@ struct TraitsImpl {
 #endif
 
 namespace {
-
 template <typename T>
 static T swap_endian(T u)
 {
@@ -986,7 +986,6 @@ struct Traits<nonstd::optional<T>>  {
     static T const & GetNullableValue(nullable_type const& value) {
         if (IsNull(value))
             throw std::runtime_error("GetNullableValue attempt on Optional type null.");
-
         return *value;
     }
 
