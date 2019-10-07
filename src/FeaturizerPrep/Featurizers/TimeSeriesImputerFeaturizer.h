@@ -57,7 +57,7 @@ TimeSeriesImputerEstimator::TimeSeriesImputerEstimator(AnnotationMapsPtr pAllCol
     BaseType("TimeSeriesImputerEstimator",
         pAllColumnAnnotations,
         [&pAllColumnAnnotations](void) { return Components::TimeSeriesFrequencyEstimator(pAllColumnAnnotations); },
-        [&pAllColumnAnnotations](void) { return Components::TimeSeriesMedianEstimator(pAllColumnAnnotations); },
+        [&pAllColumnAnnotations,&colsToImputeDataTypes](void) { return Components::TimeSeriesMedianEstimator(pAllColumnAnnotations,colsToImputeDataTypes); },
         [&pAllColumnAnnotations,&colsToImputeDataTypes,&tsImputeStrategy,&suppresserror](void) { return Components::TimeSeriesImputerEstimator(pAllColumnAnnotations,colsToImputeDataTypes,tsImputeStrategy,suppresserror); }
     ) {
 }

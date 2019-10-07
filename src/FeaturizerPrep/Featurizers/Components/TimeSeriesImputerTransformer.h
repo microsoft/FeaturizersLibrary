@@ -139,8 +139,6 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TimeSeriesImputerEstimator);
 
-    static bool DoesColTypeSupportMedian(TypeId typeId);
-
 private:
     // ----------------------------------------------------------------------
     // |
@@ -226,7 +224,7 @@ TimeSeriesImputerEstimator::TimeSeriesImputerEstimator(AnnotationMapsPtr pAllCol
         if(_tsImputeStrategy == TimeSeriesImputeStrategy::Median && _supressError == false) {
             // Verify that all col types are double/float
             for(auto const & colType : _colsToImputeDataTypes) {
-                if(DoesColTypeSupportMedian(colType) == false)
+                if(TimeSeriesMedianEstimator::DoesColTypeSupportMedian(colType) == false)
                     throw std::runtime_error("Only Numeric type columns are supported for ImputationStrategy median. (use suppressError flag to skip imputing non-numeric types)");
             }
         }
@@ -235,13 +233,6 @@ TimeSeriesImputerEstimator::TimeSeriesImputerEstimator(AnnotationMapsPtr pAllCol
 
 Estimator::FitResult TimeSeriesImputerEstimator::complete_training_impl(void) {
     throw std::runtime_error("This should never be called as this class will not be used during training");
-}
-
-/*static*/ bool TimeSeriesImputerEstimator::DoesColTypeSupportMedian(TypeId typeId) {
-    return typeId == TypeId::Float16
-        || typeId == TypeId::Float32
-        || typeId == TypeId::Float64
-        || typeId == TypeId::BFloat16;
 }
 
 // ----------------------------------------------------------------------
@@ -456,23 +447,22 @@ typename TimeSeriesImputerEstimator::BaseType::TransformedType TimeSeriesImputer
             typename TimeSeriesImputerEstimator::ColsToImputeType &         addedRowData(std::get<3>(addedRow));
 
             for(std::size_t addedRowColIndex = 0; addedRowColIndex < addedRowData.size(); ++addedRowColIndex) {
+
+                if(TimeSeriesMedianEstimator::DoesColTypeSupportMedian(_colsToImputeDataTypes[addedRowColIndex]) == false)
+                    continue;
+
                 if(StrTraits::IsNull(addedRowData[addedRowColIndex])) {
-                    addedRowData[addedRowColIndex] =
-                        [this, &iterMedian, &addedRowColIndex]() -> nonstd::optional<std::string> {
-                            assert(addedRowColIndex < _colsToImputeDataTypes.size());
-                            if(_supressError && TimeSeriesImputerEstimator::DoesColTypeSupportMedian(_colsToImputeDataTypes[addedRowColIndex]) == false)
-                                return nonstd::optional<std::string>();
-
-                            if(iterMedian == _medianValues.end()) {
-                                if(_supressError)
-                                    return nonstd::optional<std::string>();
-
-                                throw std::runtime_error("Invalid key");
-                            }
-
-                            assert(addedRowColIndex < iterMedian->second.size());
-                            return Traits<std::double_t>::ToString(iterMedian->second[addedRowColIndex]);
-                        }();
+                    if(iterMedian == _medianValues.end())
+                    {
+                        if(_supressError)
+                            continue;
+                        else
+                            throw std::runtime_error("Invalid key");
+                    }
+                    
+					assert(addedRowColIndex < _colsToImputeDataTypes.size());
+                    assert(addedRowColIndex < iterMedian->second.size());
+                    addedRowData[addedRowColIndex] = Traits<std::double_t>::ToString(iterMedian->second[addedRowColIndex]);
                 }
             }
 

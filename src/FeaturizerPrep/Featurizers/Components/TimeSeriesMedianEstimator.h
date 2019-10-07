@@ -60,10 +60,12 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    TimeSeriesMedianEstimator(AnnotationMapsPtr pAllColumnAnnotations);
+    TimeSeriesMedianEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::vector<TypeId> colsToImputeDataTypes);
     ~TimeSeriesMedianEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TimeSeriesMedianEstimator);
+
+    static bool DoesColTypeSupportMedian(TypeId typeId);
 
 private:
     // ----------------------------------------------------------------------
@@ -80,6 +82,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
+	std::vector<TypeId> const               _colsToImputeDataTypes;
     // _aggregateTracker is used to track sum in fit, while countTracker tracks count.
     // However, in complete_training_impl, we divide values(sum) in _aggregateTracker
     // by corresponding counts and after that it tracks median.
@@ -124,9 +127,17 @@ TimeSeriesMedianAnnotation::TimeSeriesMedianAnnotation(TimeSeriesMedianAnnotatio
 // |  TimeSeriesMedianEstimator
 // |
 // ----------------------------------------------------------------------
-TimeSeriesMedianEstimator::TimeSeriesMedianEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType> const &>("TimeSeriesMedianEstimator", std::move(pAllColumnAnnotations))
+TimeSeriesMedianEstimator::TimeSeriesMedianEstimator(AnnotationMapsPtr pAllColumnAnnotations,std::vector<TypeId> colsToImputeDataTypes) :
+    AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType> const &>("TimeSeriesMedianEstimator", std::move(pAllColumnAnnotations)),
+    _colsToImputeDataTypes(std::move(colsToImputeDataTypes))
     {
+}
+
+/*static*/ bool TimeSeriesMedianEstimator::DoesColTypeSupportMedian(TypeId typeId) {
+    return typeId == TypeId::Float16
+        || typeId == TypeId::Float32
+        || typeId == TypeId::Float64
+        || typeId == TypeId::BFloat16;
 }
 
 Estimator::FitResult TimeSeriesMedianEstimator::fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) {
@@ -142,7 +153,7 @@ Estimator::FitResult TimeSeriesMedianEstimator::fit_impl(typename BaseType::FitB
         }
 
         for(std::size_t i=0; i< colValues.size(); ++i) {
-            if(Traits<std::string>::IsNull(colValues[i]))
+            if(Traits<std::string>::IsNull(colValues[i]) || DoesColTypeSupportMedian(_colsToImputeDataTypes[i]) == false)
                 continue;
 
             _aggregateTracker[key][i] += Traits<std::double_t>::FromString(Traits<std::string>::GetNullableValue(colValues[i]));
@@ -160,6 +171,8 @@ Estimator::FitResult TimeSeriesMedianEstimator::complete_training_impl(void) {
         KeyType const & key = kvp.first;
         for(std::size_t i=0; i< kvp.second.size(); ++i) {
             auto count = _countTracker[key][i];
+            if(DoesColTypeSupportMedian(_colsToImputeDataTypes[i]) == false)
+                continue;
             if(count == 0)
                 throw std::runtime_error("No valid value found for median computation.");
             kvp.second[i] /= count;
