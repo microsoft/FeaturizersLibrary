@@ -17,8 +17,8 @@ stages:
           demands: azureps
           vmImage: "${{ parameters.agent_pool }}"
 
-        # This build task will try to download artifacts from the triggering build. 
-        # If there is no triggering build from the specified pipeline, it will download 
+        # This build task will try to download artifacts from the triggering build.
+        # If there is no triggering build from the specified pipeline, it will download
         # artifacts from the build specified in the options below
         steps:
           - task: PythonScript@0
@@ -27,7 +27,7 @@ stages:
               scriptSource: inline
               script: |
                import sys
-     
+
                triggeredBuildNumber = sys.argv[1]
                buildId = sys.argv[2]
 
@@ -69,6 +69,7 @@ stages:
               SourceFolder: '$(Pipeline.Workspace)/Documentation'
               Contents: '**'
               TargetFolder: '$(Pipeline.Workspace)/upload/$(Build.TriggeredBy.BuildNumber)/Documentation/'
+
           - task: CopyFiles@2
             inputs:
               SourceFolder: '$(Pipeline.Workspace)/Package'
@@ -82,7 +83,7 @@ stages:
               script: |
                import os
                import sys
-     
+
                basedir = sys.argv[1]
                for fn in os.listdir(basedir):
                  if not os.path.isdir(os.path.join(basedir, fn)):

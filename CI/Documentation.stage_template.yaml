@@ -47,7 +47,8 @@ stages:
             displayName: "[DEBUG] Environment Variables (After Activation)"
 
           - script: |-
-              $(azure_activate_script) ${{ parameters.configuration }} && Doxygener$(azure_script_extension) . "$(azure_artifacts_directory)/Doxygener" /verbose
+              echo "Doxygen is temporarily crashing, so this step has been disabled for now."
+              # $(azure_activate_script) ${{ parameters.configuration }} && Doxygener$(azure_script_extension) . "$(azure_artifacts_directory)/Doxygener" /verbose
             displayName: "<Doxygener>"
             timeoutInMinutes: 180
 
