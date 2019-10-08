@@ -51,16 +51,10 @@ class RobustScalarNormEstimator : public AnnotationEstimator<InputT const &> {
 public:
     // ----------------------------------------------------------------------
     // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    using QRangeType                             = std::tuple<std::float_t, std::float_t>;
-    // ----------------------------------------------------------------------
-    // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    RobustScalarNormEstimator(AnnotationMapsPtr pAllColumnAnnotations, bool with_centering, QRangeType quantile_range);
+    RobustScalarNormEstimator(AnnotationMapsPtr pAllColumnAnnotations, bool with_centering, std::float_t q_min, std::float_t q_max);
     ~RobustScalarNormEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RobustScalarNormEstimator);
@@ -82,9 +76,9 @@ private:
     // ----------------------------------------------------------------------
     bool const                                 _with_centering;
     bool const                                 _with_scaling;
-    QRangeType const                           _quantile_range;
+    std::float_t const                         _q_min;
+    std::float_t const                         _q_max;
     
-
     InputT                                     _upperBound; 
     InputT                                     _lowerBound;
     //two maps to find stream median. max heap to store the smaller half elements, min heap to store the greater half elements 
@@ -133,14 +127,15 @@ RobustScalarNormAnnotation<T, TransformedT>::RobustScalarNormAnnotation(Transfor
 // |
 // ----------------------------------------------------------------------
 template <typename InputT,typename TransformedT, size_t ColIndexV>
-RobustScalarNormEstimator<InputT,TransformedT,ColIndexV>::RobustScalarNormEstimator(AnnotationMapsPtr pAllColumnAnnotations,  bool with_centering, QRangeType quantile_range) :
+RobustScalarNormEstimator<InputT,TransformedT,ColIndexV>::RobustScalarNormEstimator(AnnotationMapsPtr pAllColumnAnnotations,  bool with_centering, std::float_t q_min, std::float_t q_max) :
     AnnotationEstimator<InputT const &>("RobustScalarNormEstimator", std::move(pAllColumnAnnotations)),
     _with_centering(std::move(with_centering)),
-    _with_scaling(std::get<0>(quantile_range) < static_cast<std::float_t>(0) ? false : true),
-    _quantile_range(std::move(quantile_range)) {
+    _with_scaling(q_min < static_cast<std::float_t>(0) ? false : true),
+    _q_min(std::move(q_min)),
+    _q_max(std::move(q_max)){
 
     if (_with_scaling) {
-        if (!(std::get<0>(_quantile_range) >= 0 && std::get<1>(_quantile_range) <= 100 && std::get<0>(_quantile_range) < std::get<1>(_quantile_range))) {
+        if (!(_q_min >= 0 && _q_max <= 100 && _q_min < _q_max)) {
             throw std::runtime_error("Quantile Range check failed");
         }
     }
@@ -212,7 +207,7 @@ Estimator::FitResult RobustScalarNormEstimator<InputT,TransformedT,ColIndexV>::c
     //calculate the scale
     std::float_t                                qRangeRatio = 1.0;
     if (_with_scaling) {
-        qRangeRatio = (std::get<1>(_quantile_range) - std::get<0>(_quantile_range)) / 100;
+        qRangeRatio = (_q_max - _q_min) / 100;
         if (qRangeRatio < 0 || qRangeRatio > 1) {
             throw std::runtime_error("Quantile Range check failed");
         }

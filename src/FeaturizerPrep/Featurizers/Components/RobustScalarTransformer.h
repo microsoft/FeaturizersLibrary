@@ -148,8 +148,9 @@ RobustScalarEstimator<InputT,TransformedT>::Transformer::Transformer(Transformed
 }
 
 template <typename InputT,typename TransformedT>
-RobustScalarEstimator<InputT,TransformedT>::Transformer::Transformer(typename BaseType::Transformer::Archive & ar) {
-    Transformer(Traits<TransformedT>::deserialize(ar), Traits<TransformedT>::deserialize(ar));
+RobustScalarEstimator<InputT,TransformedT>::Transformer::Transformer(typename BaseType::Transformer::Archive & ar) : 
+    _median(Traits<TransformedT>::deserialize(ar)),
+    _scale(Traits<TransformedT>::deserialize(ar)) {
 }
 
 template <typename InputT,typename TransformedT>

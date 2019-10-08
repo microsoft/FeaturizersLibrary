@@ -35,7 +35,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_CreateEstimator(/*out*/ 
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CatImputerFeaturizer_int8_t_EstimatorHandle*>(index);
 
@@ -356,7 +356,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_CreateEstimator(/*out*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CatImputerFeaturizer_int16_t_EstimatorHandle*>(index);
 
@@ -677,7 +677,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_CreateEstimator(/*out*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CatImputerFeaturizer_int32_t_EstimatorHandle*>(index);
 
@@ -998,7 +998,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_CreateEstimator(/*out*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CatImputerFeaturizer_int64_t_EstimatorHandle*>(index);
 
@@ -1319,7 +1319,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_CreateEstimator(/*out*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CatImputerFeaturizer_uint8_t_EstimatorHandle*>(index);
 
@@ -1640,7 +1640,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_CreateEstimator(/*out*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CatImputerFeaturizer_uint16_t_EstimatorHandle*>(index);
 
@@ -1961,7 +1961,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_CreateEstimator(/*out*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CatImputerFeaturizer_uint32_t_EstimatorHandle*>(index);
 
@@ -2282,7 +2282,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_CreateEstimator(/*out*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CatImputerFeaturizer_uint64_t_EstimatorHandle*>(index);
 
@@ -2603,7 +2603,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_CreateEstimator(/*out*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CatImputerFeaturizer_float_t_EstimatorHandle*>(index);
 
@@ -2924,7 +2924,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_CreateEstimator(/*out*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CatImputerFeaturizer_double_t_EstimatorHandle*>(index);
 
@@ -3245,7 +3245,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_CreateEstimator(/*out*/ Ca
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CatImputerFeaturizer_bool_EstimatorHandle*>(index);
 
@@ -3566,7 +3566,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_CreateEstimator(/*out*/ 
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1));
+        Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CatImputerFeaturizer_string_EstimatorHandle*>(index);
 

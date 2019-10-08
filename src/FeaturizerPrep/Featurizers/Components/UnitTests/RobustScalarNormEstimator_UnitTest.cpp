@@ -72,10 +72,8 @@ void Estimator_Test(
     using NormEstimator                     = NS::Featurizers::Components::RobustScalarNormEstimator<InputT, TransformedT, 0>;
     using RSNormAnnotation                  = NS::Featurizers::Components::RobustScalarNormAnnotation<InputT, TransformedT>;
 
-    std::tuple<std::float_t, std::float_t> q_range = std::make_tuple<std::float_t, std::float_t>(std::move(q_min), std::move(q_max));
-
     NS::AnnotationMapsPtr const     pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NormEstimator                   estimator(pAllColumnAnnotations, with_centering, q_range);
+    NormEstimator                   estimator(pAllColumnAnnotations, with_centering, q_min, q_max);
 
 
     if(inputBatches.empty() == false) {

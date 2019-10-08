@@ -384,9 +384,9 @@ void DateTimeTransformer::save(Archive & ar) const /*override*/ {
 }
 
 DateTimeEstimator::DateTimeEstimator(
+    AnnotationMapsPtr pAllColumnAnnotations,
     nonstd::optional<std::string> const &countryName,
-    nonstd::optional<std::string> const &dataRootDir,
-    AnnotationMapsPtr pAllColumnAnnotations
+    nonstd::optional<std::string> const &dataRootDir
 ) :
     BaseType("DateTimeEstimator", std::move(pAllColumnAnnotations), true),
     Country(countryName),

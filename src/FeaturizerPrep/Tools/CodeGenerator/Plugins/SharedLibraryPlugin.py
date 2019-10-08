@@ -170,7 +170,10 @@ def _CreateInterfaceSubstitutionDict(item, c_data):
 
         suffix = "_{}_".format(template_desc)
         type_desc = " <{}>".format(template_desc)
-        cpp_template_suffix = "<{}>".format(template)
+        if item.is_output_a_template:
+            cpp_template_suffix = "<{}>".format(template + ', ' + item.transformed_type)
+        else:
+            cpp_template_suffix = "<{}>".format(template)
 
     # ----------------------------------------------------------------------
     def ToParamsString(params, arg_desc):
@@ -537,7 +540,7 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                     custom_structs="" if not custom_structs else "{}\n\n".format(
                         custom_structs.strip(),
                     ),
-                    construct_params="{}, ".format(
+                    construct_params="{},".format(
                         ", ".join(construct_params),
                     ) if construct_params else "",
                     input_param=", ".join(
@@ -686,7 +689,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                     FEATURIZER_LIBRARY_API bool {name}{suffix}CreateEstimator({params}/*out*/ {name}{suffix}EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
                         {method_prefix}
                             {validation}
-                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}* pEstimator = new Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}({args}std::make_shared<Microsoft::Featurizer::AnnotationMaps>({num_output_columns}));
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}* pEstimator = new Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}(std::make_shared<Microsoft::Featurizer::AnnotationMaps>({num_output_columns}) {args});
                             size_t index(g_pointerTable.Add(pEstimator));
                             *ppHandle = reinterpret_cast<{name}{suffix}EstimatorHandle*>(index);
 
@@ -702,7 +705,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                     validation="// No validation" if not construct_validation else "\n".join(
                         construct_validation,
                     ).strip(),
-                    args="{}, ".format(
+                    args=", {}".format(
                         ", ".join(construct_args),
                     ) if construct_args else "",
                     num_output_columns=item.num_output_columns,

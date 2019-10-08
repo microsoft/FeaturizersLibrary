@@ -13,9 +13,9 @@ namespace NS = Microsoft::Featurizer;
 using SysClock = std::chrono::system_clock;
 
 TEST_CASE("DateTimeEstimator") {
-    CHECK(NS::Featurizers::DateTimeEstimator(nonstd::optional<std::string>(), nonstd::optional<std::string>(), NS::CreateTestAnnotationMapsPtr(2)).Name == "DateTimeEstimator");
-    CHECK(NS::Featurizers::DateTimeEstimator(nonstd::optional<std::string>(), nonstd::optional<std::string>(), NS::CreateTestAnnotationMapsPtr(2)).is_training_complete());
-    CHECK(dynamic_cast<NS::Featurizers::DateTimeTransformer *>(NS::Featurizers::DateTimeEstimator(nonstd::optional<std::string>(), nonstd::optional<std::string>(), NS::CreateTestAnnotationMapsPtr(2)).create_transformer().get()));
+    CHECK(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2), nonstd::optional<std::string>(), nonstd::optional<std::string>()).Name == "DateTimeEstimator");
+    CHECK(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2), nonstd::optional<std::string>(), nonstd::optional<std::string>()).is_training_complete());
+    CHECK(dynamic_cast<NS::Featurizers::DateTimeTransformer *>(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2), nonstd::optional<std::string>(), nonstd::optional<std::string>()).create_transformer().get()));
 }
 
 TEST_CASE("DateTimeEstimator - IsValidCountry") {

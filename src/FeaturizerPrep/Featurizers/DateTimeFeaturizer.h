@@ -188,9 +188,9 @@ public:
     static std::vector<std::string> GetSupportedCountries(nonstd::optional<std::string> dataRootDir=nonstd::optional<std::string>());
 
     DateTimeEstimator(
+        AnnotationMapsPtr pAllColumnAnnotations,
         nonstd::optional<std::string> const &optionalCountryName,
-        nonstd::optional<std::string> const &optionalDataRootDir,
-        AnnotationMapsPtr pAllColumnAnnotations
+        nonstd::optional<std::string> const &optionalDataRootDir
     );
     ~DateTimeEstimator(void) override = default;
 

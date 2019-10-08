@@ -33,15 +33,13 @@ public:
         Components::RobustScalarEstimator<InputT, TransformedT>
     >;
 
-    using QRangeType = std::tuple<std::float_t, std::float_t>;
-
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    RobustScalarEstimator(AnnotationMapsPtr pAllColumnAnnotations, bool with_centering,
-                          QRangeType quantile_range = std::make_tuple<std::float_t, std::float_t>(-1.0, -1.0));
+    RobustScalarEstimator(AnnotationMapsPtr pAllColumnAnnotations, bool withCentering,
+                          std::float_t qRangeMin = -1.0, std::float_t qRangeMax = -1.0);
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RobustScalarEstimator);
 
@@ -64,20 +62,20 @@ public:
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
-RobustScalarEstimator<InputT, TransformedT>::RobustScalarEstimator(AnnotationMapsPtr pAllColumnAnnotations, bool with_centering, QRangeType quantile_range) :
+RobustScalarEstimator<InputT, TransformedT>::RobustScalarEstimator(AnnotationMapsPtr pAllColumnAnnotations, bool withCentering, std::float_t qRangeMin, std::float_t qRangeMax) :
     BaseType("RobustScalarEstimator", 
         pAllColumnAnnotations,
-        [&pAllColumnAnnotations, &with_centering, &quantile_range](void) { return Components::RobustScalarNormEstimator<InputT, TransformedT, 0>(pAllColumnAnnotations, with_centering, quantile_range); },
+        [&pAllColumnAnnotations, &withCentering, &qRangeMin, &qRangeMax](void) { return Components::RobustScalarNormEstimator<InputT, TransformedT, 0>(pAllColumnAnnotations, withCentering, qRangeMin, qRangeMax); },
         [&pAllColumnAnnotations](void) { return Components::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations); }
     ) {     
 }
 
 template <typename InputT, typename TransformedT>
-RobustScalarEstimator<InputT, TransformedT> RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(AnnotationMapsPtr pAllColumnAnnotations, bool with_centering) {
-    if (with_centering) {
-        return RobustScalarEstimator(pAllColumnAnnotations, true, std::make_tuple<std::float_t, std::float_t>(25.0, 75.0));
+RobustScalarEstimator<InputT, TransformedT> RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(AnnotationMapsPtr pAllColumnAnnotations, bool withCentering) {
+    if (withCentering) {
+        return RobustScalarEstimator(pAllColumnAnnotations, true, 25.0, 75.0);
     } 
-    return RobustScalarEstimator(pAllColumnAnnotations, false, std::make_tuple<std::float_t, std::float_t>(25.0, 75.0));
+    return RobustScalarEstimator(pAllColumnAnnotations, false, 25.0, 75.0);
 }
 
 } // namespace Featurizers

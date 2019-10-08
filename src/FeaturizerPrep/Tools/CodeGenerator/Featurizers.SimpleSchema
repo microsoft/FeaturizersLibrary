@@ -17,7 +17,10 @@
     <templates *>:
         [name string]
         <types string +>
-
+        
+    [is_intput_a_template bool default=true ?]
+    [is_output_a_template bool default=false ?]
+    
     <transformed_type_mappings +>:
         <input_type string>
         <is_input_optional bool default=false ?>

@@ -35,7 +35,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateEstimator(/*in*/ char const
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::DateTimeEstimator* pEstimator = new Microsoft::Featurizer::Featurizers::DateTimeEstimator(optionalCountryName ? std::string(optionalCountryName) : nonstd::optional<std::string>(), optionalDataRootDir ? std::string(optionalDataRootDir) : nonstd::optional<std::string>(), std::make_shared<Microsoft::Featurizer::AnnotationMaps>(21));
+        Microsoft::Featurizer::Featurizers::DateTimeEstimator* pEstimator = new Microsoft::Featurizer::Featurizers::DateTimeEstimator(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(21) , optionalCountryName ? std::string(optionalCountryName) : nonstd::optional<std::string>(), optionalDataRootDir ? std::string(optionalDataRootDir) : nonstd::optional<std::string>());
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<DateTimeFeaturizer_EstimatorHandle*>(index);
 

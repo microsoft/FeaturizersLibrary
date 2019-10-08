@@ -251,12 +251,10 @@ void TestWrapper_WithCentering_CustomScaling(std::float_t q_min, std::float_t q_
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
-    std::tuple<std::float_t, std::float_t> q_range = std::make_tuple<std::float_t, std::float_t>(std::move(q_min), std::move(q_max));
-
     CHECK(
         FuzzyCheck(
             Test(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, true, q_range),
+                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, true, q_min, q_max),
                 trainingBatches,
                 inferencingInput
             ), 
@@ -293,12 +291,10 @@ void TestWrapper_NoCentering_CustomScaling(std::float_t q_min, std::float_t q_ma
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
-    std::tuple<std::float_t, std::float_t> q_range = std::make_tuple<std::float_t, std::float_t>(std::move(q_min), std::move(q_max));
-
     CHECK(
         FuzzyCheck(
             Test(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, false, q_range),
+                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, false, q_min, q_max),
                 trainingBatches,
                 inferencingInput
             ), 

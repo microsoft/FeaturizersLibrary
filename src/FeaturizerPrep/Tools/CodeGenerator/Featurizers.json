@@ -176,8 +176,9 @@
     },
     {
         "name": "RobustScalarFeaturizer",
-        "estimator_name": "RobustScalarFeaturizer",
+        "estimator_name": "RobustScalarEstimator",
         "num_output_columns": 1,
+        "is_output_a_template": true,
         "templates": [
             {
                 "name": "TInputFloat",
@@ -208,6 +209,23 @@
             {
                 "input_type": "TInputDouble",
                 "transformed_type": "std::double_t"
+            }
+        ],
+        "configuration_params": [
+            {
+                "type": "bool",
+                "name": "withCentering",
+                "is_optional": false
+            },
+            {
+                "type": "std::float_t",
+                "name": "qRangeMin",
+                "is_optional": false
+            },
+            {
+                "type": "std::float_t",
+                "name": "qRangeMax",
+                "is_optional": false
             }
         ]
     }

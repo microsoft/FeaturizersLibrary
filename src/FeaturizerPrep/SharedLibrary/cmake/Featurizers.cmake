@@ -32,6 +32,8 @@ generate_shared_library_attributes(
 add_library(Featurizers SHARED
     ${_this_path}/../SharedLibrary_DateTimeFeaturizerCustom.h
     ${_this_path}/../SharedLibrary_DateTimeFeaturizerCustom.cpp
+    ${_this_path}/../SharedLibrary_RobustScalarFeaturizerCustom.h
+    ${_this_path}/../SharedLibrary_RobustScalarFeaturizerCustom.cpp
     ${_this_path}/../SharedLibrary_TimeSeriesImputerFeaturizer.h
     ${_this_path}/../SharedLibrary_TimeSeriesImputerFeaturizer.cpp
 
@@ -43,6 +45,8 @@ add_library(Featurizers SHARED
     ${_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.cpp
     ${_this_path}/../GeneratedCode/SharedLibrary_PointerTable.h
     ${_this_path}/../GeneratedCode/SharedLibrary_PointerTable.cpp
+    ${_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.h
+    ${_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.cpp
     ${_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.h
     ${_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.cpp
 
