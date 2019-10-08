@@ -102,7 +102,7 @@ private:
 struct EstimatorMemory {
     using SerializerType                    = Serializer;
 
-    SerializerType                                                          Serializer;
+    SerializerType                                                          EstimatorSerializer;
     Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator          Estimator;
 
     EstimatorMemory(SerializerType serializer, Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator estimator);
@@ -118,7 +118,7 @@ struct TransformerMemory {
     using SerializerType                    = Serializer;
     using TransformerUniquePtr              = Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator::TransformerUniquePtr;
 
-    SerializerType                          Serializer;
+    SerializerType                          TransformerSerializer;
     TransformerUniquePtr                    Transformer;
 
     TransformerMemory(SerializerType serializer, TransformerUniquePtr pTransformer);
@@ -261,7 +261,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_Fit(/*in*/
 
         EstimatorMemory &                   memory(*g_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(memory.Estimator.fit(memory.Serializer.Deserialize(data.pBuffer, data.cBuffer)));
+        *pFitResult = static_cast<unsigned char>(memory.Estimator.fit(memory.EstimatorSerializer.Deserialize(data.pBuffer, data.cBuffer)));
 
         return true;
     }
@@ -296,7 +296,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_FitBuffer(
         BinaryArchiveData const * const     pEndData(pData + numDataElements);
 
         while(pData != pEndData) {
-            input.emplace_back(memory.Serializer.Deserialize(pData->pBuffer, pData->cBuffer));
+            input.emplace_back(memory.EstimatorSerializer.Deserialize(pData->pBuffer, pData->cBuffer));
             ++pData;
         }
 
@@ -344,7 +344,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTran
         EstimatorMemory &                   estimatorMemory(*g_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pEstimatorHandle)));
         std::unique_ptr<TransformerMemory>  pTransformerMemory(
             std::make_unique<TransformerMemory>(
-                std::move(estimatorMemory.Serializer),
+                std::move(estimatorMemory.EstimatorSerializer),
                 estimatorMemory.Estimator.create_transformer()
             )
         );
@@ -482,9 +482,9 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_Transform(
         if(pNumDataElements == nullptr) throw std::invalid_argument("'pNumDataElements' is null");
 
         TransformerMemory &                             memory(*g_pointerTable.Get<TransformerMemory>(reinterpret_cast<size_t>(pHandle)));
-        TransformedTuples                               results(memory.Transformer->execute(memory.Serializer.Deserialize(data.pBuffer, data.cBuffer)));
+        TransformedTuples                               results(memory.Transformer->execute(memory.TransformerSerializer.Deserialize(data.pBuffer, data.cBuffer)));
 
-        std::tie(*ppData, *pNumDataElements) = memory.Serializer.Serialize(results);
+        std::tie(*ppData, *pNumDataElements) = memory.TransformerSerializer.Serialize(results);
 
         return true;
     }
@@ -512,7 +512,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_Flush(/*in
         // TODO
         // TODO TransformedTuples                               results(transformer.flush());
         // TODO
-        // TODO std::tie(*ppData, *pNumDataElements) = memory.Serializer.Serialize(results);
+        // TODO std::tie(*ppData, *pNumDataElements) = memory.TransformerSerializer.Serialize(results);
 
         // Temporary workaround
         std::ignore = memory;
@@ -780,7 +780,7 @@ Strings Serializer::_LoadKeyStrings(Microsoft::Featurizer::Archive &ar) const {
         else {
             char buffer[1024];
 
-            snprintf(buffer, sizeof(buffer), "'%d' is not a supported type id", typeId);
+            snprintf(buffer, sizeof(buffer), "'%d' is not a supported type id", static_cast<int>(typeId));
             throw std::runtime_error(buffer);
         }
     }
@@ -846,7 +846,7 @@ OptionalStrings Serializer::_LoadDataStrings(Microsoft::Featurizer::Archive &ar)
         else {
             char buffer[1024];
 
-            snprintf(buffer, sizeof(buffer), "'%d' is not a supported type id", typeId);
+            snprintf(buffer, sizeof(buffer), "'%d' is not a supported type id", static_cast<int>(typeId));
             throw std::runtime_error(buffer);
         }
     }
@@ -907,7 +907,7 @@ void Serializer::_SaveKeyStrings(Microsoft::Featurizer::Archive &ar, Strings con
         else {
             char buffer[1024];
 
-            snprintf(buffer, sizeof(buffer), "'%d' is not a supported type id", typeId);
+            snprintf(buffer, sizeof(buffer), "'%d' is not a supported type id", static_cast<int>(typeId));
             throw std::runtime_error(buffer);
         }
     }
@@ -980,7 +980,7 @@ void Serializer::_SaveDataStrings(Microsoft::Featurizer::Archive &ar, OptionalSt
         else {
             char buffer[1024];
 
-            snprintf(buffer, sizeof(buffer), "'%d' is not a supported type id", typeId);
+            snprintf(buffer, sizeof(buffer), "'%d' is not a supported type id", static_cast<int>(typeId));
             throw std::runtime_error(buffer);
         }
     }
@@ -992,7 +992,7 @@ void Serializer::_SaveDataStrings(Microsoft::Featurizer::Archive &ar, OptionalSt
 // |
 // ----------------------------------------------------------------------
 EstimatorMemory::EstimatorMemory(SerializerType serializer, Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator estimator) :
-    Serializer(std::move(serializer)),
+    EstimatorSerializer(std::move(serializer)),
     Estimator(std::move(estimator)) {
 }
 
@@ -1002,7 +1002,7 @@ EstimatorMemory::EstimatorMemory(SerializerType serializer, Microsoft::Featurize
 // |
 // ----------------------------------------------------------------------
 TransformerMemory::TransformerMemory(SerializerType serializer, TransformerUniquePtr pTransformer) :
-    Serializer(std::move(serializer)),
+    TransformerSerializer(std::move(serializer)),
     Transformer(
         std::move(
             [&pTransformer](void) -> TransformerUniquePtr & {
@@ -1014,12 +1014,12 @@ TransformerMemory::TransformerMemory(SerializerType serializer, TransformerUniqu
 }
 
 TransformerMemory::TransformerMemory(Microsoft::Featurizer::Archive &ar) :
-    Serializer(ar),
+    TransformerSerializer(ar),
     Transformer(std::make_unique<Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator::Transformer>(ar)) {
 }
 
 Microsoft::Featurizer::Archive & TransformerMemory::save(Microsoft::Featurizer::Archive &ar) {
-    Serializer.save(ar);
+    TransformerSerializer.save(ar);
     Transformer->save(ar);
 
     return ar;

@@ -278,13 +278,13 @@ def _GenerateCommonFiles(output_dir, output_stream):
 
                     LastStaticValueId,
 
-                    TensorId = 0x1001 | LastStaticValueId + 1,
-                    SparseTensorId = 0x1001 | LastStaticValueId + 2,
-                    TabularId = 0x1001 | LastStaticValueId + 3,
+                    TensorId = 0x1001 | (LastStaticValueId + 1),
+                    SparseTensorId = 0x1001 | (LastStaticValueId + 2),
+                    TabularId = 0x1001 | (LastStaticValueId + 3),
 
-                    NullableId = 0x1001 | LastStaticValueId + 4,
-                    VectorId = 0x1001 | LastStaticValueId + 5,
-                    MapId = 0x1002 | LastStaticValueId + 6
+                    NullableId = 0x1001 | (LastStaticValueId + 4),
+                    VectorId = 0x1001 | (LastStaticValueId + 5),
+                    MapId = 0x1002 | (LastStaticValueId + 6)
                 };
 
                 typedef uint32_t TypeId;

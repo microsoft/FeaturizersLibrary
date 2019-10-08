@@ -25,7 +25,7 @@ then
     echo "This script bootstraps common library enlistment and setup."
     echo ""
     echo "    Usage:"
-    echo "        $0 <common code dir>"
+    echo "        $0 <common code dir> [/name=<custom environment name>]"
     echo ""
 
     should_continue=0
@@ -43,11 +43,12 @@ fi
 if [[ ${should_continue} == 1 ]]
 then
     # Bootstrap enlistment and setup of Common_Environment, and then invoke
-    # bootstrap_impl.py once python is available.
+    # enlistment and setup once python is available.
 
     if [[ ! -e "$1/Common/Environment" ]]
     then
-        git clone https://github.com/davidbrownell/Common_Environment_v3.git "$1/Common/Environment"
+        git clone https://github.com/davidbrownell/Common_Environment_v3.git "$1/Common/Environment.tmp"
+        mv "$1/Common/Environment.tmp" "$1/Common/Environment"
     fi
 
     name=""
@@ -86,8 +87,11 @@ then
 
     cat >bootstrap_tmp.sh <<EOL
 #!/bin/bash
+set -e
+
 . "$1/Common/Environment/${activate_cmd}" python36
-python "${this_dir}/bootstrap_impl.py" "$1" ${ARGS[@]}
+${this_dir}/Setup.sh Enlist "$1" /recurse ${ARGS[@]}
+${this_dir}/Setup.sh /recurse ${ARGS[@]}
 EOL
 
     chmod +x bootstrap_tmp.sh
@@ -100,4 +104,6 @@ EOL
     then
         should_continue=0
     fi
+
+    chown --recursive ${SUDO_UID}:${SUDO_GID} "$1"
 fi

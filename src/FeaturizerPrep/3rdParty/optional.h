@@ -766,8 +766,18 @@ public:
     )
     : has_value_( other.has_value() )
     {
+
+#if (defined __GNUC__)
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+
         if ( other.has_value() )
             contained.construct_value( other.contained.value() );
+
+#if (defined __GNUC__)
+#   pragma GCC diagnostic pop
+#endif
     }
 
 #if optional_CPP11_OR_GREATER

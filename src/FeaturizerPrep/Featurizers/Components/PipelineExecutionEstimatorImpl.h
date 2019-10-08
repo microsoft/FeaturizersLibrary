@@ -46,7 +46,7 @@ public:
     public:
         // ----------------------------------------------------------------------
         // |  Public Types
-        using EstimatorChain                = EstimatorChain;
+        using EstimatorChain                = PipelineExecutionEstimatorImpl::EstimatorChain;
 
         // ----------------------------------------------------------------------
         // |  Public Methods

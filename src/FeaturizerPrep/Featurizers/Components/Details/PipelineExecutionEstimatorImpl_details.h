@@ -183,10 +183,10 @@ struct NormalizePipeline<PipelineT, false> {
     // don't know of a way to append an element to an existing tuple at compile time
     // except by using std::make_tuple. This technique simulates invoking that functionality
     // in order to get the actual result of the expressing using decltype.
-    using EstimatorChainSuffixEstimator                 = EstimatorChainSuffixEstimator<LastInputType>;
-    using EstimatorChainSuffixEstimatorConstRawPtr      = EstimatorChainSuffixEstimator const *;
+    using LastEstimatorChainSuffixEstimator             = EstimatorChainSuffixEstimator<LastInputType>;
+    using LastEstimatorChainSuffixEstimatorConstRawPtr  = LastEstimatorChainSuffixEstimator const *;
 
-    using type                              = decltype(std::tuple_cat(*(PipelineT *)(nullptr), std::make_tuple(*(EstimatorChainSuffixEstimatorConstRawPtr)(nullptr))));
+    using type                              = decltype(std::tuple_cat(*(PipelineT *)(nullptr), std::make_tuple(*(LastEstimatorChainSuffixEstimatorConstRawPtr)(nullptr))));
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
@@ -413,7 +413,7 @@ struct PipelineTraits {
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-namespace {
+namespace Impl {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         EstimatorChainElementBase
@@ -564,7 +564,7 @@ protected:
 
     inline Estimator::FitResult fit(typename EstimatorType::FitBufferInputType const *pBuffer, size_t cBuffer) {
         // ----------------------------------------------------------------------
-        using EstimatorChainElementBase     = typename EstimatorChainElementT::EstimatorChainElementBase;
+        using EstimatorChainElementBase     = typename EstimatorChainElementT::ConcreteEstimatorChainElementBase;
         using NextEstimatorChainElement     = typename EstimatorChainElementT::NextEstimatorChainElement;
         // ----------------------------------------------------------------------
 
@@ -676,9 +676,9 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorType                     = typename std::tuple_element<N, PipelineT>::type;
-    using EstimatorChainElementBase         = EstimatorChainElementBase<N, PipelineT, IsTransformerEstimator<EstimatorType>::value>;
-    using EstimatorChainElementInterFitter  = EstimatorChainElementInterFitter<EstimatorChainElement<N, PipelineT>, N, PipelineT, IsTransformerEstimator<EstimatorType>::value>;
+    using EstimatorType                                 = typename std::tuple_element<N, PipelineT>::type;
+    using ConcreteEstimatorChainElementBase             = EstimatorChainElementBase<N, PipelineT, IsTransformerEstimator<EstimatorType>::value>;
+    using ConcreteEstimatorChainElementInterFitter      = EstimatorChainElementInterFitter<EstimatorChainElement<N, PipelineT>, N, PipelineT, IsTransformerEstimator<EstimatorType>::value>;
 
     using NextEstimatorChainElement         = EstimatorChainElement<N + 1, PipelineT>;
 
@@ -688,18 +688,18 @@ public:
     // |
     // ----------------------------------------------------------------------
     EstimatorChainElement(AnnotationMapsPtr pAllColumnAnnotaitons) :
-        EstimatorChainElementBase(pAllColumnAnnotaitons),
+        ConcreteEstimatorChainElementBase(pAllColumnAnnotaitons),
         NextEstimatorChainElement(pAllColumnAnnotaitons) {
     }
 
     template <typename ConstructFuncT, typename... ConstructFuncTs>
     EstimatorChainElement(AnnotationMapsPtr pAllColumnAnnotations, ConstructFuncT && arg, ConstructFuncTs &&... args) :
-        EstimatorChainElementBase(pAllColumnAnnotations, std::forward<ConstructFuncT>(arg)),
+        ConcreteEstimatorChainElementBase(pAllColumnAnnotations, std::forward<ConstructFuncT>(arg)),
         NextEstimatorChainElement(pAllColumnAnnotations, std::forward<ConstructFuncTs>(args)...) {
     }
 
     bool is_all_training_complete() const {
-        return EstimatorChainElementBase::is_training_complete() && NextEstimatorChainElement::is_all_training_complete();
+        return ConcreteEstimatorChainElementBase::is_training_complete() && NextEstimatorChainElement::is_all_training_complete();
     }
 
     Estimator::FitResult fit(typename EstimatorType::InputType value) {
@@ -708,8 +708,8 @@ public:
 
     Estimator::FitResult fit(typename EstimatorType::FitBufferInputType const *pBuffer, size_t cBuffer) {
         // Perform local training (if necessary)
-        if(EstimatorChainElementBase::is_training_complete() == false) {
-            Estimator::FitResult            result(EstimatorChainElementBase::fit(pBuffer, cBuffer));
+        if(ConcreteEstimatorChainElementBase::is_training_complete() == false) {
+            Estimator::FitResult            result(ConcreteEstimatorChainElementBase::fit(pBuffer, cBuffer));
 
             if(result == Estimator::FitResult::Complete) {
                 _received_forceful_completion = true;
@@ -723,26 +723,26 @@ public:
         }
 
         // Invoke the next Estimator
-        return EstimatorChainElementInterFitter::fit(pBuffer, cBuffer);
+        return ConcreteEstimatorChainElementInterFitter::fit(pBuffer, cBuffer);
     }
 
     Estimator::FitResult complete_training(bool is_forceful_completion) {
-        if(EstimatorChainElementBase::is_training_complete() == false) {
+        if(ConcreteEstimatorChainElementBase::is_training_complete() == false) {
             if(is_forceful_completion) {
                 // If here, the completion event generated by a call to complete outside
                 // of the pipeline. Force complete this estimator and reset the flag so
                 // downstream estimators aren't forced to complete as well.
-                EstimatorChainElementBase::complete_training();
+                ConcreteEstimatorChainElementBase::complete_training();
 
                 is_forceful_completion = false;
                 _received_forceful_completion = true;
             } else
                 return Estimator::FitResult::ResetAndContinue;
         } else {
-            if(EstimatorChainElementBase::has_created_transformer() == false) {
+            if(ConcreteEstimatorChainElementBase::has_created_transformer() == false) {
                 // If here, we are looking at an inference-only estimator. Create the
                 // transformer now that the ancestor state data is available.
-                EstimatorChainElementBase::init_transformer();
+                ConcreteEstimatorChainElementBase::init_transformer();
                 _received_forceful_completion = true;
             }
         }
@@ -790,32 +790,32 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorType                     = typename std::tuple_element<N, PipelineT>::type;
-    using EstimatorChainElementBase         = EstimatorChainElementBase<N, PipelineT, IsTransformerEstimator<EstimatorType>::value>;
+    using EstimatorType                                 = typename std::tuple_element<N, PipelineT>::type;
+    using ConcreteEstimatorChainElementBase             = EstimatorChainElementBase<N, PipelineT, IsTransformerEstimator<EstimatorType>::value>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    using EstimatorChainElementBase::EstimatorChainElementBase;
+    using ConcreteEstimatorChainElementBase::ConcreteEstimatorChainElementBase;
 
     bool is_all_training_complete(void) const {
-        return EstimatorChainElementBase::is_training_complete();
+        return ConcreteEstimatorChainElementBase::is_training_complete();
     }
 
     Estimator::FitResult complete_training(bool is_forceful_completion) {
         if(is_forceful_completion) {
-            if(EstimatorChainElementBase::is_training_complete() == false)
-                EstimatorChainElementBase::complete_training();
+            if(ConcreteEstimatorChainElementBase::is_training_complete() == false)
+                ConcreteEstimatorChainElementBase::complete_training();
         } else {
-            if(EstimatorChainElementBase::has_created_transformer() == false)
-                EstimatorChainElementBase::init_transformer();
+            if(ConcreteEstimatorChainElementBase::has_created_transformer() == false)
+                ConcreteEstimatorChainElementBase::init_transformer();
         }
 
         // While this chained element may be complete, we want to return a value that captures the
         // state of the entire chain.
-        return EstimatorChainElementBase::is_training_complete() ? Estimator::FitResult::Complete : Estimator::FitResult::ResetAndContinue;
+        return ConcreteEstimatorChainElementBase::is_training_complete() ? Estimator::FitResult::Complete : Estimator::FitResult::ResetAndContinue;
     }
 };
 
@@ -836,23 +836,23 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorChainElement             = EstimatorChainElement<N, PipelineT>;
-    using EstimatorChainElementBase         = typename EstimatorChainElement::EstimatorChainElementBase;
+    using ConcreteEstimatorChainElement                 = EstimatorChainElement<N, PipelineT>;
+    using ConcreteEstimatorChainElementBase             = typename ConcreteEstimatorChainElement::ConcreteEstimatorChainElementBase;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    TransformerChainElementBase(EstimatorChainElement &estimator) :
-        _pTransformer(static_cast<EstimatorChainElementBase &>(estimator).move_transformer()) {
+    TransformerChainElementBase(ConcreteEstimatorChainElement &estimator) :
+        _pTransformer(static_cast<ConcreteEstimatorChainElementBase &>(estimator).move_transformer()) {
     }
 
     TransformerChainElementBase(Archive &ar) :
-        _pTransformer(std::make_unique<typename EstimatorChainElement::EstimatorType::TransformerType>(ar)) {
+        _pTransformer(std::make_unique<typename ConcreteEstimatorChainElement::EstimatorType::TransformerType>(ar)) {
     }
 
-    inline typename EstimatorChainElement::EstimatorType::TransformedType execute(typename EstimatorChainElement::EstimatorType::InputType value) {
+    inline typename ConcreteEstimatorChainElement::EstimatorType::TransformedType execute(typename ConcreteEstimatorChainElement::EstimatorType::InputType value) {
         return _pTransformer->execute(value);
     }
 
@@ -866,7 +866,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    typename EstimatorChainElement::EstimatorType::TransformerUniquePtr const   _pTransformer;
+    typename ConcreteEstimatorChainElement::EstimatorType::TransformerUniquePtr const   _pTransformer;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -882,17 +882,17 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorChainElement             = EstimatorChainElement<N, PipelineT>;
+    using ConcreteEstimatorChainElement     = EstimatorChainElement<N, PipelineT>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    inline TransformerChainElementBase(EstimatorChainElement &) {}
+    inline TransformerChainElementBase(ConcreteEstimatorChainElement &) {}
     inline TransformerChainElementBase(Archive &) {}
 
-    inline typename EstimatorChainElement::EstimatorType::InputType execute(typename EstimatorChainElement::EstimatorType::InputType value) {
+    inline typename ConcreteEstimatorChainElement::EstimatorType::InputType execute(typename ConcreteEstimatorChainElement::EstimatorType::InputType value) {
         // No change
         return value;
     }
@@ -936,7 +936,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using NextEstimatorChainElement         = EstimatorChainElement<N + 1, PipelineT>;
-    using EstimatorChainElement             = EstimatorChainElement<N, PipelineT>;
+    using ConcreteEstimatorChainElement     = EstimatorChainElement<N, PipelineT>;
     using NextTransformerChainElement       = TransformerChainElement<N + 1, PipelineT>;
 
     using TransformerType                   = TransformerChainElementBase<
@@ -952,7 +952,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    TransformerChainElement(EstimatorChainElement &element) :
+    TransformerChainElement(ConcreteEstimatorChainElement &element) :
         TransformerType(element),
         NextTransformerChainElement(static_cast<NextEstimatorChainElement &>(element)) {
     }
@@ -962,7 +962,7 @@ public:
         NextTransformerChainElement(ar) {
     }
 
-    inline TransformedType execute(typename EstimatorChainElement::EstimatorType::InputType value) {
+    inline TransformedType execute(typename ConcreteEstimatorChainElement::EstimatorType::InputType value) {
         return NextTransformerChainElement::execute(TransformerType::execute(value));
     }
 
@@ -994,7 +994,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorChainElement             = EstimatorChainElement<N, PipelineT>;
+    using ConcreteEstimatorChainElement     = EstimatorChainElement<N, PipelineT>;
 
     using TransformerType = TransformerChainElementBase<
         N,
@@ -1007,7 +1007,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    TransformerChainElement(EstimatorChainElement &element) :
+    TransformerChainElement(ConcreteEstimatorChainElement &element) :
         TransformerType(element) {
     }
 
@@ -1018,21 +1018,21 @@ public:
     // Use the `execute` and `save` methods from the base class.
 };
 
-} // anonymous namespace
+} // Impl namespace
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         TransformerChain
 ///  \brief         Chain of `Transformers`.
 ///
 template <typename PipelineT>
-class TransformerChain : public TransformerChainElement<0, PipelineT> {
+class TransformerChain : public Impl::TransformerChainElement<0, PipelineT> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = TransformerChainElement<0, PipelineT>;
+    using BaseType                          = Impl::TransformerChainElement<0, PipelineT>;
 
     // ----------------------------------------------------------------------
     // |
@@ -1041,7 +1041,7 @@ public:
     // ----------------------------------------------------------------------
     template <typename EstimatorChainT>
     TransformerChain(EstimatorChainT &estimators) :
-        BaseType(static_cast<EstimatorChainElement<0, PipelineT> &>(estimators)) {
+        BaseType(static_cast<Impl::EstimatorChainElement<0, PipelineT> &>(estimators)) {
     }
 
     TransformerChain(Archive &ar) :
@@ -1054,14 +1054,14 @@ public:
 ///  \brief         Chain of `Estimators`.
 ///
 template <typename PipelineT>
-class EstimatorChain : public EstimatorChainElement<0, PipelineT> {
+class EstimatorChain : public Impl::EstimatorChainElement<0, PipelineT> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = EstimatorChainElement<0, PipelineT>;
+    using BaseType                          = Impl::EstimatorChainElement<0, PipelineT>;
     using TransformerType                   = TransformerChain<PipelineT>;
 
     // ----------------------------------------------------------------------

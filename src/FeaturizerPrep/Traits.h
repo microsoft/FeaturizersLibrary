@@ -72,13 +72,13 @@ enum class TypeId : uint32_t {
     LastStaticValue,
 
     // The following values have N number of trailing types
-    Tensor = 0x1001 | LastStaticValue + 1,
-    SparseTensor = 0x1001 | LastStaticValue + 2,
-    Tabular = 0x1001 | LastStaticValue + 3,
+    Tensor = 0x1001 | (LastStaticValue + 1),
+    SparseTensor = 0x1001 | (LastStaticValue + 2),
+    Tabular = 0x1001 | (LastStaticValue + 3),
 
-    Nullable = 0x1001 | LastStaticValue + 4,
-    Vector = 0x1001 | LastStaticValue + 5,
-    Map = 0x1002 | LastStaticValue + 6
+    Nullable = 0x1001 | (LastStaticValue + 4),
+    Vector = 0x1001 | (LastStaticValue + 5),
+    Map = 0x1002 | (LastStaticValue + 6)
 };
 
 inline bool IsValid(TypeId id) {
@@ -874,7 +874,7 @@ private:
     }
 };
 
-namespace {
+namespace Impl {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         CommonDurationTraits
@@ -908,14 +908,14 @@ struct CommonDurationTraits : public TraitsImpl<std::chrono::duration<RepT, Peri
     }
 };
 
-} // anonymous namespace
+} // Impl namespace
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         Traits
 ///  \brief         Traits specific to any old duration (not clock-specific)
 ///
 template <typename RepT, typename PeriodT>
-struct Traits<std::chrono::duration<RepT, PeriodT>> : public CommonDurationTraits<RepT, PeriodT> {};
+struct Traits<std::chrono::duration<RepT, PeriodT>> : public Impl::CommonDurationTraits<RepT, PeriodT> {};
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         Traits
@@ -924,11 +924,12 @@ struct Traits<std::chrono::duration<RepT, PeriodT>> : public CommonDurationTrait
 ///                 that might be impacted by these differences.
 ///
 template <>
-struct Traits<std::chrono::system_clock::duration> : public CommonDurationTraits<std::chrono::system_clock::rep, std::chrono::system_clock::period> {
+struct Traits<std::chrono::system_clock::duration> : public Impl::CommonDurationTraits<std::chrono::system_clock::rep, std::chrono::system_clock::period> {
     // "std::chrono::system_clock::duration" is a specialization of std::chrono::system_clock::duration
     // However it specializes differently on Windows(std::chrono::duration<int64_t, std::ratio<1,10000000>>)
     // and Linux(std::chrono::duration<int64_t, std::ratio<1,1000000000>>). So for serDe, we cast input to a
     // fixed specialization(SystemClockSerDeDurationType).
+
     using SystemClockDurationRepType = decltype(std::chrono::system_clock::duration())::rep;
     using SystemClockDurationPeriodType = decltype(std::chrono::system_clock::duration())::period;
     using SystemClockSerDeDurationType = std::chrono::duration<int64_t, std::ratio<1,1000>>;

@@ -38,10 +38,13 @@ if "%DEVELOPMENT_ENVIRONMENT_REPOSITORY_ACTIVATED_FLAG%" NEQ "" (
 )
 
 REM Bootstrap enlistment and setup of Common_Environment, and then invoke
-REM bootstrap_impl.py once python is available.
+REM enlistment and setup once python is available.
 
 IF NOT EXIST "%_COMMON_CODE_DIR%\Common\Environment" (
-    git clone https://github.com/davidbrownell/Common_Environment_v3.git "%_COMMON_CODE_DIR%\Common\Environment"
+    git clone https://github.com/davidbrownell/Common_Environment_v3.git "%_COMMON_CODE_DIR%\Common\Environment.tmp"
+    if %ERRORLEVEL% NEQ 0 exit /B %ERRORLEVEL%
+
+    move "%_COMMON_CODE_DIR%\Common\Environment.tmp" "%_COMMON_CODE_DIR%\Common\Environment"
     if %ERRORLEVEL% NEQ 0 exit /B %ERRORLEVEL%
 )
 
@@ -107,8 +110,15 @@ if "%_BOOTSTRAP_NAME%" NEQ "" (
 
 (
     echo @echo off
+    echo.
     echo call "%_COMMON_CODE_DIR%\Common\Environment\%_ACTIVATE_CMD%" python36
-    echo python "%~dp0bootstrap_impl.py" "%_COMMON_CODE_DIR%" %_BOOTSTRAP_CLA%
+    echo if %%ERRORLEVEL%% NEQ 0 exit /B %%ERRORLEVEL%%
+    echo.
+    echo call %~dp0Setup.cmd Enlist "%_COMMON_CODE_DIR%" /recurse %_BOOTSTRAP_CLA%
+    echo if %%ERRORLEVEL%% NEQ 0 exit /B %%ERRORLEVEL%%
+    echo.
+    echo call %~dp0Setup.cmd /recurse %_BOOTSTRAP_CLA%
+    echo if %%ERRORLEVEL%% NEQ 0 exit /B %%ERRORLEVEL%%
 ) >bootstrap_tmp.cmd
 
 cmd /C bootstrap_tmp.cmd

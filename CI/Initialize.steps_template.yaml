@@ -1,58 +1,65 @@
 parameters:
     operting_system: "" # Windows|Linux
+    configuration: ""
     enable_code_coverage: "" # True|False
 
 steps:
     # These steps are an ugly hack to set Azure DevOps variables conditionally. It really seems like there should be a better way to do this.
     - ${{ if eq(parameters.operating_system, 'Windows') }}:
-        - script: |-
+          - script: |-
                 echo ##vso[task.setvariable variable=azure_activate_script]call Activate.cmd
                 echo ##vso[task.setvariable variable=azure_script_extension].cmd
                 echo ##vso[task.setvariable variable=azure_display_all_environment_vars]set
                 echo ##vso[task.setvariable variable=azure_bootstrap_command]bootstrap.cmd
                 echo ##vso[task.setvariable variable=azure_agent_temp_directory]%AGENT_TEMPDIRECTORY%
                 echo ##vso[task.setvariable variable=azure_artifacts_directory]%BUILD_ARTIFACTSTAGINGDIRECTORY%
-          displayName: "[IMPL] Set Environment-Specific Variables (Standard)"
+            displayName: "[IMPL] Set Environment-Specific Variables (Standard)"
 
-        - ${{ if eq(parameters.enable_code_coverage, 'true') }}:
-            - script: |-
-                echo ##vso[task.setvariable variable=azure_code_coverage_arg]/code_coverage
-              displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
+          - ${{ if eq(parameters.enable_code_coverage, 'true') }}:
+                - script: |-
+                      echo ##vso[task.setvariable variable=azure_code_coverage_arg]/code_coverage
+                  displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
 
-        - ${{ if not(eq(parameters.enable_code_coverage, 'true')) }}:
-            - script: |-
-                echo ##vso[task.setvariable variable=azure_code_coverage_arg]
-              displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
+          - ${{ if not(eq(parameters.enable_code_coverage, 'true')) }}:
+                - script: |-
+                      echo ##vso[task.setvariable variable=azure_code_coverage_arg]
+                  displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
 
     - ${{ if eq(parameters.operating_system, 'Linux') }}:
-        - script: |-
+          - ${{ if eq(parameters.configuration, 'universal_linux') }}:
+                - script: |-
+                      sudo yum install -y git
+                  displayName: "[IMPL] Install git"
+
+          - script: |-
                 echo "##vso[task.setvariable variable=azure_activate_script]source ./Activate.sh"
                 echo "##vso[task.setvariable variable=azure_script_extension].sh"
                 echo "##vso[task.setvariable variable=azure_display_all_environment_vars]export"
                 echo "##vso[task.setvariable variable=azure_bootstrap_command]sudo ./bootstrap.sh"
                 echo "##vso[task.setvariable variable=azure_agent_temp_directory]${AGENT_TEMPDIRECTORY}"
                 echo "##vso[task.setvariable variable=azure_artifacts_directory]${BUILD_ARTIFACTSTAGINGDIRECTORY}"
-          displayName: "[IMPL] Set Environment-Specific Variables (Standard)"
+            displayName: "[IMPL] Set Environment-Specific Variables (Standard)"
 
-        - ${{ if eq(parameters.enable_code_coverage, 'true') }}:
-            - script: |-
-                echo "##vso[task.setvariable variable=azure_code_coverage_arg]/code_coverage"
-              displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
+          - ${{ if eq(parameters.enable_code_coverage, 'true') }}:
+                - script: |-
+                      echo "##vso[task.setvariable variable=azure_code_coverage_arg]/code_coverage"
+                  displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
 
-        - ${{ if not(eq(parameters.enable_code_coverage, 'true')) }}:
-            - script: |-
-                echo "##vso[task.setvariable variable=azure_code_coverage_arg]"
-              displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
+          - ${{ if not(eq(parameters.enable_code_coverage, 'true')) }}:
+                - script: |-
+                      echo "##vso[task.setvariable variable=azure_code_coverage_arg]"
+                  displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
 
     - script: |-
-            echo "operating_system - ${{ parameters.operating_system }}"
-            echo "enable_code_coverage - ${{ parameters.enable_code_coverage }}"
+          echo "operating_system - ${{ parameters.operating_system }}"
+          echo "configuration - ${{ parameters.configuration }}"
+          echo "enable_code_coverage - ${{ parameters.enable_code_coverage }}"
 
-            echo "activate_script - $(azure_activate_script)"
-            echo "script_extension - $(azure_script_extension)"
-            echo "display_all_environment_vars - $(azure_display_all_environment_vars)"
-            echo "bootstrap_command - $(azure_bootstrap_command)"
-            echo "agent_temp_directory - $(azure_agent_temp_directory)"
-            echo "artifacts_directory - $(azure_artifacts_directory)"
-            echo "code_coverage_arg - $(azure_code_coverage_arg)"
+          echo "activate_script - $(azure_activate_script)"
+          echo "script_extension - $(azure_script_extension)"
+          echo "display_all_environment_vars - $(azure_display_all_environment_vars)"
+          echo "bootstrap_command - $(azure_bootstrap_command)"
+          echo "agent_temp_directory - $(azure_agent_temp_directory)"
+          echo "artifacts_directory - $(azure_artifacts_directory)"
+          echo "code_coverage_arg - $(azure_code_coverage_arg)"
       displayName: "[DEBUG] Display Environment-Specific Variables"

@@ -153,7 +153,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using AnnotationMapsPtr                 = AnnotationMapsPtr;
+    using AnnotationMapsPtr                 = Microsoft::Featurizer::AnnotationMapsPtr;
 
     /////////////////////////////////////////////////////////////////////////
     ///  \enum          FitResult
@@ -375,10 +375,10 @@ public:
     public:
         // ----------------------------------------------------------------------
         // |  Public Types
-        using InputType                     = InputType;
-        using TransformedType               = TransformedType;
+        using InputType                     = typename TransformerEstimator<InputT, TransformedT>::InputType;
+        using TransformedType               = typename TransformerEstimator<InputT, TransformedT>::TransformedType;
 
-        using Archive                       = Archive;
+        using Archive                       = Microsoft::Featurizer::Archive;
 
         // ----------------------------------------------------------------------
         // |  Public Methods

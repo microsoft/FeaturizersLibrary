@@ -46,7 +46,7 @@ def CreateCMakeFile(
                 string(REPLACE ":" ";" _libs "${{_libs}}")
             endif()
 
-            include(CppCommon)
+            include(CppCommon OPTIONAL)
 
             set(CMAKE_CXX_STANDARD 17)
             set(CMAKE_CXX_STANDARD_REQUIRED ON)

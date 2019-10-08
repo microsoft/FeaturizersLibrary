@@ -1,63 +1,88 @@
 name: $(TeamProject)-$(BuildDefinitionName)-$(SourceBranchName)-$(Date:yyyy.MM.dd)-$(Rev:rr)
+
 trigger:
-    batch: true
-    branches:
-        include:
-            - master
+  batch: true
+  branches:
+    include:
+      - master
+
+resources:
+  containers:
+    - container: universal_linux
+      image: universal_linux
+      endpoint: featurizersbuild
 
 stages:
-    - template: BuildAndTest.stage_template.yaml
-      parameters:
-          agent_pool: windows-2019
-          operating_system: Windows
-          configuration: x64
-          enable_code_coverage: True
-          esrp_connected_service_name: "ESRP CodeSigning Connection"
+  # Windows/clang/x64 [Official Build]
+  - template: BuildAndTest.stage_template.yaml
+    parameters:
+      agent_pool: windows-2019
+      operating_system: Windows
+      configuration: x64
+      enable_code_coverage: True
+      esrp_connected_service_name: "ESRP CodeSigning Connection"
 
-    - template: BuildAndTest.stage_template.yaml
-      parameters:
-          agent_pool: windows-2019
-          operating_system: Windows
-          configuration: x64_MSVC
-          enable_code_coverage: False
-          # Note that this build doesn't produce "official" binaries and is here for a santity check only. Therefore, no code signing.
+  # TODO: # Linux/GCC/universal_linux [Official Build]
+  # TODO: - template: BuildAndTest.stage_template.yaml
+  # TODO:   parameters:
+  # TODO:     agent_pool: ubuntu-16.04
+  # TODO:     agent_pool_container: universal_linux
+  # TODO:     operating_system: Linux
+  # TODO:     configuration: universal_linux
+  # TODO:     enable_code_coverage: False
+  # TODO:     esrp_connected_service_name: "ESRP CodeSigning Connection"
 
-    - template: BuildAndTest.stage_template.yaml
-      parameters:
-          agent_pool: ubuntu-16.04
-          operating_system: Linux
-          configuration: x64
-          enable_code_coverage: False
-          esrp_connected_service_name: "ESRP CodeSigning Connection"
+  # Windows/MSVC/x64
+  - template: BuildAndTest.stage_template.yaml
+    parameters:
+      agent_pool: windows-2019
+      operating_system: Windows
+      configuration: x64_MSVC
+      enable_code_coverage: False
+      # Note that this build doesn't produce "official" binaries and is here for a santity check only. Therefore, no code signing.
 
-    # TODO: Add a build based on custom image
-    # - template: BuildAndTest.stage_template.yaml
-    #   parameters:
-    #       agent_pool: <Docker Container>
-    #       operating_system: Linux
-    #       configuration: system_compiler
-    #       enable_code_coverage: False
+  # Linux/clang/x64
+  - template: BuildAndTest.stage_template.yaml
+    parameters:
+      agent_pool: ubuntu-16.04
+      operating_system: Linux
+      configuration: x64
+      enable_code_coverage: False
+      # Note that this build doesn't produce "official" binaries and is here for a santity check only. Therefore, no code signing.
 
-    - template: Documentation.stage_template.yaml
-      parameters:
-          agent_pool: windows-2019
-          operating_system: "Windows"
-          configuration: "system_compiler"
-          dependencies:
-              - BuildAndTest_Windows_x64_Stage
-              - BuildAndTest_Windows_x64_MSVC_Stage
-              - BuildAndTest_Linux_x64_Stage
-              # TODO - BuildAndTest_Linux_system_compiler_Stage
+  # Linux/GCC/system_compiler
+  - template: BuildAndTest.stage_template.yaml
+    parameters:
+      agent_pool: ubuntu-16.04
+      operating_system: Linux
+      configuration: system_compiler
+      enable_code_coverage: False
+      # Note that this build doesn't produce "official" binaries and is here for a santity check only. Therefore, no code signing.
 
-    - template: Package.stage_template.yaml
-      parameters:
-          agent_pool: windows-2019
-          operating_system: "Windows"
-          configuration: "system_compiler"
-          esrp_connected_service_name: "ESRP CodeSigning Connection"
+  # TODO: MacOS Build
 
-          dependencies:
-              - BuildAndTest_Windows_x64_Stage
-              - BuildAndTest_Windows_x64_MSVC_Stage
-              - BuildAndTest_Linux_x64_Stage
-              # TODO - BuildAndTest_Linux_system_compiler_Stage
+  - template: Documentation.stage_template.yaml
+    parameters:
+      agent_pool: ubuntu-16.04
+      operating_system: Linux
+      configuration: system_compiler
+      dependencies:
+        - BuildAndTest_Windows_x64_Stage
+        # TODO: - BuildAndTest_Linux_universal_linux_Stage
+        - BuildAndTest_Windows_x64_MSVC_Stage
+        - BuildAndTest_Linux_x64_Stage
+        - BuildAndTest_Linux_system_compiler_Stage
+
+  - template: Package.stage_template.yaml
+    parameters:
+      agent_pool: windows-2019
+      operating_system: Windows
+      configuration: system_compiler
+      esrp_connected_service_name: "ESRP CodeSigning Connection"
+
+      dependencies:
+        - BuildAndTest_Windows_x64_Stage
+        # TODO: - BuildAndTest_Linux_universal_linux_Stage
+        - BuildAndTest_Windows_x64_MSVC_Stage
+        - BuildAndTest_Linux_x64_Stage
+        - BuildAndTest_Linux_system_compiler_Stage

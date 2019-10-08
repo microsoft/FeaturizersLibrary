@@ -123,10 +123,22 @@ def GetDependencies():
         )
 
     d["system_compiler"] = Configuration(
-        "Builds using the system-installed compiler on an x64 architecture (this will typically be used in a container with dependencies preinstalled)",
+        "Enables basic C++ tools (cmake, ninja, doxygen, etc.)",
         [
             Dependency(
                 "F33C43DA6BB54336A7573B39509CDAD7",
+                "Common_cpp_Common",
+                "x64",
+                "https://github.com/davidbrownell/Common_cpp_Common.git",
+            ),
+        ],
+    )
+
+    if CurrentShell.CategoryName == "Linux":
+        d["universal_linux"] = Configuration(
+            "Builds using the Holy Build Box Docker Image (phusion/holy-build-box-64). More info at http://phusion.github.io/holy-build-box/",
+            [
+                Dependency("F33C43DA6BB54336A7573B39509CDAD7",
                 "Common_cpp_Common",
                 "x64",
                 "https://github.com/davidbrownell/Common_cpp_Common.git",

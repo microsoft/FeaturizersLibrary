@@ -76,9 +76,7 @@ if not PLUGINS:
 _PluginTypeInfo                             = CommandLine.EnumTypeInfo(list(six.iterkeys(PLUGINS)))
 
 # ----------------------------------------------------------------------
-@CommandLine.EntryPoint(
-    # BugBug
-)
+@CommandLine.EntryPoint
 @CommandLine.Constraints(
     plugin=_PluginTypeInfo,
     input_filename=CommandLine.FilenameTypeInfo(),

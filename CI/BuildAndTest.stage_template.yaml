@@ -5,6 +5,7 @@ parameters:
 
   configuration: ""
   agent_pool: ""
+  agent_pool_container: ""
 
   # These are parameters not because they will be configued by the caller, but rather because arrays can be
   # defined here and not in variables.
@@ -19,109 +20,109 @@ parameters:
     # 'PerformanceTests: ''
 
 stages:
-  - stage: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration}}_Stage
+  - stage: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration }}_Stage
     displayName: "${{ parameters.operating_system }} - ${{ parameters.configuration }}: "
     dependsOn: [] # No dependencies
 
     jobs:
-      - job: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration}}_Job
+      - template: BuildAndTest.job_template.yaml
+        parameters:
+          operating_system: ${{ parameters.operating_system }}
+          configuration: ${{ parameters.configuration }}
 
-        # In the UX, this display name contains redundant info (the OS and config appear twice). However, it
-        # needs to be here to ensure that the information appears in the status email messages.
-        displayName: "Build and Test (${{ parameters.operating_system }} - ${{ parameters.configuration }})"
-        pool:
-          vmImage: "${{ parameters.agent_pool }}"
-        workspace:
-          clean: all
+          agent_pool: ${{ parameters.agent_pool }}
+          agent_pool_container: ${{ parameters.agent_pool_container }}
 
-        steps:
-          - template: Initialize.steps_template.yaml
-            parameters:
-              operating_system: ${{ parameters.operating_system }}
-              enable_code_coverage: ${{ parameters.enable_code_coverage }}
+          steps:
+            - template: Initialize.steps_template.yaml
+              parameters:
+                operating_system: ${{ parameters.operating_system }}
+                configuration: ${{ parameters.configuration }}
+                enable_code_coverage: ${{ parameters.enable_code_coverage }}
 
-          - script: |-
-              echo "esrp_connected_service_name- ${{ parameters.esrp_connected_service_name }}"
-              echo "configuration - ${{ parameters.configuration }}"
-              echo "agent_pool - ${{ parameters.agent_pool }}"
-            displayName: "[DEBUG] Display BuildAndTest Variables"
+            - script: |-
+                echo "esrp_connected_service_name - ${{ parameters.esrp_connected_service_name }}"
+                echo "configuration - ${{ parameters.configuration }}"
+                echo "agent_pool - ${{ parameters.agent_pool }}"
+                echo "agent_pool_container - ${{ parameters.agent_pool_container }}"
+              displayName: "[DEBUG] Display BuildAndTest Variables"
 
-          - script: |-
-              $(azure_display_all_environment_vars)
-            displayName: "[DEBUG] Environment Variables (Before Activation)"
+            - script: |-
+                $(azure_display_all_environment_vars)
+              displayName: "[DEBUG] Environment Variables (Before Activation)"
 
-          - script: |-
-              $(azure_bootstrap_command) $(azure_agent_temp_directory) /verbose
-            displayName: "<Bootstrap>"
-            timeoutInMinutes: 180
+            - script: |-
+                $(azure_bootstrap_command) $(azure_agent_temp_directory) "/configuration=${{ parameters.configuration }}" /use_ascii /verbose
+              displayName: "<Bootstrap>"
+              timeoutInMinutes: 180
 
-          - script: |-
-              $(azure_activate_script) ${{ parameters.configuration }} && $(azure_display_all_environment_vars)
-            displayName: "[DEBUG] Environment Variables (After Activation)"
+            - script: |-
+                $(azure_activate_script) ${{ parameters.configuration }} && $(azure_display_all_environment_vars)
+              displayName: "[DEBUG] Environment Variables (After Activation)"
 
-          # TODO: Code formatting
+            # TODO: Code formatting
 
-          - script: |-
-              $(azure_activate_script) ${{ parameters.configuration }} && Builder$(azure_script_extension) Execute . "$(azure_artifacts_directory)/Builder" /verbose
-            displayName: "<Builder>"
-            timeoutInMinutes: 180
+            - script: |-
+                $(azure_activate_script) ${{ parameters.configuration }} && Builder$(azure_script_extension) Execute . "$(azure_artifacts_directory)/Builder" /verbose
+              displayName: "<Builder>"
+              timeoutInMinutes: 180
 
-          - script: |-
-              $(azure_activate_script) ${{ parameters.configuration }} && Tester$(azure_script_extension) MatchAllTests . UnitTests /verbose
-            displayName: "<Tester (MatchAllTests) - UnitTests>"
-            timeoutInMinutes: 1800
-            condition: succeededOrFailed()
+            - script: |-
+                $(azure_activate_script) ${{ parameters.configuration }} && Tester$(azure_script_extension) MatchAllTests . UnitTests /verbose
+              displayName: "<Tester (MatchAllTests) - UnitTests>"
+              timeoutInMinutes: 1800
+              condition: succeededOrFailed()
 
-          - ${{ each test_type in parameters.test_types }}:
-              - script: |-
-                  $(azure_activate_script) ${{ parameters.configuration }} && Tester$(azure_script_extension) TestAll . "$(azure_artifacts_directory)/Tester/${{ test_type.key }}" ${{ test_type.key }} ${{ test_type.value }} /verbose
-                displayName: "<Tester - ${{ test_type.key }}>"
-                timeoutInMinutes: 180
-                condition: succeededOrFailed()
+            - ${{ each test_type in parameters.test_types }}:
+                - script: |-
+                    $(azure_activate_script) ${{ parameters.configuration }} && Tester$(azure_script_extension) TestAll . "$(azure_artifacts_directory)/Tester/${{ test_type.key }}" ${{ test_type.key }} ${{ test_type.value }} /verbose
+                  displayName: "<Tester - ${{ test_type.key }}>"
+                  timeoutInMinutes: 180
+                  condition: succeededOrFailed()
 
-          # Sign the content
-          - ${{ if not(eq(parameters.esrp_connected_service_name, 'None')) }}:
-              - task: CopyFiles@2
-                displayName: "Copy Files to Sign"
-                inputs:
-                  SourceFolder: "$(azure_artifacts_directory)/Builder"
-                  TargetFolder: "$(azure_artifacts_directory)/Builder.original"
-                  CleanTargetFolder: true
+            # Sign the content
+            - ${{ if not(eq(parameters.esrp_connected_service_name, 'None')) }}:
+                - task: CopyFiles@2
+                  displayName: "Copy Files to Sign"
+                  inputs:
+                    SourceFolder: "$(azure_artifacts_directory)/Builder"
+                    TargetFolder: "$(azure_artifacts_directory)/Builder.original"
+                    CleanTargetFolder: true
 
-              - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
-                displayName: "ESRP CodeSign"
-                inputs:
-                  ConnectedServiceName: ${{ parameters.esrp_connected_service_name }}
-                  FolderPath: "$(azure_artifacts_directory)/Builder"
-                  signConfigType: inlineSignParams
-                  inlineOperation: |-
-                    [
-                        {
-                            "KeyCode" : "CP-230012",
-                            "OperationCode" : "SigntoolSign",
-                            "Parameters" : {
-                                "OpusName" : "Microsoft",
-                                "OpusInfo" : "http://www.microsoft.com",
-                                "FileDigest" : "/fd \"SHA256\"",
-                                "PageHash" : "/NPH",
-                                "TimeStamp" : "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
-                            },
-                            "ToolName" : "sign",
-                            "ToolVersion" : "1.0"
-                        },
-                        {
-                            "KeyCode" : "CP-230012",
-                            "OperationCode" : "SigntoolVerify",
-                            "Parameters" : {},
-                            "ToolName" : "sign",
-                            "ToolVersion" : "1.0"
-                        }
-                    ]
+                - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+                  displayName: "ESRP CodeSign"
+                  inputs:
+                    ConnectedServiceName: ${{ parameters.esrp_connected_service_name }}
+                    FolderPath: "$(azure_artifacts_directory)/Builder"
+                    signConfigType: inlineSignParams
+                    inlineOperation: |-
+                      [
+                          {
+                              "KeyCode" : "CP-230012",
+                              "OperationCode" : "SigntoolSign",
+                              "Parameters" : {
+                                  "OpusName" : "Microsoft",
+                                  "OpusInfo" : "http://www.microsoft.com",
+                                  "FileDigest" : "/fd \"SHA256\"",
+                                  "PageHash" : "/NPH",
+                                  "TimeStamp" : "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
+                              },
+                              "ToolName" : "sign",
+                              "ToolVersion" : "1.0"
+                          },
+                          {
+                              "KeyCode" : "CP-230012",
+                              "OperationCode" : "SigntoolVerify",
+                              "Parameters" : {},
+                              "ToolName" : "sign",
+                              "ToolVersion" : "1.0"
+                          }
+                      ]
 
-          - task: PublishPipelineArtifact@0
-            displayName: "Publish Artifacts"
-            inputs:
-              targetPath: $(azure_artifacts_directory)
-              artifactName: "${{ parameters.operating_system }} - ${{ parameters.configuration }}"
-            condition: succeededOrFailed()
-            timeoutInMinutes: 180
+            - task: PublishPipelineArtifact@0
+              displayName: "Publish Artifacts"
+              inputs:
+                targetPath: $(azure_artifacts_directory)
+                artifactName: "${{ parameters.operating_system }} - ${{ parameters.configuration }}"
+              condition: succeededOrFailed()
+              timeoutInMinutes: 180

@@ -36,13 +36,16 @@ CONFIGURATIONS                              = ["Debug", "Release"]
     output_dir=CommandLine.DirectoryTypeInfo(
         ensure_exists=False,
     ),
+    cmake_generator=CommandLine.StringTypeInfo(
+        arity="?",
+    ),
     output_stream=None,
 )
 def Build(
     configuration,
     output_dir,
     keep_temp_dir=False,
-    cmake_generator="Ninja",
+    cmake_generator=(None if os.getenv("DEVELOPMENT_ENVIRONMENT_REPOSITORY_CONFIGURATION") == "universal_linux" else "Ninja"),
     output_stream=sys.stdout,
     verbose=False,
 ):
@@ -78,14 +81,20 @@ def Build(
                 activities = [
                     (
                         "Generating cmake Files",
-                        'cmake -G "{generator}" -DCMAKE_BUILD_TYPE={configuration} "{this_dir}"'.format(
-                            generator=cmake_generator,
+                        'cmake {generator}-DCMAKE_BUILD_TYPE={configuration} "{this_dir}"'.format(
+                            generator='-G "{}" '.format(cmake_generator) if cmake_generator else "",
                             temp_dir=temp_directory,
                             configuration=configuration,
                             this_dir=_script_dir,
                         ),
                     ),
                     ("Building", "cmake --build ."),
+                ]
+
+                if os.getenv("DEVELOPMENT_ENVIRONMENT_REPOSITORY_CONFIGURATION") == "universal_linux":
+                    activities.append(("Verifying Universal Linux Binaries", 'libcheck libFeaturizers.so'))
+
+                activities += [
                     ("Copying Binaries", _CopyBinaries),
                     ("Copying Data", _CopyData),
                     ("Copying Headers", _CopyHeaders),

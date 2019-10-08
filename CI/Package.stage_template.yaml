@@ -46,7 +46,7 @@ stages:
             displayName: "[DEBUG] Environment Variables (Before Activation)"
 
           - script: |-
-              $(azure_bootstrap_command) $(azure_agent_temp_directory) /verbose
+              $(azure_bootstrap_command) $(azure_agent_temp_directory) "/required_ancestor_dir=$(azure_agent_temp_directory)" "/configuration=${{ parameters.configuration }}" /use_ascii /verbose
             displayName: "<Bootstrap>"
             timeoutInMinutes: 180
 
@@ -65,14 +65,15 @@ stages:
           - task: DownloadPipelineArtifact@2
             inputs:
               buildType: current
-              artifactName: "Linux - x64"
-              targetPath: "$(Build.StagingDirectory)/Linux - x64"
-            displayName: 'Download "Linux - x64" Artifacts'
+              # TODO: artifactName: "Linux - universal_linux"
+              artifactName: "Linux - system_compiler"
+              targetPath: "$(Build.StagingDirectory)/Linux - universal_linux"
+            displayName: 'Download "Linux - universal_linux" Artifacts'
             timeoutInMinutes: 180
 
           - ${{ each build_configuration in parameters.build_configurations }}:
               - script: |-
-                  $(azure_activate_script) ${{ parameters.configuration }} && python src/FeaturizerPrep/SharedLibrary/Build.py Package "$(azure_artifacts_directory)/Artifacts/Packages/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Windows - x64/Builder/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Linux - x64/Builder/${{ build_configuration }}" /verbose
+                  $(azure_activate_script) ${{ parameters.configuration }} && python src/FeaturizerPrep/SharedLibrary/Build.py Package "$(azure_artifacts_directory)/Artifacts/Packages/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Windows - x64/Builder/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Linux - universal_linux/Builder/${{ build_configuration }}" /verbose
                 displayName: "<Build.py Package - ${{ build_configuration }}>"
                 timeoutInMinutes: 180
 

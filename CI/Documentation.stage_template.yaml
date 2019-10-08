@@ -30,7 +30,7 @@ stages:
           - script: |-
               echo "dependencies - ${{ join(', ', parameters.dependencies) }}"
               echo "configuration - ${{ parameters.configuration }}"
-              echo "agent_pool - ${{ parameters.agent_pool }}
+              echo "agent_pool - ${{ parameters.agent_pool }}"
             displayName: "[DEBUG] Display Documentation Variables"
 
           - script: |-
@@ -38,7 +38,7 @@ stages:
             displayName: "[DEBUG] Environment Variables (Before Activation)"
 
           - script: |-
-              $(azure_bootstrap_command) $(azure_agent_temp_directory) /verbose
+              $(azure_bootstrap_command) $(azure_agent_temp_directory) "/configuration=${{ parameters.configuration }}" /use_ascii /verbose
             displayName: "<Bootstrap>"
             timeoutInMinutes: 180
 
@@ -47,7 +47,7 @@ stages:
             displayName: "[DEBUG] Environment Variables (After Activation)"
 
           - script: |-
-              $(azure_activate_script) x64 && Doxygener$(azure_script_extension) . "$(azure_artifacts_directory)/Doxygener" /verbose
+              $(azure_activate_script) ${{ parameters.configuration }} && Doxygener$(azure_script_extension) . "$(azure_artifacts_directory)/Doxygener" /verbose
             displayName: "<Doxygener>"
             timeoutInMinutes: 180
 

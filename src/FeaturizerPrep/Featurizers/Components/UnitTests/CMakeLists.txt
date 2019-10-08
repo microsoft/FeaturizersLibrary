@@ -16,9 +16,7 @@ if(NOT WIN32)
     string(REPLACE ":" ";" _libs "${_libs}")
 endif()
 
-set(CppCommon_STATIC_CRT ON CACHE BOOL "" FORCE)
-
-include(CppCommon)
+include(CppCommon OPTIONAL)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
