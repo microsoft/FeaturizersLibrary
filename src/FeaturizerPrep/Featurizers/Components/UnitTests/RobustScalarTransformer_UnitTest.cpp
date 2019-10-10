@@ -7,52 +7,9 @@
 
 #include "../../../3rdParty/optional.h"
 #include "../../../Featurizers/RobustScalarFeaturizer.h"
+#include "../../TestHelpers.h"
 
 namespace NS = Microsoft::Featurizer;
-
-namespace {
-
-template <typename T, typename ArgT>
-void make_vector(std::vector<T> & v, ArgT && arg) {
-    v.emplace_back(std::forward<ArgT>(arg));
-}
-
-template <typename T, typename ArgT, typename... ArgsT>
-void make_vector(std::vector<T> &v, ArgT && arg, ArgsT &&...args) {
-    make_vector(v, std::forward<ArgT>(arg));
-    make_vector(v, std::forward<ArgsT>(args)...);
-}
-
-} // anonymous namespace
-
-template <typename T, typename... ArgsT>
-std::vector<T> make_vector(ArgsT &&... args) {
-    std::vector<T>                          result;
-
-    result.reserve(sizeof...(ArgsT));
-
-    make_vector(result, std::forward<ArgsT>(args)...);
-    return result;
-}
-
-template <typename T>
-std::vector<T> make_vector(void) {
-    return std::vector<T>();
-}
-
-// Fuzzy check is used to check if two vectors<double/float> are same considering precision loss 
-template <typename T>
-bool FuzzyCheck(std::vector<T> const & vec1, std::vector<T> const & vec2, std::double_t epsilon = 0.000001) {
-    assert(vec1.size() == vec2.size());
-
-    size_t vec_size = vec1.size();
-    for (size_t idx = 0; idx < vec_size; ++idx) {
-        if (abs(vec1[idx] - vec2[idx]) > static_cast<T>(epsilon)) {
-            return false;
-        }
-    }
-    return true;
-}
 
 //transformer test
 template <typename InputT, typename TransformedT>
@@ -79,13 +36,13 @@ void Transformer_Test(
         output.emplace_back(pTransformer->execute(item));
     }
 
-    CHECK(FuzzyCheck(output, label));
+    CHECK(NS::TestHelpers::FuzzyCheck(output, label));
 }
 
 //TestWrapper for Transformer test
 template<typename InputT, typename TransformedT>
 void TestWrapper_Transformer(){
-    auto inferencingInput = make_vector<InputT>(
+    auto inferencingInput = NS::TestHelpers::make_vector<InputT>(
         static_cast<InputT>(1),
         static_cast<InputT>(3),
         static_cast<InputT>(5),
@@ -93,7 +50,7 @@ void TestWrapper_Transformer(){
         static_cast<InputT>(9)
     );
 
-    auto inferencingOutput = make_vector<TransformedT>(
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedT>(
         static_cast<TransformedT>(-1.0),
         static_cast<TransformedT>(-0.5),
         static_cast<TransformedT>( 0.0),

@@ -7,111 +7,21 @@
 
 #include "../../3rdParty/optional.h"
 #include "../../Featurizers/RobustScalarFeaturizer.h"
+#include "../TestHelpers.h"
 
 namespace NS = Microsoft::Featurizer;
 
-namespace {
-
-template <typename T, typename ArgT>
-void make_vector(std::vector<T> & v, ArgT && arg) {
-    v.emplace_back(std::forward<ArgT>(arg));
-}
-
-template <typename T, typename ArgT, typename... ArgsT>
-void make_vector(std::vector<T> &v, ArgT && arg, ArgsT &&...args) {
-    make_vector(v, std::forward<ArgT>(arg));
-    make_vector(v, std::forward<ArgsT>(args)...);
-}
-
-} // anonymous namespace
-
-template <typename T, typename... ArgsT>
-std::vector<T> make_vector(ArgsT &&... args) {
-    std::vector<T>                          result;
-
-    result.reserve(sizeof...(ArgsT));
-
-    make_vector(result, std::forward<ArgsT>(args)...);
-    return result;
-}
-
-template <typename T>
-std::vector<T> make_vector(void) {
-    return std::vector<T>();
-}
-
-// Fuzzy check is used to check if two vectors<double/float> are same considering precision loss 
-template <typename T>
-bool FuzzyCheck(std::vector<T> const & vec1, std::vector<T> const & vec2, std::double_t epsilon = 0.000001) {
-    assert(vec1.size() == vec2.size());
-
-    size_t vec_size = vec1.size();
-    for (size_t idx = 0; idx < vec_size; ++idx) {
-        if (abs(vec1[idx] - vec2[idx]) > static_cast<T>(epsilon)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-//integration test
-template <typename PipelineT>
-std::vector<typename PipelineT::TransformedType> Test(
-    PipelineT pipeline,
-    std::vector<std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>>> const &inputBatches,
-    std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>> const &data
-) {
-    using FitResult                         = typename NS::Estimator::FitResult;
-    using Batches                           = std::vector<std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>>>;
-
-    if(inputBatches.empty() == false) {
-        // Train the pipeline
-        typename Batches::const_iterator        iter(inputBatches.begin());
-
-        while(true) {
-            FitResult const                     result(pipeline.fit(iter->data(), iter->size()));
-
-            if(result == FitResult::Complete)
-                break;
-            else if(result == FitResult::ResetAndContinue)
-                iter = inputBatches.begin();
-            else if(result == FitResult::Continue) {
-                ++iter;
-
-                if(iter == inputBatches.end()) {
-                    if(pipeline.complete_training() == FitResult::Complete)
-                        break;
-
-                    iter = inputBatches.begin();
-                }
-            }
-        }
-    }
-
-    assert(pipeline.is_training_complete());
-
-    typename PipelineT::TransformerUniquePtr                  pTransformer(pipeline.create_transformer());
-    std::vector<typename PipelineT::TransformedType>    	  output;
-
-    output.reserve(data.size());
-
-    for(auto const &item : data)
-        output.emplace_back(pTransformer->execute(item));
-
-    return output;
-}
-
 template<typename InputT, typename TransformedT>
 void TestWrapper_Default_WithCentering(){
-    auto trainingBatches = 	make_vector<std::vector<InputT>>(
-        make_vector<InputT>(static_cast<InputT>(1)),
-        make_vector<InputT>(static_cast<InputT>(7)),
-        make_vector<InputT>(static_cast<InputT>(5)),
-        make_vector<InputT>(static_cast<InputT>(3)),
-        make_vector<InputT>(static_cast<InputT>(9))
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputT>>(
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(1)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(7)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(5)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(3)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(9))
     );
 
-    auto inferencingInput = make_vector<InputT>(
+    auto inferencingInput = NS::TestHelpers::make_vector<InputT>(
         static_cast<InputT>(1),
         static_cast<InputT>(3),
         static_cast<InputT>(5),
@@ -119,7 +29,7 @@ void TestWrapper_Default_WithCentering(){
         static_cast<InputT>(9)
     );
 
-    auto inferencingOutput = make_vector<TransformedT>(
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedT>(
         static_cast<TransformedT>(-1.0),
         static_cast<TransformedT>(-0.5),
         static_cast<TransformedT>( 0.0),
@@ -128,12 +38,13 @@ void TestWrapper_Default_WithCentering(){
     );
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>      estimator = NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(pAllColumnAnnotations, true);
 
 
     CHECK(
-        FuzzyCheck(
-            Test(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(pAllColumnAnnotations, true),
+        NS::TestHelpers::FuzzyCheck(
+            NS::TestHelpers::TransformerEstimatorTest(
+                estimator,
                 trainingBatches,
                 inferencingInput
             ), 
@@ -144,15 +55,15 @@ void TestWrapper_Default_WithCentering(){
 
 template<typename InputT, typename TransformedT>
 void TestWrapper_Default_NoCentering(){
-    auto trainingBatches = 	make_vector<std::vector<InputT>>(
-        make_vector<InputT>(static_cast<InputT>(1)),
-        make_vector<InputT>(static_cast<InputT>(7)),
-        make_vector<InputT>(static_cast<InputT>(5)),
-        make_vector<InputT>(static_cast<InputT>(3)),
-        make_vector<InputT>(static_cast<InputT>(9))
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputT>>(
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(1)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(7)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(5)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(3)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(9))
     );
 
-    auto inferencingInput = make_vector<InputT>(
+    auto inferencingInput = NS::TestHelpers::make_vector<InputT>(
         static_cast<InputT>(1),
         static_cast<InputT>(3),
         static_cast<InputT>(5),
@@ -160,7 +71,7 @@ void TestWrapper_Default_NoCentering(){
         static_cast<InputT>(9)
     );
 
-    auto inferencingOutput = make_vector<TransformedT>(
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedT>(
         static_cast<TransformedT>(1.0/4.0),
         static_cast<TransformedT>(3.0/4.0),
         static_cast<TransformedT>(5.0/4.0),
@@ -169,12 +80,13 @@ void TestWrapper_Default_NoCentering(){
     );
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>      estimator = NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(pAllColumnAnnotations, false);
 
 
     CHECK(
-        FuzzyCheck(
-            Test(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(pAllColumnAnnotations, false),
+        NS::TestHelpers::FuzzyCheck(
+            NS::TestHelpers::TransformerEstimatorTest(
+                estimator,
                 trainingBatches,
                 inferencingInput
             ), 
@@ -185,15 +97,15 @@ void TestWrapper_Default_NoCentering(){
 
 template<typename InputT, typename TransformedT>
 void TestWrapper_WithCentering_NoScaling(){
-    auto trainingBatches = 	make_vector<std::vector<InputT>>(
-        make_vector<InputT>(static_cast<InputT>(1)),
-        make_vector<InputT>(static_cast<InputT>(7)),
-        make_vector<InputT>(static_cast<InputT>(5)),
-        make_vector<InputT>(static_cast<InputT>(3)),
-        make_vector<InputT>(static_cast<InputT>(9))
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputT>>(
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(1)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(7)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(5)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(3)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(9))
     );
 
-    auto inferencingInput = make_vector<InputT>(
+    auto inferencingInput = NS::TestHelpers::make_vector<InputT>(
         static_cast<InputT>(1),
         static_cast<InputT>(3),
         static_cast<InputT>(5),
@@ -201,7 +113,7 @@ void TestWrapper_WithCentering_NoScaling(){
         static_cast<InputT>(9)
     );
 
-    auto inferencingOutput = make_vector<TransformedT>(
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedT>(
         static_cast<TransformedT>(-4),
         static_cast<TransformedT>(-2),
         static_cast<TransformedT>(0),
@@ -210,11 +122,12 @@ void TestWrapper_WithCentering_NoScaling(){
     );
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>       estimator = NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, true);
 
     CHECK(
-        FuzzyCheck(
-            Test(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, true),
+        NS::TestHelpers::FuzzyCheck(
+            NS::TestHelpers::TransformerEstimatorTest(
+                estimator,
                 trainingBatches,
                 inferencingInput
             ), 
@@ -225,15 +138,15 @@ void TestWrapper_WithCentering_NoScaling(){
 
 template<typename InputT, typename TransformedT>
 void TestWrapper_WithCentering_CustomScaling(std::float_t q_min, std::float_t q_max){
-    auto trainingBatches = 	make_vector<std::vector<InputT>>(
-        make_vector<InputT>(static_cast<InputT>(1)),
-        make_vector<InputT>(static_cast<InputT>(7)),
-        make_vector<InputT>(static_cast<InputT>(5)),
-        make_vector<InputT>(static_cast<InputT>(3)),
-        make_vector<InputT>(static_cast<InputT>(9))
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputT>>(
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(1)),
+        NS::TestHelpers:: make_vector<InputT>(static_cast<InputT>(7)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(5)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(3)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(9))
     );
 
-    auto inferencingInput = make_vector<InputT>(
+    auto inferencingInput = NS::TestHelpers::make_vector<InputT>(
         static_cast<InputT>(1),
         static_cast<InputT>(3),
         static_cast<InputT>(5),
@@ -241,7 +154,7 @@ void TestWrapper_WithCentering_CustomScaling(std::float_t q_min, std::float_t q_
         static_cast<InputT>(9)
     );
 
-    auto inferencingOutput = make_vector<TransformedT>(
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedT>(
         static_cast<TransformedT>(static_cast<std::float_t>(-50.0) / (q_max - q_min)),
         static_cast<TransformedT>(static_cast<std::float_t>(-25.0) / (q_max - q_min)),
         static_cast<TransformedT>(static_cast<std::float_t>(  0.0) / (q_max - q_min)),
@@ -251,10 +164,12 @@ void TestWrapper_WithCentering_CustomScaling(std::float_t q_min, std::float_t q_
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
+    NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>       estimator = NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, true, q_min, q_max);
+
     CHECK(
-        FuzzyCheck(
-            Test(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, true, q_min, q_max),
+        NS::TestHelpers::FuzzyCheck(
+            NS::TestHelpers::TransformerEstimatorTest(
+                estimator,
                 trainingBatches,
                 inferencingInput
             ), 
@@ -265,15 +180,15 @@ void TestWrapper_WithCentering_CustomScaling(std::float_t q_min, std::float_t q_
 
 template<typename InputT, typename TransformedT>
 void TestWrapper_NoCentering_CustomScaling(std::float_t q_min, std::float_t q_max){
-    auto trainingBatches = 	make_vector<std::vector<InputT>>(
-        make_vector<InputT>(static_cast<InputT>(1)),
-        make_vector<InputT>(static_cast<InputT>(7)),
-        make_vector<InputT>(static_cast<InputT>(5)),
-        make_vector<InputT>(static_cast<InputT>(3)),
-        make_vector<InputT>(static_cast<InputT>(9))
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputT>>(
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(1)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(7)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(5)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(3)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(9))
     );
 
-    auto inferencingInput = make_vector<InputT>(
+    auto inferencingInput = NS::TestHelpers::make_vector<InputT>(
         static_cast<InputT>(1),
         static_cast<InputT>(3),
         static_cast<InputT>(5),
@@ -281,7 +196,7 @@ void TestWrapper_NoCentering_CustomScaling(std::float_t q_min, std::float_t q_ma
         static_cast<InputT>(9)
     );
 
-    auto inferencingOutput = make_vector<TransformedT>(
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedT>(
         static_cast<TransformedT>(static_cast<std::float_t>( 12.5) / (q_max - q_min)),
         static_cast<TransformedT>(static_cast<std::float_t>( 37.5) / (q_max - q_min)),
         static_cast<TransformedT>(static_cast<std::float_t>( 62.5) / (q_max - q_min)),
@@ -291,10 +206,11 @@ void TestWrapper_NoCentering_CustomScaling(std::float_t q_min, std::float_t q_ma
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
+    NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>      estimator = NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, false, q_min, q_max);
     CHECK(
-        FuzzyCheck(
-            Test(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, false, q_min, q_max),
+        NS::TestHelpers::FuzzyCheck(
+            NS::TestHelpers::TransformerEstimatorTest(
+                estimator,
                 trainingBatches,
                 inferencingInput
             ), 

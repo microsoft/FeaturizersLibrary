@@ -7,52 +7,9 @@
 
 #include "../../../3rdParty/optional.h"
 #include "../../../Featurizers/RobustScalarFeaturizer.h"
+#include "../../TestHelpers.h"
 
 namespace NS = Microsoft::Featurizer;
-
-namespace {
-
-template <typename T, typename ArgT>
-void make_vector(std::vector<T> & v, ArgT && arg) {
-    v.emplace_back(std::forward<ArgT>(arg));
-}
-
-template <typename T, typename ArgT, typename... ArgsT>
-void make_vector(std::vector<T> &v, ArgT && arg, ArgsT &&...args) {
-    make_vector(v, std::forward<ArgT>(arg));
-    make_vector(v, std::forward<ArgsT>(args)...);
-}
-
-} // anonymous namespace
-
-template <typename T, typename... ArgsT>
-std::vector<T> make_vector(ArgsT &&... args) {
-    std::vector<T>                          result;
-
-    result.reserve(sizeof...(ArgsT));
-
-    make_vector(result, std::forward<ArgsT>(args)...);
-    return result;
-}
-
-template <typename T>
-std::vector<T> make_vector(void) {
-    return std::vector<T>();
-}
-
-// Fuzzy check is used to check if two vectors<double/float> are same considering precision loss 
-template <typename T>
-bool FuzzyCheck(std::vector<T> const & vec1, std::vector<T> const & vec2, std::double_t epsilon = 0.000001) {
-    assert(vec1.size() == vec2.size());
-
-    size_t vec_size = vec1.size();
-    for (size_t idx = 0; idx < vec_size; ++idx) {
-        if (abs(vec1[idx] - vec2[idx]) > static_cast<T>(epsilon)) {
-            return false;
-        }
-    }
-    return true;
-}
 
 //estimator test
 template <typename InputT, typename TransformedT>
@@ -120,12 +77,12 @@ void Estimator_Test(
 //TestWrapper for Estimator test
 template<typename InputT, typename TransformedT>
 void TestWrapper_NormEstimator(){
-    auto trainingBatches = 	make_vector<std::vector<InputT>>(
-        make_vector<InputT>(static_cast<InputT>(1)),
-        make_vector<InputT>(static_cast<InputT>(7)),
-        make_vector<InputT>(static_cast<InputT>(5)),
-        make_vector<InputT>(static_cast<InputT>(3)),
-        make_vector<InputT>(static_cast<InputT>(9))
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputT>>(
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(1)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(7)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(5)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(3)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(9))
     );
     Estimator_Test<InputT, TransformedT>(trainingBatches, true, 0, 100, static_cast<TransformedT>(5), static_cast<TransformedT>(8)); 
     Estimator_Test<InputT, TransformedT>(trainingBatches, true, 20, 80, static_cast<TransformedT>(5), static_cast<TransformedT>(4.8)); 
