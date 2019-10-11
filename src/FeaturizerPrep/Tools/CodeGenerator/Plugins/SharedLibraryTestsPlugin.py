@@ -509,7 +509,7 @@ class _StringTypeInfo(TypeInfo):
         input_name="input",
     ):
         if is_input_optional:
-            return "Microsoft::Featurizer::Traits<std::string>::IsNull({input_name}) ? nullptr : {input_name}.c_str()".format(
+            return "Microsoft::Featurizer::Traits<std::string>::IsNull({input_name}) ? nullptr : {input_name}->c_str()".format(
                 input_name=input_name,
             )
 

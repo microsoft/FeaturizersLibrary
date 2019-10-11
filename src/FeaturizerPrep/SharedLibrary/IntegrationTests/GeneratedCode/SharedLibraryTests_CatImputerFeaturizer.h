@@ -1165,7 +1165,7 @@ void CatImputerFeaturizer_string_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_string_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::string>::IsNull(input) ? nullptr : input.c_str(), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_string_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::string>::IsNull(input) ? nullptr : input->c_str(), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -1229,7 +1229,7 @@ void CatImputerFeaturizer_string_Test(
         std::size_t result_items(0);
 
 
-        REQUIRE(CatImputerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::string>::IsNull(input) ? nullptr : input.c_str(), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::string>::IsNull(input) ? nullptr : input->c_str(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::string(result_ptr));

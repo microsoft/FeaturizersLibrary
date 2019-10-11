@@ -38,3 +38,21 @@ TEST_CASE("int8") {
         }
     );
 }
+
+TEST_CASE("string") {
+    CatImputerFeaturizer_string_Test(
+        std::vector<nonstd::optional<std::string>>{
+            static_cast<std::string>("world"),
+            static_cast<std::string>("world"),
+            static_cast<std::string>("world")
+        },
+        std::vector<nonstd::optional<std::string>>{
+            static_cast<std::string>("hello"),
+            nonstd::optional<std::string>()
+        },
+        [](std::vector<std::string> const &args) {
+            return args == std::vector<std::string>{"hello", "world"};
+        }
+    );
+}
+

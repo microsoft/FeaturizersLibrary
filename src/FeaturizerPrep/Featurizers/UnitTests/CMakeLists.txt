@@ -31,6 +31,7 @@ enable_testing()
 foreach(_test_name IN ITEMS
     CatImputerFeaturizer_UnitTests
     DateTimeFeaturizer_UnitTests
+    ImputationMakerFeaturizer_UnitTests
     RobustScalarFeaturizer_UnitTests
     SampleAddFeaturizer_UnitTest
     StringFeaturizer_UnitTest
