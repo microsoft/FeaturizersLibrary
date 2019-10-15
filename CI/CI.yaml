@@ -63,8 +63,8 @@ stages:
 
   - template: Documentation.stage_template.yaml
     parameters:
-      agent_pool: ubuntu-16.04
-      operating_system: Linux
+      agent_pool: windows-2019
+      operating_system: Windows
       configuration: system_compiler
       dependencies:
         - BuildAndTest_Windows_x64_Stage
