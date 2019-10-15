@@ -1,5 +1,5 @@
 parameters:
-  operating_system: "" # Windows|Linux
+  operating_system: "" # Windows|Linux|MacOS
 
   dependencies: []
   configuration: ""

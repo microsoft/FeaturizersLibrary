@@ -596,7 +596,7 @@ public:
         BaseType(archive),
         OperateOnOdd(NS::Traits<bool>::deserialize(archive)),
         Delta(NS::Traits<int>::deserialize(archive)),
-        _executeCtr(NS::Traits<size_t>::deserialize(archive)) {
+        _executeCtr(NS::Traits<std::uint32_t>::deserialize(archive)) {
     }
 
     ~CustomComponentTransformer(void) override = default;
@@ -608,7 +608,7 @@ public:
 
         NS::Traits<bool>::serialize(ar, OperateOnOdd);
         NS::Traits<int>::serialize(ar, Delta);
-        NS::Traits<size_t>::serialize(ar, _executeCtr);
+        NS::Traits<std::uint32_t>::serialize(ar, _executeCtr);
     }
 
     typename BaseType::TransformedType execute(typename BaseType::InputType input) override {
@@ -623,7 +623,7 @@ public:
 private:
     // ----------------------------------------------------------------------
     // |  Private Data
-    size_t                                  _executeCtr;
+    std::uint32_t                           _executeCtr;
 };
 
 class CustomComponentEstimator :

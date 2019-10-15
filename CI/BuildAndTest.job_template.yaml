@@ -2,7 +2,7 @@
 # the container attribute is only present when there is a container provided.
 
 parameters:
-  operating_system: "" # Windows|Linux
+  operating_system: "" # Windows|Linux|MacOS
 
   configuration: ""
   agent_pool: ""
@@ -12,6 +12,7 @@ parameters:
 jobs:
   - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
       - job: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration}}_${{ parameters.agent_pool_container }}_Job
+        timeoutInMinutes: 240
 
         # In the UX, this display name contains redundant info (the OS and config appear twice). However, it
         # needs to be here to ensure that the information appears in the status email messages.
@@ -27,6 +28,7 @@ jobs:
 
   - ${{ if eq(parameters.agent_pool_container, '') }}:
       - job: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration}}_Job
+        timeoutInMinutes: 240
 
         # In the UX, this display name contains redundant info (the OS and config appear twice). However, it
         # needs to be here to ensure that the information appears in the status email messages.

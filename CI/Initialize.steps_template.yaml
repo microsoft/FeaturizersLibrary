@@ -1,5 +1,5 @@
 parameters:
-    operting_system: "" # Windows|Linux
+    operting_system: "" # Windows|Linux|MacOS
     configuration: ""
     enable_code_coverage: "" # True|False
 
@@ -13,8 +13,10 @@ steps:
                 echo ##vso[task.setvariable variable=azure_bootstrap_command]bootstrap.cmd
                 echo ##vso[task.setvariable variable=azure_agent_temp_directory]%AGENT_TEMPDIRECTORY%
                 echo ##vso[task.setvariable variable=azure_artifacts_directory]%BUILD_ARTIFACTSTAGINGDIRECTORY%
+                echo ##vso[task.setvariable variable=azure_single_threaded_build_arg]
             displayName: "[IMPL] Set Environment-Specific Variables (Standard)"
 
+          # Dynamic Code Coverage Value
           - ${{ if eq(parameters.enable_code_coverage, 'true') }}:
                 - script: |-
                       echo ##vso[task.setvariable variable=azure_code_coverage_arg]/code_coverage
@@ -25,30 +27,44 @@ steps:
                       echo ##vso[task.setvariable variable=azure_code_coverage_arg]
                   displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
 
-    - ${{ if eq(parameters.operating_system, 'Linux') }}:
-          - ${{ if eq(parameters.configuration, 'universal_linux') }}:
-                - script: |-
-                      sudo yum install -y git
-                  displayName: "[IMPL] Install git"
+    - ? ${{ if or(eq(parameters.operating_system, 'Linux'), eq(parameters.operating_system, 'MacOS')) }}
+      : - ${{ if eq(parameters.configuration, 'universal_linux') }}:
+              - script: |-
+                    sudo yum install -y git
+                displayName: "[IMPL] Install git"
 
-          - script: |-
-                echo "##vso[task.setvariable variable=azure_activate_script]source ./Activate.sh"
-                echo "##vso[task.setvariable variable=azure_script_extension].sh"
-                echo "##vso[task.setvariable variable=azure_display_all_environment_vars]export"
-                echo "##vso[task.setvariable variable=azure_bootstrap_command]sudo ./bootstrap.sh"
-                echo "##vso[task.setvariable variable=azure_agent_temp_directory]${AGENT_TEMPDIRECTORY}"
-                echo "##vso[task.setvariable variable=azure_artifacts_directory]${BUILD_ARTIFACTSTAGINGDIRECTORY}"
-            displayName: "[IMPL] Set Environment-Specific Variables (Standard)"
+        - script: |-
+              echo "##vso[task.setvariable variable=azure_activate_script]source ./Activate.sh"
+              echo "##vso[task.setvariable variable=azure_script_extension].sh"
+              echo "##vso[task.setvariable variable=azure_display_all_environment_vars]export"
+              echo "##vso[task.setvariable variable=azure_bootstrap_command]sudo ./bootstrap.sh"
+              echo "##vso[task.setvariable variable=azure_agent_temp_directory]${AGENT_TEMPDIRECTORY}"
+              echo "##vso[task.setvariable variable=azure_artifacts_directory]${BUILD_ARTIFACTSTAGINGDIRECTORY}"
+          displayName: "[IMPL] Set Environment-Specific Variables (Standard)"
 
-          - ${{ if eq(parameters.enable_code_coverage, 'true') }}:
-                - script: |-
-                      echo "##vso[task.setvariable variable=azure_code_coverage_arg]/code_coverage"
-                  displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
+        # Dynamic Code Coverage Value
+        - ${{ if eq(parameters.enable_code_coverage, 'true') }}:
+              - script: |-
+                    echo "##vso[task.setvariable variable=azure_code_coverage_arg]/code_coverage"
+                displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
 
-          - ${{ if not(eq(parameters.enable_code_coverage, 'true')) }}:
-                - script: |-
-                      echo "##vso[task.setvariable variable=azure_code_coverage_arg]"
-                  displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
+        - ${{ if not(eq(parameters.enable_code_coverage, 'true')) }}:
+              - script: |-
+                    echo "##vso[task.setvariable variable=azure_code_coverage_arg]"
+                displayName: "[IMPL] Set Environment-Specific Variables (Code Coverage)"
+
+        # Dynamic Single Threaded Build Value.
+        #   The MacOS compiler hangs when invoking the compiler in parallel. As a result, force single threaded
+        #   execution.
+        - ${{ if eq(parameters.operating_system, 'MacOS') }}:
+              - script: |-
+                    echo "##vso[task.setvariable variable=azure_single_threaded_build_arg]/single_threaded"
+                displayName: "[IMPL] Set Environment-Specific Variables (Single Threaded Build)"
+
+        - ${{ if not(eq(parameters.operating_system, 'MacOS')) }}:
+              - script: |-
+                    echo "##vso[task.setvariable variable=azure_single_threaded_build_arg]"
+                displayName: "[IMPL] Set Environment-Specific Variables (Single Threaded Build)"
 
     - script: |-
           echo "operating_system - ${{ parameters.operating_system }}"
@@ -62,4 +78,5 @@ steps:
           echo "agent_temp_directory - $(azure_agent_temp_directory)"
           echo "artifacts_directory - $(azure_artifacts_directory)"
           echo "code_coverage_arg - $(azure_code_coverage_arg)"
+          echo "single_threaded_arg - $(azure_single_threaded_build_arg)"
       displayName: "[DEBUG] Display Environment-Specific Variables"

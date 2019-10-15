@@ -255,46 +255,42 @@ def Package(
         with dm.stream.DoneManager() as this_dm:
             nuget_file_statements = {}
 
-            statement_map = {
-                "Featurizers.dll": "runtimes/win-x64/native",
-                "libFeaturizers.so": "runtimes/linux-x64/native",
-            }
-
             for build_dir in build_dirs:
                 these_files = []
-                statements_value = None
+                value_type = None
 
                 for item in os.listdir(build_dir):
-                    for k, v in six.iteritems(statement_map):
-                        if item.startswith(k):
-                            if statements_value is not None and v != statements_value:
-                                this_dm.stream.write(
-                                    "ERROR: The item '{}' is not valid based on previously captured content ({}).\n".format(
-                                        item,
-                                        statements_value,
-                                    ),
-                                )
-                                this_dm.result = -1
+                    this_value_type = None
 
-                                return this_dm.result
+                    if item == "Featurizers.dll":
+                        # TODO: win-x86
+                        this_value_type = "runtimes/win-x64/native"
+                    elif item.startswith("libFeaturizers.so"):
+                        this_value_type = "runtimes/linux-x64/native"
+                    else:
+                        name, ext = os.path.splitext(item)
+                        if name.startswith("libFeaturizers") and ext == ".dylib":
+                            this_value_type = "runtimes/osx-x64/native"
 
-                            these_files.append(os.path.join(build_dir, item))
-                            statements_value = v
-                            break
+                    if this_value_type is not None:
+                        assert value_type is None or this_value_type == value_type, (value_type, item, this_value_type)
 
-                if statements_value in nuget_file_statements:
+                        value_type = this_value_type
+                        these_files.append(os.path.join(build_dir, item))
+
+                if value_type in nuget_file_statements:
                     this_dm.stream.write(
                         "ERROR: The build directory '{}' overwrites previously captured content ({}: '{}').\n".format(
                             build_dir,
-                            statements_value,
-                            nuget_file_statements[statements_value],
+                            value_type,
+                            nuget_file_statements[value_type],
                         ),
                     )
                     this_dm.result = -1
 
                     return this_dm.result
 
-                nuget_file_statements[statements_value] = these_files
+                nuget_file_statements[value_type] = these_files
 
             file_statements = []
 
@@ -372,9 +368,9 @@ def _CopyBinaries(temp_directory, output_dir, output_stream):
 
     if CurrentShell.CategoryName == "Windows":
         output_files += ["Featurizers.dll", "Featurizers.pdb"]
-    elif CurrentShell.CategoryName == "Linux":
+    elif CurrentShell.CategoryName in ["Linux", "BSD"]:
         for item in os.listdir(temp_directory):
-            if item.startswith("libFeaturizers.so"):
+            if item.startswith("libFeaturizers") and not os.path.splitext(item)[1] in [".a"]:
                 output_files.append(item)
     else:
         raise Exception("The Current Shell is not supported")

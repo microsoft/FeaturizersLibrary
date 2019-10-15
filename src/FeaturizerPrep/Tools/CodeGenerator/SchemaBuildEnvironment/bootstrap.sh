@@ -105,5 +105,5 @@ EOL
         should_continue=0
     fi
 
-    chown --recursive ${SUDO_UID}:${SUDO_GID} "$1"
+    chown -R ${SUDO_UID}:${SUDO_GID} "$1"
 fi

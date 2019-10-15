@@ -18,7 +18,10 @@
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wold-style-cast"
 #   pragma clang diagnostic ignored "-Wshift-sign-overflow"
-#   pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+
+#   if (!defined __apple_build_version__ )
+#       pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#   endif
 #elif (defined _MSC_VER)
 #   pragma warning(push)
 #   pragma warning(disable: 4244) // conversion from 'unsigned int' to 'unsigned char', possible loss of data

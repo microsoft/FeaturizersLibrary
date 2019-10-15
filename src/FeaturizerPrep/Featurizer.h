@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <map>
+#include <string>
 #include <vector>
 
 #include "3rdParty/optional.h"

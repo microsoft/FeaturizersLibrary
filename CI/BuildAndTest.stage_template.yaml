@@ -1,5 +1,5 @@
 parameters:
-  operating_system: "" # Windows|Linux
+  operating_system: "" # Windows|Linux|MacOS
   enable_code_coverage: "" # True|False
   esrp_connected_service_name: "None" # <Name>|None
 
@@ -70,12 +70,12 @@ stages:
             - script: |-
                 $(azure_activate_script) ${{ parameters.configuration }} && Tester$(azure_script_extension) MatchAllTests . UnitTests /verbose
               displayName: "<Tester (MatchAllTests) - UnitTests>"
-              timeoutInMinutes: 1800
+              timeoutInMinutes: 180
               condition: succeededOrFailed()
 
             - ${{ each test_type in parameters.test_types }}:
                 - script: |-
-                    $(azure_activate_script) ${{ parameters.configuration }} && Tester$(azure_script_extension) TestAll . "$(azure_artifacts_directory)/Tester/${{ test_type.key }}" ${{ test_type.key }} ${{ test_type.value }} /verbose
+                    $(azure_activate_script) ${{ parameters.configuration }} && Tester$(azure_script_extension) TestAll . "$(azure_artifacts_directory)/Tester/${{ test_type.key }}" ${{ test_type.key }} ${{ test_type.value }} /verbose $(azure_single_threaded_build_arg)
                   displayName: "<Tester - ${{ test_type.key }}>"
                   timeoutInMinutes: 180
                   condition: succeededOrFailed()

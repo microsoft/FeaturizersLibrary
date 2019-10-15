@@ -767,7 +767,7 @@ public:
     : has_value_( other.has_value() )
     {
 
-#if (defined __GNUC__)
+#if (defined __GNUC__ && !defined __apple_build_version__)
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif

@@ -1,5 +1,5 @@
 parameters:
-  operating_system: "" # Windows|Linux
+  operating_system: "" # Windows|Linux|MacOS
   esrp_connected_service_name: "None" # <Name>|None
 
   dependencies: []
@@ -62,6 +62,8 @@ stages:
             displayName: 'Download "Windows - x64" Artifacts'
             timeoutInMinutes: 180
 
+          # TODO: Download x86
+
           - task: DownloadPipelineArtifact@2
             inputs:
               buildType: current
@@ -71,9 +73,18 @@ stages:
             displayName: 'Download "Linux - universal_linux" Artifacts'
             timeoutInMinutes: 180
 
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: current
+              artifactName: "MacOS - system_compiler"
+              targetPath: "$(Build.StagingDirectory)/MacOS - system_compiler"
+            displayName: 'Download "MacOS - system_compiler" Artifacts'
+            timeoutInMinutes: 180
+
           - ${{ each build_configuration in parameters.build_configurations }}:
               - script: |-
-                  $(azure_activate_script) ${{ parameters.configuration }} && python src/FeaturizerPrep/SharedLibrary/Build.py Package "$(azure_artifacts_directory)/Artifacts/Packages/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Windows - x64/Builder/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Linux - universal_linux/Builder/${{ build_configuration }}" /verbose
+                  # TODO: x86 build
+                  $(azure_activate_script) ${{ parameters.configuration }} && python src/FeaturizerPrep/SharedLibrary/Build.py Package "$(azure_artifacts_directory)/Artifacts/Packages/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Windows - x64/Builder/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Linux - universal_linux/Builder/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/MacOS - system_compiler/Builder/${{ build_configuration }}" /verbose
                 displayName: "<Build.py Package - ${{ build_configuration }}>"
                 timeoutInMinutes: 180
 

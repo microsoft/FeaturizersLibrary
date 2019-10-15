@@ -7,8 +7,12 @@
     #include <direct.h>
     #include <Windows.h>
 #else
-    #include <dirent.h>
-    #include <unistd.h>
+#   if (defined __APPLE__)
+#       include <mach-o/dyld.h>
+#   endif
+
+#   include <dirent.h>
+#   include <unistd.h>
 #endif
 
 #ifdef _MSC_VER
@@ -166,8 +170,19 @@ namespace {
     }
 
 #else
+#   if (defined __APPLE__)
     std::string GetBinaryPath(void) {
-        char                                result[PATH_MAX];
+        char                                result[PATH_MAX + 1];
+        uint32_t                            size(sizeof(result));
+
+        if(_NSGetExecutablePath(result, &size) != 0)
+            throw std::runtime_error("_NSGetExecutablePath");
+
+        return result;
+    }
+#else
+    std::string GetBinaryPath(void) {
+        char                                result[PATH_MAX + 1];
 
         memset(result, 0x00, sizeof(result));
 
@@ -178,7 +193,8 @@ namespace {
 
         return result;
     }
-
+#endif
+    
     std::string GetDataDirectory(std::string optionalDataRootDir) {
         std::string const                   binaryPath(
             [&optionalDataRootDir](void) {
