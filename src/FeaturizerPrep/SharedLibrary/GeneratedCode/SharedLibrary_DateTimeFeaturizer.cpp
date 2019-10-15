@@ -283,26 +283,6 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerSaveData(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
 FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturizer_TransformerHandle *pHandle, /*in*/ int64_t input, /*out*/ TimePoint ** output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;

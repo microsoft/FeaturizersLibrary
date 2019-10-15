@@ -28,7 +28,6 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_CreateTransformerFromSav
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_DestroyTransformer(/*in*/ CatImputerFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_CreateTransformerSaveData(/*in*/ CatImputerFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_Transform(/*in*/ CatImputerFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -52,7 +51,6 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_CreateTransformerFromSa
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_DestroyTransformer(/*in*/ CatImputerFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_CreateTransformerSaveData(/*in*/ CatImputerFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_Transform(/*in*/ CatImputerFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t const * input, /*out*/ int16_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -76,7 +74,6 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_CreateTransformerFromSa
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_DestroyTransformer(/*in*/ CatImputerFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_CreateTransformerSaveData(/*in*/ CatImputerFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_Transform(/*in*/ CatImputerFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t const * input, /*out*/ int32_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -100,7 +97,6 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_CreateTransformerFromSa
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_DestroyTransformer(/*in*/ CatImputerFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_CreateTransformerSaveData(/*in*/ CatImputerFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_Transform(/*in*/ CatImputerFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t const * input, /*out*/ int64_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -124,7 +120,6 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_CreateTransformerFromSa
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_DestroyTransformer(/*in*/ CatImputerFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_CreateTransformerSaveData(/*in*/ CatImputerFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_Transform(/*in*/ CatImputerFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t const * input, /*out*/ uint8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -148,7 +143,6 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_CreateTransformerFromS
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_DestroyTransformer(/*in*/ CatImputerFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_CreateTransformerSaveData(/*in*/ CatImputerFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_Transform(/*in*/ CatImputerFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t const * input, /*out*/ uint16_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -172,7 +166,6 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_CreateTransformerFromS
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_DestroyTransformer(/*in*/ CatImputerFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_CreateTransformerSaveData(/*in*/ CatImputerFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_Transform(/*in*/ CatImputerFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t const * input, /*out*/ uint32_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -196,7 +189,6 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_CreateTransformerFromS
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_DestroyTransformer(/*in*/ CatImputerFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_CreateTransformerSaveData(/*in*/ CatImputerFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_Transform(/*in*/ CatImputerFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t const * input, /*out*/ uint64_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -220,7 +212,6 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_CreateTransformerFromSa
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_DestroyTransformer(/*in*/ CatImputerFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_CreateTransformerSaveData(/*in*/ CatImputerFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_Transform(/*in*/ CatImputerFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -244,7 +235,6 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_CreateTransformerFromS
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_DestroyTransformer(/*in*/ CatImputerFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_CreateTransformerSaveData(/*in*/ CatImputerFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_Transform(/*in*/ CatImputerFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -268,7 +258,6 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_CreateTransformerFromSaved
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_DestroyTransformer(/*in*/ CatImputerFeaturizer_bool_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_CreateTransformerSaveData(/*in*/ CatImputerFeaturizer_bool_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_bool_Transform(/*in*/ CatImputerFeaturizer_bool_TransformerHandle *pHandle, /*in*/ bool const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -292,7 +281,6 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_CreateTransformerFromSav
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_DestroyTransformer(/*in*/ CatImputerFeaturizer_string_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_CreateTransformerSaveData(/*in*/ CatImputerFeaturizer_string_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_Transform(/*in*/ CatImputerFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);

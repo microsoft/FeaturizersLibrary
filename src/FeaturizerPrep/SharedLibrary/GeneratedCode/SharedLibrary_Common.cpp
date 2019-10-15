@@ -10,6 +10,9 @@
 #include "SharedLibrary_Common.h"
 #include "SharedLibrary_PointerTable.h"
 
+// Forward declaration for DestroyTransformerSaveData
+ErrorInfoHandle* CreateErrorInfo(std::exception const &ex);
+
 extern "C" {
 
 FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr, /*out*/ std::size_t *output_items) {
@@ -51,6 +54,26 @@ FEATURIZER_LIBRARY_API bool DestroyErrorInfo(/*in*/ ErrorInfoHandle *pHandle) {
     delete &str;
 
     return true;
+}
+
+FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
+        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
+
+        delete [] pBuffer;
+
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
 }
 
 } // extern "C"

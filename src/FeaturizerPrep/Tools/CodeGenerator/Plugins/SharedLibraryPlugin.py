@@ -248,6 +248,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
                 FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr, /*out*/ std::size_t *output_items);
                 FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr, /*in*/ std::size_t input_items);
                 FEATURIZER_LIBRARY_API bool DestroyErrorInfo(/*in*/ ErrorInfoHandle *pHandle);
+                FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
                 // These values should match the values in Featurizer.h
                 enum FitResultValue {
@@ -355,6 +356,9 @@ def _GenerateCommonFiles(output_dir, output_stream):
                 #include "SharedLibrary_Common.h"
                 #include "SharedLibrary_PointerTable.h"
 
+                // Forward declaration for DestroyTransformerSaveData
+                ErrorInfoHandle* CreateErrorInfo(std::exception const &ex);
+
                 extern "C" {
 
                 FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr, /*out*/ std::size_t *output_items) {
@@ -396,6 +400,26 @@ def _GenerateCommonFiles(output_dir, output_stream):
                     delete &str;
 
                     return true;
+                }
+
+                FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+                    if(ppErrorInfo == nullptr)
+                        return false;
+
+                    try {
+                        *ppErrorInfo = nullptr;
+
+                        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
+                        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
+
+                        delete [] pBuffer;
+                    
+                        return true;
+                    }
+                    catch(std::exception const &ex) {
+                        *ppErrorInfo = CreateErrorInfo(ex);
+                        return false;
+                    }
                 }
 
                 } // extern "C"
@@ -531,7 +555,6 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                     FEATURIZER_LIBRARY_API bool {name}{suffix}DestroyTransformer(/*in*/ {name}{suffix}TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
                     FEATURIZER_LIBRARY_API bool {name}{suffix}CreateTransformerSaveData(/*in*/ {name}{suffix}TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-                    FEATURIZER_LIBRARY_API bool {name}{suffix}DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
                     FEATURIZER_LIBRARY_API bool {name}{suffix}Transform(/*in*/ {name}{suffix}TransformerHandle *pHandle, {input_param}, {transform_output_param}, /*out*/ ErrorInfoHandle **ppErrorInfo);
                     {delete_transformed_method}
@@ -946,23 +969,6 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
 
                             *ppBuffer = new_buffer;
                             *pBufferSize = buffer.size();
-                        {method_suffix}
-                    }}
-
-                    """,
-                ).format(**d)
-            )
-
-            # DestroyTranformerSaveData
-            f.write(
-                textwrap.dedent(
-                    """\
-                    FEATURIZER_LIBRARY_API bool {name}{suffix}DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
-                        {method_prefix}
-                            if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-                            if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-                            delete [] pBuffer;
                         {method_suffix}
                     }}
 

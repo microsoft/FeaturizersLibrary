@@ -28,7 +28,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerFromSavedDa
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyTransformer(/*in*/ StringFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_Transform(/*in*/ StringFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -53,7 +52,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerFromSavedD
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyTransformer(/*in*/ StringFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_Transform(/*in*/ StringFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -78,7 +76,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerFromSavedD
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyTransformer(/*in*/ StringFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_Transform(/*in*/ StringFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -103,7 +100,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerFromSavedD
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyTransformer(/*in*/ StringFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_Transform(/*in*/ StringFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -128,7 +124,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerFromSavedD
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyTransformer(/*in*/ StringFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_Transform(/*in*/ StringFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -153,7 +148,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerFromSaved
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyTransformer(/*in*/ StringFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_Transform(/*in*/ StringFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -178,7 +172,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerFromSaved
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyTransformer(/*in*/ StringFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_Transform(/*in*/ StringFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -203,7 +196,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerFromSaved
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyTransformer(/*in*/ StringFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_Transform(/*in*/ StringFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -228,7 +220,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerFromSavedD
 FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyTransformer(/*in*/ StringFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_Transform(/*in*/ StringFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -253,7 +244,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerFromSaved
 FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_DestroyTransformer(/*in*/ StringFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_Transform(/*in*/ StringFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -278,7 +268,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateTransformerFromSavedData
 FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_DestroyTransformer(/*in*/ StringFeaturizer_bool_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateTransformerSaveData(/*in*/ StringFeaturizer_bool_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_Transform(/*in*/ StringFeaturizer_bool_TransformerHandle *pHandle, /*in*/ bool input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -303,7 +292,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateTransformerFromSavedDa
 FEATURIZER_LIBRARY_API bool StringFeaturizer_string_DestroyTransformer(/*in*/ StringFeaturizer_string_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateTransformerSaveData(/*in*/ StringFeaturizer_string_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_string_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool StringFeaturizer_string_Transform(/*in*/ StringFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_string_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);

@@ -234,7 +234,7 @@ TEST_CASE("End-to-end") {
     CHECK(otherTransformerHandle != nullptr);
 
     // Destroy the serialized data
-    CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_DestroyTransformerSaveData(pSavedData, cSavedData, &pErrorInfo));
+    CHECK(DestroyTransformerSaveData(pSavedData, cSavedData, &pErrorInfo));
     CHECK(pErrorInfo == nullptr);
 
     CHECK(

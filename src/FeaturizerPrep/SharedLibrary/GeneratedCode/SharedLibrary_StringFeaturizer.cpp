@@ -283,26 +283,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerSaveData(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_Transform(/*in*/ StringFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -617,26 +597,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerSaveData(/
 
         *ppBuffer = new_buffer;
         *pBufferSize = buffer.size();
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
     
         return true;
     }
@@ -969,26 +929,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerSaveData(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_Transform(/*in*/ StringFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -1303,26 +1243,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerSaveData(/
 
         *ppBuffer = new_buffer;
         *pBufferSize = buffer.size();
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
     
         return true;
     }
@@ -1655,26 +1575,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerSaveData(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_Transform(/*in*/ StringFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -1989,26 +1889,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerSaveData(
 
         *ppBuffer = new_buffer;
         *pBufferSize = buffer.size();
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
     
         return true;
     }
@@ -2341,26 +2221,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerSaveData(
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_Transform(/*in*/ StringFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -2675,26 +2535,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerSaveData(
 
         *ppBuffer = new_buffer;
         *pBufferSize = buffer.size();
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
     
         return true;
     }
@@ -3027,26 +2867,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerSaveData(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
 FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_Transform(/*in*/ StringFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -3370,26 +3190,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerSaveData(
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
 FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_Transform(/*in*/ StringFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -3704,26 +3504,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateTransformerSaveData(/*in
 
         *ppBuffer = new_buffer;
         *pBufferSize = buffer.size();
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
-FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
     
         return true;
     }
@@ -4058,26 +3838,6 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateTransformerSaveData(/*
 
         *ppBuffer = new_buffer;
         *pBufferSize = buffer.size();
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
-FEATURIZER_LIBRARY_API bool StringFeaturizer_string_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
-
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
-        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
-
-        delete [] pBuffer;
     
         return true;
     }

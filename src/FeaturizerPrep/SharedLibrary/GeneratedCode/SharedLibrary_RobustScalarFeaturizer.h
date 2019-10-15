@@ -28,7 +28,6 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CreateTransformerFromS
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_DestroyTransformer(/*in*/ RobustScalarFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CreateTransformerSaveData(/*in*/ RobustScalarFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_Transform(/*in*/ RobustScalarFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -52,7 +51,6 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CreateTransformerFrom
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_DestroyTransformer(/*in*/ RobustScalarFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CreateTransformerSaveData(/*in*/ RobustScalarFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_Transform(/*in*/ RobustScalarFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -76,7 +74,6 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CreateTransformerFrom
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_DestroyTransformer(/*in*/ RobustScalarFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CreateTransformerSaveData(/*in*/ RobustScalarFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_Transform(/*in*/ RobustScalarFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -100,7 +97,6 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CreateTransformerFro
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_DestroyTransformer(/*in*/ RobustScalarFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CreateTransformerSaveData(/*in*/ RobustScalarFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_Transform(/*in*/ RobustScalarFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -124,7 +120,6 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CreateTransformerFrom
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_DestroyTransformer(/*in*/ RobustScalarFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CreateTransformerSaveData(/*in*/ RobustScalarFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_Transform(/*in*/ RobustScalarFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -148,7 +143,6 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CreateTransformerFrom
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_DestroyTransformer(/*in*/ RobustScalarFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CreateTransformerSaveData(/*in*/ RobustScalarFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_Transform(/*in*/ RobustScalarFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -172,7 +166,6 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CreateTransformerFrom
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_DestroyTransformer(/*in*/ RobustScalarFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CreateTransformerSaveData(/*in*/ RobustScalarFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_Transform(/*in*/ RobustScalarFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -196,7 +189,6 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CreateTransformerFro
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_DestroyTransformer(/*in*/ RobustScalarFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CreateTransformerSaveData(/*in*/ RobustScalarFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_Transform(/*in*/ RobustScalarFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -220,7 +212,6 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CreateTransformerFro
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_DestroyTransformer(/*in*/ RobustScalarFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CreateTransformerSaveData(/*in*/ RobustScalarFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_Transform(/*in*/ RobustScalarFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -244,7 +235,6 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CreateTransformerFro
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_DestroyTransformer(/*in*/ RobustScalarFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CreateTransformerSaveData(/*in*/ RobustScalarFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_Transform(/*in*/ RobustScalarFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 

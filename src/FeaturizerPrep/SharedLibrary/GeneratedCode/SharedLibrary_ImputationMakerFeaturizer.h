@@ -28,7 +28,6 @@ FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int8_t_CreateTransformerFr
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int8_t_DestroyTransformer(/*in*/ ImputationMakerFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int8_t_CreateTransformerSaveData(/*in*/ ImputationMakerFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int8_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int8_t_Transform(/*in*/ ImputationMakerFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -52,7 +51,6 @@ FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int16_t_CreateTransformerF
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int16_t_DestroyTransformer(/*in*/ ImputationMakerFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int16_t_CreateTransformerSaveData(/*in*/ ImputationMakerFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int16_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int16_t_Transform(/*in*/ ImputationMakerFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -76,7 +74,6 @@ FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int32_t_CreateTransformerF
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int32_t_DestroyTransformer(/*in*/ ImputationMakerFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int32_t_CreateTransformerSaveData(/*in*/ ImputationMakerFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int32_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int32_t_Transform(/*in*/ ImputationMakerFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -100,7 +97,6 @@ FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int64_t_CreateTransformerF
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int64_t_DestroyTransformer(/*in*/ ImputationMakerFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int64_t_CreateTransformerSaveData(/*in*/ ImputationMakerFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int64_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_int64_t_Transform(/*in*/ ImputationMakerFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -124,7 +120,6 @@ FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint8_t_CreateTransformerF
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint8_t_DestroyTransformer(/*in*/ ImputationMakerFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint8_t_CreateTransformerSaveData(/*in*/ ImputationMakerFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint8_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint8_t_Transform(/*in*/ ImputationMakerFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -148,7 +143,6 @@ FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint16_t_CreateTransformer
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint16_t_DestroyTransformer(/*in*/ ImputationMakerFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint16_t_CreateTransformerSaveData(/*in*/ ImputationMakerFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint16_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint16_t_Transform(/*in*/ ImputationMakerFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -172,7 +166,6 @@ FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint32_t_CreateTransformer
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint32_t_DestroyTransformer(/*in*/ ImputationMakerFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint32_t_CreateTransformerSaveData(/*in*/ ImputationMakerFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint32_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint32_t_Transform(/*in*/ ImputationMakerFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -196,7 +189,6 @@ FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint64_t_CreateTransformer
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint64_t_DestroyTransformer(/*in*/ ImputationMakerFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint64_t_CreateTransformerSaveData(/*in*/ ImputationMakerFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint64_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_uint64_t_Transform(/*in*/ ImputationMakerFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -220,7 +212,6 @@ FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_float_t_CreateTransformerF
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_float_t_DestroyTransformer(/*in*/ ImputationMakerFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_float_t_CreateTransformerSaveData(/*in*/ ImputationMakerFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_float_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_float_t_Transform(/*in*/ ImputationMakerFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -244,7 +235,6 @@ FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_double_t_CreateTransformer
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_double_t_DestroyTransformer(/*in*/ ImputationMakerFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_double_t_CreateTransformerSaveData(/*in*/ ImputationMakerFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_double_t_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_double_t_Transform(/*in*/ ImputationMakerFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -268,7 +258,6 @@ FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_bool_CreateTransformerFrom
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_bool_DestroyTransformer(/*in*/ ImputationMakerFeaturizer_bool_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_bool_CreateTransformerSaveData(/*in*/ ImputationMakerFeaturizer_bool_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_bool_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_bool_Transform(/*in*/ ImputationMakerFeaturizer_bool_TransformerHandle *pHandle, /*in*/ bool const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -292,7 +281,6 @@ FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_string_CreateTransformerFr
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_string_DestroyTransformer(/*in*/ ImputationMakerFeaturizer_string_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_string_CreateTransformerSaveData(/*in*/ ImputationMakerFeaturizer_string_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_string_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool ImputationMakerFeaturizer_string_Transform(/*in*/ ImputationMakerFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
