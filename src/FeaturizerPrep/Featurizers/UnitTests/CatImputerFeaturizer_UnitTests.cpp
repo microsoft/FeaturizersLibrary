@@ -155,7 +155,7 @@ TEST_CASE("Serialization/Deserialization- Numeric") {
 
     NS::Archive loader(vec);
     transformerType modelLoaded(loader);
-    CHECK(modelLoaded.get_most_frequent_value() == 10);
+    CHECK(modelLoaded == *model);
 }
 
 TEST_CASE("Serialization/Deserialization- string") {
@@ -170,7 +170,7 @@ TEST_CASE("Serialization/Deserialization- string") {
 
     NS::Archive loader(vec);
     transformerType modelLoaded(loader);
-    CHECK(modelLoaded.get_most_frequent_value() == "one");
+    CHECK(modelLoaded == *model);
 
 }
 

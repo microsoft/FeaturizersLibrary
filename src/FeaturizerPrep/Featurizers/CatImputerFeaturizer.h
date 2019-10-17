@@ -50,7 +50,7 @@ public:
 
         void save(typename BaseType::Transformer::Archive & ar) const override;
 
-        TransformedT const & get_most_frequent_value() const;
+        bool operator==(HistogramConsumerEstimator::Transformer const &other) const;
 
     private:
         // ----------------------------------------------------------------------
@@ -226,10 +226,9 @@ void HistogramConsumerEstimator<InputT,TransformedT>::Transformer::save(typename
 }
 
 template <typename InputT,typename TransformedT>
-TransformedT const & HistogramConsumerEstimator<InputT,TransformedT>::Transformer::get_most_frequent_value() const {
-    return _mostFreq;
+bool HistogramConsumerEstimator<InputT,TransformedT>::Transformer::operator ==(HistogramConsumerEstimator<InputT,TransformedT>::Transformer const &other) const {
+    return _mostFreq == other._mostFreq;
 }
-
 // ----------------------------------------------------------------------
 // |
 // |  CatImputerEstimator

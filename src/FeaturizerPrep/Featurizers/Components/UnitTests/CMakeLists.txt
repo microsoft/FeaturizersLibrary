@@ -28,6 +28,7 @@ enable_testing()
 
 foreach(_test_name IN ITEMS
     HistogramEstimator_UnitTest
+    IndexMapEstimator_UnitTest
     InferenceOnlyFeaturizerImpl_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
     RobustScalarNormEstimator_UnitTest

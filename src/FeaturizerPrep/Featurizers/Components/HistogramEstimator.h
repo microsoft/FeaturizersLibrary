@@ -144,7 +144,6 @@ HistogramEstimator<InputT,ColIndexV>::HistogramEstimator(AnnotationMapsPtr pAllC
 
 template <typename InputT, size_t ColIndexV>
 Estimator::FitResult HistogramEstimator<InputT,ColIndexV>::fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) {
-
     typename BaseType::FitBufferInputType const * const                 pEndBuffer(pBuffer + cBuffer);
     while(pBuffer != pEndBuffer) {
         InputT const &                                   input(*pBuffer++);

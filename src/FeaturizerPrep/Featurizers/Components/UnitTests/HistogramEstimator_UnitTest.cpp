@@ -15,15 +15,15 @@ template <typename T>
 using Histogram = std::map<T, std::uint32_t>;
 
 
-template <typename inputType>
-Histogram<inputType> Test(std::vector<std::vector<inputType>> const &inputBatches) {
+template <typename InputT>
+Histogram<InputT> Test(std::vector<std::vector<InputT>> const &inputBatches) {
     NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::HistogramEstimator<inputType, 0> estimator(pAllColumnAnnotations);
+    NS::Featurizers::Components::HistogramEstimator<InputT, 0> estimator(pAllColumnAnnotations);
 
-    NS::TestHelpers::Train< NS::Featurizers::Components::HistogramEstimator<inputType, 0>, inputType>(estimator, inputBatches);
+    NS::TestHelpers::Train< NS::Featurizers::Components::HistogramEstimator<InputT, 0>, InputT>(estimator, inputBatches);
     NS::AnnotationMap::const_iterator const &           iterAnnotations(estimator.get_column_annotations()[0].find("HistogramEstimator"));
 
-    return (static_cast<NS::Featurizers::Components::HistogramAnnotation<inputType> const &>(*iterAnnotations->second[0])).Value;
+    return (static_cast<NS::Featurizers::Components::HistogramAnnotation<InputT> const &>(*iterAnnotations->second[0])).Value;
 }
 
 TEST_CASE("int") {
