@@ -7,8 +7,6 @@
 #include "../Traits.h"
 #include "Components/InferenceOnlyFeaturizerImpl.h"
 
-#include <iostream>
-
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {

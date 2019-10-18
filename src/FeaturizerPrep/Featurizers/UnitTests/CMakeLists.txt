@@ -31,6 +31,7 @@ enable_testing()
 foreach(_test_name IN ITEMS
     CatImputerFeaturizer_UnitTests
     DateTimeFeaturizer_UnitTests
+    HashOneHotVectorizerFeaturizer_UnitTests
     ImputationMakerFeaturizer_UnitTests
     LabelEncoderFeaturizer_UnitTests
     OneHotEncoderFeaturizer_UnitTests
