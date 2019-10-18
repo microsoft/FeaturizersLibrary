@@ -90,6 +90,7 @@ class TypeInfo(Interface.Interface):
 _SUPPORTED_CUSTOM_TYPES                     = {
     "TimePoint": (lambda custom_structs: _TimePointTypeInfo(custom_structs)),
     "OneHotStruct": (lambda custom_structs: _OneHotStructTypeInfo(custom_structs)),
+    "HashOneHotVectorizerStruct": (lambda custom_structs: _HashOneHotVectorizerStructTypeInfo(custom_structs)),
 }
 
 # ----------------------------------------------------------------------
@@ -1733,6 +1734,75 @@ class _OneHotStructTypeInfo(TypeInfo):
                 name=arg_name,
                 result=result_name,
                 result_one_hot_struct_name=result_one_hot_struct_name,
+                member_statements="\n".join(member_statements),
+            ),
+        )
+    # ----------------------------------------------------------------------
+    @Interface.override
+    def GetDestroyOutputInfo(
+        self,
+        arg_name="result",
+    ):
+        return None
+
+class _HashOneHotVectorizerStructTypeInfo(TypeInfo):
+    """Functionality for HashOneHotVectorizerStructs, used in the HashOneHotVectorizerFeaturizer"""
+
+    # ----------------------------------------------------------------------
+    def __init__(self, custom_structs):
+        assert "HashOneHotVectorizerStruct" in custom_structs, custom_structs
+        self._member_info                   = custom_structs["HashOneHotVectorizerStruct"]
+
+    # ----------------------------------------------------------------------
+    @classmethod
+    @Interface.override
+    def GetInputInfo(arg_name, is_optional, invocation_template):
+        raise Exception("'HashOneHotVectorizerStruct' is only used as a TransformedType")
+
+    # ----------------------------------------------------------------------
+    @classmethod
+    @Interface.override
+    def GetInputBufferInfo(arg_name, is_optional, invocation_template):
+        raise Exception("'HashOneHotVectorizerStruct' is only used as a TransformedType")
+
+    # ----------------------------------------------------------------------
+    @Interface.override
+    def GetOutputInfo(
+        self,
+        arg_name,
+        result_name="result",
+        is_struct=False,
+    ):
+        result_hashonehotvectorizer_struct_name = "{}_item".format(arg_name)
+
+        member_statements = []
+
+        for member_name, member_info in six.iteritems(self._member_info):
+            member_statements.append(
+                member_info.GetOutputInfo(
+                    "{}.{}".format(result_hashonehotvectorizer_struct_name, member_name),
+                    "{}.{}".format(result_name, member_name),
+                    is_struct=True,
+                ).InvocationStatement,
+            )
+
+        return self.Info(
+            ["/*out*/ HashOneHotVectorizerStruct {} {}".format("" if is_struct else "*", arg_name)],
+            """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
+                name=arg_name,
+            ),
+            textwrap.dedent(
+                """\
+                HashOneHotVectorizerStruct {result_hashonehotvectorizer_struct_name};
+
+                {member_statements}
+
+                *{name} = {result_hashonehotvectorizer_struct_name};
+                """,
+            ).format(
+                name=arg_name,
+                result=result_name,
+                result_hashonehotvectorizer_struct_name=result_hashonehotvectorizer_struct_name,
                 member_statements="\n".join(member_statements),
             ),
         )

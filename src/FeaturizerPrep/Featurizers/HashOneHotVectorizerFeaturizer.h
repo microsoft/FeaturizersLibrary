@@ -117,6 +117,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = TransformerEstimator<T, HashOneHotVectorizerStruct>;
+    using TransformerType                   = HashOneHotVectorizerTransformer<T>;
 
     // ----------------------------------------------------------------------
     // |

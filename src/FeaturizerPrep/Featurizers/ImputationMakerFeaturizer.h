@@ -60,7 +60,6 @@ public:
     using Type                              = typename Traits<T>::nullable_type;
     using ThisType                          = ImputationMakerEstimator<Type>;
     using BaseType                          = Components::InferenceOnlyEstimatorImpl<ImputationMakerTransformer<Type>>;
-
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods

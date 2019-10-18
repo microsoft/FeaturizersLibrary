@@ -352,5 +352,66 @@
                 ]
             }
         ]
+    },
+    {
+        "name": "HashOneHotVectorizerFeaturizer",
+        "estimator_name": "HashOneHotVectorizerEstimator",
+        "num_output_columns": 1,
+        "templates": [
+            {
+                "name": "T",
+                "types": [
+                    "std::int8_t",
+                    "std::int16_t",
+                    "std::int32_t",
+                    "std::int64_t",
+                    "std::uint8_t",
+                    "std::uint16_t",
+                    "std::uint32_t",
+                    "std::uint64_t",
+                    "std::float_t",
+                    "std::double_t",
+                    "bool",
+                    "std::string"
+                ]
+            }
+        ],
+        "transformed_type_mappings": [
+            {
+                "input_type": "T",
+                "transformed_type": "HashOneHotVectorizerStruct"
+            }
+        ],
+        "custom_structs": [
+            {
+                "name": "HashOneHotVectorizerStruct",
+                "members": [
+                    {
+                        "type": "std::uint32_t",
+                        "name": "colIndex"
+                    },
+                    {
+                        "type": "std::uint32_t",
+                        "name": "numCols"
+                    },
+                    {
+                        "type": "bool",
+                        "name": "val"
+                    }
+                ]
+            }
+        ],
+        "configuration_params": [
+            {
+                "type": "std::uint32_t",
+                "name": "hashingSeedVal",
+                "is_optional": false
+            },
+            {
+                "type": "std::uint32_t",
+                "name": "numCols",
+                "is_optional": false
+            }
+        ]
     }
 ]

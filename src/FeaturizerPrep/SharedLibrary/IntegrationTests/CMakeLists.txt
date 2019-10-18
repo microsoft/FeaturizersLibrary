@@ -31,6 +31,7 @@ enable_testing()
 foreach(_test_name IN ITEMS
     SharedLibrary_CatImputerFeaturizer_IntegrationTest
     SharedLibrary_DateTimeFeaturizer_IntegrationTest
+    SharedLibrary_HashOneHotVectorizerFeaturizer_IntegrationTest
     SharedLibrary_ImputationMakerFeaturizer_IntegrationTest
     SharedLibrary_LabelEncoderFeaturizer_IntegrationTest
     SharedLibrary_OneHotEncoderFeaturizer_IntegrationTest
