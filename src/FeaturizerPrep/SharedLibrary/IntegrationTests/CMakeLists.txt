@@ -32,6 +32,8 @@ foreach(_test_name IN ITEMS
     SharedLibrary_CatImputerFeaturizer_IntegrationTest
     SharedLibrary_DateTimeFeaturizer_IntegrationTest
     SharedLibrary_ImputationMakerFeaturizer_IntegrationTest
+    SharedLibrary_LabelEncoderFeaturizer_IntegrationTest
+    SharedLibrary_OneHotEncoderFeaturizer_IntegrationTest
     SharedLibrary_RobustScalarFeaturizer_IntegrationTest
     SharedLibrary_StringFeaturizer_IntegrationTest
     SharedLibrary_TSIFeaturizer_IntegrationTest

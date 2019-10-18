@@ -29,6 +29,7 @@ with CallOnExit(lambda: sys.path.pop(0)):
 # ----------------------------------------------------------------------
 _SUPPORTED_CUSTOM_TYPES                     = {
     "TimePoint": (lambda custom_structs: _TimePointTypeInfo(custom_structs)),
+    "OneHotStruct": (lambda custom_structs: _OneHotStructTypeInfo(custom_structs)),
 }
 
 # ----------------------------------------------------------------------
@@ -573,3 +574,34 @@ class _TimePointTypeInfo(TypeInfo):
             result_name,
             destroy_inline=False,
         )
+
+# ----------------------------------------------------------------------
+class _OneHotStructTypeInfo(TypeInfo):
+    # ----------------------------------------------------------------------
+    def __init__(self, custom_structs):
+        assert "OneHotStruct" in custom_structs, custom_structs
+        self._member_info                   = custom_structs["OneHotStruct"]
+
+    # ----------------------------------------------------------------------
+    @Interface.override
+    def GetTransformInputArgs(
+        self,
+        is_input_optional,
+        input_name="input",
+    ):
+        raise Exception("'OneHotStruct' is only used as a TransformedType")
+
+    # ----------------------------------------------------------------------
+    @Interface.override
+    def GetOutputInfo(
+        self,
+        result_name="result",
+    ):
+        return self.Info(
+            "OneHotStruct",
+            "OneHotStruct {};".format(result_name),
+            "&{}".format(result_name),
+            "results.emplace_back({});".format(result_name),
+            destroy_inline=False,
+        )
+        

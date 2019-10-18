@@ -7,9 +7,6 @@
 #include "SharedLibrary_Common.h"
 
 extern "C" {
-
-/* ---------------------------------------------------------------------- */
-/* |  DateTimeFeaturizer */
 FEATURIZER_LIBRARY_API_PACK_PREFIX
 
 struct TimePoint {
@@ -42,6 +39,9 @@ struct TimePoint {
 
 FEATURIZER_LIBRARY_API_PACK_SUFFIX
 
+
+/* ---------------------------------------------------------------------- */
+/* |  DateTimeFeaturizer */
 struct DateTimeFeaturizer_EstimatorHandle {};
 struct DateTimeFeaturizer_TransformerHandle {};
 

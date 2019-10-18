@@ -259,5 +259,98 @@
                 "transformed_type": "bool"
             }
         ]
+    },
+    {
+        "name": "LabelEncoderFeaturizer",
+        "estimator_name": "LabelEncoderEstimator",
+        "num_output_columns": 1,
+        "templates": [
+            {
+                "name": "T",
+                "types": [
+                    "std::int8_t",
+                    "std::int16_t",
+                    "std::int32_t",
+                    "std::int64_t",
+                    "std::uint8_t",
+                    "std::uint16_t",
+                    "std::uint32_t",
+                    "std::uint64_t",
+                    "std::float_t",
+                    "std::double_t",
+                    "bool",
+                    "std::string"
+                ]
+            }
+        ],
+        "transformed_type_mappings": [
+            {
+                "input_type": "T",
+                "transformed_type": "std::uint32_t"
+            }
+        ],
+        "configuration_params": [
+            {
+                "type": "bool",
+                "name": "suppressUnrecognizedErrors",
+                "is_optional": false
+            }
+        ]
+    },
+    {
+        "name": "OneHotEncoderFeaturizer",
+        "estimator_name": "OneHotEncoderEstimator",
+        "num_output_columns": 1,
+        "templates": [
+            {
+                "name": "T",
+                "types": [
+                    "std::int8_t",
+                    "std::int16_t",
+                    "std::int32_t",
+                    "std::int64_t",
+                    "std::uint8_t",
+                    "std::uint16_t",
+                    "std::uint32_t",
+                    "std::uint64_t",
+                    "std::float_t",
+                    "std::double_t",
+                    "bool",
+                    "std::string"
+                ]
+            }
+        ],
+        "transformed_type_mappings": [
+            {
+                "input_type": "T",
+                "transformed_type": "OneHotStruct"
+            }
+        ],
+        "configuration_params": [
+            {
+                "type": "bool",
+                "name": "suppressUnrecognizedErrors",
+                "is_optional": false
+            }
+        ],
+        "custom_structs": [
+            {
+                "name": "OneHotStruct",
+                "members": [
+                    {
+                        "type": "std::uint32_t",
+                        "name": "index"
+                    },
+                    {
+                        "type": "std::uint32_t",
+                        "name": "size"
+                    },
+                    {
+                        "type": "std::uint32_t",
+                        "name": "appearances"
+                    }
+                ]
+            }
+        ]
     }
 ]

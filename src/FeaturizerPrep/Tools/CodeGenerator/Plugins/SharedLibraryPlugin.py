@@ -89,6 +89,7 @@ class TypeInfo(Interface.Interface):
 
 _SUPPORTED_CUSTOM_TYPES                     = {
     "TimePoint": (lambda custom_structs: _TimePointTypeInfo(custom_structs)),
+    "OneHotStruct": (lambda custom_structs: _OneHotStructTypeInfo(custom_structs)),
 }
 
 # ----------------------------------------------------------------------
@@ -457,10 +458,10 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                 #include "SharedLibrary_Common.h"
 
                 extern "C" {
-
                 """,
             ),
         )
+        custom_struct_flag = False
 
         for item, c_data in zip(items, c_data_items):
             template = (
@@ -531,13 +532,26 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                 )
 
             custom_structs = "\n".join(custom_structs)
-
+            if not custom_struct_flag:
+                f.write(
+                    textwrap.dedent(
+                        """\
+                        {custom_structs}
+                        """,
+                    ).format(
+                        custom_structs="" if not custom_structs else "{}\n\n".format(
+                            custom_structs.strip(),
+                        ),
+                        **d
+                    ),
+                )
+            custom_struct_flag = True
             f.write(
                 textwrap.dedent(
                     """\
                     /* ---------------------------------------------------------------------- */
                     /* |  {name}{type_desc} */
-                    {custom_structs}struct {name}{suffix}EstimatorHandle {{}};
+                    struct {name}{suffix}EstimatorHandle {{}};
                     struct {name}{suffix}TransformerHandle {{}};
 
                     /* Training Methods */
@@ -560,9 +574,6 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                     {delete_transformed_method}
                     """,
                 ).format(
-                    custom_structs="" if not custom_structs else "{}\n\n".format(
-                        custom_structs.strip(),
-                    ),
                     construct_params="{},".format(
                         ", ".join(construct_params),
                     ) if construct_params else "",
@@ -1662,6 +1673,76 @@ class _TimePointTypeInfo(TypeInfo):
                 name=arg_name,
             ),
         )
+
+# ----------------------------------------------------------------------
+class _OneHotStructTypeInfo(TypeInfo):
+    """Functionality for OneHotStructs, used in the OneHotEncoderFeaturizer"""
+
+    # ----------------------------------------------------------------------
+    def __init__(self, custom_structs):
+        assert "OneHotStruct" in custom_structs, custom_structs
+        self._member_info                   = custom_structs["OneHotStruct"]
+
+    # ----------------------------------------------------------------------
+    @classmethod
+    @Interface.override
+    def GetInputInfo(arg_name, is_optional, invocation_template):
+        raise Exception("'OneHotStruct' is only used as a TransformedType")
+
+    # ----------------------------------------------------------------------
+    @classmethod
+    @Interface.override
+    def GetInputBufferInfo(arg_name, is_optional, invocation_template):
+        raise Exception("'OneHotStruct' is only used as a TransformedType")
+
+    # ----------------------------------------------------------------------
+    @Interface.override
+    def GetOutputInfo(
+        self,
+        arg_name,
+        result_name="result",
+        is_struct=False,
+    ):
+        result_one_hot_struct_name = "{}_item".format(arg_name)
+
+        member_statements = []
+
+        for member_name, member_info in six.iteritems(self._member_info):
+            member_statements.append(
+                member_info.GetOutputInfo(
+                    "{}.{}".format(result_one_hot_struct_name, member_name),
+                    "{}.{}".format(result_name, member_name),
+                    is_struct=True,
+                ).InvocationStatement,
+            )
+
+        return self.Info(
+            ["/*out*/ OneHotStruct {} {}".format("" if is_struct else "*", arg_name)],
+            """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
+                name=arg_name,
+            ),
+            textwrap.dedent(
+                """\
+                OneHotStruct {result_one_hot_struct_name};
+
+                {member_statements}
+
+                *{name} = {result_one_hot_struct_name};
+                """,
+            ).format(
+                name=arg_name,
+                result=result_name,
+                result_one_hot_struct_name=result_one_hot_struct_name,
+                member_statements="\n".join(member_statements),
+            ),
+        )
+    # ----------------------------------------------------------------------
+    @Interface.override
+    def GetDestroyOutputInfo(
+        self,
+        arg_name="result",
+    ):
+        return None
 
 
 # ----------------------------------------------------------------------

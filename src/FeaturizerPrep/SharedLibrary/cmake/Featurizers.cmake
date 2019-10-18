@@ -45,6 +45,10 @@ add_library(Featurizers SHARED
     ${_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.cpp
     ${_this_path}/../GeneratedCode/SharedLibrary_ImputationMakerFeaturizer.h
     ${_this_path}/../GeneratedCode/SharedLibrary_ImputationMakerFeaturizer.cpp
+    ${_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.h
+    ${_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.cpp
+    ${_this_path}/../GeneratedCode/SharedLibrary_OneHotEncoderFeaturizer.h
+    ${_this_path}/../GeneratedCode/SharedLibrary_OneHotEncoderFeaturizer.cpp
     ${_this_path}/../GeneratedCode/SharedLibrary_PointerTable.h
     ${_this_path}/../GeneratedCode/SharedLibrary_PointerTable.cpp
     ${_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.h
