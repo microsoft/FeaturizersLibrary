@@ -98,7 +98,7 @@ def GetDependencies():
     d = OrderedDict()
 
     d["x64"] = Configuration(
-        "Builds using Clang on an x64 architecture",
+        "Builds using Clang for a x64 architecture",
         [
             Dependency(
                 "3DE9F3430E494A6C8429B26A1503C895",
@@ -110,17 +110,30 @@ def GetDependencies():
     )
 
     if CurrentShell.CategoryName == "Windows":
-        d["x64_MSVC"] = Configuration(
-            "Builds using MSVC 2019 on an x64 architecture",
+        d["x86"] = Configuration(
+            "Builds using Clang for a x86 architecture",
             [
                 Dependency(
-                    "AB7D87C49C2449F79D9F42E5195030FD",
-                    "Common_cpp_MSVC_2019",
-                    "x64",
-                    "https://github.com/davidbrownell/Common_cpp_MSVC_2019.git",
+                    "3DE9F3430E494A6C8429B26A1503C895",
+                    "Common_cpp_Clang_8",
+                    "x86-ex",
+                    "https://github.com/davidbrownell/Common_cpp_Clang_8.git",
                 ),
             ],
         )
+
+        for architecture in ["x64", "x86"]:
+            d["{}_MSVC".format(architecture)] = Configuration(
+                "Builds using MSVC 2019 for a {} architecture".format(architecture),
+                [
+                    Dependency(
+                        "AB7D87C49C2449F79D9F42E5195030FD",
+                        "Common_cpp_MSVC_2019",
+                        architecture,
+                        "https://github.com/davidbrownell/Common_cpp_MSVC_2019.git",
+                    ),
+                ],
+            )
 
     d["system_compiler"] = Configuration(
         "Enables basic C++ tools (cmake, ninja, doxygen, etc.)",

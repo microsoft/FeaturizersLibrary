@@ -62,7 +62,13 @@ stages:
             displayName: 'Download "Windows - x64" Artifacts'
             timeoutInMinutes: 180
 
-          # TODO: Download x86
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: current
+              artifactName: "Windows - x86"
+              targetPath: "$(Build.StagingDirectory)/Windows - x86"
+            displayName: 'Download "Windows - x86" Artifacts'
+            timeoutInMinutes: 180
 
           - task: DownloadPipelineArtifact@2
             inputs:
@@ -83,8 +89,7 @@ stages:
 
           - ${{ each build_configuration in parameters.build_configurations }}:
               - script: |-
-                  # TODO: x86 build
-                  $(azure_activate_script) ${{ parameters.configuration }} && python src/FeaturizerPrep/SharedLibrary/Build.py Package "$(azure_artifacts_directory)/Artifacts/Packages/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Windows - x64/Builder/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Linux - universal_linux/Builder/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/MacOS - system_compiler/Builder/${{ build_configuration }}" /verbose
+                  $(azure_activate_script) ${{ parameters.configuration }} && python src/FeaturizerPrep/SharedLibrary/Build.py Package "$(azure_artifacts_directory)/Artifacts/Packages/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Windows - x64/Builder/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Windows - x86/Builder/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/Linux - universal_linux/Builder/${{ build_configuration }}" "/build_dir=$(Build.StagingDirectory)/MacOS - system_compiler/Builder/${{ build_configuration }}" /verbose
                 displayName: "<Build.py Package - ${{ build_configuration }}>"
                 timeoutInMinutes: 180
 

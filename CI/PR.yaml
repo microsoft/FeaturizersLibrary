@@ -17,7 +17,13 @@ stages:
       configuration: x64
       enable_code_coverage: True
 
-  # TODO: Windows/clang/x86 [Official build]
+  # Windows/clang/x86 [Official build]
+  - template: BuildAndTest.stage_template.yaml
+    parameters:
+      agent_pool: windows-2019
+      operating_system: Windows
+      configuration: x86
+      enable_code_coverage: False
 
   # TODO: # Linux/GCC/universal_linux [Official build]
   # TODO: - template: BuildAndTest.stage_template.yaml
@@ -44,7 +50,13 @@ stages:
       configuration: x64_MSVC
       enable_code_coverage: False
 
-  # TODO: Windows/MSVC/x86
+  # Windows/MSVC/x86
+  - template: BuildAndTest.stage_template.yaml
+    parameters:
+      agent_pool: windows-2019
+      operating_system: Windows
+      configuration: x86_MSVC
+      enable_code_coverage: False
 
   # Linux/clang/x64
   - template: BuildAndTest.stage_template.yaml
@@ -69,10 +81,10 @@ stages:
       configuration: system_compiler
       dependencies:
         - BuildAndTest_Windows_x64_Stage
-        # TODO: - BuildAndTest_Windows_x86_Stage
+        - BuildAndTest_Windows_x86_Stage
         # TODO: - BuildAndTest_Linux_universal_linux_Stage
         - BuildAndTest_MacOS_system_compiler_Stage
         - BuildAndTest_Windows_x64_MSVC_Stage
-        # TODO: - BuildAndTest_Windows_x86_MSVC_Stage
+        - BuildAndTest_Windows_x86_MSVC_Stage
         - BuildAndTest_Linux_x64_Stage
         - BuildAndTest_Linux_system_compiler_Stage

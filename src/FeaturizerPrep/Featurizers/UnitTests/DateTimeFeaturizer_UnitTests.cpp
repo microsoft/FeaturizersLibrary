@@ -5,7 +5,6 @@
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-#include <cstdio>
 #include "../DateTimeFeaturizer.h"
 
 namespace NS = Microsoft::Featurizer;
@@ -81,19 +80,23 @@ TEST_CASE("DateTimeTransformer - Countries") {
     // isn't one of those. Wrap the creation of the transformer in this method
     // that returns a well-understood bool. This works because the object will
     // either be created or it won't.
-    auto const                              creator(
-        [](std::string arg) {
+
+    // Note that clang x86 ran into an internal compiler error when this method
+    // was implemented as an anonymous lambda.
+    struct Internal {
+        static bool Creator(std::string arg) {
+            // This will either throw or it won't
             NS::Featurizers::DateTimeTransformer(std::move(arg));
             return true;
         }
-    );
+    };
 
-    CHECK(creator(""));
-    CHECK(creator("United States"));
-    CHECK(creator("United States.json"));
-    CHECK(creator("united states"));
-    CHECK(creator("unitedstates"));
-    CHECK_THROWS(creator("This is not a valid country name"));
+    CHECK(Internal::Creator(""));
+    CHECK(Internal::Creator("United States"));
+    CHECK(Internal::Creator("United States.json"));
+    CHECK(Internal::Creator("united states"));
+    CHECK(Internal::Creator("unitedstates"));
+    CHECK_THROWS(Internal::Creator("This is not a valid country name"));
 }
 
 TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {

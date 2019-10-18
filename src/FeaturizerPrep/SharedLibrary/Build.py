@@ -263,10 +263,16 @@ def Package(
                     this_value_type = None
 
                     if item == "Featurizers.dll":
-                        # TODO: win-x86
-                        this_value_type = "runtimes/win-x64/native"
+                        if "x64" in build_dir:
+                            this_value_type = "runtimes/win-x64/native"
+                        elif "x86" in build_dir:
+                            this_value_type = "runtimes/win-x86/native"
+                        else:
+                            assert False, build_dir
+
                     elif item.startswith("libFeaturizers.so"):
                         this_value_type = "runtimes/linux-x64/native"
+
                     else:
                         name, ext = os.path.splitext(item)
                         if name.startswith("libFeaturizers") and ext == ".dylib":

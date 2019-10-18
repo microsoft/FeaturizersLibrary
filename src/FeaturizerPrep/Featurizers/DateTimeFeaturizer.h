@@ -18,6 +18,7 @@
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wold-style-cast"
 #   pragma clang diagnostic ignored "-Wshift-sign-overflow"
+#   pragma clang diagnostic ignored "-Wsign-conversion"
 
 #   if (!defined __apple_build_version__ )
 #       pragma clang diagnostic ignored "-Wimplicit-int-conversion"
