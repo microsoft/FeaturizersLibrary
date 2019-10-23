@@ -6,7 +6,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "../ImputationMakerFeaturizer.h"
+#include "../ImputationMarkerFeaturizer.h"
 
 /////////////////////////////////////////////////////////////////////////
 ///  Tests are lighter for this featurizer because we are directly
@@ -18,14 +18,14 @@ template <typename T>
 void TestHelper(T const & input) {
     using Type = typename NS::Traits<T>::nullable_type;
     Type nullValue = NS::Traits<T>::CreateNullValue();
-    CHECK(NS::Featurizers::ImputationMakerTransformer<Type>().execute(input) == false);
-    CHECK(NS::Featurizers::ImputationMakerTransformer<Type>().execute(nullValue) == true);
+    CHECK(NS::Featurizers::ImputationMarkerTransformer<Type>().execute(input) == false);
+    CHECK(NS::Featurizers::ImputationMarkerTransformer<Type>().execute(nullValue) == true);
 }
 
-TEST_CASE("ImputationMakerEstimator") {
-    CHECK(NS::Featurizers::ImputationMakerEstimator<int>(NS::CreateTestAnnotationMapsPtr(1)).Name == "ImputationMakerEstimator");
-    CHECK(NS::Featurizers::ImputationMakerEstimator<int>(NS::CreateTestAnnotationMapsPtr(1)).is_training_complete());
-    CHECK(dynamic_cast<NS::Featurizers::ImputationMakerTransformer<nonstd::optional<int>> *>(NS::Featurizers::ImputationMakerEstimator<int>(NS::CreateTestAnnotationMapsPtr(1)).create_transformer().get()));
+TEST_CASE("ImputationMarkerEstimator") {
+    CHECK(NS::Featurizers::ImputationMarkerEstimator<int>(NS::CreateTestAnnotationMapsPtr(1)).Name == "ImputationMarkerEstimator");
+    CHECK(NS::Featurizers::ImputationMarkerEstimator<int>(NS::CreateTestAnnotationMapsPtr(1)).is_training_complete());
+    CHECK(dynamic_cast<NS::Featurizers::ImputationMarkerTransformer<nonstd::optional<int>> *>(NS::Featurizers::ImputationMarkerEstimator<int>(NS::CreateTestAnnotationMapsPtr(1)).create_transformer().get()));
 }
 
 TEST_CASE("Single Tests") {
@@ -44,7 +44,7 @@ TEST_CASE("Single Tests") {
 }
 
 TEST_CASE("Numeric NaNs") {
-    CHECK(NS::Featurizers::ImputationMakerTransformer<std::float_t>().execute(std::numeric_limits<std::float_t>::quiet_NaN()) == true);
-    CHECK(NS::Featurizers::ImputationMakerTransformer<std::double_t>().execute(std::numeric_limits<std::double_t>::quiet_NaN()) == true);
+    CHECK(NS::Featurizers::ImputationMarkerTransformer<std::float_t>().execute(std::numeric_limits<std::float_t>::quiet_NaN()) == true);
+    CHECK(NS::Featurizers::ImputationMarkerTransformer<std::double_t>().execute(std::numeric_limits<std::double_t>::quiet_NaN()) == true);
 }
 

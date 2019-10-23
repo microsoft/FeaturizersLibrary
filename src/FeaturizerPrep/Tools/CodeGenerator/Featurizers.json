@@ -230,8 +230,8 @@
         ]
     },
     {
-        "name": "ImputationMakerFeaturizer",
-        "estimator_name": "ImputationMakerEstimator",
+        "name": "ImputationMarkerFeaturizer",
+        "estimator_name": "ImputationMarkerEstimator",
         "num_output_columns": 1,
         "templates": [
             {

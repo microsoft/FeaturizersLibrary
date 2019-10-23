@@ -12,11 +12,11 @@ namespace Featurizer {
 namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         ImputationMakerTransformer
+///  \class         ImputationMarkerTransformer
 ///  \brief         if input is Null, return true. Otherwise return false
 ///
 template <typename T>
-class ImputationMakerTransformer : public Components::InferenceOnlyTransformerImpl<T, bool> {
+class ImputationMarkerTransformer : public Components::InferenceOnlyTransformerImpl<T, bool> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -25,7 +25,7 @@ public:
     // ----------------------------------------------------------------------
     static_assert(std::is_same<T, typename Traits<T>::nullable_type>::value, "Input should be Nullable Type");
     using Type                              = T;
-    using ThisType                          = ImputationMakerTransformer<Type>;
+    using ThisType                          = ImputationMarkerTransformer<Type>;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, bool>;
 
     // ----------------------------------------------------------------------
@@ -33,12 +33,12 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    ImputationMakerTransformer(void) = default;
-    ImputationMakerTransformer(Archive &ar);
+    ImputationMarkerTransformer(void) = default;
+    ImputationMarkerTransformer(Archive &ar);
 
-    ~ImputationMakerTransformer(void) override = default;
+    ~ImputationMarkerTransformer(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(ImputationMakerTransformer);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(ImputationMarkerTransformer);
 
     // MSVC has problems when the function is defined outside of the declaration
     typename BaseType::TransformedType execute(typename BaseType::InputType input) override {
@@ -50,7 +50,7 @@ public:
 };
 
 template <typename T>
-class ImputationMakerEstimator : public Components::InferenceOnlyEstimatorImpl<ImputationMakerTransformer<typename Traits<T>::nullable_type>> {
+class ImputationMarkerEstimator : public Components::InferenceOnlyEstimatorImpl<ImputationMarkerTransformer<typename Traits<T>::nullable_type>> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -58,17 +58,17 @@ public:
     // |
     // ----------------------------------------------------------------------
     using Type                              = typename Traits<T>::nullable_type;
-    using ThisType                          = ImputationMakerEstimator<Type>;
-    using BaseType                          = Components::InferenceOnlyEstimatorImpl<ImputationMakerTransformer<Type>>;
+    using ThisType                          = ImputationMarkerEstimator<Type>;
+    using BaseType                          = Components::InferenceOnlyEstimatorImpl<ImputationMarkerTransformer<Type>>;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    ImputationMakerEstimator(AnnotationMapsPtr pAllCoumnAnnotations);
-    ~ImputationMakerEstimator(void) override = default;
+    ImputationMarkerEstimator(AnnotationMapsPtr pAllCoumnAnnotations);
+    ~ImputationMarkerEstimator(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(ImputationMakerEstimator);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(ImputationMarkerEstimator);
 };
 
 // ----------------------------------------------------------------------
@@ -83,22 +83,22 @@ public:
 
 // ----------------------------------------------------------------------
 // |
-// |  ImputationMakerEstimator
+// |  ImputationMarkerEstimator
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-ImputationMakerTransformer<T>::ImputationMakerTransformer(Archive &ar) :
+ImputationMarkerTransformer<T>::ImputationMarkerTransformer(Archive &ar) :
     BaseType(ar) {
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  ImputationMakerEstimator
+// |  ImputationMarkerEstimator
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-ImputationMakerEstimator<T>::ImputationMakerEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    BaseType("ImputationMakerEstimator", std::move(pAllColumnAnnotations)) {
+ImputationMarkerEstimator<T>::ImputationMarkerEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+    BaseType("ImputationMarkerEstimator", std::move(pAllColumnAnnotations)) {
 }
 
 } // namespace Featurizers

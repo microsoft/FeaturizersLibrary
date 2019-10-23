@@ -5,10 +5,10 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "GeneratedCode/SharedLibraryTests_ImputationMakerFeaturizer.h"
+#include "GeneratedCode/SharedLibraryTests_ImputationMarkerFeaturizer.h"
 
 TEST_CASE("int8") {
-    ImputationMakerFeaturizer_int8_t_Test(
+    ImputationMarkerFeaturizer_int8_t_Test(
         std::vector<nonstd::optional<std::int8_t>>(),
         std::vector<nonstd::optional<std::int8_t>>{
             static_cast<std::int8_t>(1),
@@ -23,7 +23,7 @@ TEST_CASE("int8") {
 
 TEST_CASE("double") {
     std::double_t input_d = std::numeric_limits<std::double_t>::quiet_NaN();
-    ImputationMakerFeaturizer_double_t_Test(
+    ImputationMarkerFeaturizer_double_t_Test(
         std::vector<std::double_t>(),
         std::vector<std::double_t>{
             static_cast<std::double_t>(1.0),
@@ -38,7 +38,7 @@ TEST_CASE("double") {
 
 TEST_CASE("string") {
     using type = nonstd::optional<std::string>;
-    ImputationMakerFeaturizer_string_Test(
+    ImputationMarkerFeaturizer_string_Test(
         std::vector<nonstd::optional<std::string>>(),
         std::vector<nonstd::optional<std::string>>{
             "hello",
