@@ -76,6 +76,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ImputationMarkerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalarFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalarFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxScalarFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxScalarFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MissingDummiesFeaturizer.h

@@ -472,5 +472,43 @@
                 "transformed_type": "std::double_t"
             }
         ]
+    },
+    {
+        "name": "MaxAbsScalarFeaturizer",
+        "estimator_name": "MaxAbsScalarEstimator",
+        "num_output_columns": 1,
+        "is_output_a_template": true,
+        "templates": [
+            {
+                "name": "TInputFloat",
+                "types": [
+                    "std::int8_t",
+                    "std::int16_t",
+                    "std::uint8_t",
+                    "std::uint16_t",
+                    "std::float_t"
+                ]
+            },
+            {
+                "name": "TInputDouble",
+                "types": [
+                    "std::int32_t",
+                    "std::int64_t",
+                    "std::uint32_t",
+                    "std::uint64_t",
+                    "std::double_t"
+                ]
+            }
+        ],
+        "transformed_type_mappings": [
+            {
+                "input_type": "TInputFloat",
+                "transformed_type": "std::float_t"
+            },
+            {
+                "input_type": "TInputDouble",
+                "transformed_type": "std::double_t"
+            }
+        ]
     }
 ]
