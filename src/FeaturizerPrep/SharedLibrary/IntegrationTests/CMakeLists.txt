@@ -34,6 +34,8 @@ foreach(_test_name IN ITEMS
     SharedLibrary_HashOneHotVectorizerFeaturizer_IntegrationTest
     SharedLibrary_ImputationMarkerFeaturizer_IntegrationTest
     SharedLibrary_LabelEncoderFeaturizer_IntegrationTest
+    SharedLibrary_MinMaxScalarFeaturizer_IntegrationTest
+    SharedLibrary_MissingDummiesFeaturizer_IntegrationTest
     SharedLibrary_OneHotEncoderFeaturizer_IntegrationTest
     SharedLibrary_RobustScalarFeaturizer_IntegrationTest
     SharedLibrary_StringFeaturizer_IntegrationTest

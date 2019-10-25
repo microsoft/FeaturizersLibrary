@@ -30,6 +30,7 @@ foreach(_test_name IN ITEMS
     HistogramEstimator_UnitTest
     IndexMapEstimator_UnitTest
     InferenceOnlyFeaturizerImpl_UnitTest
+    MinMaxEstimator_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
     RobustScalarNormEstimator_UnitTest
     RobustScalarTransformer_UnitTest

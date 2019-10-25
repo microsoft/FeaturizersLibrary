@@ -49,6 +49,10 @@ add_library(Featurizers SHARED
     ${_this_path}/../GeneratedCode/SharedLibrary_ImputationMarkerFeaturizer.cpp
     ${_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.h
     ${_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.cpp
+    ${_this_path}/../GeneratedCode/SharedLibrary_MinMaxScalarFeaturizer.h
+    ${_this_path}/../GeneratedCode/SharedLibrary_MinMaxScalarFeaturizer.cpp
+    ${_this_path}/../GeneratedCode/SharedLibrary_MissingDummiesFeaturizer.h
+    ${_this_path}/../GeneratedCode/SharedLibrary_MissingDummiesFeaturizer.cpp
     ${_this_path}/../GeneratedCode/SharedLibrary_OneHotEncoderFeaturizer.h
     ${_this_path}/../GeneratedCode/SharedLibrary_OneHotEncoderFeaturizer.cpp
     ${_this_path}/../GeneratedCode/SharedLibrary_PointerTable.h
