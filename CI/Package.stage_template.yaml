@@ -1,7 +1,6 @@
 parameters:
   operating_system: "" # Windows|Linux|MacOS
   esrp_connected_service_name: "None" # <Name>|None
-
   dependencies: []
   configuration: ""
   agent_pool: ""
@@ -35,7 +34,7 @@ stages:
               enable_code_coverage: False
 
           - script: |-
-              echo "esrp_connected_service_name- ${{ parameters.esrp_connected_service_name }}"
+              echo "esrp_connected_service_name - ${{ parameters.esrp_connected_service_name }}"
               echo "dependencies - ${{ join(', ', parameters.dependencies) }}"
               echo "configuration - ${{ parameters.configuration }}"
               echo "agent_pool - ${{ parameters.agent_pool }}
@@ -101,6 +100,7 @@ stages:
                   SourceFolder: "$(azure_artifacts_directory)/Artifacts/Packages"
                   TargetFolder: "$(azure_artifacts_directory)/Artifacts/Packages.original"
                   CleanTargetFolder: true
+                timeoutInMinutes: 180
 
               - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
                 displayName: "ESRP CodeSign"
@@ -126,6 +126,7 @@ stages:
                             "ToolVersion" : "1.0"
                         }
                     ]
+                timeoutInMinutes: 180
 
           - task: PublishPipelineArtifact@0
             displayName: "Publish Artifacts"

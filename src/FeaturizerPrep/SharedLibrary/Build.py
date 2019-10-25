@@ -4,6 +4,7 @@
 # ----------------------------------------------------------------------
 """Builds the Shared Library"""
 
+import datetime
 import hashlib
 import json
 import os
@@ -28,6 +29,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 # ----------------------------------------------------------------------
 
 CONFIGURATIONS                              = ["Debug", "Release"]
+JSON_FILENAME                               = "Microsoft MLFeaturizers.FileAttributes.json"
 
 # ----------------------------------------------------------------------
 @CommandLine.EntryPoint
@@ -35,6 +37,9 @@ CONFIGURATIONS                              = ["Debug", "Release"]
     configuration=CommandLine.EnumTypeInfo(CONFIGURATIONS),
     output_dir=CommandLine.DirectoryTypeInfo(
         ensure_exists=False,
+    ),
+    prerelease_build_name=CommandLine.StringTypeInfo(
+        arity="?",
     ),
     cmake_generator=CommandLine.StringTypeInfo(
         arity="?",
@@ -44,12 +49,25 @@ CONFIGURATIONS                              = ["Debug", "Release"]
 def Build(
     configuration,
     output_dir,
+    release_build=False,
+    prerelease_build_name=None,
+    no_build_info=False,
     keep_temp_dir=False,
-    cmake_generator=(None if os.getenv("DEVELOPMENT_ENVIRONMENT_REPOSITORY_CONFIGURATION") == "universal_linux" else "Ninja"),
+    cmake_generator=(
+        None
+        if os.getenv("DEVELOPMENT_ENVIRONMENT_REPOSITORY_CONFIGURATION")
+        == "universal_linux"
+        else "Ninja"
+    ),
     output_stream=sys.stdout,
     verbose=False,
 ):
     """Builds the Featurizer Shared Library"""
+
+    if release_build and prerelease_build_name:
+        raise CommandLine.UsageException(
+            "A prerelese build name cannot be provided with the 'release_build' flag",
+        )
 
     with StreamDecorator(output_stream).DoneManager(
         line_prefix="",
@@ -78,21 +96,54 @@ def Build(
             os.chdir(temp_directory)
 
             with CallOnExit(lambda: os.chdir(prev_dir)):
+                if not release_build:
+                    if prerelease_build_name is None:
+                        # This value should compare as:
+                        #   "manual" < "pipeline"
+                        prerelease_build_name = "manual"
+
+                    if not no_build_info:
+                        now = datetime.datetime.now()
+
+                        prerelease_build_name = "{prerelease_build_name}.{year}.{month}.{day}.{hour}.{minute}.{second}.{configuration}".format(
+                            year=now.year,
+                            month=now.month,
+                            day=now.day,
+                            hour=now.hour,
+                            minute=now.minute,
+                            second=now.second,
+                            prerelease_build_name=prerelease_build_name,
+                            configuration=configuration.lower(),
+                        )
+
                 activities = [
                     (
                         "Generating cmake Files",
-                        'cmake {generator}-DCMAKE_BUILD_TYPE={configuration} "{this_dir}"'.format(
-                            generator='-G "{}" '.format(cmake_generator) if cmake_generator else "",
+                        'cmake {generator}-DCMAKE_BUILD_TYPE={configuration} {prerelease_build_name} "{this_dir}"'.format(
+                            generator='-G "{}" '.format(
+                                cmake_generator,
+                            ) if cmake_generator else "",
                             temp_dir=temp_directory,
                             configuration=configuration,
                             this_dir=_script_dir,
+                            prerelease_build_name="" if not prerelease_build_name else "-DPRODUCT_VERSION_PRERELEASE_INFO={}".format(
+                                prerelease_build_name,
+                            ),
                         ),
                     ),
                     ("Building", "cmake --build ."),
                 ]
 
-                if os.getenv("DEVELOPMENT_ENVIRONMENT_REPOSITORY_CONFIGURATION") == "universal_linux":
-                    activities.append(("Verifying Universal Linux Binaries", 'libcheck libFeaturizers.so'))
+                if (
+                    os.getenv("DEVELOPMENT_ENVIRONMENT_REPOSITORY_CONFIGURATION")
+                    == "universal_linux"
+                ):
+                    activities.append(
+                        (
+                            "Verifying Universal Linux Binaries",
+                            "libcheck libFeaturizers.so",
+                        ),
+                    )
 
                 activities += [
                     ("Copying Binaries", _CopyBinaries),
@@ -203,14 +254,14 @@ def Package(
         if len(build_dirs) > 1:
             dm.stream.write("Ensuring that build data matches...")
             with dm.stream.DoneManager() as ensure_dm:
-                ensure_dm.stream.write("Checking 'Featurizers.json'...")
+                ensure_dm.stream.write("Checking '{}'...".format(JSON_FILENAME))
                 with ensure_dm.stream.DoneManager() as this_dm:
                     this_dm.result = (
                         0
                         if _CompareFiles(
                             this_dm.stream,
                             *[
-                                os.path.join(build_dir, "Featurizers.json")
+                                os.path.join(build_dir, JSON_FILENAME)
                                 for build_dir in build_dirs
                             ]
                         )
@@ -234,7 +285,7 @@ def Package(
 
         dm.stream.write("Reading build configuration...")
         with dm.stream.DoneManager() as this_dm:
-            json_filename = os.path.join(build_dirs[0], "Featurizers.json")
+            json_filename = os.path.join(build_dirs[0], JSON_FILENAME)
             if not os.path.isfile(json_filename):
                 this_dm.stream.write(
                     "ERROR: The filename '{}' does not exist.\n".format(json_filename),
@@ -248,7 +299,11 @@ def Package(
 
             build_config["build_dir"] = build_dirs[0]
             build_config["data_dir"] = os.path.join(build_dirs[0], "Data", "**", "*.*")
-            build_config["package_id"] = build_config["product_name"].replace(" ", "")
+            build_config["package_id"] = build_config["product_name"].replace(" ", ".")
+            build_config["product_copyright"] = build_config["product_copyright"].replace(
+                "(C)",
+                "Â©",
+            )
 
         # Generate the correct nuget file statements based on output in the build_dir
         dm.stream.write("Generating nuget file statements...")
@@ -263,12 +318,10 @@ def Package(
                     this_value_type = None
 
                     if item == "Featurizers.dll":
-                        if "x64" in build_dir:
-                            this_value_type = "runtimes/win-x64/native"
-                        elif "x86" in build_dir:
+                        if "x86" in build_dir:
                             this_value_type = "runtimes/win-x86/native"
                         else:
-                            assert False, build_dir
+                            this_value_type = "runtimes/win-x64/native"
 
                     elif item.startswith("libFeaturizers.so"):
                         this_value_type = "runtimes/linux-x64/native"
@@ -279,7 +332,11 @@ def Package(
                             this_value_type = "runtimes/osx-x64/native"
 
                     if this_value_type is not None:
-                        assert value_type is None or this_value_type == value_type, (value_type, item, this_value_type)
+                        assert value_type is None or this_value_type == value_type, (
+                            value_type,
+                            item,
+                            this_value_type,
+                        )
 
                         value_type = this_value_type
                         these_files.append(os.path.join(build_dir, item))
@@ -344,16 +401,16 @@ _nuget_template                             = textwrap.dedent(
     <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
         <metadata>
             <id>{package_id}</id>
-            <version>{product_version_major}.{product_version_minor}.{product_version_patch}.{product_version_revision}</version>
+            <version>{product_version_full}</version>
             <authors>Microsoft</authors>
             <owners>microsoft</owners>
             <license type="expression">MIT</license>
             <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
             <requireLicenseAcceptance>true</requireLicenseAcceptance>
-            <copyright>{product_company_copyright}</copyright>
+            <copyright>{product_copyright}</copyright>
 
             <description>{product_bundle}</description>
-            <projectUrl>https://www.microsoft.com</projectUrl>
+            <projectUrl>https://aka.ms/MLFeaturizers</projectUrl>
 
             <contentFiles>
                 <files include="any/any/Data/**/*.json" buildAction="None" copyToOutput="true" />
@@ -370,13 +427,15 @@ _nuget_template                             = textwrap.dedent(
 
 # ----------------------------------------------------------------------
 def _CopyBinaries(temp_directory, output_dir, output_stream):
-    output_files = ["Featurizers.json"]
+    output_files = [JSON_FILENAME]
 
     if CurrentShell.CategoryName == "Windows":
         output_files += ["Featurizers.dll", "Featurizers.pdb"]
     elif CurrentShell.CategoryName in ["Linux", "BSD"]:
         for item in os.listdir(temp_directory):
-            if item.startswith("libFeaturizers") and not os.path.splitext(item)[1] in [".a"]:
+            if item.startswith("libFeaturizers") and not os.path.splitext(item)[1] in [
+                ".a"
+            ]:
                 output_files.append(item)
     else:
         raise Exception("The Current Shell is not supported")

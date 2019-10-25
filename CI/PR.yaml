@@ -9,12 +9,20 @@ resources:
       endpoint: featurizersbuild
 
 stages:
+  - template: Prerequisites.stage_template.yaml
+    parameters:
+      agent_pool: windows-2019
+      release_build: False
+      prerelease_build_name: ""
+
   # Windows/clang/x64 [Official build]
   - template: BuildAndTest.stage_template.yaml
     parameters:
       agent_pool: windows-2019
       operating_system: Windows
       configuration: x64
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: True
 
   # Windows/clang/x86 [Official build]
@@ -23,6 +31,8 @@ stages:
       agent_pool: windows-2019
       operating_system: Windows
       configuration: x86
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: False
 
   # TODO: # Linux/GCC/universal_linux [Official build]
@@ -32,6 +42,8 @@ stages:
   # TODO:     agent_pool_container: universal_linux
   # TODO:     operating_system: Linux
   # TODO:     configuration: universal_linux
+  # TODO:     dependencies:
+  # TODO:       - Prerequisites_Stage
   # TODO:     enable_code_coverage: False
 
   # MacOS/clang/x64
@@ -40,6 +52,8 @@ stages:
       agent_pool: macOS-10.14
       operating_system: MacOS
       configuration: system_compiler
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: False
 
   # Windows/MSVC/x64
@@ -48,6 +62,8 @@ stages:
       agent_pool: windows-2019
       operating_system: Windows
       configuration: x64_MSVC
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: False
 
   # Windows/MSVC/x86
@@ -56,6 +72,8 @@ stages:
       agent_pool: windows-2019
       operating_system: Windows
       configuration: x86_MSVC
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: False
 
   # Linux/clang/x64
@@ -64,6 +82,8 @@ stages:
       agent_pool: ubuntu-16.04
       operating_system: Linux
       configuration: x64
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: False
 
   # Linux/GCC/system_compiler
@@ -72,6 +92,8 @@ stages:
       agent_pool: ubuntu-16.04
       operating_system: Linux
       configuration: system_compiler
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: False
 
   - template: Package.stage_template.yaml

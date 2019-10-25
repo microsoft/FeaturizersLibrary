@@ -12,13 +12,29 @@ resources:
       image: universal_linux
       endpoint: featurizersbuild
 
+# Note that a variable set in this file will always override a value set within the editor.
+# Therefore, do not set the default value to False here but instead do it in an initialization
+# script.
+#
+#   variables:
+#     release_build: False                  # Set to true to create a release build
+#     prerelease_build_name: ""             # Set to a value (e.g. "preview.1" to create a preview build)
+
 stages:
+  - template: Prerequisites.stage_template.yaml
+    parameters:
+      agent_pool: windows-2019
+      release_build: $(release_build)
+      prerelease_build_name: $(prerelease_build_name)
+
   # Windows/clang/x64 [Official Build]
   - template: BuildAndTest.stage_template.yaml
     parameters:
       agent_pool: windows-2019
       operating_system: Windows
       configuration: x64
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: True
       esrp_connected_service_name: "ESRP CodeSigning Connection"
 
@@ -28,6 +44,8 @@ stages:
       agent_pool: windows-2019
       operating_system: Windows
       configuration: x86
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: False
       esrp_connected_service_name: "ESRP CodeSigning Connection"
 
@@ -38,6 +56,8 @@ stages:
   # TODO:     agent_pool_container: universal_linux
   # TODO:     operating_system: Linux
   # TODO:     configuration: universal_linux
+  # TODO:     dependencies:
+  # TODO:       - Prerequisites_Stage
   # TODO:     enable_code_coverage: False
   # TODO:     esrp_connected_service_name: "ESRP CodeSigning Connection"
 
@@ -47,6 +67,8 @@ stages:
       agent_pool: macOS-10.14
       operating_system: MacOS
       configuration: system_compiler
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: False
       esrp_connected_service_name: "ESRP CodeSigning Connection"
 
@@ -56,6 +78,8 @@ stages:
       agent_pool: windows-2019
       operating_system: Windows
       configuration: x64_MSVC
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: False
       # Note that this build doesn't produce "official" binaries and is here for a santity check only. Therefore, no code signing.
 
@@ -65,6 +89,8 @@ stages:
       agent_pool: windows-2019
       operating_system: Windows
       configuration: x86_MSVC
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: False
       # Note that this build doesn't produce "official" binaries and is here for a santity check only. Therefore, no code signing.
 
@@ -74,6 +100,8 @@ stages:
       agent_pool: ubuntu-16.04
       operating_system: Linux
       configuration: x64
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: False
       # Note that this build doesn't produce "official" binaries and is here for a santity check only. Therefore, no code signing.
 
@@ -83,6 +111,8 @@ stages:
       agent_pool: ubuntu-16.04
       operating_system: Linux
       configuration: system_compiler
+      dependencies:
+        - Prerequisites_Stage
       enable_code_coverage: False
       # Note that this build doesn't produce "official" binaries and is here for a santity check only. Therefore, no code signing.
 

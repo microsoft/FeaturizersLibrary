@@ -1,0 +1,45 @@
+parameters:
+  agent_pool: "" # windows-2019
+  azure_dev_ops_project_id: "" # 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32 (The project GUID from which to download the pipeline artifacts)
+  azure_dev_ops_build_definition_id: "" # 717 (The definition ID of the build pipeline)
+  service_connection: "" # Service connection name setup in Azure DevOps
+
+stages:
+  - stage: NuGetPublish_Stage
+    displayName: "Publish NuGet Packages"
+    dependsOn: [] # No dependencies
+
+    jobs:
+      - job: NuGetPublish_Job
+        timeoutInMinutes: 240
+
+        displayName: "Publish"
+
+        pool:
+          vmImage: "${{ parameters.agent_pool }}"
+
+        steps:
+          - template: PublishInitialize.steps_template.yaml
+            parameters:
+              azure_dev_ops_project_id: ${{ parameters.azure_dev_ops_project_id }}
+              azure_dev_ops_build_definition_id: ${{ parameters.azure_dev_ops_build_definition_id }}
+
+          - task: NuGetCommand@2
+            displayName: "Push to Internal Store"
+            condition: not(or(eq(variables['azure_is_release_build'], 1), eq(variables['azure_is_prerelease_build'], 1)))
+            inputs:
+              command: push
+              publishVstsFeed: "DataPipelines"
+              allowPackageConflicts: false
+              packagesToPush: "$(Pipeline.Workspace)/Package/Packages/**/*.nupkg;!$(Pipeline.Workspace)/Package/Packages/**/*.symbols.nupkg"
+            timeoutInMinutes: 180
+
+          - task: NuGetCommand@2
+            displayName: "Push to External Store"
+            condition: or(eq(variables['azure_is_release_build'], 1), eq(variables['azure_is_prerelease_build'], 1))
+            inputs:
+              command: push
+              nuGetFeedType: external
+              packagesToPush: "$(Pipeline.Workspace)/Package/Packages/Release/**/*.nupkg;!$(Pipeline.Workspace)/Package/Packages/Release/**/*.symbols.nupkg"
+              publishFeedCredentials: ${{ parameters.service_connection }}
+            timeoutInMinutes: 180

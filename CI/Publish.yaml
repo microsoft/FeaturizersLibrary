@@ -6,13 +6,53 @@ trigger: none
 
 # User will need to specify buildId if publishing with non-triggered build
 stages:
-    - template: AzureUpload.stage_template.yaml
-      parameters:
-          agent_pool: vs2017-win2016
-          project: 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32
-          definition: 717
-          subscription: AI Infra Build (00c06639-6ee4-454e-8058-8d8b1703bd87)
-          storage: featurizersbuild
-          containerName: Archive
+  - template: AzureUpload.stage_template.yaml
+    parameters:
+      agent_pool: windows-2019
+      azure_dev_ops_project_id: 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32
+      azure_dev_ops_build_definition_id: 717
+      subscription: AI Infra Build (00c06639-6ee4-454e-8058-8d8b1703bd87)
+      storage: featurizersbuild
+      containerName: Archive
 
+  - template: NugetPublish.stage_template.yaml
+    parameters:
+      agent_pool: windows-2019
+      azure_dev_ops_project_id: 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32
+      azure_dev_ops_build_definition_id: 717
+      service_connection: "NuGet"
 
+  - stage: TagSource_Stage
+    displayName: "Tag Sources (for release builds)"
+    dependsOn:
+      - AzureUpload_Stage
+      - NuGetPublish_Stage
+
+    jobs:
+      - job: TagSource_Job
+        timeoutInMinutes: 240
+
+        displayName: "Tag"
+
+        pool:
+          vmImage: windows-2019
+
+        steps:
+          - checkout: self
+            persistCredentials: true
+            clean: true
+
+          - template: PublishInitialize.steps_template.yaml
+            parameters:
+              azure_dev_ops_project_id: 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32
+              azure_dev_ops_build_definition_id: 717
+
+          - script: |-
+              git config --global user.email "featurizer_dev@microsoft.com"
+              git config --global user.name "Azure DevOps"
+
+              git tag "$(azure_product_version)"
+              git push origin "$(azure_product_version)"
+            displayName: "<Tag Release Sources [Optional]>"
+            condition: or(eq(variables['azure_is_release_build'], 1), eq(variables['azure_is_prerelease_build'], 1))
+            timeoutInMinutes: 180

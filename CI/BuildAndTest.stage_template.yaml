@@ -2,6 +2,7 @@ parameters:
   operating_system: "" # Windows|Linux|MacOS
   enable_code_coverage: "" # True|False
   esrp_connected_service_name: "None" # <Name>|None
+  dependencies: []
 
   configuration: ""
   agent_pool: ""
@@ -22,7 +23,7 @@ parameters:
 stages:
   - stage: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration }}_Stage
     displayName: "${{ parameters.operating_system }} - ${{ parameters.configuration }}: "
-    dependsOn: [] # No dependencies
+    dependsOn: ${{ parameters.dependencies }}
 
     jobs:
       - template: BuildAndTest.job_template.yaml
@@ -42,6 +43,7 @@ stages:
 
             - script: |-
                 echo "esrp_connected_service_name - ${{ parameters.esrp_connected_service_name }}"
+                echo "dependencies - ${{ join(', ', parameters.dependencies) }}"
                 echo "configuration - ${{ parameters.configuration }}"
                 echo "agent_pool - ${{ parameters.agent_pool }}"
                 echo "agent_pool_container - ${{ parameters.agent_pool_container }}"
@@ -62,8 +64,25 @@ stages:
 
             # TODO: Code formatting
 
+            # Dynamically create the builder args
+            - task: PythonScript@0
+              displayName: "[IMPL] Create Builder Args"
+              inputs:
+                scriptSource: inline
+                script: |-
+                  if "$(azure_is_release_build)" == "1":
+                      args = "/release_build"
+                  else:
+                      args = "/prerelease_build_name=$(azure_build_name)"
+
+                  args = '"/custom_build_args=src/FeaturizerPrep/SharedLibrary:{} /no_build_info"'.format(args)
+
+                  print("azure_builder_args = {}".format(args))
+                  print("##vso[task.setvariable variable=azure_builder_args]{}".format(args))
+              timeoutInMinutes: 180
+
             - script: |-
-                $(azure_activate_script) ${{ parameters.configuration }} && Builder$(azure_script_extension) Execute . "$(azure_artifacts_directory)/Builder" /verbose
+                $(azure_activate_script) ${{ parameters.configuration }} && Builder$(azure_script_extension) Execute . "$(azure_artifacts_directory)/Builder" /verbose $(azure_builder_args)
               displayName: "<Builder>"
               timeoutInMinutes: 180
 
@@ -118,6 +137,46 @@ stages:
                               "ToolVersion" : "1.0"
                           }
                       ]
+
+            - task: PythonScript@0
+              displayName: "[IMPL] Persist Product Version Information"
+              inputs:
+                scriptSource: inline
+                script: |-
+                  import json
+                  import os
+
+                  from collections import OrderedDict
+
+                  values = OrderedDict()
+
+                  builder_dir = os.path.join(r"$(azure_artifacts_directory)", "Builder")
+
+                  # Get the release directory
+                  for potential_dirname in os.listdir(builder_dir):
+                      potential_fullpath = os.path.join(builder_dir, potential_dirname)
+                      if not os.path.isdir(potential_fullpath):
+                          continue
+
+                      file_attributes_filename = os.path.join(potential_fullpath, "Microsoft MLFeaturizers.FileAttributes.json")
+                      if not os.path.isfile(file_attributes_filename):
+                          raise Exception("'{}' does not exist".format(file_attributes_filename))
+
+                      with open(file_attributes_filename) as f:
+                          file_attributes_data = json.load(f)
+
+                      assert "product_version_full" in file_attributes_data, file_attributes_data
+                      values["product_version"] = file_attributes_data["product_version_full"]
+
+                      break
+
+                  for k, v in values.items():
+                      print("{} = {}".format(k, v))
+
+                  with open(os.path.join(builder_dir, "product_version_information.json"), "w") as f:
+                      json.dump(values, f)
+              condition: succeededOrFailed()
+              timeoutInMinutes: 180
 
             - task: PublishPipelineArtifact@0
               displayName: "Publish Artifacts"

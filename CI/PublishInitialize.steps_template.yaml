@@ -1,0 +1,102 @@
+parameters:
+  azure_dev_ops_project_id: "" # 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32 (The project GUID from which to download the pipeline artifacts)
+  azure_dev_ops_build_definition_id: "" # 717 (The definition ID of the build pipeline)
+
+steps:
+  # This build task will try to download artifacts from the triggering build.
+  # If there is no triggering build from the specified pipeline, it will download
+  # artifacts from the build specified in the options below
+  - task: PythonScript@0
+    displayName: "[IMPL] Validate Variables"
+    inputs:
+      scriptSource: inline
+      script: |-
+        import sys
+
+        triggeredBuildNumber = sys.argv[1]
+        buildId = sys.argv[2]
+
+        # the intention here is to compare if var == '$(var)', but as the right side of == will be a string of
+        # "$(var)" if var is empty, or the exact value which is equal to var if var is assigned the value.
+        # Therefore, a non-standard comparison is necessary in this case
+        if triggeredBuildNumber == "{}(Build.TriggeredBy.BuildNumber)".format("$"):
+            if buildId == "{}(buildId)".format("$"):
+               raise ValueError('Please specify variable buildId since this is a publish with non-triggered build. e.g. set buildId = 104648')
+
+      arguments: "$(Build.TriggeredBy.BuildNumber) $(buildId)"
+
+  # Download from a specific id
+  - task: DownloadPipelineArtifact@2
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'))
+    displayName: "[IMPL] Download Pipeline Artifact for Manual build"
+    inputs:
+      buildType: "specific"
+      project: "${{ parameters.azure_dev_ops_project_id }}"
+      definition: "${{ parameters.azure_dev_ops_build_definition_id }}"
+      specificBuildWithTriggering: false
+      buildVersionToDownload: specific
+      pipelineId: "$(buildId)"
+      artifactName: ""
+      targetPath: "$(Pipeline.Workspace)"
+    timeoutInMinutes: 180
+
+  # Download from the triggering build
+  - task: DownloadPipelineArtifact@2
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'BuildCompletion'))
+    displayName: "[IMPL] Download Pipeline Artifact for Build triggered by BuildCompletion"
+    inputs:
+      buildType: "specific"
+      project: "${{ parameters.azure_dev_ops_project_id }}"
+      definition: "${{ parameters.azure_dev_ops_build_definition_id }}"
+      specificBuildWithTriggering: true
+      buildVersionToDownload: latestFromBranch
+      artifactName: ""
+      targetPath: "$(Pipeline.Workspace)"
+    timeoutInMinutes: 180
+
+  - task: PythonScript@0
+    displayName: "[IMPL] Populate Stage Variables"
+    inputs:
+      scriptSource: inline
+      script: |-
+        import json
+        import os
+
+        from collections import OrderedDict
+
+        values = OrderedDict()
+
+        # Version info comes from these places:
+        #
+        #     - Global build Information
+        #     - Build Instance Information
+        #
+        for info_filename in [
+            os.path.join(r"$(Pipeline.Workspace)", "Prerequisites", "global_build_information.json"),
+
+            # It doesn't matter which configuration that we use, as they will all contain
+            # identical builder info files.
+            os.path.join(r"$(Pipeline.Workspace)", "Windows - x64", "Builder", "product_version_information.json"),
+        ]:
+            assert os.path.isdir(os.path.dirname(info_filename)), info_filename
+            assert os.path.isfile(info_filename), info_filename
+
+            with open(info_filename) as f:
+                content = json.load(f)
+
+            for k, v in content.items():
+                k = "azure_{}".format(k)
+                assert k not in values, (k, values[k], info_filename)
+
+                if isinstance(v, bool):
+                    v = 1 if v else 0
+                elif v is None:
+                    v = ""
+
+                values[k] = v
+
+        for k, v in values.items():
+            print("{} = {}".format(k, v))
+            print("##vso[task.setvariable variable={}]{}".format(k, v))
+
+    timeoutInMinutes: 180
