@@ -1,0 +1,61 @@
+# ----------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
+parameters:
+  agent_pool: ""
+  agent_pool_container: ""
+  agent_pool_is_custom: False # Set this value to True if the agent is part of a custom pool
+  job_name: ""
+  job_display_name: ""
+  steps: []
+  timeout_in_minutes: 240
+
+# This template is necessary because we can't create a job with an empty container string. Therefore,
+# the container attribute is only present when there is a container provided.
+
+jobs:
+  - ${{ if eq(parameters.agent_pool_container, '') }}:
+      - ${{ if eq(parameters.agent_pool_is_custom, 'true') }}:
+          - job: ${{ parameters.job_name }}
+            displayName: ${{ parameters.job_display_name }}
+
+            timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
+
+            pool: "${{ parameters.agent_pool }}"
+
+            workspace:
+              clean: All
+
+            steps:
+              ${{ parameters.steps }}
+
+      - ${{ if not(eq(parameters.agent_pool_is_custom, 'true')) }}:
+          - job: ${{ parameters.job_name }}
+            displayName: ${{ parameters.job_display_name }}
+
+            timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
+
+            pool:
+              vmImage: "${{ parameters.agent_pool }}"
+
+            workspace:
+              clean: All
+
+            steps:
+              ${{ parameters.steps }}
+
+  - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
+      - job: ${{ parameters.job_name }}
+        displayName: ${{ parameters.job_display_name }}
+
+        timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
+
+        pool:
+          vmImage: "${{ parameters.agent_pool }}"
+        container: "${{ parameters.agent_pool_container }}"
+
+        workspace:
+          clean: All
+
+        steps:
+          ${{ parameters.steps }}

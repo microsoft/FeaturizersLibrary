@@ -1,0 +1,59 @@
+# ----------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
+parameters:
+  configuration: ""
+  operating_system: "" # Windows|Linux|MacOS
+
+steps:
+  - task: PythonScript@0
+    displayName: "[DEBUG] Display Variables"
+
+    timeoutInMinutes: 180
+
+    inputs:
+      scriptSource: inline
+      script: |-
+        import textwrap
+
+        print(
+            textwrap.dedent(
+                """\
+                configuration:                ${{ parameters.configuration }}
+                operating_system:             ${{ parameters.operating_system }}
+                """,
+            ),
+        )
+
+  - template: BuildAndTest.initialize_steps_template.yaml
+    parameters:
+      operating_system: ${{ parameters.operating_system }}
+
+  - script: |-
+      $(pipeline_display_all_environment_vars)
+    displayName: "[DEBUG] Environment Variables (Before Activation)"
+    timeoutInMinutes: 180
+
+  - script: |-
+      $(pipeline_bootstrap_command) "$(pipeline_bootstrap_directory)" "/configuration=${{ parameters.configuration }}" /use_ascii /verbose
+    displayName: "<Bootstrap>"
+    timeoutInMinutes: 180
+
+  - script: |-
+      $(pipeline_activate_script) "${{ parameters.configuration }}" && $(pipeline_display_all_environment_vars)
+    displayName: "[DEBUG] Environment Variables (After Activation)"
+    timeoutInMinutes: 180
+
+  - script: |-
+      $(pipeline_activate_script) "${{ parameters.configuration }}" && Doxygener$(pipeline_script_extension) . "$(pipeline_artifacts_directory)/Doxygener" /verbose
+    displayName: "<Doxygener>"
+    timeoutInMinutes: 180
+
+  - task: PublishPipelineArtifact@0
+    displayName: "Publish Artifacts"
+
+    timeoutInMinutes: 180
+
+    inputs:
+      targetPath: "$(pipeline_artifacts_directory)/Doxygener"
+      artifactName: "Documentation"

@@ -1,0 +1,86 @@
+# ----------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
+parameters:
+  is_ci_build: False # True if this stage is invoked from the CI build (and not a PR). This will impact that name of the build.
+  prerelease_build_name: ""
+  release_build: False # True|False
+
+stages:
+  - stage: Prologue_Stage
+    displayName: "Prologue:"
+
+    jobs:
+      - template: '_job_template.yaml'
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          job_name: 'Globals_Job'
+          job_display_name: "Global Variables"
+          steps:
+            - checkout: none
+
+            - task: PythonScript@0
+              displayName: "[IMPL] Create JSON"
+
+              timeoutInMinutes: 180
+
+              inputs:
+                scriptSource: inline
+                script: |-
+                  import datetime
+                  import json
+                  import sys
+
+                  from collections import OrderedDict
+
+                  values = OrderedDict()
+
+                  values["is_release_build"] = "${{ parameters.release_build }}".lower() in ["true", "yes"]
+
+                  # the intention here is to compare if var == '$(var)', but as the right side of == will be a string of
+                  # "$(var)" if var is empty, or the exact value which is equal to var if var is assigned the value.
+                  # Therefore, a non-standard comparison is necessary in this case
+                  if "${{ parameters.prerelease_build_name }}" and "${{ parameters.prerelease_build_name }}" != "{}(prerelease_build_name)".format("$"):
+                      is_prerelease_build = True
+                      build_name = "${{ parameters.prerelease_build_name }}"
+                  else:
+                      is_prerelease_build = False
+
+                      if values["is_release_build"]:
+                          build_name = None
+                      else:
+                          now = datetime.datetime.now()
+
+                          # The build names should compare as:
+                          #
+                          #     "manual" < "pipe" < "preview"
+                          #
+                          build_name = "pipe.{build_id}.{year}.{month}.{day}.{hour}.{minute}.{second}".format(
+                              build_id=1 if "${{ parameters.is_ci_build }}".lower() in ["true", "yes"] else 0,
+                              year=now.year,
+                              month=now.month,
+                              day=now.day,
+                              hour=now.hour,
+                              minute=now.minute,
+                              second=now.second,
+                          )
+
+                  values["is_prerelease_build"] = is_prerelease_build
+                  values["build_name"] = build_name
+
+                  for k, v in values.items():
+                      print("{} = {}".format(k, v))
+
+                  with open("globals.json", "w") as f:
+                      json.dump(values, f)
+
+            - task: PublishPipelineArtifact@0
+              displayName: "Publish JSON"
+
+              timeoutInMinutes: 180
+
+              inputs:
+                targetPath: "globals.json"
+                artifactName: "Globals"

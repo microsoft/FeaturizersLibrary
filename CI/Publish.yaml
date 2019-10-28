@@ -1,58 +1,62 @@
+# ----------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
 name: $(TeamProject)-$(BuildDefinitionName)-$(SourceBranchName)-$(Date:yyyy.MM.dd)-$(Rev:rr)
 
 #TODO: Build completion triggers are not yet supported in YAML syntax
 #reference: https://docs.microsoft.com/en-us/azure/devops/pipelines/build/triggers?view=azure-devops&tabs=yaml#build-completion-triggers
 trigger: none
 
-# User will need to specify buildId if publishing with non-triggered build
 stages:
-  - template: AzureUpload.stage_template.yaml
-    parameters:
-      agent_pool: windows-2019
-      azure_dev_ops_project_id: 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32
-      azure_dev_ops_build_definition_id: 717
-      subscription: AI Infra Build (00c06639-6ee4-454e-8058-8d8b1703bd87)
-      storage: featurizersbuild
-      containerName: Archive
-
-  - template: NugetPublish.stage_template.yaml
-    parameters:
-      agent_pool: windows-2019
-      azure_dev_ops_project_id: 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32
-      azure_dev_ops_build_definition_id: 717
-      service_connection: "NuGet"
-
-  - stage: TagSource_Stage
-    displayName: "Tag Sources (for release builds)"
-    dependsOn:
-      - AzureUpload_Stage
-      - NuGetPublish_Stage
+  - stage: Publish_Stage
+    displayName: "Publish:"
 
     jobs:
-      - job: TagSource_Job
-        timeoutInMinutes: 240
+      - template: "templates/_job_template.yaml"
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          job_name: AuzreUpload_Job
+          job_display_name: "Azure Upload"
+          steps:
+            - template: "Publish.azureupload_steps_template.yaml"
+              parameters:
+                azure_dev_ops_build_definition_id: 717
+                azure_dev_ops_project_id: "7b4fddf7-fb53-4b12-bfcb-f87ad3774a32"
+                subscription_id: 'AI Infra Build (00c06639-6ee4-454e-8058-8d8b1703bd87)'
+                storage_account: 'featurizersbuild'
+                container: 'Archive'
 
-        displayName: "Tag"
+      - template: "templates/_job_template.yaml"
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          job_name: NuGet_Job
+          job_display_name: "NuGet Packages"
+          steps:
+            - template: "Publish.nuget_steps_template.yaml"
+              parameters:
+                azure_dev_ops_build_definition_id: 717
+                azure_dev_ops_project_id: "7b4fddf7-fb53-4b12-bfcb-f87ad3774a32"
+                azure_dev_ops_artifacts_feed_name: "DataPipelines"
+                service_connection: "NuGet"
 
-        pool:
-          vmImage: windows-2019
+  - stage: Epilogue_Stage
+    displayName: "Epilogue:"
+    dependsOn: Publish_Stage
 
-        steps:
-          - checkout: self
-            persistCredentials: true
-            clean: true
-
-          - template: PublishInitialize.steps_template.yaml
-            parameters:
-              azure_dev_ops_project_id: 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32
-              azure_dev_ops_build_definition_id: 717
-
-          - script: |-
-              git config --global user.email "featurizer_dev@microsoft.com"
-              git config --global user.name "Azure DevOps"
-
-              git tag "$(azure_product_version)"
-              git push origin "$(azure_product_version)"
-            displayName: "<Tag Release Sources [Optional]>"
-            condition: or(eq(variables['azure_is_release_build'], 1), eq(variables['azure_is_prerelease_build'], 1))
-            timeoutInMinutes: 180
+    jobs:
+      - template: "templates/_job_template.yaml"
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          job_name: GitTag_Job
+          job_display_name: "Tag Git Sources (for release builds)"
+          steps:
+            - template: "Publish.tagsources_steps_template.yaml"
+              parameters:
+                azure_dev_ops_build_definition_id: 717
+                azure_dev_ops_project_id: "7b4fddf7-fb53-4b12-bfcb-f87ad3774a32"
