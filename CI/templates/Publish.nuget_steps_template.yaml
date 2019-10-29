@@ -25,7 +25,7 @@ steps:
       command: push
       publishVstsFeed: '${{ parameters.azure_dev_ops_artifacts_feed_name }}'
       allowPackageConflicts: true
-      packagesToPush: "$(Pipeline.Workspace)/Package/Packages/Release/*.nupkg;!$(Pipeline.Workspace)/Package/Packages/Release/*.symbols.nupkg"
+      packagesToPush: "$(Pipeline.Workspace)/Packages/Packages/Release/*.nupkg;!$(Pipeline.Workspace)/Packages/Packages/Release/*.symbols.nupkg"
 
   - task: NuGetCommand@2
     displayName: "Push to External Store"
@@ -36,5 +36,5 @@ steps:
     inputs:
       command: push
       nuGetFeedType: external
-      packagesToPush: "$(Pipeline.Workspace)/Package/Packages/Release/*.nupkg;!$(Pipeline.Workspace)/Package/Packages/Release/*.symbols.nupkg"
+      packagesToPush: "$(Pipeline.Workspace)/Packages/Packages/Release/*.nupkg;!$(Pipeline.Workspace)/Packages/Packages/Release/*.symbols.nupkg"
       publishFeedCredentials: ${{ parameters.service_connection }}
