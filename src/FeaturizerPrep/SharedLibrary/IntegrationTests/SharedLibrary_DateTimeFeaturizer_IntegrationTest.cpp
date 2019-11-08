@@ -12,12 +12,12 @@ TEST_CASE("Standard") {
     DateTimeFeaturizer_Test(
         std::vector<std::int64_t>(),
         std::vector<std::int64_t>{1751241600, 217081625},
-        [](std::vector<TimePoint *> const &args) {
+        [](std::vector<TimePoint> const &args) {
             if(args.size() != 2)
                 return false;
 
             // First value
-            TimePoint const &               tp1(*args[0]);
+            TimePoint const &               tp1(args[0]);
 
             if(tp1.year != 2025) return false;
             if(tp1.month != 6) return false;
@@ -25,7 +25,7 @@ TEST_CASE("Standard") {
             if(strcmp(tp1.monthLabel_ptr, "June") != 0) return false;
 
             // Second value
-            TimePoint const &               tp2(*args[1]);
+            TimePoint const &               tp2(args[1]);
 
             if(tp2.year != 1976) return false;
             if(tp2.month != 11) return false;

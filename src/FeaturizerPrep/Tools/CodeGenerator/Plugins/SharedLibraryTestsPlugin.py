@@ -30,7 +30,9 @@ with CallOnExit(lambda: sys.path.pop(0)):
 _SUPPORTED_CUSTOM_TYPES                     = {
     "TimePoint": (lambda custom_structs: _TimePointTypeInfo(custom_structs)),
     "OneHotStruct": (lambda custom_structs: _OneHotStructTypeInfo(custom_structs)),
-    "HashOneHotVectorizerStruct": (lambda custom_structs: _HashOneHotVectorizerStructTypeInfo(custom_structs)),
+    "HashOneHotVectorizerStruct": (
+        lambda custom_structs: _HashOneHotVectorizerStructTypeInfo(custom_structs)
+    ),
 }
 
 # ----------------------------------------------------------------------
@@ -160,7 +162,7 @@ class Plugin(PluginBase):
                             else:
                                 trailing_destroy_statement = textwrap.dedent(
                                     """\
-                                    for(auto const & result : results) {{
+                                    for(auto &result : results) {{
                                         REQUIRE({name}{suffix}DestroyTransformedData({args}, &pErrorInfo));
                                         REQUIRE(pErrorInfo == nullptr);
                                     }}
@@ -568,13 +570,14 @@ class _TimePointTypeInfo(TypeInfo):
         result_name="result",
     ):
         return self.Info(
-            "TimePoint *",
-            "TimePoint * {}(nullptr);".format(result_name),
+            "TimePoint",
+            "TimePoint {};".format(result_name),
             "&{}".format(result_name),
             "results.emplace_back({});".format(result_name),
-            result_name,
+            "&{}".format(result_name),
             destroy_inline=False,
         )
+
 
 # ----------------------------------------------------------------------
 class _OneHotStructTypeInfo(TypeInfo):
@@ -603,8 +606,10 @@ class _OneHotStructTypeInfo(TypeInfo):
             "OneHotStruct {};".format(result_name),
             "&{}".format(result_name),
             "results.emplace_back({});".format(result_name),
+            "&{}".format(result_name),
             destroy_inline=False,
         )
+
 
 # ----------------------------------------------------------------------
 class _HashOneHotVectorizerStructTypeInfo(TypeInfo):
@@ -633,6 +638,6 @@ class _HashOneHotVectorizerStructTypeInfo(TypeInfo):
             "HashOneHotVectorizerStruct {};".format(result_name),
             "&{}".format(result_name),
             "results.emplace_back({});".format(result_name),
+            "&{}".format(result_name),
             destroy_inline=False,
         )
-        

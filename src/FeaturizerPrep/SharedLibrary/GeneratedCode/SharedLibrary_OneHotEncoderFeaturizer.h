@@ -39,7 +39,8 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_DestroyTransformer(/*
 
 FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_Transform(/*in*/ OneHotEncoderFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_Transform(/*in*/ OneHotEncoderFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <int16_t> */
@@ -62,7 +63,8 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_DestroyTransformer(/
 
 FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_Transform(/*in*/ OneHotEncoderFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_Transform(/*in*/ OneHotEncoderFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <int32_t> */
@@ -85,7 +87,8 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_DestroyTransformer(/
 
 FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_Transform(/*in*/ OneHotEncoderFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_Transform(/*in*/ OneHotEncoderFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <int64_t> */
@@ -108,7 +111,8 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_DestroyTransformer(/
 
 FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_Transform(/*in*/ OneHotEncoderFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_Transform(/*in*/ OneHotEncoderFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <uint8_t> */
@@ -131,7 +135,8 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_DestroyTransformer(/
 
 FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <uint16_t> */
@@ -154,7 +159,8 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_DestroyTransformer(
 
 FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <uint32_t> */
@@ -177,7 +183,8 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_DestroyTransformer(
 
 FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <uint64_t> */
@@ -200,7 +207,8 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_DestroyTransformer(
 
 FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <float_t> */
@@ -223,7 +231,8 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_DestroyTransformer(/
 
 FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_Transform(/*in*/ OneHotEncoderFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_Transform(/*in*/ OneHotEncoderFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <double_t> */
@@ -246,7 +255,8 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_DestroyTransformer(
 
 FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_Transform(/*in*/ OneHotEncoderFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_Transform(/*in*/ OneHotEncoderFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <bool> */
@@ -269,7 +279,8 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_DestroyTransformer(/*in
 
 FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_bool_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_Transform(/*in*/ OneHotEncoderFeaturizer_bool_TransformerHandle *pHandle, /*in*/ bool input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_Transform(/*in*/ OneHotEncoderFeaturizer_bool_TransformerHandle *pHandle, /*in*/ bool input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <string> */
@@ -292,6 +303,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_DestroyTransformer(/*
 
 FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_string_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_Transform(/*in*/ OneHotEncoderFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_Transform(/*in*/ OneHotEncoderFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 } // extern "C"

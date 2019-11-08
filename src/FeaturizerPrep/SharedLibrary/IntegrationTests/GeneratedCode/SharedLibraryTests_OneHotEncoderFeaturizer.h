@@ -104,7 +104,10 @@ void OneHotEncoderFeaturizer_int8_t_Test(
 
     REQUIRE(verify_func(results));
 
-    // No trailing destroy statement
+    for(auto &result : results) {
+        REQUIRE(OneHotEncoderFeaturizer_int8_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(pErrorInfo == nullptr);
+    }
 
     // Destroy the transformer
     REQUIRE(OneHotEncoderFeaturizer_int8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -208,7 +211,10 @@ void OneHotEncoderFeaturizer_int16_t_Test(
 
     REQUIRE(verify_func(results));
 
-    // No trailing destroy statement
+    for(auto &result : results) {
+        REQUIRE(OneHotEncoderFeaturizer_int16_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(pErrorInfo == nullptr);
+    }
 
     // Destroy the transformer
     REQUIRE(OneHotEncoderFeaturizer_int16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -312,7 +318,10 @@ void OneHotEncoderFeaturizer_int32_t_Test(
 
     REQUIRE(verify_func(results));
 
-    // No trailing destroy statement
+    for(auto &result : results) {
+        REQUIRE(OneHotEncoderFeaturizer_int32_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(pErrorInfo == nullptr);
+    }
 
     // Destroy the transformer
     REQUIRE(OneHotEncoderFeaturizer_int32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -416,7 +425,10 @@ void OneHotEncoderFeaturizer_int64_t_Test(
 
     REQUIRE(verify_func(results));
 
-    // No trailing destroy statement
+    for(auto &result : results) {
+        REQUIRE(OneHotEncoderFeaturizer_int64_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(pErrorInfo == nullptr);
+    }
 
     // Destroy the transformer
     REQUIRE(OneHotEncoderFeaturizer_int64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -520,7 +532,10 @@ void OneHotEncoderFeaturizer_uint8_t_Test(
 
     REQUIRE(verify_func(results));
 
-    // No trailing destroy statement
+    for(auto &result : results) {
+        REQUIRE(OneHotEncoderFeaturizer_uint8_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(pErrorInfo == nullptr);
+    }
 
     // Destroy the transformer
     REQUIRE(OneHotEncoderFeaturizer_uint8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -624,7 +639,10 @@ void OneHotEncoderFeaturizer_uint16_t_Test(
 
     REQUIRE(verify_func(results));
 
-    // No trailing destroy statement
+    for(auto &result : results) {
+        REQUIRE(OneHotEncoderFeaturizer_uint16_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(pErrorInfo == nullptr);
+    }
 
     // Destroy the transformer
     REQUIRE(OneHotEncoderFeaturizer_uint16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -728,7 +746,10 @@ void OneHotEncoderFeaturizer_uint32_t_Test(
 
     REQUIRE(verify_func(results));
 
-    // No trailing destroy statement
+    for(auto &result : results) {
+        REQUIRE(OneHotEncoderFeaturizer_uint32_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(pErrorInfo == nullptr);
+    }
 
     // Destroy the transformer
     REQUIRE(OneHotEncoderFeaturizer_uint32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -832,7 +853,10 @@ void OneHotEncoderFeaturizer_uint64_t_Test(
 
     REQUIRE(verify_func(results));
 
-    // No trailing destroy statement
+    for(auto &result : results) {
+        REQUIRE(OneHotEncoderFeaturizer_uint64_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(pErrorInfo == nullptr);
+    }
 
     // Destroy the transformer
     REQUIRE(OneHotEncoderFeaturizer_uint64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -936,7 +960,10 @@ void OneHotEncoderFeaturizer_float_t_Test(
 
     REQUIRE(verify_func(results));
 
-    // No trailing destroy statement
+    for(auto &result : results) {
+        REQUIRE(OneHotEncoderFeaturizer_float_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(pErrorInfo == nullptr);
+    }
 
     // Destroy the transformer
     REQUIRE(OneHotEncoderFeaturizer_float_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -1040,7 +1067,10 @@ void OneHotEncoderFeaturizer_double_t_Test(
 
     REQUIRE(verify_func(results));
 
-    // No trailing destroy statement
+    for(auto &result : results) {
+        REQUIRE(OneHotEncoderFeaturizer_double_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(pErrorInfo == nullptr);
+    }
 
     // Destroy the transformer
     REQUIRE(OneHotEncoderFeaturizer_double_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -1144,7 +1174,10 @@ void OneHotEncoderFeaturizer_bool_Test(
 
     REQUIRE(verify_func(results));
 
-    // No trailing destroy statement
+    for(auto &result : results) {
+        REQUIRE(OneHotEncoderFeaturizer_bool_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(pErrorInfo == nullptr);
+    }
 
     // Destroy the transformer
     REQUIRE(OneHotEncoderFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -1248,7 +1281,10 @@ void OneHotEncoderFeaturizer_string_Test(
 
     REQUIRE(verify_func(results));
 
-    // No trailing destroy statement
+    for(auto &result : results) {
+        REQUIRE(OneHotEncoderFeaturizer_string_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(pErrorInfo == nullptr);
+    }
 
     // Destroy the transformer
     REQUIRE(OneHotEncoderFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));

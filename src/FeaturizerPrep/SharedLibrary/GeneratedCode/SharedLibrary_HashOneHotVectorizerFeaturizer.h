@@ -39,7 +39,8 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_DestroyTransfo
 
 FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <int16_t> */
@@ -62,7 +63,8 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_DestroyTransf
 
 FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t input, /*out*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <int32_t> */
@@ -85,7 +87,8 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_DestroyTransf
 
 FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <int64_t> */
@@ -108,7 +111,8 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_DestroyTransf
 
 FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t input, /*out*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <uint8_t> */
@@ -131,7 +135,8 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_DestroyTransf
 
 FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <uint16_t> */
@@ -154,7 +159,8 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_DestroyTrans
 
 FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <uint32_t> */
@@ -177,7 +183,8 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_DestroyTrans
 
 FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <uint64_t> */
@@ -200,7 +207,8 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_DestroyTrans
 
 FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <float_t> */
@@ -223,7 +231,8 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_DestroyTransf
 
 FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <double_t> */
@@ -246,7 +255,8 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_DestroyTrans
 
 FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <bool> */
@@ -269,7 +279,8 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_DestroyTransform
 
 FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_bool_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_Transform(/*in*/ HashOneHotVectorizerFeaturizer_bool_TransformerHandle *pHandle, /*in*/ bool input, /*out*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_Transform(/*in*/ HashOneHotVectorizerFeaturizer_bool_TransformerHandle *pHandle, /*in*/ bool input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <string> */
@@ -292,6 +303,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_DestroyTransfo
 
 FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_string_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_Transform(/*in*/ HashOneHotVectorizerFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_Transform(/*in*/ HashOneHotVectorizerFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 } // extern "C"

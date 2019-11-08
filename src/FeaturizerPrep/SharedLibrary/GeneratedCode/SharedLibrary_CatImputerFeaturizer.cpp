@@ -136,14 +136,14 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int8_t_FitBuffer(/*in*/ CatImpu
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Microsoft::Featurizer::Traits<int8_t>::nullable_type> input_buffer;
+        std::vector<Microsoft::Featurizer::Traits<std::int8_t>::nullable_type> input_buffer;
 
         input_buffer.reserve(input_items);
 
-        int8_t const * const * const input_end(input_ptr + input_items);
+        std::int8_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<int8_t>::CreateNullValue());
+            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int8_t>::CreateNullValue());
             ++input_ptr;
         }
 
@@ -437,14 +437,14 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int16_t_FitBuffer(/*in*/ CatImp
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Microsoft::Featurizer::Traits<int16_t>::nullable_type> input_buffer;
+        std::vector<Microsoft::Featurizer::Traits<std::int16_t>::nullable_type> input_buffer;
 
         input_buffer.reserve(input_items);
 
-        int16_t const * const * const input_end(input_ptr + input_items);
+        std::int16_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<int16_t>::CreateNullValue());
+            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int16_t>::CreateNullValue());
             ++input_ptr;
         }
 
@@ -738,14 +738,14 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int32_t_FitBuffer(/*in*/ CatImp
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Microsoft::Featurizer::Traits<int32_t>::nullable_type> input_buffer;
+        std::vector<Microsoft::Featurizer::Traits<std::int32_t>::nullable_type> input_buffer;
 
         input_buffer.reserve(input_items);
 
-        int32_t const * const * const input_end(input_ptr + input_items);
+        std::int32_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<int32_t>::CreateNullValue());
+            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int32_t>::CreateNullValue());
             ++input_ptr;
         }
 
@@ -1039,14 +1039,14 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_int64_t_FitBuffer(/*in*/ CatImp
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Microsoft::Featurizer::Traits<int64_t>::nullable_type> input_buffer;
+        std::vector<Microsoft::Featurizer::Traits<std::int64_t>::nullable_type> input_buffer;
 
         input_buffer.reserve(input_items);
 
-        int64_t const * const * const input_end(input_ptr + input_items);
+        std::int64_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<int64_t>::CreateNullValue());
+            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int64_t>::CreateNullValue());
             ++input_ptr;
         }
 
@@ -1340,14 +1340,14 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint8_t_FitBuffer(/*in*/ CatImp
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Microsoft::Featurizer::Traits<uint8_t>::nullable_type> input_buffer;
+        std::vector<Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type> input_buffer;
 
         input_buffer.reserve(input_items);
 
-        uint8_t const * const * const input_end(input_ptr + input_items);
+        std::uint8_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<uint8_t>::CreateNullValue());
+            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint8_t>::CreateNullValue());
             ++input_ptr;
         }
 
@@ -1641,14 +1641,14 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint16_t_FitBuffer(/*in*/ CatIm
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Microsoft::Featurizer::Traits<uint16_t>::nullable_type> input_buffer;
+        std::vector<Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type> input_buffer;
 
         input_buffer.reserve(input_items);
 
-        uint16_t const * const * const input_end(input_ptr + input_items);
+        std::uint16_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<uint16_t>::CreateNullValue());
+            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint16_t>::CreateNullValue());
             ++input_ptr;
         }
 
@@ -1942,14 +1942,14 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint32_t_FitBuffer(/*in*/ CatIm
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Microsoft::Featurizer::Traits<uint32_t>::nullable_type> input_buffer;
+        std::vector<Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type> input_buffer;
 
         input_buffer.reserve(input_items);
 
-        uint32_t const * const * const input_end(input_ptr + input_items);
+        std::uint32_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<uint32_t>::CreateNullValue());
+            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue());
             ++input_ptr;
         }
 
@@ -2243,14 +2243,14 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_uint64_t_FitBuffer(/*in*/ CatIm
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Microsoft::Featurizer::Traits<uint64_t>::nullable_type> input_buffer;
+        std::vector<Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type> input_buffer;
 
         input_buffer.reserve(input_items);
 
-        uint64_t const * const * const input_end(input_ptr + input_items);
+        std::uint64_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<uint64_t>::CreateNullValue());
+            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint64_t>::CreateNullValue());
             ++input_ptr;
         }
 
@@ -2544,14 +2544,14 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_t_FitBuffer(/*in*/ CatImp
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Microsoft::Featurizer::Traits<float>::nullable_type> input_buffer;
+        std::vector<Microsoft::Featurizer::Traits<std::float_t>::nullable_type> input_buffer;
 
         input_buffer.reserve(input_items);
 
-        float const * const * const input_end(input_ptr + input_items);
+        std::float_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<float>::CreateNullValue());
+            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
             ++input_ptr;
         }
 
@@ -2845,14 +2845,14 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_t_FitBuffer(/*in*/ CatIm
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Microsoft::Featurizer::Traits<double>::nullable_type> input_buffer;
+        std::vector<Microsoft::Featurizer::Traits<std::double_t>::nullable_type> input_buffer;
 
         input_buffer.reserve(input_items);
 
-        double const * const * const input_end(input_ptr + input_items);
+        std::double_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<double>::CreateNullValue());
+            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue());
             ++input_ptr;
         }
 
@@ -3628,7 +3628,8 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_string_Transform(/*in*/ CatImpu
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);

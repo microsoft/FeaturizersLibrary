@@ -13,7 +13,7 @@ template <typename VectorInputT, typename... ConstructorArgsT>
 void DateTimeFeaturizer_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<TimePoint *> const &)> const &verify_func,
+    std::function<bool (std::vector<TimePoint> const &)> const &verify_func,
     ConstructorArgsT &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -88,12 +88,12 @@ void DateTimeFeaturizer_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<TimePoint *> results;
+    std::vector<TimePoint> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        TimePoint * result(nullptr);
+        TimePoint result;
 
         REQUIRE(DateTimeFeaturizer_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -104,8 +104,8 @@ void DateTimeFeaturizer_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto const & result : results) {
-        REQUIRE(DateTimeFeaturizer_DestroyTransformedData(result, &pErrorInfo));
+    for(auto &result : results) {
+        REQUIRE(DateTimeFeaturizer_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 

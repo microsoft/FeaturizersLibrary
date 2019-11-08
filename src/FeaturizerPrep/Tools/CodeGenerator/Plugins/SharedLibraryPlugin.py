@@ -28,72 +28,6 @@ with CallOnExit(lambda: sys.path.pop(0)):
     from Plugin import Plugin as PluginBase, TypeVisitor as TypeVisitorBase
 
 # ----------------------------------------------------------------------
-class TypeInfo(Interface.Interface):
-    """Information about a specific named type"""
-
-    # ----------------------------------------------------------------------
-    # |  Public Types
-    class Info(object):
-        """Information about the type when it is used in various scenarios"""
-
-        def __init__(self, parameter_decl, validation_statements, invocation_statement):
-            self.ParameterDecl              = parameter_decl
-            self.ValidationStatements       = validation_statements
-            self.InvocationStatement        = invocation_statement
-
-    # ----------------------------------------------------------------------
-    # |  Public Methods
-    @staticmethod
-    @Interface.abstractmethod
-    def GetInputInfo(arg_name, is_optional, invocation_template):
-        """Return `Info` when the type is used as an input argument.
-
-           `invocation_template` is a string template string that should
-           be formatted with the arguments.
-        """
-        raise Exception("Abstract Method")
-
-    # ----------------------------------------------------------------------
-    @staticmethod
-    @Interface.abstractmethod
-    def GetInputBufferInfo(arg_name, is_optional, invocation_template):
-        """Return `Info` when the type is used as an input argument for a buffer.
-
-           `invocation_template` is a string template string that should
-           be formatted with the arguments.
-        """
-        raise Exception("Abstract method")
-
-    # ----------------------------------------------------------------------
-    @staticmethod
-    @Interface.abstractmethod
-    def GetOutputInfo(
-        arg_name,
-        result_name="result",
-        is_struct=False,
-    ):
-        """Return `Info` when the type is used an an output argument. `result_name` is the name of the
-           result returned by the shared library code.
-        """
-        raise Exception("Abstract method")
-
-    # ----------------------------------------------------------------------\
-    @staticmethod
-    @Interface.abstractmethod
-    def GetDestroyOutputInfo(
-        arg_name="result",
-    ):
-        """Return `Info` when the type requires explicit destruction or `None` if no explicit destruction functionality is required"""
-        raise Exception("Abstract method")
-
-
-_SUPPORTED_CUSTOM_TYPES                     = {
-    "TimePoint": (lambda custom_structs: _TimePointTypeInfo(custom_structs)),
-    "OneHotStruct": (lambda custom_structs: _OneHotStructTypeInfo(custom_structs)),
-    "HashOneHotVectorizerStruct": (lambda custom_structs: _HashOneHotVectorizerStructTypeInfo(custom_structs)),
-}
-
-# ----------------------------------------------------------------------
 @Interface.staticderived
 class Plugin(PluginBase):
     # ----------------------------------------------------------------------
@@ -173,7 +107,7 @@ def _CreateInterfaceSubstitutionDict(item, c_data):
         suffix = "_{}_".format(template_desc)
         type_desc = " <{}>".format(template_desc)
         if item.is_output_a_template:
-            cpp_template_suffix = "<{}>".format(template + ', ' + item.transformed_type)
+            cpp_template_suffix = "<{}>".format(template + ", " + item.transformed_type)
         else:
             cpp_template_suffix = "<{}>".format(template)
 
@@ -415,7 +349,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
                         if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
 
                         delete [] pBuffer;
-                    
+
                         return true;
                     }
                     catch(std::exception const &ex) {
@@ -473,10 +407,10 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
 
             construct_params = []
 
-            if c_data.ConfigurationParamTypeInfos:
+            if c_data.ConfigurationParamTypeInfoFactories:
                 for configuration_param, type_info in zip(
                     item.configuration_params,
-                    c_data.ConfigurationParamTypeInfos,
+                    c_data.ConfigurationParamTypeInfoFactories,
                 ):
                     info = type_info.GetInputInfo(
                         configuration_param.name,
@@ -486,7 +420,9 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
 
                     construct_params += info.ParameterDecl
 
-            delete_transformed_info = c_data.TransformedTypeInfo.GetDestroyOutputInfo()
+            delete_transformed_info = (
+                c_data.TransformedTypeInfoFactory.GetDestroyOutputInfo()
+            )
             if delete_transformed_info is not None:
                 delete_transformed_method = textwrap.dedent(
                     """\
@@ -508,7 +444,7 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                 for struct_member_name, struct_member in six.iteritems(struct_members):
                     members += struct_member.GetOutputInfo(
                         struct_member_name,
-                        is_struct=True,
+                        is_struct_member=True,
                     ).ParameterDecl
 
                 custom_structs.append(
@@ -544,7 +480,7 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                             custom_structs.strip(),
                         ),
                         **d
-                    ),
+                    )
                 )
             custom_struct_flag = True
             f.write(
@@ -579,21 +515,23 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                         ", ".join(construct_params),
                     ) if construct_params else "",
                     input_param=", ".join(
-                        c_data.InputTypeInfo.GetInputInfo(
+                        c_data.InputTypeInfoFactory.GetInputInfo(
                             "input",
                             getattr(item, "is_input_optional", False),
                             "",
                         ).ParameterDecl,
                     ),
                     input_buffer_param=", ".join(
-                        c_data.InputTypeInfo.GetInputBufferInfo(
+                        c_data.InputTypeInfoFactory.GetInputBufferInfo(
                             "input",
                             getattr(item, "is_input_optional", False),
                             "",
                         ).ParameterDecl,
                     ),
                     transform_output_param=", ".join(
-                        c_data.TransformedTypeInfo.GetOutputInfo("output").ParameterDecl,
+                        c_data.TransformedTypeInfoFactory.GetOutputInfo(
+                            "output",
+                        ).ParameterDecl,
                     ),
                     delete_transformed_method=delete_transformed_method,
                     **d
@@ -700,10 +638,10 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
             construct_validation = []
             construct_args = []
 
-            if c_data.ConfigurationParamTypeInfos:
+            if c_data.ConfigurationParamTypeInfoFactories:
                 for configuration_param, type_info in zip(
                     item.configuration_params,
-                    c_data.ConfigurationParamTypeInfos,
+                    c_data.ConfigurationParamTypeInfoFactories,
                 ):
                     info = type_info.GetInputInfo(
                         configuration_param.name,
@@ -716,7 +654,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                     if info.ValidationStatements:
                         construct_validation.append(info.ValidationStatements)
 
-                    construct_args.append(info.InvocationStatement)
+                    construct_args.append(info.InvocationStatements)
 
             f.write(
                 textwrap.dedent(
@@ -789,7 +727,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
             )
 
             # Fit
-            input_info = c_data.InputTypeInfo.GetInputInfo(
+            input_info = c_data.InputTypeInfoFactory.GetInputInfo(
                 "input",
                 getattr(item, "is_input_optional", False),
                 "*pFitResult = static_cast<unsigned char>(estimator.fit({}));",
@@ -821,7 +759,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                         8,
                     ),
                     statement=StringHelpers.LeftJustify(
-                        input_info.InvocationStatement.strip(),
+                        input_info.InvocationStatements.strip(),
                         8,
                     ),
                     **d
@@ -829,7 +767,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
             )
 
             # FitBuffer
-            input_info = c_data.InputTypeInfo.GetInputBufferInfo(
+            input_info = c_data.InputTypeInfoFactory.GetInputBufferInfo(
                 "input",
                 getattr(item, "is_input_optional", False),
                 "*pFitResult = static_cast<unsigned char>(estimator.fit({}));",
@@ -861,7 +799,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                         8,
                     ),
                     statement=StringHelpers.LeftJustify(
-                        input_info.InvocationStatement.strip(),
+                        input_info.InvocationStatements.strip(),
                         8,
                     ),
                     **d
@@ -989,13 +927,13 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
             )
 
             # Transform
-            input_info = c_data.InputTypeInfo.GetInputInfo(
+            input_info = c_data.InputTypeInfoFactory.GetInputInfo(
                 "input",
                 getattr(item, "is_input_optional", False),
                 "auto result(transformer.execute({}));",
             )
 
-            output_info = c_data.TransformedTypeInfo.GetOutputInfo("output")
+            output_info = c_data.TransformedTypeInfoFactory.GetOutputInfo("output")
 
             f.write(
                 textwrap.dedent(
@@ -1031,11 +969,11 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                         8,
                     ),
                     input_statement=StringHelpers.LeftJustify(
-                        input_info.InvocationStatement.strip(),
+                        input_info.InvocationStatements.strip(),
                         8,
                     ),
                     output_statement=StringHelpers.LeftJustify(
-                        output_info.InvocationStatement.strip(),
+                        output_info.InvocationStatements.strip(),
                         8,
                     ),
                     **d
@@ -1043,7 +981,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
             )
 
             # DestroyTransformedData (optional)
-            output_info = c_data.TransformedTypeInfo.GetDestroyOutputInfo()
+            output_info = c_data.TransformedTypeInfoFactory.GetDestroyOutputInfo()
             if output_info is not None:
                 f.write(
                     textwrap.dedent(
@@ -1064,7 +1002,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             8,
                         ),
                         statement=StringHelpers.LeftJustify(
-                            output_info.InvocationStatement.strip(),
+                            output_info.InvocationStatements.strip(),
                             8,
                         ),
                         **d
@@ -1111,9 +1049,6 @@ class CData(object):
     # |
     # ----------------------------------------------------------------------
     def __init__(self, item):
-        type_info_visitor = _TypeInfoVisitor()
-        supported_custom_types = set(six.iterkeys(_SUPPORTED_CUSTOM_TYPES))
-
         # Create the custom structs
         custom_structs = OrderedDict()
 
@@ -1121,718 +1056,80 @@ class CData(object):
             members = OrderedDict()
 
             for member in custom_struct.members:
-                members[member.name] = type_info_visitor.Accept(
-                    member.type,
-                    supported_custom_types=supported_custom_types,
-                    custom_structs=custom_structs,
-                )
+                tif = self._GetTypeInfoClass(member.type)
+                assert tif, member.type
+
+                members[member.name] = tif()
 
             custom_structs[custom_struct.name] = members
 
-        # Create the configuration params
-        configuration_param_type_infos = []
+        # Create the configuration param factories
+        configuration_param_type_info_factories = []
 
         for configuration_param in getattr(item, "configuration_params", []):
-            configuration_param_type_infos.append(
-                type_info_visitor.Accept(
-                    configuration_param.type,
-                    supported_custom_types=supported_custom_types,
-                    custom_structs=custom_structs,
-                ),
-            )
+            tif = self._GetTypeInfoClass(configuration_param.type)
+            assert tif, configuration_param.type
 
-        # Input
-        input_type_info = type_info_visitor.Accept(
-            item.input_type,
-            supported_custom_types=supported_custom_types,
-            custom_structs=custom_structs,
-        )
+            configuration_param_type_info_factories.append(tif(custom_structs))
 
-        # Output
-        transformed_type_info = type_info_visitor.Accept(
-            item.transformed_type,
-            supported_custom_types=supported_custom_types,
-            custom_structs=custom_structs,
-        )
+        # Create the input factory
+        tif = self._GetTypeInfoClass(item.input_type)
+        assert tif, item.input_type
+
+        input_type_info_factory = tif(custom_structs)
+
+        # Create the output factory
+        tif = self._GetTypeInfoClass(item.transformed_type)
+        assert tif, item.transformed_type
+
+        transformed_type_info_factory = tif(custom_structs)
 
         # Commit the results
-        self.CustomStructs                  = custom_structs
-        self.ConfigurationParamTypeInfos    = configuration_param_type_infos
-        self.InputTypeInfo                  = input_type_info
-        self.TransformedTypeInfo            = transformed_type_info
+        self.CustomStructs                              = custom_structs
+        self.ConfigurationParamTypeInfoFactories        = configuration_param_type_info_factories
+        self.InputTypeInfoFactory                       = input_type_info_factory
+        self.TransformedTypeInfoFactory                 = transformed_type_info_factory
 
-
-# ----------------------------------------------------------------------
-# |
-# |  Private Types
-# |
-# ----------------------------------------------------------------------
-@Interface.staticderived
-class _TypeInfoVisitor(TypeVisitorBase):
     # ----------------------------------------------------------------------
-    # |  Public Methods
-    @classmethod
-    @Interface.override
-    def OnInt8(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::int8_t")
+    # |
+    # |  Private Data
+    # |
+    # ----------------------------------------------------------------------
+    _type_info_factory_classes              = None
 
+    # ----------------------------------------------------------------------
+    # |
+    # |  Private Methods
+    # |
     # ----------------------------------------------------------------------
     @classmethod
-    @Interface.override
-    def OnInt16(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::int16_t")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnInt32(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::int32_t")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnInt64(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::int64_t")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnUInt8(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::uint8_t")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnUInt16(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::uint16_t")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnUInt32(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::uint32_t")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnUInt64(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::uint64_t")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnFloat32(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::float_t", "float")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnFloat64(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::double_t", "double")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnBool(cls, *args, **kwargs):
-        return _ScalarTypeInfo("bool")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnString(cls, *args, **kwargs):
-        return _StringTypeInfo()
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnArray(cls, template_args, arg_name, is_input_optional):
-        raise Exception("TODO: Not implemented")
-
-    # ----------------------------------------------------------------------
-    @staticmethod
-    @Interface.override
-    def OnVector(*args, **kwargs):
-        raise Exception("TODO: Not implemented")
-
-    # ----------------------------------------------------------------------
-    @staticmethod
-    @Interface.override
-    def OnMap(*args, **kwargs):
-        raise Exception("TODO: Not implemented")
-
-    # ----------------------------------------------------------------------
-    @staticmethod
-    @Interface.override
-    def OnCustomType(type, *args, **kwargs):
-        return _SUPPORTED_CUSTOM_TYPES[type](*args, **kwargs)
-
-
-# ----------------------------------------------------------------------
-class _ScalarTypeInfo(TypeInfo):
-    """Functionality for scalar types"""
-
-    # ----------------------------------------------------------------------
-    def __init__(
-        self,
-        cpp_type,
-        interface_type=None,
-    ):
-        if interface_type is None:
-            interface_type = cpp_type.replace("std::", "")
-
-        self._cpp_type                      = cpp_type
-        self._interface_type                = interface_type
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetInputInfo(self, arg_name, is_optional, invocation_template):
-        if is_optional:
-            input_type = "{} const *".format(self._interface_type)
-            invocation_statement = invocation_template.format(
-                "{name} != nullptr ? *{name} : Microsoft::Featurizer::Traits<{cpp_type}>::CreateNullValue()".format(
-                    name=arg_name,
-                    cpp_type=self._cpp_type,
-                ),
+    def _GetTypeInfoClass(cls, the_type):
+        if cls._type_info_factory_classes is None:
+            from Plugins.SharedLibraryPluginImpl import ScalarTypeInfoFactories
+            from Plugins.SharedLibraryPluginImpl.StringTypeInfoFactory import (
+                StringTypeInfoFactory,
             )
-        else:
-            input_type = self._interface_type
-            invocation_statement = invocation_template.format(arg_name)
+            from Plugins.SharedLibraryPluginImpl import StructTypeInfoFactories
 
-        return self.Info(
-            ["/*in*/ {} {}".format(input_type, arg_name)],
-            None,                           # No validation
-            invocation_statement,
-        )
+            type_info_factory_classes = [StringTypeInfoFactory]
 
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetInputBufferInfo(self, arg_name, is_optional, invocation_template):
-        if is_optional:
-            input_type = "{} const * const *".format(self._interface_type)
+            for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
+                for obj_name in dir(compound_module):
+                    if (
+                        obj_name.startswith("_")
+                        or not obj_name.endswith("Factory")
+                        or obj_name == "TypeInfoFactory"
+                    ):
+                        continue
 
-            validation_suffix = textwrap.dedent(
-                """\
-                std::vector<Microsoft::Featurizer::Traits<{cpp_type}>::nullable_type> {name}_buffer;
+                    type_info_factory_classes.append(getattr(compound_module, obj_name))
 
-                {name}_buffer.reserve({name}_items);
+            # Associate the type info factories with the class rather than the instance
+            # so that we only need to perform this initialization once.
+            cls._type_info_factory_classes = type_info_factory_classes
 
-                {cpp_type} const * const * const {name}_end({name}_ptr + {name}_items);
+        for type_info_factory_class in cls._type_info_factory_classes:
+            if type_info_factory_class.TypeName == the_type:
+                return type_info_factory_class
 
-                while({name}_ptr != {name}_end) {{
-                    {name}_buffer.emplace_back(*{name}_ptr ? **{name}_ptr : Microsoft::Featurizer::Traits<{cpp_type}>::CreateNullValue());
-                    ++{name}_ptr;
-                }}
-                """,
-            ).format(
-                name=arg_name,
-                cpp_type=self._interface_type,
-            )
-
-            invocation_statement = invocation_template.format(
-                "{name}_buffer.data(), {name}_buffer.size()".format(
-                    name=arg_name,
-                ),
-            )
-        else:
-            input_type = "{} const *".format(self._interface_type)
-            validation_suffix = None
-            invocation_statement = invocation_template.format(
-                "{name}_ptr, {name}_items".format(
-                    name=arg_name,
-                ),
-            )
-
-        return self.Info(
-            [
-                "/*in*/ {type} {name}_ptr".format(
-                    type=input_type,
-                    name=arg_name,
-                ),
-                "/*in*/ std::size_t {name}_items".format(
-                    name=arg_name,
-                ),
-            ],
-            textwrap.dedent(
-                """\
-                if({name}_ptr == nullptr) throw std::invalid_argument("'{name}_ptr' is null");
-                if({name}_items == 0) throw std::invalid_argument("'{name}_items' is 0");
-                {validation_suffix}
-                """,
-            ).format(
-                name=arg_name,
-                validation_suffix="\n{}\n".format(
-                    validation_suffix,
-                ) if validation_suffix else "",
-            ),
-            invocation_statement,
-        )
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetOutputInfo(
-        self,
-        arg_name,
-        result_name="result",
-        is_struct=False,
-    ):
-        return self.Info(
-            [
-                "/*out*/ {}{} {}".format(
-                    self._interface_type,
-                    "" if is_struct else " *",
-                    arg_name,
-                ),
-            ],
-            """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
-                name=arg_name,
-            ),
-            "{}{} = {};".format("" if is_struct else "*", arg_name, result_name),
-        )
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetDestroyOutputInfo(
-        self,
-        arg_name="result",
-    ):
         return None
-
-
-# ----------------------------------------------------------------------
-@Interface.staticderived
-class _StringTypeInfo(TypeInfo):
-    """Functionality for strings"""
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def GetInputInfo(cls, arg_name, is_optional, invocation_template):
-        if is_optional:
-            validation = ""
-            invocation = invocation_template.format(
-                "{name} ? std::string({name}) : nonstd::optional<std::string>()".format(
-                    name=arg_name,
-                ),
-            )
-        else:
-            validation = """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
-                name=arg_name,
-            )
-            invocation = invocation_template.format(arg_name)
-
-        return cls.Info(
-            ["/*in*/ char const *{}".format(arg_name)],
-            validation,
-            invocation,
-        )
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def GetInputBufferInfo(cls, arg_name, is_optional, invocation_template):
-        if is_optional:
-            validation_suffix = textwrap.dedent(
-                """\
-                std::vector<nonstd::optional<std::string>> {name}_buffer;
-
-                {name}_buffer.reserve({name}_items);
-
-                char const * const * const {name}_end({name}_ptr + {name}_items);
-
-                while({name}_ptr != {name}_end) {{
-                    {name}_buffer.emplace_back(*{name}_ptr ? *{name}_ptr : nonstd::optional<std::string>());
-                    ++{name}_ptr;
-                }}
-                """,
-            ).format(
-                name=arg_name,
-            )
-        else:
-            validation_suffix = textwrap.dedent(
-                """\
-                std::vector<std::string> {name}_buffer;
-
-                {name}_buffer.reserve({name}_items);
-
-                char const * const * const {name}_end({name}_ptr + {name}_items);
-
-                while({name}_ptr != {name}_end) {{
-                    {name}_buffer.emplace_back(*{name}_ptr);
-                    ++{name}_ptr;
-                }}
-                """,
-            ).format(
-                name=arg_name,
-            )
-
-        return cls.Info(
-            [
-                "/*in*/ char const * const * {name}_ptr".format(
-                    name=arg_name,
-                ),
-                "std::size_t {name}_items".format(
-                    name=arg_name,
-                ),
-            ],
-            textwrap.dedent(
-                """\
-                if({name}_ptr == nullptr) throw std::invalid_argument("'{name}_ptr' is null");
-                if({name}_items == 0) throw std::invalid_argument("'{name}_items' is 0");
-                {validation_suffix}
-                """,
-            ).format(
-                name=arg_name,
-                validation_suffix="\n{}\n".format(
-                    validation_suffix,
-                ) if validation_suffix else "",
-            ),
-            invocation_template.format(
-                "{name}_buffer.data(), {name}_buffer.size()".format(
-                    name=arg_name,
-                ),
-            ),
-        )
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def GetOutputInfo(
-        cls,
-        arg_name,
-        result_name="result",
-        is_struct=False,
-    ):
-        return cls.Info(
-            [
-                "/*out*/ char const *{pointer} {name}_ptr".format(
-                    name=arg_name,
-                    pointer="" if is_struct else "*",
-                ),
-                "/*out*/ std::size_t{pointer} {name}_items".format(
-                    name=arg_name,
-                    pointer="" if is_struct else " *",
-                ),
-            ],
-            textwrap.dedent(
-                """\
-                if({name}_ptr == nullptr) throw std::invalid_argument("'{name}_ptr' is null");
-                if({name}_items == nullptr) throw std::invalid_argument("'{name}_items' is null");
-                """,
-            ).format(
-                name=arg_name,
-            ),
-            textwrap.dedent(
-                """\
-                if({result_name}.empty()) {{
-                    {pointer}{name}_ptr = nullptr;
-                    {pointer}{name}_items = 0;
-                }} else {{
-                    char * string_buffer(new char[{result_name}.size() + 1]);
-
-                    std::copy({result_name}.begin(), {result_name}.end(), string_buffer);
-                    string_buffer[{result_name}.size()] = 0;
-
-                    {pointer}{name}_ptr = string_buffer;
-                    {pointer}{name}_items = {result_name}.size();
-                }}
-                """,
-            ).format(
-                name=arg_name,
-                result_name=result_name,
-                pointer="" if is_struct else "*",
-            ),
-        )
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def GetDestroyOutputInfo(
-        cls,
-        arg_name="result",
-    ):
-        return cls.Info(
-            [
-                "/*in*/ char const *{name}_ptr".format(
-                    name=arg_name,
-                ),
-                "/*in*/ std::size_t {name}_items".format(
-                    name=arg_name,
-                ),
-            ],
-            textwrap.dedent(
-                """\
-                if({name}_ptr == nullptr && {name}_items != 0) throw std::invalid_argument("Invalid buffer");
-                if({name}_ptr != nullptr && {name}_items == 0) throw std::invalid_argument("Invalid buffer");
-                """,
-            ).format(
-                name=arg_name,
-            ),
-            textwrap.dedent(
-                """\
-                if({name}_ptr)
-                    delete [] {name}_ptr;
-                """,
-            ).format(
-                name=arg_name,
-            ),
-        )
-
-
-# ----------------------------------------------------------------------
-class _TimePointTypeInfo(TypeInfo):
-    """Functionality for TimePoints, used in the DateTimeFeaturizer"""
-
-    # ----------------------------------------------------------------------
-    def __init__(self, custom_structs):
-        assert "TimePoint" in custom_structs, custom_structs
-        self._member_info                   = custom_structs["TimePoint"]
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def GetInputInfo(arg_name, is_optional, invocation_template):
-        raise Exception("'TimePoint' is only used as a TransformedType")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def GetInputBufferInfo(arg_name, is_optional, invocation_template):
-        raise Exception("'TimePoint' is only used as a TransformedType")
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetOutputInfo(
-        self,
-        arg_name,
-        result_name="result",
-        is_struct=False,
-    ):
-        result_time_point_name = "{}_item".format(arg_name)
-
-        member_statements = []
-
-        for member_name, member_info in six.iteritems(self._member_info):
-            member_statements.append(
-                member_info.GetOutputInfo(
-                    "{}.{}".format(result_time_point_name, member_name),
-                    "{}.{}".format(result_name, member_name),
-                    is_struct=True,
-                ).InvocationStatement,
-            )
-
-        return self.Info(
-            ["/*out*/ TimePoint *{} {}".format("" if is_struct else "*", arg_name)],
-            """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
-                name=arg_name,
-            ),
-            textwrap.dedent(
-                """\
-                TimePoint {result_time_point_name};
-
-                {member_statements}
-
-                *{name} = std::make_unique<TimePoint>(std::move({result_time_point_name})).release();
-                """,
-            ).format(
-                name=arg_name,
-                result=result_name,
-                result_time_point_name=result_time_point_name,
-                member_statements="\n".join(member_statements),
-            ),
-        )
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetDestroyOutputInfo(
-        self,
-        arg_name="result",
-    ):
-        member_validation = []
-        member_statements = []
-
-        for member_name, member_info in six.iteritems(self._member_info):
-            output_info = member_info.GetDestroyOutputInfo(
-                "{}->{}".format(arg_name, member_name),
-            )
-            if output_info is None:
-                continue
-
-            member_validation.append(output_info.ValidationStatements)
-            member_statements.append(output_info.InvocationStatement)
-
-        return self.Info(
-            ["/*in*/ TimePoint * {}".format(arg_name)],
-            "\n".join(member_validation),
-            textwrap.dedent(
-                """\
-                {statements}
-
-                delete {name};
-                """,
-            ).format(
-                statements="\n".join(member_statements).strip(),
-                name=arg_name,
-            ),
-        )
-
-# ----------------------------------------------------------------------
-class _OneHotStructTypeInfo(TypeInfo):
-    """Functionality for OneHotStructs, used in the OneHotEncoderFeaturizer"""
-
-    # ----------------------------------------------------------------------
-    def __init__(self, custom_structs):
-        assert "OneHotStruct" in custom_structs, custom_structs
-        self._member_info                   = custom_structs["OneHotStruct"]
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def GetInputInfo(arg_name, is_optional, invocation_template):
-        raise Exception("'OneHotStruct' is only used as a TransformedType")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def GetInputBufferInfo(arg_name, is_optional, invocation_template):
-        raise Exception("'OneHotStruct' is only used as a TransformedType")
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetOutputInfo(
-        self,
-        arg_name,
-        result_name="result",
-        is_struct=False,
-    ):
-        result_one_hot_struct_name = "{}_item".format(arg_name)
-
-        member_statements = []
-
-        for member_name, member_info in six.iteritems(self._member_info):
-            member_statements.append(
-                member_info.GetOutputInfo(
-                    "{}.{}".format(result_one_hot_struct_name, member_name),
-                    "{}.{}".format(result_name, member_name),
-                    is_struct=True,
-                ).InvocationStatement,
-            )
-
-        return self.Info(
-            ["/*out*/ OneHotStruct {} {}".format("" if is_struct else "*", arg_name)],
-            """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
-                name=arg_name,
-            ),
-            textwrap.dedent(
-                """\
-                OneHotStruct {result_one_hot_struct_name};
-
-                {member_statements}
-
-                *{name} = {result_one_hot_struct_name};
-                """,
-            ).format(
-                name=arg_name,
-                result=result_name,
-                result_one_hot_struct_name=result_one_hot_struct_name,
-                member_statements="\n".join(member_statements),
-            ),
-        )
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetDestroyOutputInfo(
-        self,
-        arg_name="result",
-    ):
-        return None
-
-class _HashOneHotVectorizerStructTypeInfo(TypeInfo):
-    """Functionality for HashOneHotVectorizerStructs, used in the HashOneHotVectorizerFeaturizer"""
-
-    # ----------------------------------------------------------------------
-    def __init__(self, custom_structs):
-        assert "HashOneHotVectorizerStruct" in custom_structs, custom_structs
-        self._member_info                   = custom_structs["HashOneHotVectorizerStruct"]
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def GetInputInfo(arg_name, is_optional, invocation_template):
-        raise Exception("'HashOneHotVectorizerStruct' is only used as a TransformedType")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def GetInputBufferInfo(arg_name, is_optional, invocation_template):
-        raise Exception("'HashOneHotVectorizerStruct' is only used as a TransformedType")
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetOutputInfo(
-        self,
-        arg_name,
-        result_name="result",
-        is_struct=False,
-    ):
-        result_hashonehotvectorizer_struct_name = "{}_item".format(arg_name)
-
-        member_statements = []
-
-        for member_name, member_info in six.iteritems(self._member_info):
-            member_statements.append(
-                member_info.GetOutputInfo(
-                    "{}.{}".format(result_hashonehotvectorizer_struct_name, member_name),
-                    "{}.{}".format(result_name, member_name),
-                    is_struct=True,
-                ).InvocationStatement,
-            )
-
-        return self.Info(
-            ["/*out*/ HashOneHotVectorizerStruct {} {}".format("" if is_struct else "*", arg_name)],
-            """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
-                name=arg_name,
-            ),
-            textwrap.dedent(
-                """\
-                HashOneHotVectorizerStruct {result_hashonehotvectorizer_struct_name};
-
-                {member_statements}
-
-                *{name} = {result_hashonehotvectorizer_struct_name};
-                """,
-            ).format(
-                name=arg_name,
-                result=result_name,
-                result_hashonehotvectorizer_struct_name=result_hashonehotvectorizer_struct_name,
-                member_statements="\n".join(member_statements),
-            ),
-        )
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetDestroyOutputInfo(
-        self,
-        arg_name="result",
-    ):
-        return None
-
-
-# ----------------------------------------------------------------------
-# |
-# |  Private Methods
-# |
-# ----------------------------------------------------------------------
-def _IsScalarType(cpp_type):
-    cpp_type = cpp_type.replace("std::", "")
-
-    return cpp_type in [
-        "int8_t",
-        "int16_t",
-        "int32_t",
-        "int64_t",
-        "uint8_t",
-        "uint16_t",
-        "uint32_t",
-        "uint64_t",
-        "float",
-        "double",
-        "bool",
-    ]

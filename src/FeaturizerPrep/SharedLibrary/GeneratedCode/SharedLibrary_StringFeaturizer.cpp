@@ -306,7 +306,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_Transform(/*in*/ StringFeatu
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);
@@ -629,7 +630,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_Transform(/*in*/ StringFeat
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);
@@ -952,7 +954,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_Transform(/*in*/ StringFeat
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);
@@ -1275,7 +1278,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_Transform(/*in*/ StringFeat
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);
@@ -1598,7 +1602,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_Transform(/*in*/ StringFeat
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);
@@ -1921,7 +1926,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_Transform(/*in*/ StringFea
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);
@@ -2244,7 +2250,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_Transform(/*in*/ StringFea
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);
@@ -2567,7 +2574,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_Transform(/*in*/ StringFea
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);
@@ -2890,7 +2898,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_Transform(/*in*/ StringFeat
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);
@@ -3213,7 +3222,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_Transform(/*in*/ StringFea
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);
@@ -3536,7 +3546,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_Transform(/*in*/ StringFeaturi
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);
@@ -3870,7 +3881,8 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_Transform(/*in*/ StringFeatu
         if(result.empty()) {
             *output_ptr = nullptr;
             *output_items = 0;
-        } else {
+        }
+        else {
             char * string_buffer(new char[result.size() + 1]);
 
             std::copy(result.begin(), result.end(), string_buffer);

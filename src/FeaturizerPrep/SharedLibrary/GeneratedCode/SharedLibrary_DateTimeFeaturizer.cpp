@@ -283,7 +283,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerSaveData(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturizer_TransformerHandle *pHandle, /*in*/ int64_t input, /*out*/ TimePoint ** output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturizer_TransformerHandle *pHandle, /*in*/ int64_t input, /*out via struct*/ TimePoint * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -302,79 +302,79 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturiz
         auto result(transformer.execute(input));
 
         // Output
-        TimePoint output_item;
-
-        output_item.year = result.year;
-        output_item.month = result.month;
-        output_item.day = result.day;
-        output_item.hour = result.hour;
-        output_item.minute = result.minute;
-        output_item.second = result.second;
-        output_item.amPm = result.amPm;
-        output_item.hour12 = result.hour12;
-        output_item.dayOfWeek = result.dayOfWeek;
-        output_item.dayOfQuarter = result.dayOfQuarter;
-        output_item.dayOfYear = result.dayOfYear;
-        output_item.weekOfMonth = result.weekOfMonth;
-        output_item.quarterOfYear = result.quarterOfYear;
-        output_item.halfOfYear = result.halfOfYear;
-        output_item.weekIso = result.weekIso;
-        output_item.yearIso = result.yearIso;
+        output->year = result.year;
+        output->month = result.month;
+        output->day = result.day;
+        output->hour = result.hour;
+        output->minute = result.minute;
+        output->second = result.second;
+        output->amPm = result.amPm;
+        output->hour12 = result.hour12;
+        output->dayOfWeek = result.dayOfWeek;
+        output->dayOfQuarter = result.dayOfQuarter;
+        output->dayOfYear = result.dayOfYear;
+        output->weekOfMonth = result.weekOfMonth;
+        output->quarterOfYear = result.quarterOfYear;
+        output->halfOfYear = result.halfOfYear;
+        output->weekIso = result.weekIso;
+        output->yearIso = result.yearIso;
         if(result.monthLabel.empty()) {
-            output_item.monthLabel_ptr = nullptr;
-            output_item.monthLabel_items = 0;
-        } else {
+            output->monthLabel_ptr = nullptr;
+            output->monthLabel_items = 0;
+        }
+        else {
             char * string_buffer(new char[result.monthLabel.size() + 1]);
 
             std::copy(result.monthLabel.begin(), result.monthLabel.end(), string_buffer);
             string_buffer[result.monthLabel.size()] = 0;
 
-            output_item.monthLabel_ptr = string_buffer;
-            output_item.monthLabel_items = result.monthLabel.size();
+            output->monthLabel_ptr = string_buffer;
+            output->monthLabel_items = result.monthLabel.size();
         }
 
         if(result.amPmLabel.empty()) {
-            output_item.amPmLabel_ptr = nullptr;
-            output_item.amPmLabel_items = 0;
-        } else {
+            output->amPmLabel_ptr = nullptr;
+            output->amPmLabel_items = 0;
+        }
+        else {
             char * string_buffer(new char[result.amPmLabel.size() + 1]);
 
             std::copy(result.amPmLabel.begin(), result.amPmLabel.end(), string_buffer);
             string_buffer[result.amPmLabel.size()] = 0;
 
-            output_item.amPmLabel_ptr = string_buffer;
-            output_item.amPmLabel_items = result.amPmLabel.size();
+            output->amPmLabel_ptr = string_buffer;
+            output->amPmLabel_items = result.amPmLabel.size();
         }
 
         if(result.dayOfWeekLabel.empty()) {
-            output_item.dayOfWeekLabel_ptr = nullptr;
-            output_item.dayOfWeekLabel_items = 0;
-        } else {
+            output->dayOfWeekLabel_ptr = nullptr;
+            output->dayOfWeekLabel_items = 0;
+        }
+        else {
             char * string_buffer(new char[result.dayOfWeekLabel.size() + 1]);
 
             std::copy(result.dayOfWeekLabel.begin(), result.dayOfWeekLabel.end(), string_buffer);
             string_buffer[result.dayOfWeekLabel.size()] = 0;
 
-            output_item.dayOfWeekLabel_ptr = string_buffer;
-            output_item.dayOfWeekLabel_items = result.dayOfWeekLabel.size();
+            output->dayOfWeekLabel_ptr = string_buffer;
+            output->dayOfWeekLabel_items = result.dayOfWeekLabel.size();
         }
 
         if(result.holidayName.empty()) {
-            output_item.holidayName_ptr = nullptr;
-            output_item.holidayName_items = 0;
-        } else {
+            output->holidayName_ptr = nullptr;
+            output->holidayName_items = 0;
+        }
+        else {
             char * string_buffer(new char[result.holidayName.size() + 1]);
 
             std::copy(result.holidayName.begin(), result.holidayName.end(), string_buffer);
             string_buffer[result.holidayName.size()] = 0;
 
-            output_item.holidayName_ptr = string_buffer;
-            output_item.holidayName_items = result.holidayName.size();
+            output->holidayName_ptr = string_buffer;
+            output->holidayName_items = result.holidayName.size();
         }
 
-        output_item.isPaidTimeOff = result.isPaidTimeOff;
-
-        *output = std::make_unique<TimePoint>(std::move(output_item)).release();
+        output->isPaidTimeOff = result.isPaidTimeOff;
     
         return true;
     }
@@ -391,6 +391,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyTransformedData(/*in*/ Tim
     try {
         *ppErrorInfo = nullptr;
 
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
         if(result->monthLabel_ptr == nullptr && result->monthLabel_items != 0) throw std::invalid_argument("Invalid buffer");
         if(result->monthLabel_ptr != nullptr && result->monthLabel_items == 0) throw std::invalid_argument("Invalid buffer");
 
@@ -414,8 +415,6 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyTransformedData(/*in*/ Tim
 
         if(result->holidayName_ptr)
             delete [] result->holidayName_ptr;
-
-        delete result;
     
         return true;
     }

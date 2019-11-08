@@ -283,7 +283,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_Transform(/*in*/ OneHotEncoderFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_Transform(/*in*/ OneHotEncoderFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -302,13 +302,28 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_Transform(/*in*/ OneH
         auto result(transformer.execute(input));
 
         // Output
-        OneHotStruct output_item;
+        output->index = result.index;
+        output->size = result.size;
+        output->appearances = result.appearances;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
 
-        output_item.index = result.index;
-        output_item.size = result.size;
-        output_item.appearances = result.appearances;
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
 
-        *output = output_item;
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
+
+        // There aren't any members to delete, but we are including this method for consistency
     
         return true;
     }
@@ -579,7 +594,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_Transform(/*in*/ OneHotEncoderFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_Transform(/*in*/ OneHotEncoderFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -598,13 +613,28 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_Transform(/*in*/ One
         auto result(transformer.execute(input));
 
         // Output
-        OneHotStruct output_item;
+        output->index = result.index;
+        output->size = result.size;
+        output->appearances = result.appearances;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
 
-        output_item.index = result.index;
-        output_item.size = result.size;
-        output_item.appearances = result.appearances;
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
 
-        *output = output_item;
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
+
+        // There aren't any members to delete, but we are including this method for consistency
     
         return true;
     }
@@ -875,7 +905,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_Transform(/*in*/ OneHotEncoderFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_Transform(/*in*/ OneHotEncoderFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -894,13 +924,28 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_Transform(/*in*/ One
         auto result(transformer.execute(input));
 
         // Output
-        OneHotStruct output_item;
+        output->index = result.index;
+        output->size = result.size;
+        output->appearances = result.appearances;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
 
-        output_item.index = result.index;
-        output_item.size = result.size;
-        output_item.appearances = result.appearances;
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
 
-        *output = output_item;
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
+
+        // There aren't any members to delete, but we are including this method for consistency
     
         return true;
     }
@@ -1171,7 +1216,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_Transform(/*in*/ OneHotEncoderFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_Transform(/*in*/ OneHotEncoderFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1190,13 +1235,28 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_Transform(/*in*/ One
         auto result(transformer.execute(input));
 
         // Output
-        OneHotStruct output_item;
+        output->index = result.index;
+        output->size = result.size;
+        output->appearances = result.appearances;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
 
-        output_item.index = result.index;
-        output_item.size = result.size;
-        output_item.appearances = result.appearances;
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
 
-        *output = output_item;
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
+
+        // There aren't any members to delete, but we are including this method for consistency
     
         return true;
     }
@@ -1467,7 +1527,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1486,13 +1546,28 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_Transform(/*in*/ One
         auto result(transformer.execute(input));
 
         // Output
-        OneHotStruct output_item;
+        output->index = result.index;
+        output->size = result.size;
+        output->appearances = result.appearances;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
 
-        output_item.index = result.index;
-        output_item.size = result.size;
-        output_item.appearances = result.appearances;
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
 
-        *output = output_item;
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
+
+        // There aren't any members to delete, but we are including this method for consistency
     
         return true;
     }
@@ -1763,7 +1838,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1782,13 +1857,28 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_Transform(/*in*/ On
         auto result(transformer.execute(input));
 
         // Output
-        OneHotStruct output_item;
+        output->index = result.index;
+        output->size = result.size;
+        output->appearances = result.appearances;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
 
-        output_item.index = result.index;
-        output_item.size = result.size;
-        output_item.appearances = result.appearances;
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
 
-        *output = output_item;
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
+
+        // There aren't any members to delete, but we are including this method for consistency
     
         return true;
     }
@@ -2059,7 +2149,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2078,13 +2168,28 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_Transform(/*in*/ On
         auto result(transformer.execute(input));
 
         // Output
-        OneHotStruct output_item;
+        output->index = result.index;
+        output->size = result.size;
+        output->appearances = result.appearances;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
 
-        output_item.index = result.index;
-        output_item.size = result.size;
-        output_item.appearances = result.appearances;
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
 
-        *output = output_item;
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
+
+        // There aren't any members to delete, but we are including this method for consistency
     
         return true;
     }
@@ -2355,7 +2460,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2374,13 +2479,28 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_Transform(/*in*/ On
         auto result(transformer.execute(input));
 
         // Output
-        OneHotStruct output_item;
+        output->index = result.index;
+        output->size = result.size;
+        output->appearances = result.appearances;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
 
-        output_item.index = result.index;
-        output_item.size = result.size;
-        output_item.appearances = result.appearances;
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
 
-        *output = output_item;
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
+
+        // There aren't any members to delete, but we are including this method for consistency
     
         return true;
     }
@@ -2651,7 +2771,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_Transform(/*in*/ OneHotEncoderFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_Transform(/*in*/ OneHotEncoderFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2670,13 +2790,28 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_Transform(/*in*/ One
         auto result(transformer.execute(input));
 
         // Output
-        OneHotStruct output_item;
+        output->index = result.index;
+        output->size = result.size;
+        output->appearances = result.appearances;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
 
-        output_item.index = result.index;
-        output_item.size = result.size;
-        output_item.appearances = result.appearances;
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
 
-        *output = output_item;
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
+
+        // There aren't any members to delete, but we are including this method for consistency
     
         return true;
     }
@@ -2947,7 +3082,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_Transform(/*in*/ OneHotEncoderFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_Transform(/*in*/ OneHotEncoderFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2966,13 +3101,28 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_Transform(/*in*/ On
         auto result(transformer.execute(input));
 
         // Output
-        OneHotStruct output_item;
+        output->index = result.index;
+        output->size = result.size;
+        output->appearances = result.appearances;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
 
-        output_item.index = result.index;
-        output_item.size = result.size;
-        output_item.appearances = result.appearances;
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
 
-        *output = output_item;
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
+
+        // There aren't any members to delete, but we are including this method for consistency
     
         return true;
     }
@@ -3243,7 +3393,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_CreateTransformerSaveDa
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_Transform(/*in*/ OneHotEncoderFeaturizer_bool_TransformerHandle *pHandle, /*in*/ bool input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_Transform(/*in*/ OneHotEncoderFeaturizer_bool_TransformerHandle *pHandle, /*in*/ bool input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3262,13 +3412,28 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_Transform(/*in*/ OneHot
         auto result(transformer.execute(input));
 
         // Output
-        OneHotStruct output_item;
+        output->index = result.index;
+        output->size = result.size;
+        output->appearances = result.appearances;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
 
-        output_item.index = result.index;
-        output_item.size = result.size;
-        output_item.appearances = result.appearances;
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
 
-        *output = output_item;
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
+
+        // There aren't any members to delete, but we are including this method for consistency
     
         return true;
     }
@@ -3550,7 +3715,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_Transform(/*in*/ OneHotEncoderFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_Transform(/*in*/ OneHotEncoderFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3569,13 +3734,28 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_Transform(/*in*/ OneH
         auto result(transformer.execute(input));
 
         // Output
-        OneHotStruct output_item;
+        output->index = result.index;
+        output->size = result.size;
+        output->appearances = result.appearances;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
 
-        output_item.index = result.index;
-        output_item.size = result.size;
-        output_item.appearances = result.appearances;
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
 
-        *output = output_item;
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result == nullptr) throw std::invalid_argument("'result' is null");
+
+        // There aren't any members to delete, but we are including this method for consistency
     
         return true;
     }

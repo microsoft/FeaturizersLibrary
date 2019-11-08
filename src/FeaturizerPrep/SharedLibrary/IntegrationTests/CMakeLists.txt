@@ -31,14 +31,14 @@ enable_testing()
 foreach(_test_name IN ITEMS
     SharedLibrary_CatImputerFeaturizer_IntegrationTest
     SharedLibrary_DateTimeFeaturizer_IntegrationTest
-    SharedLibrary_HashOneHotVectorizerFeaturizer_IntegrationTest
-    SharedLibrary_ImputationMarkerFeaturizer_IntegrationTest
-    SharedLibrary_LabelEncoderFeaturizer_IntegrationTest
-    SharedLibrary_MaxAbsScalarFeaturizer_IntegrationTest
-    SharedLibrary_MinMaxScalarFeaturizer_IntegrationTest
-    SharedLibrary_MissingDummiesFeaturizer_IntegrationTest
-    SharedLibrary_OneHotEncoderFeaturizer_IntegrationTest
-    SharedLibrary_RobustScalarFeaturizer_IntegrationTest
+    SharedLibrary_HOHVFeaturizer_IntegrationTest
+    SharedLibrary_IMFeaturizer_IntegrationTest
+    SharedLibrary_LEFeaturizer_IntegrationTest
+    SharedLibrary_MASFeaturizer_IntegrationTest
+    SharedLibrary_MMSFeaturizer_IntegrationTest
+    SharedLibrary_MDFeaturizer_IntegrationTest
+    SharedLibrary_OHEFeaturizer_IntegrationTest
+    SharedLibrary_RSFeaturizer_IntegrationTest
     SharedLibrary_StringFeaturizer_IntegrationTest
     SharedLibrary_TSIFeaturizer_IntegrationTest
 )
