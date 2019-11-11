@@ -9,19 +9,19 @@
 
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <int8_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void LabelEncoderFeaturizer_int8_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     LabelEncoderFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(LabelEncoderFeaturizer_int8_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(LabelEncoderFeaturizer_int8_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -88,12 +88,12 @@ void LabelEncoderFeaturizer_int8_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
         REQUIRE(LabelEncoderFeaturizer_int8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -113,19 +113,19 @@ void LabelEncoderFeaturizer_int8_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <int16_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void LabelEncoderFeaturizer_int16_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     LabelEncoderFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(LabelEncoderFeaturizer_int16_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(LabelEncoderFeaturizer_int16_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -192,12 +192,12 @@ void LabelEncoderFeaturizer_int16_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
         REQUIRE(LabelEncoderFeaturizer_int16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -217,19 +217,19 @@ void LabelEncoderFeaturizer_int16_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <int32_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void LabelEncoderFeaturizer_int32_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     LabelEncoderFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(LabelEncoderFeaturizer_int32_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(LabelEncoderFeaturizer_int32_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -296,12 +296,12 @@ void LabelEncoderFeaturizer_int32_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
         REQUIRE(LabelEncoderFeaturizer_int32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -321,19 +321,19 @@ void LabelEncoderFeaturizer_int32_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <int64_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void LabelEncoderFeaturizer_int64_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     LabelEncoderFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(LabelEncoderFeaturizer_int64_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(LabelEncoderFeaturizer_int64_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -400,12 +400,12 @@ void LabelEncoderFeaturizer_int64_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
         REQUIRE(LabelEncoderFeaturizer_int64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -425,19 +425,19 @@ void LabelEncoderFeaturizer_int64_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <uint8_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void LabelEncoderFeaturizer_uint8_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     LabelEncoderFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(LabelEncoderFeaturizer_uint8_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(LabelEncoderFeaturizer_uint8_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -504,12 +504,12 @@ void LabelEncoderFeaturizer_uint8_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
         REQUIRE(LabelEncoderFeaturizer_uint8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -529,19 +529,19 @@ void LabelEncoderFeaturizer_uint8_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <uint16_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void LabelEncoderFeaturizer_uint16_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     LabelEncoderFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(LabelEncoderFeaturizer_uint16_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(LabelEncoderFeaturizer_uint16_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -608,12 +608,12 @@ void LabelEncoderFeaturizer_uint16_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
         REQUIRE(LabelEncoderFeaturizer_uint16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -633,19 +633,19 @@ void LabelEncoderFeaturizer_uint16_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <uint32_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void LabelEncoderFeaturizer_uint32_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     LabelEncoderFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(LabelEncoderFeaturizer_uint32_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(LabelEncoderFeaturizer_uint32_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -712,12 +712,12 @@ void LabelEncoderFeaturizer_uint32_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
         REQUIRE(LabelEncoderFeaturizer_uint32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -737,19 +737,19 @@ void LabelEncoderFeaturizer_uint32_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <uint64_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void LabelEncoderFeaturizer_uint64_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     LabelEncoderFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(LabelEncoderFeaturizer_uint64_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(LabelEncoderFeaturizer_uint64_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -816,12 +816,12 @@ void LabelEncoderFeaturizer_uint64_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
         REQUIRE(LabelEncoderFeaturizer_uint64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -841,19 +841,19 @@ void LabelEncoderFeaturizer_uint64_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <float_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void LabelEncoderFeaturizer_float_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     LabelEncoderFeaturizer_float_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(LabelEncoderFeaturizer_float_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(LabelEncoderFeaturizer_float_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -920,12 +920,12 @@ void LabelEncoderFeaturizer_float_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
         REQUIRE(LabelEncoderFeaturizer_float_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -945,19 +945,19 @@ void LabelEncoderFeaturizer_float_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <double_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void LabelEncoderFeaturizer_double_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     LabelEncoderFeaturizer_double_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(LabelEncoderFeaturizer_double_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(LabelEncoderFeaturizer_double_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1024,12 +1024,12 @@ void LabelEncoderFeaturizer_double_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
         REQUIRE(LabelEncoderFeaturizer_double_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1049,19 +1049,19 @@ void LabelEncoderFeaturizer_double_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <bool> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void LabelEncoderFeaturizer_bool_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     LabelEncoderFeaturizer_bool_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(LabelEncoderFeaturizer_bool_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(LabelEncoderFeaturizer_bool_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1128,12 +1128,12 @@ void LabelEncoderFeaturizer_bool_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
         REQUIRE(LabelEncoderFeaturizer_bool_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1153,19 +1153,19 @@ void LabelEncoderFeaturizer_bool_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <string> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void LabelEncoderFeaturizer_string_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     LabelEncoderFeaturizer_string_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(LabelEncoderFeaturizer_string_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(LabelEncoderFeaturizer_string_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1232,12 +1232,12 @@ void LabelEncoderFeaturizer_string_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
         REQUIRE(LabelEncoderFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);

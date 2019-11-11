@@ -9,19 +9,19 @@
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <int8_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_int8_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_int8_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int8_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -104,7 +104,7 @@ void HashOneHotVectorizerFeaturizer_int8_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(HashOneHotVectorizerFeaturizer_int8_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -116,19 +116,19 @@ void HashOneHotVectorizerFeaturizer_int8_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <int16_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_int16_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_int16_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int16_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -211,7 +211,7 @@ void HashOneHotVectorizerFeaturizer_int16_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(HashOneHotVectorizerFeaturizer_int16_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -223,19 +223,19 @@ void HashOneHotVectorizerFeaturizer_int16_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <int32_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_int32_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_int32_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int32_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -318,7 +318,7 @@ void HashOneHotVectorizerFeaturizer_int32_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(HashOneHotVectorizerFeaturizer_int32_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -330,19 +330,19 @@ void HashOneHotVectorizerFeaturizer_int32_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <int64_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_int64_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_int64_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int64_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -425,7 +425,7 @@ void HashOneHotVectorizerFeaturizer_int64_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(HashOneHotVectorizerFeaturizer_int64_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -437,19 +437,19 @@ void HashOneHotVectorizerFeaturizer_int64_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <uint8_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_uint8_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint8_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint8_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -532,7 +532,7 @@ void HashOneHotVectorizerFeaturizer_uint8_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(HashOneHotVectorizerFeaturizer_uint8_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -544,19 +544,19 @@ void HashOneHotVectorizerFeaturizer_uint8_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <uint16_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_uint16_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint16_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint16_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -639,7 +639,7 @@ void HashOneHotVectorizerFeaturizer_uint16_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(HashOneHotVectorizerFeaturizer_uint16_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -651,19 +651,19 @@ void HashOneHotVectorizerFeaturizer_uint16_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <uint32_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_uint32_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint32_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint32_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -746,7 +746,7 @@ void HashOneHotVectorizerFeaturizer_uint32_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(HashOneHotVectorizerFeaturizer_uint32_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -758,19 +758,19 @@ void HashOneHotVectorizerFeaturizer_uint32_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <uint64_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_uint64_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint64_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint64_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -853,7 +853,7 @@ void HashOneHotVectorizerFeaturizer_uint64_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(HashOneHotVectorizerFeaturizer_uint64_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -865,19 +865,19 @@ void HashOneHotVectorizerFeaturizer_uint64_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <float_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_float_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_float_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_float_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -960,7 +960,7 @@ void HashOneHotVectorizerFeaturizer_float_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(HashOneHotVectorizerFeaturizer_float_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -972,19 +972,19 @@ void HashOneHotVectorizerFeaturizer_float_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <double_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_double_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_double_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_double_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1067,7 +1067,7 @@ void HashOneHotVectorizerFeaturizer_double_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(HashOneHotVectorizerFeaturizer_double_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -1079,19 +1079,19 @@ void HashOneHotVectorizerFeaturizer_double_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <bool> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_bool_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     HashOneHotVectorizerFeaturizer_bool_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_bool_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_bool_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1174,7 +1174,7 @@ void HashOneHotVectorizerFeaturizer_bool_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(HashOneHotVectorizerFeaturizer_bool_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -1186,19 +1186,19 @@ void HashOneHotVectorizerFeaturizer_bool_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <string> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_string_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     HashOneHotVectorizerFeaturizer_string_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_string_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_string_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1281,7 +1281,7 @@ void HashOneHotVectorizerFeaturizer_string_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(HashOneHotVectorizerFeaturizer_string_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }

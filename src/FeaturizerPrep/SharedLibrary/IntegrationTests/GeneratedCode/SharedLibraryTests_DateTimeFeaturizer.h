@@ -9,19 +9,19 @@
 
 /* ---------------------------------------------------------------------- */
 /* |  DateTimeFeaturizer */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void DateTimeFeaturizer_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<TimePoint> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     DateTimeFeaturizer_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(DateTimeFeaturizer_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(DateTimeFeaturizer_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -104,7 +104,7 @@ void DateTimeFeaturizer_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(DateTimeFeaturizer_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }

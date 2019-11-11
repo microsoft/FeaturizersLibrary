@@ -32,7 +32,7 @@ void ImputationMarkerFeaturizer_int8_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(ImputationMarkerFeaturizer_int8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_int8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -94,7 +94,7 @@ void ImputationMarkerFeaturizer_int8_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_int8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -135,7 +135,7 @@ void ImputationMarkerFeaturizer_int16_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(ImputationMarkerFeaturizer_int16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_int16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -197,7 +197,7 @@ void ImputationMarkerFeaturizer_int16_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_int16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -238,7 +238,7 @@ void ImputationMarkerFeaturizer_int32_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(ImputationMarkerFeaturizer_int32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_int32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -300,7 +300,7 @@ void ImputationMarkerFeaturizer_int32_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_int32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -341,7 +341,7 @@ void ImputationMarkerFeaturizer_int64_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(ImputationMarkerFeaturizer_int64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_int64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -403,7 +403,7 @@ void ImputationMarkerFeaturizer_int64_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_int64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -444,7 +444,7 @@ void ImputationMarkerFeaturizer_uint8_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(ImputationMarkerFeaturizer_uint8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_uint8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -506,7 +506,7 @@ void ImputationMarkerFeaturizer_uint8_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_uint8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -547,7 +547,7 @@ void ImputationMarkerFeaturizer_uint16_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(ImputationMarkerFeaturizer_uint16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_uint16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -609,7 +609,7 @@ void ImputationMarkerFeaturizer_uint16_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_uint16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -650,7 +650,7 @@ void ImputationMarkerFeaturizer_uint32_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(ImputationMarkerFeaturizer_uint32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_uint32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -712,7 +712,7 @@ void ImputationMarkerFeaturizer_uint32_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_uint32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -753,7 +753,7 @@ void ImputationMarkerFeaturizer_uint64_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(ImputationMarkerFeaturizer_uint64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_uint64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -815,7 +815,7 @@ void ImputationMarkerFeaturizer_uint64_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_uint64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -856,7 +856,7 @@ void ImputationMarkerFeaturizer_float_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(ImputationMarkerFeaturizer_float_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::float_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::float_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_float_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -918,7 +918,7 @@ void ImputationMarkerFeaturizer_float_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_float_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::float_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::float_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_float_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -959,7 +959,7 @@ void ImputationMarkerFeaturizer_double_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(ImputationMarkerFeaturizer_double_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::double_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::double_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_double_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -1021,7 +1021,7 @@ void ImputationMarkerFeaturizer_double_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_double_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::double_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::double_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_double_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));

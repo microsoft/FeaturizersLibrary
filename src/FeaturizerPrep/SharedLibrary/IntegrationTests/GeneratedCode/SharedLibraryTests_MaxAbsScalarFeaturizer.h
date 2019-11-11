@@ -13,7 +13,7 @@ template <typename VectorInputT>
 void MaxAbsScalarFeaturizer_int8_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
+    std::function<bool (std::vector<float> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -87,12 +87,12 @@ void MaxAbsScalarFeaturizer_int8_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::float_t> results;
+    std::vector<float> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::float_t result;
+        float result;
 
         REQUIRE(MaxAbsScalarFeaturizer_int8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -116,7 +116,7 @@ template <typename VectorInputT>
 void MaxAbsScalarFeaturizer_int16_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
+    std::function<bool (std::vector<float> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -190,12 +190,12 @@ void MaxAbsScalarFeaturizer_int16_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::float_t> results;
+    std::vector<float> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::float_t result;
+        float result;
 
         REQUIRE(MaxAbsScalarFeaturizer_int16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -219,7 +219,7 @@ template <typename VectorInputT>
 void MaxAbsScalarFeaturizer_uint8_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
+    std::function<bool (std::vector<float> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -293,12 +293,12 @@ void MaxAbsScalarFeaturizer_uint8_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::float_t> results;
+    std::vector<float> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::float_t result;
+        float result;
 
         REQUIRE(MaxAbsScalarFeaturizer_uint8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -322,7 +322,7 @@ template <typename VectorInputT>
 void MaxAbsScalarFeaturizer_uint16_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
+    std::function<bool (std::vector<float> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -396,12 +396,12 @@ void MaxAbsScalarFeaturizer_uint16_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::float_t> results;
+    std::vector<float> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::float_t result;
+        float result;
 
         REQUIRE(MaxAbsScalarFeaturizer_uint16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -425,7 +425,7 @@ template <typename VectorInputT>
 void MaxAbsScalarFeaturizer_float_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
+    std::function<bool (std::vector<float> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -499,12 +499,12 @@ void MaxAbsScalarFeaturizer_float_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::float_t> results;
+    std::vector<float> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::float_t result;
+        float result;
 
         REQUIRE(MaxAbsScalarFeaturizer_float_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -528,7 +528,7 @@ template <typename VectorInputT>
 void MaxAbsScalarFeaturizer_int32_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
+    std::function<bool (std::vector<double> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -602,12 +602,12 @@ void MaxAbsScalarFeaturizer_int32_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::double_t> results;
+    std::vector<double> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        double result;
 
         REQUIRE(MaxAbsScalarFeaturizer_int32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -631,7 +631,7 @@ template <typename VectorInputT>
 void MaxAbsScalarFeaturizer_int64_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
+    std::function<bool (std::vector<double> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -705,12 +705,12 @@ void MaxAbsScalarFeaturizer_int64_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::double_t> results;
+    std::vector<double> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        double result;
 
         REQUIRE(MaxAbsScalarFeaturizer_int64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -734,7 +734,7 @@ template <typename VectorInputT>
 void MaxAbsScalarFeaturizer_uint32_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
+    std::function<bool (std::vector<double> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -808,12 +808,12 @@ void MaxAbsScalarFeaturizer_uint32_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::double_t> results;
+    std::vector<double> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        double result;
 
         REQUIRE(MaxAbsScalarFeaturizer_uint32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -837,7 +837,7 @@ template <typename VectorInputT>
 void MaxAbsScalarFeaturizer_uint64_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
+    std::function<bool (std::vector<double> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -911,12 +911,12 @@ void MaxAbsScalarFeaturizer_uint64_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::double_t> results;
+    std::vector<double> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        double result;
 
         REQUIRE(MaxAbsScalarFeaturizer_uint64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -940,7 +940,7 @@ template <typename VectorInputT>
 void MaxAbsScalarFeaturizer_double_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
+    std::function<bool (std::vector<double> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -1014,12 +1014,12 @@ void MaxAbsScalarFeaturizer_double_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::double_t> results;
+    std::vector<double> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        double result;
 
         REQUIRE(MaxAbsScalarFeaturizer_double_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);

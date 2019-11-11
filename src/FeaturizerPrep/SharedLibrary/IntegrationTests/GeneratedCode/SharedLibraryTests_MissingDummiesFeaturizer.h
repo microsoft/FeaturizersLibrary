@@ -13,7 +13,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_int8_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -32,7 +32,7 @@ void MissingDummiesFeaturizer_int8_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(MissingDummiesFeaturizer_int8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_int8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -87,14 +87,14 @@ void MissingDummiesFeaturizer_int8_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_int8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_int8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -116,7 +116,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_int16_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -135,7 +135,7 @@ void MissingDummiesFeaturizer_int16_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(MissingDummiesFeaturizer_int16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_int16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -190,14 +190,14 @@ void MissingDummiesFeaturizer_int16_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_int16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_int16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -219,7 +219,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_int32_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -238,7 +238,7 @@ void MissingDummiesFeaturizer_int32_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(MissingDummiesFeaturizer_int32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_int32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -293,14 +293,14 @@ void MissingDummiesFeaturizer_int32_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_int32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_int32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -322,7 +322,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_int64_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -341,7 +341,7 @@ void MissingDummiesFeaturizer_int64_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(MissingDummiesFeaturizer_int64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_int64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -396,14 +396,14 @@ void MissingDummiesFeaturizer_int64_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_int64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_int64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -425,7 +425,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_uint8_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -444,7 +444,7 @@ void MissingDummiesFeaturizer_uint8_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(MissingDummiesFeaturizer_uint8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_uint8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -499,14 +499,14 @@ void MissingDummiesFeaturizer_uint8_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_uint8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_uint8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -528,7 +528,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_uint16_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -547,7 +547,7 @@ void MissingDummiesFeaturizer_uint16_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(MissingDummiesFeaturizer_uint16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_uint16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -602,14 +602,14 @@ void MissingDummiesFeaturizer_uint16_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_uint16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_uint16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -631,7 +631,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_uint32_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -650,7 +650,7 @@ void MissingDummiesFeaturizer_uint32_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(MissingDummiesFeaturizer_uint32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_uint32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -705,14 +705,14 @@ void MissingDummiesFeaturizer_uint32_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_uint32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_uint32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -734,7 +734,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_uint64_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -753,7 +753,7 @@ void MissingDummiesFeaturizer_uint64_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(MissingDummiesFeaturizer_uint64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_uint64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -808,14 +808,14 @@ void MissingDummiesFeaturizer_uint64_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_uint64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_uint64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -837,7 +837,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_float_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -856,7 +856,7 @@ void MissingDummiesFeaturizer_float_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(MissingDummiesFeaturizer_float_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::float_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::float_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_float_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -911,14 +911,14 @@ void MissingDummiesFeaturizer_float_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_float_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::float_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::float_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_float_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -940,7 +940,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_double_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -959,7 +959,7 @@ void MissingDummiesFeaturizer_double_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(MissingDummiesFeaturizer_double_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::double_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::double_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_double_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -1014,14 +1014,14 @@ void MissingDummiesFeaturizer_double_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_double_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::double_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::double_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_double_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -1043,7 +1043,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_bool_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -1117,12 +1117,12 @@ void MissingDummiesFeaturizer_bool_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
         REQUIRE(MissingDummiesFeaturizer_bool_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<bool>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<bool>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1146,7 +1146,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_string_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -1220,12 +1220,12 @@ void MissingDummiesFeaturizer_string_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
         REQUIRE(MissingDummiesFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::string>::IsNull(input) ? nullptr : input->c_str(), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);

@@ -13,7 +13,7 @@ template <typename VectorInputT>
 void CatImputerFeaturizer_int8_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -32,7 +32,7 @@ void CatImputerFeaturizer_int8_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_int8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_int8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -87,14 +87,14 @@ void CatImputerFeaturizer_int8_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int8_t> results;
+    std::vector<int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int8_t result;
+        int8_t result;
 
-        REQUIRE(CatImputerFeaturizer_int8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_int8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -116,7 +116,7 @@ template <typename VectorInputT>
 void CatImputerFeaturizer_int16_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int16_t> const &)> const &verify_func
+    std::function<bool (std::vector<int16_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -135,7 +135,7 @@ void CatImputerFeaturizer_int16_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_int16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_int16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -190,14 +190,14 @@ void CatImputerFeaturizer_int16_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int16_t> results;
+    std::vector<int16_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int16_t result;
+        int16_t result;
 
-        REQUIRE(CatImputerFeaturizer_int16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_int16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -219,7 +219,7 @@ template <typename VectorInputT>
 void CatImputerFeaturizer_int32_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int32_t> const &)> const &verify_func
+    std::function<bool (std::vector<int32_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -238,7 +238,7 @@ void CatImputerFeaturizer_int32_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_int32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_int32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -293,14 +293,14 @@ void CatImputerFeaturizer_int32_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int32_t> results;
+    std::vector<int32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int32_t result;
+        int32_t result;
 
-        REQUIRE(CatImputerFeaturizer_int32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_int32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -322,7 +322,7 @@ template <typename VectorInputT>
 void CatImputerFeaturizer_int64_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int64_t> const &)> const &verify_func
+    std::function<bool (std::vector<int64_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -341,7 +341,7 @@ void CatImputerFeaturizer_int64_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_int64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_int64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -396,14 +396,14 @@ void CatImputerFeaturizer_int64_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::int64_t> results;
+    std::vector<int64_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::int64_t result;
+        int64_t result;
 
-        REQUIRE(CatImputerFeaturizer_int64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_int64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -425,7 +425,7 @@ template <typename VectorInputT>
 void CatImputerFeaturizer_uint8_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint8_t> const &)> const &verify_func
+    std::function<bool (std::vector<uint8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -444,7 +444,7 @@ void CatImputerFeaturizer_uint8_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_uint8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_uint8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -499,14 +499,14 @@ void CatImputerFeaturizer_uint8_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint8_t> results;
+    std::vector<uint8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint8_t result;
+        uint8_t result;
 
-        REQUIRE(CatImputerFeaturizer_uint8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_uint8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -528,7 +528,7 @@ template <typename VectorInputT>
 void CatImputerFeaturizer_uint16_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint16_t> const &)> const &verify_func
+    std::function<bool (std::vector<uint16_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -547,7 +547,7 @@ void CatImputerFeaturizer_uint16_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_uint16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_uint16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -602,14 +602,14 @@ void CatImputerFeaturizer_uint16_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint16_t> results;
+    std::vector<uint16_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint16_t result;
+        uint16_t result;
 
-        REQUIRE(CatImputerFeaturizer_uint16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_uint16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -631,7 +631,7 @@ template <typename VectorInputT>
 void CatImputerFeaturizer_uint32_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func
+    std::function<bool (std::vector<uint32_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -650,7 +650,7 @@ void CatImputerFeaturizer_uint32_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_uint32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_uint32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -705,14 +705,14 @@ void CatImputerFeaturizer_uint32_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint32_t> results;
+    std::vector<uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        uint32_t result;
 
-        REQUIRE(CatImputerFeaturizer_uint32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_uint32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -734,7 +734,7 @@ template <typename VectorInputT>
 void CatImputerFeaturizer_uint64_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint64_t> const &)> const &verify_func
+    std::function<bool (std::vector<uint64_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -753,7 +753,7 @@ void CatImputerFeaturizer_uint64_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_uint64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_uint64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -808,14 +808,14 @@ void CatImputerFeaturizer_uint64_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::uint64_t> results;
+    std::vector<uint64_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint64_t result;
+        uint64_t result;
 
-        REQUIRE(CatImputerFeaturizer_uint64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_uint64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -837,7 +837,7 @@ template <typename VectorInputT>
 void CatImputerFeaturizer_float_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
+    std::function<bool (std::vector<float> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -856,7 +856,7 @@ void CatImputerFeaturizer_float_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_float_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::float_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::float_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_float_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -911,14 +911,14 @@ void CatImputerFeaturizer_float_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::float_t> results;
+    std::vector<float> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::float_t result;
+        float result;
 
-        REQUIRE(CatImputerFeaturizer_float_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::float_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::float_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_float_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -940,7 +940,7 @@ template <typename VectorInputT>
 void CatImputerFeaturizer_double_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
+    std::function<bool (std::vector<double> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -959,7 +959,7 @@ void CatImputerFeaturizer_double_t_Test(
             FitResult result(Continue);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_double_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::double_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::double_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_double_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == Complete)
@@ -1014,14 +1014,14 @@ void CatImputerFeaturizer_double_t_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<std::double_t> results;
+    std::vector<double> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        double result;
 
-        REQUIRE(CatImputerFeaturizer_double_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::double_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::double_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_double_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));

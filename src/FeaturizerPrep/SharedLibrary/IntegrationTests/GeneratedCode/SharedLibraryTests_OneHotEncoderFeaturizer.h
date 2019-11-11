@@ -9,19 +9,19 @@
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <int8_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void OneHotEncoderFeaturizer_int8_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<OneHotStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     OneHotEncoderFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(OneHotEncoderFeaturizer_int8_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(OneHotEncoderFeaturizer_int8_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -104,7 +104,7 @@ void OneHotEncoderFeaturizer_int8_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(OneHotEncoderFeaturizer_int8_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -116,19 +116,19 @@ void OneHotEncoderFeaturizer_int8_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <int16_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void OneHotEncoderFeaturizer_int16_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<OneHotStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     OneHotEncoderFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(OneHotEncoderFeaturizer_int16_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(OneHotEncoderFeaturizer_int16_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -211,7 +211,7 @@ void OneHotEncoderFeaturizer_int16_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(OneHotEncoderFeaturizer_int16_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -223,19 +223,19 @@ void OneHotEncoderFeaturizer_int16_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <int32_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void OneHotEncoderFeaturizer_int32_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<OneHotStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     OneHotEncoderFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(OneHotEncoderFeaturizer_int32_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(OneHotEncoderFeaturizer_int32_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -318,7 +318,7 @@ void OneHotEncoderFeaturizer_int32_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(OneHotEncoderFeaturizer_int32_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -330,19 +330,19 @@ void OneHotEncoderFeaturizer_int32_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <int64_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void OneHotEncoderFeaturizer_int64_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<OneHotStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     OneHotEncoderFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(OneHotEncoderFeaturizer_int64_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(OneHotEncoderFeaturizer_int64_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -425,7 +425,7 @@ void OneHotEncoderFeaturizer_int64_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(OneHotEncoderFeaturizer_int64_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -437,19 +437,19 @@ void OneHotEncoderFeaturizer_int64_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <uint8_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void OneHotEncoderFeaturizer_uint8_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<OneHotStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     OneHotEncoderFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(OneHotEncoderFeaturizer_uint8_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(OneHotEncoderFeaturizer_uint8_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -532,7 +532,7 @@ void OneHotEncoderFeaturizer_uint8_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(OneHotEncoderFeaturizer_uint8_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -544,19 +544,19 @@ void OneHotEncoderFeaturizer_uint8_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <uint16_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void OneHotEncoderFeaturizer_uint16_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<OneHotStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     OneHotEncoderFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(OneHotEncoderFeaturizer_uint16_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(OneHotEncoderFeaturizer_uint16_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -639,7 +639,7 @@ void OneHotEncoderFeaturizer_uint16_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(OneHotEncoderFeaturizer_uint16_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -651,19 +651,19 @@ void OneHotEncoderFeaturizer_uint16_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <uint32_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void OneHotEncoderFeaturizer_uint32_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<OneHotStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     OneHotEncoderFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(OneHotEncoderFeaturizer_uint32_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(OneHotEncoderFeaturizer_uint32_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -746,7 +746,7 @@ void OneHotEncoderFeaturizer_uint32_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(OneHotEncoderFeaturizer_uint32_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -758,19 +758,19 @@ void OneHotEncoderFeaturizer_uint32_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <uint64_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void OneHotEncoderFeaturizer_uint64_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<OneHotStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     OneHotEncoderFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(OneHotEncoderFeaturizer_uint64_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(OneHotEncoderFeaturizer_uint64_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -853,7 +853,7 @@ void OneHotEncoderFeaturizer_uint64_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(OneHotEncoderFeaturizer_uint64_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -865,19 +865,19 @@ void OneHotEncoderFeaturizer_uint64_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <float_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void OneHotEncoderFeaturizer_float_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<OneHotStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     OneHotEncoderFeaturizer_float_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(OneHotEncoderFeaturizer_float_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(OneHotEncoderFeaturizer_float_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -960,7 +960,7 @@ void OneHotEncoderFeaturizer_float_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(OneHotEncoderFeaturizer_float_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -972,19 +972,19 @@ void OneHotEncoderFeaturizer_float_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <double_t> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void OneHotEncoderFeaturizer_double_t_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<OneHotStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     OneHotEncoderFeaturizer_double_t_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(OneHotEncoderFeaturizer_double_t_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(OneHotEncoderFeaturizer_double_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1067,7 +1067,7 @@ void OneHotEncoderFeaturizer_double_t_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(OneHotEncoderFeaturizer_double_t_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -1079,19 +1079,19 @@ void OneHotEncoderFeaturizer_double_t_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <bool> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void OneHotEncoderFeaturizer_bool_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<OneHotStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     OneHotEncoderFeaturizer_bool_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(OneHotEncoderFeaturizer_bool_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(OneHotEncoderFeaturizer_bool_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1174,7 +1174,7 @@ void OneHotEncoderFeaturizer_bool_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(OneHotEncoderFeaturizer_bool_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
@@ -1186,19 +1186,19 @@ void OneHotEncoderFeaturizer_bool_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <string> */
-template <typename VectorInputT, typename... ConstructorArgsT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void OneHotEncoderFeaturizer_string_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<OneHotStruct> const &)> const &verify_func,
-    ConstructorArgsT &&... constructor_args
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     OneHotEncoderFeaturizer_string_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(OneHotEncoderFeaturizer_string_CreateEstimator(std::forward<ConstructorArgsT>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(OneHotEncoderFeaturizer_string_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1281,7 +1281,7 @@ void OneHotEncoderFeaturizer_string_Test(
 
     REQUIRE(verify_func(results));
 
-    for(auto &result : results) {
+    for(auto & result: results) {
         REQUIRE(OneHotEncoderFeaturizer_string_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
