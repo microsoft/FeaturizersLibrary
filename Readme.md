@@ -65,4 +65,4 @@ Once CMake has generated the build files, within `<WorkSpace Dir>/build` run...
 - [Test] `ctest --parallel`
 
 ## Featurizers
-Information for setup/configuration of the Featurizers library can be found [here](src/FeaturizerPrep/Readme.md)
+Information for setup/configuration of the Featurizers library can be found [here](src/Readme.md)

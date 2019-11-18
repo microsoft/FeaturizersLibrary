@@ -72,7 +72,7 @@ steps:
         else:
             args = '"/prerelease_build_name=$(pipeline_build_name)"'
 
-        values["pipeline_builder_args"] = '"/custom_build_args=src/FeaturizerPrep/SharedLibrary:{} /no_build_info"'.format(args)
+        values["pipeline_builder_args"] = '"/custom_build_args=src/SharedLibrary:{} /no_build_info"'.format(args)
 
         # Tester
         tester_code_coverage = "${{ parameters.tester_code_coverage }}".lower() in ["true", "yes"]

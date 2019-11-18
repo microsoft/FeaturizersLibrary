@@ -10,7 +10,7 @@ that follows.
                                                 < 1.2.3-zulu        <   1.2.3
 
 `<major>`, `<minor>`, and `<patch>` build values are defined in cmake files and should be updated there;
-for an example, see src/FeaturizerPrep/SharedLibrary/cmake/Featurizers.cmake.
+for an example, see src/SharedLibrary/cmake/Featurizers.cmake.
 
 `<prerelease_build_name>` and `<build_info>` are defined when invoking the CI build. Additional information
 (including steps to specify these values) follows.

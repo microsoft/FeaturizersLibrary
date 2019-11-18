@@ -87,7 +87,7 @@ steps:
             artifacts = "${{ join(',', parameters.artifact_configurations) }}".split(',')
 
             command_line = '$(pipeline_activate_script) "${{ parameters.configuration }}" && python {build_filename} Package "{output_dir}" /verbose {build_dirs}'.format(
-                build_filename=os.path.join("src", "FeaturizerPrep", "SharedLibrary", "Build.py"),
+                build_filename=os.path.join("src", "SharedLibrary", "Build.py"),
                 output_dir=os.path.join(r"$(pipeline_artifacts_directory)", "Artifacts", "Packages", "${{ build_configuration }}"),
                 build_dirs=" ".join(['"/build_dir={}"'.format(os.path.join(r"$(Build.StagingDirectory)", artifact, "Builder", "${{ build_configuration }}")) for artifact in artifacts]),
             )
