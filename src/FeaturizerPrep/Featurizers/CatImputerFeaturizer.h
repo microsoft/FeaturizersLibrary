@@ -7,144 +7,141 @@
 #include "../Archive.h"
 #include "../Featurizer.h"
 #include "../Traits.h"
+
 #include "Components/PipelineExecutionEstimatorImpl.h"
 #include "Components/HistogramEstimator.h"
+#include "Components/ModeEstimator.h"
 
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
-
-
 /////////////////////////////////////////////////////////////////////////
-///  \class         HistogramConsumerEstimator
-///  \brief         This class retrieves a HistogramAnnotation and computes
-///                 the most frequent value from it. This value is used to
-///                    replace null values.
+///  \class         CatImputerTransformer
+///  \brief         Transformer that populates null values with the most
+///                 frequent value found in the training data set.
 ///
-template <typename InputT,typename TransformedT>
-class HistogramConsumerEstimator : public TransformerEstimator<InputT const &, TransformedT> {
+template <typename InputT, typename TransformedT>
+class CatImputerTransformer : public StandardTransformer<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                           = TransformerEstimator<InputT const &, TransformedT>;
-    using TraitsT                              = Traits<typename std::remove_cv<typename std::remove_reference<InputT>::type>::type>;
+    static_assert(Traits<InputT>::IsNullableType, "'InputT' must be a nullable type");
+    static_assert(Traits<TransformedT>::IsNullableType == false || Traits<TransformedT>::IsNativeNullableType, "'TransformedT' must not be a nullable type");
 
-    class Transformer : public BaseType::Transformer {
-    public:
-        // ----------------------------------------------------------------------
-        // |
-        // |  Public Methods
-        // |
-        // ----------------------------------------------------------------------
-        Transformer(TransformedT mostFreq);
-        Transformer(typename BaseType::Transformer::Archive & ar);
-        ~Transformer(void) override = default;
+    using BaseType                          = StandardTransformer<InputT, TransformedT>;
 
-        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Transformer);
-
-        typename BaseType::TransformedType execute(typename BaseType::InputType input) override;
-
-        void save(typename BaseType::Transformer::Archive & ar) const override;
-
-        bool operator==(HistogramConsumerEstimator::Transformer const &other) const;
-
-    private:
-        // ----------------------------------------------------------------------
-        // |
-        // |  Private Data
-        // |
-        // ----------------------------------------------------------------------
-        TransformedT                              _mostFreq;
-    };
-
-    using TransformerType                   = Transformer;
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Data
+    // |
+    // ----------------------------------------------------------------------
+    typename BaseType::TransformedType const            Value;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    HistogramConsumerEstimator(AnnotationMapsPtr pAllColumnAnnotations);
-    ~HistogramConsumerEstimator(void) override = default;
+    CatImputerTransformer(typename BaseType::TransformedType value);
+    CatImputerTransformer(Archive &ar);
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(HistogramConsumerEstimator);
+    ~CatImputerTransformer(void) override = default;
+
+    void save(Archive &ar) const override;
 
 private:
     // ----------------------------------------------------------------------
     // |
-    // |  Private Types
+    // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    using Histogram                          = std::map<InputT, std::uint32_t>;
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override;
+};
+
+namespace Details {
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         CatImputerEstimatorImpl
+///  \brief         Estimator that reads the imputation strategy value and
+///                 creates a `CatImputerTransformer` object.
+///
+template <
+    typename InputT,
+    typename TransformedT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
+class CatImputerEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = TransformerEstimator<InputT, TransformedT>;
+    using TransformerType                   = CatImputerTransformer<InputT, TransformedT>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    CatImputerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~CatImputerEstimatorImpl(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(CatImputerEstimatorImpl);
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+    size_t const                            _colIndex;
 
     // ----------------------------------------------------------------------
     // |
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
+    bool begin_training_impl(void) override;
+    FitResult fit_impl(typename BaseType::InputType const *, size_t) override;
+    void complete_training_impl(void) override;
 
-    // MSVC has problems when the function is defined outside of the declaration
-    Estimator::FitResult fit_impl(typename BaseType::BaseType::FitBufferInputType *, size_t) override {
-        throw std::runtime_error("This should never be called as this class will not be used during training");
-    }
-
-    Estimator::FitResult complete_training_impl(void) override;
-
-    // MSVC has problems when the function is defined outside of the declaration
+    // MSVC runs into problems when separating the definition for this method
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        // Retrieve Histogram from Annotation
-        AnnotationMaps const &                          maps(Estimator::get_column_annotations());
-        // Currently Annnotations are per output column index (0-based)
-        // Since we've only one column as output- hardcoding this to 0 now.
-        // Expect annotation design to be further rationalized in near future
-        // which will address this hard-coding.
-        AnnotationMap const &                           annotations(maps[0]);
-        AnnotationMap::const_iterator const &           iterAnnotations(annotations.find("HistogramEstimator"));
+        // ----------------------------------------------------------------------
+        using ModeAnnotationData            = Components::ModeAnnotationData<InputT>;
+        using ModeEstimator                 = Components::ModeEstimator<InputT, false, MaxNumTrainingItemsV>;
 
-        if(iterAnnotations == annotations.end())
-            throw std::runtime_error("Couldn't retrieve HistogramAnnotation.");
+        using TheseTraits                   = Traits<InputT>;
+        // ----------------------------------------------------------------------
 
-        // An output column can have multiple annotations from same 'kind' of estimator.
-        // However, since we have only one estimator- hence the hard-coded value of 0 for retrieval.
-        // Expect annotation design to be further rationalized in near future
-        // which will address this hard-coding.
-        Annotation const &                              annotation(*iterAnnotations->second[0]);
+        ModeAnnotationData const &          data(ModeEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::ModeEstimatorName));
 
-        assert(dynamic_cast<Components::HistogramAnnotation<InputT> const *>(&annotation));
-
-        Components::HistogramAnnotation<InputT> const &       histogramAnnotation(static_cast<Components::HistogramAnnotation<InputT> const &>(annotation));
-        Histogram const &                               histogram(histogramAnnotation.Value);
-
-        // Compute most frequent value from Histogram
-        typename Histogram::const_iterator              iMostCommon(histogram.end());
-
-        for(typename Histogram::const_iterator iter=histogram.begin(); iter != histogram.end(); ++iter) {
-            if(iMostCommon == histogram.end() || iter->second > iMostCommon->second) {
-                iMostCommon = iter;
-            }
-        }
-        if(iMostCommon == histogram.end())
-            throw std::runtime_error("All null values or empty training set.");
-
-        return std::make_unique<Transformer>(Traits<InputT>::GetNullableValue(iMostCommon->first));
+        assert(TheseTraits::IsNullableType);
+        return std::make_unique<CatImputerTransformer<InputT, TransformedT>>(TheseTraits::GetNullableValue(data.Value));
     }
 };
 
+} // namespace Details
+
 /////////////////////////////////////////////////////////////////////////
 ///  \class         CatImputerEstimator
-///  \brief         This class 'chains' HistogramEstimator and HistogramConsumerEstimator.
-///                 HistogramEstimator generates HistogramAnnotation which is consumed by
-///                 HistogramConsumerEstimator to compute most frequent value.
+///  \brief         Creates a `CatImputerTransformer` object.
 ///
-template <typename T>
+template <
+    typename TransformedT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
 class CatImputerEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-        Components::HistogramEstimator<typename Traits<T>::nullable_type, 0>,
-        HistogramConsumerEstimator<typename Traits<T>::nullable_type, T>
+        Components::HistogramEstimator<typename Traits<TransformedT>::nullable_type, MaxNumTrainingItemsV>,
+        Components::ModeEstimator<typename Traits<TransformedT>::nullable_type, false, MaxNumTrainingItemsV>,
+        Details::CatImputerEstimatorImpl<typename Traits<TransformedT>::nullable_type, TransformedT, MaxNumTrainingItemsV>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -152,17 +149,20 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType = Components::PipelineExecutionEstimatorImpl<
-        Components::HistogramEstimator<typename Traits<T>::nullable_type, 0>,
-        HistogramConsumerEstimator<typename Traits<T>::nullable_type, T>
-    >;
+    using BaseType =
+        Components::PipelineExecutionEstimatorImpl<
+            Components::HistogramEstimator<typename Traits<TransformedT>::nullable_type, MaxNumTrainingItemsV>,
+            Components::ModeEstimator<typename Traits<TransformedT>::nullable_type, false, MaxNumTrainingItemsV>,
+            Details::CatImputerEstimatorImpl<typename Traits<TransformedT>::nullable_type, TransformedT, MaxNumTrainingItemsV>
+        >;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    CatImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations);
+    CatImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~CatImputerEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(CatImputerEstimator);
 };
@@ -179,64 +179,90 @@ public:
 
 // ----------------------------------------------------------------------
 // |
-// |  HistogramConsumerEstimator
+// |  CatImputerTransformer
 // |
 // ----------------------------------------------------------------------
-template <typename InputT,typename TransformedT>
-HistogramConsumerEstimator<InputT,TransformedT>::HistogramConsumerEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    BaseType("HistogramConsumerEstimator", std::move(pAllColumnAnnotations), true) {
+template <typename InputT, typename TransformedT>
+CatImputerTransformer<InputT, TransformedT>::CatImputerTransformer(typename BaseType::TransformedType value) :
+    Value(std::move(value)) {
 }
 
-template <typename InputT,typename TransformedT>
-Estimator::FitResult HistogramConsumerEstimator<InputT,TransformedT>::complete_training_impl(void) {
-    throw std::runtime_error("This should never be called as this class will not be used during training");
+template <typename InputT, typename TransformedT>
+CatImputerTransformer<InputT, TransformedT>::CatImputerTransformer(Archive &ar) :
+    Value(Traits<decltype(Value)>::deserialize(ar)) {
+}
+
+template <typename InputT, typename TransformedT>
+void CatImputerTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
+    Traits<decltype(Value)>::serialize(ar, Value);
 }
 
 // ----------------------------------------------------------------------
-// |
-// |  HistogramConsumerEstimator::Transformer
-// |
 // ----------------------------------------------------------------------
-template <typename InputT,typename TransformedT>
-HistogramConsumerEstimator<InputT,TransformedT>::Transformer::Transformer(TransformedT mostFreq) :
-    _mostFreq(std::move(mostFreq)) {
+// ----------------------------------------------------------------------
+template <typename InputT, typename TransformedT>
+void CatImputerTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
+    // ----------------------------------------------------------------------
+    using TheseTraits                       = Traits<InputT>;
+    // ----------------------------------------------------------------------
+
+    if(TheseTraits::IsNull(input))
+        callback(Value);
+    else
+        callback(TheseTraits::GetNullableValue(input));
 }
 
-template <typename InputT,typename TransformedT>
-HistogramConsumerEstimator<InputT,TransformedT>::Transformer::Transformer(typename BaseType::Transformer::Archive & ar) {
-    if(Traits<std::uint8_t>::deserialize(ar) != 1)
-        throw std::runtime_error("Invalid transformer version");
-
-    _mostFreq = Traits<TransformedT>::deserialize(ar);
-}
-
-template <typename InputT,typename TransformedT>
-typename HistogramConsumerEstimator<InputT,TransformedT>::BaseType::TransformedType HistogramConsumerEstimator<InputT,TransformedT>::Transformer::execute(typename BaseType::InputType input) {
-
-    if(TraitsT::IsNull(input))
-        return _mostFreq;
-
-    return TraitsT::GetNullableValue(input);
-}
-
-template <typename InputT,typename TransformedT>
-void HistogramConsumerEstimator<InputT,TransformedT>::Transformer::save(typename HistogramConsumerEstimator<InputT,TransformedT>::BaseType::Transformer::Archive & ar) const {
-    Traits<std::uint8_t>::serialize(ar, 1); // Current version
-    Traits<TransformedT>::serialize(ar,_mostFreq);
-}
-
-template <typename InputT,typename TransformedT>
-bool HistogramConsumerEstimator<InputT,TransformedT>::Transformer::operator ==(HistogramConsumerEstimator<InputT,TransformedT>::Transformer const &other) const {
-    return _mostFreq == other._mostFreq;
-}
 // ----------------------------------------------------------------------
 // |
 // |  CatImputerEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename T>
-CatImputerEstimator<T>::CatImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    BaseType("CatImputerEstimator", std::move(pAllColumnAnnotations)) {
+template <typename TransformedT, size_t MaxNumTrainingItemsV>
+CatImputerEstimator<TransformedT, MaxNumTrainingItemsV>::CatImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+    BaseType(
+        "CatImputerEstimator",
+        pAllColumnAnnotations,
+        [pAllColumnAnnotations, colIndex](void) { return Components::HistogramEstimator<typename Traits<TransformedT>::nullable_type, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex](void) { return Components::ModeEstimator<typename Traits<TransformedT>::nullable_type, false, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex](void) { return Details::CatImputerEstimatorImpl<typename Traits<TransformedT>::nullable_type, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
+    ) {
+}
+
+// ----------------------------------------------------------------------
+// |
+// |  Details::CatImputerEstimatorImpl
+// |
+// ----------------------------------------------------------------------
+template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
+Details::CatImputerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::CatImputerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+    BaseType("CatImputerEstimatorImpl", std::move(pAllColumnAnnotations)),
+    _colIndex(
+        std::move(
+            [this, &colIndex](void) -> size_t & {
+                if(colIndex >= this->get_column_annotations().size())
+                    throw std::invalid_argument("colIndex");
+
+                return colIndex;
+            }()
+        )
+    ) {
+}
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
+bool Details::CatImputerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+    return false;
+}
+
+template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
+FitResult Details::CatImputerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
+    throw std::runtime_error("This should not be called");
+}
+
+template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
+void Details::CatImputerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
 } // namespace Featurizers

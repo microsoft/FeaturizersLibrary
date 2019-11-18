@@ -133,8 +133,6 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DateTimeTransformer);
 
-    TransformedType execute(InputType input) override;
-
     void save(Archive & ar) const override;
 
 private:
@@ -144,17 +142,24 @@ private:
     // |
     // ----------------------------------------------------------------------
     using JsonStream                        = nlohmann::json;
-
     using HolidayMap                        = std::unordered_map<InputType, std::string>;
 
     // ----------------------------------------------------------------------
     // |
-    // |  Private Primitives
+    // |  Private Data
     // |
     // ----------------------------------------------------------------------
     std::string const                         _countryName;
 
     HolidayMap                                _dateHolidayMap;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    void execute_impl(InputType const &input, CallbackFunction const &callback) override;
+    void flush_impl(CallbackFunction const &callback) override;
 };
 
 class DateTimeEstimator :
@@ -206,10 +211,9 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    // Note that the following training methods aren't used, but need to be overridden as
-    // the base implementations are abstract. The noop definitions are below.
-    Estimator::FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer) override;
-    Estimator::FitResult complete_training_impl(void) override;
+    bool begin_training_impl(void) override;
+    FitResult fit_impl(InputType const *pBuffer, size_t cBuffer) override;
+    void complete_training_impl(void) override;
 
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override;
 };

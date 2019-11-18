@@ -14,9 +14,14 @@ using HOHVStruct = NS::Featurizers::HashOneHotVectorizerStruct;
 
 
 TEST_CASE("HashOneHotVectorizerEstimator") {
-    CHECK(NS::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>(NS::CreateTestAnnotationMapsPtr(1), 2, 100).Name == "HashOneHotVectorizerEstimator");
-    CHECK(NS::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>(NS::CreateTestAnnotationMapsPtr(1), 2, 100).is_training_complete());
-    CHECK(dynamic_cast<NS::Featurizers::HashOneHotVectorizerTransformer<std::int8_t> *>(NS::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>(NS::CreateTestAnnotationMapsPtr(1) , 2, 100).create_transformer().get()));
+    CHECK(strcmp(NS::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>(NS::CreateTestAnnotationMapsPtr(1), 2, 100).Name, "HashOneHotVectorizerEstimator") == 0);
+
+    NS::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>      estimator(NS::CreateTestAnnotationMapsPtr(1), 2, 100);
+
+    estimator.begin_training();
+    estimator.complete_training();
+
+    CHECK(dynamic_cast<NS::Featurizers::HashOneHotVectorizerTransformer<std::int8_t> *>(estimator.create_transformer().get()));
 }
 
 TEST_CASE("HashOneHotVectorizerTransformer_int8") {

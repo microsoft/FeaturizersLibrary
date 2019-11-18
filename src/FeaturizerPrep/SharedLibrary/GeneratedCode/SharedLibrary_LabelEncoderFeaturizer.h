@@ -20,7 +20,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_DestroyEstimator(/*in*
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_IsTrainingComplete(/*in*/ LabelEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_Fit(/*in*/ LabelEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_FitBuffer(/*in*/ LabelEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_CreateTransformerFromEstimator(/*in*/ LabelEncoderFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle, /*out*/ LabelEncoderFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -43,7 +43,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_DestroyEstimator(/*in
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_IsTrainingComplete(/*in*/ LabelEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_Fit(/*in*/ LabelEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_FitBuffer(/*in*/ LabelEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_CreateTransformerFromEstimator(/*in*/ LabelEncoderFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle, /*out*/ LabelEncoderFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -66,7 +66,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_DestroyEstimator(/*in
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_IsTrainingComplete(/*in*/ LabelEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_Fit(/*in*/ LabelEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_FitBuffer(/*in*/ LabelEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_CreateTransformerFromEstimator(/*in*/ LabelEncoderFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle, /*out*/ LabelEncoderFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -89,7 +89,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_DestroyEstimator(/*in
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_IsTrainingComplete(/*in*/ LabelEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_Fit(/*in*/ LabelEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_FitBuffer(/*in*/ LabelEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_CreateTransformerFromEstimator(/*in*/ LabelEncoderFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle, /*out*/ LabelEncoderFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -112,7 +112,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_DestroyEstimator(/*in
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_IsTrainingComplete(/*in*/ LabelEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_Fit(/*in*/ LabelEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_FitBuffer(/*in*/ LabelEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_CreateTransformerFromEstimator(/*in*/ LabelEncoderFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle, /*out*/ LabelEncoderFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -135,7 +135,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_DestroyEstimator(/*i
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_IsTrainingComplete(/*in*/ LabelEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_Fit(/*in*/ LabelEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_FitBuffer(/*in*/ LabelEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_CreateTransformerFromEstimator(/*in*/ LabelEncoderFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle, /*out*/ LabelEncoderFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -158,7 +158,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_DestroyEstimator(/*i
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_IsTrainingComplete(/*in*/ LabelEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_Fit(/*in*/ LabelEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_FitBuffer(/*in*/ LabelEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_CreateTransformerFromEstimator(/*in*/ LabelEncoderFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle, /*out*/ LabelEncoderFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -181,7 +181,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_DestroyEstimator(/*i
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_IsTrainingComplete(/*in*/ LabelEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_Fit(/*in*/ LabelEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_FitBuffer(/*in*/ LabelEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_CreateTransformerFromEstimator(/*in*/ LabelEncoderFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle, /*out*/ LabelEncoderFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -204,7 +204,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_DestroyEstimator(/*in
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_IsTrainingComplete(/*in*/ LabelEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_Fit(/*in*/ LabelEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_FitBuffer(/*in*/ LabelEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_CreateTransformerFromEstimator(/*in*/ LabelEncoderFeaturizer_float_t_EstimatorHandle *pEstimatorHandle, /*out*/ LabelEncoderFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -227,7 +227,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_DestroyEstimator(/*i
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_IsTrainingComplete(/*in*/ LabelEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_Fit(/*in*/ LabelEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_FitBuffer(/*in*/ LabelEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_CreateTransformerFromEstimator(/*in*/ LabelEncoderFeaturizer_double_t_EstimatorHandle *pEstimatorHandle, /*out*/ LabelEncoderFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -250,7 +250,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_DestroyEstimator(/*in*/ 
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_IsTrainingComplete(/*in*/ LabelEncoderFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_Fit(/*in*/ LabelEncoderFeaturizer_bool_EstimatorHandle *pHandle, /*in*/ bool input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_FitBuffer(/*in*/ LabelEncoderFeaturizer_bool_EstimatorHandle *pHandle, /*in*/ bool const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_CompleteTraining(/*in*/ LabelEncoderFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_CompleteTraining(/*in*/ LabelEncoderFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_CreateTransformerFromEstimator(/*in*/ LabelEncoderFeaturizer_bool_EstimatorHandle *pEstimatorHandle, /*out*/ LabelEncoderFeaturizer_bool_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -273,7 +273,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_DestroyEstimator(/*in*
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_IsTrainingComplete(/*in*/ LabelEncoderFeaturizer_string_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_Fit(/*in*/ LabelEncoderFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const *input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_FitBuffer(/*in*/ LabelEncoderFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const * const * input_ptr, std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_CompleteTraining(/*in*/ LabelEncoderFeaturizer_string_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_CompleteTraining(/*in*/ LabelEncoderFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_CreateTransformerFromEstimator(/*in*/ LabelEncoderFeaturizer_string_EstimatorHandle *pEstimatorHandle, /*out*/ LabelEncoderFeaturizer_string_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);

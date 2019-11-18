@@ -41,6 +41,7 @@ foreach(_test_name IN ITEMS
     RobustScalarFeaturizer_UnitTests
     SampleAddFeaturizer_UnitTest
     StringFeaturizer_UnitTest
+    Structs_UnitTest
     TimeSeriesImputerFeaturizer_UnitTest
 )
     add_executable(${_test_name} ${_test_name}.cpp)

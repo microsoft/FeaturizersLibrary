@@ -5,23 +5,23 @@
 #pragma once
 
 #include <limits>
-#include "../../Archive.h"
-#include "../../Featurizer.h"
-#include "../../Traits.h"
+
+#include "TrainingOnlyEstimatorImpl.h"
 
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 namespace Components {
 
+static constexpr char const * const         MinMaxEstimatorName("MinMaxEstimator");
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MinMaxAnnotation
+///  \class         MinMaxAnnotationData
 ///  \brief         An annotation class which contains the min feature and the max
 ///                 for an input column
 ///
 template <typename T>
-class MinMaxAnnotation : public Annotation {
+class MinMaxAnnotationData {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -36,28 +36,44 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MinMaxAnnotation(T min, T max);
-    ~MinMaxAnnotation(void) override = default;
+    MinMaxAnnotationData(T min, T max);
+    ~MinMaxAnnotationData(void) = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxAnnotation);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxAnnotationData);
 };
 
+namespace Details {
+
 /////////////////////////////////////////////////////////////////////////
-///  \class         MinMaxEstimator
-///  \brief         An AnnotationEstimator class that finds the min, max
+///  \class         MinMaxTrainingOnlyPolicy
+///  \brief         `MinMaxEstimator` implementation details.
 ///
-template <typename InputT, size_t ColIndexV>
-class MinMaxEstimator : public AnnotationEstimator<InputT const &> {
+template <typename T>
+class MinMaxTrainingOnlyPolicy {
 public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using InputType                         = T;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Data
+    // |
+    // ----------------------------------------------------------------------
+    static constexpr char const * const     NameValue = MinMaxEstimatorName;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MinMaxEstimator(AnnotationMapsPtr pAllColumnAnnotations);
-    ~MinMaxEstimator(void) override = default;
+    MinMaxTrainingOnlyPolicy(void);
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxEstimator);
+    void fit(InputType const &input);
+    MinMaxAnnotationData<T> complete_training(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -65,30 +81,21 @@ private:
     // |  Private Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                             = AnnotationEstimator<InputT const &>;
-    using TraitsT                              = Traits<InputT>;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Data
-    // |
-    // ----------------------------------------------------------------------
-    InputT                                       _min;
-    InputT                                       _max;
-    
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Methods
-    // |
-    // ----------------------------------------------------------------------
-    Estimator::FitResult fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) override;
-
-    Estimator::FitResult complete_training_impl(void) override;
-
+    InputType                               _min;
+    InputType                               _max;
 };
 
+} // namespace Details
 
-
+/////////////////////////////////////////////////////////////////////////
+///  \typedef       MinMaxEstimator
+///  \brief         A training-only class that finds the min, max
+///
+template <
+    typename InputT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
+using MinMaxEstimator                       = TrainingOnlyEstimatorImpl<Details::MinMaxTrainingOnlyPolicy<InputT>, MaxNumTrainingItemsV>;
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -102,56 +109,41 @@ private:
 
 // ----------------------------------------------------------------------
 // |
-// |  MinMaxAnnotation
+// |  MinMaxAnnotationData
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-MinMaxAnnotation<T>::MinMaxAnnotation(T min, T max) :
-    Annotation(this),
+MinMaxAnnotationData<T>::MinMaxAnnotationData(T min, T max) :
     Min(std::move(min)),
     Max(std::move(max)) {
+    if(Min > Max)
+        throw std::invalid_argument("min is > max");
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  MinMaxEstimator
+// |  Details::MinMaxTrainingOnlyPolicy
 // |
 // ----------------------------------------------------------------------
-
-template <typename InputT, size_t ColIndexV>
-MinMaxEstimator<InputT,ColIndexV>::MinMaxEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    AnnotationEstimator<InputT const &>("MinMaxEstimator", std::move(pAllColumnAnnotations)){
-        // didn't use std::numeric_limits::min() because for float this is not the smallest possible value
-        // but the smallest value closest to 0 instead
-        _min = std::numeric_limits<InputT>::max();
-        _max = std::numeric_limits<InputT>::lowest();
+template <typename T>
+Details::MinMaxTrainingOnlyPolicy<T>::MinMaxTrainingOnlyPolicy(void) :
+    // didn't use std::numeric_limits::min() because for float this is not the smallest possible value
+    // but the smallest value closest to 0 instead
+    _min(std::numeric_limits<T>::max()),
+    _max(std::numeric_limits<T>::lowest()) {
 }
 
-template <typename InputT, size_t ColIndexV>
-Estimator::FitResult MinMaxEstimator<InputT,ColIndexV>::fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) {
-    typename BaseType::FitBufferInputType const * const                 pEndBuffer(pBuffer + cBuffer);
-    while(pBuffer != pEndBuffer) {
-        InputT const &                                   input(*pBuffer++);
-        // null input should be ignored
-        if(TraitsT::IsNull(input))
-            continue;
-        if(input < _min) {
-            _min = input;
-        }
-        if(input > _max) {
-            _max = input;
-        }
-    }
-
-    return Estimator::FitResult::Continue;
+template <typename T>
+void Details::MinMaxTrainingOnlyPolicy<T>::fit(InputType const &input) {
+    if(input < _min)
+        _min = input;
+    if(input > _max)
+        _max = input;
 }
 
-template <typename InputT, size_t ColIndexV>
-Estimator::FitResult MinMaxEstimator<InputT,ColIndexV>::complete_training_impl(void) {
-    assert(_min<=_max);
-    BaseType::add_annotation(std::make_shared<MinMaxAnnotation<InputT>>(std::move(_min),std::move(_max)), ColIndexV);
-
-    return Estimator::FitResult::Complete;
+template <typename T>
+MinMaxAnnotationData<T> Details::MinMaxTrainingOnlyPolicy<T>::complete_training(void) {
+    return MinMaxAnnotationData<T>(std::move(_min), std::move(_max));
 }
 
 } // namespace Components

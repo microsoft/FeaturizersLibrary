@@ -21,6 +21,7 @@ using Microsoft::Featurizer::CreateTestAnnotationMapsPtr;
 SampleAddEstimator::TransformerUniquePtr Train(std::vector<std::uint16_t> const &input) {
     SampleAddEstimator                      estimator(CreateTestAnnotationMapsPtr(2));
 
+    estimator.begin_training();
     estimator.fit(input.data(), input.size());
     estimator.complete_training();
 
@@ -32,9 +33,13 @@ SampleAddEstimator::TransformerUniquePtr Train(std::vector<std::uint16_t> const 
 #endif
 
 TEST_CASE("SampleAddFeaturizer") {
-    CHECK(Train({10})->execute(20) == 30);
-    CHECK(Train({20})->execute(1) == 21);
+    // ----------------------------------------------------------------------
+    using StandardTransformer               = Microsoft::Featurizer::StandardTransformer<std::uint16_t, std::uint32_t>;
+    // ----------------------------------------------------------------------
 
-    CHECK(Train({10, 20})->execute(20) == 50);
-    CHECK(Train({10, 20, 30})->execute(20) == 80);
+    CHECK(static_cast<StandardTransformer *>(Train({10}).get())->execute(20) == 30);
+    CHECK(static_cast<StandardTransformer *>(Train({20}).get())->execute(1) == 21);
+
+    CHECK(static_cast<StandardTransformer *>(Train({10, 20}).get())->execute(20) == 50);
+    CHECK(static_cast<StandardTransformer *>(Train({10, 20, 30}).get())->execute(20) == 80);
 }

@@ -15,9 +15,15 @@
 namespace NS = Microsoft::Featurizer;
 
 TEST_CASE("StringEstimator") {
-    CHECK(NS::Featurizers::StringEstimator<int>(NS::CreateTestAnnotationMapsPtr(2)).Name == "StringEstimator");
-    CHECK(NS::Featurizers::StringEstimator<int>(NS::CreateTestAnnotationMapsPtr(2)).is_training_complete());
-    CHECK(dynamic_cast<NS::Featurizers::StringTransformer<int> *>(NS::Featurizers::StringEstimator<int>(NS::CreateTestAnnotationMapsPtr(2)).create_transformer().get()));
+    CHECK(strcmp(NS::Featurizers::StringEstimator<int>(NS::CreateTestAnnotationMapsPtr(2)).Name, "StringEstimator") == 0);
+
+    NS::Featurizers::StringEstimator<int>   estimator(NS::CreateTestAnnotationMapsPtr(1));
+
+    estimator
+        .begin_training()
+        .complete_training();
+
+    CHECK(dynamic_cast<NS::Featurizers::StringTransformer<int> *>(estimator.create_transformer().get()));
 }
 
 TEST_CASE("Transformer_Binary") {

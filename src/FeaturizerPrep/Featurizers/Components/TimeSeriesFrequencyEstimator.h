@@ -53,7 +53,7 @@ public:
 ///                 timepoints for a given grain. Note that frequency is same for
 ///                 complete dataset.
 ///
-class TimeSeriesFrequencyEstimator : public AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, std::vector<nonstd::optional<std::string>>> const &> {
+class TimeSeriesFrequencyEstimator : public FitEstimator<std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, std::vector<nonstd::optional<std::string>>>> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -73,7 +73,7 @@ private:
     // ----------------------------------------------------------------------
     using KeyType                           = std::vector<std::string>;
     using ColsToImputeType                  = std::vector<nonstd::optional<std::string>>;
-    using BaseType                          = AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType> const &>;
+    using BaseType                          = FitEstimator<std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType>>;
     using FrequencyType                     = std::chrono::system_clock::duration;
     using TimePointType                     = std::chrono::system_clock::time_point;
     using MapType                           = std::map<KeyType, TimePointType>;
@@ -91,9 +91,11 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    Estimator::FitResult fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) override;
+    bool begin_training_impl(void) override;
 
-    Estimator::FitResult complete_training_impl(void) override;
+    FitResult fit_impl(typename BaseType::InputType const *pBuffer, size_t cBuffer) override;
+
+    void complete_training_impl(void) override;
 };
 
 
@@ -113,8 +115,7 @@ private:
 // |  TimeSeriesFrequencyAnnotation
 // |
 // ----------------------------------------------------------------------
-TimeSeriesFrequencyAnnotation::TimeSeriesFrequencyAnnotation(TimeSeriesFrequencyAnnotation::FrequencyType value) :
-    Annotation(this),
+inline TimeSeriesFrequencyAnnotation::TimeSeriesFrequencyAnnotation(TimeSeriesFrequencyAnnotation::FrequencyType value) :
     Value(std::move(value)) {
 }
 
@@ -123,17 +124,25 @@ TimeSeriesFrequencyAnnotation::TimeSeriesFrequencyAnnotation(TimeSeriesFrequency
 // |  TimeSeriesFrequencyEstimator
 // |
 // ----------------------------------------------------------------------
-TimeSeriesFrequencyEstimator::TimeSeriesFrequencyEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType> const &>("TimeSeriesFrequencyEstimator", std::move(pAllColumnAnnotations))
+inline TimeSeriesFrequencyEstimator::TimeSeriesFrequencyEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+    BaseType("TimeSeriesFrequencyEstimator", std::move(pAllColumnAnnotations))
     ,_minFrequency(std::chrono::system_clock::duration::max().count()){
 }
 
-Estimator::FitResult TimeSeriesFrequencyEstimator::fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) {
-    typename BaseType::FitBufferInputType const * const                 pEndBuffer(pBuffer + cBuffer);
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+inline bool TimeSeriesFrequencyEstimator::begin_training_impl(void) /*override*/ {
+    return true;
+}
+
+inline FitResult TimeSeriesFrequencyEstimator::fit_impl(typename BaseType::InputType const *pBuffer, size_t cBuffer) {
+    typename BaseType::InputType const * const          pEndBuffer(pBuffer + cBuffer);
+
     while(pBuffer != pEndBuffer) {
         std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType> const &        input(*pBuffer++);
         TimePointType const &                                           timeValue (std::get<0>(input));
-        KeyType const &                                                 keyValues (std::get<1>(input)); 
+        KeyType const &                                                 keyValues (std::get<1>(input));
         typename MapType::iterator const                                iter(_grainTimePointTracker.find(keyValues));
 
         if(iter == _grainTimePointTracker.end())
@@ -147,20 +156,18 @@ Estimator::FitResult TimeSeriesFrequencyEstimator::fit_impl(typename BaseType::F
             FrequencyType                                               currentFrequency(timeValue-lastObservedTimeValue);
             if(currentFrequency <= _minFrequency)
                 _minFrequency = currentFrequency;
-				
+
             iter->second = timeValue;
         }
     }
 
-    return Estimator::FitResult::Continue;
+    return FitResult::Continue;
 }
 
-Estimator::FitResult TimeSeriesFrequencyEstimator::complete_training_impl(void) {
+inline void TimeSeriesFrequencyEstimator::complete_training_impl(void) {
 
     BaseType::add_annotation(std::make_shared<TimeSeriesFrequencyAnnotation>(std::move(_minFrequency)), 0);
-    return Estimator::FitResult::Complete;
 }
-
 
 } // namespace Components
 } // namespace Featurizers

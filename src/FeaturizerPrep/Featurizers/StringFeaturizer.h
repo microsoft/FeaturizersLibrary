@@ -24,7 +24,6 @@ public:
     // |
     // ----------------------------------------------------------------------
     using Type                              = T;
-    using ThisType                          = StringTransformer<Type>;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, std::string>;
 
     // ----------------------------------------------------------------------
@@ -39,9 +38,16 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StringTransformer);
 
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+
     // MSVC has problems when the function is defined outside of the declaration
-    typename BaseType::TransformedType execute(typename BaseType::InputType input) override {
-        return Traits<T>::ToString(input);
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
+        callback(Traits<T>::ToString(input));
     }
 };
 
@@ -54,7 +60,6 @@ public:
     // |
     // ----------------------------------------------------------------------
     using Type                              = T;
-    using ThisType                          = StringEstimator<Type>;
     using BaseType                          = Components::InferenceOnlyEstimatorImpl<StringTransformer<Type>>;
 
     // ----------------------------------------------------------------------

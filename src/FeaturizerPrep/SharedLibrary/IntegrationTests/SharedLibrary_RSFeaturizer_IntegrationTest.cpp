@@ -23,6 +23,9 @@ bool FuzzyCheck(std::vector<T> const & vec1, std::vector<T> const & vec2, std::d
 }
 
 TEST_CASE("standard-int8_t-float_t") {
+    std::float_t const                      qMin(25.0f);
+    std::float_t const                      qMax(75.0f);
+
     RobustScalarFeaturizer_int8_t_Test(
         std::vector<std::int8_t>{
             static_cast<std::int8_t>(1),
@@ -41,13 +44,16 @@ TEST_CASE("standard-int8_t-float_t") {
         [](std::vector<std::float_t> const &args) {
             return FuzzyCheck(args, std::vector<std::float_t>{-1.0, -0.5, 0.0, 0.5, 1.0});
         },
-        bool(true),
-        static_cast<std::float_t>(25.0),
-        static_cast<std::float_t>(75.0)
+        true,
+        &qMin,
+        &qMax
     );
 }
 
 TEST_CASE("standard-int32_t-double_t") {
+    std::float_t const                      qMin(25.0f);
+    std::float_t const                      qMax(75.0f);
+
     RobustScalarFeaturizer_int32_t_Test(
         std::vector<std::int32_t>{
             static_cast<std::int32_t>(1),
@@ -66,9 +72,9 @@ TEST_CASE("standard-int32_t-double_t") {
         [](std::vector<std::double_t> const &args) {
             return FuzzyCheck(args, std::vector<std::double_t>{-1.0, -0.5, 0.0, 0.5, 1.0});
         },
-        bool(true),
-        static_cast<std::float_t>(25.0),
-        static_cast<std::float_t>(75.0)
+        true,
+        &qMin,
+        &qMax
     );
 }
 

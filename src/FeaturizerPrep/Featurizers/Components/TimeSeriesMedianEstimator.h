@@ -53,7 +53,7 @@ public:
 ///  \brief         This class computes the median per grain.
 ///                 .
 ///
-class TimeSeriesMedianEstimator : public AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, std::vector<nonstd::optional<std::string>>> const &> {
+class TimeSeriesMedianEstimator : public FitEstimator<std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, std::vector<nonstd::optional<std::string>>>> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -75,7 +75,7 @@ private:
     // ----------------------------------------------------------------------
     using KeyType                           = std::vector<std::string>;
     using ColsToImputeType                  = std::vector<nonstd::optional<std::string>>;
-    using BaseType                          = AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType> const &>;
+    using BaseType                          = FitEstimator<std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType>>;
 
     // ----------------------------------------------------------------------
     // |
@@ -95,12 +95,11 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    Estimator::FitResult fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) override;
+    bool begin_training_impl(void) override;
+    FitResult fit_impl(typename BaseType::InputType const *pBuffer, size_t cBuffer) override;
 
-    Estimator::FitResult complete_training_impl(void) override;
+    void complete_training_impl(void) override;
 };
-
-
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -117,8 +116,7 @@ private:
 // |  TimeSeriesMedianAnnotation
 // |
 // ----------------------------------------------------------------------
-TimeSeriesMedianAnnotation::TimeSeriesMedianAnnotation(TimeSeriesMedianAnnotation::MedianMapType value) :
-    Annotation(this),
+inline TimeSeriesMedianAnnotation::TimeSeriesMedianAnnotation(TimeSeriesMedianAnnotation::MedianMapType value) :
     Value(std::move(value)) {
 }
 
@@ -127,21 +125,25 @@ TimeSeriesMedianAnnotation::TimeSeriesMedianAnnotation(TimeSeriesMedianAnnotatio
 // |  TimeSeriesMedianEstimator
 // |
 // ----------------------------------------------------------------------
-TimeSeriesMedianEstimator::TimeSeriesMedianEstimator(AnnotationMapsPtr pAllColumnAnnotations,std::vector<TypeId> colsToImputeDataTypes) :
-    AnnotationEstimator<std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType> const &>("TimeSeriesMedianEstimator", std::move(pAllColumnAnnotations)),
-    _colsToImputeDataTypes(std::move(colsToImputeDataTypes))
-    {
+inline TimeSeriesMedianEstimator::TimeSeriesMedianEstimator(AnnotationMapsPtr pAllColumnAnnotations,std::vector<TypeId> colsToImputeDataTypes) :
+    BaseType("TimeSeriesMedianEstimator", std::move(pAllColumnAnnotations)),
+    _colsToImputeDataTypes(std::move(colsToImputeDataTypes)) {
 }
 
-/*static*/ bool TimeSeriesMedianEstimator::DoesColTypeSupportMedian(TypeId typeId) {
+inline /*static*/ bool TimeSeriesMedianEstimator::DoesColTypeSupportMedian(TypeId typeId) {
     return typeId == TypeId::Float16
         || typeId == TypeId::Float32
         || typeId == TypeId::Float64
         || typeId == TypeId::BFloat16;
 }
 
-Estimator::FitResult TimeSeriesMedianEstimator::fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) {
-    typename BaseType::FitBufferInputType const * const                 pEndBuffer(pBuffer + cBuffer);
+inline bool TimeSeriesMedianEstimator::begin_training_impl(void) /*override*/ {
+    return true;
+}
+
+inline FitResult TimeSeriesMedianEstimator::fit_impl(typename BaseType::InputType const *pBuffer, size_t cBuffer) {
+    typename BaseType::InputType const * const          pEndBuffer(pBuffer + cBuffer);
+
     while(pBuffer != pEndBuffer) {
         std::tuple<std::chrono::system_clock::time_point, KeyType, ColsToImputeType> const &        input(*pBuffer++);
         KeyType const &                                                 key (std::get<1>(input));
@@ -161,10 +163,10 @@ Estimator::FitResult TimeSeriesMedianEstimator::fit_impl(typename BaseType::FitB
         }
     }
 
-    return Estimator::FitResult::Continue;
+    return FitResult::Continue;
 }
 
-Estimator::FitResult TimeSeriesMedianEstimator::complete_training_impl(void) {
+inline void TimeSeriesMedianEstimator::complete_training_impl(void) {
     // Note that this class reuses _aggregateTracker to calculate median values before
     // moving it to the annotation.
     for(auto & kvp: _aggregateTracker) {
@@ -181,9 +183,7 @@ Estimator::FitResult TimeSeriesMedianEstimator::complete_training_impl(void) {
     _countTracker.clear();
 
     BaseType::add_annotation(std::make_shared<TimeSeriesMedianAnnotation>(std::move(_aggregateTracker)), 0);
-    return Estimator::FitResult::Complete;
 }
-
 
 } // namespace Components
 } // namespace Featurizers

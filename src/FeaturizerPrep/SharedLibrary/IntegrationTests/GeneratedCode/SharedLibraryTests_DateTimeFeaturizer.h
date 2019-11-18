@@ -50,22 +50,17 @@ void DateTimeFeaturizer_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(DateTimeFeaturizer_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    DateTimeFeaturizer_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {

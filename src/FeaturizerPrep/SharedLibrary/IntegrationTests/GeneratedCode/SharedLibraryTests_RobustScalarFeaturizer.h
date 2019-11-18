@@ -50,22 +50,17 @@ void RobustScalarFeaturizer_int8_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(RobustScalarFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    RobustScalarFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -154,22 +149,17 @@ void RobustScalarFeaturizer_int16_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(RobustScalarFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    RobustScalarFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -258,22 +248,17 @@ void RobustScalarFeaturizer_uint8_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(RobustScalarFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    RobustScalarFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -362,22 +347,17 @@ void RobustScalarFeaturizer_uint16_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(RobustScalarFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    RobustScalarFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -466,22 +446,17 @@ void RobustScalarFeaturizer_float_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(RobustScalarFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    RobustScalarFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -570,22 +545,17 @@ void RobustScalarFeaturizer_int32_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(RobustScalarFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    RobustScalarFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -674,22 +644,17 @@ void RobustScalarFeaturizer_int64_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(RobustScalarFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    RobustScalarFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -778,22 +743,17 @@ void RobustScalarFeaturizer_uint32_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(RobustScalarFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    RobustScalarFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -882,22 +842,17 @@ void RobustScalarFeaturizer_uint64_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(RobustScalarFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    RobustScalarFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -986,22 +941,17 @@ void RobustScalarFeaturizer_double_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(RobustScalarFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    RobustScalarFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {

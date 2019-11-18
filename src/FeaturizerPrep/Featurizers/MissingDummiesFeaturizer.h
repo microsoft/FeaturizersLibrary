@@ -14,7 +14,7 @@ namespace Featurizers {
 /////////////////////////////////////////////////////////////////////////
 ///  \class         MissingDummiesTransformer
 ///  \brief         if input is Null, return 1. Otherwise return 0
-///                 
+///
 ///                 Considering this transformer is almost identical to ImputationMarkerTransformer,
 ///                 there are several ways to do this
 ///                 1. Combine these two transformers into one and implement execute() based on the output type,
@@ -38,8 +38,8 @@ public:
     // |
     // ----------------------------------------------------------------------
     static_assert(std::is_same<T, typename Traits<T>::nullable_type>::value, "Input should be Nullable Type");
+
     using Type                              = T;
-    using ThisType                          = MissingDummiesTransformer<Type>;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, std::int8_t>;
 
     // ----------------------------------------------------------------------
@@ -53,13 +53,16 @@ public:
     ~MissingDummiesTransformer(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MissingDummiesTransformer);
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
 
     // MSVC has problems when the function is defined outside of the declaration
-    typename BaseType::TransformedType execute(typename BaseType::InputType input) override {
-        if(Traits<T>::IsNull(input)) 
-            return 1;
-
-        return 0;
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
+        callback(Traits<T>::IsNull(input) ? 1 : 0);
     }
 };
 
@@ -72,8 +75,8 @@ public:
     // |
     // ----------------------------------------------------------------------
     using Type                              = typename Traits<T>::nullable_type;
-    using ThisType                          = MissingDummiesEstimator<Type>;
     using BaseType                          = Components::InferenceOnlyEstimatorImpl<MissingDummiesTransformer<Type>>;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods

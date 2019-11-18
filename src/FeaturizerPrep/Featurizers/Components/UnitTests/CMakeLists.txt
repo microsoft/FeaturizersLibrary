@@ -31,12 +31,14 @@ foreach(_test_name IN ITEMS
     IndexMapEstimator_UnitTest
     InferenceOnlyFeaturizerImpl_UnitTest
     MaxAbsValueEstimator_UnitTest
-    MaxAbsScalarTransformer_UnitTest
     MinMaxEstimator_UnitTest
+    ModeEstimator_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
     RobustScalarNormEstimator_UnitTest
-    RobustScalarTransformer_UnitTest
     TrainingOnlyEstimatorImpl_UnitTest
+    # TODO: Add tests for:
+    #   - TimeSeriesFrequencyEstimator
+    #   - TimeSeriesMedianEstimator
 )
     add_executable(
         ${_test_name}

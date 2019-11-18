@@ -41,60 +41,61 @@ std::vector<T> make_vector(void) {
     return std::vector<T>();
 }
 
+template <typename EstimatorT, typename InputT>
+void Train(EstimatorT &estimator, std::vector<std::vector<InputT>> const &inputBatches) {
+    // ----------------------------------------------------------------------
+    using Batches                           = std::vector<std::vector<InputT>>;
+    // ----------------------------------------------------------------------
 
-template <typename PipelineT, typename InputT>
-void Train(
-    PipelineT& pipeline,
-    std::vector<std::vector<std::remove_const_t<std::remove_reference_t<InputT>>>> const &inputBatches
-) {
-    using FitResult                         = typename NS::Estimator::FitResult;
-    using Batches                           = std::vector<std::vector<std::remove_const_t<std::remove_reference_t<InputT>>>>;
-    typename Batches::const_iterator iter(inputBatches.begin());
-    while(true) {
-        FitResult const                     result(pipeline.fit(iter->data(), iter->size()));
-        
-        
-            if(result == FitResult::Complete)
-                break;
-            else if(result == FitResult::ResetAndContinue)
-                iter = inputBatches.begin();
-            else if(result == FitResult::Continue) {
-                ++iter;
+    estimator.begin_training();
 
-                if(iter == inputBatches.end()) {
-                    if(pipeline.complete_training() == FitResult::Complete)
-                        break;
+    typename Batches::const_iterator        iter(inputBatches.begin());
 
-                    iter = inputBatches.begin();
-                }
-            }
+    while(estimator.get_state() == NS::TrainingState::Training) {
+        if(estimator.fit(iter->data(), iter->size()) == NS::FitResult::Reset) {
+            iter = inputBatches.begin();
+            continue;
         }
-    assert(pipeline.is_training_complete());
+
+        ++iter;
+        if(iter == inputBatches.end()) {
+            estimator.on_data_completed();
+
+            iter = inputBatches.begin();
+        }
+    }
+
+    estimator.complete_training();
 }
-    
 
-
-
-template <typename PipelineT>
-std::vector<typename PipelineT::TransformedType> TransformerEstimatorTest(
-    PipelineT &pipeline,
-    std::vector<std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>>> const &inputBatches,
-    std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>> const &data
+template <typename EstimatorT>
+std::vector<typename EstimatorT::TransformedType> TransformerEstimatorTest(
+    EstimatorT estimator,
+    std::vector<std::vector<typename EstimatorT::InputType>> const &inputBatches,
+    std::vector<typename EstimatorT::InputType> const &data
 ) {
-    Train<PipelineT, typename PipelineT::InputType>(pipeline, inputBatches);
+    Train<EstimatorT>(estimator, inputBatches);
 
-    typename PipelineT::TransformerUniquePtr                  pTransformer(pipeline.create_transformer());
-    std::vector<typename PipelineT::TransformedType>    	  output;
+    typename EstimatorT::TransformerUniquePtr           pTransformer(estimator.create_transformer());
+    std::vector<typename EstimatorT::TransformedType>   output;
 
     output.reserve(data.size());
 
+    auto const                              callback(
+        [&output](typename EstimatorT::TransformedType value) {
+            output.emplace_back(std::move(value));
+        }
+    );
+
     for(auto const &item : data)
-        output.emplace_back(pTransformer->execute(item));
+        pTransformer->execute(item, callback);
+
+    pTransformer->flush(callback);
 
     return output;
 }
 
-// Fuzzy check is used to check if two vectors<double/float> are same considering precision loss 
+// Fuzzy check is used to check if two vectors<double/float> are same considering precision loss
 template <typename T>
 bool FuzzyCheck(std::vector<T> const & vec1, std::vector<T> const & vec2, std::double_t epsilon = 0.000001) {
     if (vec1.size() != vec2.size())
@@ -109,6 +110,6 @@ bool FuzzyCheck(std::vector<T> const & vec1, std::vector<T> const & vec2, std::d
     return true;
 }
 
-}
-}
-}
+} // namespace TestHelpers
+} // namespace Featurizer
+} // namespace Microsoft

@@ -40,11 +40,9 @@ void NumericTestWrapper(){
         static_cast<castType>(10)
     );
 
-    NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::CatImputerEstimator<transformedType>   estimator(pAllColumnAnnotations);
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            estimator,
+            NS::Featurizers::CatImputerEstimator<transformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
             trainingBatches,
             inferencingInput
         ) == inferencingOutput
@@ -113,15 +111,13 @@ TEST_CASE("CatImputer- string") {
     using type = nonstd::optional<std::string>;
     using transformedType = std::string;
 
-    NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::CatImputerEstimator<transformedType>    estimator(pAllColumnAnnotations);
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            estimator,
+            NS::Featurizers::CatImputerEstimator<transformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
             NS::TestHelpers::make_vector<std::vector<type>>(
-                NS::TestHelpers::make_vector<type>("one", "one", "one",type{},type{},"two", "three")
+                NS::TestHelpers::make_vector<type>("one", "one", "one", type(), type(), "two", type(), type(), "three")
             ),
-            NS::TestHelpers::make_vector<type>("one", "two", "three",type{})
+            NS::TestHelpers::make_vector<type>("one", "two", "three",type())
         ) == NS::TestHelpers::make_vector<transformedType>("one","two","three","one")
     );
 }
@@ -130,38 +126,37 @@ TEST_CASE("CatImputer- All values Null") {
     using type = nonstd::optional<std::int64_t>;
     using transformedType = std::int64_t;
 
-    NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::CatImputerEstimator<transformedType>    estimator(pAllColumnAnnotations);
-
     CHECK_THROWS_WITH(
         NS::TestHelpers::TransformerEstimatorTest(
-            estimator,
+            NS::Featurizers::CatImputerEstimator<transformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
             NS::TestHelpers::make_vector<std::vector<type>>(
                 NS::TestHelpers::make_vector<type>(type{},type{},type{},type{},type{},type{})),
                 NS::TestHelpers::make_vector<type>(5, 8, 20,type{}))
-                , Catch::Contains("All null values or empty training set."));
+                , Catch::Contains("The histogram does not contain any supported values"));
 }
 
 TEST_CASE("Serialization/Deserialization- Numeric") {
-    using type = nonstd::optional<std::int64_t>;
-    using transformedType = std::int64_t;
-    using transformerType = NS::Featurizers::HistogramConsumerEstimator<type,transformedType>::Transformer;
+    using type                              = nonstd::optional<std::int64_t>;
+    using transformedType                   = std::int64_t;
+    using transformerType                   = NS::Featurizers::CatImputerTransformer<type,transformedType>;
+
     auto model = std::make_shared<transformerType>(10);
 
     NS::Archive archive;
     model->save(archive);
     std::vector<unsigned char> vec = archive.commit();
-    CHECK(vec.size() == 9);
+    CHECK(vec.size() == 8);
 
     NS::Archive loader(vec);
     transformerType modelLoaded(loader);
-    CHECK(modelLoaded == *model);
+    CHECK(modelLoaded.Value == model->Value);
 }
 
 TEST_CASE("Serialization/Deserialization- string") {
-    using type = nonstd::optional<std::string>;
-    using transformedType = std::string;
-    using transformerType = NS::Featurizers::HistogramConsumerEstimator<type,transformedType>::Transformer;
+    using type                              = nonstd::optional<std::string>;
+    using transformedType                   = std::string;
+    using transformerType                   = NS::Featurizers::CatImputerTransformer<type,transformedType>;
+
     auto model = std::make_shared<transformerType>("one");
 
     NS::Archive archive;
@@ -170,10 +165,6 @@ TEST_CASE("Serialization/Deserialization- string") {
 
     NS::Archive loader(vec);
     transformerType modelLoaded(loader);
-    CHECK(modelLoaded == *model);
+    CHECK(modelLoaded.Value == model->Value);
 
 }
-
-
-
-

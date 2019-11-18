@@ -50,22 +50,17 @@ void OneHotEncoderFeaturizer_int8_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(OneHotEncoderFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    OneHotEncoderFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -157,22 +152,17 @@ void OneHotEncoderFeaturizer_int16_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(OneHotEncoderFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    OneHotEncoderFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -264,22 +254,17 @@ void OneHotEncoderFeaturizer_int32_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(OneHotEncoderFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    OneHotEncoderFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -371,22 +356,17 @@ void OneHotEncoderFeaturizer_int64_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(OneHotEncoderFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    OneHotEncoderFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -478,22 +458,17 @@ void OneHotEncoderFeaturizer_uint8_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(OneHotEncoderFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    OneHotEncoderFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -585,22 +560,17 @@ void OneHotEncoderFeaturizer_uint16_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(OneHotEncoderFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    OneHotEncoderFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -692,22 +662,17 @@ void OneHotEncoderFeaturizer_uint32_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(OneHotEncoderFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    OneHotEncoderFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -799,22 +764,17 @@ void OneHotEncoderFeaturizer_uint64_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(OneHotEncoderFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    OneHotEncoderFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -906,22 +866,17 @@ void OneHotEncoderFeaturizer_float_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(OneHotEncoderFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    OneHotEncoderFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -1013,22 +968,17 @@ void OneHotEncoderFeaturizer_double_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(OneHotEncoderFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    OneHotEncoderFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -1120,22 +1070,17 @@ void OneHotEncoderFeaturizer_bool_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(OneHotEncoderFeaturizer_bool_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    OneHotEncoderFeaturizer_bool_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -1227,22 +1172,17 @@ void OneHotEncoderFeaturizer_string_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(OneHotEncoderFeaturizer_string_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    OneHotEncoderFeaturizer_string_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {

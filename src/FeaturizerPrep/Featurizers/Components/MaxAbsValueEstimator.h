@@ -4,59 +4,75 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include <queue>
-#include "../../Archive.h"
-#include "../../Featurizer.h"
-#include "../../Traits.h"
+#include "TrainingOnlyEstimatorImpl.h"
 
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 namespace Components {
 
+static constexpr char const * const         MaxAbsValueEstimatorName("MaxAbsValueEstimator");
+
 /////////////////////////////////////////////////////////////////////////
-///  \class         MaxAbsValueAnnotation
+///  \class         MaxAbsValueAnnotationData
 ///  \brief         An annotation class which contains the maxAbsVal(maximum absolute value)
 ///                 for an input column
 ///
-template <typename T, typename TransformedT>
-class MaxAbsValueAnnotation : public Annotation {
+template <typename TransformedT>
+class MaxAbsValueAnnotationData {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
     // |
     // ----------------------------------------------------------------------
-    TransformedT const                           MaxAbsVal;
+    TransformedT const                      Value;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MaxAbsValueAnnotation(TransformedT maxAbsVal);
-    ~MaxAbsValueAnnotation(void) override = default;
+    template <typename T>
+    MaxAbsValueAnnotationData(T maxAbsVal);
+    ~MaxAbsValueAnnotationData(void) = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MaxAbsValueAnnotation);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MaxAbsValueAnnotationData);
 };
 
+namespace Details {
+
 /////////////////////////////////////////////////////////////////////////
-///  \class         MaxAbsValueEstimator
-///  \brief         An AnnotationEstimator class that computes the maxAbsVal 
-///                 for an input column and creates a MaxAbsValueAnnotation.
+///  \class         MaxAbsValueTrainingOnlyPolicy
+///  \brief         `MaxAbsValueEstimator` implementation details.
 ///
-template <typename InputT,typename TransformedT, size_t ColIndexV>
-class MaxAbsValueEstimator : public AnnotationEstimator<InputT const &> {
+template <typename T, typename TransformedT>
+class MaxAbsValueTrainingOnlyPolicy {
 public:
     // ----------------------------------------------------------------------
     // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using InputType                         = T;
+    using TransformedType                   = TransformedT;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Data
+    // |
+    // ----------------------------------------------------------------------
+    static constexpr char const * const     NameValue = MaxAbsValueEstimatorName;
+
+    // ----------------------------------------------------------------------
+    // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MaxAbsValueEstimator(AnnotationMapsPtr pAllColumnAnnotations);
-    ~MaxAbsValueEstimator(void) override = default;
+    MaxAbsValueTrainingOnlyPolicy(void);
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MaxAbsValueEstimator);
+    void fit(InputType const &input);
+    MaxAbsValueAnnotationData<TransformedType> complete_training(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -64,24 +80,22 @@ private:
     // |  Private Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                             = AnnotationEstimator<InputT const &>;
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Data
-    // |
-    // ----------------------------------------------------------------------
-    InputT                                     _outerBound; 
-    
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Methods
-    // |
-    // ----------------------------------------------------------------------
-    Estimator::FitResult fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) override;
-
-    Estimator::FitResult complete_training_impl(void) override;
-
+    TransformedType                         _max;
 };
+
+} // namespace Details
+
+/////////////////////////////////////////////////////////////////////////
+///  \typedef       MaxAbsValueEstimator
+///  \brief         A training-only class that computes the maxAbsVal
+///                 for an input column and creates a MaxAbsValueAnnotationData.
+///
+template <
+    typename InputT,
+    typename TransformedT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
+using MaxAbsValueEstimator                  = TrainingOnlyEstimatorImpl<Details::MaxAbsValueTrainingOnlyPolicy<InputT, TransformedT>, MaxNumTrainingItemsV>;
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -95,64 +109,53 @@ private:
 
 // ----------------------------------------------------------------------
 // |
-// |  MaxAbsValueAnnotation
+// |  MaxAbsValueAnnotationData
 // |
 // ----------------------------------------------------------------------
-template <typename T, typename TransformedT>
-MaxAbsValueAnnotation<T, TransformedT>::MaxAbsValueAnnotation(TransformedT maxAbsVal) :
-    Annotation(this),
-    MaxAbsVal(std::move(maxAbsVal)) {
-    if (maxAbsVal <= 0)
-        throw std::runtime_error("maxAbsVal must bigger than 0");
+template <typename TransformedT>
+template <typename T>
+MaxAbsValueAnnotationData<TransformedT>::MaxAbsValueAnnotationData(T maxAbsValue) :
+    Value(
+        [&maxAbsValue](void) -> TransformedT {
+            if (maxAbsValue < 0)
+                throw std::invalid_argument("maxAbsValue");
+
+            if(maxAbsValue > static_cast<T>(std::numeric_limits<TransformedT>::max()))
+                throw std::invalid_argument("maxAbsValue overflow");
+
+            return static_cast<TransformedT>(maxAbsValue);
+        }()
+    ) {
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  MaxAbsValueEstimator
+// |  Details::MaxAbsValueTrainingOnlyPolicy
 // |
 // ----------------------------------------------------------------------
-template <typename InputT,typename TransformedT, size_t ColIndexV>
-MaxAbsValueEstimator<InputT,TransformedT,ColIndexV>::MaxAbsValueEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    AnnotationEstimator<InputT const &>("MaxAbsValueEstimator", std::move(pAllColumnAnnotations)) {
-
-    _outerBound = static_cast<InputT>(0);
+template <typename InputT, typename TransformedT>
+Details::MaxAbsValueTrainingOnlyPolicy<InputT, TransformedT>::MaxAbsValueTrainingOnlyPolicy(void) :
+    _max(0) {
 }
 
-template <typename InputT,typename TransformedT, size_t ColIndexV>
-Estimator::FitResult MaxAbsValueEstimator<InputT, TransformedT,ColIndexV>::fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) {
-
-    typename BaseType::FitBufferInputType const * const                 pEndBuffer(pBuffer + cBuffer); 
-
-    while(pBuffer != pEndBuffer) {
-        InputT const &                                   input(*pBuffer++);
+template <typename InputT, typename TransformedT>
+void Details::MaxAbsValueTrainingOnlyPolicy<InputT, TransformedT>::fit(InputType const &input) {
 
 #if (defined _MSC_VER)
 #   pragma warning(push)
-#   pragma warning(disable: 4146) 
+#   pragma warning(disable: 4146) // unary minus operator applied to unsigned type, result still unsigned
 #endif
 
-        this->_outerBound = std::max(this->_outerBound, static_cast<InputT>(input < 0 ? -input : input)); 
+    _max = std::max(_max, static_cast<TransformedT>(input < 0 ? -input : input));
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)
 #endif
-
-    }
-    
-    return Estimator::FitResult::Continue;
 }
 
-template <typename InputT,typename TransformedT, size_t ColIndexV>
-Estimator::FitResult MaxAbsValueEstimator<InputT,TransformedT,ColIndexV>::complete_training_impl(void) {
-
-    TransformedT                                maxAbsVal = static_cast<TransformedT>(_outerBound);
-                    
-    BaseType::add_annotation(std::make_shared<MaxAbsValueAnnotation<InputT, TransformedT>>(std::move(maxAbsVal)), ColIndexV);
-
-    //clear class variables
-    this->_outerBound = InputT();
-
-    return Estimator::FitResult::Complete;
+template <typename InputT, typename TransformedT>
+MaxAbsValueAnnotationData<TransformedT> Details::MaxAbsValueTrainingOnlyPolicy<InputT, TransformedT>::complete_training(void) {
+    return MaxAbsValueAnnotationData<TransformedT>(_max);
 }
 
 } // namespace Components

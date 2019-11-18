@@ -206,22 +206,17 @@ def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
                                     if(iter != training_input.end())
                                         continue;
 
-                                    REQUIRE({name}{suffix}CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                                    REQUIRE(pErrorInfo == nullptr);
-
-                                    if(result == Complete)
-                                        break;
-
-                                    if(result == ResetAndContinue) {{
-                                        iter = training_input.begin();
-                                        continue;
-                                    }}
+                                    break;
                                 }}
 
                                 INFO("Value is " << result)
                                 REQUIRE(false);
                             }}
                         }}
+
+                        {name}{suffix}CompleteTraining(pEstimatorHandle, &pErrorInfo);
+                        REQUIRE(pErrorInfo == nullptr);
+
 
                         // Once here, training should be complete
                         {{

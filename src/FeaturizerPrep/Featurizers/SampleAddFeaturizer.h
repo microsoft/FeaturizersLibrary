@@ -48,8 +48,9 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
+    bool begin_training_impl(void) override;
     FitResult fit_impl(InputType const *pBuffer, size_t cBuffer) override;
-    FitResult complete_training_impl(void) override;
+    void complete_training_impl(void) override;
     TransformerUniquePtr create_transformer_impl(void) override;
 };
 

@@ -23,9 +23,16 @@ void TestHelper(T const & input) {
 }
 
 TEST_CASE("ImputationMarkerEstimator") {
-    CHECK(NS::Featurizers::ImputationMarkerEstimator<int>(NS::CreateTestAnnotationMapsPtr(1)).Name == "ImputationMarkerEstimator");
-    CHECK(NS::Featurizers::ImputationMarkerEstimator<int>(NS::CreateTestAnnotationMapsPtr(1)).is_training_complete());
-    CHECK(dynamic_cast<NS::Featurizers::ImputationMarkerTransformer<nonstd::optional<int>> *>(NS::Featurizers::ImputationMarkerEstimator<int>(NS::CreateTestAnnotationMapsPtr(1)).create_transformer().get()));
+
+    CHECK(strcmp(NS::Featurizers::ImputationMarkerEstimator<int>(NS::CreateTestAnnotationMapsPtr(2)).Name, "ImputationMarkerEstimator") == 0);
+
+    NS::Featurizers::ImputationMarkerEstimator<int>   estimator(NS::CreateTestAnnotationMapsPtr(1));
+
+    estimator
+        .begin_training()
+        .complete_training();
+
+    CHECK(dynamic_cast<NS::Featurizers::ImputationMarkerTransformer<nonstd::optional<int>> *>(estimator.create_transformer().get()));
 }
 
 TEST_CASE("Single Tests") {

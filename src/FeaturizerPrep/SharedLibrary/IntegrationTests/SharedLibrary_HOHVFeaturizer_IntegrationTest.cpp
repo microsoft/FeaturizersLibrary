@@ -15,7 +15,7 @@ TEST_CASE("int8") {
         },
         [](std::vector<HashOneHotVectorizerStruct> const &args) {
             HashOneHotVectorizerStruct obj(args[0]);
-            return (obj.colIndex == 29 && obj.numCols == 100 && obj.val == true);
+            return (obj.ColIndex == 29 && obj.NumCols == 100 && obj.Val == true);
         },
         static_cast<std::uint32_t>(2),
         static_cast<std::uint32_t>(100)
@@ -30,7 +30,7 @@ TEST_CASE("string") {
         },
         [](std::vector<HashOneHotVectorizerStruct> const &args) {
             HashOneHotVectorizerStruct obj(args[0]);
-            return (obj.colIndex == 25 && obj.numCols == 100 && obj.val == true);
+            return (obj.ColIndex == 25 && obj.NumCols == 100 && obj.Val == true);
         },
         static_cast<std::uint32_t>(2),
         static_cast<std::uint32_t>(100)

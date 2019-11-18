@@ -49,22 +49,17 @@ void MaxAbsScalarFeaturizer_int8_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MaxAbsScalarFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MaxAbsScalarFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -152,22 +147,17 @@ void MaxAbsScalarFeaturizer_int16_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MaxAbsScalarFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MaxAbsScalarFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -255,22 +245,17 @@ void MaxAbsScalarFeaturizer_uint8_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MaxAbsScalarFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MaxAbsScalarFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -358,22 +343,17 @@ void MaxAbsScalarFeaturizer_uint16_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MaxAbsScalarFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MaxAbsScalarFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -461,22 +441,17 @@ void MaxAbsScalarFeaturizer_float_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MaxAbsScalarFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MaxAbsScalarFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -564,22 +539,17 @@ void MaxAbsScalarFeaturizer_int32_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MaxAbsScalarFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MaxAbsScalarFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -667,22 +637,17 @@ void MaxAbsScalarFeaturizer_int64_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MaxAbsScalarFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MaxAbsScalarFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -770,22 +735,17 @@ void MaxAbsScalarFeaturizer_uint32_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MaxAbsScalarFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MaxAbsScalarFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -873,22 +833,17 @@ void MaxAbsScalarFeaturizer_uint64_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MaxAbsScalarFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MaxAbsScalarFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -976,22 +931,17 @@ void MaxAbsScalarFeaturizer_double_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MaxAbsScalarFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MaxAbsScalarFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {

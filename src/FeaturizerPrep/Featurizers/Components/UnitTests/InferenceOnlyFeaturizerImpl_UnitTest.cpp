@@ -10,21 +10,20 @@
 
 // ----------------------------------------------------------------------
 using Microsoft::Featurizer::CreateTestAnnotationMapsPtr;
+
+namespace NS = Microsoft::Featurizer;
 // ----------------------------------------------------------------------
 
 class MyTransformer : public Microsoft::Featurizer::Featurizers::Components::InferenceOnlyTransformerImpl<int, bool> {
 public:
     MyTransformer(void) = default;
-    MyTransformer(Microsoft::Featurizer::Archive &ar) :
-        Microsoft::Featurizer::Featurizers::Components::InferenceOnlyTransformerImpl<int, bool>(ar) {
-    }
-
     ~MyTransformer(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyTransformer);
 
-    TransformedType execute(InputType input) override {
-        return input & 1;
+private:
+    void execute_impl(InputType const &input, CallbackFunction const &callback) override {
+        callback(input & 1);
     }
 };
 
@@ -48,14 +47,22 @@ public:
 TEST_CASE("MyEstimator") {
     MyEstimator                            featurizer(CreateTestAnnotationMapsPtr(2));
 
-    CHECK(featurizer.Name == "MyEstimator");
-    CHECK(featurizer.is_training_complete());
+    CHECK(strcmp(featurizer.Name, "MyEstimator") == 0);
+
+    CHECK(featurizer.get_state() == NS::TrainingState::Pending);
+    featurizer.begin_training();
+    CHECK(featurizer.get_state() == NS::TrainingState::Finished);
+    featurizer.complete_training();
+    CHECK(featurizer.get_state() == NS::TrainingState::Completed);
+
     CHECK(featurizer.has_created_transformer() == false);
 
     auto const                              pTransformer(featurizer.create_transformer());
 
     CHECK(featurizer.has_created_transformer());
 
-    CHECK(pTransformer->execute(3));
-    CHECK(pTransformer->execute(4) == false);
+    MyTransformer &                         transformer(static_cast<MyTransformer &>(*pTransformer));
+
+    CHECK(transformer.execute(3));
+    CHECK(transformer.execute(4) == false);
 }

@@ -118,5 +118,4 @@ stages:
             - template: "BuildAndTest.package_steps_template.yaml"
               parameters:
                 configuration: system_compiler
-                esrp_connected_service_name: "ESRP CodeSigning Connection"
                 operating_system: Windows

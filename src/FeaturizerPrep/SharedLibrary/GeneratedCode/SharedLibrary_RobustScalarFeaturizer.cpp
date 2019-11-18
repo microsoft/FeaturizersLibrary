@@ -27,7 +27,7 @@ extern "C" {
 /* |  RobustScalarFeaturizer <int8_t> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalarFeaturizer_int8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalarFeaturizer_int8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -35,7 +35,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CreateEstimator(/*in*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int8_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int8_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , withCentering, qRangeMin, qRangeMax);
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int8_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int8_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<RobustScalarFeaturizer_int8_t_EstimatorHandle*>(index);
 
@@ -85,7 +88,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_IsTrainingComplete(/*i
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int8_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -148,7 +151,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_FitBuffer(/*in*/ Robus
     }
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -156,13 +159,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CompleteTraining(/*in*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -317,7 +317,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_Transform(/*in*/ Robus
 /* |  RobustScalarFeaturizer <int16_t> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalarFeaturizer_int16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalarFeaturizer_int16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -325,7 +325,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CreateEstimator(/*in*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int16_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int16_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , withCentering, qRangeMin, qRangeMax);
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int16_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int16_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<RobustScalarFeaturizer_int16_t_EstimatorHandle*>(index);
 
@@ -375,7 +378,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_IsTrainingComplete(/*
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int16_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -438,7 +441,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_FitBuffer(/*in*/ Robu
     }
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -446,13 +449,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CompleteTraining(/*in
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -607,7 +607,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_Transform(/*in*/ Robu
 /* |  RobustScalarFeaturizer <uint8_t> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -615,7 +615,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CreateEstimator(/*in*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint8_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint8_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , withCentering, qRangeMin, qRangeMax);
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint8_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint8_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<RobustScalarFeaturizer_uint8_t_EstimatorHandle*>(index);
 
@@ -665,7 +668,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_IsTrainingComplete(/*
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint8_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -728,7 +731,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_FitBuffer(/*in*/ Robu
     }
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -736,13 +739,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CompleteTraining(/*in
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -897,7 +897,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_Transform(/*in*/ Robu
 /* |  RobustScalarFeaturizer <uint16_t> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -905,7 +905,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint16_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint16_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , withCentering, qRangeMin, qRangeMax);
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint16_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint16_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<RobustScalarFeaturizer_uint16_t_EstimatorHandle*>(index);
 
@@ -955,7 +958,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint16_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1018,7 +1021,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_FitBuffer(/*in*/ Rob
     }
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1026,13 +1029,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1187,7 +1187,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_Transform(/*in*/ Rob
 /* |  RobustScalarFeaturizer <float_t> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalarFeaturizer_float_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalarFeaturizer_float_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1195,7 +1195,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CreateEstimator(/*in*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::float_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::float_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , withCentering, qRangeMin, qRangeMax);
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::float_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::float_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<RobustScalarFeaturizer_float_t_EstimatorHandle*>(index);
 
@@ -1245,7 +1248,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_IsTrainingComplete(/*
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::float_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1308,7 +1311,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_FitBuffer(/*in*/ Robu
     }
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1316,13 +1319,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CompleteTraining(/*in
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::float_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1477,7 +1477,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_Transform(/*in*/ Robu
 /* |  RobustScalarFeaturizer <int32_t> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalarFeaturizer_int32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalarFeaturizer_int32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1485,7 +1485,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CreateEstimator(/*in*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int32_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int32_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , withCentering, qRangeMin, qRangeMax);
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int32_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int32_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<RobustScalarFeaturizer_int32_t_EstimatorHandle*>(index);
 
@@ -1535,7 +1538,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_IsTrainingComplete(/*
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int32_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1598,7 +1601,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_FitBuffer(/*in*/ Robu
     }
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1606,13 +1609,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CompleteTraining(/*in
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1767,7 +1767,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_Transform(/*in*/ Robu
 /* |  RobustScalarFeaturizer <int64_t> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalarFeaturizer_int64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalarFeaturizer_int64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1775,7 +1775,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CreateEstimator(/*in*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int64_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int64_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , withCentering, qRangeMin, qRangeMax);
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int64_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int64_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<RobustScalarFeaturizer_int64_t_EstimatorHandle*>(index);
 
@@ -1825,7 +1828,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_IsTrainingComplete(/*
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int64_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1888,7 +1891,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_FitBuffer(/*in*/ Robu
     }
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1896,13 +1899,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CompleteTraining(/*in
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2057,7 +2057,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_Transform(/*in*/ Robu
 /* |  RobustScalarFeaturizer <uint32_t> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2065,7 +2065,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint32_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint32_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , withCentering, qRangeMin, qRangeMax);
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint32_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint32_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<RobustScalarFeaturizer_uint32_t_EstimatorHandle*>(index);
 
@@ -2115,7 +2118,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint32_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2178,7 +2181,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_FitBuffer(/*in*/ Rob
     }
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2186,13 +2189,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2347,7 +2347,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_Transform(/*in*/ Rob
 /* |  RobustScalarFeaturizer <uint64_t> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2355,7 +2355,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint64_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint64_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , withCentering, qRangeMin, qRangeMax);
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint64_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint64_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<RobustScalarFeaturizer_uint64_t_EstimatorHandle*>(index);
 
@@ -2405,7 +2408,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint64_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2468,7 +2471,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_FitBuffer(/*in*/ Rob
     }
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2476,13 +2479,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2637,7 +2637,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_Transform(/*in*/ Rob
 /* |  RobustScalarFeaturizer <double_t> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalarFeaturizer_double_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalarFeaturizer_double_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2645,7 +2645,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::double_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::double_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , withCentering, qRangeMin, qRangeMax);
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::double_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::double_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<RobustScalarFeaturizer_double_t_EstimatorHandle*>(index);
 
@@ -2695,7 +2698,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::double_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2758,7 +2761,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_FitBuffer(/*in*/ Rob
     }
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2766,13 +2769,10 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }

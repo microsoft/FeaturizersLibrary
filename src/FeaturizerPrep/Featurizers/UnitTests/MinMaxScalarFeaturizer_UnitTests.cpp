@@ -8,6 +8,7 @@
 #include "../../3rdParty/optional.h"
 #include "../../Featurizers/MinMaxScalarFeaturizer.h"
 #include "../TestHelpers.h"
+#include "../../Archive.h"
 #include "../../Traits.h"
 
 namespace NS = Microsoft::Featurizer;
@@ -30,14 +31,12 @@ TEST_CASE("int") {
         static_cast<TransformedType>(1.75)
     );
 
-    NS::AnnotationMapsPtr const                                          pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::MinMaxScalarEstimator<InputType>   estimator(pAllColumnAnnotations);
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            estimator,
+            NS::Featurizers::MinMaxScalarEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
             trainingBatches,
             inferencingInput
-        )== inferencingOutput
+        ) == inferencingOutput
     );
 }
 
@@ -58,14 +57,12 @@ TEST_CASE("float") {
         static_cast<TransformedType>(1.5)
     );
 
-    NS::AnnotationMapsPtr const                                          pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::MinMaxScalarEstimator<InputType>   estimator(pAllColumnAnnotations);
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            estimator,
+            NS::Featurizers::MinMaxScalarEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
             trainingBatches,
             inferencingInput
-        )== inferencingOutput
+        ) == inferencingOutput
     );
 }
 
@@ -83,14 +80,12 @@ TEST_CASE("only one input") {
         static_cast<TransformedType>(0)
     );
 
-    NS::AnnotationMapsPtr const                                          pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::MinMaxScalarEstimator<InputType>   estimator(pAllColumnAnnotations);
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            estimator,
+            NS::Featurizers::MinMaxScalarEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
             trainingBatches,
             inferencingInput
-        )== inferencingOutput
+        ) == inferencingOutput
     );
 }
 
@@ -111,10 +106,8 @@ TEST_CASE("null training data") {
     auto inferencingInput  = NS::TestHelpers::make_vector<InputType>(null);
 
 
-    NS::AnnotationMapsPtr const                                          pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::MinMaxScalarEstimator<InputType>   estimator(pAllColumnAnnotations);
     std::vector<TransformedType> inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-            estimator,
+            NS::Featurizers::MinMaxScalarEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
             trainingBatches,
             inferencingInput
     );
@@ -124,15 +117,16 @@ TEST_CASE("null training data") {
 TEST_CASE("Serialization/Deserialization") {
     using InputType       = std::float_t;
     using TransformedType = std::double_t;
-    using TransformerType = NS::Featurizers::MMScalingEstimator<InputType>::Transformer;
-    auto model = std::make_shared<TransformerType>(static_cast<TransformedType>(-5), static_cast<TransformedType>(9));
+    using TransformerType = NS::Featurizers::MinMaxScalarTransformer<InputType, TransformedType>;
+
+    auto model = std::make_shared<TransformerType>(static_cast<InputType>(-5), static_cast<InputType>(9));
 
     NS::Archive archive;
     model->save(archive);
     std::vector<unsigned char> vec = archive.commit();
-    CHECK(vec.size() == 16);
+    CHECK(vec.size() == 8);
 
     NS::Archive loader(vec);
     TransformerType modelLoaded(loader);
-    CHECK(modelLoaded==*model);
+    CHECK(modelLoaded == *model);
 }

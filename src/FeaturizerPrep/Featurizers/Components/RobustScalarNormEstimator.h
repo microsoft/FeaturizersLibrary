@@ -5,59 +5,79 @@
 #pragma once
 
 #include <queue>
-#include "../../Archive.h"
-#include "../../Featurizer.h"
-#include "../../Traits.h"
+
+#include "TrainingOnlyEstimatorImpl.h"
 
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 namespace Components {
 
+// TODO: This should be split into 2 estimators
+
+static constexpr char const * const         RobustScalarNormEstimatorName("RobustScalarNormEstimator");
+
 /////////////////////////////////////////////////////////////////////////
-///  \class         RobustScalarNormAnnotation
+///  \class         RobustScalarNormAnnotationData
 ///  \brief         An annotation class which contains the center and scale
 ///                 for an input column
 ///
-template <typename T, typename TransformedT>
-class RobustScalarNormAnnotation : public Annotation {
+template <typename T>
+class RobustScalarNormAnnotationData {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
     // |
     // ----------------------------------------------------------------------
-    TransformedT const                           Median;
-    TransformedT const                           Scale;
+    T const                                 Median;
+    T const                                 Scale;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    RobustScalarNormAnnotation(TransformedT median, TransformedT scale);
-    ~RobustScalarNormAnnotation(void) override = default;
+    RobustScalarNormAnnotationData(T median, T scale);
+    ~RobustScalarNormAnnotationData(void) = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RobustScalarNormAnnotation);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RobustScalarNormAnnotationData);
 };
 
+namespace Details {
+
 /////////////////////////////////////////////////////////////////////////
-///  \class         RobustScalarNormEstimator
-///  \brief         An AnnotationEstimator class that computes the center and range 
-///                 for an input column and creates a RobustScalarNormAnnotation.
+///  \class         RobustScalarNormTrainingOnlyPolicy
+///  \brief         `RobustScalarNormEstimator` implementation details.
 ///
-template <typename InputT,typename TransformedT, size_t ColIndexV>
-class RobustScalarNormEstimator : public AnnotationEstimator<InputT const &> {
+template <typename InputT, typename TransformedT>
+class RobustScalarNormTrainingOnlyPolicy {
 public:
     // ----------------------------------------------------------------------
     // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using InputType                         = InputT;
+    using ScalingParameters                 = std::tuple<float, float>;
+    using OptionalScalingParameters         = nonstd::optional<ScalingParameters>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Data
+    // |
+    // ----------------------------------------------------------------------
+    static constexpr char const * const     NameValue = RobustScalarNormEstimatorName;
+
+    // ----------------------------------------------------------------------
+    // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    RobustScalarNormEstimator(AnnotationMapsPtr pAllColumnAnnotations, bool with_centering, std::float_t q_min, std::float_t q_max);
-    ~RobustScalarNormEstimator(void) override = default;
+    RobustScalarNormTrainingOnlyPolicy(bool withCentering, OptionalScalingParameters optionalScalingParameters);
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RobustScalarNormEstimator);
+    void fit(InputType const &input);
+    RobustScalarNormAnnotationData<TransformedT> complete_training(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -65,36 +85,60 @@ private:
     // |  Private Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                             = AnnotationEstimator<InputT const &>;
-    using MaxHeapType                          = std::priority_queue<InputT>;
-    using MinHeapType                          = std::priority_queue<InputT, std::vector<InputT>, std::greater<InputT> >;
+
+    // Note that a priority_queue is used here over another type, as a priority_queue
+    // ensures that sorting only happens when a value is retrieved while sorting would
+    // need to happen during insertion for other types. For this algorithm, it means
+    // that sorting only happens when we need to rebalance the queues.
+    using MaxHeapType                       = std::priority_queue<InputT>;
+    using MinHeapType                       = std::priority_queue<InputT, std::vector<InputT>, std::greater<InputT>>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    bool const                                 _with_centering;
-    bool const                                 _with_scaling;
-    std::float_t const                         _q_min;
-    std::float_t const                         _q_max;
-    
-    InputT                                     _upperBound; 
-    InputT                                     _lowerBound;
-    //two maps to find stream median. max heap to store the smaller half elements, min heap to store the greater half elements 
-    MaxHeapType                                _smallerHalf; 
-    MinHeapType                                _greaterHalf; 
-    
+    bool const                              _withCentering;
+    OptionalScalingParameters const         _optionalScalingParameters;
+
+    InputT                                  _lowerBound;
+    InputT                                  _upperBound;
+
+    MaxHeapType                             _smallerHalf;
+    MinHeapType                             _greaterHalf;
+};
+
+} // namespace Details
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         RobustScalarNormEstimator
+///  \brief         An `Estimator` class that computes the center and range
+///                 for an input column and creates a `RobustScalarNormAnnotationData`.
+///
+template <
+    typename InputT,
+    typename TransformedT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
+class RobustScalarNormEstimator : public TrainingOnlyEstimatorImpl<Details::RobustScalarNormTrainingOnlyPolicy<InputT, TransformedT>, MaxNumTrainingItemsV> {
+public:
     // ----------------------------------------------------------------------
     // |
-    // |  Private Methods
+    // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    Estimator::FitResult fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) override;
+    using BaseType                          = TrainingOnlyEstimatorImpl<Details::RobustScalarNormTrainingOnlyPolicy<InputT, TransformedT>, MaxNumTrainingItemsV>;
+    using OptionalScalingParameters         = typename Details::RobustScalarNormTrainingOnlyPolicy<InputT, TransformedT>::OptionalScalingParameters;
 
-    Estimator::FitResult complete_training_impl(void) override;
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    RobustScalarNormEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool withCentering, OptionalScalingParameters optionalScalingParameters);
+    ~RobustScalarNormEstimator(void) override = default;
 
-    void UpdateStreamMedianHeap(InputT const & input);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RobustScalarNormEstimator);
 };
 
 // ----------------------------------------------------------------------
@@ -109,143 +153,135 @@ private:
 
 // ----------------------------------------------------------------------
 // |
-// |  NormAnnotation
+// |  RobustScalarNormAnnotationData
 // |
 // ----------------------------------------------------------------------
-template <typename T, typename TransformedT>
-RobustScalarNormAnnotation<T, TransformedT>::RobustScalarNormAnnotation(TransformedT median, TransformedT scale) :
-    Annotation(this),
+template <typename T>
+RobustScalarNormAnnotationData<T>::RobustScalarNormAnnotationData(T median, T scale) :
     Median(std::move(median)),
-    Scale(std::move(scale)) {
-    if (scale <= 0)
-        throw std::runtime_error("scale must bigger than 0");
+    Scale(
+        std::move(
+            [&scale](void) -> T & {
+                if(scale < 0)
+                    throw std::invalid_argument("scale");
+
+                return scale;
+            }()
+        )
+    ) {
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  NormEstimator
+// |  RobustScalarNormEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename InputT,typename TransformedT, size_t ColIndexV>
-RobustScalarNormEstimator<InputT,TransformedT,ColIndexV>::RobustScalarNormEstimator(AnnotationMapsPtr pAllColumnAnnotations,  bool with_centering, std::float_t q_min, std::float_t q_max) :
-    AnnotationEstimator<InputT const &>("RobustScalarNormEstimator", std::move(pAllColumnAnnotations)),
-    _with_centering(std::move(with_centering)),
-    _with_scaling(q_min < static_cast<std::float_t>(0) ? false : true),
-    _q_min(std::move(q_min)),
-    _q_max(std::move(q_max)){
+template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
+RobustScalarNormEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::RobustScalarNormEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool withCentering, OptionalScalingParameters optionalScalingParameters) :
+    BaseType(
+        std::move(pAllColumnAnnotations),
+        std::move(colIndex),
+        true,
+        std::move(withCentering),
+        std::move(optionalScalingParameters)
+    ) {
+}
 
-    if (_with_scaling) {
-        if (!(_q_min >= 0 && _q_max <= 100 && _q_min < _q_max)) {
-            throw std::runtime_error("Quantile Range check failed");
+// ----------------------------------------------------------------------
+// |
+// |  Details::RobustScalarNormTrainingOnlyPolicy
+// |
+// ----------------------------------------------------------------------
+template <typename InputT, typename TransformedT>
+Details::RobustScalarNormTrainingOnlyPolicy<InputT, TransformedT>::RobustScalarNormTrainingOnlyPolicy(bool withCentering, OptionalScalingParameters optionalScalingParameters) :
+    _withCentering(std::move(withCentering)),
+    _optionalScalingParameters(
+        std::move(
+            [&optionalScalingParameters](void) -> OptionalScalingParameters & {
+                if(
+                    optionalScalingParameters
+                    && (
+                        std::get<0>(*optionalScalingParameters) < 0.0f
+                        || std::get<0>(*optionalScalingParameters) > 100.0f
+                        || std::get<1>(*optionalScalingParameters) < 0.0f
+                        || std::get<1>(*optionalScalingParameters) > 100.0f
+                        || std::get<0>(*optionalScalingParameters) > std::get<1>(*optionalScalingParameters)
+                    )
+                )
+                    throw std::invalid_argument("optionalScalingParameters");
+
+                return optionalScalingParameters;
+            }()
+        )
+    ),
+    _lowerBound(std::numeric_limits<decltype(_lowerBound)>::max()),
+    _upperBound(std::numeric_limits<decltype(_upperBound)>::min()) {
+}
+
+template <typename InputT, typename TransformedT>
+void Details::RobustScalarNormTrainingOnlyPolicy<InputT, TransformedT>::fit(InputType const &input) {
+    if(_withCentering) {
+        if(_smallerHalf.empty() || input <= _smallerHalf.top())
+            _smallerHalf.emplace(input);
+        else
+            _greaterHalf.emplace(input);
+
+        // Rebalance if necessary
+        if(_smallerHalf.size() >= _greaterHalf.size() + 2) {
+            _greaterHalf.emplace(_smallerHalf.top());
+            _smallerHalf.pop();
+        }
+        else if(_greaterHalf.size() > _smallerHalf.size()) {
+            _smallerHalf.emplace(_greaterHalf.top());
+            _greaterHalf.pop();
         }
     }
 
-    if (_with_scaling) {
-        _lowerBound = std::numeric_limits<InputT>::max();
-        _upperBound = std::numeric_limits<InputT>::min();
+    if(_optionalScalingParameters) {
+        this->_lowerBound = std::min(this->_lowerBound, input);
+        this->_upperBound = std::max(this->_upperBound, input);
     }
 }
 
-template <typename InputT,typename TransformedT, size_t ColIndexV>
-Estimator::FitResult RobustScalarNormEstimator<InputT, TransformedT,ColIndexV>::fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) {
+template <typename InputT, typename TransformedT>
+RobustScalarNormAnnotationData<TransformedT> Details::RobustScalarNormTrainingOnlyPolicy<InputT, TransformedT>::complete_training(void) {
+    TransformedT                            median(static_cast<TransformedT>(0.0));
 
-    typename BaseType::FitBufferInputType const * const                 pEndBuffer(pBuffer + cBuffer); 
+    if(_withCentering) {
+        size_t const                        heapSize(_smallerHalf.size() + _greaterHalf.size());
 
-    while(pBuffer != pEndBuffer) {
-        InputT const &                                   input(*pBuffer++);
+        if(heapSize & 1) {
+            assert(_smallerHalf.empty() == false);
+            assert(_smallerHalf.size() == _greaterHalf.size() + 1);
 
-        if (_with_scaling) {
-            this->_lowerBound = std::min(this->_lowerBound, input);
-            this->_upperBound = std::max(this->_upperBound, input);
+            median = static_cast<TransformedT>(_smallerHalf.top());
+        }
+        else {
+            InputT const                    greater(_greaterHalf.empty() ? 0 : _greaterHalf.top());
+
+            assert(_smallerHalf.empty() == false);
+            median = static_cast<TransformedT>(_smallerHalf.top() + greater) / 2;
         }
 
-        if (_with_centering) {
-            UpdateStreamMedianHeap(input);
-        }
-    }
-    
-    return Estimator::FitResult::Continue;
-}
-
-template <typename InputT,typename TransformedT, size_t ColIndexV>
-Estimator::FitResult RobustScalarNormEstimator<InputT,TransformedT,ColIndexV>::complete_training_impl(void) {
-    // create the median and range
-    TransformedT                                median;
-    TransformedT                                scale;
-    InputT                                      range;
-                       
-    //calculate the median
-    median = static_cast<TransformedT>(0);  
-
-    size_t heapSize = this->_smallerHalf.size() + this->_greaterHalf.size();
-    if (_with_centering) {
-
-#if (defined __clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wdouble-promotion"
-#elif (defined _MSC_VER)
-#   pragma warning(push)
-#   pragma warning(disable: 4244) // conversion from 'unsigned int' to 'unsigned char', possible loss of data
-#endif
-        if (heapSize % 2 != 0) {
-            median = this->_smallerHalf.top();
-        } else if (heapSize != 0) {
-            median = (this->_smallerHalf.top() + this->_greaterHalf.top()) / 2;
-        }
-
-#if (defined __clang__)
-#   pragma clang diagnostic pop
-#elif (defined _MSC_VER)
-#   pragma warning(pop)
-#endif
-
+        // Clean up after ourselves
+        _smallerHalf = MaxHeapType();
+        _greaterHalf = MinHeapType();
     }
 
-    //calculate the range
-    range = _with_scaling ? this->_upperBound - this->_lowerBound : static_cast<InputT>(1);
+    assert(_smallerHalf.empty());
+    assert(_greaterHalf.empty());
 
-    //calculate the scale
-    std::float_t                                qRangeRatio = 1.0;
-    if (_with_scaling) {
-        qRangeRatio = (_q_max - _q_min) / 100;
-        if (qRangeRatio < 0 || qRangeRatio > 1) {
-            throw std::runtime_error("Quantile Range check failed");
-        }
+    TransformedT                            scale(static_cast<TransformedT>(1.0));
+
+    if(_optionalScalingParameters) {
+        float const                         qRangeRatio((std::get<1>(*_optionalScalingParameters) - std::get<0>(*_optionalScalingParameters)) / 100.0f);
+
+        assert(qRangeRatio >= 0.0f && qRangeRatio <= 1.0f);
+
+        scale = static_cast<TransformedT>(_upperBound - _lowerBound) * static_cast<TransformedT>(qRangeRatio);
     }
 
-    scale = static_cast<TransformedT>(range) * static_cast<TransformedT>(qRangeRatio);
-
-    BaseType::add_annotation(std::make_shared<RobustScalarNormAnnotation<InputT, TransformedT>>(std::move(median), std::move(scale)), ColIndexV);
-
-    //clear class variables
-    if (_with_scaling) {
-        this->_upperBound = InputT();
-        this->_lowerBound = InputT();
-
-        this->_greaterHalf = MinHeapType();
-        this->_smallerHalf = MaxHeapType();
-    }
-    
-    return Estimator::FitResult::Complete;
-}
-
-template <typename InputT,typename TransformedT, size_t ColIndexV>
-void RobustScalarNormEstimator<InputT,TransformedT,ColIndexV>::UpdateStreamMedianHeap(InputT const & input) {
-
-    if (_smallerHalf.empty() || input <= _smallerHalf.top()) {
-        _smallerHalf.emplace(std::move(input));
-    } else {
-        _greaterHalf.emplace(std::move(input));
-    }
-
-    // unsigned danger
-    if (_smallerHalf.size() >= _greaterHalf.size() + 2) {
-        _greaterHalf.emplace(std::move(_smallerHalf.top()));
-        _smallerHalf.pop();
-    } else if (_greaterHalf.size() > _smallerHalf.size()) {
-        _smallerHalf.emplace(std::move(_greaterHalf.top()));
-        _greaterHalf.pop();
-    }
+    return RobustScalarNormAnnotationData<TransformedT>(std::move(median), std::move(scale));
 }
 
 } // namespace Components

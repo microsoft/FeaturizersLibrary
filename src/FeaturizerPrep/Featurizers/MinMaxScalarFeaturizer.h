@@ -10,112 +10,133 @@
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
-   
-   
+
 /////////////////////////////////////////////////////////////////////////
-///  \class         MMScalingEstimator
-///  \brief         This class retrieves max and min value and scale based on these two values
-template <typename InputT>
-class MMScalingEstimator : public TransformerEstimator<InputT const &, std::double_t> {
+///  \class         MinMaxScalarTransformer
+///  \brief         Scales values based on learned min and max values.
+///
+template <typename InputT, typename TransformedT>
+class MinMaxScalarTransformer : public StandardTransformer<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using TransformedType                    = std::double_t;
-    using BaseType                           = TransformerEstimator<InputT const &, TransformedType>;
+    static_assert(Traits<TransformedT>::IsNullableType, "'TransformedT' must be a nullable type");
 
-    class Transformer : public BaseType::Transformer {
-    public:
-        // ----------------------------------------------------------------------
-        // |
-        // |  Public Methods
-        // |
-        // ----------------------------------------------------------------------
-        Transformer(TransformedType min, TransformedType max);
-        Transformer(typename BaseType::Transformer::Archive & ar);
-        ~Transformer(void) override = default;
-
-        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Transformer);
-
-        typename BaseType::TransformedType execute(typename BaseType::InputType input) override;
-
-        void save(typename BaseType::Transformer::Archive & ar) const override;
-
-        bool operator==(MMScalingEstimator::Transformer const &other) const;
-    private:
-        // ----------------------------------------------------------------------
-        // |
-        // |  Private Data
-        // |
-        // ---------------------------------------------------------------------- 
-        TransformedType const                        _min;
-        TransformedType const                        _max;
-    };
-
-    using TransformerType                         = Transformer;
+    using BaseType                          = StandardTransformer<InputT, TransformedT>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MMScalingEstimator(AnnotationMapsPtr pAllColumnAnnotations);
-    ~MMScalingEstimator(void) override = default;
+    MinMaxScalarTransformer(typename BaseType::InputType min, typename BaseType::InputType max);
+    MinMaxScalarTransformer(Archive &ar);
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MMScalingEstimator);
+    ~MinMaxScalarTransformer(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxScalarTransformer);
+
+    bool operator==(MinMaxScalarTransformer const &other) const;
+
+    void save(Archive &ar) const override;
+
 private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+    typename BaseType::InputType const      _min;
+    typename BaseType::InputType const      _span;
+
     // ----------------------------------------------------------------------
     // |
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override;
+};
 
-    // MSVC has problems when the function is defined outside of the declaration
-    Estimator::FitResult fit_impl(typename BaseType::BaseType::FitBufferInputType *, size_t) override {
-        throw std::runtime_error("This should never be called as this class will not be used during training");
-    }
+namespace Details {
 
-    Estimator::FitResult complete_training_impl(void) override;
+/////////////////////////////////////////////////////////////////////////
+///  \class         MinMaxScalarEstimatorImpl
+///  \brief         Estimator that reads an annotation created by the `MinMaxEstimator`
+///                 and creates a `MinMaxScalarTransformer` object.
+///
+template <
+    typename InputT,
+    typename TransformedT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
+class MinMaxScalarEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = TransformerEstimator<InputT, TransformedT>;
+    using TransformerType                   = MinMaxScalarTransformer<InputT, TransformedT>;
 
-    //The MSVC compiler will complain when the definition is outside the declaration 
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    MinMaxScalarEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~MinMaxScalarEstimatorImpl(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxScalarEstimatorImpl);
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+    size_t const                            _colIndex;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    bool begin_training_impl(void) override;
+    FitResult fit_impl(typename BaseType::InputType const *, size_t) override;
+    void complete_training_impl(void) override;
+
+    // MSVC has problems when the definition is separate from the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        AnnotationMaps const &                          maps(Estimator::get_column_annotations());
-        // Currently Annnotations are per output column index (0-based)
-        // Since we've only one column as output- hardcoding this to 0 now.
-        // Expect annotation design to be further rationalized in near future
-        // which will address this hard-coding.
-        AnnotationMap const &                           annotations(maps[0]);
-        AnnotationMap::const_iterator const &           iterAnnotations(annotations.find("MinMaxEstimator"));
+        // ----------------------------------------------------------------------
+        using MinMaxAnnotationData          = Components::MinMaxAnnotationData<InputT>;
+        using MinMaxEstimator               = Components::MinMaxEstimator<InputT, MaxNumTrainingItemsV>;
+        // ----------------------------------------------------------------------
 
-        if(iterAnnotations == annotations.end())
-            throw std::runtime_error("Couldn't retrieve MinMaxEstimator.");
+        MinMaxAnnotationData const &        data(MinMaxEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::MinMaxEstimatorName));
 
-        // An output column can have multiple annotations from same 'kind' of estimator.
-        // However, since we have only one estimator- hence the hard-coded value of 0 for retrieval.
-        // Expect annotation design to be further rationalized in near future
-        // which will address this hard-coding.
-        Annotation const &                                                  annotation(*iterAnnotations->second[0]);
-
-        Components::MinMaxAnnotation<InputT> const &                        minMaxAnnotation(static_cast<Components::MinMaxAnnotation<InputT> const &>(annotation));
-        InputT                               const &                        max(minMaxAnnotation.Max);
-        InputT                               const &                        min(minMaxAnnotation.Min);
-        return std::make_unique<Transformer>(static_cast<TransformedType>(min), static_cast<TransformedType>(max));
+        return std::make_unique<MinMaxScalarTransformer<InputT, TransformedT>>(data.Min, data.Max);
     }
 };
 
+} // namespace Details
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MinMaxScalarEstimator
-///  \brief         This class 'chains' MinMaxEstimator which find out min and max value,
-///                 and MMScalingEstimator which transforms into values in (0,1) range
+///  \class         MinMaxScalarFeaturizer
+///  \brief         Creates the `MinMaxScalarTransformer` object.
 ///
-template <typename InputT>
+template <
+    typename InputT,
+    typename TransformedT=std::double_t,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
 class MinMaxScalarEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-        Components::MinMaxEstimator<InputT, 0>,
-        MMScalingEstimator<InputT>
+        Components::MinMaxEstimator<InputT, MaxNumTrainingItemsV>,
+        Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -123,17 +144,19 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType = Components::PipelineExecutionEstimatorImpl<
-        Components::MinMaxEstimator<InputT, 0>,
-        MMScalingEstimator<InputT>
-    >;
+    using BaseType =
+        Components::PipelineExecutionEstimatorImpl<
+            Components::MinMaxEstimator<InputT, MaxNumTrainingItemsV>,
+            Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
+        >;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MinMaxScalarEstimator(AnnotationMapsPtr pAllColumnAnnotations);
+    MinMaxScalarEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~MinMaxScalarEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxScalarEstimator);
 };
@@ -150,72 +173,93 @@ public:
 
 // ----------------------------------------------------------------------
 // |
-// |  MMScalingEstimator
+// |  MinMaxScalarTransformer
 // |
 // ----------------------------------------------------------------------
-
-template <typename InputT>
-MMScalingEstimator<InputT>::MMScalingEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    BaseType("MMScalingEstimator", std::move(pAllColumnAnnotations), true) {
-}
-
-template <typename InputT>
-Estimator::FitResult MMScalingEstimator<InputT>::complete_training_impl(void) {
-    throw std::runtime_error("This should never be called as this class will not be used during training");
-}
-
-// ----------------------------------------------------------------------
-// |
-// |  MMScalingEstimator::Transformer
-// |
-// ----------------------------------------------------------------------
-template <typename InputT>
-MMScalingEstimator<InputT>::Transformer::Transformer(TransformedType min, TransformedType max) :
+template <typename InputT, typename TransformedT>
+MinMaxScalarTransformer<InputT, TransformedT>::MinMaxScalarTransformer(typename BaseType::InputType min, typename BaseType::InputType max) :
     _min(std::move(min)),
-    _max(std::move(max)){
+    _span(
+        [this, &max](void) -> typename BaseType::InputType {
+            if(this->_min > max)
+                throw std::invalid_argument("max");
+
+            return max - this->_min;
+        }()
+    ) {
 }
 
-template <typename InputT>
-MMScalingEstimator<InputT>::Transformer::Transformer(typename BaseType::Transformer::Archive & ar) :
-    _min(Traits<TransformedType>::deserialize(ar)),
-    _max(Traits<TransformedType>::deserialize(ar))
-    {
+template <typename InputT, typename TransformedT>
+MinMaxScalarTransformer<InputT, TransformedT>::MinMaxScalarTransformer(Archive &ar) :
+    MinMaxScalarTransformer(
+        [&ar](void) {
+            typename BaseType::InputType    min(Traits<typename BaseType::InputType>::deserialize(ar));
+            typename BaseType::InputType    max(Traits<typename BaseType::InputType>::deserialize(ar));
+
+            return MinMaxScalarTransformer<InputT, TransformedT>(std::move(min), std::move(max));
+        }()
+    ) {
 }
+
+template <typename InputT, typename TransformedT>
+bool MinMaxScalarTransformer<InputT, TransformedT>::operator==(MinMaxScalarTransformer const &other) const {
+
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wfloat-equal"
-#   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
-template <typename InputT>
-typename MMScalingEstimator<InputT>::BaseType::TransformedType MMScalingEstimator<InputT>::Transformer::execute(typename BaseType::InputType input) {
-    if (Traits<typename BaseType::InputType>::IsNull(input)) {
-        // if input is null, it will be disregarded in fit and maintain in transform
-        return  Traits<typename BaseType::TransformedType>::CreateNullValue();
-    }
-    // comparing two floats warning is ignored
-    if (_max == _min) {
-        // there is only one value in training set, the output is set to 0
-        return static_cast<TransformedType>(0);
-    }
-    
-    return (static_cast<TransformedType>(input) - _min) / (_max - _min);
-}
 
-template <typename InputT>
-bool MMScalingEstimator<InputT>::Transformer::operator==(MMScalingEstimator<InputT>::Transformer const &other) const {
-    
-    return _min == other._min && _max == other._max;
-
-}
+    return this->_min == other._min
+        && this->_span == other._span;
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
 
-template <typename InputT>
-void MMScalingEstimator<InputT>::Transformer::save(typename MMScalingEstimator<InputT>::BaseType::Transformer::Archive & ar) const {
-    Traits<TransformedType>::serialize(ar, _min);
-    Traits<TransformedType>::serialize(ar, _max);
+}
+
+template <typename InputT, typename TransformedT>
+void MinMaxScalarTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
+    Traits<decltype(_min)>::serialize(ar, _min);
+
+    // Note that we are serializing the max value rather than just the span so
+    // that we can deserialize in a way that is consistent with the constructor's
+    // parameters (min, max).
+    Traits<decltype(_span)>::serialize(ar, _min + _span);
+}
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+template <typename InputT, typename TransformedT>
+void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
+    // ----------------------------------------------------------------------
+    using InputTraits                       = Traits<InputT>;
+    using TransformedTraits                 = Traits<TransformedT>;
+    // ----------------------------------------------------------------------
+
+    if(InputTraits::IsNull(input)) {
+        callback(TransformedTraits::CreateNullValue());
+        return;
+    }
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
+
+    if(_span == static_cast<InputT>(0)) {
+        callback(static_cast<TransformedT>(0));
+        return;
+    }
+
+    callback((static_cast<TransformedT>(input) - _min) / _span);
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+
 }
 
 // ----------------------------------------------------------------------
@@ -223,10 +267,53 @@ void MMScalingEstimator<InputT>::Transformer::save(typename MMScalingEstimator<I
 // |  MinMaxScalarEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename InputT>
-MinMaxScalarEstimator<InputT>::MinMaxScalarEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    BaseType("MinMaxScalarEstimator", std::move(pAllColumnAnnotations)) {
+template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
+MinMaxScalarEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::MinMaxScalarEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+    BaseType(
+        "MinMaxScalarEstimator",
+        pAllColumnAnnotations,
+        [pAllColumnAnnotations, colIndex](void) { return Components::MinMaxEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex](void) { return Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
+    ) {
 }
+
+// ----------------------------------------------------------------------
+// |
+// |  Details::MinMaxScalarEstimatorImpl
+// |
+// ----------------------------------------------------------------------
+template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
+Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::MinMaxScalarEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+    BaseType("MinMaxScalarEstimatorImpl", std::move(pAllColumnAnnotations)),
+    _colIndex(
+        std::move(
+            [this, &colIndex](void) -> size_t & {
+                if(colIndex >= this->get_column_annotations().size())
+                    throw std::invalid_argument("colIndex");
+
+                return colIndex;
+            }()
+        )
+    ) {
+}
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
+bool Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+    return false;
+}
+
+template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
+FitResult Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
+    throw std::runtime_error("This will never be called");
+}
+
+template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
+void Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+}
+
 } // namespace Featurizers
 } // namespace Featurizer
 } // namespace Microsoft

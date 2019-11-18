@@ -48,10 +48,15 @@ static inline std::uint32_t MurmurHashHelper(T const &input, std::uint32_t hashi
 ///  \class         HashOneHotVectorizer Struct
 ///  \brief         <std::uint32_t colIndex, std::uint32_t numCols, bool val>
 ///
+//todo:This structure is shared between the HashOneHotVectorizerFeaturizer and the OneHotFeaturizer.
+//Consider moving to a common location.
 struct HashOneHotVectorizerStruct {
-    std::uint32_t colIndex;
-    std::uint32_t numCols;
-    bool          val;
+    std::uint32_t const ColIndex;
+    std::uint32_t const NumCols;
+    bool          const Val;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(HashOneHotVectorizerStruct);
+    HashOneHotVectorizerStruct(std::uint32_t colIndex, std::uint32_t numCols, bool val);
     bool operator==(HashOneHotVectorizerStruct const &obj) const;
 };
 
@@ -68,7 +73,6 @@ public:
     // |
     // ----------------------------------------------------------------------
     using Type                              = T;
-    using ThisType                          = HashOneHotVectorizerTransformer<Type>;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, HashOneHotVectorizerStruct>;
 
     // ----------------------------------------------------------------------
@@ -84,15 +88,18 @@ public:
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(HashOneHotVectorizerTransformer);
 
     // MSVC has problems when the function is defined outside of the declaration
-    typename BaseType::TransformedType execute(typename BaseType::InputType input) override {
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
 
         std::uint32_t colHashVal = MurmurHashHelper(input, _hashingSeedVal);
 
-        return HashOneHotVectorizerStruct{static_cast<std::uint32_t>(colHashVal % _numCols),
-                                          static_cast<std::uint32_t>(_numCols), 
-                                          static_cast<bool>(true)
-        };
-
+        // TODO _numCols should be the number of bits
+        callback(
+            HashOneHotVectorizerStruct(
+                static_cast<std::uint32_t>(colHashVal % _numCols),
+                static_cast<std::uint32_t>(_numCols),
+                true
+            )
+        );
     }
 
     void save(Archive & ar) const override;
@@ -107,6 +114,8 @@ private:
     std::uint32_t const                        _hashingSeedVal;
     std::uint32_t const                        _numCols;
 };
+
+// TODO: This should be implemented in terms of Components::InferenceOnlyFeaturizerImpl
 
 template <typename T>
 class HashOneHotVectorizerEstimator : public TransformerEstimator<T, HashOneHotVectorizerStruct> {
@@ -142,12 +151,14 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
+    bool begin_training_impl(void) override;
+
     //MSVC will complain when the function is defined outside of the declaration
-    Estimator::FitResult fit_impl(typename BaseType::BaseType::FitBufferInputType const *, size_t) override {
+    FitResult fit_impl(typename BaseType::InputType const *, size_t) override {
         throw std::runtime_error("This should never be called as this class will not be used during training");
     }
 
-    Estimator::FitResult complete_training_impl(void) override;
+    void complete_training_impl(void) override;
 
     //MSVC will complain when the function is defined outside of the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
@@ -170,8 +181,16 @@ private:
 // |  HashOneHotVectorizerStruct
 // |
 // ----------------------------------------------------------------------
+HashOneHotVectorizerStruct::HashOneHotVectorizerStruct(std::uint32_t colIndex, std::uint32_t numCols, bool val) :
+    ColIndex(std::move(colIndex)),
+    NumCols(std::move(numCols)),
+    Val(std::move(val)) {
+}
+
 bool HashOneHotVectorizerStruct::operator==(HashOneHotVectorizerStruct const &obj) const {
-    return (colIndex == obj.colIndex && numCols == obj.numCols && val == obj.val);
+    return ColIndex == obj.ColIndex
+        && NumCols == obj.NumCols
+        && Val == obj.Val;
 }
 
 // ----------------------------------------------------------------------
@@ -182,17 +201,23 @@ bool HashOneHotVectorizerStruct::operator==(HashOneHotVectorizerStruct const &ob
 template <typename T>
 HashOneHotVectorizerTransformer<T>::HashOneHotVectorizerTransformer(std::uint32_t hashingSeedVal, std::uint32_t numCols):
     _hashingSeedVal(std::move(hashingSeedVal)),
-    _numCols([&numCols](void)->uint32_t {
+    _numCols(std::move([&numCols](void)->uint32_t & {
         if (numCols <= 0)
             throw std::runtime_error("Invalid numCols");
-        return std::move(numCols);
-    }()){
+        return numCols;
+    }())){
 }
 
 template <typename T>
 HashOneHotVectorizerTransformer<T>::HashOneHotVectorizerTransformer(Archive &ar) :
-    _hashingSeedVal(Traits<std::uint32_t>::deserialize(ar)) ,
-    _numCols(Traits<std::uint32_t>::deserialize(ar)) {
+    HashOneHotVectorizerTransformer(
+        [&ar](void) {
+            std::uint32_t    hashingSeedVal(Traits<std::uint32_t>::deserialize(ar));
+            std::uint32_t    numCols(Traits<std::uint32_t>::deserialize(ar));
+
+            return HashOneHotVectorizerTransformer<T>(std::move(hashingSeedVal), std::move(numCols));
+        }()
+    ) {
 }
 
 template <typename T>
@@ -210,14 +235,18 @@ void HashOneHotVectorizerTransformer<T>::save(Archive & ar) const {
 // ----------------------------------------------------------------------
 template <typename T>
 HashOneHotVectorizerEstimator<T>::HashOneHotVectorizerEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t hashingSeedVal, std::uint32_t numCols) :
-    BaseType("HashOneHotVectorizerEstimator", std::move(pAllColumnAnnotations), true),
+    BaseType("HashOneHotVectorizerEstimator", std::move(pAllColumnAnnotations)),
     _hashingSeedVal(std::move(hashingSeedVal)),
     _numCols(std::move(numCols)) {
 }
 
 template <typename T>
-Estimator::FitResult HashOneHotVectorizerEstimator<T>::complete_training_impl(void) /*override*/ {
-    throw std::runtime_error("This should never be called as this class will not be used during training");
+bool HashOneHotVectorizerEstimator<T>::begin_training_impl(void) /*override*/ {
+    return false;
+}
+
+template <typename T>
+void HashOneHotVectorizerEstimator<T>::complete_training_impl(void) /*override*/ {
 }
 
 } // namespace Featurizers

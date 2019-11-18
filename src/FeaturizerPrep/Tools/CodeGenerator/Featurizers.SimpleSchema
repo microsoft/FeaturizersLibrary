@@ -3,6 +3,10 @@
     [estimator_name string]
     [num_output_columns number min=1]
 
+    # TODO: I hope that we don't need this value once we get rid of column-based
+    #       annotations in favor of "ModelContexts".
+    [creates_annotations bool default=true ?]
+
     <custom_structs *>:
         [name string]
         <members +>:
@@ -17,13 +21,13 @@
     <templates *>:
         [name string]
         <types string +>
-        
+
     [is_intput_a_template bool default=true ?]
     [is_output_a_template bool default=false ?]
-    
+
     <transformed_type_mappings +>:
         <input_type string>
         <is_input_optional bool default=false ?>
-        
+
         <transformed_type string>
-        <is_output_optional bool default=false ?>    
+        <is_output_optional bool default=false ?>

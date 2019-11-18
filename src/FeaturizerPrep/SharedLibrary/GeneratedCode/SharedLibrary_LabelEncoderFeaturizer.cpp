@@ -35,7 +35,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_CreateEstimator(/*in*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<LabelEncoderFeaturizer_int8_t_EstimatorHandle*>(index);
 
@@ -85,7 +88,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_IsTrainingComplete(/*i
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -148,7 +151,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_FitBuffer(/*in*/ Label
     }
 }
 
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -156,13 +159,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int8_t_CompleteTraining(/*in*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -325,7 +325,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_CreateEstimator(/*in*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<LabelEncoderFeaturizer_int16_t_EstimatorHandle*>(index);
 
@@ -375,7 +378,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_IsTrainingComplete(/*
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -438,7 +441,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_FitBuffer(/*in*/ Labe
     }
 }
 
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -446,13 +449,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int16_t_CompleteTraining(/*in
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -615,7 +615,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_CreateEstimator(/*in*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<LabelEncoderFeaturizer_int32_t_EstimatorHandle*>(index);
 
@@ -665,7 +668,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_IsTrainingComplete(/*
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -728,7 +731,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_FitBuffer(/*in*/ Labe
     }
 }
 
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -736,13 +739,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int32_t_CompleteTraining(/*in
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -905,7 +905,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_CreateEstimator(/*in*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<LabelEncoderFeaturizer_int64_t_EstimatorHandle*>(index);
 
@@ -955,7 +958,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_IsTrainingComplete(/*
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1018,7 +1021,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_FitBuffer(/*in*/ Labe
     }
 }
 
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1026,13 +1029,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_int64_t_CompleteTraining(/*in
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1195,7 +1195,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_CreateEstimator(/*in*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<LabelEncoderFeaturizer_uint8_t_EstimatorHandle*>(index);
 
@@ -1245,7 +1248,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_IsTrainingComplete(/*
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1308,7 +1311,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_FitBuffer(/*in*/ Labe
     }
 }
 
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1316,13 +1319,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint8_t_CompleteTraining(/*in
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1485,7 +1485,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<LabelEncoderFeaturizer_uint16_t_EstimatorHandle*>(index);
 
@@ -1535,7 +1538,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1598,7 +1601,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_FitBuffer(/*in*/ Lab
     }
 }
 
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1606,13 +1609,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint16_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1775,7 +1775,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<LabelEncoderFeaturizer_uint32_t_EstimatorHandle*>(index);
 
@@ -1825,7 +1828,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1888,7 +1891,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_FitBuffer(/*in*/ Lab
     }
 }
 
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1896,13 +1899,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint32_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2065,7 +2065,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<LabelEncoderFeaturizer_uint64_t_EstimatorHandle*>(index);
 
@@ -2115,7 +2118,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2178,7 +2181,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_FitBuffer(/*in*/ Lab
     }
 }
 
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2186,13 +2189,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_uint64_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2355,7 +2355,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_CreateEstimator(/*in*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<LabelEncoderFeaturizer_float_t_EstimatorHandle*>(index);
 
@@ -2405,7 +2408,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_IsTrainingComplete(/*
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2468,7 +2471,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_FitBuffer(/*in*/ Labe
     }
 }
 
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2476,13 +2479,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_float_t_CompleteTraining(/*in
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2645,7 +2645,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<LabelEncoderFeaturizer_double_t_EstimatorHandle*>(index);
 
@@ -2695,7 +2698,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2758,7 +2761,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_FitBuffer(/*in*/ Lab
     }
 }
 
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_CompleteTraining(/*in*/ LabelEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2766,13 +2769,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_double_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2935,7 +2935,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_CreateEstimator(/*in*/ b
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<bool>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<bool>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<LabelEncoderFeaturizer_bool_EstimatorHandle*>(index);
 
@@ -2985,7 +2988,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_IsTrainingComplete(/*in*
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<bool> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -3048,7 +3051,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_FitBuffer(/*in*/ LabelEn
     }
 }
 
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_CompleteTraining(/*in*/ LabelEncoderFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_CompleteTraining(/*in*/ LabelEncoderFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3056,13 +3059,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_bool_CompleteTraining(/*in*/ 
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -3225,7 +3225,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_CreateEstimator(/*in*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<LabelEncoderFeaturizer_string_EstimatorHandle*>(index);
 
@@ -3275,7 +3278,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_IsTrainingComplete(/*i
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::string> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -3349,7 +3352,7 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_FitBuffer(/*in*/ Label
     }
 }
 
-FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_CompleteTraining(/*in*/ LabelEncoderFeaturizer_string_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_CompleteTraining(/*in*/ LabelEncoderFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3357,13 +3360,10 @@ FEATURIZER_LIBRARY_API bool LabelEncoderFeaturizer_string_CompleteTraining(/*in*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::LabelEncoderEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }

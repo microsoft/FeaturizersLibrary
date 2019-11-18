@@ -20,7 +20,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_DestroyEstimator(/*i
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_Fit(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -43,7 +43,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_DestroyEstimator(/*
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_Fit(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -66,7 +66,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_DestroyEstimator(/*
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_Fit(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -89,7 +89,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_DestroyEstimator(/*
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_Fit(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -112,7 +112,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_DestroyEstimator(/*
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_Fit(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -135,7 +135,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_DestroyEstimator(/
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_Fit(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -158,7 +158,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_DestroyEstimator(/
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_Fit(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -181,7 +181,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_DestroyEstimator(/
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_Fit(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -204,7 +204,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_DestroyEstimator(/*
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_Fit(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -227,7 +227,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_DestroyEstimator(/
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_Fit(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -250,7 +250,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_DestroyEstimator(/*in*
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_Fit(/*in*/ MissingDummiesFeaturizer_bool_EstimatorHandle *pHandle, /*in*/ bool const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_FitBuffer(/*in*/ MissingDummiesFeaturizer_bool_EstimatorHandle *pHandle, /*in*/ bool const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_CompleteTraining(/*in*/ MissingDummiesFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_CompleteTraining(/*in*/ MissingDummiesFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_bool_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_bool_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -273,7 +273,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_DestroyEstimator(/*i
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_string_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_Fit(/*in*/ MissingDummiesFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const *input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_FitBuffer(/*in*/ MissingDummiesFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const * const * input_ptr, std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_CompleteTraining(/*in*/ MissingDummiesFeaturizer_string_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_CompleteTraining(/*in*/ MissingDummiesFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_string_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_string_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);

@@ -106,10 +106,8 @@ TEST_CASE("End-to-end") {
         CHECK(fitResult == Continue);
         CHECK(pErrorInfo == nullptr);
 
-        CHECK(TimeSeriesImputerFeaturizer_BinaryArchive_CompleteTraining(estimatorHandle, &fitResult, &pErrorInfo));
-        CHECK(pErrorInfo == nullptr);
-        if(fitResult == Complete)
-            break;
+        TimeSeriesImputerFeaturizer_BinaryArchive_CompleteTraining(estimatorHandle, &pErrorInfo);
+        break;
     }
 
     // Create Transformer

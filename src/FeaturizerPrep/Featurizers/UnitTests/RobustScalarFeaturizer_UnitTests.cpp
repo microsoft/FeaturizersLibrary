@@ -6,6 +6,7 @@
 #include "catch.hpp"
 
 #include "../../3rdParty/optional.h"
+#include "../../Archive.h"
 #include "../../Featurizers/RobustScalarFeaturizer.h"
 #include "../TestHelpers.h"
 
@@ -37,17 +38,13 @@ void TestWrapper_Default_WithCentering(){
         static_cast<TransformedT>( 1.0)
     );
 
-    NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>      estimator = NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(pAllColumnAnnotations, true);
-
-
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                estimator,
+                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(NS::CreateTestAnnotationMapsPtr(1), 0, true),
                 trainingBatches,
                 inferencingInput
-            ), 
+            ),
             inferencingOutput
         )
     );
@@ -79,17 +76,45 @@ void TestWrapper_Default_NoCentering(){
         static_cast<TransformedT>(9.0/4.0)
     );
 
-    NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>      estimator = NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(pAllColumnAnnotations, false);
+    CHECK(
+        NS::TestHelpers::FuzzyCheck(
+            NS::TestHelpers::TransformerEstimatorTest(
+                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(NS::CreateTestAnnotationMapsPtr(1), 0, false),
+                trainingBatches,
+                inferencingInput
+            ),
+            inferencingOutput
+        )
+    );
+}
 
+template<typename InputT, typename TransformedT>
+void TestWrapper_Default_NoCentering_ZeroScale(){
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputT>>(
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(10)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(10)),
+        NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(10))
+    );
+
+    auto inferencingInput = NS::TestHelpers::make_vector<InputT>(
+        static_cast<InputT>(10),
+        static_cast<InputT>(10),
+        static_cast<InputT>(10)
+    );
+
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedT>(
+        static_cast<TransformedT>(10),
+        static_cast<TransformedT>(10),
+        static_cast<TransformedT>(10)
+    );
 
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                estimator,
+                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(NS::CreateTestAnnotationMapsPtr(1), 0, false),
                 trainingBatches,
                 inferencingInput
-            ), 
+            ),
             inferencingOutput
         )
     );
@@ -121,16 +146,13 @@ void TestWrapper_WithCentering_NoScaling(){
         static_cast<TransformedT>(4)
     );
 
-    NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>       estimator = NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, true);
-
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                estimator,
+                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0, true),
                 trainingBatches,
                 inferencingInput
-            ), 
+            ),
             inferencingOutput
         )
     );
@@ -162,17 +184,13 @@ void TestWrapper_WithCentering_CustomScaling(std::float_t q_min, std::float_t q_
         static_cast<TransformedT>(static_cast<std::float_t>( 50.0) / (q_max - q_min))
     );
 
-    NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-
-    NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>       estimator = NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, true, q_min, q_max);
-
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                estimator,
+                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0, true, q_min, q_max),
                 trainingBatches,
                 inferencingInput
-            ), 
+            ),
             inferencingOutput
         )
     );
@@ -204,16 +222,13 @@ void TestWrapper_NoCentering_CustomScaling(std::float_t q_min, std::float_t q_ma
         static_cast<TransformedT>(static_cast<std::float_t>(112.5) / (q_max - q_min))
     );
 
-    NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-
-    NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>      estimator = NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(pAllColumnAnnotations, false, q_min, q_max);
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                estimator,
+                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0, false, q_min, q_max),
                 trainingBatches,
                 inferencingInput
-            ), 
+            ),
             inferencingOutput
         )
     );
@@ -224,6 +239,7 @@ template<typename InputT, typename TransformedT>
 void TestWrapper_Integration_Tests(){
     TestWrapper_Default_WithCentering<InputT, TransformedT>();
     TestWrapper_Default_NoCentering<InputT, TransformedT>();
+    TestWrapper_Default_NoCentering_ZeroScale<InputT, TransformedT>();
     TestWrapper_WithCentering_NoScaling<InputT, TransformedT>();
     TestWrapper_WithCentering_CustomScaling<InputT, TransformedT>(0.0, 100.0);
     TestWrapper_WithCentering_CustomScaling<InputT, TransformedT>(20.0, 80.0);
@@ -243,13 +259,3 @@ TEST_CASE("RobustScalarFeaturizer - input<float_t> - output<float_t/double_t>") 
     TestWrapper_Integration_Tests<std::float_t, std::float_t>();
     TestWrapper_Integration_Tests<std::float_t, std::double_t>();
 }
-
-
-
-
-
-
-
-
-
-

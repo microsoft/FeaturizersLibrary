@@ -36,16 +36,14 @@ using TimeSeriesImputerEstimatorInputType = std::tuple<
     std::chrono::system_clock::time_point,
     std::vector<std::string>,
     std::vector<nonstd::optional<std::string>>
-> const &;
+>;
 
-using TimeSeriesImputerEstimatorTransformedType = std::vector<
-    std::tuple<
+using TimeSeriesImputerEstimatorTransformedType = std::tuple<
         bool,
         std::chrono::system_clock::time_point,
         std::vector<std::string>,
         std::vector<nonstd::optional<std::string>>
-    >
->;
+    >;
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         TimeSeriesImputerEstimator
@@ -70,10 +68,11 @@ public:
     using SerDeDurationType = std::chrono::duration<int64_t, std::ratio<1,1000000000>>;
 
 
-    class Transformer : public QueuedTransformer<typename BaseType::InputType,typename BaseType::TransformedType> {
+    class Transformer : public Microsoft::Featurizer::Transformer<typename BaseType::InputType,typename BaseType::TransformedType> {
     public:
 
-        using StrTraits                        = Traits<std::string>;
+        using StrTraits                     = Traits<std::string>;
+        using ThisBaseType                  = Microsoft::Featurizer::Transformer<typename BaseType::InputType,typename BaseType::TransformedType>;
 
         // ----------------------------------------------------------------------
         // |
@@ -81,16 +80,12 @@ public:
         // |
         // ----------------------------------------------------------------------
         Transformer(FrequencyType value, std::vector<TypeId> colsToImputeDataTypes, TimeSeriesImputeStrategy tsImputeStrategy, bool supressError, std::map<KeyType,std::vector<double_t>> medianValues);
-        Transformer(typename BaseType::Transformer::Archive & ar);
+        Transformer(Archive & ar);
         ~Transformer(void) override = default;
 
         FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Transformer);
 
-        typename BaseType::TransformedType execute(typename BaseType::InputType input) override;
-
-        typename BaseType::TransformedType flush(void) override;
-
-        void save(typename BaseType::Transformer::Archive & ar) const override;
+        void save(Archive & ar) const override;
 
         // ----------------------------------------------------------------------
         // |
@@ -112,19 +107,22 @@ public:
         // |  Private Data
         // |
         // ----------------------------------------------------------------------
-        std::map<KeyType,OutputRowType>                 _lastRowtracker;
-        std::map<KeyType,BaseType::TransformedType>     _buffer;
+        std::map<KeyType,OutputRowType>                                     _lastRowtracker;
+        std::map<KeyType,std::vector<BaseType::TransformedType>>            _buffer;
 
         // ----------------------------------------------------------------------
         // |
         // |  Private Methods
         // |
         // ----------------------------------------------------------------------
-        typename BaseType::TransformedType generate_rows(typename BaseType::InputType input, TimePointType const & lastObservedTP);
+        void execute_impl(typename ThisBaseType::InputType const &input, typename ThisBaseType::CallbackFunction const &callback) override;
+        void flush_impl(typename ThisBaseType::CallbackFunction const &callback) override;
+
+        std::vector<typename BaseType::TransformedType> generate_rows(typename ThisBaseType::InputType const &input, TimePointType const & lastObservedTP);
         void impute(ColsToImputeType & prev, ColsToImputeType & current);
         bool no_nulls(ColsToImputeType const & input);
-        typename BaseType::TransformedType bfill(typename BaseType::InputType input);
-        typename BaseType::TransformedType ffill_or_median(typename BaseType::InputType input);
+        void bfill(typename ThisBaseType::InputType const &input, typename ThisBaseType::CallbackFunction const &callback);
+        void ffill_or_median(typename ThisBaseType::InputType const &input, typename ThisBaseType::CallbackFunction const &callback);
     };
 
     using TransformerType                   = Transformer;
@@ -160,13 +158,14 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
+    bool begin_training_impl(void) override;
 
     // MSVC has problems when the function is defined outside of the declaration
-    Estimator::FitResult fit_impl(typename BaseType::BaseType::FitBufferInputType *, size_t) override {
+    FitResult fit_impl(typename BaseType::InputType const *, size_t) override {
         throw std::runtime_error("This should never be called as this class will not be used during training");
     }
 
-    Estimator::FitResult complete_training_impl(void) override;
+    void complete_training_impl(void) override;
 
     // MSVC has problems when the function is defined outside of the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
@@ -206,8 +205,8 @@ private:
 // |  TimeSeriesImputerEstimator
 // |
 // ----------------------------------------------------------------------
-TimeSeriesImputerEstimator::TimeSeriesImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations,std::vector<TypeId> colsToImputeDataTypes,TimeSeriesImputeStrategy tsImputeStrategy,bool supressError) :
-    BaseType("TimeSeriesImputerEstimator", std::move(pAllColumnAnnotations), true),
+inline TimeSeriesImputerEstimator::TimeSeriesImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations,std::vector<TypeId> colsToImputeDataTypes,TimeSeriesImputeStrategy tsImputeStrategy,bool supressError) :
+    BaseType("TimeSeriesImputerEstimator", std::move(pAllColumnAnnotations)),
     _colsToImputeDataTypes(std::move(colsToImputeDataTypes)),
     _tsImputeStrategy(
         std::move(
@@ -231,8 +230,11 @@ TimeSeriesImputerEstimator::TimeSeriesImputerEstimator(AnnotationMapsPtr pAllCol
 
 }
 
-Estimator::FitResult TimeSeriesImputerEstimator::complete_training_impl(void) {
-    throw std::runtime_error("This should never be called as this class will not be used during training");
+inline bool TimeSeriesImputerEstimator::begin_training_impl(void) /*override*/ {
+    return false;
+}
+
+inline void TimeSeriesImputerEstimator::complete_training_impl(void) /*override */ {
 }
 
 // ----------------------------------------------------------------------
@@ -240,7 +242,7 @@ Estimator::FitResult TimeSeriesImputerEstimator::complete_training_impl(void) {
 // |  TimeSeriesImputerEstimator::Transformer
 // |
 // ----------------------------------------------------------------------
-TimeSeriesImputerEstimator::Transformer::Transformer(TimeSeriesImputerEstimator::FrequencyType value, std::vector<TypeId> colsToImputeDataTypes,TimeSeriesImputeStrategy tsImputeStrategy, bool supressError, std::map<KeyType,std::vector<double_t>> medianValues) :
+inline TimeSeriesImputerEstimator::Transformer::Transformer(TimeSeriesImputerEstimator::FrequencyType value, std::vector<TypeId> colsToImputeDataTypes,TimeSeriesImputeStrategy tsImputeStrategy, bool supressError, std::map<KeyType,std::vector<double_t>> medianValues) :
     _version(1),
     _frequency(std::move(value)),
     _colsToImputeDataTypes(std::move(colsToImputeDataTypes)),
@@ -256,7 +258,7 @@ TimeSeriesImputerEstimator::Transformer::Transformer(TimeSeriesImputerEstimator:
 
 }
 
-TimeSeriesImputerEstimator::Transformer::Transformer(typename BaseType::Transformer::Archive & ar) :
+inline TimeSeriesImputerEstimator::Transformer::Transformer(Archive & ar) :
     _version([&ar](void)->uint8_t {
             uint8_t version = Traits<std::uint8_t>::deserialize(ar);
             if(version != 1)
@@ -292,43 +294,7 @@ TimeSeriesImputerEstimator::Transformer::Transformer(typename BaseType::Transfor
     _supressError(Traits<bool>::deserialize(ar))
     {}
 
-typename TimeSeriesImputerEstimator::BaseType::TransformedType TimeSeriesImputerEstimator::Transformer::execute(typename BaseType::InputType input) {
-    // Ensure that this row is in chronological order
-    KeyType const &                                                         key(std::get<1>(input));
-    std::map<KeyType, OutputRowType>::const_iterator const                  iterLastRow(_lastRowtracker.find(key));
-
-    if(iterLastRow != _lastRowtracker.end()) {
-        std::chrono::system_clock::time_point const &   lastRowTimePoint(std::get<1>(iterLastRow->second));
-        std::chrono::system_clock::time_point const &   inputTimePoint(std::get<0>(input));
-
-        if(inputTimePoint < lastRowTimePoint)
-            throw std::runtime_error("Input stream not in chronological order.");
-    }
-
-    // Invoke the specified impute strategy
-    if(_tsImputeStrategy == TimeSeriesImputeStrategy::Forward || _tsImputeStrategy == TimeSeriesImputeStrategy::Median)
-        return ffill_or_median(input);
-    else if(_tsImputeStrategy == TimeSeriesImputeStrategy::Backward)
-        return bfill(input);
-    else
-        throw std::runtime_error("Unsupported Impute Strategy");
-}
-
-typename TimeSeriesImputerEstimator::BaseType::TransformedType TimeSeriesImputerEstimator::Transformer::flush() {
-
-    typename TimeSeriesImputerEstimator::BaseType::TransformedType output;
-
-    for (auto it = _buffer.begin(); it != _buffer.end(); ++it)
-        output.insert(output.end(), it->second.begin(), it->second.end());
-
-    // Clear the working state
-    _lastRowtracker.clear();
-    _buffer.clear();
-
-    return output;
-}
-
-void  TimeSeriesImputerEstimator::Transformer::save(typename  TimeSeriesImputerEstimator::BaseType::Transformer::Archive & ar) const {
+inline void  TimeSeriesImputerEstimator::Transformer::save(Archive & ar) const {
     Traits<std::uint8_t>::serialize(ar, 1); // Current version
 
     //_frequency
@@ -357,9 +323,49 @@ void  TimeSeriesImputerEstimator::Transformer::save(typename  TimeSeriesImputerE
 
 }
 
-typename TimeSeriesImputerEstimator::BaseType::TransformedType TimeSeriesImputerEstimator::Transformer::generate_rows(typename BaseType::InputType input, typename TimeSeriesImputerEstimator::TimePointType const & lastObservedTP) {
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+inline void TimeSeriesImputerEstimator::Transformer::execute_impl(typename ThisBaseType::InputType const &input, typename ThisBaseType::CallbackFunction const &callback) /*override*/ {
+    // Ensure that this row is in chronological order
+    KeyType const &                                                         key(std::get<1>(input));
+    std::map<KeyType, OutputRowType>::const_iterator const                  iterLastRow(_lastRowtracker.find(key));
 
-    typename TimeSeriesImputerEstimator::BaseType::TransformedType output;
+    if(iterLastRow != _lastRowtracker.end()) {
+        std::chrono::system_clock::time_point const &   lastRowTimePoint(std::get<1>(iterLastRow->second));
+        std::chrono::system_clock::time_point const &   inputTimePoint(std::get<0>(input));
+
+        if(inputTimePoint < lastRowTimePoint)
+            throw std::runtime_error("Input stream not in chronological order.");
+    }
+
+    // Invoke the specified impute strategy
+    if(_tsImputeStrategy == TimeSeriesImputeStrategy::Forward || _tsImputeStrategy == TimeSeriesImputeStrategy::Median)
+        ffill_or_median(input, callback);
+    else if(_tsImputeStrategy == TimeSeriesImputeStrategy::Backward)
+        bfill(input, callback);
+    else
+        throw std::runtime_error("Unsupported Impute Strategy");
+}
+
+inline void TimeSeriesImputerEstimator::Transformer::flush_impl(typename ThisBaseType::CallbackFunction const &callback) /*override*/ {
+    std::vector<typename TimeSeriesImputerEstimator::BaseType::TransformedType> output;
+
+    for (auto it = _buffer.begin(); it != _buffer.end(); ++it)
+        output.insert(output.end(), it->second.begin(), it->second.end());
+
+    // Clear the working state
+    _lastRowtracker.clear();
+    _buffer.clear();
+
+    // TODO: This can be implemented more efficiently, but we are just going for functional parity during this refactor
+    for(auto & addedRow : output)
+        callback(std::move(addedRow));
+}
+
+inline std::vector<typename TimeSeriesImputerEstimator::Transformer::ThisBaseType::TransformedType> TimeSeriesImputerEstimator::Transformer::generate_rows(typename ThisBaseType::InputType const &input, typename TimeSeriesImputerEstimator::TimePointType const & lastObservedTP) {
+
+    std::vector<typename TimeSeriesImputerEstimator::Transformer::ThisBaseType::TransformedType> output;
     typename TimeSeriesImputerEstimator::TimePointType tempTP = lastObservedTP + _frequency;
     typename TimeSeriesImputerEstimator::TimePointType inputTP = std::get<0>(input);
 
@@ -373,14 +379,14 @@ typename TimeSeriesImputerEstimator::BaseType::TransformedType TimeSeriesImputer
     return output;
 }
 
-void TimeSeriesImputerEstimator::Transformer::impute(typename TimeSeriesImputerEstimator::ColsToImputeType & prev, typename TimeSeriesImputerEstimator::ColsToImputeType & current) {
+inline void TimeSeriesImputerEstimator::Transformer::impute(typename TimeSeriesImputerEstimator::ColsToImputeType & prev, typename TimeSeriesImputerEstimator::ColsToImputeType & current) {
 
     for(std::size_t i=0; i< current.size(); ++i)
         if(StrTraits::IsNull(current[i]))
             current[i] = prev[i];
 }
 
-bool TimeSeriesImputerEstimator::Transformer::no_nulls(typename TimeSeriesImputerEstimator::ColsToImputeType const & input) {
+inline bool TimeSeriesImputerEstimator::Transformer::no_nulls(typename TimeSeriesImputerEstimator::ColsToImputeType const & input) {
 
     for(std::size_t i=0; i< input.size(); ++i)
         if(StrTraits::IsNull(input[i]))
@@ -389,7 +395,7 @@ bool TimeSeriesImputerEstimator::Transformer::no_nulls(typename TimeSeriesImpute
     return true;
 }
 
-typename TimeSeriesImputerEstimator::BaseType::TransformedType TimeSeriesImputerEstimator::Transformer::bfill(typename BaseType::InputType input) {
+inline void TimeSeriesImputerEstimator::Transformer::bfill(typename ThisBaseType::InputType const &input, typename ThisBaseType::CallbackFunction const &callback) {
 
     typename TimeSeriesImputerEstimator::KeyType const & key = std::get<1>(input);
 
@@ -397,7 +403,7 @@ typename TimeSeriesImputerEstimator::BaseType::TransformedType TimeSeriesImputer
             _lastRowtracker.insert(std::make_pair(key, std::tuple_cat(std::make_tuple(false), input)));
 
     typename TimeSeriesImputerEstimator::OutputRowType  & lastRow = _lastRowtracker[key];
-    TimeSeriesImputerEstimator::BaseType::TransformedType addedRowsResultset = generate_rows(input, std::get<1>(lastRow));
+    std::vector<TimeSeriesImputerEstimator::BaseType::TransformedType> addedRowsResultset = generate_rows(input, std::get<1>(lastRow));
 
     if ( _buffer.find(key) != _buffer.end() )
             _buffer[key].insert(_buffer[key].end(), addedRowsResultset.begin(), addedRowsResultset.end());
@@ -412,7 +418,7 @@ typename TimeSeriesImputerEstimator::BaseType::TransformedType TimeSeriesImputer
     }
     _lastRowtracker[key] = _buffer[key].back();
 
-    typename TimeSeriesImputerEstimator::BaseType::TransformedType results;
+    std::vector<typename TimeSeriesImputerEstimator::BaseType::TransformedType> results;
     int count = 0;
     for(std::size_t i=0; i< _buffer[key].size(); ++i)
     {
@@ -427,17 +433,19 @@ typename TimeSeriesImputerEstimator::BaseType::TransformedType TimeSeriesImputer
     if(count > 0)
         _buffer[key].erase(_buffer[key].begin(),_buffer[key].begin()+count);
 
-    return results;
+    // TODO: This can be implemented more efficiently, but we are just going for functional parity during this refactor
+    for(auto & addedRow : results)
+        callback(std::move(addedRow));
 }
 
-typename TimeSeriesImputerEstimator::BaseType::TransformedType TimeSeriesImputerEstimator::Transformer::ffill_or_median(typename BaseType::InputType input) {
+inline void TimeSeriesImputerEstimator::Transformer::ffill_or_median(typename ThisBaseType::InputType const &input, typename ThisBaseType::CallbackFunction const &callback) {
 
     typename TimeSeriesImputerEstimator::KeyType const & key = std::get<1>(input);
     if ( _lastRowtracker.find(key) == _lastRowtracker.end() )
             _lastRowtracker.insert(std::make_pair(key, std::tuple_cat(std::make_tuple(false), input)));
 
     typename TimeSeriesImputerEstimator::OutputRowType  & lastRow = _lastRowtracker[key];
-    TimeSeriesImputerEstimator::BaseType::TransformedType addedRowsResultset = generate_rows(input, std::get<1>(lastRow));
+    std::vector<TimeSeriesImputerEstimator::BaseType::TransformedType> addedRowsResultset = generate_rows(input, std::get<1>(lastRow));
 
     for(auto &addedRow : addedRowsResultset) {
         if(_tsImputeStrategy == TimeSeriesImputeStrategy::Forward)
@@ -459,7 +467,7 @@ typename TimeSeriesImputerEstimator::BaseType::TransformedType TimeSeriesImputer
                         else
                             throw std::runtime_error("Invalid key");
                     }
-                    
+
 					assert(addedRowColIndex < _colsToImputeDataTypes.size());
                     assert(addedRowColIndex < iterMedian->second.size());
                     addedRowData[addedRowColIndex] = Traits<std::double_t>::ToString(iterMedian->second[addedRowColIndex]);
@@ -473,9 +481,10 @@ typename TimeSeriesImputerEstimator::BaseType::TransformedType TimeSeriesImputer
 
     _lastRowtracker[key] = lastRow;
 
-    return addedRowsResultset;
+    // TODO: This can be implemented more efficiently, but we are just going for functional parity during this refactor
+    for(auto & addedRow : addedRowsResultset)
+        callback(std::move(addedRow));
 }
-
 
 } // namespace Components
 } // namespace Featurizers

@@ -49,22 +49,17 @@ void MissingDummiesFeaturizer_int8_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MissingDummiesFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MissingDummiesFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -152,22 +147,17 @@ void MissingDummiesFeaturizer_int16_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MissingDummiesFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MissingDummiesFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -255,22 +245,17 @@ void MissingDummiesFeaturizer_int32_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MissingDummiesFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MissingDummiesFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -358,22 +343,17 @@ void MissingDummiesFeaturizer_int64_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MissingDummiesFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MissingDummiesFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -461,22 +441,17 @@ void MissingDummiesFeaturizer_uint8_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MissingDummiesFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MissingDummiesFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -564,22 +539,17 @@ void MissingDummiesFeaturizer_uint16_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MissingDummiesFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MissingDummiesFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -667,22 +637,17 @@ void MissingDummiesFeaturizer_uint32_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MissingDummiesFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MissingDummiesFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -770,22 +735,17 @@ void MissingDummiesFeaturizer_uint64_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MissingDummiesFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MissingDummiesFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -873,22 +833,17 @@ void MissingDummiesFeaturizer_float_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MissingDummiesFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MissingDummiesFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -976,22 +931,17 @@ void MissingDummiesFeaturizer_double_t_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MissingDummiesFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MissingDummiesFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -1079,22 +1029,17 @@ void MissingDummiesFeaturizer_bool_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MissingDummiesFeaturizer_bool_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MissingDummiesFeaturizer_bool_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {
@@ -1182,22 +1127,17 @@ void MissingDummiesFeaturizer_string_Test(
                 if(iter != training_input.end())
                     continue;
 
-                REQUIRE(MissingDummiesFeaturizer_string_CompleteTraining(pEstimatorHandle, &result, &pErrorInfo));
-                REQUIRE(pErrorInfo == nullptr);
-
-                if(result == Complete)
-                    break;
-
-                if(result == ResetAndContinue) {
-                    iter = training_input.begin();
-                    continue;
-                }
+                break;
             }
 
             INFO("Value is " << result)
             REQUIRE(false);
         }
     }
+
+    MissingDummiesFeaturizer_string_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    REQUIRE(pErrorInfo == nullptr);
+
 
     // Once here, training should be complete
     {

@@ -13,77 +13,139 @@ namespace Featurizers {
 namespace Components {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         PipelineExecutionEstimatorImpl
-///  \brief         Executes one or more `Estimators` in sequential
-///                 order. This object is used to stich together individual
-///                 `Estimators` into a larger directed acyclic graph (DAG).
+///  \class         PipelineExecutionTransformer
+///  \brief         `Transformer` associated with a `PipelineExecutionEstimatorImpl`
+///                 object.
 ///
-template <typename... EstimatorT>
-class PipelineExecutionEstimatorImpl : public TransformerEstimator<
-    typename Details::PipelineTraits<EstimatorT...>::InputType,
-    typename Details::PipelineTraits<EstimatorT...>::TransformedType
-> {
+template <typename... EstimatorTs>
+class PipelineExecutionTransformer :
+    public Transformer<
+        typename Details::PipelineTraits<EstimatorTs...>::InputType,
+        typename Details::PipelineTraits<EstimatorTs...>::TransformedType
+    > {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using PipelineTraits                    = Details::PipelineTraits<EstimatorT...>;
+    using PipelineTraits                    = Details::PipelineTraits<EstimatorTs...>;
 
-    using ThisType                          = PipelineExecutionEstimatorImpl<EstimatorT...>;
-    using BaseType                          = TransformerEstimator<typename PipelineTraits::InputType, typename PipelineTraits::TransformedType>;
-
-    using InputType                         = typename BaseType::InputType;
-    using FitBufferInputType                = typename BaseType::FitBufferInputType;
-    using FitResult                         = typename BaseType::FitResult;
-    using TransformerUniquePtr              = typename BaseType::TransformerUniquePtr;
-    using TransformedType                   = typename BaseType::TransformedType;
-
-    using EstimatorChain                    = Details::EstimatorChain<typename PipelineTraits::Pipeline>;
-
-    class Transformer : public BaseType::Transformer {
-    public:
-        // ----------------------------------------------------------------------
-        // |  Public Types
-        using EstimatorChain                = PipelineExecutionEstimatorImpl::EstimatorChain;
-
-        // ----------------------------------------------------------------------
-        // |  Public Methods
-        Transformer(EstimatorChain &estimator_chain);
-        Transformer(Archive &ar);
-
-        ~Transformer(void) override = default;
-
-        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Transformer);
-
-        TransformedType execute(InputType input) override;
-        void save(Archive &ar) const override;
-
-    private:
-        // ----------------------------------------------------------------------
-        // |  Private Types
-        using TransformerChain              = Details::TransformerChain<typename PipelineTraits::Pipeline>;
-
-        // ----------------------------------------------------------------------
-        // |  Private Data
-        TransformerChain                    _transformer_chain;
-    };
-
-    using TransformerType                   = Transformer;
+    using BaseType =
+        Transformer<
+            typename PipelineTraits::InputType,
+            typename PipelineTraits::TransformedType
+        >;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    PipelineExecutionEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
+    PipelineExecutionTransformer(typename PipelineTraits::EstimatorChain &estimatorChain);
+    PipelineExecutionTransformer(Archive &ar);
+
+    ~PipelineExecutionTransformer(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(PipelineExecutionTransformer);
+
+    void save(Archive &ar) const override;
+
+    using BaseType::execute;
+
+    // MSVC has problems when the method definition is separated from the declaration
+    typename BaseType::TransformedType execute(typename BaseType::InputType &input) {
+        // ----------------------------------------------------------------------
+        using TransformedType               = typename BaseType::TransformedType;
+        // ----------------------------------------------------------------------
+
+        // Do absolutely everything possible to avoid default construction, as we don't want
+        // to burden transformed types with that concept.
+        TransformedType *                   pResult(reinterpret_cast<TransformedType *>(alloca(sizeof(TransformedType))));
+        size_t                              cResults(0);
+
+        execute(
+            input,
+            [&pResult, &cResults](TransformedType value) {
+                ++cResults;
+                new (reinterpret_cast<void *>(pResult)) TransformedType(std::move(value));
+            }
+        );
+
+        if(cResults != 1)
+            throw std::runtime_error("This method should only be used with Transformers that generate 1 output value for each input value");
+
+        return std::move(*pResult);
+    }
+
+    typename BaseType::TransformedType execute(typename BaseType::InputType const &input) {
+        typename BaseType::InputType        temp(input);
+
+        return execute(temp);
+    }
+
+private:
+    // ----------------------------------------------------------------------
+    // |  Private Types
+    using TransformerChain                  = typename PipelineTraits::TransformerChain;
+
+    // ----------------------------------------------------------------------
+    // |  Private Data
+    TransformerChain                        _transformerChain;
+
+    // ----------------------------------------------------------------------
+    // |  Private Methods
+
+    // MSVC has problems when attempting to separate the definition from the declaration
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
+        _transformerChain.execute(input, callback);
+    }
+
+    // MSVC has problems when attempting to separate the definition from the declaration
+    void flush_impl(typename BaseType::CallbackFunction const &callback) override {
+        _transformerChain.flush(callback);
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         PipelineExecutionEstimatorImpl
+///  \brief         Executes one or more `Estimators` in sequential
+///                 order. This object is used to stich together individual
+///                 `Estimators` into a larger directed acyclic graph (DAG).
+///
+template <typename... EstimatorTs>
+class PipelineExecutionEstimatorImpl :
+    public TransformerEstimator<
+        typename Details::PipelineTraits<EstimatorTs...>::InputType,
+        typename Details::PipelineTraits<EstimatorTs...>::TransformedType
+    > {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using PipelineTraits                    = Details::PipelineTraits<EstimatorTs...>;
+
+    using BaseType = TransformerEstimator<
+        typename PipelineTraits::InputType,
+        typename PipelineTraits::TransformedType
+    >;
+
+    using TransformerType                   = PipelineExecutionTransformer<EstimatorTs...>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    PipelineExecutionEstimatorImpl(char const *name, AnnotationMapsPtr pAllColumnAnnotations);
 
     /////////////////////////////////////////////////////////////////////////
     ///  \fn            PipelineExecutionEstimatorImpl
     ///  \brief         This constructor should be used when one or more of
-    ///                 the Estimators within the pipeline require custom
-    ///                 arguments during construction:
+    ///                 the `Estimators` within the pipeline require custom
+    ///                 arguments during construction.
     ///
     ///                 Standard:
     ///                     MyObject(AnnotationMapsPtr pAllColumnAnnotations);
@@ -93,7 +155,7 @@ public:
     ///
     ///                 If any Estimator requires Custom constructor, then a ConstructFuncT
     ///                 must be provided (even for those that may not require
-    ///                 custom construction.
+    ///                 custom construction).
     ///
     ///                 Example:
     ///                     class MyEstimator :
@@ -124,24 +186,46 @@ public:
     ///                     };
     ///
     template <typename... ConstructFuncTs>
-    PipelineExecutionEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations, ConstructFuncTs &&... args);
+    PipelineExecutionEstimatorImpl(char const *name, AnnotationMapsPtr pAllColumnAnnotations, ConstructFuncTs &&... args);
+
+    ~PipelineExecutionEstimatorImpl(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(PipelineExecutionEstimatorImpl);
 
 private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Types
+    // |
+    // ----------------------------------------------------------------------
+    using EstimatorChain                    = typename PipelineTraits::EstimatorChain;
+
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    EstimatorChain                          _estimator_chain;
+    EstimatorChain                          _estimatorChain;
 
     // ----------------------------------------------------------------------
     // |
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer) override;
-    FitResult complete_training_impl(void) override;
-    TransformerUniquePtr create_transformer_impl(void) override;
+    bool begin_training_impl(void) override;
+
+    // MSVC has problems when attempting to separate the definition from the declaration
+    FitResult fit_impl(typename BaseType::InputType const *pBuffer, size_t cBuffer) override {
+        return _estimatorChain.fit(pBuffer, cBuffer);
+    }
+
+    bool on_data_completed_impl(void) override;
+    void complete_training_impl(void) override;
+
+    // MSVC has problems when attempting to separate the definition from the declaration
+    typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
+        return std::make_unique<TransformerType>(_estimatorChain);
+    }
 };
 
 // ----------------------------------------------------------------------
@@ -156,66 +240,60 @@ private:
 
 // ----------------------------------------------------------------------
 // |
+// |  PipelineExecutionTransformer
+// |
+// ----------------------------------------------------------------------
+template <typename... EstimatorTs>
+PipelineExecutionTransformer<EstimatorTs...>::PipelineExecutionTransformer(typename PipelineTraits::EstimatorChain &estimatorChain) :
+    _transformerChain(estimatorChain) {
+}
+
+template <typename... EstimatorTs>
+PipelineExecutionTransformer<EstimatorTs...>::PipelineExecutionTransformer(Archive &ar) :
+    _transformerChain(ar) {
+}
+
+template <typename... EstimatorTs>
+void PipelineExecutionTransformer<EstimatorTs...>::save(Archive &ar) const /*override*/ {
+    _transformerChain.save(ar);
+}
+
+// ----------------------------------------------------------------------
+// |
 // |  PipelineExecutionEstimatorImpl
 // |
 // ----------------------------------------------------------------------
-template <typename... EstimatorT>
-PipelineExecutionEstimatorImpl<EstimatorT...>::PipelineExecutionEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations) :
-    BaseType(std::move(name), pAllColumnAnnotations),
-    _estimator_chain(pAllColumnAnnotations) {
-        if(_estimator_chain.is_all_training_complete())
-            this->complete_training();
+template <typename... EstimatorTs>
+PipelineExecutionEstimatorImpl<EstimatorTs...>::PipelineExecutionEstimatorImpl(char const *name, AnnotationMapsPtr pAllColumnAnnotations) :
+    BaseType(name, pAllColumnAnnotations),
+    _estimatorChain(pAllColumnAnnotations) {
 }
 
-template <typename... EstimatorT>
+template <typename... EstimatorTs>
 template <typename... ConstructFuncTs>
-PipelineExecutionEstimatorImpl<EstimatorT...>::PipelineExecutionEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations, ConstructFuncTs &&... args) :
-    BaseType(std::move(name), pAllColumnAnnotations),
-    _estimator_chain(pAllColumnAnnotations, std::forward<ConstructFuncTs>(args)...) {
-        static_assert(sizeof...(EstimatorT) == sizeof...(ConstructFuncTs), "The number of constructor creation args must be equal to the number of estimators");
+PipelineExecutionEstimatorImpl<EstimatorTs...>::PipelineExecutionEstimatorImpl(char const *name, AnnotationMapsPtr pAllColumnAnnotations, ConstructFuncTs &&... funcs) :
+    BaseType(name, pAllColumnAnnotations),
+    _estimatorChain(std::forward<ConstructFuncTs>(funcs)...) {
 
-        if(_estimator_chain.is_all_training_complete())
-            this->complete_training();
-}
-
-template <typename... EstimatorT>
-typename PipelineExecutionEstimatorImpl<EstimatorT...>::FitResult PipelineExecutionEstimatorImpl<EstimatorT...>::fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer) /*override*/ {
-    return _estimator_chain.fit(pBuffer, cBuffer);
-}
-
-template <typename... EstimatorT>
-typename PipelineExecutionEstimatorImpl<EstimatorT...>::FitResult PipelineExecutionEstimatorImpl<EstimatorT...>::complete_training_impl(void) /*override*/ {
-    return _estimator_chain.complete_training(true);
-}
-
-template <typename... EstimatorT>
-typename PipelineExecutionEstimatorImpl<EstimatorT...>::TransformerUniquePtr PipelineExecutionEstimatorImpl<EstimatorT...>::create_transformer_impl(void) /*override*/ {
-    return std::make_unique<Transformer>(_estimator_chain);
+    static_assert(sizeof...(EstimatorTs) == sizeof...(ConstructFuncTs), "The number of constructor creation args must be equal to the number of estimators");
 }
 
 // ----------------------------------------------------------------------
-// |
-// |  PipelineExecutionEstimatorImpl::Transformer
-// |
 // ----------------------------------------------------------------------
-template <typename... EstimatorT>
-PipelineExecutionEstimatorImpl<EstimatorT...>::Transformer::Transformer(EstimatorChain &estimator_chain) :
-    _transformer_chain(estimator_chain) {
+// ----------------------------------------------------------------------
+template <typename... EstimatorTs>
+bool PipelineExecutionEstimatorImpl<EstimatorTs...>::begin_training_impl(void) /*override*/ {
+    return _estimatorChain.begin_training();
 }
 
-template <typename... EstimatorT>
-PipelineExecutionEstimatorImpl<EstimatorT...>::Transformer::Transformer(Archive &ar) :
-    _transformer_chain(ar) {
+template <typename... EstimatorTs>
+bool PipelineExecutionEstimatorImpl<EstimatorTs...>::on_data_completed_impl(void) /*override*/ {
+    return _estimatorChain.on_data_completed();
 }
 
-template <typename... EstimatorT>
-typename PipelineExecutionEstimatorImpl<EstimatorT...>::TransformedType PipelineExecutionEstimatorImpl<EstimatorT...>::Transformer::execute(InputType input) /*override*/ {
-    return _transformer_chain.execute(input);
-}
-
-template <typename... EstimatorT>
-void PipelineExecutionEstimatorImpl<EstimatorT...>::Transformer::save(Archive &ar) const /*override*/ {
-    _transformer_chain.save(ar);
+template <typename... EstimatorTs>
+void PipelineExecutionEstimatorImpl<EstimatorTs...>::complete_training_impl(void) /*override*/ {
+    _estimatorChain.complete_training();
 }
 
 } // namespace Components

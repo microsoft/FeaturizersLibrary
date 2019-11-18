@@ -50,12 +50,16 @@ TransformedType Test(std::vector<std::vector<InputType>> const &trainingBatches,
     NS::TestHelpers::Train<TSImputerEstimator, InputType>(estimator, trainingBatches);
     TSImputerEstimator::TransformerUniquePtr                  pTransformer(estimator.create_transformer());
     TransformedType   	  output;
+    auto const              callback(
+        [&output](typename TransformedType::value_type value) {
+            output.emplace_back(std::move(value));
+        }
+    );
 
     for(auto const &item : inferenceBatches)
-    {
-        auto a = pTransformer->execute(item);
-        output.insert(output.end(), a.begin(), a.end());
-    }
+        pTransformer->execute(item, callback);
+
+    pTransformer->flush(callback);
 
     return output;
 }
@@ -296,7 +300,7 @@ TEST_CASE("ColumnImputation (ffill): 2 grains (ValidRow, EmptyRow)") {
                         std::make_tuple(GetTimePoint(now,0), std::vector<std::string>{"b"}, std::vector<nonstd::optional<std::string>>{"114.5","118"}),
                         std::make_tuple(GetTimePoint(now,1), std::vector<std::string>{"b"}, std::vector<nonstd::optional<std::string>>{nonstd::optional<std::string>{},nonstd::optional<std::string>{}}),
                         std::make_tuple(GetTimePoint(now,1), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{nonstd::optional<std::string>{},nonstd::optional<std::string>{}})
-                        
+
                     }
                 },
                 {
@@ -325,7 +329,7 @@ TEST_CASE("ColumnImputation (ffill): 2 grains (ValidRow, EmptyRow, EmptyRow)") {
                         std::make_tuple(GetTimePoint(now,1), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{nonstd::optional<std::string>{},nonstd::optional<std::string>{}}),
                         std::make_tuple(GetTimePoint(now,2), std::vector<std::string>{"b"}, std::vector<nonstd::optional<std::string>>{nonstd::optional<std::string>{},nonstd::optional<std::string>{}}),
                         std::make_tuple(GetTimePoint(now,2), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{nonstd::optional<std::string>{},nonstd::optional<std::string>{}})
-                        
+
                     }
                 },
                 {
@@ -440,7 +444,7 @@ TEST_CASE("ColumnImputation (bfill): 2 grains (ValidRow, EmptyRow, ValidRow)") {
                         std::make_tuple(GetTimePoint(now,1), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{nonstd::optional<std::string>{},nonstd::optional<std::string>{}}),
                         std::make_tuple(GetTimePoint(now,2), std::vector<std::string>{"b"}, std::vector<nonstd::optional<std::string>>{"120.5","130.5"}),
                         std::make_tuple(GetTimePoint(now,2), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{"20.5","30.5"})
-                        
+
                     }
                 },
                 {

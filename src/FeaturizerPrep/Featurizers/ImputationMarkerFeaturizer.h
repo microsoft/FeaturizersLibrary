@@ -25,7 +25,6 @@ public:
     // ----------------------------------------------------------------------
     static_assert(std::is_same<T, typename Traits<T>::nullable_type>::value, "Input should be Nullable Type");
     using Type                              = T;
-    using ThisType                          = ImputationMarkerTransformer<Type>;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, bool>;
 
     // ----------------------------------------------------------------------
@@ -41,11 +40,9 @@ public:
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(ImputationMarkerTransformer);
 
     // MSVC has problems when the function is defined outside of the declaration
-    typename BaseType::TransformedType execute(typename BaseType::InputType input) override {
-        if(Traits<T>::IsNull(input)) 
-            return true;
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
 
-        return false;
+        callback(Traits<T>::IsNull(input));
     }
 };
 
@@ -58,8 +55,8 @@ public:
     // |
     // ----------------------------------------------------------------------
     using Type                              = typename Traits<T>::nullable_type;
-    using ThisType                          = ImputationMarkerEstimator<Type>;
     using BaseType                          = Components::InferenceOnlyEstimatorImpl<ImputationMarkerTransformer<Type>>;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods

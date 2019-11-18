@@ -11,6 +11,7 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #if (!defined ISLITTLEENDIAN)
@@ -133,12 +134,18 @@ struct Traits {
     //   // Types
     //   - nullable_type
     //
+    //   // "Data"
+    //   static constexpr bool const        IsNullableType;
+    //   static constexpr bool const        IsNativeNullableType;
+    //
     //   // Methods
     //   - static nullable_type CreateNullValue(void);
     //   - static bool IsNull(nullable_type const &value);
     //   - static T const & GetNullableValue(nullable_type const &value);
+    //   - static T & GetNullableValue(nullable_type &value);
     //   - static std::string ToString(T const &value);
-    //   - static T FromString(std::string const &value);    //   - template <typename ArchiveT> static ArchiveT & serialize(ArchiveT &ar, T const &value);
+    //   - static T FromString(std::string const &value);
+    //   - template <typename ArchiveT> static ArchiveT & serialize(ArchiveT &ar, T const &value);
     //   - template <typename ArchiveT> static T deserialize(ArchiveT &ar);
     //
 };
@@ -174,6 +181,9 @@ template <typename T> struct Traits<T const> : public Traits<T> {};
 ///
 template <typename T>
 struct TraitsImpl {
+    static constexpr bool const             IsNullableType = false;
+    static constexpr bool const             IsNativeNullableType = false;
+
     using nullable_type = nonstd::optional<T>;
 
     static nullable_type CreateNullValue(void) {
@@ -191,7 +201,14 @@ struct TraitsImpl {
 
     static T const & GetNullableValue(nullable_type const &value) {
         if (IsNull(value))
-            throw std::runtime_error("GetNullableValue attempt on float_t null.");
+            throw std::runtime_error("GetNullableValue attempt on a null value.");
+        return *value;
+    }
+
+    static T & GetNullableValue(nullable_type &value) {
+        if(IsNull(value))
+            throw std::runtime_error("GetNullableValue attempt on a null value.");
+
         return *value;
     }
 };
@@ -540,7 +557,10 @@ struct Traits<std::uint64_t> : public TraitsImpl<std::uint64_t> {
 
 template <>
 struct Traits<std::float_t> {
-    using nullable_type = std::float_t;
+    using nullable_type                     = std::float_t;
+
+    static constexpr bool const             IsNullableType = true;
+    static constexpr bool const             IsNativeNullableType = true;
 
     static nullable_type CreateNullValue(void) {
         return std::numeric_limits<std::float_t>::quiet_NaN();
@@ -552,7 +572,14 @@ struct Traits<std::float_t> {
 
     static std::float_t const & GetNullableValue(nullable_type const& value) {
         if (IsNull(value))
-            throw std::runtime_error("GetNullableValue attempt on float_t null.");
+            throw std::runtime_error("GetNullableValue attempt on a float_t NaN.");
+
+        return value;
+    }
+
+    static std::float_t & GetNullableValue(nullable_type &value) {
+        if(IsNull(value))
+            throw std::runtime_error("GetNullableValue attempt on a float_t NaN.");
 
         return value;
     }
@@ -589,7 +616,10 @@ struct Traits<std::float_t> {
 
 template <>
 struct Traits<std::double_t>  {
-    using nullable_type = std::double_t;
+    using nullable_type                     = std::double_t;
+
+    static constexpr bool const             IsNullableType = true;
+    static constexpr bool const             IsNativeNullableType = true;
 
     static nullable_type CreateNullValue(void) {
         return std::numeric_limits<std::double_t>::quiet_NaN();
@@ -601,7 +631,14 @@ struct Traits<std::double_t>  {
 
     static std::double_t const & GetNullableValue(nullable_type const& value) {
         if (IsNull(value))
-            throw std::runtime_error("GetNullableValue attempt on double_t null.");
+            throw std::runtime_error("GetNullableValue attempt on a double_t NaN.");
+
+        return value;
+    }
+
+    static std::double_t & GetNullableValue(nullable_type &value) {
+        if(IsNull(value))
+            throw std::runtime_error("GetNullableValue attempt on a double_t NaN.");
 
         return value;
     }
@@ -995,7 +1032,10 @@ struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<st
 
 template <typename T>
 struct Traits<nonstd::optional<T>>  {
-    using nullable_type = nonstd::optional<T>;
+    using nullable_type                     = nonstd::optional<T>;
+
+    static constexpr bool const             IsNullableType = true;
+    static constexpr bool const             IsNativeNullableType = false;
 
     static nullable_type CreateNullValue(void) {
         return nullable_type();
@@ -1007,7 +1047,14 @@ struct Traits<nonstd::optional<T>>  {
 
     static T const & GetNullableValue(nullable_type const& value) {
         if (IsNull(value))
-            throw std::runtime_error("GetNullableValue attempt on Optional type null.");
+            throw std::runtime_error("GetNullableValue attempt on a null optional type.");
+        return *value;
+    }
+
+    static T & GetNullableValue(nullable_type &value) {
+        if(IsNull(value))
+            throw std::runtime_error("GetNullableValue attempt on a null optional type.");
+
         return *value;
     }
 

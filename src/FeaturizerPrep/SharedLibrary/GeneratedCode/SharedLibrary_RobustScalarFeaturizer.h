@@ -14,13 +14,13 @@ struct RobustScalarFeaturizer_int8_t_EstimatorHandle {};
 struct RobustScalarFeaturizer_int8_t_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax,/*out*/ RobustScalarFeaturizer_int8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax,/*out*/ RobustScalarFeaturizer_int8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_DestroyEstimator(/*in*/ RobustScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_IsTrainingComplete(/*in*/ RobustScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_Fit(/*in*/ RobustScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_FitBuffer(/*in*/ RobustScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CreateTransformerFromEstimator(/*in*/ RobustScalarFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle, /*out*/ RobustScalarFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -37,13 +37,13 @@ struct RobustScalarFeaturizer_int16_t_EstimatorHandle {};
 struct RobustScalarFeaturizer_int16_t_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax,/*out*/ RobustScalarFeaturizer_int16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax,/*out*/ RobustScalarFeaturizer_int16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_DestroyEstimator(/*in*/ RobustScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_IsTrainingComplete(/*in*/ RobustScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_Fit(/*in*/ RobustScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_FitBuffer(/*in*/ RobustScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CreateTransformerFromEstimator(/*in*/ RobustScalarFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle, /*out*/ RobustScalarFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -60,13 +60,13 @@ struct RobustScalarFeaturizer_uint8_t_EstimatorHandle {};
 struct RobustScalarFeaturizer_uint8_t_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax,/*out*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax,/*out*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_DestroyEstimator(/*in*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_IsTrainingComplete(/*in*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_Fit(/*in*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_FitBuffer(/*in*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CreateTransformerFromEstimator(/*in*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle, /*out*/ RobustScalarFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -83,13 +83,13 @@ struct RobustScalarFeaturizer_uint16_t_EstimatorHandle {};
 struct RobustScalarFeaturizer_uint16_t_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax,/*out*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax,/*out*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_DestroyEstimator(/*in*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_IsTrainingComplete(/*in*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_Fit(/*in*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_FitBuffer(/*in*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CreateTransformerFromEstimator(/*in*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle, /*out*/ RobustScalarFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -106,13 +106,13 @@ struct RobustScalarFeaturizer_float_t_EstimatorHandle {};
 struct RobustScalarFeaturizer_float_t_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax,/*out*/ RobustScalarFeaturizer_float_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax,/*out*/ RobustScalarFeaturizer_float_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_DestroyEstimator(/*in*/ RobustScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_IsTrainingComplete(/*in*/ RobustScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_Fit(/*in*/ RobustScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_FitBuffer(/*in*/ RobustScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CreateTransformerFromEstimator(/*in*/ RobustScalarFeaturizer_float_t_EstimatorHandle *pEstimatorHandle, /*out*/ RobustScalarFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -129,13 +129,13 @@ struct RobustScalarFeaturizer_int32_t_EstimatorHandle {};
 struct RobustScalarFeaturizer_int32_t_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax,/*out*/ RobustScalarFeaturizer_int32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax,/*out*/ RobustScalarFeaturizer_int32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_DestroyEstimator(/*in*/ RobustScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_IsTrainingComplete(/*in*/ RobustScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_Fit(/*in*/ RobustScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_FitBuffer(/*in*/ RobustScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CreateTransformerFromEstimator(/*in*/ RobustScalarFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle, /*out*/ RobustScalarFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -152,13 +152,13 @@ struct RobustScalarFeaturizer_int64_t_EstimatorHandle {};
 struct RobustScalarFeaturizer_int64_t_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax,/*out*/ RobustScalarFeaturizer_int64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax,/*out*/ RobustScalarFeaturizer_int64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_DestroyEstimator(/*in*/ RobustScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_IsTrainingComplete(/*in*/ RobustScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_Fit(/*in*/ RobustScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_FitBuffer(/*in*/ RobustScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CreateTransformerFromEstimator(/*in*/ RobustScalarFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle, /*out*/ RobustScalarFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -175,13 +175,13 @@ struct RobustScalarFeaturizer_uint32_t_EstimatorHandle {};
 struct RobustScalarFeaturizer_uint32_t_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax,/*out*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax,/*out*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_DestroyEstimator(/*in*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_IsTrainingComplete(/*in*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_Fit(/*in*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_FitBuffer(/*in*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CreateTransformerFromEstimator(/*in*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle, /*out*/ RobustScalarFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -198,13 +198,13 @@ struct RobustScalarFeaturizer_uint64_t_EstimatorHandle {};
 struct RobustScalarFeaturizer_uint64_t_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax,/*out*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax,/*out*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_DestroyEstimator(/*in*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_IsTrainingComplete(/*in*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_Fit(/*in*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_FitBuffer(/*in*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CreateTransformerFromEstimator(/*in*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle, /*out*/ RobustScalarFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -221,13 +221,13 @@ struct RobustScalarFeaturizer_double_t_EstimatorHandle {};
 struct RobustScalarFeaturizer_double_t_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax,/*out*/ RobustScalarFeaturizer_double_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax,/*out*/ RobustScalarFeaturizer_double_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_DestroyEstimator(/*in*/ RobustScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_IsTrainingComplete(/*in*/ RobustScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_Fit(/*in*/ RobustScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_FitBuffer(/*in*/ RobustScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CompleteTraining(/*in*/ RobustScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CreateTransformerFromEstimator(/*in*/ RobustScalarFeaturizer_double_t_EstimatorHandle *pEstimatorHandle, /*out*/ RobustScalarFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);

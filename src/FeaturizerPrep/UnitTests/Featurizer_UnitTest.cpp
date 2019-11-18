@@ -13,6 +13,8 @@ using Microsoft::Featurizer::AnnotationPtr;
 using Microsoft::Featurizer::AnnotationMaps;
 using Microsoft::Featurizer::AnnotationMapsPtr;
 using Microsoft::Featurizer::CreateTestAnnotationMapsPtr;
+
+namespace NS = Microsoft::Featurizer;
 // ----------------------------------------------------------------------
 
 class MyAnnotation : public Microsoft::Featurizer::Annotation {
@@ -23,8 +25,7 @@ public:
 
     // ----------------------------------------------------------------------
     // |  Public Methods
-    MyAnnotation(EstimatorUniqueId id, int state, bool valid_construction=true) :
-        Microsoft::Featurizer::Annotation(valid_construction ? id : nullptr),
+    MyAnnotation(int state) :
         State(std::move(state)) {
     }
 
@@ -34,39 +35,37 @@ public:
 };
 
 TEST_CASE("Annotation") {
-    Microsoft::Featurizer::Annotation::EstimatorUniqueId const              id(reinterpret_cast<void *>(10));
-    MyAnnotation const                                                      annotation(id, 10);
+    MyAnnotation const                                                      annotation(10);
 
-    CHECK(annotation.CreatorId == id);
     CHECK(annotation.State == 10);
-    CHECK_THROWS_WITH(MyAnnotation(id, 10, false), Catch::Matches("Invalid id"));
 }
 
 class MyEstimator : public Microsoft::Featurizer::Estimator {
 public:
     // ----------------------------------------------------------------------
     // |  Public Methods
-    MyEstimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations) :
-        Microsoft::Featurizer::Estimator(std::move(name), std::move(pAllColumnAnnotations)) {
+    MyEstimator(char const *name, AnnotationMapsPtr pAllColumnAnnotations) :
+        Microsoft::Featurizer::Estimator(name, std::move(pAllColumnAnnotations)) {
     }
 
     ~MyEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyEstimator);
 
-    void add_annotation(size_t col_index, int state, bool invalid_add=false) const {
-        Microsoft::Featurizer::Estimator::add_annotation(invalid_add ? AnnotationPtr() : std::make_shared<MyAnnotation>(this, state), col_index);
+    void add_annotation(size_t colIndex, int state, bool invalidAdd=false) const {
+        Microsoft::Featurizer::Estimator::add_annotation(invalidAdd ? AnnotationPtr() : std::make_shared<MyAnnotation>(state), colIndex);
     }
 
-    MyAnnotation * get_annotation(size_t col_index) const {
-        return get_annotation_impl<MyAnnotation>(col_index);
+    MyAnnotation * get_annotation(size_t colIndex) const {
+        return get_annotation_impl<MyAnnotation>(get_column_annotations(), colIndex, Name);
     }
 };
 
 TEST_CASE("Estimator - Invalid construction") {
-    CHECK_THROWS_WITH(MyEstimator(std::string(), CreateTestAnnotationMapsPtr(1)), "Invalid name");
-    CHECK_THROWS_WITH(MyEstimator("Name", AnnotationMapsPtr()), "Empty annotations");
-    CHECK_THROWS_WITH(MyEstimator("Name", CreateTestAnnotationMapsPtr(0)), "Empty annotations");
+    CHECK_THROWS_WITH(MyEstimator(nullptr, CreateTestAnnotationMapsPtr(1)), "name");
+    CHECK_THROWS_WITH(MyEstimator("", CreateTestAnnotationMapsPtr(1)), "name");
+    CHECK_THROWS_WITH(MyEstimator("Name", AnnotationMapsPtr()), "pAllColumnAnnotations");
+    CHECK_THROWS_WITH(MyEstimator("Name", CreateTestAnnotationMapsPtr(0)), "pAllColumnAnnotations");
 
 }
 
@@ -74,7 +73,7 @@ TEST_CASE("Estimator") {
     AnnotationMapsPtr const                 pAllAnnotations(CreateTestAnnotationMapsPtr(2));
     MyEstimator const                       estimator("MyNewEstimator", pAllAnnotations);
 
-    CHECK(estimator.Name == "MyNewEstimator");
+    CHECK(strcmp(estimator.Name, "MyNewEstimator") == 0);
     CHECK(&estimator.get_column_annotations() == pAllAnnotations.get());
 
     CHECK(!estimator.get_annotation(0));
@@ -86,19 +85,21 @@ TEST_CASE("Estimator") {
     CHECK(estimator.get_annotation(1)->State == 100);
 
     // Annotation-related errors
-    CHECK_THROWS_WITH(estimator.add_annotation(0, 200, true), "Invalid annotation");
-    CHECK_THROWS_WITH(estimator.add_annotation(99999, 200), "Invalid annotation index");
+    CHECK_THROWS_WITH(estimator.add_annotation(0, 200, true), "pAnnotation");
+    CHECK_THROWS_WITH(estimator.add_annotation(99999, 200), "colIndex");
 
-    CHECK_THROWS_WITH(estimator.get_annotation(99999), "Invalid annotation index");
+    CHECK_THROWS_WITH(estimator.get_annotation(99999), "colIndex");
 }
 
-class MyFitEstimator : public Microsoft::Featurizer::FitEstimatorImpl<int> {
+class MyFitEstimator : public Microsoft::Featurizer::FitEstimator<int> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Methods
-    MyFitEstimator(bool return_complete_from_fit, bool is_training_complete=false) :
-        Microsoft::Featurizer::FitEstimatorImpl<int>("Name", CreateTestAnnotationMapsPtr(2), is_training_complete),
-        _return_complete_from_fit(return_complete_from_fit) {
+    MyFitEstimator(bool complete_on_begin, bool complete_on_fit, bool prevent_finished) :
+        Microsoft::Featurizer::FitEstimator<int>("Name", CreateTestAnnotationMapsPtr(2)),
+        _complete_on_begin(complete_on_begin),
+        _complete_on_fit(complete_on_fit),
+        _prevent_finished(prevent_finished) {
     }
 
     ~MyFitEstimator(void) override = default;
@@ -108,77 +109,143 @@ public:
 private:
     // ----------------------------------------------------------------------
     // |  Private Data
-    bool const                              _return_complete_from_fit;
+    bool const                              _complete_on_begin;
+    bool const                              _complete_on_fit;
+    bool const                              _prevent_finished;
 
     // ----------------------------------------------------------------------
     // |  Private Methods
-    FitResult fit_impl(InputType const *, size_t) override {
-        return _return_complete_from_fit ? FitResult::Complete : FitResult::Continue;
+    bool begin_training_impl(void) override {
+        return _complete_on_begin == false;
     }
 
-    FitResult complete_training_impl(void) override {
-        return FitResult::Complete;
+    NS::FitResult fit_impl(InputType const *, size_t) override {
+        return _complete_on_fit ? NS::FitResult::Complete : NS::FitResult::Continue;
+    }
+
+    bool on_data_completed_impl(void) override {
+        return _prevent_finished == false;
+    }
+
+    void complete_training_impl(void) override {
     }
 };
 
-TEST_CASE("FitEstimatorImpl") {
-    CHECK(MyFitEstimator(true).is_training_complete() == false);
-    CHECK(MyFitEstimator(true, true).is_training_complete());
+TEST_CASE("FitEstimator - Standard") {
+    MyFitEstimator                          estimator(false, false, false);
 
-    MyFitEstimator                          completed(false, true);
+    CHECK(estimator.get_state() == NS::TrainingState::Pending);
+    CHECK_THROWS_WITH(estimator.fit(1), Catch::Contains("should not be invoked on an estimator that is not training or is already finished/complete"));
+    CHECK_THROWS_WITH(estimator.on_data_completed(), Catch::Contains("should not be invoked on an estimator that is not training or is already complete"));
+    CHECK_THROWS_WITH(estimator.complete_training(), Catch::Contains("should not be invoked on an estimator that is not training or is already complete"));
 
-    CHECK(completed.is_training_complete());
-    CHECK_THROWS_WITH(completed.fit(reinterpret_cast<int *>(&completed), 1), Catch::Contains("should not be invoked on an estimator that is already complete"));
+    estimator.begin_training();
 
-    // Note that in all these cases, the actual value set to fit doesn't matter because the object doesn't
-    // do anything with the data.
-    MyFitEstimator                          manual_complete(false);
+    CHECK(estimator.get_state() == NS::TrainingState::Training);
+    CHECK_THROWS_WITH(estimator.begin_training(), Catch::Contains("should not be invoked on an estimator that is already training or completed"));
 
-    // Invalid invocation
-    CHECK_THROWS_WITH(manual_complete.fit(reinterpret_cast<int *>(&manual_complete), 0), "Invalid buffer");
-    CHECK_THROWS_WITH(manual_complete.fit(nullptr, 10), "Invalid buffer");
+    estimator.fit(1);
+    CHECK(estimator.get_state() == NS::TrainingState::Training);
 
-    CHECK(manual_complete.fit(reinterpret_cast<int *>(&manual_complete), 1) == MyFitEstimator::FitResult::Continue);
+    estimator.fit(2);
+    CHECK(estimator.get_state() == NS::TrainingState::Training);
 
-    CHECK(manual_complete.is_training_complete() == false);
-    manual_complete.complete_training();
-    CHECK(manual_complete.is_training_complete());
-    CHECK_THROWS_WITH(manual_complete.fit(reinterpret_cast<int *>(&manual_complete), 1), Catch::Contains("should not be invoked on an estimator that is already complete"));
-    CHECK_THROWS_WITH(manual_complete.complete_training(), Catch::Contains("should not be invoked on an estimator that is already complete"));
+    estimator.on_data_completed();
+    CHECK(estimator.get_state() == NS::TrainingState::Finished);
 
-    MyFitEstimator                          auto_complete(true);
+    estimator.complete_training();
 
-    CHECK(auto_complete.is_training_complete() == false);
-    CHECK(auto_complete.fit(reinterpret_cast<int *>(&auto_complete), 1) == MyFitEstimator::FitResult::Complete);
-    CHECK(auto_complete.is_training_complete());
-    CHECK_THROWS_WITH(auto_complete.fit(reinterpret_cast<int *>(&manual_complete), 1), Catch::Contains("should not be invoked on an estimator that is already complete"));
-    CHECK_THROWS_WITH(auto_complete.complete_training(), Catch::Contains("should not be invoked on an estimator that is already complete"));
+    CHECK(estimator.get_state() == NS::TrainingState::Completed);
+    CHECK_THROWS_WITH(estimator.begin_training(), Catch::Contains("should not be invoked on an estimator that is already training or completed"));
+    CHECK_THROWS_WITH(estimator.fit(3), Catch::Contains("should not be invoked on an estimator that is not training or is already finished/complete"));
+    CHECK_THROWS_WITH(estimator.on_data_completed(), Catch::Contains("should not be invoked on an estimator that is not training or is already complete"));
+    CHECK_THROWS_WITH(estimator.complete_training(), Catch::Contains("should not be invoked on an estimator that is not training or is already complete"));
+}
+
+TEST_CASE("FitEstimator - Finished on Begin") {
+    MyFitEstimator                          estimator(true, false, false);
+
+    CHECK(estimator.get_state() == NS::TrainingState::Pending);
+
+    estimator.begin_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Finished);
+    CHECK_THROWS_WITH(estimator.fit(1), Catch::Contains("should not be invoked on an estimator that is not training or is already finished/complete"));
+
+    estimator.on_data_completed();
+    CHECK(estimator.get_state() == NS::TrainingState::Finished);
+
+    estimator.complete_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Completed);
+}
+
+TEST_CASE("FitEstimator - Finished on Fit") {
+    MyFitEstimator                          estimator(false, true, false);
+
+    CHECK(estimator.get_state() == NS::TrainingState::Pending);
+
+    estimator.begin_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Training);
+
+    estimator.fit(1);
+    CHECK(estimator.get_state() == NS::TrainingState::Finished);
+    CHECK_THROWS_WITH(estimator.fit(2), Catch::Contains("should not be invoked on an estimator that is not training or is already finished/complete"));
+
+    estimator.on_data_completed();
+    CHECK(estimator.get_state() == NS::TrainingState::Finished);
+
+    estimator.complete_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Completed);
+}
+
+TEST_CASE("FitEstimator - No Finished") {
+    MyFitEstimator                          estimator(false, false, true);
+
+    CHECK(estimator.get_state() == NS::TrainingState::Pending);
+
+    estimator.begin_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Training);
+
+    estimator.fit(1);
+    CHECK(estimator.get_state() == NS::TrainingState::Training);
+
+    estimator.on_data_completed();
+    CHECK(estimator.get_state() == NS::TrainingState::Training);
+
+    estimator.complete_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Completed);
 }
 
 class MyTransformerEstimator : public Microsoft::Featurizer::TransformerEstimator<int, bool> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Types
-    struct  MyTransformer : public Transformer {
+    class  MyTransformer : public Microsoft::Featurizer::StandardTransformer<int, bool> {
+    public:
         MyTransformer(void) = default;
         ~MyTransformer(void) override = default;
 
         FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyTransformer);
 
-        bool execute(int value) override {
-            return value & 1;
-        }
-
         void save(Microsoft::Featurizer::Archive &) const override {
             // Nothing to do here
+        }
+
+    private:
+        void execute_impl(int const &value, CallbackFunction const &callback) override {
+            callback(value & 1);
         }
     };
 
     // ----------------------------------------------------------------------
     // |  Public Methods
-    MyTransformerEstimator(bool return_invalid_transformer, bool is_training_completed=true) :
-        Microsoft::Featurizer::TransformerEstimator<int, bool>("Name", CreateTestAnnotationMapsPtr(2), is_training_completed),
+    MyTransformerEstimator(bool auto_complete, bool return_invalid_transformer) :
+        Microsoft::Featurizer::TransformerEstimator<int, bool>("Name", CreateTestAnnotationMapsPtr(2)),
         _return_invalid_transformer(return_invalid_transformer) {
+
+            if(auto_complete) {
+                begin_training();
+                complete_training();
+            }
     }
 
     ~MyTransformerEstimator(void) override = default;
@@ -192,12 +259,19 @@ private:
 
     // ----------------------------------------------------------------------
     // |  Private Methods
-    FitResult fit_impl(InputType const *, size_t) override {
+    bool begin_training_impl(void) override {
+        return true;
+    }
+
+    NS::FitResult fit_impl(InputType const *, size_t) override {
         throw std::runtime_error("This should never be called");
     }
 
-    FitResult complete_training_impl(void) override {
-        throw std::runtime_error("This should never be called");
+    bool on_data_completed_impl(void) override {
+        return true;
+    }
+
+    void complete_training_impl(void) override {
     }
 
     TransformerUniquePtr create_transformer_impl(void) override {
@@ -206,13 +280,13 @@ private:
 };
 
 TEST_CASE("TransformerEstimator") {
-    CHECK_THROWS_WITH(MyTransformerEstimator(false, false).create_transformer(), Catch::Contains("should not be invoked on an estimator that is not yet complete"));
+    CHECK_THROWS_WITH(MyTransformerEstimator(false, true).create_transformer(), Catch::Contains("should not be invoked on an estimator that is not yet complete"));
 
-    MyTransformerEstimator                  estimator(false);
+    MyTransformerEstimator                  estimator(true, false);
 
-    CHECK(estimator.is_training_complete());
+    CHECK(estimator.get_state() == NS::TrainingState::Completed);
     CHECK(estimator.create_transformer());
     CHECK_THROWS_WITH(estimator.create_transformer(), Catch::Contains("should not be invoked on an estimator that has been used to create a"));
 
-    CHECK_THROWS_WITH(MyTransformerEstimator(true).create_transformer(), "Invalid result");
+    CHECK_THROWS_WITH(MyTransformerEstimator(true, true).create_transformer(), "Invalid result");
 }

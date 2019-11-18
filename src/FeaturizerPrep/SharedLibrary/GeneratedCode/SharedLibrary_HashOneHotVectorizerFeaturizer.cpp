@@ -36,6 +36,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateEstimato
 
         // No validation
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , hashingSeedVal, numCols);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle*>(index);
 
@@ -85,7 +88,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_IsTrainingComp
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -148,7 +151,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_FitBuffer(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -156,13 +159,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CompleteTraini
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -302,9 +302,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_Transform(/*in
         auto result(transformer.execute(input));
 
         // Output
-        output->colIndex = result.colIndex;
-        output->numCols = result.numCols;
-        output->val = result.val;
+        output->ColIndex = result.ColIndex;
+        output->NumCols = result.NumCols;
+        output->Val = result.Val;
     
         return true;
     }
@@ -347,6 +347,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateEstimat
 
         // No validation
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , hashingSeedVal, numCols);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle*>(index);
 
@@ -396,7 +399,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_IsTrainingCom
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -459,7 +462,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_FitBuffer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -467,13 +470,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CompleteTrain
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -613,9 +613,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_Transform(/*i
         auto result(transformer.execute(input));
 
         // Output
-        output->colIndex = result.colIndex;
-        output->numCols = result.numCols;
-        output->val = result.val;
+        output->ColIndex = result.ColIndex;
+        output->NumCols = result.NumCols;
+        output->Val = result.Val;
     
         return true;
     }
@@ -658,6 +658,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateEstimat
 
         // No validation
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , hashingSeedVal, numCols);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle*>(index);
 
@@ -707,7 +710,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_IsTrainingCom
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -770,7 +773,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_FitBuffer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -778,13 +781,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CompleteTrain
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -924,9 +924,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_Transform(/*i
         auto result(transformer.execute(input));
 
         // Output
-        output->colIndex = result.colIndex;
-        output->numCols = result.numCols;
-        output->val = result.val;
+        output->ColIndex = result.ColIndex;
+        output->NumCols = result.NumCols;
+        output->Val = result.Val;
     
         return true;
     }
@@ -969,6 +969,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateEstimat
 
         // No validation
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , hashingSeedVal, numCols);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle*>(index);
 
@@ -1018,7 +1021,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_IsTrainingCom
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1081,7 +1084,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_FitBuffer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1089,13 +1092,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CompleteTrain
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1235,9 +1235,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_Transform(/*i
         auto result(transformer.execute(input));
 
         // Output
-        output->colIndex = result.colIndex;
-        output->numCols = result.numCols;
-        output->val = result.val;
+        output->ColIndex = result.ColIndex;
+        output->NumCols = result.NumCols;
+        output->Val = result.Val;
     
         return true;
     }
@@ -1280,6 +1280,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateEstimat
 
         // No validation
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , hashingSeedVal, numCols);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle*>(index);
 
@@ -1329,7 +1332,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_IsTrainingCom
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1392,7 +1395,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_FitBuffer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1400,13 +1403,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CompleteTrain
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1546,9 +1546,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_Transform(/*i
         auto result(transformer.execute(input));
 
         // Output
-        output->colIndex = result.colIndex;
-        output->numCols = result.numCols;
-        output->val = result.val;
+        output->ColIndex = result.ColIndex;
+        output->NumCols = result.NumCols;
+        output->Val = result.Val;
     
         return true;
     }
@@ -1591,6 +1591,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateEstima
 
         // No validation
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , hashingSeedVal, numCols);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle*>(index);
 
@@ -1640,7 +1643,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_IsTrainingCo
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1703,7 +1706,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_FitBuffer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1711,13 +1714,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CompleteTrai
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1857,9 +1857,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_Transform(/*
         auto result(transformer.execute(input));
 
         // Output
-        output->colIndex = result.colIndex;
-        output->numCols = result.numCols;
-        output->val = result.val;
+        output->ColIndex = result.ColIndex;
+        output->NumCols = result.NumCols;
+        output->Val = result.Val;
     
         return true;
     }
@@ -1902,6 +1902,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateEstima
 
         // No validation
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , hashingSeedVal, numCols);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle*>(index);
 
@@ -1951,7 +1954,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_IsTrainingCo
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2014,7 +2017,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_FitBuffer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2022,13 +2025,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CompleteTrai
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2168,9 +2168,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_Transform(/*
         auto result(transformer.execute(input));
 
         // Output
-        output->colIndex = result.colIndex;
-        output->numCols = result.numCols;
-        output->val = result.val;
+        output->ColIndex = result.ColIndex;
+        output->NumCols = result.NumCols;
+        output->Val = result.Val;
     
         return true;
     }
@@ -2213,6 +2213,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateEstima
 
         // No validation
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , hashingSeedVal, numCols);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle*>(index);
 
@@ -2262,7 +2265,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_IsTrainingCo
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2325,7 +2328,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_FitBuffer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2333,13 +2336,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CompleteTrai
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2479,9 +2479,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_Transform(/*
         auto result(transformer.execute(input));
 
         // Output
-        output->colIndex = result.colIndex;
-        output->numCols = result.numCols;
-        output->val = result.val;
+        output->ColIndex = result.ColIndex;
+        output->NumCols = result.NumCols;
+        output->Val = result.Val;
     
         return true;
     }
@@ -2524,6 +2524,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateEstimat
 
         // No validation
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , hashingSeedVal, numCols);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle*>(index);
 
@@ -2573,7 +2576,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_IsTrainingCom
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2636,7 +2639,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_FitBuffer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2644,13 +2647,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CompleteTrain
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2790,9 +2790,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_Transform(/*i
         auto result(transformer.execute(input));
 
         // Output
-        output->colIndex = result.colIndex;
-        output->numCols = result.numCols;
-        output->val = result.val;
+        output->ColIndex = result.ColIndex;
+        output->NumCols = result.NumCols;
+        output->Val = result.Val;
     
         return true;
     }
@@ -2835,6 +2835,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateEstima
 
         // No validation
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , hashingSeedVal, numCols);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle*>(index);
 
@@ -2884,7 +2887,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_IsTrainingCo
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2947,7 +2950,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_FitBuffer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2955,13 +2958,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CompleteTrai
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -3101,9 +3101,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_Transform(/*
         auto result(transformer.execute(input));
 
         // Output
-        output->colIndex = result.colIndex;
-        output->numCols = result.numCols;
-        output->val = result.val;
+        output->ColIndex = result.ColIndex;
+        output->NumCols = result.NumCols;
+        output->Val = result.Val;
     
         return true;
     }
@@ -3146,6 +3146,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_CreateEstimator(
 
         // No validation
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<bool>* pEstimator = new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , hashingSeedVal, numCols);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_bool_EstimatorHandle*>(index);
 
@@ -3195,7 +3198,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_IsTrainingComple
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<bool> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -3258,7 +3261,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_FitBuffer(/*in*/
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3266,13 +3269,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_CompleteTraining
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -3412,9 +3412,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_Transform(/*in*/
         auto result(transformer.execute(input));
 
         // Output
-        output->colIndex = result.colIndex;
-        output->numCols = result.numCols;
-        output->val = result.val;
+        output->ColIndex = result.ColIndex;
+        output->NumCols = result.NumCols;
+        output->Val = result.Val;
     
         return true;
     }
@@ -3457,6 +3457,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_CreateEstimato
 
         // No validation
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , hashingSeedVal, numCols);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_string_EstimatorHandle*>(index);
 
@@ -3506,7 +3509,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_IsTrainingComp
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::string> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -3580,7 +3583,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_FitBuffer(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_string_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3588,13 +3591,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_CompleteTraini
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -3734,9 +3734,9 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_Transform(/*in
         auto result(transformer.execute(input));
 
         // Output
-        output->colIndex = result.colIndex;
-        output->numCols = result.numCols;
-        output->val = result.val;
+        output->ColIndex = result.ColIndex;
+        output->NumCols = result.NumCols;
+        output->Val = result.Val;
     
         return true;
     }

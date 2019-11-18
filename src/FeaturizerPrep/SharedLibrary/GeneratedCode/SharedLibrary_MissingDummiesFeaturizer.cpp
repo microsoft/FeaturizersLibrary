@@ -36,6 +36,9 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateEstimator(/*ou
 
         // No validation
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_int8_t_EstimatorHandle*>(index);
 
@@ -85,7 +88,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -159,7 +162,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_FitBuffer(/*in*/ Mis
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -167,13 +170,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -337,6 +337,9 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateEstimator(/*o
 
         // No validation
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_int16_t_EstimatorHandle*>(index);
 
@@ -386,7 +389,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_IsTrainingComplete(
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -460,7 +463,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_FitBuffer(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -468,13 +471,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CompleteTraining(/*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -638,6 +638,9 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateEstimator(/*o
 
         // No validation
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_int32_t_EstimatorHandle*>(index);
 
@@ -687,7 +690,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_IsTrainingComplete(
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -761,7 +764,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_FitBuffer(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -769,13 +772,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CompleteTraining(/*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -939,6 +939,9 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateEstimator(/*o
 
         // No validation
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_int64_t_EstimatorHandle*>(index);
 
@@ -988,7 +991,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_IsTrainingComplete(
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1062,7 +1065,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_FitBuffer(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1070,13 +1073,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CompleteTraining(/*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1240,6 +1240,9 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateEstimator(/*o
 
         // No validation
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_uint8_t_EstimatorHandle*>(index);
 
@@ -1289,7 +1292,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_IsTrainingComplete(
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1363,7 +1366,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_FitBuffer(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1371,13 +1374,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CompleteTraining(/*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1541,6 +1541,9 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateEstimator(/*
 
         // No validation
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_uint16_t_EstimatorHandle*>(index);
 
@@ -1590,7 +1593,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_IsTrainingComplete
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1664,7 +1667,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_FitBuffer(/*in*/ M
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1672,13 +1675,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CompleteTraining(/
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1842,6 +1842,9 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateEstimator(/*
 
         // No validation
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_uint32_t_EstimatorHandle*>(index);
 
@@ -1891,7 +1894,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_IsTrainingComplete
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1965,7 +1968,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_FitBuffer(/*in*/ M
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1973,13 +1976,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CompleteTraining(/
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2143,6 +2143,9 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateEstimator(/*
 
         // No validation
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_uint64_t_EstimatorHandle*>(index);
 
@@ -2192,7 +2195,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_IsTrainingComplete
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2266,7 +2269,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_FitBuffer(/*in*/ M
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2274,13 +2277,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CompleteTraining(/
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2444,6 +2444,9 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateEstimator(/*o
 
         // No validation
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_float_t_EstimatorHandle*>(index);
 
@@ -2493,7 +2496,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_IsTrainingComplete(
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2567,7 +2570,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_FitBuffer(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2575,13 +2578,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CompleteTraining(/*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2745,6 +2745,9 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateEstimator(/*
 
         // No validation
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_double_t_EstimatorHandle*>(index);
 
@@ -2794,7 +2797,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_IsTrainingComplete
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2868,7 +2871,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_FitBuffer(/*in*/ M
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2876,13 +2879,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CompleteTraining(/
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -3046,6 +3046,9 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_CreateEstimator(/*out*
 
         // No validation
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<bool>* pEstimator = new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_bool_EstimatorHandle*>(index);
 
@@ -3095,7 +3098,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_IsTrainingComplete(/*i
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<bool> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -3169,7 +3172,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_FitBuffer(/*in*/ Missi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_CompleteTraining(/*in*/ MissingDummiesFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_CompleteTraining(/*in*/ MissingDummiesFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3177,13 +3180,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_CompleteTraining(/*in*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -3347,6 +3347,9 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_CreateEstimator(/*ou
 
         // No validation
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_string_EstimatorHandle*>(index);
 
@@ -3396,7 +3399,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::string> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -3470,7 +3473,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_FitBuffer(/*in*/ Mis
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_CompleteTraining(/*in*/ MissingDummiesFeaturizer_string_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_CompleteTraining(/*in*/ MissingDummiesFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3478,13 +3481,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }

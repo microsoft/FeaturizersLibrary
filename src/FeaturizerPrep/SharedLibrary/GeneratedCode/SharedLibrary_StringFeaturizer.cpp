@@ -36,6 +36,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateEstimator(/*out*/ Stri
 
         // No validation
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<StringFeaturizer_int8_t_EstimatorHandle*>(index);
 
@@ -85,7 +88,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_IsTrainingComplete(/*in*/ St
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -148,7 +151,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_FitBuffer(/*in*/ StringFeatu
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CompleteTraining(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CompleteTraining(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -156,13 +159,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CompleteTraining(/*in*/ Stri
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -360,6 +360,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateEstimator(/*out*/ Str
 
         // No validation
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<StringFeaturizer_int16_t_EstimatorHandle*>(index);
 
@@ -409,7 +412,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_IsTrainingComplete(/*in*/ S
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -472,7 +475,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_FitBuffer(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CompleteTraining(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CompleteTraining(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -480,13 +483,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CompleteTraining(/*in*/ Str
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -684,6 +684,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateEstimator(/*out*/ Str
 
         // No validation
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<StringFeaturizer_int32_t_EstimatorHandle*>(index);
 
@@ -733,7 +736,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_IsTrainingComplete(/*in*/ S
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -796,7 +799,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_FitBuffer(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CompleteTraining(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CompleteTraining(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -804,13 +807,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CompleteTraining(/*in*/ Str
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1008,6 +1008,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateEstimator(/*out*/ Str
 
         // No validation
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<StringFeaturizer_int64_t_EstimatorHandle*>(index);
 
@@ -1057,7 +1060,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_IsTrainingComplete(/*in*/ S
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1120,7 +1123,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_FitBuffer(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CompleteTraining(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CompleteTraining(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1128,13 +1131,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CompleteTraining(/*in*/ Str
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1332,6 +1332,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateEstimator(/*out*/ Str
 
         // No validation
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<StringFeaturizer_uint8_t_EstimatorHandle*>(index);
 
@@ -1381,7 +1384,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_IsTrainingComplete(/*in*/ S
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1444,7 +1447,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_FitBuffer(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CompleteTraining(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CompleteTraining(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1452,13 +1455,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CompleteTraining(/*in*/ Str
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1656,6 +1656,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateEstimator(/*out*/ St
 
         // No validation
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<StringFeaturizer_uint16_t_EstimatorHandle*>(index);
 
@@ -1705,7 +1708,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_IsTrainingComplete(/*in*/ 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1768,7 +1771,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_FitBuffer(/*in*/ StringFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CompleteTraining(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CompleteTraining(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1776,13 +1779,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CompleteTraining(/*in*/ St
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1980,6 +1980,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateEstimator(/*out*/ St
 
         // No validation
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<StringFeaturizer_uint32_t_EstimatorHandle*>(index);
 
@@ -2029,7 +2032,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_IsTrainingComplete(/*in*/ 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2092,7 +2095,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_FitBuffer(/*in*/ StringFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CompleteTraining(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CompleteTraining(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2100,13 +2103,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CompleteTraining(/*in*/ St
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2304,6 +2304,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateEstimator(/*out*/ St
 
         // No validation
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<StringFeaturizer_uint64_t_EstimatorHandle*>(index);
 
@@ -2353,7 +2356,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_IsTrainingComplete(/*in*/ 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2416,7 +2419,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_FitBuffer(/*in*/ StringFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CompleteTraining(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CompleteTraining(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2424,13 +2427,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CompleteTraining(/*in*/ St
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2628,6 +2628,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateEstimator(/*out*/ Str
 
         // No validation
         Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<StringFeaturizer_float_t_EstimatorHandle*>(index);
 
@@ -2677,7 +2680,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_IsTrainingComplete(/*in*/ S
         Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2740,7 +2743,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_FitBuffer(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CompleteTraining(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CompleteTraining(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2748,13 +2751,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CompleteTraining(/*in*/ Str
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2952,6 +2952,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateEstimator(/*out*/ St
 
         // No validation
         Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<StringFeaturizer_double_t_EstimatorHandle*>(index);
 
@@ -3001,7 +3004,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_IsTrainingComplete(/*in*/ 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -3064,7 +3067,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_FitBuffer(/*in*/ StringFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CompleteTraining(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CompleteTraining(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3072,13 +3075,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CompleteTraining(/*in*/ St
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -3276,6 +3276,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateEstimator(/*out*/ String
 
         // No validation
         Microsoft::Featurizer::Featurizers::StringEstimator<bool>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<StringFeaturizer_bool_EstimatorHandle*>(index);
 
@@ -3325,7 +3328,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_IsTrainingComplete(/*in*/ Stri
         Microsoft::Featurizer::Featurizers::StringEstimator<bool> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -3388,7 +3391,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_FitBuffer(/*in*/ StringFeaturi
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CompleteTraining(/*in*/ StringFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CompleteTraining(/*in*/ StringFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3396,13 +3399,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CompleteTraining(/*in*/ String
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::StringEstimator<bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -3600,6 +3600,9 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateEstimator(/*out*/ Stri
 
         // No validation
         Microsoft::Featurizer::Featurizers::StringEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<StringFeaturizer_string_EstimatorHandle*>(index);
 
@@ -3649,7 +3652,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_IsTrainingComplete(/*in*/ St
         Microsoft::Featurizer::Featurizers::StringEstimator<std::string> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -3723,7 +3726,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_FitBuffer(/*in*/ StringFeatu
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CompleteTraining(/*in*/ StringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CompleteTraining(/*in*/ StringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3731,13 +3734,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CompleteTraining(/*in*/ Stri
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }

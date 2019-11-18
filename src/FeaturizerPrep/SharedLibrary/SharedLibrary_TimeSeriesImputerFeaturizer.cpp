@@ -187,6 +187,8 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateEsti
             )
         );
 
+        pMemory->Estimator.begin_training();
+
         size_t                              index(g_pointerTable.Add(pMemory.get()));
 
         *ppHandle = reinterpret_cast<TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *>(index);
@@ -237,7 +239,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_IsTraining
 
         EstimatorMemory const &             memory(*g_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
 
-        *pIsTrainingComplete = memory.Estimator.is_training_complete();
+        *pIsTrainingComplete = memory.Estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
 
         return true;
     }
@@ -310,7 +312,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_FitBuffer(
     }
 }
 
-FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CompleteTraining(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CompleteTraining(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -321,7 +323,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CompleteTr
 
         EstimatorMemory &                   memory(*g_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(memory.Estimator.complete_training());
+        memory.Estimator.complete_training();
 
         return true;
     }
@@ -482,7 +484,14 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_Transform(
         if(pNumDataElements == nullptr) throw std::invalid_argument("'pNumDataElements' is null");
 
         TransformerMemory &                             memory(*g_pointerTable.Get<TransformerMemory>(reinterpret_cast<size_t>(pHandle)));
-        TransformedTuples                               results(memory.Transformer->execute(memory.TransformerSerializer.Deserialize(data.pBuffer, data.cBuffer)));
+        TransformedTuples                               results;
+
+        memory.Transformer->execute(
+            memory.TransformerSerializer.Deserialize(data.pBuffer, data.cBuffer),
+            [&results](typename TransformedTuples::value_type value) {
+                results.emplace_back(std::move(value));
+            }
+        );
 
         std::tie(*ppData, *pNumDataElements) = memory.TransformerSerializer.Serialize(results);
 
@@ -1015,7 +1024,7 @@ TransformerMemory::TransformerMemory(SerializerType serializer, TransformerUniqu
 
 TransformerMemory::TransformerMemory(Microsoft::Featurizer::Archive &ar) :
     TransformerSerializer(ar),
-    Transformer(std::make_unique<Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator::Transformer>(ar)) {
+    Transformer(std::make_unique<Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator::TransformerType>(ar)) {
 }
 
 Microsoft::Featurizer::Archive & TransformerMemory::save(Microsoft::Featurizer::Archive &ar) {

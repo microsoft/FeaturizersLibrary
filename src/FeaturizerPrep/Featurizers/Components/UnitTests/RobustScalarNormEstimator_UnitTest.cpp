@@ -6,71 +6,38 @@
 #include "catch.hpp"
 
 #include "../../../3rdParty/optional.h"
-#include "../../../Featurizers/RobustScalarFeaturizer.h"
 #include "../../TestHelpers.h"
+#include "../RobustScalarNormEstimator.h"
 
 namespace NS = Microsoft::Featurizer;
 
 //estimator test
 template <typename InputT, typename TransformedT>
 void Estimator_Test(
-    std::vector<std::vector<std::remove_const_t<std::remove_reference_t<InputT>>>> const &inputBatches, 
+    std::vector<std::vector<InputT>> const &inputBatches,
     bool with_centering,
     std::float_t q_min,
     std::float_t q_max,
-    TransformedT median, 
-    TransformedT scale
+    TransformedT expected_median,
+    TransformedT expected_scale
 ) {
-    
-    using FitResult                         = typename NS::Estimator::FitResult;
-    using Batches                           = std::vector<std::vector<std::remove_const_t<std::remove_reference_t<InputT>>>>;
-    using AnnotationMaps                    = std::vector<NS::AnnotationMap>;
 
-    using NormEstimator                     = NS::Featurizers::Components::RobustScalarNormEstimator<InputT, TransformedT, 0>;
-    using RSNormAnnotation                  = NS::Featurizers::Components::RobustScalarNormAnnotation<InputT, TransformedT>;
+    using NormEstimator                     = NS::Featurizers::Components::RobustScalarNormEstimator<InputT, TransformedT>;
+    using RSNormAnnotationData              = NS::Featurizers::Components::RobustScalarNormAnnotationData<TransformedT>;
 
-    NS::AnnotationMapsPtr const     pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NormEstimator                   estimator(pAllColumnAnnotations, with_centering, q_min, q_max);
+    NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NormEstimator                           estimator(pAllColumnAnnotations, 0, with_centering, nonstd::optional<std::tuple<float, float>>(std::tuple<float, float>(q_min, q_max)));
 
+    NS::TestHelpers::Train(estimator, inputBatches);
 
-    if(inputBatches.empty() == false) {
-        // Train the pipeline
-        typename Batches::const_iterator        iter(inputBatches.begin());
-
-        while(true) {
-            FitResult const                     result(estimator.fit(iter->data(), iter->size()));
-
-            if(result == FitResult::Complete)
-                break;
-            else if(result == FitResult::ResetAndContinue)
-                iter = inputBatches.begin();
-            else if(result == FitResult::Continue) {
-                ++iter;
-
-                if(iter == inputBatches.end()) {
-                    if(estimator.complete_training() == FitResult::Complete)
-                        break;
-
-                    iter = inputBatches.begin();
-                }
-            }
-        }
-    }
-    
-    AnnotationMaps const &                          maps(estimator.get_column_annotations());
-      
-    NS::AnnotationMap const &                       annotations(maps[0]);
-    NS::AnnotationMap::const_iterator const &       iterAnnotations(annotations.find("RobustScalarNormEstimator"));
-    NS::Annotation const &                          annotation(*iterAnnotations->second[0]);
-    RSNormAnnotation const &                        normAnnotation(static_cast<NS::Featurizers::Components::RobustScalarNormAnnotation<InputT, TransformedT> const &>(annotation));
-        
-    TransformedT const &                            _median(normAnnotation.Median);
-    TransformedT const &                            _scale(normAnnotation.Scale);
+    RSNormAnnotationData const &            normAnnotation(estimator.get_annotation_data());
+    TransformedT const &                    median(normAnnotation.Median);
+    TransformedT const &                    scale(normAnnotation.Scale);
 
     TransformedT epsilon = static_cast<TransformedT>(0.000001);
 
-    CHECK(abs(_median - median) < epsilon);
-    CHECK(abs(_scale - scale) < epsilon);
+    CHECK(abs(median - expected_median) < epsilon);
+    CHECK(abs(scale - expected_scale) < epsilon);
 }
 
 
@@ -84,11 +51,11 @@ void TestWrapper_NormEstimator(){
         NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(3)),
         NS::TestHelpers::make_vector<InputT>(static_cast<InputT>(9))
     );
-    Estimator_Test<InputT, TransformedT>(trainingBatches, true, 0, 100, static_cast<TransformedT>(5), static_cast<TransformedT>(8)); 
-    Estimator_Test<InputT, TransformedT>(trainingBatches, true, 20, 80, static_cast<TransformedT>(5), static_cast<TransformedT>(4.8)); 
+    Estimator_Test<InputT, TransformedT>(trainingBatches, true, 0, 100, static_cast<TransformedT>(5), static_cast<TransformedT>(8));
+    Estimator_Test<InputT, TransformedT>(trainingBatches, true, 20, 80, static_cast<TransformedT>(5), static_cast<TransformedT>(4.8));
     Estimator_Test<InputT, TransformedT>(trainingBatches, true, 25, 75, static_cast<TransformedT>(5), static_cast<TransformedT>(4));
-    Estimator_Test<InputT, TransformedT>(trainingBatches, true, 35, 65, static_cast<TransformedT>(5), static_cast<TransformedT>(2.4));       
-    Estimator_Test<InputT, TransformedT>(trainingBatches, false, 25, 75, static_cast<TransformedT>(0), static_cast<TransformedT>(4));       
+    Estimator_Test<InputT, TransformedT>(trainingBatches, true, 35, 65, static_cast<TransformedT>(5), static_cast<TransformedT>(2.4));
+    Estimator_Test<InputT, TransformedT>(trainingBatches, false, 25, 75, static_cast<TransformedT>(0), static_cast<TransformedT>(4));
 }
 
 //NormEstimator test

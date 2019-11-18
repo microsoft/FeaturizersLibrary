@@ -20,7 +20,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyEstimator(/*in*/ Stri
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_IsTrainingComplete(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_Fit(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_FitBuffer(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CompleteTraining(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CompleteTraining(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -44,7 +44,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyEstimator(/*in*/ Str
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_IsTrainingComplete(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_Fit(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_FitBuffer(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CompleteTraining(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CompleteTraining(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -68,7 +68,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyEstimator(/*in*/ Str
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_IsTrainingComplete(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_Fit(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_FitBuffer(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CompleteTraining(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CompleteTraining(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -92,7 +92,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyEstimator(/*in*/ Str
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_IsTrainingComplete(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_Fit(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_FitBuffer(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CompleteTraining(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CompleteTraining(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -116,7 +116,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyEstimator(/*in*/ Str
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_IsTrainingComplete(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_Fit(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_FitBuffer(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CompleteTraining(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CompleteTraining(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -140,7 +140,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyEstimator(/*in*/ St
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_IsTrainingComplete(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_Fit(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_FitBuffer(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CompleteTraining(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CompleteTraining(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -164,7 +164,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyEstimator(/*in*/ St
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_IsTrainingComplete(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_Fit(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_FitBuffer(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CompleteTraining(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CompleteTraining(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -188,7 +188,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyEstimator(/*in*/ St
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_IsTrainingComplete(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_Fit(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_FitBuffer(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CompleteTraining(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CompleteTraining(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -212,7 +212,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyEstimator(/*in*/ Str
 FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_IsTrainingComplete(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_Fit(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_FitBuffer(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CompleteTraining(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CompleteTraining(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -236,7 +236,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_DestroyEstimator(/*in*/ St
 FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_IsTrainingComplete(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_Fit(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_FitBuffer(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CompleteTraining(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CompleteTraining(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -260,7 +260,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_DestroyEstimator(/*in*/ String
 FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_IsTrainingComplete(/*in*/ StringFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_Fit(/*in*/ StringFeaturizer_bool_EstimatorHandle *pHandle, /*in*/ bool input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_FitBuffer(/*in*/ StringFeaturizer_bool_EstimatorHandle *pHandle, /*in*/ bool const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CompleteTraining(/*in*/ StringFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CompleteTraining(/*in*/ StringFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_bool_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_bool_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -284,7 +284,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_DestroyEstimator(/*in*/ Stri
 FEATURIZER_LIBRARY_API bool StringFeaturizer_string_IsTrainingComplete(/*in*/ StringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_string_Fit(/*in*/ StringFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const *input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool StringFeaturizer_string_FitBuffer(/*in*/ StringFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const * const * input_ptr, std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CompleteTraining(/*in*/ StringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CompleteTraining(/*in*/ StringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_string_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_string_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);

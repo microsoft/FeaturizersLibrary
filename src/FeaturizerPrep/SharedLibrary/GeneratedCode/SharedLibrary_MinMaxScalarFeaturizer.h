@@ -20,7 +20,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_DestroyEstimator(/*in*
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_Fit(/*in*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -43,7 +43,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_DestroyEstimator(/*in
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_Fit(/*in*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -66,7 +66,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_DestroyEstimator(/*in
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_Fit(/*in*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -89,7 +89,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_DestroyEstimator(/*in
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_Fit(/*in*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -112,7 +112,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_DestroyEstimator(/*in
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_Fit(/*in*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -135,7 +135,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_DestroyEstimator(/*i
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_Fit(/*in*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -158,7 +158,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_DestroyEstimator(/*i
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_Fit(/*in*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -181,7 +181,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_DestroyEstimator(/*i
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_Fit(/*in*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -204,7 +204,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_DestroyEstimator(/*in
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_Fit(/*in*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -227,7 +227,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_DestroyEstimator(/*i
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_Fit(/*in*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);

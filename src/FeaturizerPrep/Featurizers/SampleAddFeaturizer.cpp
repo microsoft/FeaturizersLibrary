@@ -14,7 +14,7 @@ namespace Featurizers {
 ///  \class         SampleAddTransformer
 ///  \brief         Adds a delta to the provided value.
 ///
-class SampleAddTransformer : public SampleAddEstimator::BaseType::Transformer {
+class SampleAddTransformer : public StandardTransformer<std::uint16_t, std::uint32_t> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Data
@@ -34,12 +34,15 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SampleAddTransformer);
 
-    TransformedType execute(InputType input) override {
-        return input + Delta;
-    }
-
     void save(Archive &ar) const override {
         ar.serialize(Delta);
+    }
+
+private:
+    // ----------------------------------------------------------------------
+    // |  Private Methods
+    void execute_impl(InputType const &input, CallbackFunction const &callback) override {
+        callback(input + Delta);
     }
 };
 
@@ -52,7 +55,11 @@ SampleAddEstimator::SampleAddEstimator(AnnotationMapsPtr pAllColumnAnnotations) 
     BaseType("SampleAddEstimator", std::move(pAllColumnAnnotations)) {
 }
 
-SampleAddEstimator::FitResult SampleAddEstimator::fit_impl(InputType const *pBuffer, size_t cBuffer) /*override*/ {
+bool SampleAddEstimator::begin_training_impl(void) /*override*/ {
+    return true;
+}
+
+FitResult SampleAddEstimator::fit_impl(InputType const *pBuffer, size_t cBuffer) /*override*/ {
     InputType const * const                 pEndBuffer(pBuffer + cBuffer);
 
     while(pBuffer != pEndBuffer) {
@@ -63,8 +70,7 @@ SampleAddEstimator::FitResult SampleAddEstimator::fit_impl(InputType const *pBuf
     return FitResult::Continue;
 }
 
-SampleAddEstimator::FitResult SampleAddEstimator::complete_training_impl(void) /*override*/ {
-    return FitResult::Complete;
+void SampleAddEstimator::complete_training_impl(void) /*override*/ {
 }
 
 SampleAddEstimator::TransformerUniquePtr SampleAddEstimator::create_transformer_impl(void) /*override*/ {

@@ -4,8 +4,6 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include "../../Featurizer.h"
-#include "../../Traits.h"
 #include "HistogramEstimator.h"
 
 namespace Microsoft {
@@ -13,86 +11,130 @@ namespace Featurizer {
 namespace Featurizers {
 namespace Components {
 
+static constexpr char const * const         IndexMapEstimatorName("IndexMapEstimator");
+
 /////////////////////////////////////////////////////////////////////////
-///  \class         IndexMapAnnotation
-///  \brief         This is an annotation class which holds all the values and corresponding
-///                 index for an input column. This is just a modify on the annotation
-///                 so the result would be set to complete in the constrcutor
+///  \class         IndexMapAnnotationData
+///  \brief         Contains an IndexMap where keys point to unique id values.
 ///
-template <typename KeyT, typename IndexT>
-class IndexMapAnnotation : public Annotation {
+template <typename T>
+class IndexMapAnnotationData {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    // index map is a map of <category, <index, # of appearance>>
-    // Index template is input, # of appearance type is aligned with histogram type, std::uint32_t
-    using IndexMap                          = std::map<KeyT, IndexT>;
+    using IndexMap                          = std::unordered_map<T, std::uint32_t>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
     // |
     // ----------------------------------------------------------------------
-    IndexMap const                           Value;
+    IndexMap const                          Value;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    IndexMapAnnotation(IndexMap value);
-    ~IndexMapAnnotation(void) override = default;
+    IndexMapAnnotationData(IndexMap value);
+    ~IndexMapAnnotationData(void) = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(IndexMapAnnotation);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(IndexMapAnnotationData);
 };
 
+template <typename T> typename IndexMapAnnotationData<T>::IndexMap CreateIndexMap(typename HistogramAnnotationData<T>::Histogram const &histogram, typename IndexMapAnnotationData<T>::IndexMap existingValues);
+
+namespace Details {
+
 /////////////////////////////////////////////////////////////////////////
-///  \class         IndexMapEstimator
-///  \brief         This class computes the index map for an input column
-///                 and creates a IndexMapAnnotation.
+///  \class         IndexMapTrainingOnlyPolicy
+///  \brief         `IndexMapEstimator` implementation details.
 ///
-template <typename InputT, typename TransformedT, size_t ColIndexV>
-class IndexMapEstimator : public AnnotationEstimator<InputT const &> {
+template <typename T, typename EstimatorT>
+class IndexMapTrainingOnlyPolicy {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using NonRefType                         = typename std::remove_cv<typename std::remove_reference<InputT>::type>::type;
-    using IndexMap                           = std::map<NonRefType, TransformedT>;
-    using Histogram                          = std::map<NonRefType, std::uint32_t>;
+    using InputType                         = T;
+    using IndexMap                          = typename IndexMapAnnotationData<InputType>::IndexMap;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Data
+    // |
+    // ----------------------------------------------------------------------
+    static constexpr char const * const     NameValue = IndexMapEstimatorName;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    IndexMapEstimator(AnnotationMapsPtr pAllColumnAnnotations);
-    ~IndexMapEstimator(void) override = default;
+    IndexMapTrainingOnlyPolicy(IndexMap previousItems);
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(IndexMapEstimator);
+    void fit(InputType const &input);
+    IndexMapAnnotationData<T> complete_training(void);
 
-    static IndexMap create_index_map_from_histogram(Histogram const& histogram);
 private:
     // ----------------------------------------------------------------------
     // |
-    // |  Private Types
+    // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    using BaseType                           = AnnotationEstimator<InputT const &>;
-    using TraitsT                            = Traits<NonRefType>;
+    IndexMap                                _values;
+};
+
+} // namespace Details
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         IndexMapEstimator
+///  \brief         This class computes the index map for an input column
+///                 and creates `IndexMapAnnotationData`.
+///
+template <
+    typename T,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
+class IndexMapEstimator :
+    public TrainingOnlyEstimatorImpl<
+        Details::IndexMapTrainingOnlyPolicy<
+            T,
+            IndexMapEstimator<T, MaxNumTrainingItemsV>
+        >,
+        MaxNumTrainingItemsV
+    > {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType =
+        TrainingOnlyEstimatorImpl<
+            Details::IndexMapTrainingOnlyPolicy<
+                T,
+                IndexMapEstimator<T, MaxNumTrainingItemsV>
+            >,
+            MaxNumTrainingItemsV
+        >;
 
     // ----------------------------------------------------------------------
     // |
-    // |  Private Methods
+    // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    Estimator::FitResult fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) override;
+    IndexMapEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    IndexMapEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, typename IndexMapAnnotationData<T>::IndexMap existingValues);
 
-    Estimator::FitResult complete_training_impl(void) override;
+    ~IndexMapEstimator(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(IndexMapEstimator);
 };
 
 // ----------------------------------------------------------------------
@@ -104,81 +146,96 @@ private:
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
+template <typename T>
+typename IndexMapAnnotationData<T>::IndexMap CreateIndexMap(typename HistogramAnnotationData<T>::Histogram const &histogram, typename IndexMapAnnotationData<T>::IndexMap existingValues) {
+    // ----------------------------------------------------------------------
+    using IndexMap                          = typename IndexMapAnnotationData<T>::IndexMap;
+    using Keys                              = std::vector<typename HistogramAnnotationData<T>::Histogram::key_type>;
+    // ----------------------------------------------------------------------
+
+    IndexMap                                results(std::move(existingValues));
+    Keys                                    keys;
+
+    for(auto const &kvp : histogram) {
+        if(results.find(kvp.first) != results.end())
+            continue;
+
+        keys.push_back(kvp.first);
+    }
+
+    if(keys.empty() == false) {
+        sort(keys.begin(), keys.end());
+    }
+
+    // There is an annoying problem here. When the reference map contains keys that are bool, we can't actually
+    // get a reference to the value as the value is generated on the fly. So, rather than using 'for(auto const &kvp : keys)',
+    // use an iterator instead.
+    //
+    // for(auto const & key : keys) {
+    for(typename Keys::iterator iter=keys.begin(); iter != keys.end(); ++iter) {
+        std::pair<typename IndexMap::iterator, bool>    result(results.emplace(std::make_pair(*iter, static_cast<typename IndexMap::mapped_type>(results.size()))));
+
+        if(result.first == results.end())
+            throw std::runtime_error("Invalid insertion");
+    }
+
+    return results;
+}
 
 // ----------------------------------------------------------------------
 // |
-// |  IndexMapAnnotation
+// |  IndexMapAnnotationData
 // |
 // ----------------------------------------------------------------------
-template <typename InputT, typename TransformedT>
-IndexMapAnnotation<InputT, TransformedT>::IndexMapAnnotation(IndexMap t_value) :
-    Annotation(this),
-    Value(std::move(t_value)) {
-        static_assert(Traits<TransformedT>::IsUnsignedInt::value, "Category index type must be unsigned!");
+template <typename T>
+IndexMapAnnotationData<T>::IndexMapAnnotationData(IndexMap value) :
+    Value(std::move(value)) {
 }
+
 // ----------------------------------------------------------------------
 // |
 // |  IndexMapEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename InputT, typename TransformedT, size_t ColIndexV>
-IndexMapEstimator<InputT,TransformedT,ColIndexV>::IndexMapEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    AnnotationEstimator<InputT const &>("IndexMapEstimator", std::move(pAllColumnAnnotations)) {
+template <typename T, size_t MaxNumTrainingItemsV>
+IndexMapEstimator<T, MaxNumTrainingItemsV>::IndexMapEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+    IndexMapEstimator(std::move(pAllColumnAnnotations), std::move(colIndex), typename IndexMapAnnotationData<T>::IndexMap()) {
 }
 
-template <typename InputT, typename TransformedT, size_t ColIndexV>
-typename IndexMapEstimator<InputT,TransformedT,ColIndexV>::IndexMap IndexMapEstimator<InputT,TransformedT,ColIndexV>::create_index_map_from_histogram(IndexMapEstimator<InputT,TransformedT,ColIndexV>::Histogram const & t_histogram) {
-    TransformedT index = 1;
-    IndexMap indexmap;
-    for (auto const &kvp : t_histogram) {
-        if(indexmap.find(kvp.first) == indexmap.end()) {
-            indexmap.insert(std::make_pair(kvp.first, index));
-            ++index;
-        }
-    }
-    return indexmap;
+template <typename T, size_t MaxNumTrainingItemsV>
+IndexMapEstimator<T, MaxNumTrainingItemsV>::IndexMapEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, typename IndexMapAnnotationData<T>::IndexMap existingValues) :
+    BaseType(std::move(pAllColumnAnnotations), std::move(colIndex), false, std::move(existingValues)) {
 }
 
-template <typename InputT, typename TransformedT, size_t ColIndexV>
-Estimator::FitResult IndexMapEstimator<InputT,TransformedT,ColIndexV>::fit_impl(typename BaseType::FitBufferInputType const *, size_t) {
-    // we are not doing any fit in this estimator,
-    // instead we create annotation from another annotation,
-    // so we can just complete the generation in complete_training_impl
-    return Estimator::FitResult::Complete;
+// ----------------------------------------------------------------------
+// |
+// |  Details::IndexMapTrainingOnlyPolicy
+// |
+// ----------------------------------------------------------------------
+template <typename T, typename IndexMapEstimatorT>
+Details::IndexMapTrainingOnlyPolicy<T, IndexMapEstimatorT>::IndexMapTrainingOnlyPolicy(IndexMap previousItems) :
+    _values(std::move(previousItems)) {
 }
 
-template <typename InputT, typename TransformedT, size_t ColIndexV>
-Estimator::FitResult IndexMapEstimator<InputT,TransformedT,ColIndexV>::complete_training_impl(void) {
-    // Retrieve Histogram from Annotation
-    AnnotationMaps const &                          maps(Estimator::get_column_annotations());
-    // Currently Annnotations are per output column index (0-based)
-    // Since we've only one column as output- hardcoding this to 0 now.
-    // Expect annotation design to be further rationalized in near future
-    // which will address this hard-coding.
-    AnnotationMap const &                           annotations(maps[0]);
-    AnnotationMap::const_iterator const &           iterAnnotations(annotations.find("HistogramEstimator"));
-
-    if(iterAnnotations == annotations.end())
-        throw std::runtime_error("Couldn't retrieve HistogramEstimator.");
-
-    // An output column can have multiple annotations from same 'kind' of estimator.
-    // However, since we have only one estimator- hence the hard-coded value of 0 for retrieval.
-    // Expect annotation design to be further rationalized in near future
-    // which will address this hard-coding.
-
-    Annotation const &                              annotation(*iterAnnotations->second[0]);
-
-    HistogramAnnotation<InputT> const &       histogramAnnotation(static_cast<HistogramAnnotation<InputT> const &>(annotation));
-    Histogram const &                         histogram(histogramAnnotation.Value);
-    IndexMap const&                           index(create_index_map_from_histogram(histogram));
-
-    BaseType::add_annotation(std::make_shared<IndexMapAnnotation<InputT, TransformedT>>(std::move(index)), ColIndexV);
-
-    return Estimator::FitResult::Complete;
+template <typename T, typename IndexMapEstimatorT>
+void Details::IndexMapTrainingOnlyPolicy<T, IndexMapEstimatorT>::fit(InputType const &) {
+    throw std::runtime_error("This will never be called");
 }
 
+template <typename T, typename IndexMapEstimatorT>
+IndexMapAnnotationData<T> Details::IndexMapTrainingOnlyPolicy<T, IndexMapEstimatorT>::complete_training(void) {
+    // ----------------------------------------------------------------------
+    using HistogramAnnotationData           = HistogramAnnotationData<T>;
+    using HistogramEstimator                = HistogramEstimator<T, IndexMapEstimatorT::MaxNumTrainingItems>;
+    // ----------------------------------------------------------------------
 
+    IndexMapEstimatorT const &              estimator(static_cast<IndexMapEstimatorT const &>(*this));
+    HistogramAnnotationData const &         data(HistogramEstimator::get_annotation_data(estimator.get_column_annotations(), estimator.get_column_index(), HistogramEstimatorName));
+
+    return IndexMapAnnotationData<T>(CreateIndexMap<T>(data.Value, std::move(_values)));
 }
-}
-}
-}
+
+} // namespace Components
+} // namespace Featurizers
+} // namespace Featurizer
+} // namespace Microsoft

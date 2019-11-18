@@ -12,9 +12,14 @@ namespace NS = Microsoft::Featurizer;
 using SysClock = std::chrono::system_clock;
 
 TEST_CASE("DateTimeEstimator") {
-    CHECK(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2), nonstd::optional<std::string>(), nonstd::optional<std::string>()).Name == "DateTimeEstimator");
-    CHECK(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2), nonstd::optional<std::string>(), nonstd::optional<std::string>()).is_training_complete());
-    CHECK(dynamic_cast<NS::Featurizers::DateTimeTransformer *>(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2), nonstd::optional<std::string>(), nonstd::optional<std::string>()).create_transformer().get()));
+    CHECK(strcmp(NS::Featurizers::DateTimeEstimator(NS::CreateTestAnnotationMapsPtr(2), nonstd::optional<std::string>(), nonstd::optional<std::string>()).Name, "DateTimeEstimator") == 0);
+
+    NS::Featurizers::DateTimeEstimator      estimator(NS::CreateTestAnnotationMapsPtr(2), nonstd::optional<std::string>(), nonstd::optional<std::string>());
+
+    estimator.begin_training();
+    estimator.complete_training();
+
+    CHECK(dynamic_cast<NS::Featurizers::DateTimeTransformer *>(estimator.create_transformer().get()));
 }
 
 TEST_CASE("DateTimeEstimator - IsValidCountry") {
@@ -141,8 +146,9 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {
 }
 
 TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeTransformer][DateTimeTransformer]") {
-    NS::Featurizers::DateTimeTransformer dt("");
-    NS::Featurizers::TimePoint tp = dt.execute(217081625);
+    NS::Featurizers::DateTimeTransformer    dt("");
+    NS::Featurizers::TimePoint              tp(dt.execute(217081625));
+
     CHECK(tp.year == 1976);
     CHECK(tp.month == NS::Featurizers::TimePoint::NOVEMBER);
     CHECK(tp.day == 17);

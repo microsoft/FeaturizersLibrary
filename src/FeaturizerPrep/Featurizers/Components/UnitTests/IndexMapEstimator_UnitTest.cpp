@@ -9,72 +9,51 @@
 #include "../../TestHelpers.h"
 #include "../IndexMapEstimator.h"
 #include "../HistogramEstimator.h"
-#include "../PipelineExecutionEstimatorImpl.h"
 
 namespace NS = Microsoft::Featurizer;
 
-template <typename KeyT, typename IndexT>
-using IndexMap                            = std::map<KeyT, IndexT>;
+TEST_CASE("CreateIndexMap") {
+    // ----------------------------------------------------------------------
+    using Histogram                         = NS::Featurizers::Components::HistogramAnnotationData<int>::Histogram;
+    using IndexMap                          = NS::Featurizers::Components::IndexMapAnnotationData<int>::IndexMap;
+    // ----------------------------------------------------------------------
+
+    IndexMap const                          result(NS::Featurizers::Components::CreateIndexMap<int>(Histogram{ {5, 1u}, {3, 1u}, {1, 1u}, {2, 1u} }, IndexMap()));
+
+    // Values should be indexed in order
+    CHECK(result == IndexMap{ {1, 0u}, {2, 1u}, {3, 2u}, {5, 3u} });
+
+    // Values appended should appear at the end of the list
+    CHECK(NS::Featurizers::Components::CreateIndexMap<int>(Histogram{ {4, 1u}, {5, 1u}, {3, 1u}, {1, 1u}, {2, 1u} }, result) == IndexMap{ {1, 0u}, {2, 1u}, {3, 2u}, {5, 3u}, {4, 4u} });
+
+    // In-order index when previous values aren't provided
+    CHECK(NS::Featurizers::Components::CreateIndexMap<int>(Histogram{ {4, 1u}, {5, 1u}, {3, 1u}, {1, 1u}, {2, 1u} }, IndexMap()) == IndexMap{ {1, 0u}, {2, 1u}, {3, 2u}, {4, 3u}, {5, 4u}, {4, 4u} });
+}
+
 template <typename T>
-using Histogram                           = std::map<T, std::uint32_t>;
+typename NS::Featurizers::Components::IndexMapAnnotationData<T>::IndexMap Test(std::vector<T> const &input) {
+    std::vector<std::vector<T>> const       batchedInput(NS::TestHelpers::make_vector<std::vector<T>>(input));
+    NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
+    // Index map requires Histogram annotations
+    NS::Featurizers::Components::IndexMapEstimator<T>   tempIndexMapEstimator(pAllColumnAnnotations, 0);
 
+    CHECK_THROWS_WITH(NS::TestHelpers::Train(tempIndexMapEstimator, batchedInput), "Annotation data was not found for this column");
 
-TEST_CASE("int") {
-    using InputType = int;
-    using TransformedType = std::uint32_t;
-    Histogram<InputType> histogram({
-                                    {10,4},
-                                    {11,1},
-                                    {18,1},
-                                    {6,1},
-                                    {7,1},
-                                    {15,2},
-                                    {30,2},
-                                    {20,1},
-                                    {8,2}
-                                    
-                                    });
-    IndexMap<InputType, TransformedType> indexmap({
-                                   {6, 1}, 
-                                   {7, 2}, 
-                                   {8, 3}, 
-                                   {10, 4}, 
-                                   {11, 5}, 
-                                   {15, 6}, 
-                                   {18, 7}, 
-                                   {20, 8}, 
-                                   {30, 9}
-                                   });
-    
-    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::IndexMapEstimator<InputType, TransformedType,0> estimator(pAllColumnAnnotations);
-    IndexMap<InputType, TransformedType> toCheck(estimator.create_index_map_from_histogram(histogram));
-    CHECK(toCheck == indexmap);
+    // Standard tests
+    NS::Featurizers::Components::HistogramEstimator<T>  histoEstimator(pAllColumnAnnotations, 0);
+    NS::Featurizers::Components::IndexMapEstimator<T>   indexMapEstimator(pAllColumnAnnotations, 0);
+
+    NS::TestHelpers::Train(histoEstimator, batchedInput);
+    NS::TestHelpers::Train(indexMapEstimator, batchedInput);
+
+    return indexMapEstimator.get_annotation_data().Value;
 }
 
-
-TEST_CASE("string") {
-    using InputType = std::string;
-    using TransformedType = std::uint32_t;
-    Histogram<InputType> histogram({
-                                    {"apple",2},
-                                    {"banana",1},
-                                    {"grape",2},
-                                    {"orange",2},
-                                    {"peach",3}
-                                    
-                                    });
-    IndexMap<InputType, TransformedType> indexmap({
-                                    {"apple", 1},
-                                    {"banana", 2},
-                                    {"grape", 3},
-                                    {"orange", 4},
-                                    {"peach", 5}});
-                                                    
-    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::IndexMapEstimator<InputType, TransformedType,0> estimator(pAllColumnAnnotations);
-    IndexMap<InputType, TransformedType> toCheck(estimator.create_index_map_from_histogram(histogram));
-    CHECK(toCheck == indexmap);
+TEST_CASE("Integers") {
+    CHECK(Test<int>({5, 3, 1, 2, 100, 4}) == NS::Featurizers::Components::IndexMapAnnotationData<int>::IndexMap{ {1, 0u}, {2, 1u}, {3, 2u}, {4, 3u}, {5, 4u}, {100, 5u} });
 }
 
+TEST_CASE("Strings") {
+    CHECK(Test<std::string>({"one", "two", "three", "four"}) == NS::Featurizers::Components::IndexMapAnnotationData<std::string>::IndexMap{ {"four", 0u}, {"one", 1u}, {"three", 2u}, {"two", 3u} });
+}

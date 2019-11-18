@@ -35,7 +35,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateEstimator(/*in*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_int8_t_EstimatorHandle*>(index);
 
@@ -85,7 +88,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_IsTrainingComplete(/*
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -148,7 +151,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_FitBuffer(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -156,13 +159,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CompleteTraining(/*in
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -346,7 +346,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_int16_t_EstimatorHandle*>(index);
 
@@ -396,7 +399,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -459,7 +462,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_FitBuffer(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -467,13 +470,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -657,7 +657,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_int32_t_EstimatorHandle*>(index);
 
@@ -707,7 +710,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -770,7 +773,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_FitBuffer(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -778,13 +781,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -968,7 +968,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_int64_t_EstimatorHandle*>(index);
 
@@ -1018,7 +1021,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1081,7 +1084,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_FitBuffer(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1089,13 +1092,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1279,7 +1279,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint8_t_EstimatorHandle*>(index);
 
@@ -1329,7 +1332,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1392,7 +1395,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_FitBuffer(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1400,13 +1403,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1590,7 +1590,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateEstimator(/*i
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint16_t_EstimatorHandle*>(index);
 
@@ -1640,7 +1643,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_IsTrainingComplete(
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -1703,7 +1706,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_FitBuffer(/*in*/ On
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1711,13 +1714,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CompleteTraining(/*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -1901,7 +1901,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateEstimator(/*i
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint32_t_EstimatorHandle*>(index);
 
@@ -1951,7 +1954,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_IsTrainingComplete(
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2014,7 +2017,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_FitBuffer(/*in*/ On
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2022,13 +2025,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CompleteTraining(/*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2212,7 +2212,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateEstimator(/*i
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint64_t_EstimatorHandle*>(index);
 
@@ -2262,7 +2265,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_IsTrainingComplete(
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2325,7 +2328,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_FitBuffer(/*in*/ On
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2333,13 +2336,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CompleteTraining(/*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2523,7 +2523,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateEstimator(/*in
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_float_t_EstimatorHandle*>(index);
 
@@ -2573,7 +2576,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_IsTrainingComplete(/
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2636,7 +2639,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_FitBuffer(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2644,13 +2647,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CompleteTraining(/*i
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -2834,7 +2834,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateEstimator(/*i
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_double_t_EstimatorHandle*>(index);
 
@@ -2884,7 +2887,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_IsTrainingComplete(
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -2947,7 +2950,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_FitBuffer(/*in*/ On
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2955,13 +2958,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CompleteTraining(/*
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -3145,7 +3145,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_CreateEstimator(/*in*/ 
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<bool>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<bool>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_bool_EstimatorHandle*>(index);
 
@@ -3195,7 +3198,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_IsTrainingComplete(/*in
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<bool> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -3258,7 +3261,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_FitBuffer(/*in*/ OneHot
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3266,13 +3269,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_CompleteTraining(/*in*/
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }
@@ -3456,7 +3456,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_CreateEstimator(/*in*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , suppressUnrecognizedErrors);
+        Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , suppressUnrecognizedErrors);
+
+        pEstimator->begin_training();
+
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_string_EstimatorHandle*>(index);
 
@@ -3506,7 +3509,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_IsTrainingComplete(/*
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::string> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
 
-        *pIsTrainingComplete = estimator.is_training_complete();
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
     }
@@ -3580,7 +3583,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_FitBuffer(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_string_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3588,13 +3591,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_CompleteTraining(/*in
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+        estimator.complete_training();
     
         return true;
     }

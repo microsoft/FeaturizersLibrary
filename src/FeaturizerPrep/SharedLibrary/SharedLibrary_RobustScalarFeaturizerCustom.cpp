@@ -13,6 +13,8 @@
 
 #include "RobustScalarFeaturizer.h"
 
+#include "Archive.h"
+
 // These method(s) are defined in SharedLibrary_Common.cpp
 ErrorInfoHandle * CreateErrorInfo(std::exception const &ex);
 
@@ -23,7 +25,7 @@ ErrorInfoHandle * CreateErrorInfo(std::exception const &ex);
 #   pragma warning(disable: 4702) // Unreachable code
 #endif
 
-template <typename InputT, typename TransformedT, typename EstimatorHandleT> 
+template <typename InputT, typename TransformedT, typename EstimatorHandleT>
 bool RobustScalarFeaturizer_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ EstimatorHandleT **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -32,7 +34,7 @@ bool RobustScalarFeaturizer_CreateEstimatorWithDefault( /*in*/ bool withCenterin
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<InputT, TransformedT>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<InputT, TransformedT>(Microsoft::Featurizer::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , withCentering));
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<InputT, TransformedT>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<InputT, TransformedT>(Microsoft::Featurizer::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0, withCentering));
         size_t index(g_pointerTable.Add(pEstimator));
 
         *ppHandle = reinterpret_cast<EstimatorHandleT*>(index);

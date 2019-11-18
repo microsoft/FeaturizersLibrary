@@ -194,7 +194,7 @@ namespace {
         return result;
     }
 #endif
-    
+
     std::string GetDataDirectory(std::string optionalDataRootDir) {
         std::string const                   binaryPath(
             [&optionalDataRootDir](void) {
@@ -343,7 +343,14 @@ DateTimeTransformer::DateTimeTransformer(std::string optionalCountryName, std::s
     }
 }
 
-DateTimeTransformer::TransformedType DateTimeTransformer::execute(InputType input) /*override*/ {
+void DateTimeTransformer::save(Archive & ar) const /*override*/ {
+    Traits<std::string>::serialize(ar, _countryName);
+}
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+void DateTimeTransformer::execute_impl(InputType const &input, CallbackFunction const &callback) /*override*/ {
     std::chrono::time_point<std::chrono::system_clock> time(std::chrono::seconds {input} );
     TimePoint result = TimePoint(time);
 
@@ -358,11 +365,11 @@ DateTimeTransformer::TransformedType DateTimeTransformer::execute(InputType inpu
             result.holidayName = x->second;
         }
     }
-    return result;
+
+    callback(std::move(result));
 }
 
-void DateTimeTransformer::save(Archive & ar) const /*override*/ {
-    Traits<std::string>::serialize(ar, _countryName);
+void DateTimeTransformer::flush_impl(CallbackFunction const &) /*override*/ {
 }
 
 // ----------------------------------------------------------------------
@@ -404,7 +411,7 @@ DateTimeEstimator::DateTimeEstimator(
     nonstd::optional<std::string> const &countryName,
     nonstd::optional<std::string> const &dataRootDir
 ) :
-    BaseType("DateTimeEstimator", std::move(pAllColumnAnnotations), true),
+    BaseType("DateTimeEstimator", std::move(pAllColumnAnnotations)),
     Country(countryName),
     DataRootDir(dataRootDir) {
         if(Country && DateTimeEstimator::IsValidCountry(*Country, DataRootDir) == false) {
@@ -418,12 +425,15 @@ DateTimeEstimator::DateTimeEstimator(
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-Estimator::FitResult DateTimeEstimator::fit_impl(FitBufferInputType const *, size_t) /*override*/ {
+bool DateTimeEstimator::begin_training_impl(void) /*override*/ {
+    return false;
+}
+
+FitResult DateTimeEstimator::fit_impl(InputType const *, size_t) /*override*/ {
     throw std::runtime_error("This should never be called as this class will not be used during training");
 }
 
-Estimator::FitResult DateTimeEstimator::complete_training_impl(void) /*override*/ {
-    throw std::runtime_error("This should never be called as this class will not be used during training");
+void DateTimeEstimator::complete_training_impl(void) /*override*/ {
 }
 
 typename DateTimeEstimator::BaseType::TransformerUniquePtr DateTimeEstimator::create_transformer_impl(void) /*override*/ {

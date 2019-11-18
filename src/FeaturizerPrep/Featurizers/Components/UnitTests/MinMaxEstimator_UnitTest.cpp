@@ -12,61 +12,60 @@
 namespace NS = Microsoft::Featurizer;
 
 template <typename InputT>
-std::vector<InputT> FindMinMax(std::vector<std::vector<InputT>> const &inputBatches) {
-    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::MinMaxEstimator<InputT, 0> estimator(pAllColumnAnnotations);
+std::tuple<InputT, InputT> FindMinMax(std::vector<std::vector<InputT>> const &inputBatches) {
+    NS::AnnotationMapsPtr                                                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::Components::MinMaxEstimator<InputT>                    estimator(pAllColumnAnnotations, 0);
 
-    NS::TestHelpers::Train< NS::Featurizers::Components::MinMaxEstimator<InputT, 0>, InputT>(estimator, inputBatches);
-    NS::AnnotationMap::const_iterator const &           iterAnnotations(estimator.get_column_annotations()[0].find("MinMaxEstimator"));
+    NS::TestHelpers::Train(estimator, inputBatches);
 
-    return std::vector<InputT>({
-                                (static_cast<NS::Featurizers::Components::MinMaxAnnotation<InputT> const &>(*iterAnnotations->second[0])).Min,
-                                (static_cast<NS::Featurizers::Components::MinMaxAnnotation<InputT> const &>(*iterAnnotations->second[0])).Max
-                               }
-    );
+    NS::Featurizers::Components::MinMaxAnnotationData<InputT> const &       annotation(estimator.get_annotation_data());
+
+    return std::make_tuple(annotation.Min, annotation.Max);
 }
 
+TEST_CASE("Invalid Annotation") {
+    CHECK_THROWS_WITH(NS::Featurizers::Components::MinMaxAnnotationData<int>(100, -2), "min is > max");
+}
 
 TEST_CASE("int") {
-    using inputType = int;
-    
-    std::vector<std::vector<inputType>> const list({{10,
-                                                    20,
-                                                    8,
-                                                    10,
-                                                    30}});
-    std::vector<inputType> toCheck = FindMinMax<inputType>(list);
-    CHECK(toCheck == std::vector<inputType>({8,30}));
+    using InputType                         = int;
+
+    std::vector<std::vector<InputType>> const           list({{10,
+                                                               20,
+                                                               8,
+                                                               10,
+                                                               30}});
+    std::tuple<InputType, InputType> const              toCheck(FindMinMax(list));
+
+    CHECK(toCheck == std::make_tuple(8, 30));
 }
 
 
 TEST_CASE("float") {
-    using inputType = std::float_t;
-    
-    std::vector<std::vector<inputType>> const list({{
-                                                    static_cast<inputType>(10.3),
-                                                    static_cast<inputType>(20.1),
-                                                    static_cast<inputType>(8.4),
-                                                    static_cast<inputType>(8.2),
-                                                    static_cast<inputType>(10.3),
-                                                    static_cast<inputType>(30.1),
-                                                    static_cast<inputType>(30.4)}});
-    std::vector<inputType> toCheck = FindMinMax<inputType>(list);
-    
-    CHECK(toCheck == std::vector<inputType>({static_cast<inputType>(8.2),static_cast<inputType>(30.4)}));
-    
+    using InputType                         = std::float_t;
+
+    std::vector<std::vector<InputType>> const           list({{
+                                                                static_cast<InputType>(10.3),
+                                                                static_cast<InputType>(20.1),
+                                                                static_cast<InputType>(8.4),
+                                                                static_cast<InputType>(8.2),
+                                                                static_cast<InputType>(10.3),
+                                                                static_cast<InputType>(30.1),
+                                                                static_cast<InputType>(30.4)}});
+    std::tuple<InputType, InputType> const              toCheck(FindMinMax(list));
+
+    CHECK(toCheck == std::tuple<InputType, InputType>(8.2f, 30.4f));
 }
 
 TEST_CASE("double") {
-    using inputType = std::double_t;
-    
-    std::vector<std::vector<inputType>> const list({{
-                                                    static_cast<inputType>(-1),
-                                                    static_cast<inputType>(-0.5),
-                                                    static_cast<inputType>(1),
-                                                    static_cast<inputType>(0)}});
-    std::vector<inputType> toCheck = FindMinMax<inputType>(list);
+    using InputType                         = std::double_t;
 
-    CHECK(toCheck == std::vector<inputType>({static_cast<inputType>(-1),static_cast<inputType>(1)}));
-    
+    std::vector<std::vector<InputType>> const           list({{
+                                                                static_cast<InputType>(-1),
+                                                                static_cast<InputType>(-0.5),
+                                                                static_cast<InputType>(1),
+                                                                static_cast<InputType>(0)}});
+    std::tuple<InputType, InputType> const              toCheck(FindMinMax(list));
+
+    CHECK(toCheck == std::tuple<InputType, InputType>(-1, 1));
 }

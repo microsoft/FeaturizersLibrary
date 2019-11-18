@@ -50,11 +50,11 @@ TEST_CASE("Transformer_Nullable") {
 	CHECK(Traits<std::double_t>::ToString(Traits<std::double_t>::GetNullableValue(arg_d)) == "123.450000");
 
 	CHECK_THROWS_WITH(Traits<nonstd::optional<std::int8_t>>::GetNullableValue(arg_null)
-				, Catch::Contains("GetNullableValue attempt on Optional type null."));
+				, Catch::Contains("GetNullableValue attempt on a null optional type."));
 	CHECK_THROWS_WITH(Traits<float_t>::GetNullableValue(arg_f_ini)
-				, Catch::Contains("GetNullableValue attempt on float_t null."));
+				, Catch::Contains("GetNullableValue attempt on a float_t NaN."));
 	CHECK_THROWS_WITH(Traits<double_t>::GetNullableValue(arg_d_ini)
-				, Catch::Contains("GetNullableValue attempt on double_t null"));
+				, Catch::Contains("GetNullableValue attempt on a double_t NaN."));
 }
 
 TEST_CASE("Transformer_Binary") {

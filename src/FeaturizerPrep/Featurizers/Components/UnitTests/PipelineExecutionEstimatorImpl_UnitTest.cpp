@@ -8,6 +8,8 @@
 #include "../PipelineExecutionEstimatorImpl.h"
 #include "../InferenceOnlyFeaturizerImpl.h"
 #include "../../TestHelpers.h"
+#include "../../../Archive.h"
+
 namespace NS = Microsoft::Featurizer;
 
 template <typename T>
@@ -37,7 +39,6 @@ public:
     T const                                 Value;
 
     MyAnnotation(T value) :
-        NS::Annotation(this),
         Value(std::move(value)) {
     }
 
@@ -47,12 +48,12 @@ public:
 };
 
 template <typename T, size_t ColIndexV, size_t MaxRowsV=100000>
-class MyAnnotationEstimator : public NS::AnnotationEstimator<T const &> {
+class MyAnnotationEstimator : public NS::FitEstimator<T> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Methods
     MyAnnotationEstimator(NS::AnnotationMapsPtr pAllColumnAnnotations) :
-        NS::AnnotationEstimator<T const &>("MyAnnotationEstimator", std::move(pAllColumnAnnotations)),
+        NS::FitEstimator<T>("MyAnnotationEstimator", std::move(pAllColumnAnnotations)),
         _remaining(MaxRowsV) {
     }
 
@@ -91,7 +92,7 @@ private:
         static U const & get_value(NonCopyable<U> const &value) { return value.Value; }
     };
 
-    using BaseType                          = NS::AnnotationEstimator<T const &>;
+    using BaseType                          = NS::FitEstimator<T>;
     using CountMap                          = std::map<typename InternalValueTraits<T>::Type, std::uint32_t>;
 
     // ----------------------------------------------------------------------
@@ -101,8 +102,12 @@ private:
 
     // ----------------------------------------------------------------------
     // |  Private Methods
-    NS::Estimator::FitResult fit_impl(typename BaseType::FitBufferInputType const *pBuffer, size_t cBuffer) override {
-        typename BaseType::FitBufferInputType const * const                 pEndBuffer(pBuffer + cBuffer);
+    bool begin_training_impl(void) override {
+        return true;
+    }
+
+    NS::FitResult fit_impl(typename BaseType::InputType const *pBuffer, size_t cBuffer) override {
+        typename BaseType::InputType const * const      pEndBuffer(pBuffer + cBuffer);
 
         while(pBuffer != pEndBuffer) {
             T const &                                   input(*pBuffer++);
@@ -122,13 +127,13 @@ private:
             iter->second += 1;
 
             if(--_remaining == 0)
-                return NS::Estimator::FitResult::Complete;
+                return NS::FitResult::Complete;
         }
 
-        return NS::Estimator::FitResult::Continue;
+        return NS::FitResult::Continue;
     }
 
-    NS::Estimator::FitResult complete_training_impl(void) override {
+    void complete_training_impl(void) override {
         // Find the most common value in the map
         typename CountMap::iterator         iMostCommon(_map.end());
 
@@ -142,15 +147,13 @@ private:
         BaseType::add_annotation(std::make_shared<MyAnnotation<T>>(iMostCommon->first), ColIndexV);
 
         _map.clear();
-
-        return NS::Estimator::FitResult::Complete;
     }
 };
 
-class StringToIntTransformer : public NS::Featurizers::Components::InferenceOnlyTransformerImpl<NonCopyable<std::string> const &, NonCopyable<size_t>> {
-public:
-    TransformedType execute(InputType input) override {
-        return input.Value.size();
+class StringToIntTransformer : public NS::Featurizers::Components::InferenceOnlyTransformerImpl<NonCopyable<std::string>, NonCopyable<size_t>> {
+private:
+    void execute_impl(InputType const &input, CallbackFunction const &callback) override {
+        callback(input.Value.size());
     }
 };
 
@@ -165,10 +168,10 @@ public:
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StringToIntEstimator);
 };
 
-class IntToStringTransformer : public NS::Featurizers::Components::InferenceOnlyTransformerImpl<NonCopyable<size_t> const &, NonCopyable<std::string>> {
-public:
-    TransformedType execute(InputType input) override {
-        return std::to_string(input.Value);
+class IntToStringTransformer : public NS::Featurizers::Components::InferenceOnlyTransformerImpl<NonCopyable<size_t>, NonCopyable<std::string>> {
+private:
+    void execute_impl(InputType const &input, CallbackFunction const &callback) override {
+        callback(std::to_string(input.Value));
     }
 };
 
@@ -183,29 +186,6 @@ public:
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(IntToStringEstimator);
 };
 
-template <typename PipelineT>
-std::vector<typename PipelineT::TransformedType> Test(
-    PipelineT pipeline,
-    std::vector<std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>>> const &inputBatches,
-    std::vector<std::remove_const_t<std::remove_reference_t<typename PipelineT::InputType>>> const &data
-) {
-    if(inputBatches.empty() == false) {
-        NS::TestHelpers::Train<PipelineT, typename PipelineT::InputType>(pipeline, inputBatches);
-    }
-
-    assert(pipeline.is_training_complete());
-
-    typename PipelineT::TransformerUniquePtr            pTransformer(pipeline.create_transformer());
-    std::vector<typename PipelineT::TransformedType>    output;
-
-    output.reserve(data.size());
-
-    for(auto const &item : data)
-        output.emplace_back(pTransformer->execute(item));
-
-    return output;
-}
-
 TEST_CASE("Single Transformer") {
     using Estimator = NS::Featurizers::Components::PipelineExecutionEstimatorImpl<
         StringToIntEstimator
@@ -214,7 +194,7 @@ TEST_CASE("Single Transformer") {
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
     CHECK(
-        Test(
+        NS::TestHelpers::TransformerEstimatorTest(
             Estimator("Estimator", pAllColumnAnnotations),
             NS::TestHelpers::make_vector<std::vector<NonCopyable<std::string>>>(),
             NS::TestHelpers::make_vector<NonCopyable<std::string>>("one", "two", "three")
@@ -232,7 +212,7 @@ TEST_CASE("Annotation, Transformer") {
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
     CHECK(
-        Test(
+        NS::TestHelpers::TransformerEstimatorTest(
             Estimator("Estimator", pAllColumnAnnotations),
             NS::TestHelpers::make_vector<std::vector<NonCopyable<std::string>>>(
                 NS::TestHelpers::make_vector<NonCopyable<std::string>>("one", "two", "two", "one", "one")
@@ -259,20 +239,25 @@ TEST_CASE("Annotation, Transformer") {
     CHECK(myAnnotation.Value.Value == "one");
 }
 
-TEST_CASE("Annotation, Annotation, Transformer") {
+TEST_CASE("Annotation, Annotation, Annotation, Transformer") {
     using Estimator = NS::Featurizers::Components::PipelineExecutionEstimatorImpl<
         MyAnnotationEstimator<NonCopyable<std::string>, 0>,
-        MyAnnotationEstimator<NonCopyable<std::string>, 0, 3>,
+        MyAnnotationEstimator<NonCopyable<std::string>, 0, 4>,
+        MyAnnotationEstimator<NonCopyable<std::string>, 0>,
         StringToIntEstimator
     >;
 
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
     CHECK(
-        Test(
+        NS::TestHelpers::TransformerEstimatorTest(
             Estimator("Estimator", pAllColumnAnnotations),
             NS::TestHelpers::make_vector<std::vector<NonCopyable<std::string>>>(
-                NS::TestHelpers::make_vector<NonCopyable<std::string>>("one", "two", "two", "one", "one")
+                // Note that the values have been carefully selected to ensure that batches are properly reset
+                // when an estimator reports that it no longer needs any data (which will happen
+                // in this test when the 2nd estimator sees the first 4 items).
+                NS::TestHelpers::make_vector<NonCopyable<std::string>>("three", "one", "two", "one", "three", "three", "three"),
+                NS::TestHelpers::make_vector<NonCopyable<std::string>>("two", "two")
             ),
             NS::TestHelpers::make_vector<NonCopyable<std::string>>("one", "two", "three")
         ) == NS::TestHelpers::make_vector<NonCopyable<size_t>>(3, 3, 5)
@@ -289,19 +274,23 @@ TEST_CASE("Annotation, Annotation, Transformer") {
     // There are 2 annotation instances. The first is configured to look at all the
     // training data while the second is only looking at the first 3 times. They
     // will get different results because of this.
-    REQUIRE(iter->second.size() == 2);
+    REQUIRE(iter->second.size() == 3);
 
     NS::Annotation const &                  annotation1(*iter->second[0]);
     NS::Annotation const &                  annotation2(*iter->second[1]);
+    NS::Annotation const &                  annotation3(*iter->second[2]);
 
     REQUIRE(dynamic_cast<MyAnnotation<NonCopyable<std::string>> const *>(&annotation1));
     REQUIRE(dynamic_cast<MyAnnotation<NonCopyable<std::string>> const *>(&annotation2));
+    REQUIRE(dynamic_cast<MyAnnotation<NonCopyable<std::string>> const *>(&annotation3));
 
     MyAnnotation<NonCopyable<std::string>> const &      mine1(static_cast<MyAnnotation<NonCopyable<std::string>> const &>(annotation1));
     MyAnnotation<NonCopyable<std::string>> const &      mine2(static_cast<MyAnnotation<NonCopyable<std::string>> const &>(annotation2));
+    MyAnnotation<NonCopyable<std::string>> const &      mine3(static_cast<MyAnnotation<NonCopyable<std::string>> const &>(annotation3));
 
-    CHECK(mine1.Value.Value == "one");
-    CHECK(mine2.Value.Value == "two");
+    CHECK(mine1.Value.Value == "three");
+    CHECK(mine2.Value.Value == "one");
+    CHECK(mine3.Value.Value == "three"); // This test will fail if batches aren't being properly reset
 }
 
 TEST_CASE("Transformer, Transformer") {
@@ -313,7 +302,7 @@ TEST_CASE("Transformer, Transformer") {
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
     CHECK(
-        Test(
+        NS::TestHelpers::TransformerEstimatorTest(
             Estimator("Estimator", pAllColumnAnnotations),
             NS::TestHelpers::make_vector<std::vector<NonCopyable<std::string>>>(),
             NS::TestHelpers::make_vector<NonCopyable<std::string>>("one", "two", "three")
@@ -332,7 +321,7 @@ TEST_CASE("Transformer, Annotation, Transformer") {
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
     CHECK(
-        Test(
+        NS::TestHelpers::TransformerEstimatorTest(
             Estimator("Estimator", pAllColumnAnnotations),
             NS::TestHelpers::make_vector<std::vector<NonCopyable<size_t>>>(
                 NS::TestHelpers::make_vector<NonCopyable<size_t>>(1000, 200, 30, 4),
@@ -370,7 +359,7 @@ TEST_CASE("Transformer, Annotation") {
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
     CHECK(
-        Test(
+        NS::TestHelpers::TransformerEstimatorTest(
             Estimator("Estimator", pAllColumnAnnotations),
             NS::TestHelpers::make_vector<std::vector<NonCopyable<size_t>>>(
                 NS::TestHelpers::make_vector<NonCopyable<size_t>>(1000, 200, 30, 4),
@@ -409,7 +398,7 @@ TEST_CASE("Annotation, Annotation, Transformer, Annotation") {
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
     CHECK(
-        Test(
+        NS::TestHelpers::TransformerEstimatorTest(
             Estimator("Estimator", pAllColumnAnnotations),
             NS::TestHelpers::make_vector<std::vector<NonCopyable<size_t>>>(
                 NS::TestHelpers::make_vector<NonCopyable<size_t>>(1000, 200, 30, 4),
@@ -447,25 +436,28 @@ TEST_CASE("Annotation, Annotation, Transformer, Annotation") {
     CHECK(myAnnotation3.Value.Value == "4");
 }
 
-class SimpleEstimator : public NS::TransformerEstimator<int const &, double> {
+class SimpleEstimator : public NS::TransformerEstimator<int, double> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Types
-    using BaseType                          = NS::TransformerEstimator<int const &, double>;
+    using BaseType                          = NS::TransformerEstimator<int, double>;
 
-    class Transformer : public BaseType::Transformer {
+    class Transformer : public NS::Transformer<int, double> {
     public:
         Transformer(double delta) : _delta(delta) {}
         Transformer(Archive &) {}
-
-        TransformedType execute(InputType input) override {
-            return input + _delta;
-        }
 
         void save(Archive &) const override {}
 
     private:
         double                              _delta;
+
+        void execute_impl(InputType const &input, CallbackFunction const &func) override {
+            func(input + _delta);
+        }
+
+        void flush_impl(CallbackFunction const &) override {
+        }
     };
 
     using TransformerType                   = Transformer;
@@ -490,21 +482,24 @@ private:
 
     // ----------------------------------------------------------------------
     // |  Private Methods
-    NS::Estimator::FitResult fit_impl(FitBufferInputType *pBuffer, size_t cBuffer) override {
-        FitBufferInputType const * const    pEndBuffer(pBuffer + cBuffer);
+    bool begin_training_impl(void) override {
+        return true;
+    }
+
+    NS::FitResult fit_impl(InputType const *pBuffer, size_t cBuffer) override {
+        InputType const * const             pEndBuffer(pBuffer + cBuffer);
 
         while(pBuffer != pEndBuffer) {
             _total += *pBuffer++;
             ++_count;
         }
 
-        return NS::Estimator::FitResult::Continue;
+        return NS::FitResult::Continue;
     }
-    NS::Estimator::FitResult complete_training_impl(void) override {
+
+    void complete_training_impl(void) override {
         assert(_count);
         _result = static_cast<double>(_total) / _count;
-
-        return NS::Estimator::FitResult::Complete;
     }
 
     TransformerUniquePtr create_transformer_impl(void) override {
@@ -522,7 +517,7 @@ TEST_CASE("Transformer with Training") {
     NS::AnnotationMapsPtr const             pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
     CHECK(
-        Test(
+        NS::TestHelpers::TransformerEstimatorTest(
             Estimator("Estimator", pAllColumnAnnotations),
             {{1, 2, 3, 4}, {5, 6, 7, 8}},
             {10, 20, 30, 40, 50}
@@ -611,19 +606,21 @@ public:
         NS::Traits<std::uint32_t>::serialize(ar, _executeCtr);
     }
 
-    typename BaseType::TransformedType execute(typename BaseType::InputType input) override {
-        bool const                          isOdd(_executeCtr++ & 1);
-
-        if((OperateOnOdd && isOdd) == false && (OperateOnOdd == false && isOdd == false) == false)
-            return input;
-
-        return input + Delta;
-    }
-
 private:
     // ----------------------------------------------------------------------
     // |  Private Data
     std::uint32_t                           _executeCtr;
+
+    // ----------------------------------------------------------------------
+    // |  Private Methods
+    void execute_impl(typename BaseType::InputType const &input, CallbackFunction const &func) override {
+        bool const                          isOdd(_executeCtr++ & 1);
+
+        if((OperateOnOdd && isOdd) == false && (OperateOnOdd == false && isOdd == false) == false)
+            func(input);
+        else
+            func(input + Delta);
+    }
 };
 
 class CustomComponentEstimator :
@@ -649,7 +646,7 @@ public:
     // ----------------------------------------------------------------------
     // |  Public Methods
     CustomComponentEstimator(NS::AnnotationMapsPtr pAllColumnAnnotations, bool operateOnOdd, int delta) :
-        BaseType("CustomComponentEstimator", std::move(pAllColumnAnnotations), true),
+        BaseType("CustomComponentEstimator", std::move(pAllColumnAnnotations)),
         OperateOnOdd(operateOnOdd),
         Delta(delta) {
     }
@@ -661,12 +658,15 @@ public:
 private:
     // ----------------------------------------------------------------------
     // |  Private Methods
-    Estimator::FitResult fit_impl(FitBufferInputType const *, size_t) override {
+    bool begin_training_impl(void) override {
+        return false;
+    }
+
+    NS::FitResult fit_impl(InputType const *, size_t) override {
         throw std::runtime_error("This should never be called as this class will not be used during training");
     }
 
-    Estimator::FitResult complete_training_impl(void) override {
-        throw std::runtime_error("This should never be called as this class will not be used during training");
+    void complete_training_impl(void) override {
     }
 
     inline typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
@@ -696,6 +696,9 @@ public:
             [&pAllColumnAnnotations, &oddDelta](void) { return CustomComponentEstimator(pAllColumnAnnotations, true, oddDelta); },
             [&pAllColumnAnnotations, &evenDelta](void) { return CustomComponentEstimator(pAllColumnAnnotations, false, evenDelta); }
         ) {
+
+        begin_training();
+        complete_training();
     }
 
     ~CustomEstimator(void) override = default;
@@ -706,9 +709,22 @@ public:
 TEST_CASE("Custom Constructor") {
     CustomEstimator                                     estimator(NS::CreateTestAnnotationMapsPtr(1), 10, 200);
     CustomEstimator::TransformerUniquePtr const         pTransformer(estimator.create_transformer());
+    int                                                 result;
+    auto const                                          callback(
+        [&result](int output) {
+            result = output;
+        }
+    );
 
-    CHECK(pTransformer->execute(1) == 201);
-    CHECK(pTransformer->execute(2) == 12);
-    CHECK(pTransformer->execute(3) == 203);
-    CHECK(pTransformer->execute(4) == 14);
+    pTransformer->execute(1, callback);
+    CHECK(result == 201);
+
+    pTransformer->execute(2, callback);
+    CHECK(result == 12);
+
+    pTransformer->execute(3, callback);
+    CHECK(result == 203);
+
+    pTransformer->execute(4, callback);
+    CHECK(result == 14);
 }

@@ -4,10 +4,13 @@
 // ----------------------------------------------------------------------
 #pragma once
 
+#include <cstring>                          // For `strcmp`
 #include <memory>
 #include <map>
 #include <string>
 #include <vector>
+
+#include "Traits.h"
 
 #include "3rdParty/optional.h"
 
@@ -43,6 +46,116 @@ namespace Featurizer {
 class Archive; // Defined in Archive.h
 
 /////////////////////////////////////////////////////////////////////////
+///  \class         Transformer
+///  \brief         Object that uses state to produce a result during
+///                 inferencing activities.
+///
+template <typename InputT, typename TransformedT>
+class Transformer {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    static_assert(std::is_reference<InputT>::value == false, "InputT should not be a reference type");
+    static_assert(std::is_const<InputT>::value == false, "InputT should not be a const type");
+
+    using InputType                     = InputT;
+    using TransformedType               = TransformedT;
+
+    using Archive                       = Microsoft::Featurizer::Archive;
+
+    using CallbackFunction              = std::function<void (TransformedType)>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    Transformer(void) = default;
+    virtual ~Transformer(void) = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Transformer);
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \fn            execute
+    ///  \brief         Invokes the provided callback for each result generated
+    ///                 by the provided input.
+    ///
+    void execute(InputType const &input, CallbackFunction const &callback);
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \fn            flush
+    ///  \brief         Flushes any remaining elements before the `Transformer`
+    ///                 is destroyed.
+    ///
+    void flush(CallbackFunction const &callback);
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \fn            save
+    ///  \brief         Saves the state of the object so it can be reconstructed
+    ///                 at a later time.
+    ///
+    virtual void save(Archive &ar) const = 0;
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    virtual void execute_impl(InputType const &input, CallbackFunction const &callback) = 0;
+    virtual void flush_impl(CallbackFunction const &callback) = 0;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         StandardTransformer
+///  \brief         Most `Transformers` will generate a single transformed
+///                 type for each input. However, the `Transformer` base
+///                 class is written for the more infrequent scenario where
+///                 a single input may generate zero or more transformed types.
+///                 This derived class provides functionality common where
+///                 there is only one output for each input.
+///
+template <typename InputT, typename TransformedT>
+class StandardTransformer : public Transformer<InputT, TransformedT> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = Transformer<InputT, TransformedT>;
+
+    using InputType                         = typename BaseType::InputType;
+    using TransformedType                   = typename BaseType::TransformedType;
+    using CallbackFunction                  = typename BaseType::CallbackFunction;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    StandardTransformer(void) = default;
+    ~StandardTransformer(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StandardTransformer);
+
+    TransformedType execute(InputType &input);
+    TransformedType execute(InputType const &input);
+    using BaseType::execute;
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    void flush_impl(CallbackFunction const &callback) override;
+};
+
+/////////////////////////////////////////////////////////////////////////
 ///  \class         Annotation
 ///  \brief         Base class for an individual datum associated with a column that is produced
 ///                 by an `Estimator`. Once an `Annotation` is created and associated with a column,
@@ -51,8 +164,8 @@ class Archive; // Defined in Archive.h
 ///                 a column isn't calculated repeatedly.
 ///
 ///                 Examples of possible derived classes:
-///                     - Mean of all values in a column, as calculated by a Mean `AnnotationEstimator`
-///                     - Most common value in a column, as calculated by a histogram-like `AnnotationEstimator`
+///                     - Mean of all values in a column, as calculated by a Mean `FitEstimator`
+///                     - Most common value in a column, as calculated by a histogram-like `FitEstimator`
 ///                     - etc.
 ///
 ///                 This base class doesn't contain the data produced by an `Estimator`, but
@@ -64,52 +177,13 @@ class Annotation {
 public:
     // ----------------------------------------------------------------------
     // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-
-    /////////////////////////////////////////////////////////////////////////
-    ///  \typedef       EstimatorUniqueId
-    ///  \brief         Different estimators of the same name produce annotations that must be uniquely
-    ///                 identifiable. For example, the results produce by a mean `AnnotationEstimator`
-    ///                 based on the first 200 values must be distinguishable from the results produced
-    ///                 by a mean `AnnotationEstimator` based on the first 500 values.
-    ///
-    ///                 The estimator's address is memory is used to determine uniqueness.
-    ///
-    ///                 THIS IMPLEMENTATION WILL BREAK IF WE EVER SUPPORT SERIALIZATION, as the memory
-    ///                 address of a deserialized object will be different from the memory address used
-    ///                 when originally creating the `Annotation`. If we want to support serialization
-    ///                 during training, we will need to introduce a mechanisms to uniquely identify
-    ///                 object instances in a way that persists after objects are serialized/deserialized.
-    ///                 `Annotations` are only used during training, so this will not be an issue when
-    ///                 serializing `Transformers`.
-    ///
-    using EstimatorUniqueId                 = void const *;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Data
-    // |
-    // ----------------------------------------------------------------------
-    EstimatorUniqueId const                 CreatorId;
-
-    // ----------------------------------------------------------------------
-    // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
+    Annotation(void) = default;
     virtual ~Annotation(void) = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Annotation);
-
-protected:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Protected Methods
-    // |
-    // ----------------------------------------------------------------------
-    Annotation(EstimatorUniqueId creator_id);
 };
 
 using AnnotationPtr                         = std::shared_ptr<Annotation>;
@@ -119,8 +193,16 @@ using AnnotationPtr                         = std::shared_ptr<Annotation>;
 using AnnotationPtrs                        = std::vector<AnnotationPtr>;
 // TODO: Updating the vector should be thread safe when executing the DAGs in parallel.
 
+namespace Details {
+
+struct RawStringComparison {
+    inline bool operator()(char const *p1, char const *p2) const { return strcmp(p1, p2) < 0; }
+};
+
+} // namespace Details
+
 // A single column supports `Annotations` from different `Estimators`...
-using AnnotationMap                         = std::map<std::string, AnnotationPtrs>;
+using AnnotationMap                         = std::map<char const *, AnnotationPtrs, Details::RawStringComparison>;
 // TODO: Updating the map should be thread safe when executing the DAGs in parallel.
 
 // An `Estimator` may support multiple columns...
@@ -128,8 +210,6 @@ using AnnotationMaps                        = std::vector<AnnotationMap>;
 
 // All `Estimators` within a DAG should use the same collection of column `Annotations`.
 using AnnotationMapsPtr                     = std::shared_ptr<AnnotationMaps>;
-
-// TODO: Expect more classes with regards to Annotation as we use the functionality more.
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            CreateTestAnnotationMapsPtr
@@ -139,7 +219,7 @@ using AnnotationMapsPtr                     = std::shared_ptr<AnnotationMaps>;
 ///
 ///                 THIS FUNCTION SHOULD NOT BE USED IN ANY PRODUCTION CODE!
 ///
-AnnotationMapsPtr CreateTestAnnotationMapsPtr(size_t num_cols);
+AnnotationMapsPtr CreateTestAnnotationMapsPtr(size_t numCols);
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         Estimator
@@ -156,22 +236,12 @@ public:
     // ----------------------------------------------------------------------
     using AnnotationMapsPtr                 = Microsoft::Featurizer::AnnotationMapsPtr;
 
-    /////////////////////////////////////////////////////////////////////////
-    ///  \enum          FitResult
-    ///  \brief         Result returned by the `fit` method.
-    ///
-    enum class FitResult: unsigned char {
-        Complete = 1,                       /// Fitting is complete and there is no need to call `fit` on this `Estimator` any more.
-        Continue,                           /// Continue providing data to `fit` (if such data is available).
-        ResetAndContinue                    /// Reset the data back to the beginning and continue training.
-    };
-
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
     // |
     // ----------------------------------------------------------------------
-    std::string const                       Name;
+    char const * const                      Name;
 
     // ----------------------------------------------------------------------
     // |
@@ -202,13 +272,13 @@ protected:
     // |  Protected Methods
     // |
     // ----------------------------------------------------------------------
-    Estimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
+    Estimator(char const *name, AnnotationMapsPtr pAllColumnAnnotations);
 
     /////////////////////////////////////////////////////////////////////////
     ///  \fn            add_annotation
     ///  \brief         Adds an `Annotation` to the specified column.
     ///
-    void add_annotation(AnnotationPtr pAnnotation, size_t col_index) const;
+    void add_annotation(AnnotationPtr pAnnotation, size_t colIndex) const;
 
     /////////////////////////////////////////////////////////////////////////
     ///  \fn            get_annotation_impl
@@ -221,7 +291,7 @@ protected:
     ///                 Consider the return value to be a potentially null pointer.
     ///
     template <typename DerivedAnnotationT>
-    DerivedAnnotationT * get_annotation_impl(size_t col_index) const;
+    static DerivedAnnotationT * get_annotation_impl(AnnotationMaps const &allAnnotations, size_t colIndex, char const *name);
 
 private:
     // ----------------------------------------------------------------------
@@ -229,65 +299,100 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    AnnotationMapsPtr const                 _all_column_annotations;
+    AnnotationMapsPtr const                 _allColumnAnnotations;
 };
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         FitEstimatorImpl
-///  \brief         Common base class for an `Estimator` that supports fit functionality. Derived
+///  \enum          TrainingState
+///  \brief         Training state associated with an `Estimator`.
+///
+enum class TrainingState : unsigned char {
+    Pending = 1,                            ///> `begin_training` has not been called.
+    Training,                               ///> `fit` may be invoked.
+    Finished,                               ///> The estimator has received enough data and should be completed; future calls to `fit` will raise an exception.
+    Completed                               ///> `complete_training` has been called; calls to `begin_training`, `fit`, and `complete_training` will fail.
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \enum          FitResult
+///  \brief         Result returned from calls to fit.
+///
+enum class FitResult : unsigned char {
+    Complete = 1,                           ///> Training is complete; any future calls to fit will fail.
+    Continue,                               ///> Continue to provide training data.
+    Reset                                   ///> Training should continue, but data should be provided from the start of the batch
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         FitEstimator
+///  \brief         Base class for an `Estimator` that supports fit functionality. Derived
 ///                 classes can produce `Annotations` used by other `Estimators` during the training
 ///                 process and/or state that is returned to the caller during runtime as a part
 ///                 of training and inferencing activities.
 ///
 template <typename InputT>
-class FitEstimatorImpl : public Estimator {
+class FitEstimator : public Estimator {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using InputType                         = InputT;
-    using FitBufferInputType                = std::remove_reference_t<InputType>;
+    static_assert(std::is_reference<InputT>::value == false, "InputT should not be a reference type");
+    static_assert(std::is_const<InputT>::value == false, "InputT should not be a const type");
 
-    using ThisType                          = FitEstimatorImpl<InputType>;
+    using InputType                         = InputT;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    FitEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations, bool is_training_complete=false);
-    ~FitEstimatorImpl(void) override = default;
+    FitEstimator(char const *name, AnnotationMapsPtr pAllColumnAnnotations);
+    ~FitEstimator(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FitEstimatorImpl);
-
-    /////////////////////////////////////////////////////////////////////////
-    ///  \fn            is_training_complete
-    ///  \brief         Returns true if the `complete_training` method has been called
-    ///                 for this `Estimator`. `fit` should not be invoked on
-    ///                 an `Estimator` where training has been completed.
-    ///
-    bool is_training_complete(void) const;
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FitEstimator);
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \fn            fit
-    ///  \brief         Method invoked during training. This method will be invoked until it returns `FitResult::Complete`
-    ///                 or no additional data is available. Derived classes should use this columnar data to create
-    ///                 state (either in the form of `Annotations`) used during the training process or state data that
-    ///                 is used in future calls to `transform`. This method should not be invoked on an object that
-    ///                 has already been completed.
+    ///  \fn            get_state
+    ///  \brief         Returns the training state associated with this `Estimator`.
     ///
-    FitResult fit(InputType value);
-    FitResult fit(FitBufferInputType const *pInputBuffer, size_t cInputBuffer);
+    TrainingState get_state(void) const;
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \fn            begin_training
+    ///  \brief         Begins training for this `Estimator`.
+    ///
+    FitEstimator & begin_training(void);
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \fn            Fit
+    ///  \brief         Fits data according to the `Estimator's` internal logic.
+    ///                 `begin_training` must be called before `fit` can be invoked.
+    ///                 After calls to `fit`, an `Estimator` may transition into
+    ///                 the finished state, indicating that it no longer needs
+    ///                 any training data.
+    ///
+    FitResult fit(InputType const &value);
+    FitResult fit(InputType const *pItems, size_t cItems);
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \fn            on_data_completed
+    ///  \brief         Method called to notify an `Estimator` that it has seen
+    ///                 all available data. An `Estimator` will either transition
+    ///                 into the finished state, indicating that it no longer needs
+    ///                 any training data, or remaining in the Training state. If
+    ///                 the `Estimator` remains in the Training state, callers
+    ///                 should reset the training data and call fit with that
+    ///                 data again.
+    ///
+    FitEstimator & on_data_completed(void);
 
     /////////////////////////////////////////////////////////////////////////
     ///  \fn            complete_training
-    ///  \brief         Completes the training process. Derived classes should use this method to produce any final state
-    ///                 that is used in calls to `transform` or to add `Annotations` for a column. This method should not be
-    ///                 invoked on an object that has already been completed.
+    ///  \brief         Completes training for the `Estimator`.
     ///
-    FitResult complete_training(void);
+    FitEstimator & complete_training(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -295,7 +400,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    bool                                    _is_training_complete;
+    TrainingState                           _state;
 
     // ----------------------------------------------------------------------
     // |
@@ -304,47 +409,36 @@ private:
     // ----------------------------------------------------------------------
 
     /////////////////////////////////////////////////////////////////////////
+    ///  \fn            begin_training_impl
+    ///  \brief         `begin_training` performs common object state validation before invoking
+    ///                 this method. Return true to set the `Estimator` into a Training state,
+    ///                 false to set the `Estimator` into a Finished state.
+    ///
+    virtual bool begin_training_impl(void) = 0;
+
+    /////////////////////////////////////////////////////////////////////////
     ///  \fn            fit_impl
     ///  \brief         `fit` performs common object state and parameter validation before invoking
-    ///                 this abstract method.
+    ///                 this abstract method. Return true to set the `Estimator` into a Training
+    ///                 state, false to set the `Estimator` into a Finished state.
     ///
-    virtual FitResult fit_impl(FitBufferInputType const *pBuffer, size_t cBuffer) = 0;
+    virtual FitResult fit_impl(InputType const *pItems, size_t cItems) = 0;
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \fn            on_data_completed_impl
+    ///  \brief         `on_data_completed` performs common object state validation before invoking
+    ///                 this method. Unlike `begin_training_impl` and `fit_impl`, return true to set
+    ///                 the `Estimator` into a Finished state and false to ensure the `Estimator`
+    ///                 remains in the Training state.
+    ///
+    virtual bool on_data_completed_impl(void);
 
     /////////////////////////////////////////////////////////////////////////
     ///  \fn            complete_training_impl
     ///  \brief         `complete_training` performs common object state validation before invoking this
     ///                 abstract method.
     ///
-    virtual FitResult complete_training_impl(void) = 0;
-};
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         AnnotationEstimator
-///  \brief         An `Estimator` that generates `Annotations` when completed. It is no longer
-///                 invoked once its training is complete (i.e. it doesn't have a `transform`
-///                 method).
-///
-template <typename InputT>
-class AnnotationEstimator : public FitEstimatorImpl<InputT> {
-public:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    using InputType                         = InputT;
-    using ThisType                          = AnnotationEstimator<InputType>;
-    using BaseType                          = FitEstimatorImpl<InputT>;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-    using BaseType::BaseType;
-    ~AnnotationEstimator(void) override = default;
-
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(AnnotationEstimator);
+    virtual void complete_training_impl(void) = 0;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -355,7 +449,7 @@ public:
 ///                 state.
 ///
 template <typename InputT, typename TransformedT>
-class TransformerEstimator : public FitEstimatorImpl<InputT> {
+class TransformerEstimator : public FitEstimator<InputT> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -364,47 +458,10 @@ public:
     // ----------------------------------------------------------------------
     using InputType                         = InputT;
     using TransformedType                   = TransformedT;
-    using ThisType                          = TransformerEstimator<InputType, TransformedType>;
-    using BaseType                          = FitEstimatorImpl<InputT>;
 
-    /////////////////////////////////////////////////////////////////////////
-    ///  \class         Transformer
-    ///  \brief         Object that uses state to produce a result during
-    ///                 inferencing activities.
-    ///
-    class Transformer {
-    public:
-        // ----------------------------------------------------------------------
-        // |  Public Types
-        using InputType                     = typename TransformerEstimator<InputT, TransformedT>::InputType;
-        using TransformedType               = typename TransformerEstimator<InputT, TransformedT>::TransformedType;
+    using BaseType                          = FitEstimator<InputT>;
 
-        using Archive                       = Microsoft::Featurizer::Archive;
-
-        // ----------------------------------------------------------------------
-        // |  Public Methods
-        Transformer(void) = default;
-        Transformer(Archive &ar);
-
-        virtual ~Transformer(void) = default;
-
-        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Transformer);
-
-        /////////////////////////////////////////////////////////////////////////
-        ///  \fn            execute
-        ///  \brief         Produces a result for a given input.
-        ///
-        virtual TransformedType execute(InputType input) = 0;
-
-        /////////////////////////////////////////////////////////////////////////
-        ///  \fn            save
-        ///  \brief         Saves the state of the object so it can be reconstructed
-        ///                 at a later time.
-        ///
-        virtual void save(Archive &ar) const = 0;
-    };
-
-    using TransformerUniquePtr              = std::unique_ptr<Transformer>;
+    using TransformerUniquePtr              = std::unique_ptr<Transformer<InputT, TransformedT>>;
 
     // ----------------------------------------------------------------------
     // |
@@ -438,7 +495,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    bool                                    _created_transformer = false;
+    bool                                    _createdTransformer = false;
 
     // ----------------------------------------------------------------------
     // |
@@ -454,55 +511,6 @@ private:
     virtual TransformerUniquePtr create_transformer_impl(void) = 0;
 };
 
-/////////////////////////////////////////////////////////////////////////
-///  \class         QueuedTransformer
-///  \brief         In most cases, input set to a Transformer is immediately
-///                 converted to transformed output - there is a 1:1 relationship
-///                 between input and output.
-///
-///                 However, in some rare circumstances, a Transformer may use
-///                 the relationship between consecutive rows to determine output.
-///                 In these scenarios, there is a 1:M relationship between input
-///                 and potential transformed output. Furthermore, input may
-///                 be queued until additional input is processes. this means that the
-///                 result returned by a call to execute may be an empty vector;
-///                 this is a valid result for these transformers.
-///
-///                 These types of transformers must implement additional functionality
-///                 (such as a flush method) to account for this behavior.
-///
-template <typename InputT, typename TransformedT>
-class QueuedTransformer : public TransformerEstimator<InputT, TransformedT>::Transformer {
-public:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    using BaseType                          = typename TransformerEstimator<InputT, TransformedT>::Transformer;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-    QueuedTransformer(void) = default;
-    QueuedTransformer(Archive &archive);
-
-    ~QueuedTransformer(void) override = default;
-
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(QueuedTransformer);
-
-    /////////////////////////////////////////////////////////////////////////
-    ///  \function      flush
-    ///  \brief         Return any pending results queued by the Transformer.
-    ///                 This method may return an empty vector when no results
-    ///                 are pending.
-    ///
-    virtual TransformedT flush(void) = 0;
-};
-
-
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -512,33 +520,74 @@ public:
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
+inline AnnotationMapsPtr CreateTestAnnotationMapsPtr(size_t numCols) {
+    AnnotationMaps                          maps;
+
+    if(numCols)
+        maps.resize(numCols);
+
+    return std::make_shared<decltype(maps)>(std::move(maps));
+}
 
 // ----------------------------------------------------------------------
 // |
-// |  Annotation
+// |  Transformer
 // |
 // ----------------------------------------------------------------------
-inline Annotation::Annotation(EstimatorUniqueId creator_id) :
-    CreatorId(
-        [&creator_id]() {
-            if(creator_id == nullptr)
-                throw std::invalid_argument("Invalid id");
+template <typename InputT, typename TransformedT>
+void Transformer<InputT, TransformedT>::execute(InputType const &input, CallbackFunction const &callback) {
+    if(!callback)
+        throw std::invalid_argument("callback");
 
-            return creator_id;
-        }()
-    ) {
+    execute_impl(input, callback);
+}
+
+template <typename InputT, typename TransformedT>
+void Transformer<InputT, TransformedT>::flush(CallbackFunction const &callback) {
+    if(!callback)
+        throw std::invalid_argument("callback");
+
+    flush_impl(callback);
+}
+
+// ----------------------------------------------------------------------
+// |
+// |  StandardTransformer
+// |
+// ----------------------------------------------------------------------
+template <typename InputT, typename TransformedT>
+typename StandardTransformer<InputT, TransformedT>::TransformedType StandardTransformer<InputT, TransformedT>::execute(InputType &input) {
+    // We can't use nonstd::optional here, as it doesn't properly support move semantics (which
+    // becomes a problem for types that don't support copying).
+    TransformedT *                          pResult(reinterpret_cast<TransformedT *>(alloca(sizeof(TransformedT))));
+    bool                                    isSet(false);
+
+    execute(
+        input,
+        [&pResult, &isSet](TransformedType r) {
+            assert(isSet == false);
+            new (reinterpret_cast<void *>(pResult)) TransformedT(std::move(r));
+            isSet = true;
+        }
+    );
+
+    assert(isSet);
+    return std::move(*pResult);
+}
+
+template <typename InputT, typename TransformedT>
+typename StandardTransformer<InputT, TransformedT>::TransformedType StandardTransformer<InputT, TransformedT>::execute(InputType const &input) {
+    InputType                               value(input);
+
+    return execute(value);
 }
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-inline AnnotationMapsPtr CreateTestAnnotationMapsPtr(size_t num_cols) {
-    AnnotationMaps                          maps;
-
-    if(num_cols)
-        maps.resize(num_cols);
-
-    return std::make_shared<decltype(maps)>(std::move(maps));
+template <typename InputT, typename TransformedT>
+void StandardTransformer<InputT, TransformedT>::flush_impl(CallbackFunction const &) /*override*/ {
+    // This method doesn't do anything for StandardTransformers
 }
 
 // ----------------------------------------------------------------------
@@ -547,28 +596,26 @@ inline AnnotationMapsPtr CreateTestAnnotationMapsPtr(size_t num_cols) {
 // |
 // ----------------------------------------------------------------------
 inline AnnotationMaps const & Estimator::get_column_annotations(void) const {
-    return *_all_column_annotations;
+    return *_allColumnAnnotations;
 }
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-inline Estimator::Estimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations) :
+inline Estimator::Estimator(char const *name, AnnotationMapsPtr pAllColumnAnnotations) :
     Name(
-        std::move(
-            [&name](void) -> std::string & {
-                if(name.empty())
-                    throw std::invalid_argument("Invalid name");
+        [name](void) {
+            if(name == nullptr || *name == 0)
+                throw std::invalid_argument("name");
 
-                return name;
-            }()
-        )
+            return name;
+        }()
     ),
-    _all_column_annotations(
+    _allColumnAnnotations(
         std::move(
             [&pAllColumnAnnotations](void) -> AnnotationMapsPtr & {
                 if(!pAllColumnAnnotations || pAllColumnAnnotations->empty())
-                    throw std::invalid_argument("Empty annotations");
+                    throw std::invalid_argument("pAllColumnAnnotations");
 
                 return pAllColumnAnnotations;
             }()
@@ -576,29 +623,29 @@ inline Estimator::Estimator(std::string name, AnnotationMapsPtr pAllColumnAnnota
     ) {
 }
 
-inline void Estimator::add_annotation(AnnotationPtr pAnnotation, size_t col_index) const {
+inline void Estimator::add_annotation(AnnotationPtr pAnnotation, size_t colIndex) const {
     if(!pAnnotation)
-        throw std::invalid_argument("Invalid annotation");
+        throw std::invalid_argument("pAnnotation");
 
-    AnnotationMaps &                        all_annotations(*_all_column_annotations);
+    AnnotationMaps &                        allAnnotations(*_allColumnAnnotations);
 
-    if(col_index >= all_annotations.size())
-        throw std::invalid_argument("Invalid annotation index");
+    if(colIndex >= allAnnotations.size())
+        throw std::invalid_argument("colIndex");
 
     AnnotationPtrs &                        annotations(
-        [&all_annotations, &col_index, this](void) -> AnnotationPtrs & {
-            AnnotationMap &                 column_annotations(all_annotations[col_index]);
+        [&allAnnotations, &colIndex, this](void) -> AnnotationPtrs & {
+            AnnotationMap &                 columnAnnotations(allAnnotations[colIndex]);
 
             // TODO: Acquire read map lock
-            AnnotationMap::iterator const   iter(column_annotations.find(Name));
+            AnnotationMap::iterator const   iter(columnAnnotations.find(Name));
 
-            if(iter != column_annotations.end())
+            if(iter != columnAnnotations.end())
                 return iter->second;
 
             // TODO: Promote read lock to write lock
-            std::pair<AnnotationMap::iterator, bool> const result(column_annotations.emplace(std::make_pair(Name, AnnotationPtrs())));
+            std::pair<AnnotationMap::iterator, bool> const result(columnAnnotations.emplace(std::make_pair(Name, AnnotationPtrs())));
 
-            if(result.first == column_annotations.end() || result.second == false)
+            if(result.first == columnAnnotations.end() || result.second == false)
                 throw std::runtime_error("Invalid insertion");
 
             return result.first->second;
@@ -610,25 +657,25 @@ inline void Estimator::add_annotation(AnnotationPtr pAnnotation, size_t col_inde
 }
 
 template <typename DerivedAnnotationT>
-DerivedAnnotationT * Estimator::get_annotation_impl(size_t col_index) const {
-    AnnotationMaps const &                  all_annotations(*_all_column_annotations);
+DerivedAnnotationT * Estimator::get_annotation_impl(AnnotationMaps const &allAnnotations, size_t colIndex, char const *name) {
+    if(colIndex >= allAnnotations.size())
+        throw std::invalid_argument("colIndex");
+    if(name == nullptr || *name == 0)
+        throw std::invalid_argument("name");
 
-    if(col_index >= all_annotations.size())
-        throw std::invalid_argument("Invalid annotation index");
-
-    AnnotationMap const &                   column_annotations(all_annotations[col_index]);
+    AnnotationMap const &                   columnAnnotations(allAnnotations[colIndex]);
 
     // TODO: Acquire read map lock
-    AnnotationMap::const_iterator const     column_annotations_iter(column_annotations.find(Name));
+    AnnotationMap::const_iterator const     column_annotations_iter(columnAnnotations.find(name));
 
-    if(column_annotations_iter != column_annotations.end()) {
+    if(column_annotations_iter != columnAnnotations.end()) {
         AnnotationPtrs const &              annotations(column_annotations_iter->second);
 
         // TODO: Acquire vector read lock
-        for(auto const & annotation : annotations) {
-            if(annotation->CreatorId == this) {
+
+        for(auto const &annotation : annotations) {
+            if(dynamic_cast<DerivedAnnotationT *>(annotation.get()) != nullptr)
                 return &static_cast<DerivedAnnotationT &>(*annotation);
-            }
         }
     }
 
@@ -637,22 +684,35 @@ DerivedAnnotationT * Estimator::get_annotation_impl(size_t col_index) const {
 
 // ----------------------------------------------------------------------
 // |
-// |  FitEstimatorImpl
+// |  FitEstimator
 // |
 // ----------------------------------------------------------------------
 template <typename InputT>
-FitEstimatorImpl<InputT>::FitEstimatorImpl(std::string name, AnnotationMapsPtr pAllColumnAnnotations, bool is_training_complete /*=false*/) :
-    Estimator(std::move(name), std::move(pAllColumnAnnotations)),
-    _is_training_complete(std::move(is_training_complete)) {
+FitEstimator<InputT>::FitEstimator(char const *name, AnnotationMapsPtr pAllColumnAnnotations) :
+    Estimator(name, std::move(pAllColumnAnnotations)),
+    _state(TrainingState::Pending) {
 }
 
 template <typename InputT>
-bool FitEstimatorImpl<InputT>::is_training_complete(void) const {
-    return _is_training_complete;
+TrainingState FitEstimator<InputT>::get_state(void) const {
+    return _state;
 }
 
 template <typename InputT>
-Estimator::FitResult FitEstimatorImpl<InputT>::fit(InputType value) {
+FitEstimator<InputT> & FitEstimator<InputT>::begin_training(void) {
+    if(_state != TrainingState::Pending)
+        throw std::runtime_error("`begin_training` should not be invoked on an estimator that is already training or completed");
+
+    if(begin_training_impl())
+        _state = TrainingState::Training;
+    else
+        _state = TrainingState::Finished;
+
+    return *this;
+}
+
+template <typename InputT>
+FitResult FitEstimator<InputT>::fit(InputType const &value) {
     return fit(&value, 1);
 }
 
@@ -664,20 +724,20 @@ Estimator::FitResult FitEstimatorImpl<InputT>::fit(InputType value) {
 #endif
 
 template <typename InputT>
-Estimator::FitResult FitEstimatorImpl<InputT>::fit(FitBufferInputType const *pInputBuffer, size_t cInputBuffer) {
-    if(_is_training_complete)
-        throw std::runtime_error("`fit` should not be invoked on an estimator that is already complete");
+FitResult FitEstimator<InputT>::fit(InputType const *pInputs, size_t cInputs) {
+    if(_state != TrainingState::Training)
+        throw std::runtime_error("`fit` should not be invoked on an estimator that is not training or is already finished/complete");
 
-    if(pInputBuffer == nullptr)
-        throw std::invalid_argument("Invalid buffer");
+    if(pInputs == nullptr)
+        throw std::invalid_argument("pInputBuffer");
 
-    if(cInputBuffer == 0)
-        throw std::invalid_argument("Invalid buffer");
+    if(cInputs == 0)
+        throw std::invalid_argument("cInputBuffer");
 
-    FitResult                               result(fit_impl(pInputBuffer, cInputBuffer));
+    FitResult                               result(fit_impl(pInputs, cInputs));
 
     if(result == FitResult::Complete)
-        result = complete_training();
+        _state = TrainingState::Finished;
 
     return result;
 }
@@ -687,16 +747,34 @@ Estimator::FitResult FitEstimatorImpl<InputT>::fit(FitBufferInputType const *pIn
 #endif
 
 template <typename InputT>
-Estimator::FitResult FitEstimatorImpl<InputT>::complete_training(void) {
-    if(_is_training_complete)
-        throw std::runtime_error("`complete_training` should not be invoked on an estimator that is already complete");
+FitEstimator<InputT> & FitEstimator<InputT>::on_data_completed(void) {
+    if(_state != TrainingState::Training && _state != TrainingState::Finished)
+        throw std::runtime_error("`on_data_completed` should not be invoked on an estimator that is not training or is already complete");
 
-    FitResult                               result(complete_training_impl());
+    if(_state != TrainingState::Finished && on_data_completed_impl())
+        _state = TrainingState::Finished;
 
-    if(result == FitResult::Complete)
-        _is_training_complete = true;
+    return *this;
+}
 
-    return result;
+template <typename InputT>
+FitEstimator<InputT> & FitEstimator<InputT>::complete_training(void) {
+    if(_state != TrainingState::Training && _state != TrainingState::Finished)
+        throw std::runtime_error("`complete_training` should not be invoked on an estimator that is not training or is already complete");
+
+    complete_training_impl();
+    _state = TrainingState::Completed;
+
+    return *this;
+}
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+template <typename InputT>
+/*virtual*/ bool FitEstimator<InputT>::on_data_completed_impl(void) {
+    // By default, an estimator can always complete training
+    return true;
 }
 
 // ----------------------------------------------------------------------
@@ -706,15 +784,15 @@ Estimator::FitResult FitEstimatorImpl<InputT>::complete_training(void) {
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
 bool TransformerEstimator<InputT, TransformedT>::has_created_transformer(void) const {
-    return _created_transformer;
+    return _createdTransformer;
 }
 
 template <typename InputT, typename TransformedT>
 typename TransformerEstimator<InputT, TransformedT>::TransformerUniquePtr TransformerEstimator<InputT, TransformedT>::create_transformer(void) {
-    if(!BaseType::is_training_complete())
+    if(BaseType::get_state() != TrainingState::Completed)
         throw std::runtime_error("`create_transformer` should not be invoked on an estimator that is not yet complete");
 
-    if(_created_transformer)
+    if(_createdTransformer)
         throw std::runtime_error("`create_transformer` should not be invoked on an estimator that has been used to create a `Transformer`");
 
     TransformerUniquePtr                    result(create_transformer_impl());
@@ -722,20 +800,9 @@ typename TransformerEstimator<InputT, TransformedT>::TransformerUniquePtr Transf
     if(!result)
         throw std::runtime_error("Invalid result");
 
-    _created_transformer = true;
+    _createdTransformer = true;
     return result;
 }
-
-// ----------------------------------------------------------------------
-// |
-// |  QueuedTransformer
-// |
-// ----------------------------------------------------------------------
-template <typename InputT, typename TransformedT>
-QueuedTransformer<InputT, TransformedT>::QueuedTransformer(Archive &archive) :
-    BaseType(archive) {
-}
-
 
 } // namespace Featurizer
 } // namespace Microsoft

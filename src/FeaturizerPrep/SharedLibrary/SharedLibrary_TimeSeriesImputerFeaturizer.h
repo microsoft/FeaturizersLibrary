@@ -48,7 +48,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_DestroyEst
 FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_IsTrainingComplete(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_Fit(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *pHandle, /*in*/ BinaryArchiveData data, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_FitBuffer(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *pHandle, /*in*/ BinaryArchiveData const *pData, /*in*/ std::size_t numDataElements, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CompleteTraining(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CompleteTraining(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
 FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTransformerFromEstimator(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *pEstimatorHandle, /*out*/ TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);

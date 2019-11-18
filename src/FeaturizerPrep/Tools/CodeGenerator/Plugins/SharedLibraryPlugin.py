@@ -498,7 +498,7 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                     FEATURIZER_LIBRARY_API bool {name}{suffix}IsTrainingComplete(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
                     FEATURIZER_LIBRARY_API bool {name}{suffix}Fit(/*in*/ {name}{suffix}EstimatorHandle *pHandle, {input_param}, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
                     FEATURIZER_LIBRARY_API bool {name}{suffix}FitBuffer(/*in*/ {name}{suffix}EstimatorHandle *pHandle, {input_buffer_param}, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-                    FEATURIZER_LIBRARY_API bool {name}{suffix}CompleteTraining(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+                    FEATURIZER_LIBRARY_API bool {name}{suffix}CompleteTraining(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
                     /* Inference Methods */
                     FEATURIZER_LIBRARY_API bool {name}{suffix}CreateTransformerFromEstimator(/*in*/ {name}{suffix}EstimatorHandle *pEstimatorHandle, /*out*/ {name}{suffix}TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -662,7 +662,10 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                     FEATURIZER_LIBRARY_API bool {name}{suffix}CreateEstimator({params}/*out*/ {name}{suffix}EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
                         {method_prefix}
                             {validation}
-                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}* pEstimator = new Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}(std::make_shared<Microsoft::Featurizer::AnnotationMaps>({num_output_columns}) {args});
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}* pEstimator = new Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}(std::make_shared<Microsoft::Featurizer::AnnotationMaps>({num_output_columns}){col_index} {args});
+
+                            pEstimator->begin_training();
+
                             size_t index(g_pointerTable.Add(pEstimator));
                             *ppHandle = reinterpret_cast<{name}{suffix}EstimatorHandle*>(index);
 
@@ -678,6 +681,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                     validation="// No validation" if not construct_validation else "\n".join(
                         construct_validation,
                     ).strip(),
+                    col_index=", 0" if item.creates_annotations else "",
                     args=", {}".format(
                         ", ".join(construct_args),
                     ) if construct_args else "",
@@ -718,7 +722,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
 
 
-                            *pIsTrainingComplete = estimator.is_training_complete();
+                            *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
                         {method_suffix}
                     }}
 
@@ -810,16 +814,13 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
             f.write(
                 textwrap.dedent(
                     """\
-                    FEATURIZER_LIBRARY_API bool {name}{suffix}CompleteTraining(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
+                    FEATURIZER_LIBRARY_API bool {name}{suffix}CompleteTraining(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
                         {method_prefix}
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-                            if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
 
-                            *pFitResult = static_cast<unsigned char>(estimator.complete_training());
+                            estimator.complete_training();
                         {method_suffix}
                     }}
 

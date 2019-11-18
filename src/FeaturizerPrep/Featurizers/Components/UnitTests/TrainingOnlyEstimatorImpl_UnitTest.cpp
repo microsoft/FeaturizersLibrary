@@ -10,28 +10,8 @@
 
 namespace NS = Microsoft::Featurizer;
 
-struct CountEstimatorPolicyBase {
-    static std::string const                EstimatorName;
-};
-
-#if (defined __clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wglobal-constructors"
-#   pragma clang diagnostic ignored "-Wexit-time-destructors"
-#endif
-
-std::string const CountEstimatorPolicyBase::EstimatorName("CountEstimatorPolicy");
-
-#if (defined __clang__)
-#   pragma clang diagnostic pop
-#endif
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         CountEstimatorPolicy
-///  \brief         Counts distinct values.
-///
-template <typename T, size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
-class CountEstimatorPolicy : public CountEstimatorPolicyBase {
+template <typename T>
+class CountEstimatorPolicyBase {
 public:
     // ----------------------------------------------------------------------
     // |  Public Types
@@ -49,24 +29,77 @@ public:
 
     // ----------------------------------------------------------------------
     // |  Public Data
-    static size_t const                     MaxNumTrainingItems = MaxNumTrainingItemsV;
+    static constexpr char const * const     NameValue = "Test";
 
     // ----------------------------------------------------------------------
     // |  Public Methods
-    template <typename FitBufferInputTypeT>
-    void fit_items(FitBufferInputTypeT const *pBuffer, size_t cItems) {
-        FitBufferInputTypeT const * const   pEndBuffer(pBuffer + cItems);
+    Results complete_training(void) {
+        return Results(std::move(_counts));
+    }
 
-        while(pBuffer != pEndBuffer) {
-            InputType const &                           input(*pBuffer++);
-            std::uint32_t &                             count(
+protected:
+    // ----------------------------------------------------------------------
+    // |  Protected Data
+    typename Results::CountMap              _counts;
+
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         SingleCountEstimatorPolicy
+///  \brief         Counts distinct values.
+///
+template <typename T>
+class SingleCountEstimatorPolicy : public CountEstimatorPolicyBase<T> {
+public:
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    using BaseType                          = CountEstimatorPolicyBase<T>;
+
+    // ----------------------------------------------------------------------
+    // |  Public Methods
+    template <typename U>
+    void fit(U const &input) {
+        std::uint32_t &                     count(
+            [this, &input](void) -> std::uint32_t & {
+                typename BaseType::Results::CountMap::iterator const        i(BaseType::_counts.find(input));
+
+                if(i != BaseType::_counts.end())
+                    return i->second;
+
+                std::pair<typename BaseType::Results::CountMap::iterator, bool> const   result(BaseType::_counts.emplace(std::make_pair(input, 0)));
+
+                return result.first->second;
+            }()
+        );
+
+        count += 1;
+    }
+};
+
+template <typename T>
+class MultipleCountEstimatorPolicy : public CountEstimatorPolicyBase<T> {
+public:
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    using BaseType                          = CountEstimatorPolicyBase<T>;
+
+    // ----------------------------------------------------------------------
+    // |  Public Methods
+    template <typename U>
+    void fit(U const *pItems, size_t cItems) {
+        U const * const                     pEndItems(pItems + cItems);
+
+        while(pItems != pEndItems) {
+            U const &                       input(*pItems++);
+
+            std::uint32_t &                 count(
                 [this, &input](void) -> std::uint32_t & {
-                    typename Results::CountMap::iterator const              i(_counts.find(input));
+                    typename BaseType::Results::CountMap::iterator const    i(BaseType::_counts.find(input));
 
-                    if(i != _counts.end())
+                    if(i != BaseType::_counts.end())
                         return i->second;
 
-                    std::pair<typename Results::CountMap::iterator, bool> const     result(_counts.emplace(std::make_pair(input, 0)));
+                    std::pair<typename BaseType::Results::CountMap::iterator, bool> const   result(BaseType::_counts.emplace(std::make_pair(input, 0)));
 
                     return result.first->second;
                 }()
@@ -75,48 +108,57 @@ public:
             count += 1;
         }
     }
-
-    void fit_nulls(std::uint64_t const &) {
-    }
-
-    Results complete_training(void) {
-        return Results(std::move(_counts));
-    }
-
-private:
-    // ----------------------------------------------------------------------
-    // |  Private Data
-    typename Results::CountMap              _counts;
 };
 
-template <typename EstimatorPolicyT>
+template <
+    typename EstimatorPolicyT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
 std::map<typename EstimatorPolicyT::InputType, std::uint32_t> Test(
     std::vector<std::vector<typename EstimatorPolicyT::InputType>> const &inputBatches
 ) {
-    NS::AnnotationMapsPtr                                                           pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::TrainingOnlyEstimatorImpl<EstimatorPolicyT, 0>     estimator(pAllColumnAnnotations);
+    NS::AnnotationMapsPtr                                                                           pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::Components::TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>  estimator(pAllColumnAnnotations, 0);
 
-    NS::TestHelpers::Train< NS::Featurizers::Components::TrainingOnlyEstimatorImpl<EstimatorPolicyT, 0> ,typename EstimatorPolicyT::InputType>(estimator, inputBatches);
+    NS::TestHelpers::Train(estimator, inputBatches);
 
     typename EstimatorPolicyT::Results const &          results(estimator.get_annotation_data());
 
     return results.Counts;
 }
 
-TEST_CASE("Ints") {
-    std::map<int, std::uint32_t> const      counts(Test<CountEstimatorPolicy<int>>({{1, 2, 3}, {4, 5}, {3, 5}}));
+TEST_CASE("Ints - single") {
+    std::map<int, std::uint32_t> const      counts(Test<SingleCountEstimatorPolicy<int>>({{1, 2, 3}, {4, 5}, {3, 5}}));
 
     CHECK(counts == std::map<int, std::uint32_t>{{1, 1}, {2, 1}, {3, 2}, {4, 1}, {5, 2}});
 }
 
-TEST_CASE("Limited Ints") {
-    std::map<int, std::uint32_t> const      counts(Test<CountEstimatorPolicy<int, 4>>({{1, 2, 3}, {4, 5}, {3, 5}}));
+TEST_CASE("Ints - multiple") {
+    std::map<int, std::uint32_t> const      counts(Test<MultipleCountEstimatorPolicy<int>>({{1, 2, 3}, {4, 5}, {3, 5}}));
+
+    CHECK(counts == std::map<int, std::uint32_t>{{1, 1}, {2, 1}, {3, 2}, {4, 1}, {5, 2}});
+}
+
+TEST_CASE("Limited Ints - single") {
+    std::map<int, std::uint32_t> const      counts(Test<SingleCountEstimatorPolicy<int>, 4>({{1, 2, 3}, {4, 5}, {3, 5}}));
 
     CHECK(counts == std::map<int, std::uint32_t>{{1, 1}, {2, 1}, {3, 1}, {4, 1}});
 }
 
-TEST_CASE("Strings") {
-    std::map<std::string, std::uint32_t> const          counts(Test<CountEstimatorPolicy<std::string>>({{"one", "two", "three"}, {"three", "two"}, {"four"}}));
+TEST_CASE("Limited Ints - multiple") {
+    std::map<int, std::uint32_t> const      counts(Test<MultipleCountEstimatorPolicy<int>, 4>({{1, 2, 3}, {4, 5}, {3, 5}}));
+
+    CHECK(counts == std::map<int, std::uint32_t>{{1, 1}, {2, 1}, {3, 1}, {4, 1}});
+}
+
+TEST_CASE("Strings - single") {
+    std::map<std::string, std::uint32_t> const          counts(Test<SingleCountEstimatorPolicy<std::string>>({{"one", "two", "three"}, {"three", "two"}, {"four"}}));
+
+    CHECK(counts == std::map<std::string, std::uint32_t>{{"one", 1}, {"two", 2}, {"three", 2}, {"four", 1}});
+}
+
+TEST_CASE("Strings - multiple") {
+    std::map<std::string, std::uint32_t> const          counts(Test<MultipleCountEstimatorPolicy<std::string>>({{"one", "two", "three"}, {"three", "two"}, {"four"}}));
 
     CHECK(counts == std::map<std::string, std::uint32_t>{{"one", 1}, {"two", 2}, {"three", 2}, {"four", 1}});
 }
