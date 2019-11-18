@@ -1,16 +1,6 @@
 # ----------------------------------------------------------------------
-# |
-# |  Setup_custom.py
-# |
-# |  David Brownell <db@DavidBrownell.com>
-# |      2018-05-03 22:12:13
-# |
-# ----------------------------------------------------------------------
-# |
-# |  Copyright David Brownell 2018-19.
-# |  Distributed under the Boost Software License, Version 1.0.
-# |  (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-# |
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
 # ----------------------------------------------------------------------
 """Performs repository-specific setup activities."""
 
@@ -112,7 +102,7 @@ def GetCustomActions(debug, verbose, explicit_configurations):
     """
     Returns an action or list of actions that should be invoked as part of the setup process.
 
-    Actions are generic command line statements defined in 
+    Actions are generic command line statements defined in
     <Common_Environment>/Libraries/Python/CommonEnvironment/v1.0/CommonEnvironment/Shell/Commands/__init__.py
     that are converted into statements appropriate for the current scripting language (in most
     cases, this is Bash on Linux systems and Batch or PowerShell on Windows systems.

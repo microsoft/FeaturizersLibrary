@@ -1,18 +1,8 @@
 #!/bin/bash
+
 # ----------------------------------------------------------------------
-# |
-# |  bootstrap.sh
-# |
-# |  David Brownell <db@DavidBrownell.com>
-# |      2019-05-21 11:27:06
-# |
-# ----------------------------------------------------------------------
-# |
-# |  Copyright David Brownell 2019
-# |  Distributed under the Boost Software License, Version 1.0. See
-# |  accompanying file LICENSE_1_0.txt or copy at
-# |  http://www.boost.org/LICENSE_1_0.txt.
-# |
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
 # ----------------------------------------------------------------------
 set -e                                      # Exit on error
 set +v                                      # Disable output

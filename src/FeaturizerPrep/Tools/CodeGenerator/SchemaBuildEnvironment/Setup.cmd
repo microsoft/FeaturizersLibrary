@@ -1,24 +1,14 @@
 @REM ----------------------------------------------------------------------
-@REM |  
-@REM |  Setup.cmd
-@REM |  
-@REM |  David Brownell <db@DavidBrownell.com>
-@REM |      2018-04-20 11:21:37
-@REM |  
-@REM ----------------------------------------------------------------------
-@REM |  
-@REM |  Copyright David Brownell 2018-19.
-@REM |  Distributed under the Boost Software License, Version 1.0.
-@REM |  (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-@REM |  
+@REM Copyright (c) Microsoft Corporation. All rights reserved.
+@REM Licensed under the MIT License
 @REM ----------------------------------------------------------------------
 @echo off
 
 @REM ----------------------------------------------------------------------
-@REM |  
+@REM |
 @REM |  Run as:
 @REM |     Setup.cmd [/debug] [/verbose] ["/configuration=<config_name>"]*
-@REM |  
+@REM |
 @REM ----------------------------------------------------------------------
 
 if "%DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL%"=="" (
