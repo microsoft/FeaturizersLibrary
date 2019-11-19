@@ -1,7 +1,7 @@
 <featurizers +>:
     [name string]
     [estimator_name string]
-    [num_output_columns number min=1]
+    [num_output_columns int min=1]
 
     # TODO: I hope that we don't need this value once we get rid of column-based
     #       annotations in favor of "ModelContexts".

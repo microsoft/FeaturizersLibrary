@@ -32,7 +32,7 @@ def Build(
     verbose=False,
 ):
     return Process.Execute(
-        '"{script}" Generate PythonJson Featurizers "{output_dir}" "/input={input}" /plugin_arg=no_serialization:true{force}{verbose}'.format(
+        '"{script}" Generate PythonYaml Featurizers "{output_dir}" "/input={input}" /plugin_arg=no_serialization:true{force}{verbose}'.format(
             script=CurrentShell.CreateScriptName("SimpleSchemaGenerator"),
             output_dir=os.path.join(_script_dir, "..", "GeneratedCode"),
             input=os.path.join(_script_dir, "..", "Featurizers.SimpleSchema"),

@@ -1,0 +1,381 @@
+--- # ----------------------------------------------------------------------
+- name: CatImputerFeaturizer
+  estimator_name: CatImputerEstimator
+  num_output_columns: 1
+
+  templates:
+    - name: T
+      types:
+        - std::int8_t
+        - std::int16_t
+        - std::int32_t
+        - std::int64_t
+        - std::uint8_t
+        - std::uint16_t
+        - std::uint32_t
+        - std::uint64_t
+        - std::float_t
+        - std::double_t
+        - bool
+        - std::string
+
+  transformed_type_mappings:
+    - input_type: T
+      is_input_optional: true
+      transformed_type: T
+
+# ----------------------------------------------------------------------
+- name: DateTimeFeaturizer
+  estimator_name: DateTimeEstimator
+  num_output_columns: 21
+  creates_annotations: false
+
+  transformed_type_mappings:
+    - input_type: std::int64_t
+      transformed_type: TimePoint
+
+  configuration_params:
+    - type: std::string
+      name: optionalCountryName
+      is_optional: true
+
+    - type: std::string
+      name: optionalDataRootDir
+      is_optional: true
+
+  custom_structs:
+    - name: TimePoint
+      members:
+        - type: std::int32_t
+          name: year
+        - type: std::uint8_t
+          name: month
+        - type: std::uint8_t
+          name: day
+        - type: std::uint8_t
+          name: hour
+        - type: std::uint8_t
+          name: minute
+        - type: std::uint8_t
+          name: second
+        - type: std::uint8_t
+          name: amPm
+        - type: std::uint8_t
+          name: hour12
+        - type: std::uint8_t
+          name: dayOfWeek
+        - type: std::uint8_t
+          name: dayOfQuarter
+        - type: std::uint16_t
+          name: dayOfYear
+        - type: std::uint16_t
+          name: weekOfMonth
+        - type: std::uint8_t
+          name: quarterOfYear
+        - type: std::uint8_t
+          name: halfOfYear
+        - type: std::uint8_t
+          name: weekIso
+        - type: std::int32_t
+          name: yearIso
+        - type: std::string
+          name: monthLabel
+        - type: std::string
+          name: amPmLabel
+        - type: std::string
+          name: dayOfWeekLabel
+        - type: std::string
+          name: holidayName
+        - type: std::uint8_t
+          name: isPaidTimeOff
+
+# ----------------------------------------------------------------------
+- name: HashOneHotVectorizerFeaturizer
+  estimator_name: HashOneHotVectorizerEstimator
+  num_output_columns: 1
+  creates_annotations: false
+
+  templates:
+    - name: T
+      types:
+        - std::int8_t
+        - std::int16_t
+        - std::int32_t
+        - std::int64_t
+        - std::uint8_t
+        - std::uint16_t
+        - std::uint32_t
+        - std::uint64_t
+        - std::float_t
+        - std::double_t
+        - bool
+        - std::string
+
+  transformed_type_mappings:
+    - input_type: T
+      transformed_type: HashOneHotVectorizerStruct
+
+  configuration_params:
+    - type: std::uint32_t
+      name: hashingSeedVal
+      is_optional: false
+
+    - type: std::uint32_t
+      name: numCols
+      is_optional: false
+
+  custom_structs:
+    - name: HashOneHotVectorizerStruct
+      members:
+        - type: std::uint32_t
+          name: ColIndex
+        - type: std::uint32_t
+          name: NumCols
+        - type: bool
+          name: Val
+
+# ----------------------------------------------------------------------
+- name: ImputationMarkerFeaturizer
+  estimator_name: ImputationMarkerEstimator
+  num_output_columns: 1
+  creates_annotations: false
+
+  templates:
+    - name: T
+      types:
+        - std::int8_t
+        - std::int16_t
+        - std::int32_t
+        - std::int64_t
+        - std::uint8_t
+        - std::uint16_t
+        - std::uint32_t
+        - std::uint64_t
+        - std::float_t
+        - std::double_t
+        - bool
+        - std::string
+
+  transformed_type_mappings:
+    - input_type: T
+      is_input_optional: true
+      transformed_type: bool
+
+# ----------------------------------------------------------------------
+- name: LabelEncoderFeaturizer
+  estimator_name: LabelEncoderEstimator
+  num_output_columns: 1
+
+  templates:
+    - name: T
+      types:
+        - std::int8_t
+        - std::int16_t
+        - std::int32_t
+        - std::int64_t
+        - std::uint8_t
+        - std::uint16_t
+        - std::uint32_t
+        - std::uint64_t
+        - std::float_t
+        - std::double_t
+        - bool
+        - std::string
+
+  transformed_type_mappings:
+    - input_type: T
+      transformed_type: std::uint32_t
+
+  configuration_params:
+    - type: bool
+      name: suppressUnrecognizedErrors
+      is_optional: false
+
+# ----------------------------------------------------------------------
+- name: MaxAbsScalarFeaturizer
+  estimator_name: MaxAbsScalarEstimator
+  num_output_columns: 1
+  is_output_a_template: true
+
+  templates:
+    - name: TInputFloat
+      types:
+        - std::int8_t
+        - std::int16_t
+        - std::uint8_t
+        - std::uint16_t
+        - std::float_t
+
+    - name: TInputDouble
+      types:
+        - std::int32_t
+        - std::int64_t
+        - std::uint32_t
+        - std::uint64_t
+        - std::double_t
+
+  transformed_type_mappings:
+    - input_type: TInputFloat
+      transformed_type: std::float_t
+
+    - input_type: TInputDouble
+      transformed_type: std::double_t
+
+# ----------------------------------------------------------------------
+- name: MinMaxScalarFeaturizer
+  estimator_name: MinMaxScalarEstimator
+  num_output_columns: 1
+
+  templates:
+    - name: T
+      types:
+        - std::int8_t
+        - std::int16_t
+        - std::int32_t
+        - std::int64_t
+        - std::uint8_t
+        - std::uint16_t
+        - std::uint32_t
+        - std::uint64_t
+        - std::float_t
+        - std::double_t
+
+  transformed_type_mappings:
+    - input_type: T
+      transformed_type: std::double_t
+
+# ----------------------------------------------------------------------
+- name: MissingDummiesFeaturizer
+  estimator_name: MissingDummiesEstimator
+  num_output_columns: 1
+  creates_annotations: false
+
+  templates:
+    - name: T
+      types:
+        - std::int8_t
+        - std::int16_t
+        - std::int32_t
+        - std::int64_t
+        - std::uint8_t
+        - std::uint16_t
+        - std::uint32_t
+        - std::uint64_t
+        - std::float_t
+        - std::double_t
+        - bool
+        - std::string
+
+  transformed_type_mappings:
+    - input_type: T
+      is_input_optional: true
+      transformed_type: std::int8_t
+
+# ----------------------------------------------------------------------
+- name: OneHotEncoderFeaturizer
+  estimator_name: OneHotEncoderEstimator
+  num_output_columns: 1
+
+  templates:
+    - name: T
+      types:
+        - std::int8_t
+        - std::int16_t
+        - std::int32_t
+        - std::int64_t
+        - std::uint8_t
+        - std::uint16_t
+        - std::uint32_t
+        - std::uint64_t
+        - std::float_t
+        - std::double_t
+        - bool
+        - std::string
+
+  transformed_type_mappings:
+    - input_type: T
+      transformed_type: OneHotStruct
+
+  configuration_params:
+    - type: bool
+      name: suppressUnrecognizedErrors
+      is_optional: false
+
+  custom_structs:
+    - name: OneHotStruct
+      members:
+        - type: std::uint32_t
+          name: index
+        - type: std::uint32_t
+          name: size
+        - type: std::uint32_t
+          name: appearances
+
+# ----------------------------------------------------------------------
+- name: RobustScalarFeaturizer
+  estimator_name: RobustScalarEstimator
+  num_output_columns: 1
+  is_output_a_template: true
+
+  templates:
+    - name: TInputFloat
+      types:
+        - std::int8_t
+        - std::int16_t
+        - std::uint8_t
+        - std::uint16_t
+        - std::float_t
+
+    - name: TInputDouble
+      types:
+        - std::int32_t
+        - std::int64_t
+        - std::uint32_t
+        - std::uint64_t
+        - std::double_t
+
+  transformed_type_mappings:
+    - input_type: TInputFloat
+      transformed_type: std::float_t
+
+    - input_type: TInputDouble
+      transformed_type: std::double_t
+
+  configuration_params:
+    - type: bool
+      name: withCentering
+      is_optional: false
+
+    - type: std::float_t
+      name: qRangeMin
+      is_optional: true
+
+    - type: std::float_t
+      name: qRangeMax
+      is_optional: true
+
+# ----------------------------------------------------------------------
+- name: StringFeaturizer
+  estimator_name: StringEstimator
+  num_output_columns: 1
+  creates_annotations: false
+
+  templates:
+    - name: T
+      types:
+        - std::int8_t
+        - std::int16_t
+        - std::int32_t
+        - std::int64_t
+        - std::uint8_t
+        - std::uint16_t
+        - std::uint32_t
+        - std::uint64_t
+        - std::float_t
+        - std::double_t
+        - bool
+        - std::string
+
+  transformed_type_mappings:
+    - input_type: T
+      transformed_type: std::string

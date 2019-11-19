@@ -46,7 +46,7 @@ def Build(
     ) as dm:
         command_line_template = 'python "{script}" {{plugin}} "{input}" "{{output}}"'.format(
             script=_script_dir,
-            input=os.path.join(_script_dir, "Featurizers.json"),
+            input=os.path.join(_script_dir, "Featurizers.yaml"),
         )
 
         for index, (plugin, output_dir) in enumerate(_PLUGINS):

@@ -20,6 +20,7 @@ from CommonEnvironment.CallOnExit import CallOnExit
 from CommonEnvironment import CommandLine
 from CommonEnvironment import FileSystem
 from CommonEnvironment.StreamDecorator import StreamDecorator
+from CommonEnvironment import StringHelpers
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -28,7 +29,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 sys.path.insert(0, os.path.join(_script_dir, "GeneratedCode"))
 with CallOnExit(lambda: sys.path.pop(0)):
-    import Featurizers_PythonJsonSerialization as Serialization
+    import Featurizers_PythonYamlSerialization as Serialization
 
 # ----------------------------------------------------------------------
 def EnumeratePlugins():
@@ -101,8 +102,24 @@ def EntryPoint(
         suffix="\n",
     ) as dm:
         dm.stream.write("Reading input data...")
-        with dm.stream.DoneManager():
-            data = Serialization.Deserialize(input_filename)
+        with dm.stream.DoneManager() as this_dm:
+            try:
+                data = Serialization.Deserialize(input_filename)
+            except Exception as e:
+                this_dm.stream.write(
+                    textwrap.dedent(
+                        """\
+                        ERROR: {}
+                               {}
+                        """,
+                    ).format(
+                        StringHelpers.LeftJustify(str(e), len("ERROR: ")),
+                        str(getattr(e, "stack", None)),
+                    ),
+                )
+
+                this_dm.result = -1
+                return this_dm.result
 
         dm.stream.write("Preprocessing data...")
         with dm.stream.DoneManager():
@@ -118,7 +135,7 @@ def EntryPoint(
                         new_item.transformed_type = mapping.transformed_type
                         new_item.is_input_optional = mapping.is_input_optional
                         new_item.is_output_optional = mapping.is_output_optional
-                        
+
                         new_data.append([new_item])
                     continue
                 new_data_items = []
@@ -144,7 +161,7 @@ def EntryPoint(
                             # Since we can have multiple templates this is for when a mapping doesn't use a template or not the current template
                             if mapping.input_type != template.name and mapping.transformed_type != template.name:
                                 continue
-                            
+
                             new_item.input_type = regex.sub(template_type, mapping.input_type)
                             new_item.transformed_type = regex.sub(template_type, mapping.transformed_type)
                             new_item.is_input_optional = mapping.is_input_optional
@@ -154,7 +171,7 @@ def EntryPoint(
                             new_data_items.append(copy.deepcopy(new_item))
 
                 new_data.append(new_data_items)
-            
+
             data = new_data
 
         dm.stream.write("Generating content...")
