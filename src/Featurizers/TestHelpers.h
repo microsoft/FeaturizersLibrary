@@ -69,12 +69,7 @@ void Train(EstimatorT &estimator, std::vector<std::vector<InputT>> const &inputB
 }
 
 template <typename EstimatorT>
-std::vector<typename EstimatorT::TransformedType> TransformerEstimatorTest(
-    EstimatorT estimator,
-    std::vector<std::vector<typename EstimatorT::InputType>> const &inputBatches,
-    std::vector<typename EstimatorT::InputType> const &data
-) {
-    Train<EstimatorT>(estimator, inputBatches);
+std::vector<typename EstimatorT::TransformedType> Predict(EstimatorT &estimator, std::vector<typename EstimatorT::InputType> const &data) {
 
     typename EstimatorT::TransformerUniquePtr           pTransformer(estimator.create_transformer());
     std::vector<typename EstimatorT::TransformedType>   output;
@@ -93,6 +88,27 @@ std::vector<typename EstimatorT::TransformedType> TransformerEstimatorTest(
     pTransformer->flush(callback);
 
     return output;
+}
+
+template <typename EstimatorT>
+std::vector<typename EstimatorT::TransformedType> TransformerEstimatorTest(
+    EstimatorT estimator,
+    std::vector<std::vector<typename EstimatorT::InputType>> const &inputBatches,
+    std::vector<typename EstimatorT::InputType> const &data
+) {
+    Train<EstimatorT>(estimator, inputBatches);
+    return Predict(estimator, data);   
+}
+
+template <typename EstimatorT>
+std::vector<typename EstimatorT::TransformedType> TransformerTest(
+    EstimatorT estimator,
+    std::vector<typename EstimatorT::InputType> const &data
+) {
+    estimator.begin_training();
+    estimator.complete_training();
+
+    return Predict(estimator, data);  
 }
 
 // Fuzzy check is used to check if two vectors<double/float> are same considering precision loss
