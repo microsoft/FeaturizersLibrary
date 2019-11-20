@@ -25,6 +25,10 @@ _PLUGINS                                    = [
         os.path.join(_script_dir, "..", "..", "SharedLibrary", "GeneratedCode"),
     ),
     (
+        "MLNet",
+        os.path.join(_script_dir, "..", "..", "GeneratedCode", "ML.NET"),
+    ),
+    (
         "SharedLibraryTests",
         os.path.join(_script_dir, "..", "..", "SharedLibrary", "IntegrationTests", "GeneratedCode"),
     ),

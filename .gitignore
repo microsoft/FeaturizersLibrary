@@ -21,3 +21,5 @@ CmakeSettings.json
 **/out/*
 
 Libraries/Python/DataPipelines/v1\.0/DataPipelines/CppToJson/GeneratedCode/Compiler\.ConditionalInvocationQueryMixin\.data
+
+**/GeneratedCode/ML.NET/*
