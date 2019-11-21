@@ -13,6 +13,7 @@ import textwrap
 
 from collections import OrderedDict
 
+import inflect as inflect_mod
 import six
 
 import CommonEnvironment
@@ -30,6 +31,8 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 sys.path.insert(0, os.path.join(_script_dir, "GeneratedCode"))
 with CallOnExit(lambda: sys.path.pop(0)):
     import Featurizers_PythonYamlSerialization as Serialization
+
+inflect                                     = inflect_mod.engine()
 
 # ----------------------------------------------------------------------
 def EnumeratePlugins():
@@ -121,13 +124,28 @@ def EntryPoint(
                 this_dm.result = -1
                 return this_dm.result
 
+        nonlocals = CommonEnvironment.Nonlocals(
+            skipped=0,
+        )
+
         dm.stream.write("Preprocessing data...")
-        with dm.stream.DoneManager():
+        with dm.stream.DoneManager(
+            done_suffix=lambda: "{} were skipped".format(inflect.no("file", nonlocals.skipped)),
+            suffix=lambda: "\n" if nonlocals.skipped else None,
+        ) as this_dm:
             # If there are templates at play, preprocess the content and expand the values
             new_data = []
 
             for item in data:
+                if item.status != "Available":
+                    this_dm.stream.write("The status for '{}' is set to '{}' and will not be processed.\n".format(item.name, item.status))
+                    nonlocals.skipped += 1
+
+                    continue
+
                 if not hasattr(item, "templates"):
+                    assert item.transformed_type_mappings
+
                     for mapping in item.transformed_type_mappings:
                         new_item = copy.deepcopy(item)
 

@@ -1,7 +1,11 @@
+(Description string min_length=0 default="" ?)
+
 <featurizers +>:
     [name string]
     [estimator_name string]
     [num_output_columns int min=1]
+    [description Description]
+    [status enum values=["Pending", "External", "Available"] default="Available" ?]
 
     # TODO: I hope that we don't need this value once we get rid of column-based
     #       annotations in favor of "ModelContexts".
@@ -9,23 +13,33 @@
 
     <custom_structs *>:
         [name string]
+        [description Description]
+
         <members +>:
+            [description Description]
             <type string>
             <name string>
 
     <configuration_params *>:
+        [description Description]
         <type string>
         <name string>
         <is_optional bool default="false" ?>
 
     <templates *>:
         [name string]
+        [description Description]
         <types string +>
+
+    <input_description Description>
+    <transformed_description Description>
 
     [is_intput_a_template bool default=true ?]
     [is_output_a_template bool default=false ?]
 
-    <transformed_type_mappings +>:
+    <transformed_type_mappings *>:
+        [description Description]
+
         <input_type string>
         <is_input_optional bool default=false ?>
 
