@@ -50,18 +50,16 @@ def EnumeratePlugins():
 
             basename, ext = os.path.splitext(item)
 
-            if (
-                ext != ".py"
-                or not basename.endswith("Plugin")
-                or basename == "Plugin"
-            ):
+            if ext != ".py" or not basename.endswith("Plugin") or basename == "Plugin":
                 continue
 
             mod = importlib.import_module(basename)
 
             plugin_class = getattr(mod, "Plugin", None)
             if plugin_class is None:
-                raise Exception("The module '{}' does not contain a supported plugin".format(fullpath))
+                raise Exception(
+                    "The module '{}' does not contain a supported plugin".format(fullpath),
+                )
 
             error_string = plugin_class.IsValidEnvironment()
             if error_string is not None:
@@ -69,6 +67,7 @@ def EnumeratePlugins():
                 continue
 
             yield plugin_class
+
 
 PLUGINS                                     = OrderedDict([(plugin.Name, plugin) for plugin in EnumeratePlugins()])
 del EnumeratePlugins
@@ -130,7 +129,9 @@ def EntryPoint(
 
         dm.stream.write("Preprocessing data...")
         with dm.stream.DoneManager(
-            done_suffix=lambda: "{} were skipped".format(inflect.no("file", nonlocals.skipped)),
+            done_suffix=lambda: "{} were skipped".format(
+                inflect.no("file", nonlocals.skipped),
+            ),
             suffix=lambda: "\n" if nonlocals.skipped else None,
         ) as this_dm:
             # If there are templates at play, preprocess the content and expand the values
@@ -138,19 +139,24 @@ def EntryPoint(
 
             for item in data:
                 if item.status != "Available":
-                    this_dm.stream.write("The status for '{}' is set to '{}' and will not be processed.\n".format(item.name, item.status))
+                    this_dm.stream.write(
+                        "The status for '{}' is set to '{}' and will not be processed.\n".format(
+                            item.name,
+                            item.status,
+                        ),
+                    )
                     nonlocals.skipped += 1
 
                     continue
 
                 if not hasattr(item, "templates"):
-                    assert item.transformed_type_mappings
+                    assert item.type_mappings
 
-                    for mapping in item.transformed_type_mappings:
+                    for mapping in item.type_mappings:
                         new_item = copy.deepcopy(item)
 
                         new_item.input_type = mapping.input_type
-                        new_item.transformed_type = mapping.transformed_type
+                        new_item.output_type = mapping.output_type
                         new_item.is_input_optional = mapping.is_input_optional
                         new_item.is_output_optional = mapping.is_output_optional
 
@@ -166,22 +172,38 @@ def EntryPoint(
 
                         # Remove the template mapping and list of templates
                         del new_item.templates
-                        del new_item.transformed_type_mappings
+                        del new_item.type_mappings
 
-                        for configuration_param in getattr(new_item, "configuration_params", []):
-                            configuration_param.type = regex.sub(template_type, configuration_param.type)
+                        for configuration_param in getattr(
+                            new_item,
+                            "configuration_params",
+                            [],
+                        ):
+                            configuration_param.type = regex.sub(
+                                template_type,
+                                configuration_param.type,
+                            )
 
                         for custom_struct in getattr(new_item, "custom_structs", []):
                             for member in custom_struct.members:
                                 member.type = regex.sub(template_type, member.type)
 
-                        for mapping in item.transformed_type_mappings:
+                        for mapping in item.type_mappings:
                             # Since we can have multiple templates this is for when a mapping doesn't use a template or not the current template
-                            if mapping.input_type != template.name and mapping.transformed_type != template.name:
+                            if (
+                                mapping.input_type != template.name
+                                and mapping.output_type != template.name
+                            ):
                                 continue
 
-                            new_item.input_type = regex.sub(template_type, mapping.input_type)
-                            new_item.transformed_type = regex.sub(template_type, mapping.transformed_type)
+                            new_item.input_type = regex.sub(
+                                template_type,
+                                mapping.input_type,
+                            )
+                            new_item.output_type = regex.sub(
+                                template_type,
+                                mapping.output_type,
+                            )
                             new_item.is_input_optional = mapping.is_input_optional
                             new_item.is_output_optional = mapping.is_output_optional
 
@@ -224,6 +246,7 @@ def CommandLineSuffix():
 
         """,
     ).format("\n".join(content).rstrip())
+
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------

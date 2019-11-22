@@ -44,10 +44,10 @@
         - bool
         - std::string
 
-  transformed_type_mappings:
+  type_mappings:
     - input_type: T
       is_input_optional: true
-      transformed_type: T
+      output_type: T
 
 # ----------------------------------------------------------------------
 - name: CountVectorizerFeaturizer
@@ -103,9 +103,9 @@
         "isPaidTimeOff": 0
       }
 
-  transformed_type_mappings:
+  type_mappings:
     - input_type: std::int64_t
-      transformed_type: TimePoint
+      output_type: TimePoint
 
   configuration_params:
     - type: std::string
@@ -202,9 +202,9 @@
         - bool
         - std::string
 
-  transformed_type_mappings:
+  type_mappings:
     - input_type: T
-      transformed_type: HashOneHotVectorizerStruct
+      output_type: HashOneHotVectorizerStruct
 
   configuration_params:
     - type: std::uint32_t
@@ -266,10 +266,10 @@
         - bool
         - std::string
 
-  transformed_type_mappings:
+  type_mappings:
     - input_type: T
       is_input_optional: true
-      transformed_type: bool
+      output_type: bool
 
 # ----------------------------------------------------------------------
 - name: ImputerFeaturizer
@@ -340,9 +340,9 @@
         - bool
         - std::string
 
-  transformed_type_mappings:
+  type_mappings:
     - input_type: T
-      transformed_type: std::uint32_t
+      output_type: std::uint32_t
 
   configuration_params:
     - type: bool
@@ -386,12 +386,12 @@
         - std::uint64_t
         - std::double_t
 
-  transformed_type_mappings:
+  type_mappings:
     - input_type: TInputFloat
-      transformed_type: std::float_t
+      output_type: std::float_t
 
     - input_type: TInputDouble
-      transformed_type: std::double_t
+      output_type: std::double_t
 
 # ----------------------------------------------------------------------
 - name: MinMaxScalarFeaturizer
@@ -427,9 +427,9 @@
         - std::float_t
         - std::double_t
 
-  transformed_type_mappings:
+  type_mappings:
     - input_type: T
-      transformed_type: std::double_t
+      output_type: std::double_t
 
 # ----------------------------------------------------------------------
 - name: MissingDummiesFeaturizer
@@ -467,10 +467,10 @@
         - bool
         - std::string
 
-  transformed_type_mappings:
+  type_mappings:
     - input_type: T
       is_input_optional: true
-      transformed_type: std::int8_t
+      output_type: std::int8_t
 
 # ----------------------------------------------------------------------
 - name: NumericalizeFeaturizer
@@ -524,9 +524,9 @@
         - bool
         - std::string
 
-  transformed_type_mappings:
+  type_mappings:
     - input_type: T
-      transformed_type: OneHotStruct
+      output_type: OneHotStruct
 
   configuration_params:
     - type: bool
@@ -589,12 +589,12 @@
         - std::uint64_t
         - std::double_t
 
-  transformed_type_mappings:
+  type_mappings:
     - input_type: TInputFloat
-      transformed_type: std::float_t
+      output_type: std::float_t
 
     - input_type: TInputDouble
-      transformed_type: std::double_t
+      output_type: std::double_t
 
   configuration_params:
     - type: bool
@@ -670,9 +670,9 @@
         - bool
         - std::string
 
-  transformed_type_mappings:
+  type_mappings:
     - input_type: T
-      transformed_type: std::string
+      output_type: std::string
 
 # ----------------------------------------------------------------------
 - name: TfidfVectorizerFeaturizer

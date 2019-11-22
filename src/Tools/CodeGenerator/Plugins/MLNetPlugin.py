@@ -53,7 +53,7 @@ class TypeInfo(Interface.Interface):
            `invocation_template` is a string template string that should
            be formatted with the arguments.
         """
-        raise Exception("Abstract Method")    
+        raise Exception("Abstract Method")
 
     # ----------------------------------------------------------------------
     @staticmethod
@@ -133,7 +133,7 @@ def _FillList(item, status_stream, unsupported_types):
         return CSharpData(item)
     except Exception as e:
         if "is not a supported type" in e.args[0]:
-            if item.custom_structs[0].name not in unsupported_types: 
+            if item.custom_structs[0].name not in unsupported_types:
                 status_stream.write(
                     "{}\tUnsupported type '{}' found in class '{}'. The corrsponding methods will not be generated for this type.\n".
                     format(
@@ -224,7 +224,7 @@ def _GenerateCSharpFile(output_dir, items, csharp_data_items, output_stream):
                         private readonly IHost _host;
 
                         /* Codegen: Add additional needed class members here */
-                        
+
                         #region Options
 
                         /* If not one to one need to change this */
@@ -327,7 +327,7 @@ def _GenerateCSharpFile(output_dir, items, csharp_data_items, output_stream):
                         {{
                             Host.CheckValue(ctx, nameof(ctx));
                             ctx.CheckAtModel(GetVersionInfo());
-                            
+
                             /* Codegen: Edit this format as needed */
                             // *** Binary format ***
                             // int number of column pairs
@@ -687,12 +687,12 @@ def _GenerateTypedColumns(items, csharp_data_items, featurizerName, transformerN
     unsupported_types = set()
     for index, item in enumerate(csharp_data_items):
         if item == None:
-            if items[index].transformed_type not in unsupported_types:
+            if items[index].output_type not in unsupported_types:
                 output_stream.write(
                     "Unsupported type '{}' found, not generating interop code for it.\n".
-                    format(items[index].transformed_type)
+                    format(items[index].output_type)
                 )
-                unsupported_types.add(items[index].transformed_type)
+                unsupported_types.add(items[index].output_type)
             continue
         code.append( """
             #region {typeName}TypedColumn
@@ -787,7 +787,7 @@ def _GenerateTypedColumns(items, csharp_data_items, featurizerName, transformerN
                 private static extern bool CreateTransformerSaveDataNative(TransformerEstimatorSafeHandle transformer, out IntPtr buffer, out IntPtr bufferSize, out IntPtr error);
                 private protected override bool CreateTransformerSaveDataHelper(out IntPtr buffer, out IntPtr bufferSize, out IntPtr errorHandle) =>
                     CreateTransformerSaveDataNative(_transformerHandler, out buffer, out bufferSize, out errorHandle);
-                
+
                 [DllImport("Featurizers", EntryPoint = "{featurizerName}_{nativeFeaturizerType}_IsTrainingComplete", CallingConvention = CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
                 private static extern bool IsTrainingCompleteNative(TransformerEstimatorSafeHandle transformer, out bool isTrainingComplete, out IntPtr errorHandle);
                 private protected override bool IsTrainingComplete(TransformerEstimatorSafeHandle estimatorHandle)
@@ -809,16 +809,16 @@ def _GenerateTypedColumns(items, csharp_data_items, featurizerName, transformerN
             """.format(
                 typeName = item.InputTypeInfo.csharp_type_name,
                 inputType = item.InputTypeInfo.csharp_type,
-                outputType = item.TransformedTypeInfo.csharp_type,
+                outputType = item.OutputTypeInfo.csharp_type,
                 featurizerName = featurizerName,
                 nativeFeaturizerType = item.InputTypeInfo.cpp_type,
                 nativeInputDeclaration = item.InputTypeInfo.GetNativeInputInfo(item.IsInputOptional).ParameterDecl,
-                nativeOutputDeclaration = item.TransformedTypeInfo.GetNativeOutputInfo().ParameterDecl,
+                nativeOutputDeclaration = item.OutputTypeInfo.GetNativeOutputInfo().ParameterDecl,
                 inputConversion = item.InputTypeInfo.GetNativeInputInfo(item.IsInputOptional).InvocationStatement,
-                outputConversion = item.TransformedTypeInfo.GetNativeOutputInfo().InvocationStatement,
+                outputConversion = item.OutputTypeInfo.GetNativeOutputInfo().InvocationStatement,
                 transformerName = transformerName,
                 conversionEnd = item.InputTypeInfo.GetNativeInputInfo(item.IsInputOptional).ConversionEnd,
-                deleteTransformedData = item.TransformedTypeInfo.GetNativeOutputInfo(featurizer_name = featurizerName).DeleteTransformedData,
+                deleteTransformedData = item.OutputTypeInfo.GetNativeOutputInfo(featurizer_name = featurizerName).DeleteTransformedData,
 
             )
         )
@@ -873,8 +873,8 @@ class CSharpData(object):
         )
 
         # Output
-        transformed_type_info = type_info_visitor.Accept(
-            item.transformed_type,
+        output_type_info = type_info_visitor.Accept(
+            item.output_type,
             supported_custom_types=supported_custom_types,
             custom_structs=custom_structs,
         )
@@ -883,8 +883,8 @@ class CSharpData(object):
         self.CustomStructs                  = custom_structs
         self.ConfigurationParamTypeInfos    = configuration_param_type_infos
         self.InputTypeInfo                  = input_type_info
-        self.TransformedTypeInfo            = transformed_type_info
-        self.IsInputOptional                     = item.is_input_optional
+        self.OutputTypeInfo                 = output_type_info
+        self.IsInputOptional                = item.is_input_optional
 
 
 # ----------------------------------------------------------------------
@@ -1022,7 +1022,7 @@ class _ScalarTypeInfo(TypeInfo):
                     \t\t\t\t\tinteropInput = &input;
                 """
             ).format(self.csharp_type)
-            
+
         else:
             decl = "{} input".format(self.csharp_type)
             invocation_statement = "{} interopInput = input;".format(self.csharp_type)
@@ -1042,7 +1042,7 @@ class _ScalarTypeInfo(TypeInfo):
         is_struct=False,
         featurizer_name = "",
     ):
- 
+
         decl = "out {} interopOutput".format(self.csharp_type)
         invocation_statement = "{} output = interopOutput;".format(self.csharp_type)
 
@@ -1111,7 +1111,7 @@ class _StringTypeInfo(TypeInfo):
                 \t\t\t\t\t{{
                 """
             ).format(self.csharp_type)
-            
+
         else:
             invocation_statement = textwrap.dedent(
                 """\
@@ -1167,7 +1167,7 @@ class _StringTypeInfo(TypeInfo):
             "",
             delete_transformed_data,
         )
-        
+
 
 # ----------------------------------------------------------------------
 class _TimePointTypeInfo(TypeInfo):
@@ -1182,7 +1182,7 @@ class _TimePointTypeInfo(TypeInfo):
     @classmethod
     @Interface.override
     def GetNativeInputInfo(self, is_optional):
-        raise Exception("'TimePoint' is only used as a TransformedType")
+        raise Exception("'TimePoint' is only used as a OutputType")
 
     # ----------------------------------------------------------------------
     @Interface.override

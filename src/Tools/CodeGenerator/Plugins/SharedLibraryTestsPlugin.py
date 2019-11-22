@@ -55,7 +55,9 @@ class Plugin(PluginBase):
             with status_stream.DoneManager(
                 suffix="\n",
             ) as dm:
-                for index, (items, items_type_info_data) in enumerate(zip(data, type_info_data)):
+                for index, (items, items_type_info_data) in enumerate(
+                    zip(data, type_info_data),
+                ):
                     dm.stream.write(
                         "Processing '{}' ({} of {})...".format(
                             items[0].name,
@@ -83,7 +85,10 @@ class Plugin(PluginBase):
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
-    with open(os.path.join(output_dir, "SharedLibraryTests_{}.h".format(items[0].name)), "w") as f:
+    with open(
+        os.path.join(output_dir, "SharedLibraryTests_{}.h".format(items[0].name)),
+        "w",
+    ) as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -128,7 +133,7 @@ def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
                 is_input_optional=getattr(item, "is_input_optional", False),
             )
 
-            output_statement_info = type_info_data.TransformedTypeInfoFactory.GetOutputInfo()
+            output_statement_info = type_info_data.OutputTypeInfoFactory.GetOutputInfo()
 
             inline_destroy_statement = "// No inline destroy statement"
             trailing_destroy_statement = "// No trailing destroy statement"
@@ -334,16 +339,16 @@ class TypeInfoData(object):
         input_type_info_factory = tif(custom_structs)
 
         # Create the output factory
-        tif = self._GetTypeInfoClass(item.transformed_type)
-        assert tif, item.transformed_type
+        tif = self._GetTypeInfoClass(item.output_type)
+        assert tif, item.output_type
 
-        transformed_type_info_factory = tif(custom_structs)
+        output_type_info_factory = tif(custom_structs)
 
         # Commit the results
         self.CustomStructs                              = custom_structs
         self.ConfigurationParamTypeInfoFactories        = configuration_param_type_info_factories
         self.InputTypeInfoFactory                       = input_type_info_factory
-        self.TransformedTypeInfoFactory                 = transformed_type_info_factory
+        self.OutputTypeInfoFactory                      = output_type_info_factory
 
     # ----------------------------------------------------------------------
     # |
@@ -361,7 +366,9 @@ class TypeInfoData(object):
     def _GetTypeInfoClass(cls, the_type):
         if cls._type_info_factory_classes is None:
             from Plugins.SharedLibraryTestsPluginImpl import ScalarTypeInfoFactories
-            from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
+            from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfoFactory import (
+                StringTypeInfoFactory,
+            )
             from Plugins.SharedLibraryTestsPluginImpl import StructTypeInfoFactories
 
             type_info_factory_classes = [StringTypeInfoFactory]

@@ -39,12 +39,12 @@ class _StructTypeInfoFactory(TypeInfoFactory):
     # ----------------------------------------------------------------------
     @Interface.override
     def GetInputInfo(self, arg_name, is_optional, invocation_template):
-        raise Exception("'{}' is only used as a TransformedType".format(self.TypeName))
+        raise Exception("'{}' is only used as a OutputType".format(self.TypeName))
 
     # ----------------------------------------------------------------------
     @Interface.override
     def GetInputBufferInfo(self, arg_name, is_optional, invocation_template):
-        raise Exception("'{}' is only used as a TransformedType".format(self.TypeName))
+        raise Exception("'{}' is only used as a OutputType".format(self.TypeName))
 
     # ----------------------------------------------------------------------
     @Interface.override

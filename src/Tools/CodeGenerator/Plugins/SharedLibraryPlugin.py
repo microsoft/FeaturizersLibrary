@@ -107,7 +107,7 @@ def _CreateInterfaceSubstitutionDict(item, c_data):
         suffix = "_{}_".format(template_desc)
         type_desc = " <{}>".format(template_desc)
         if item.is_output_a_template:
-            cpp_template_suffix = "<{}>".format(template + ", " + item.transformed_type)
+            cpp_template_suffix = "<{}>".format(template + ", " + item.output_type)
         else:
             cpp_template_suffix = "<{}>".format(template)
 
@@ -420,9 +420,7 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
 
                     construct_params += info.ParameterDecl
 
-            delete_transformed_info = (
-                c_data.TransformedTypeInfoFactory.GetDestroyOutputInfo()
-            )
+            delete_transformed_info = c_data.OutputTypeInfoFactory.GetDestroyOutputInfo()
             if delete_transformed_info is not None:
                 delete_transformed_method = textwrap.dedent(
                     """\
@@ -529,9 +527,7 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                         ).ParameterDecl,
                     ),
                     transform_output_param=", ".join(
-                        c_data.TransformedTypeInfoFactory.GetOutputInfo(
-                            "output",
-                        ).ParameterDecl,
+                        c_data.OutputTypeInfoFactory.GetOutputInfo("output").ParameterDecl,
                     ),
                     delete_transformed_method=delete_transformed_method,
                     **d
@@ -934,7 +930,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                 "auto result(transformer.execute({}));",
             )
 
-            output_info = c_data.TransformedTypeInfoFactory.GetOutputInfo("output")
+            output_info = c_data.OutputTypeInfoFactory.GetOutputInfo("output")
 
             f.write(
                 textwrap.dedent(
@@ -982,7 +978,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
             )
 
             # DestroyTransformedData (optional)
-            output_info = c_data.TransformedTypeInfoFactory.GetDestroyOutputInfo()
+            output_info = c_data.OutputTypeInfoFactory.GetDestroyOutputInfo()
             if output_info is not None:
                 f.write(
                     textwrap.dedent(
@@ -1080,16 +1076,16 @@ class CData(object):
         input_type_info_factory = tif(custom_structs)
 
         # Create the output factory
-        tif = self._GetTypeInfoClass(item.transformed_type)
-        assert tif, item.transformed_type
+        tif = self._GetTypeInfoClass(item.output_type)
+        assert tif, item.output_type
 
-        transformed_type_info_factory = tif(custom_structs)
+        output_type_info_factory = tif(custom_structs)
 
         # Commit the results
         self.CustomStructs                              = custom_structs
         self.ConfigurationParamTypeInfoFactories        = configuration_param_type_info_factories
         self.InputTypeInfoFactory                       = input_type_info_factory
-        self.TransformedTypeInfoFactory                 = transformed_type_info_factory
+        self.OutputTypeInfoFactory                      = output_type_info_factory
 
     # ----------------------------------------------------------------------
     # |

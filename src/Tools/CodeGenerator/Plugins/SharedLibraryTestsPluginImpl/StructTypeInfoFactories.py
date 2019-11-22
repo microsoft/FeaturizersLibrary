@@ -43,7 +43,7 @@ class _StructTypeInfoFactory(TypeInfoFactory):
         is_input_optional,
         input_name="input",
     ):
-        raise Exception("'{}' is only used as a TransformedType".format(self.TypeName))
+        raise Exception("'{}' is only used as a OutputType".format(self.TypeName))
 
     # ----------------------------------------------------------------------
     @Interface.override

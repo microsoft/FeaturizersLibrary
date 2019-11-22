@@ -20,17 +20,25 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 # ----------------------------------------------------------------------
 
 _PLUGINS                                    = [
+    ("MLNet", os.path.join(_script_dir, "..", "..", "GeneratedCode", "ML.NET")),
+    (
+        "OnnxRuntime",
+        os.path.join(_script_dir, "..", "..", "GeneratedCode", "OnnxRuntime"),
+    ),
     (
         "SharedLibrary",
         os.path.join(_script_dir, "..", "..", "SharedLibrary", "GeneratedCode"),
     ),
     (
-        "MLNet",
-        os.path.join(_script_dir, "..", "..", "GeneratedCode", "ML.NET"),
-    ),
-    (
         "SharedLibraryTests",
-        os.path.join(_script_dir, "..", "..", "SharedLibrary", "IntegrationTests", "GeneratedCode"),
+        os.path.join(
+            _script_dir,
+            "..",
+            "..",
+            "SharedLibrary",
+            "IntegrationTests",
+            "GeneratedCode",
+        ),
     ),
 ]
 
