@@ -1,0 +1,151 @@
+# ----------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
+name: $(TeamProject)-$(BuildDefinitionName)-$(SourceBranchName)-$(Date:yyyy.MM.dd)-$(Rev:rr)
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+resources:
+  containers:
+    - container: universal_linux
+      image: universal_linux
+      endpoint: featurizersbuild
+
+# Note that any variable set in this file will always override a value set within the editor.
+# Therefore, do not set default values here but instead do it in an initialization script.
+#
+#   variables:
+#     release_build: False                  # Set to true to create a release build
+#     prerelease_build_name: ""             # Set to a value (e.g. "preview.1" to create a preview build)
+
+stages:
+  - template: "templates/BuildAndTest.prologue_stage_template.yaml"
+    parameters:
+      release_build: $(release_build)
+      prerelease_build_name: $(prerelease_build_name)
+      is_ci_build: true
+
+  - stage: BuildAndTest_Stage
+    displayName: "Build and Test:"
+    dependsOn: Prologue_Stage
+
+    jobs:
+      # ----------------------------------------------------------------------
+      # Official Builds
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          configuration: x64
+          esrp_connected_service_name: "ESRP CodeSigning Connection"
+          operating_system: Windows
+          tester_code_coverage: True
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          configuration: x86
+          esrp_connected_service_name: "ESRP CodeSigning Connection"
+          operating_system: Windows
+
+      # Note that the universal_linux build is generating code that produces runtime errors. Therefore, this
+      # build has been disabled in favor of an ubuntu-16.04-based build.
+      #
+      # - template: 'templates/BuildAndTest.job_template.yaml'
+      #   parameters:
+      #     agent_pool: ubuntu-16.04
+      #     agent_pool_container: universal_linux
+      #     configuration: universal_linux
+      #     esrp_connected_service_name: 'ESRP CodeSigning Connection'
+      #     operating_system: Linux
+
+      # Work-around for issues with the ubuntu-16.04-based build.
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: ubuntu-16.04
+          configuration: system_compiler
+          esrp_connected_service_name: "ESRP CodeSigning Connection"
+          operating_system: Linux
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: macOS-10.14
+          configuration: system_compiler
+          esrp_connected_service_name: "ESRP CodeSigning Connection"
+          operating_system: MacOS
+
+      # ----------------------------------------------------------------------
+      # Sanity Builds
+
+      # When code coverage is enabled, we only test debug builds. Execute release tests to ensure that everything is working.
+      - template: 'templates/BuildAndTest.job_template.yaml'
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          configuration: x64
+          operating_system: Windows
+          test_only: true
+          test_only_suffix: ' (test only)'
+          tester_release_only: true
+
+      - template: 'templates/BuildAndTest.job_template.yaml'
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          configuration: x64_MSVC
+          operating_system: Windows
+
+      - template: 'templates/BuildAndTest.job_template.yaml'
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          configuration: x86_MSVC
+          operating_system: Windows
+
+      - template: 'templates/BuildAndTest.job_template.yaml'
+        parameters:
+          agent_pool: ubuntu-16.04
+          configuration: x64
+          operating_system: Linux
+
+  - stage: PostBuild_Stage
+    displayName: "Post Build:"
+    dependsOn: BuildAndTest_Stage
+
+    jobs:
+      - template: "templates/_job_template.yaml"
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          job_name: Package_Job
+          job_display_name: "Package"
+          steps:
+            - template: "BuildAndTest.package_steps_template.yaml"
+              parameters:
+                configuration: system_compiler
+                esrp_connected_service_name: "ESRP CodeSigning Connection"
+                operating_system: Windows
+
+      - template: "templates/_job_template.yaml"
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          job_name: Documentation_Job
+          job_display_name: "Generate Documentation"
+          steps:
+            - template: "BuildAndTest.documentation_steps_template.yaml"
+              parameters:
+                configuration: system_compiler
+                operating_system: Windows

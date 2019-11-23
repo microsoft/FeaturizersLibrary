@@ -1,0 +1,29 @@
+# ----------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
+parameters:
+  azure_dev_ops_build_definition_id: "" # 717 (The definition ID of the build pipeline)
+  azure_dev_ops_project_id: "" # 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32 (The project GUID from which to download the pipeline artifacts)
+
+steps:
+  - checkout: self
+    persistCredentials: true
+    clean: true
+
+  - template: Publish.initialize_steps_template.yaml
+    parameters:
+      azure_dev_ops_build_definition_id: ${{ parameters.azure_dev_ops_build_definition_id }}
+      azure_dev_ops_project_id: ${{ parameters.azure_dev_ops_project_id }}
+      minimal_download: true
+
+  - script: |-
+      git config --global user.email "featurizer_dev@microsoft.com"
+      git config --global user.name "Azure DevOps"
+
+      git tag "$(pipeline_product_version)"
+      git push origin "$(pipeline_product_version)"
+
+    displayName: "<Tag Release Sources [Optional]>"
+
+    timeoutInMinutes: 180
+    condition: or(eq(variables['pipeline_is_release_build'], 1), eq(variables['pipeline_is_prerelease_build'], 1))

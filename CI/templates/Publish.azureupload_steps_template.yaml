@@ -1,0 +1,46 @@
+# ----------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
+parameters:
+  azure_dev_ops_build_definition_id: "" # 717 (The definition ID of the build pipeline)
+  azure_dev_ops_project_id: "" # 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32 (The project GUID from which to download the pipeline artifacts)
+
+  subscription_id: ''
+  storage_account: ''
+  container: ''
+
+  # These are parameters not because they will be configued by the caller, but rather because arrays can be
+  # defined here and not in variables.
+  artifacts:
+    - Packages
+    - Documentation
+
+steps:
+  - checkout: none
+
+  - template: Publish.initialize_steps_template.yaml
+    parameters:
+      azure_dev_ops_build_definition_id: ${{ parameters.azure_dev_ops_build_definition_id }}
+      azure_dev_ops_project_id: ${{ parameters.azure_dev_ops_project_id }}
+
+  - ${{ each artifact in parameters.artifacts }}:
+    - task: CopyFiles@2
+      displayName: "Copy ${{ artifact }}"
+
+      timeoutInMinutes: 180
+
+      inputs:
+        SourceFolder: "$(Pipeline.Workspace)/${{ artifact }}"
+        TargetFolder: "$(Pipeline.Workspace)/upload/$(pipeline_product_version)/${{ artifact }}"
+
+  - task: AzureFileCopy@2
+    displayName: "Azure Upload"
+
+    timeoutInMinutes: 180
+
+    inputs:
+      SourcePath: "$(Pipeline.Workspace)/upload"
+      azureSubscription: '${{ parameters.subscription_id }}'
+      Destination: AzureBlob
+      storage: '${{ parameters.storage_account }}'
+      ContainerName: '${{ parameters.container }}'

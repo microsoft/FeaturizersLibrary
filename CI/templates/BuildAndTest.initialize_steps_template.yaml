@@ -1,0 +1,78 @@
+# ----------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
+parameters:
+  operating_system: "" # Windows|Linux|MacOS
+
+steps:
+  - task: DownloadPipelineArtifact@2
+    displayName: "[IMPL] Download Global Build Information"
+
+    timeoutInMinutes: 180
+
+    inputs:
+      artifactName: Globals
+      targetPath: "$(Pipeline.Workspace)/Globals"
+
+  - task: PythonScript@0
+    displayName: "[IMPL] Populate Stage Variables"
+
+    timeoutInMinutes: 180
+
+    inputs:
+      scriptSource: inline
+      script: |-
+        import json
+        import os
+
+        from collections import OrderedDict
+
+        values = OrderedDict()
+
+        # Create standard values
+        operating_system = "${{ parameters.operating_system }}"
+
+        if operating_system == "Windows":
+            values["pipeline_activate_script"] = "call Activate.cmd"
+            values["pipeline_script_extension"] = ".cmd"
+            values["pipeline_display_all_environment_vars"] = "set"
+            values["pipeline_bootstrap_command"] = "bootstrap.cmd"
+            values["pipeline_single_threaded_arg"] = ""
+
+        elif operating_system in ["Linux", "MacOS"]:
+            values["pipeline_activate_script"] = "source ./Activate.sh"
+            values["pipeline_script_extension"] = ".sh"
+            values["pipeline_display_all_environment_vars"] = "export"
+            values["pipeline_bootstrap_command"] = "sudo ./bootstrap.sh"
+
+            # The MacOS compiler hangs when invoking the compiler in parallel. As a result, force single threaded
+            # execution.
+            if operating_system == "MacOS":
+                values["pipeline_single_threaded_arg"] = "/single_threaded"
+            else:
+                values["pipeline_single_threaded_arg"] = ""
+
+        values["pipeline_bootstrap_directory"] = os.path.join(os.getenv("AGENT_ROOTDIRECTORY"), "CommonCode")
+        values["pipeline_artifacts_directory"] = os.getenv("BUILD_ARTIFACTSTAGINGDIRECTORY")
+
+        # Read the global args
+        globals_filename = os.path.join(r"$(Pipeline.Workspace)", "Globals", "globals.json")
+        assert os.path.isfile(globals_filename), globals_filename
+
+        with open(globals_filename) as f:
+            content = json.load(f)
+
+        for k, v in content.items():
+            k = "pipeline_{}".format(k)
+            assert k not in values, (k, values[k])
+
+            if isinstance(v, bool):
+                v = 1 if v else 0
+            elif v is None:
+                v = ""
+
+            values[k] = v
+
+        for k, v in values.items():
+            print("{} = {}".format(k, v))
+            print("##vso[task.setvariable variable={}]{}".format(k, v))

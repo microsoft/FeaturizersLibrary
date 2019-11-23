@@ -1,0 +1,62 @@
+# ----------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
+name: $(TeamProject)-$(BuildDefinitionName)-$(SourceBranchName)-$(Date:yyyy.MM.dd)-$(Rev:rr)
+
+#TODO: Build completion triggers are not yet supported in YAML syntax
+#reference: https://docs.microsoft.com/en-us/azure/devops/pipelines/build/triggers?view=azure-devops&tabs=yaml#build-completion-triggers
+trigger: none
+
+stages:
+  - stage: Publish_Stage
+    displayName: "Publish:"
+
+    jobs:
+      - template: "templates/_job_template.yaml"
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          job_name: AuzreUpload_Job
+          job_display_name: "Azure Upload"
+          steps:
+            - template: "Publish.azureupload_steps_template.yaml"
+              parameters:
+                azure_dev_ops_build_definition_id: 717
+                azure_dev_ops_project_id: "7b4fddf7-fb53-4b12-bfcb-f87ad3774a32"
+                subscription_id: 'AI Infra Build (00c06639-6ee4-454e-8058-8d8b1703bd87)'
+                storage_account: 'featurizersbuild'
+                container: 'Archive'
+
+      - template: "templates/_job_template.yaml"
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          job_name: NuGet_Job
+          job_display_name: "NuGet Packages"
+          steps:
+            - template: "Publish.nuget_steps_template.yaml"
+              parameters:
+                azure_dev_ops_build_definition_id: 717
+                azure_dev_ops_project_id: "7b4fddf7-fb53-4b12-bfcb-f87ad3774a32"
+                azure_dev_ops_artifacts_feed_name: "DataPipelines"
+                service_connection: "NuGet"
+
+  - stage: Epilogue_Stage
+    displayName: "Epilogue:"
+    dependsOn: Publish_Stage
+
+    jobs:
+      - template: "templates/_job_template.yaml"
+        parameters:
+          # agent_pool: AI-Pytorch-Win-CPU
+          # agent_pool_is_custom: true
+          agent_pool: windows-2019
+          job_name: GitTag_Job
+          job_display_name: "Tag Git Sources (for release builds)"
+          steps:
+            - template: "Publish.tagsources_steps_template.yaml"
+              parameters:
+                azure_dev_ops_build_definition_id: 717
+                azure_dev_ops_project_id: "7b4fddf7-fb53-4b12-bfcb-f87ad3774a32"

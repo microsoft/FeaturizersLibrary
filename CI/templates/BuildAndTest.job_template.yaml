@@ -1,0 +1,33 @@
+# ----------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
+parameters:
+  agent_pool: ""
+  agent_pool_container: ""
+  agent_pool_is_custom: False # Set this value to True if the agent is part of a custom pool
+  configuration: "" # Environment Activation Configuration
+  esrp_connected_service_name: "" # Name of service connection to use for code signing (or empty string if code signing is not required)
+  operating_system: "" # Windows|Linux|MacOS
+  test_only: False # Set to true to only run tests (no build)
+  test_only_suffix: "" # Optional value to distinguish between standard- and test-only- builds if both configurations are invoked as part of the same stage
+  tester_code_coverage: False # Enable code coverage for tests
+  tester_release_only: False # Only run release tests
+
+jobs:
+  - template: "_job_template.yaml"
+    parameters:
+      agent_pool: ${{ parameters.agent_pool }}
+      agent_pool_container: ${{ parameters.agent_pool_container }}
+      agent_pool_is_custom: ${{ parameters.agent_pool_is_custom }}
+      job_name: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration }}_${{ parameters.agent_pool_container }}_${{ parameters.test_only }}_Job
+      job_display_name: "${{ parameters.operating_system }} - ${{ parameters.configuration }}${{ parameters.test_only_suffix }}"
+      steps:
+        - template: BuildAndTest.steps_template.yaml
+          parameters:
+            configuration: ${{ parameters.configuration }}
+            esrp_connected_service_name: ${{ parameters.esrp_connected_service_name }}
+            operating_system: ${{ parameters.operating_system }}
+            test_only: ${{ parameters.test_only }}
+            test_only_suffix: ${{ parameters.test_only_suffix }}
+            tester_code_coverage: ${{ parameters.tester_code_coverage }}
+            tester_release_only: ${{ parameters.tester_release_only }}

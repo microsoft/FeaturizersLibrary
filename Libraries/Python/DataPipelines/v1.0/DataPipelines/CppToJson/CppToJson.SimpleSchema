@@ -1,0 +1,33 @@
+<FileInfo *>:
+    <function_list *>:
+        <name string>
+
+        <raw_return_type string>
+        <simple_return_type string>
+
+        <var_names string *>
+        <raw_var_types string *>
+        <simple_var_types string *>
+
+        <declaration_line int min=1 ?>
+        <definition_line int min=1 ?>
+
+    <struct_list *>:
+        <name string>
+
+        <var_names string *>
+        <raw_var_types string *>
+        <simple_var_types string *>
+
+        <definition_line int min=1 ?>
+
+        <base_structs string *>
+
+        <constructor_list *>:
+            <var_names string *>
+            <raw_var_types string *>
+            <simple_var_types string *>
+            <definition_line int min=1 ?>
+
+    <include_list string *>
+    

@@ -1,0 +1,40 @@
+# ----------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License
+parameters:
+  azure_dev_ops_build_definition_id: "" # 717 (The definition ID of the build pipeline)
+  azure_dev_ops_project_id: "" # 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32 (The project GUID from which to download the pipeline artifacts)
+
+  azure_dev_ops_artifacts_feed_name: "" # Name of Azure DevOps Artifacts feed used to store internal builds
+  service_connection: "" # Service connection name setup in Azure DevOps
+
+steps:
+  - checkout: none
+
+  - template: Publish.initialize_steps_template.yaml
+    parameters:
+      azure_dev_ops_build_definition_id: ${{ parameters.azure_dev_ops_build_definition_id }}
+      azure_dev_ops_project_id: ${{ parameters.azure_dev_ops_project_id }}
+
+  - task: NuGetCommand@2
+    displayName: "Push to Internal Store"
+
+    timeoutInMinutes: 180
+
+    inputs:
+      command: push
+      publishVstsFeed: '${{ parameters.azure_dev_ops_artifacts_feed_name }}'
+      allowPackageConflicts: true
+      packagesToPush: "$(Pipeline.Workspace)/Packages/Packages/Release/*.nupkg;!$(Pipeline.Workspace)/Packages/Packages/Release/*.symbols.nupkg"
+
+  - task: NuGetCommand@2
+    displayName: "Push to External Store"
+
+    condition: or(eq(variables['pipeline_is_release_build'], 1), eq(variables['pipeline_is_prerelease_build'], 1))
+    timeoutInMinutes: 180
+
+    inputs:
+      command: push
+      nuGetFeedType: external
+      packagesToPush: "$(Pipeline.Workspace)/Packages/Packages/Release/*.nupkg;!$(Pipeline.Workspace)/Packages/Packages/Release/*.symbols.nupkg"
+      publishFeedCredentials: ${{ parameters.service_connection }}
