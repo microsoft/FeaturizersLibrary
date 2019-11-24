@@ -22,7 +22,7 @@ stages:
           steps:
             - template: "Publish.azureupload_steps_template.yaml"
               parameters:
-                azure_dev_ops_build_definition_id: 717
+                azure_dev_ops_build_definition_id: 758
                 azure_dev_ops_project_id: "7b4fddf7-fb53-4b12-bfcb-f87ad3774a32"
                 subscription_id: 'AI Infra Build (00c06639-6ee4-454e-8058-8d8b1703bd87)'
                 storage_account: 'featurizersbuild'
@@ -38,7 +38,7 @@ stages:
           steps:
             - template: "Publish.nuget_steps_template.yaml"
               parameters:
-                azure_dev_ops_build_definition_id: 717
+                azure_dev_ops_build_definition_id: 758
                 azure_dev_ops_project_id: "7b4fddf7-fb53-4b12-bfcb-f87ad3774a32"
                 azure_dev_ops_artifacts_feed_name: "DataPipelines"
                 service_connection: "NuGet"
@@ -58,5 +58,5 @@ stages:
           steps:
             - template: "Publish.tagsources_steps_template.yaml"
               parameters:
-                azure_dev_ops_build_definition_id: 717
+                azure_dev_ops_build_definition_id: 758
                 azure_dev_ops_project_id: "7b4fddf7-fb53-4b12-bfcb-f87ad3774a32"
