@@ -33,6 +33,7 @@ foreach(_test_name IN ITEMS
     DateTimeFeaturizer_UnitTests
     HashOneHotVectorizerFeaturizer_UnitTests
     ImputationMarkerFeaturizer_UnitTests
+    InverseDocumentFrequencyEstimator_UnitTests
     LabelEncoderFeaturizer_UnitTests
     MaxAbsScalarFeaturizer_UnitTests
     MinMaxScalarFeaturizer_UnitTests
