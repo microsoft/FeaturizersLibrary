@@ -27,49 +27,6 @@ sys.path.insert(0, os.path.join(_script_dir, ".."))
 with CallOnExit(lambda: sys.path.pop(0)):
     from Plugin import Plugin as PluginBase, TypeVisitor as TypeVisitorBase
 
-# ----------------------------------------------------------------------
-class TypeInfo(Interface.Interface):
-    """Information about a specific named type"""
-
-    # ----------------------------------------------------------------------
-    # |  Public Types
-    class Info(object):
-        """Information about the type when it is used in various scenarios"""
-
-        def __init__(self, parameter_decl, validation_statements, invocation_statement, conversion_end, delete_transformed_data):
-            self.ParameterDecl              = parameter_decl
-            self.ValidationStatements       = validation_statements
-            self.InvocationStatement        = invocation_statement
-            self.ConversionEnd              = conversion_end
-            self.DeleteTransformedData      = delete_transformed_data
-
-    # ----------------------------------------------------------------------
-    # |  Public Methods
-    @staticmethod
-    @Interface.abstractmethod
-    def GetNativeInputInfo(is_optional):
-        """Return `Info` when the type is used as an input argument.
-
-           `invocation_template` is a string template string that should
-           be formatted with the arguments.
-        """
-        raise Exception("Abstract Method")
-
-    # ----------------------------------------------------------------------
-    @staticmethod
-    @Interface.abstractmethod
-    def GetNativeOutputInfo(
-        is_struct=False,
-        featurizer_name = "",
-    ):
-        """Return `Info` when the type is used an an output argument. `result_name` is the name of the
-           result returned by the shared library code.
-        """
-        raise Exception("Abstract method")
-
-_SUPPORTED_CUSTOM_TYPES                     = {
-    #"TimePoint": (lambda custom_structs: _TimePointTypeInfo(custom_structs)),
-}
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
@@ -95,16 +52,18 @@ class Plugin(PluginBase):
             csharp_data = []
             unsupported_types = set()
             for items in data:
-                csharp_data.append([_FillList(item, status_stream, unsupported_types) for item in items])
+                csharp_data.append(
+                    [_FillList(item, status_stream, unsupported_types) for item in items],
+                )
 
-        for desc, func in [
-            ("Generating C# files...", _GenerateCSharpFile)
-        ]:
+        for desc, func in [("Generating C# files...", _GenerateCSharpFile)]:
             status_stream.write(desc)
             with status_stream.DoneManager(
                 suffix="\n",
             ) as dm:
-                for index, (items, items_csharp_data) in enumerate(zip(data, csharp_data)):
+                for index, (items, items_csharp_data) in enumerate(
+                    zip(data, csharp_data),
+                ):
                     dm.stream.write(
                         "Processing '{}' ({} of {})...".format(
                             items[0].name,
@@ -127,6 +86,7 @@ class Plugin(PluginBase):
 
         return result_code
 
+
 # ----------------------------------------------------------------------
 def _FillList(item, status_stream, unsupported_types):
     try:
@@ -135,16 +95,16 @@ def _FillList(item, status_stream, unsupported_types):
         if "is not a supported type" in e.args[0]:
             if item.custom_structs[0].name not in unsupported_types:
                 status_stream.write(
-                    "{}\tUnsupported type '{}' found in class '{}'. The corrsponding methods will not be generated for this type.\n".
-                    format(
+                    "{}\tUnsupported type '{}' found in class '{}'. The corrsponding methods will not be generated for this type.\n".format(
                         "\n" if len(unsupported_types) == 0 else "",
                         item.custom_structs[0].name,
                         item.estimator_name,
-                    )
+                    ),
                 )
                 unsupported_types.add(item.custom_structs[0].name)
         else:
             raise e
+
 
 def _GenerateCSharpFile(output_dir, items, csharp_data_items, output_stream):
     baseName = items[0].name.replace("Featurizer", "")
@@ -152,11 +112,7 @@ def _GenerateCSharpFile(output_dir, items, csharp_data_items, output_stream):
     estimatorName = baseName + "Estimator"
     entrypointName = baseName + "Entrypoint"
 
-
-    with open(
-        os.path.join(output_dir, "{}.cs".format(items[0].name)),
-        "w",
-    ) as f:
+    with open(os.path.join(output_dir, "{}.cs".format(items[0].name)), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -622,25 +578,32 @@ def _GenerateCSharpFile(output_dir, items, csharp_data_items, output_stream):
                 }}
                 """,
             ).format(
-                baseName = baseName,
-                transformerName = transformerName,
-                estimatorName = estimatorName,
-                entrypointName = entrypointName,
-                columnInfo = _GenerateTypedColumns(items, csharp_data_items, items[0].name, transformerName, output_stream),
-                optionalInput = _GenerateOptionalInputDeclaration(items),
-                optionalInputOptions = _GenerateOptionalInputOptionsConstructor(items),
-                optionalInputOptionClass = _GenerateOptionalInputOptionClassValues(items),
-                supportedTypes = _GenerateSupportedTypes(csharp_data_items),
-                typeFactory = _GenerateTypeFactory(csharp_data_items),
+                baseName=baseName,
+                transformerName=transformerName,
+                estimatorName=estimatorName,
+                entrypointName=entrypointName,
+                columnInfo=_GenerateTypedColumns(
+                    items,
+                    csharp_data_items,
+                    items[0].name,
+                    transformerName,
+                    output_stream,
+                ),
+                optionalInput=_GenerateOptionalInputDeclaration(items),
+                optionalInputOptions=_GenerateOptionalInputOptionsConstructor(items),
+                optionalInputOptionClass=_GenerateOptionalInputOptionClassValues(items),
+                supportedTypes=_GenerateSupportedTypes(csharp_data_items),
+                typeFactory=_GenerateTypeFactory(csharp_data_items),
             ),
         )
+
 
 def _GenerateTypeFactory(csharp_data_items):
     code = []
     valid_types = [t for t in csharp_data_items if t != None]
     for index, item in enumerate(valid_types):
         code.append(
-            textwrap.dedent(\
+            textwrap.dedent(
                 """\
                 {}if (type == typeof({}).ToString())
                 \t\t\t\t{{
@@ -648,16 +611,22 @@ def _GenerateTypeFactory(csharp_data_items):
                 \t\t\t\t}}
                 """.format(
                     "\t\t\t\telse " if index != 0 else "",
-                    item.InputTypeInfo.csharp_type,
-                    item.InputTypeInfo.csharp_type_name,
-                )
-            )
+                    item.InputTypeInfoFactory.CSharpType,
+                    item.InputTypeInfoFactory.CSharpTypeName,
+                ),
+            ),
         )
 
     return "".join(code)
 
+
 def _GenerateSupportedTypes(csharp_data_items):
-    return ", ".join("typeof({})".format(item.InputTypeInfo.csharp_type) for item in csharp_data_items if item != None )
+    return ", ".join(
+        "typeof({})".format(item.InputTypeInfoFactory.CSharpType)
+        for item in csharp_data_items
+        if item != None
+    )
+
 
 def _GenerateOptionalInputDeclaration(items):
     if items[0] != None and items[0].is_input_optional:
@@ -665,36 +634,47 @@ def _GenerateOptionalInputDeclaration(items):
     else:
         return ""
 
+
 def _GenerateOptionalInputOptionsConstructor(items):
     if items[0] != None and items[0].is_input_optional:
         return "TreatDefaultAsNull = treatDefaultAsNull,"
     else:
         return ""
 
+
 def _GenerateOptionalInputOptionClassValues(items):
     if items[0] != None and items[0].is_input_optional:
-        return textwrap.dedent(\
+        return textwrap.dedent(
             """\
             [Argument(ArgumentType.AtMostOnce, HelpText = "If default value for the variable should be treated as null",
                 \t\t\tName = "TreatDefaultAsNull", ShortName = "DefaultNull", SortOrder = 2)]
-            \t\t\tpublic bool TreatDefaultAsNull = false;"""
+            \t\t\tpublic bool TreatDefaultAsNull = false;""",
         )
     else:
         return ""
 
-def _GenerateTypedColumns(items, csharp_data_items, featurizerName, transformerName, output_stream):
+
+def _GenerateTypedColumns(
+    items,
+    csharp_data_items,
+    featurizerName,
+    transformerName,
+    output_stream,
+):
     code = []
     unsupported_types = set()
     for index, item in enumerate(csharp_data_items):
         if item == None:
             if items[index].output_type not in unsupported_types:
                 output_stream.write(
-                    "Unsupported type '{}' found, not generating interop code for it.\n".
-                    format(items[index].output_type)
+                    "Unsupported type '{}' found, not generating interop code for it.\n".format(
+                        items[index].output_type,
+                    ),
                 )
                 unsupported_types.add(items[index].output_type)
             continue
-        code.append( """
+        code.append(
+            """
             #region {typeName}TypedColumn
 
             internal sealed class {typeName}TypedColumn : TypedColumn<{inputType}, {outputType}>
@@ -807,23 +787,31 @@ def _GenerateTypedColumns(items, csharp_data_items, featurizerName, transformerN
 
             #endregion
             """.format(
-                typeName = item.InputTypeInfo.csharp_type_name,
-                inputType = item.InputTypeInfo.csharp_type,
-                outputType = item.OutputTypeInfo.csharp_type,
-                featurizerName = featurizerName,
-                nativeFeaturizerType = item.InputTypeInfo.cpp_type,
-                nativeInputDeclaration = item.InputTypeInfo.GetNativeInputInfo(item.IsInputOptional).ParameterDecl,
-                nativeOutputDeclaration = item.OutputTypeInfo.GetNativeOutputInfo().ParameterDecl,
-                inputConversion = item.InputTypeInfo.GetNativeInputInfo(item.IsInputOptional).InvocationStatement,
-                outputConversion = item.OutputTypeInfo.GetNativeOutputInfo().InvocationStatement,
-                transformerName = transformerName,
-                conversionEnd = item.InputTypeInfo.GetNativeInputInfo(item.IsInputOptional).ConversionEnd,
-                deleteTransformedData = item.OutputTypeInfo.GetNativeOutputInfo(featurizer_name = featurizerName).DeleteTransformedData,
-
-            )
+                typeName=item.InputTypeInfoFactory.CSharpTypeName,
+                inputType=item.InputTypeInfoFactory.CSharpType,
+                outputType=item.OutputTypeInfoFactory.CSharpType,
+                featurizerName=featurizerName,
+                nativeFeaturizerType=item.InputTypeInfoFactory.TypeName,
+                nativeInputDeclaration=item.InputTypeInfoFactory.GetNativeInputInfo(
+                    item.IsInputOptional,
+                ).ParameterDecl,
+                nativeOutputDeclaration=item.OutputTypeInfoFactory.GetNativeOutputInfo().ParameterDecl,
+                inputConversion=item.InputTypeInfoFactory.GetNativeInputInfo(
+                    item.IsInputOptional,
+                ).InvocationStatement,
+                outputConversion=item.OutputTypeInfoFactory.GetNativeOutputInfo().InvocationStatement,
+                transformerName=transformerName,
+                conversionEnd=item.InputTypeInfoFactory.GetNativeInputInfo(
+                    item.IsInputOptional,
+                ).ConversionEnd,
+                deleteTransformedData=item.OutputTypeInfoFactory.GetNativeOutputInfo(
+                    featurizer_name=featurizerName,
+                ).DeleteTransformedData,
+            ),
         )
 
     return "".join(code)
+
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
@@ -835,415 +823,90 @@ class CSharpData(object):
     # |
     # ----------------------------------------------------------------------
     def __init__(self, item):
-        type_info_visitor = _TypeInfoVisitor()
-        supported_custom_types = set(six.iterkeys(_SUPPORTED_CUSTOM_TYPES))
-
-        # Create the custom structs
         custom_structs = OrderedDict()
 
         for custom_struct in getattr(item, "custom_structs", []):
             members = OrderedDict()
 
             for member in custom_struct.members:
-                members[member.name] = type_info_visitor.Accept(
-                    member.type,
-                    supported_custom_types=supported_custom_types,
-                    custom_structs=custom_structs,
-                )
+                tif = self._GetTypeInfoClass(member.type)
+                assert tif, member.type
+
+                members[member.name] = tif()
 
             custom_structs[custom_struct.name] = members
 
-        # Create the configuration params
-        configuration_param_type_infos = []
+        # Create the configuration param factories
+        configuration_param_type_info_factories = []
 
         for configuration_param in getattr(item, "configuration_params", []):
-            configuration_param_type_infos.append(
-                type_info_visitor.Accept(
-                    configuration_param.type,
-                    supported_custom_types=supported_custom_types,
-                    custom_structs=custom_structs,
-                ),
-            )
+            tif = self._GetTypeInfoClass(configuration_param.type)
+            assert tif, configuration_param.type
 
-        # Input
-        input_type_info = type_info_visitor.Accept(
-            item.input_type,
-            supported_custom_types=supported_custom_types,
-            custom_structs=custom_structs,
-        )
+            configuration_param_type_info_factories.append(tif(custom_structs))
 
-        # Output
-        output_type_info = type_info_visitor.Accept(
-            item.output_type,
-            supported_custom_types=supported_custom_types,
-            custom_structs=custom_structs,
-        )
+        # Create the input factory
+        tif = self._GetTypeInfoClass(item.input_type)
+        assert tif, item.input_type
+
+        input_type_info_factory = tif(custom_structs)
+
+        # Create the output factory
+        tif = self._GetTypeInfoClass(item.output_type)
+        if tif is None:
+            raise Exception("'{}' is not a supported type".format(item.output_type))
+
+        output_type_info_factory = tif(custom_structs)
 
         # Commit the results
-        self.CustomStructs                  = custom_structs
-        self.ConfigurationParamTypeInfos    = configuration_param_type_infos
-        self.InputTypeInfo                  = input_type_info
-        self.OutputTypeInfo                 = output_type_info
-        self.IsInputOptional                = item.is_input_optional
+        self.CustomStructs                              = custom_structs
+        self.ConfigurationParamTypeInfoFactories        = configuration_param_type_info_factories
+        self.InputTypeInfoFactory                       = input_type_info_factory
+        self.OutputTypeInfoFactory                      = output_type_info_factory
+        self.IsInputOptional                            = item.is_input_optional
 
-
-# ----------------------------------------------------------------------
-# |
-# |  Private Types
-# |
-# ----------------------------------------------------------------------
-@Interface.staticderived
-class _TypeInfoVisitor(TypeVisitorBase):
     # ----------------------------------------------------------------------
-    # |  Public Methods
-    @classmethod
-    @Interface.override
-    def OnInt8(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::int8", "sbyte", "Int8")
+    # |
+    # |  Private Data
+    # |
+    # ----------------------------------------------------------------------
+    _type_info_factory_classes              = None
 
+    # ----------------------------------------------------------------------
+    # |
+    # |  Private Methods
+    # |
     # ----------------------------------------------------------------------
     @classmethod
-    @Interface.override
-    def OnInt16(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::int16", "short", "Int16")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnInt32(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::int32", "int", "Int32")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnInt64(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::int64", "long", "Int64")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnUInt8(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::uint8", "byte", "UInt8")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnUInt16(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::uint16", "ushort", "UInt16")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnUInt32(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::uint32", "uint", "UInt32")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnUInt64(cls, *args, **kwargs):
-        return _ScalarTypeInfo("std::uint64", "ulong", "UInt64")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnFloat32(cls, *args, **kwargs):
-        return _FloatingPointTypeInfo("std::float", "float", "Float")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnFloat64(cls, *args, **kwargs):
-        return _FloatingPointTypeInfo("std::double", "double", "Double")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnBool(cls, *args, **kwargs):
-        return _ScalarTypeInfo("bool", "bool", "Bool")
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnString(cls, *args, **kwargs):
-        return _StringTypeInfo()
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def OnArray(cls, template_args, arg_name, is_input_optional):
-        raise Exception("TODO: Not implemented")
-
-    # ----------------------------------------------------------------------
-    @staticmethod
-    @Interface.override
-    def OnVector(*args, **kwargs):
-        raise Exception("TODO: Not implemented")
-
-    # ----------------------------------------------------------------------
-    @staticmethod
-    @Interface.override
-    def OnMap(*args, **kwargs):
-        raise Exception("TODO: Not implemented")
-
-    # ----------------------------------------------------------------------
-    @staticmethod
-    @Interface.override
-    def OnCustomType(type, *args, **kwargs):
-        return _SUPPORTED_CUSTOM_TYPES[type](*args, **kwargs)
-
-# ----------------------------------------------------------------------
-class _ScalarTypeInfo(TypeInfo):
-    """Functionality for scalar types"""
-
-    # ----------------------------------------------------------------------
-    def __init__(
-        self,
-        cpp_type,
-        interface_type,
-        csharp_type_name
-    ):
-
-        self.cpp_type                       = cpp_type.replace("std::", "")
-        self.csharp_type                    = interface_type
-        self.csharp_type_name               = csharp_type_name
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetNativeInputInfo(self, is_optional):
-
-        if is_optional:
-            decl = "{}* input".format(self.csharp_type)
-            invocation_statement = textwrap.dedent(
-                """\
-                {}* interopInput;
-                \t\t\t\t\tif (_parent._options.TreatDefaultAsNull && input == default)
-                    \t\t\t\t\tinteropInput = null;
-                \t\t\t\t\telse
-                    \t\t\t\t\tinteropInput = &input;
-                """
-            ).format(self.csharp_type)
-
-        else:
-            decl = "{} input".format(self.csharp_type)
-            invocation_statement = "{} interopInput = input;".format(self.csharp_type)
-
-        return self.Info(
-            decl,
-            None,                           # No validation
-            invocation_statement,
-            "",
-            "",
-        )
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetNativeOutputInfo(
-        self,
-        is_struct=False,
-        featurizer_name = "",
-    ):
-
-        decl = "out {} interopOutput".format(self.csharp_type)
-        invocation_statement = "{} output = interopOutput;".format(self.csharp_type)
-
-        return self.Info(
-            decl,
-            None,                           # No validation
-            invocation_statement,
-            "",
-            "",
-        )
-
-# ----------------------------------------------------------------------
-class _FloatingPointTypeInfo(_ScalarTypeInfo):
-    """Functionality for scalar types"""
-
-    # ----------------------------------------------------------------------
-    def __init__(
-        self,
-        cpp_type,
-        interface_type,
-        csharp_type_name
-    ):
-
-        self.cpp_type                      = cpp_type.replace("std::", "")
-        self.csharp_type                = interface_type
-        self.csharp_type_name               = csharp_type_name
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetNativeInputInfo(self, is_optional):
-
-        if is_optional:
-            decl = "{}* input".format(self.cpp_type)
-            invocation_statement = "{}* interopInput = &input;".format(self.csharp_type)
-        else:
-            decl = "{} input".format(self.cpp_type)
-            invocation_statement = "{} interopInput = input;".format(self.csharp_type)
-
-        return self.Info(
-            decl,
-            None,                           # No validation
-            invocation_statement,
-            "",
-            "",
-        )
-
-# ----------------------------------------------------------------------
-class _StringTypeInfo(TypeInfo):
-    """Functionality for strings"""
-
-    # ----------------------------------------------------------------------
-    def __init__(self):
-
-        self.csharp_type_name                   = "ReadOnlyMemoryChar"
-        self.csharp_type                        = "ReadOnlyMemory<char>"
-        self.cpp_type                           = "string"
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetNativeInputInfo(self, is_optional):
-        if is_optional:
-            invocation_statement = textwrap.dedent(
-                """\
-                var inputAsString = input.ToString();
-                \t\t\t\t\tfixed (byte* interopInput = (string.IsNullOrEmpty(inputAsString) && _parent._options.TreatDefaultAsNull) ? null : Encoding.UTF8.GetBytes(inputAsString + char.MinValue))
-                \t\t\t\t\t{{
-                """
-            ).format(self.csharp_type)
-
-        else:
-            invocation_statement = textwrap.dedent(
-                """\
-                var inputAsString = input.ToString();
-                fixed (byte* interopInput = Encoding.UTF8.GetBytes(inputAsString + char.MinValue))
-                {{
-                """
-            ).format(self.csharp_type)
-
-        decl = "byte* input"
-
-        return self.Info(
-            decl,
-            None,
-            invocation_statement,
-            "}",
-            "",
-        )
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetNativeOutputInfo(
-        self,
-        is_struct=False,
-        featurizer_name = "",
-    ):
-        decl = "out IntPtr interopOutput, out IntPtr outputSize".format(self.csharp_type)
-        invocation_statement = textwrap.dedent(
-            """\
-            if (outputSize.ToInt32() == 0)
-                \t\t\t\t\treturn new ReadOnlyMemory<char>(string.Empty.ToArray());
-            \t\t\t\t\tReadOnlyMemory<char> output;
-            \t\t\t\t\tusing (var handler = new TransformedDataSafeHandle(interopOutput, outputSize, DestroyTransformedDataNative))
-            \t\t\t\t\t{{
-                \t\t\t\t\tbyte[] buffer = new byte[outputSize.ToInt32()];
-                \t\t\t\t\tMarshal.Copy(interopOutput, buffer, 0, buffer.Length);
-                \t\t\t\t\toutput = new ReadOnlyMemory<char>(Encoding.UTF8.GetString(buffer).ToArray());
-            \t\t\t\t\t}}
-            """
-        ).format(self.csharp_type)
-
-        delete_transformed_data = textwrap.dedent(
-            """\
-            [DllImport("Featurizers", EntryPoint = "{}_string_DestroyTransformedData", CallingConvention = CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-            \t\t\t\tprivate static extern bool DestroyTransformedDataNative(IntPtr output, IntPtr outputSize, out IntPtr errorHandle);
-            """
-        ).format(featurizer_name)
-
-        return self.Info(
-            decl,
-            None,                           # No validation
-            invocation_statement,
-            "",
-            delete_transformed_data,
-        )
-
-
-# ----------------------------------------------------------------------
-class _TimePointTypeInfo(TypeInfo):
-    """Functionality for TimePoints, used in the DateTimeFeaturizer"""
-
-    # ----------------------------------------------------------------------
-    def __init__(self, custom_structs):
-        assert "TimePoint" in custom_structs, custom_structs
-        self._member_info                   = custom_structs["TimePoint"]
-
-    # ----------------------------------------------------------------------
-    @classmethod
-    @Interface.override
-    def GetNativeInputInfo(self, is_optional):
-        raise Exception("'TimePoint' is only used as a OutputType")
-
-    # ----------------------------------------------------------------------
-    @Interface.override
-    def GetNativeOutputInfo(
-        self,
-        is_struct=False,
-        featurizer_name = "",
-    ):
-        result_time_point_name = "{}_item".format(arg_name)
-
-        member_statements = []
-
-        for member_name, member_info in six.iteritems(self._member_info):
-            member_statements.append(
-                member_info.GetNativeOutputInfo(
-                    "{}.{}".format(result_time_point_name, member_name),
-                    "{}.{}".format(result_name, member_name),
-                    is_struct=True,
-                    featurizer_name = featurizer_name,
-                ).InvocationStatement,
+    def _GetTypeInfoClass(cls, the_type):
+        if cls._type_info_factory_classes is None:
+            from Plugins.MLNetPluginImpl import ScalarTypeInfoFactories
+            from Plugins.MLNetPluginImpl.StringTypeInfoFactory import (
+                StringTypeInfoFactory,
             )
+            from Plugins.MLNetPluginImpl import StructTypeInfoFactories
 
-        return self.Info(
-            ["/*out*/ TimePoint *{} {}".format("" if is_struct else "*", arg_name)],
-            """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
-                name=arg_name,
-            ),
-            textwrap.dedent(
-                """\
-                TimePoint {result_time_point_name};
+            type_info_factory_classes = [StringTypeInfoFactory]
 
-                {member_statements}
+            for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
+                for obj_name in dir(compound_module):
+                    if (
+                        obj_name.startswith("_")
+                        or not obj_name.endswith("Factory")
+                        or obj_name == "TypeInfoFactory"
+                    ):
+                        continue
 
-                *{name} = std::make_unique<TimePoint>(std::move({result_time_point_name})).release();
-                """,
-            ).format(
-                name=arg_name,
-                result=result_name,
-                result_time_point_name=result_time_point_name,
-                member_statements="\n".join(member_statements),
-            ),
-        )
+                    type_info_factory_classes.append(getattr(compound_module, obj_name))
 
-# ----------------------------------------------------------------------
-# |
-# |  Private Methods
-# |
-# ----------------------------------------------------------------------
-def _IsScalarType(cpp_type):
-    cpp_type = cpp_type.replace("std::", "")
+            # Associate the type info factories with the class rather than the instance
+            # so that we only need to perform this initialization once.
+            cls._type_info_factory_classes = type_info_factory_classes
 
-    return cpp_type in [
-        "int8_t",
-        "int16_t",
-        "int32_t",
-        "int64_t",
-        "uint8_t",
-        "uint16_t",
-        "uint32_t",
-        "uint64_t",
-        "float",
-        "double",
-        "bool",
-    ]
+        the_type = the_type.replace("std::", "").replace("_t", "")
+
+        for type_info_factory_class in cls._type_info_factory_classes:
+            if type_info_factory_class.TypeName == the_type:
+                return type_info_factory_class
+
+        return None
