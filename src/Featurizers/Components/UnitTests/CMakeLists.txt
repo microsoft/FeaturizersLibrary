@@ -30,6 +30,7 @@ foreach(_test_name IN ITEMS
     HistogramEstimator_UnitTest
     IndexMapEstimator_UnitTest
     InferenceOnlyFeaturizerImpl_UnitTest
+    InverseDocumentFrequencyEstimator_UnitTests
     MaxAbsValueEstimator_UnitTest
     MinMaxEstimator_UnitTest
     ModeEstimator_UnitTest
