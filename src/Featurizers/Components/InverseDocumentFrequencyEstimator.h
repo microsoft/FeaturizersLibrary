@@ -7,11 +7,12 @@
 #include <unordered_map>
 #include <set>
 
-#include "Components/TrainingOnlyEstimatorImpl.h"
+#include "TrainingOnlyEstimatorImpl.h"
 
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
+namespace Components {
 
 namespace {
 
@@ -227,6 +228,7 @@ InverseDocumentFrequencyAnnotationData Details::InverseDocumentFrequencyTraining
     return InverseDocumentFrequencyAnnotationData(std::move(_inverseDocumentFrequency), std::move(_totalNumDocuments));
 }
 
+} // namespace Components
 } // namespace Featurizers
 } // namespace Featurizer
 } // namespace Microsoft

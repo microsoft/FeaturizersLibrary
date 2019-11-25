@@ -5,15 +5,15 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "../../3rdParty/optional.h"
-#include "../TestHelpers.h"
+#include "../../../3rdParty/optional.h"
+#include "../../TestHelpers.h"
 #include "../InverseDocumentFrequencyEstimator.h"
 
 namespace NS = Microsoft::Featurizer;
 
 void TestString (std::string const & input, std::vector<std::string> const & label) {
     std::vector<std::string> predict;
-    NS::Featurizers::split_temp( 
+    NS::Featurizers::Components::split_temp( 
         input, 
         [&predict] (std::string::const_iterator & iter_start, std::string::const_iterator & iter_end) {
             std::string word = std::string(iter_start, iter_end);
@@ -23,26 +23,28 @@ void TestString (std::string const & input, std::vector<std::string> const & lab
     CHECK(predict == label);
 }
 
-NS::Featurizers::InverseDocumentFrequencyAnnotationData::InverseDocumentFrequency Test(std::vector<std::vector<std::string>> const &inputBatches) {
+NS::Featurizers::Components::InverseDocumentFrequencyAnnotationData::InverseDocumentFrequency Test(std::vector<std::vector<std::string>> const &inputBatches) {
     NS::AnnotationMapsPtr                                                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::InverseDocumentFrequencyEstimator<std::numeric_limits<size_t>::max()>        
+    NS::Featurizers::Components::InverseDocumentFrequencyEstimator<std::numeric_limits<size_t>::max()>        
                                                                             estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, inputBatches);
 
-    NS::Featurizers::InverseDocumentFrequencyAnnotationData     const &     annotation(estimator.get_annotation_data());
+    NS::Featurizers::Components::InverseDocumentFrequencyAnnotationData const &     
+                                                                            annotation(estimator.get_annotation_data());
 
     return annotation.TermFrequency;
 }
 
 std::uint32_t TestNum(std::vector<std::vector<std::string>> const &inputBatches) {
     NS::AnnotationMapsPtr                                                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::InverseDocumentFrequencyEstimator<std::numeric_limits<size_t>::max()>            
+    NS::Featurizers::Components::InverseDocumentFrequencyEstimator<std::numeric_limits<size_t>::max()>            
                                                                             estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, inputBatches);
 
-    NS::Featurizers::InverseDocumentFrequencyAnnotationData const &         annotation(estimator.get_annotation_data());
+    NS::Featurizers::Components::InverseDocumentFrequencyAnnotationData const &         
+                                                                            annotation(estimator.get_annotation_data());
 
     return annotation.TotalNumDocuments;
 }
@@ -68,7 +70,7 @@ TEST_CASE("string_split") {
 }
 
 TEST_CASE("string_idf") {
-    using InverseDocumentFrequency                         = NS::Featurizers::InverseDocumentFrequencyAnnotationData::InverseDocumentFrequency;
+    using InverseDocumentFrequency                         = NS::Featurizers::Components::InverseDocumentFrequencyAnnotationData::InverseDocumentFrequency;
 
     InverseDocumentFrequency const                         label({{"orange",3}, {"apple", 1}, {"peach", 3}, {"grape", 2}, {"banana",1}});
     std::vector<std::vector<std::string>> const            inputBatches({{" orange  apple  apple peach  grape "},
@@ -80,7 +82,7 @@ TEST_CASE("string_idf") {
 }
 
 TEST_CASE("string_idf_single_appearance") {
-    using InverseDocumentFrequency                         = NS::Featurizers::InverseDocumentFrequencyAnnotationData::InverseDocumentFrequency;
+    using InverseDocumentFrequency                         = NS::Featurizers::Components::InverseDocumentFrequencyAnnotationData::InverseDocumentFrequency;
 
     InverseDocumentFrequency const                         label({{"orange", 1}, {"apple", 1}, {"grape", 1}});
     std::vector<std::vector<std::string>> const            inputBatches({{" apple apple  apple"},
@@ -92,7 +94,7 @@ TEST_CASE("string_idf_single_appearance") {
 }
 
 TEST_CASE("string_idf_full_appearance") {
-    using InverseDocumentFrequency                         = NS::Featurizers::InverseDocumentFrequencyAnnotationData::InverseDocumentFrequency;
+    using InverseDocumentFrequency                         = NS::Featurizers::Components::InverseDocumentFrequencyAnnotationData::InverseDocumentFrequency;
 
     InverseDocumentFrequency const                         label({{"orange", 3}, {"apple", 3}, {"grape", 3}});
     std::vector<std::vector<std::string>> const            inputBatches({{"apple  grape orange  "},
@@ -104,7 +106,7 @@ TEST_CASE("string_idf_full_appearance") {
 }
 
 TEST_CASE("string_num") {
-    using InverseDocumentFrequency                         = NS::Featurizers::InverseDocumentFrequencyAnnotationData::InverseDocumentFrequency;
+    using InverseDocumentFrequency                         = NS::Featurizers::Components::InverseDocumentFrequencyAnnotationData::InverseDocumentFrequency;
 
     InverseDocumentFrequency const                         label({{"orange",3}, {"apple", 1}, {"peach", 3}, {"grape", 2}, {"banana",1}});
     std::vector<std::vector<std::string>> const            inputBatches({{"orange apple apple peach grape"},
