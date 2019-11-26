@@ -15,7 +15,7 @@ static constexpr char const * const         MatrixDecompositionEstimatorName("Ma
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         MatrixDecompositionAnnotationData
-///  \brief         Contains an MatrixDecomposition 
+///  \brief         Contains 
 ///
 template <typename T>
 class MatrixDecompositionAnnotationData {
@@ -25,8 +25,8 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using SingularValueType                          = T;
-    using SingularVectorType                         = std::vector<SingularValueType>;
+    using SingularValueType                          = std::vector<T>;
+    using SingularVectorType                         = std::vector<std::vector<T>>;
 
     // ----------------------------------------------------------------------
     // |
@@ -63,22 +63,25 @@ public:
     // |
     // ----------------------------------------------------------------------
     using InputType                                  = T;
-    using SingularValueType                          = InputType;
-    using SingularVectorType                         = std::vector<SingularValueType>;
-    using MatrixType                                 = SingularVectorType;
+    using SingularValueType                          = std::vector<T>;
+    using SingularVectorType                         = std::vector<std::vector<T>>;
+    using MatrixType                                 = std::vector<T>;
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
     // |
     // ----------------------------------------------------------------------
     static constexpr char const * const     NameValue = MatrixDecompositionEstimatorName;
-
+    enum DecompositionMethod {
+        SVD = 0,
+        PCA = 1
+    };
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MatrixDecompositionTrainingOnlyPolicy(std::string mode);
+    MatrixDecompositionTrainingOnlyPolicy(DecompositionMethod method, size_t numRows);
 
     void fit(InputType const &input);
     MatrixDecompositionAnnotationData<T> complete_training(void);
@@ -91,11 +94,12 @@ private:
     // ----------------------------------------------------------------------
     MatrixType                                       _matrix;
 
-    SingularValueType const                          _sigma;
-    SingularVectorType const                         _u;
-    SingularVectorType const                         _v;
+    SingularValueType                                _sigma;
+    SingularVectorType                               _u;
+    SingularVectorType                               _v;
 
-    std::string const                                _mode;
+    DecompositionMethod const                        _method;
+    size_t const                                     _numRows;
 };
 
 } // namespace Details
@@ -125,13 +129,14 @@ public:
             Details::MatrixDecompositionTrainingOnlyPolicy<T>,
             MaxNumTrainingItemsV
         >;
+    using DecompositionMethod = typename Details::MatrixDecompositionTrainingOnlyPolicy<T>::DecompositionMethod;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MatrixDecompositionEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, std::string mode);
+    MatrixDecompositionEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, DecompositionMethod method, size_t numRows);
     ~MatrixDecompositionEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MatrixDecompositionEstimator);
@@ -166,8 +171,8 @@ MatrixDecompositionAnnotationData<T>::MatrixDecompositionAnnotationData(Singular
 // |
 // ----------------------------------------------------------------------
 template <typename T, size_t MaxNumTrainingItemsV>
-MatrixDecompositionEstimator<T, MaxNumTrainingItemsV>::MatrixDecompositionEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, std::string mode) :
-    BaseType(std::move(pAllColumnAnnotations), std::move(colIndex), true, std::move(mode)) {
+MatrixDecompositionEstimator<T, MaxNumTrainingItemsV>::MatrixDecompositionEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, DecompositionMethod method, size_t numRows) :
+    BaseType(std::move(pAllColumnAnnotations), std::move(colIndex), true, std::move(method), std::move(numRows)) {
 }
 
 // ----------------------------------------------------------------------
@@ -176,17 +181,10 @@ MatrixDecompositionEstimator<T, MaxNumTrainingItemsV>::MatrixDecompositionEstima
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-Details::MatrixDecompositionTrainingOnlyPolicy<T>::MatrixDecompositionTrainingOnlyPolicy(std::string mode) :
-    _mode(
-        std::move(
-            [&mode](void) -> std::string & {
-                if(mode != "svd" && mode != "pca")
-                    throw std::invalid_argument("only support svd and pca for now");
-
-                return mode;
-            }()
-        )
-    ) {
+Details::MatrixDecompositionTrainingOnlyPolicy<T>::MatrixDecompositionTrainingOnlyPolicy(DecompositionMethod method, size_t numRows) :
+    //todo:variable validation 
+    _method(method),
+    _numRows(std::move(numRows)) {
 }
 
 template <typename T>
@@ -196,10 +194,33 @@ void Details::MatrixDecompositionTrainingOnlyPolicy<T>::fit(InputType const &inp
 
 template <typename T>
 MatrixDecompositionAnnotationData<T> Details::MatrixDecompositionTrainingOnlyPolicy<T>::complete_training(void) {
-    
-    //do math
 
-    return MatrixDecompositionAnnotationData<T>(_sigma, _u, _v);
+    //svd, pca solver goes here...
+    //svd, pca solver goes here...
+    //svd, pca solver goes here...
+    //svd, pca solver goes here...
+    //svd, pca solver goes here...
+    //svd, pca solver goes here...
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    //sample code. just copy the origin matrix to output variable with the correct shape.
+    size_t numCols = _matrix.size() / _numRows;
+    std::vector<std::double_t> temp_vec;
+    for (T const & val : _matrix) {
+        _sigma.emplace_back(val);
+        temp_vec.emplace_back(val);
+        if (temp_vec.size() % numCols == 0) {
+            _u.emplace_back(temp_vec);
+            _v.emplace_back(temp_vec);
+            temp_vec = {};
+        }   
+    }
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    
+    return MatrixDecompositionAnnotationData<T>(std::move(_sigma), std::move(_u), std::move(_v));
 }
 
 } // namespace Components
