@@ -39,8 +39,8 @@ struct TFStruct {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \struct        TFIDFStruct
-///  \brief         Struct to hold return value of count vectorizer,
-///                 consist of <dictid, # of appearances>
+///  \brief         Struct to hold return value of tfidf vectorizer,
+///                 consist of <dictid, tfidf value>
 ///
 struct TFIDFStruct {
     std::uint32_t const dictionaryId;                              // dict id
