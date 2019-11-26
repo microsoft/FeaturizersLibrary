@@ -30,6 +30,7 @@ enable_testing()
 
 foreach(_test_name IN ITEMS
     CatImputerFeaturizer_UnitTests
+    CountVectorizerFeaturizer_UnitTests
     DateTimeFeaturizer_UnitTests
     HashOneHotVectorizerFeaturizer_UnitTests
     ImputationMarkerFeaturizer_UnitTests
@@ -42,6 +43,7 @@ foreach(_test_name IN ITEMS
     SampleAddFeaturizer_UnitTest
     StringFeaturizer_UnitTest
     Structs_UnitTest
+    TfidfVectorizerFeaturizer_UnitTests
     TimeSeriesImputerFeaturizer_UnitTest
 )
     add_executable(${_test_name} ${_test_name}.cpp)
