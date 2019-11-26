@@ -9,18 +9,13 @@
 #include "../Traits.h"
 #include "Structs.h"
 
-//todo:
-//1.existed map
-//2.max_features(use optional<>)
-//3.int/float in max/min df
-
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         CountVectorizerTransformer
-///  \brief         Returns a unique one hot struct for each input.
+///  \brief         Returns TFStruct for each unique input
 ///
 class CountVectorizerTransformer : public StandardTransformer<std::string, TFStruct> {
 public:
@@ -103,10 +98,9 @@ namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         CountVectorizerEstimatorImpl
-///  \brief         Estimator that uses the output of the
-///                 `IndexMapEstmator` and `HistogramEstmator`
-///                 to produce a unique label.
-///
+///  \brief         Estimator that uses the output of the 
+///                 InverseDocumentFrequencyEstimator to provide useful
+///                 information which helps calculation of CountVectorizer
 template <size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
 class CountVectorizerEstimatorImpl : public TransformerEstimator<std::string, TFStruct> {
 public:

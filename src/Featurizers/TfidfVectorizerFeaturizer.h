@@ -17,7 +17,7 @@ namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         TfidfVectorizerTransformer
-///  \brief         Returns a unique one hot struct for each input.
+///  \brief         Returns a unique TFIDFStruct for each input.
 ///
 class TfidfVectorizerTransformer : public StandardTransformer<std::string, TFIDFStruct> {
 public:
@@ -148,9 +148,9 @@ namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         TfidfVectorizerEstimatorImpl
-///  \brief         Estimator that uses the output of the
-///                 `IndexMapEstmator` and `HistogramEstmator`
-///                 to produce a unique label.
+///  \brief         Estimator that uses the output of the 
+///                 InverseDocumentFrequencyEstimator to provide useful
+///                 information which helps calculation of TfidfVectorizer
 ///
 template <size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
 class TfidfVectorizerEstimatorImpl : public TransformerEstimator<std::string, TFIDFStruct> {
