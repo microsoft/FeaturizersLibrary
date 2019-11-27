@@ -53,31 +53,33 @@ public:
 private:
     // ----------------------------------------------------------------------
     // |
-    // |  Private Methods
+    // |  Private Methodsa
     // |
     // ----------------------------------------------------------------------
 
     // MSVC has problems when the definition and declaration are separated
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
 
-        typename std::map<IterRangeType, std::uint32_t, Components::IterRangeComp> ApperanceMap;
+        using ApperanceMapType = typename std::map<IterRangeType, std::uint32_t, Components::IterRangeComp>;
+
+        ApperanceMapType apperanceMap;
 
         //todo: will use vector<functor> after string header file is done
         Components::split_temp( 
             input, 
-            [&ApperanceMap] (std::string::const_iterator & iter_start, std::string::const_iterator & iter_end) {
+            [&apperanceMap] (std::string::const_iterator & iter_start, std::string::const_iterator & iter_end) {
                 
-                typename std::map<IterRangeType, std::uint32_t, Components::IterRangeComp>::iterator iter_apperance(ApperanceMap.find(std::make_tuple(iter_start, iter_end)));
+                ApperanceMapType::iterator iter_apperance(apperanceMap.find(std::make_tuple(iter_start, iter_end)));
                 
-                if (iter_apperance != ApperanceMap.end()) {
+                if (iter_apperance != apperanceMap.end()) {
                     ++iter_apperance->second;
                 } else {
-                    ApperanceMap.insert(std::make_pair(std::make_tuple(iter_start, iter_end), 1));
+                    apperanceMap.insert(std::make_pair(std::make_tuple(iter_start, iter_end), 1));
                 }
             }
         );
 
-        for (auto const & pair : ApperanceMap) {
+        for (auto const & pair : apperanceMap) {
             std::string const word = std::string(std::get<0>(pair.first), std::get<1>(pair.first));
 
             typename IndexMapType::const_iterator const      iter_label(Labels.find(word));

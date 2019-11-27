@@ -14,11 +14,11 @@ namespace Featurizers {
 ///                 consist of <category index, total size of category, # of appearances>
 ///
 struct OneHotStruct {
-    std::uint32_t const index;                                    // category index
-    std::uint32_t const size;                                     // category total size
-    std::uint32_t const appearances;                              // number of appearances
+    std::uint32_t const Index;                                    // category index
+    std::uint32_t const Size;                                     // category total size
+    std::uint32_t const Appearances;                              // number of appearances
 
-    OneHotStruct(std::uint32_t i, std::uint32_t s, std::uint32_t a);
+    OneHotStruct(std::uint32_t index, std::uint32_t size, std::uint32_t appearances);
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(OneHotStruct);
     bool operator==(OneHotStruct const &other) const;
 };
@@ -29,10 +29,10 @@ struct OneHotStruct {
 ///                 consist of <dictid, # of appearances>
 ///
 struct TFStruct {
-    std::uint32_t const dictionaryId;                              // dict id
-    std::uint32_t const appearances;                               // number of appearances
+    std::uint32_t const DictionaryId;                              // dict id
+    std::uint32_t const Appearances;                               // number of appearances
 
-    TFStruct(std::uint32_t d, std::uint32_t a);
+    TFStruct(std::uint32_t dictionaryid, std::uint32_t appearances);
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TFStruct);
     bool operator==(TFStruct const &other) const;
 };
@@ -43,10 +43,10 @@ struct TFStruct {
 ///                 consist of <dictid, tfidf value>
 ///
 struct TFIDFStruct {
-    std::uint32_t const dictionaryId;                              // dict id
-    std::float_t const tfidf;                                      // freq
+    std::uint32_t const DictionaryId;                              // dict id
+    std::float_t const Tfidf;                                      // freq
 
-    TFIDFStruct(std::uint32_t d, std::float_t t);
+    TFIDFStruct(std::uint32_t dictionaryid, std::float_t tfidf);
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TFIDFStruct);
     bool operator==(TFIDFStruct const &other) const;
 };
@@ -66,46 +66,49 @@ struct TFIDFStruct {
 // |  OneHotStruct
 // |
 // ----------------------------------------------------------------------
-
-bool OneHotStruct::operator==(OneHotStruct const &other) const {
-    return (appearances == other.appearances) && (index == other.index) && (size == other.size);
-}
-OneHotStruct::OneHotStruct(std::uint32_t i, std::uint32_t s, std::uint32_t a) :
-    index(std::move(i)),
-    size(std::move(s)),
-    appearances(std::move(a)) {
-        if (index >= size) {
+OneHotStruct::OneHotStruct(std::uint32_t index, std::uint32_t size, std::uint32_t appearances) :
+    Index(std::move(index)),
+    Size(std::move(size)),
+    Appearances(std::move(appearances)) {
+        if (Index >= Size) {
             throw std::invalid_argument("Category index should be smaller than total number of categories!");
         }
 }
+
+bool OneHotStruct::operator==(OneHotStruct const &other) const {
+    return (Appearances == other.Appearances) && (Index == other.Index) && (Size == other.Size);
+}
+
 
 // ----------------------------------------------------------------------
 // |
 // |  TFStruct
 // |
 // ----------------------------------------------------------------------
+TFStruct::TFStruct(std::uint32_t dictionaryid, std::uint32_t appearances) :
+    DictionaryId(std::move(dictionaryid)),
+    Appearances(std::move(appearances)) {
+}
 
 bool TFStruct::operator==(TFStruct const &other) const {
-    return (appearances == other.appearances) && (dictionaryId == other.dictionaryId);
+    return (Appearances == other.Appearances) && (DictionaryId == other.DictionaryId);
 }
-TFStruct::TFStruct(std::uint32_t d, std::uint32_t a) :
-    dictionaryId(std::move(d)),
-    appearances(std::move(a)) {
-}
+
 
 // ----------------------------------------------------------------------
 // |
 // |  TFIDFStruct
 // |
 // ----------------------------------------------------------------------
+TFIDFStruct::TFIDFStruct(std::uint32_t dictionaryid, std::float_t tfidf) :
+    DictionaryId(std::move(dictionaryid)),
+    Tfidf(std::move(tfidf)) {
+}
 
 bool TFIDFStruct::operator==(TFIDFStruct const &other) const {
-    return (dictionaryId == other.dictionaryId) && (abs(tfidf - other.tfidf) < 0.000001f);
+    return (DictionaryId == other.DictionaryId) && (abs(Tfidf - other.Tfidf) < 0.000001f);
 }
-TFIDFStruct::TFIDFStruct(std::uint32_t d, std::float_t t) :
-    dictionaryId(std::move(d)),
-    tfidf(std::move(t)) {
-}
+
 
 }
 }
