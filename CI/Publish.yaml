@@ -7,6 +7,9 @@ name: $(TeamProject)-$(BuildDefinitionName)-$(SourceBranchName)-$(Date:yyyy.MM.d
 #reference: https://docs.microsoft.com/en-us/azure/devops/pipelines/build/triggers?view=azure-devops&tabs=yaml#build-completion-triggers
 trigger: none
 
+variables:
+  runCodesignValidationInjection: false
+
 stages:
   - stage: Publish_Stage
     displayName: "Publish:"
@@ -24,9 +27,9 @@ stages:
               parameters:
                 azure_dev_ops_build_definition_id: 758
                 azure_dev_ops_project_id: "7b4fddf7-fb53-4b12-bfcb-f87ad3774a32"
-                subscription_id: 'AI Infra Build (00c06639-6ee4-454e-8058-8d8b1703bd87)'
-                storage_account: 'featurizersbuild'
-                container: 'Archive'
+                subscription_id: "AI Infra Build (00c06639-6ee4-454e-8058-8d8b1703bd87)"
+                storage_account: "featurizersbuild"
+                container: "Archive"
 
       - template: "templates/_job_template.yaml"
         parameters:

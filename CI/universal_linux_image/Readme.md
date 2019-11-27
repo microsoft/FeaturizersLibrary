@@ -5,6 +5,8 @@ assumes that `sudo` is available on the image. Unfortunately, the image that
 we use for universal linux builds (`phusion/holy-build-box-64`) does not enable
 `sudo` by default.
 
+Building the Image
+------------------
 These are the steps required to build an image locally and push it to an Azure
 Container Registry so that it can be used during builds.
 
@@ -14,7 +16,7 @@ Container Registry so that it can be used during builds.
 
     2) Login to the ACR:
 
-            docker login --username featurizersbuild --password <password> featurizersbuild.azurecr.io
+            docker login --username featurizersbuild --password-stdin featurizersbuild.azurecr.io
 
             Where '<password>` can be found by:
 
