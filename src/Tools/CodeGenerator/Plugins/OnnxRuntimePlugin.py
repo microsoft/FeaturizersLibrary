@@ -428,7 +428,7 @@ def _GenerateGlobalDefs(
                                 type_name=type_name,
                                 constraints=", ".join(
                                     [
-                                        '"{}"'.format(constraint)
+                                        '"tensor({})"'.format(constraint)
                                         for constraint in constraints
                                     ],
                                 ),
@@ -779,7 +779,7 @@ def _GenerateKernel(
                         {input_type},
                         kCpuExecutionProvider,
                         KernelDefBuilder()
-                            .TypeConstraint("{template_input_type}", DataTypeImpl::GetTensorType<{input_type}>())
+                            .TypeConstraint("{template_input_type}", DataTypeImpl::GetTensorType<{input_type}>()),
                         {transformer_name}<{input_type}>
                     );
                     """,
@@ -820,7 +820,7 @@ def _GenerateKernel(
                 #include "core/automl/featurizers/src/FeaturizerPrep/Featurizers/{featurizer_name}.h"
 
                 using namespace std;
-                namespace featurizers = Microsoft::Featurizer;
+                namespace featurizers = Microsoft::Featurizer::Featurizers;
 
                 namespace onnxruntime {{
                 namespace automl {{
