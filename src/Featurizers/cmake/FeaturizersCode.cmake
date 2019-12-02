@@ -7,7 +7,6 @@ get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 add_library(FeaturizersCode STATIC
     ${_this_path}/../CatImputerFeaturizer.h
     ${_this_path}/../DateTimeFeaturizer.h
-    ${_this_path}/../DateTimeFeaturizer.cpp
     ${_this_path}/../SampleAddFeaturizer.h
     ${_this_path}/../SampleAddFeaturizer.cpp
     ${_this_path}/../StringFeaturizer.h

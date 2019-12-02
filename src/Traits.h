@@ -1007,16 +1007,45 @@ struct Traits<std::chrono::system_clock::duration> : public Impl::CommonDuration
 template <typename ClockT, typename DurationT>
 struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<std::chrono::time_point<ClockT, DurationT>> {
     static std::string ToString(std::chrono::time_point<ClockT, DurationT> const &tp) {
-        std::ostringstream                  out;
-
-        date::operator <<(out, tp);
-        out.flush();
-
-        return out.str();
+        return date::format("%FT%TZ", date::floor<std::chrono::seconds>(tp));
     }
 
     static std::chrono::time_point<ClockT, DurationT> FromString(std::string const &value) {
-        std::ignore = value; throw std::logic_error("Not Implemented Yet");
+        std::string dash = "";
+        std::string colon = "";
+        std::string T = " ";
+        std::string Z = "Z";
+        std::string v(value);
+        if ((value.find_first_of("Z") == std::string::npos)) {
+            // there is no Z in the string
+            if (value.find_last_of(":") == value.size() - 3) {
+                // there is a colon in the time zone
+                // remove it
+                v.erase(v.size() - 3, 1);
+            }
+            Z = "%z";
+        }
+        if (!(value.find_first_of("-") == std::string::npos)) {
+            // there is - in the string
+            dash = "-";
+        }
+        if (!(value.find_first_of(":") == std::string::npos)) {
+            // there is : in the string
+            colon = ":";
+        }
+        if (!(value.find_first_of("T") == std::string::npos)) {
+            // there is T in the string
+            T = "T";
+        }
+        std::string date_template = "%Y" + dash + "%m" + dash + "%d" + T + "%H" + colon +"%M" + colon + "%S" + Z;
+        date::sys_time<std::chrono::system_clock::duration> tp;
+        std::istringstream ss(v);
+        date::from_stream(ss, date_template.c_str(), tp);
+
+        if (ss.fail() ) {
+            throw std::invalid_argument("Date time string is not in valid ISO 8601 form!");
+        }
+        return tp;
     }
 
     template <typename ArchiveT>

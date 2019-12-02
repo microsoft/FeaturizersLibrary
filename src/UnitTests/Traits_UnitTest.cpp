@@ -7,7 +7,7 @@
 
 #include "../Traits.h"
 #include "../Archive.h"
-
+#include "../Featurizers/Structs.h"
 #include <type_traits>
 
 using namespace Microsoft::Featurizer;
@@ -230,6 +230,80 @@ TEST_CASE("Transformer_Tuples") {
 
     CHECK_THROWS_WITH((Traits<std::tuple<int, std::string, double>>::FromString(tu_s)), "Not Implemented Yet");
 }
+
+TEST_CASE("Transformer_TimePoint") {
+    // without time offset
+    std::string tp_str = "1975-02-28T12:02:15Z";
+    std::chrono::system_clock::time_point tp = Traits<std::chrono::system_clock::time_point>::FromString(tp_str);
+    std::string tp_res = Traits<std::chrono::system_clock::time_point>::ToString(tp);
+    CHECK(tp_res == tp_str);
+    Microsoft::Featurizer::Featurizers::TimePoint time(tp);
+    CHECK(time.year == 1975);
+    CHECK(time.month == 2);
+    CHECK(time.day == 28);
+    CHECK(time.hour == 12);
+    CHECK(time.minute == 2);
+    CHECK(time.second == 15);
+
+    // with time offset
+    tp_str = "1975-02-28T12:02:15-03:00";
+    tp = Traits<std::chrono::system_clock::time_point>::FromString(tp_str);
+
+    Microsoft::Featurizer::Featurizers::TimePoint time1(tp);
+    CHECK(time1.year == 1975);
+    CHECK(time1.month == 2);
+    CHECK(time1.day == 28);
+    CHECK(time1.hour == 15);
+    CHECK(time1.minute == 2);
+    CHECK(time1.second == 15);
+
+    // with add ins
+    tp_str = "1975-12-31T20:50:15-07:45";
+    tp = Traits<std::chrono::system_clock::time_point>::FromString(tp_str);
+
+    Microsoft::Featurizer::Featurizers::TimePoint time2(tp);
+    CHECK(time2.year == 1976);
+    CHECK(time2.month == 1);
+    CHECK(time2.day == 1);
+    CHECK(time2.hour == 4);
+    CHECK(time2.minute == 35);
+    CHECK(time2.second == 15);
+
+    // invalid 02/29 year
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-02-29T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid month
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-13-29T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid 31 day
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-31T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid hour
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-30T27:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid minute
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-30T12:61:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid second
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-30T12:02:79Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid dash
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-0428T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid colon
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T1202:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid T
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28S12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid Z
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T12:02:15")), "Date time string is not in valid ISO 8601 form!");
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T12:02:15-0700Z")), "Date time string is not in valid ISO 8601 form!");
+
+
+}
+
+
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
