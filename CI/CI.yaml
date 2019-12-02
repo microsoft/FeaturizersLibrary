@@ -38,9 +38,8 @@ stages:
       # Official Builds
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           configuration: x64
           esrp_connected_service_name: "ESRP CodeSigning Connection"
           operating_system: Windows
@@ -48,9 +47,8 @@ stages:
 
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           configuration: x86
           esrp_connected_service_name: "ESRP CodeSigning Connection"
           operating_system: Windows
@@ -75,9 +73,8 @@ stages:
       # When code coverage is enabled, we only test debug builds. Execute release tests to ensure that everything is working.
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           configuration: x64
           job_suffix: " (test only)"
           operating_system: Windows
@@ -86,17 +83,15 @@ stages:
 
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           configuration: x64_MSVC
           operating_system: Windows
 
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           configuration: x86_MSVC
           operating_system: Windows
 
@@ -124,11 +119,11 @@ stages:
     jobs:
       - template: "templates/_job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           job_name: Package_Job
           job_display_name: "Package"
+          operating_system: Windows
           steps:
             - template: "BuildAndTest.package_steps_template.yaml"
               parameters:
@@ -138,11 +133,11 @@ stages:
 
       - template: "templates/_job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           job_name: Documentation_Job
           job_display_name: "Generate Documentation"
+          operating_system: Windows
           steps:
             - template: "BuildAndTest.documentation_steps_template.yaml"
               parameters:

@@ -7,6 +7,7 @@ parameters:
   agent_pool_is_custom: False # Set this value to True if the agent is part of a custom pool
   job_name: ""
   job_display_name: ""
+  operating_system: "" # Windows|Linux|MacOS
   steps: []
   timeout_in_minutes: 240
 
@@ -16,18 +17,39 @@ parameters:
 jobs:
   - ${{ if eq(parameters.agent_pool_container, '') }}:
       - ${{ if eq(parameters.agent_pool_is_custom, 'true') }}:
-          - job: ${{ parameters.job_name }}
-            displayName: ${{ parameters.job_display_name }}
+          - ${{ if eq(parameters.operating_system, 'Windows') }}:
+              - job: ${{ parameters.job_name }}
+                displayName: ${{ parameters.job_display_name }}
 
-            timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
+                timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
 
-            pool: "${{ parameters.agent_pool }}"
+                pool:
+                  name: "${{ parameters.agent_pool }}"
+                  demands:
+                      - Agent.OS -equals Windows_NT
 
-            workspace:
-              clean: All
+                workspace:
+                  clean: All
 
-            steps:
-              ${{ parameters.steps }}
+                steps:
+                  ${{ parameters.steps }}
+
+          - ${{ if eq(parameters.operating_system, 'Linux') }}:
+              - job: ${{ parameters.job_name }}
+                displayName: ${{ parameters.job_display_name }}
+
+                timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
+
+                pool:
+                  name: "${{ parameters.agent_pool }}"
+                  demands:
+                      - Agent.OS -equals Linux
+
+                workspace:
+                  clean: All
+
+                steps:
+                  ${{ parameters.steps }}
 
       - ${{ if not(eq(parameters.agent_pool_is_custom, 'true')) }}:
           - job: ${{ parameters.job_name }}

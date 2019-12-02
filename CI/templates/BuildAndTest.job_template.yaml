@@ -22,6 +22,7 @@ jobs:
       agent_pool_is_custom: ${{ parameters.agent_pool_is_custom }}
       job_name: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration }}_${{ parameters.agent_pool_container }}_${{ parameters.test_only }}_Job
       job_display_name: "${{ parameters.operating_system }} - ${{ parameters.configuration }}${{ parameters.job_suffix }}"
+      operating_system: ${{ parameters.operating_system }}
       steps:
         - template: BuildAndTest.steps_template.yaml
           parameters:
