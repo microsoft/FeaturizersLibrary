@@ -1011,36 +1011,46 @@ struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<st
     }
 
     static std::chrono::time_point<ClockT, DurationT> FromString(std::string const &value) {
-        std::string dash = "";
-        std::string colon = "";
-        std::string T = " ";
-        std::string Z = "Z";
-        std::string v(value);
+        // valid iso8601 format can be YYYY-MM-DDTHH:mm:ssZ
+        // dashes, T, colons and time zone offset can be optional
+        // so we search for these tokens and create a template to be used in parse
+        std::string dash_template_component = "";
+        std::string colon_template_component = "";
+        std::string T_template_component = " ";
+        std::string Z_template_component = "Z";
+
+        // use a pointer to make a copy only when necessary
+        std::string const * ptr(&value);
+        std::string modified;
+
         if ((value.find_first_of("Z") == std::string::npos)) {
             // there is no Z in the string
             if (value.find_last_of(":") == value.size() - 3) {
                 // there is a colon in the time zone
                 // remove it
-                v.erase(v.size() - 3, 1);
+                modified = *ptr;
+                modified.erase(modified.size() - 3, 1);
+                ptr = &modified;
             }
-            Z = "%z";
+            Z_template_component = "%z";
         }
         if (!(value.find_first_of("-") == std::string::npos)) {
             // there is - in the string
-            dash = "-";
+            dash_template_component = "-";
         }
         if (!(value.find_first_of(":") == std::string::npos)) {
             // there is : in the string
-            colon = ":";
+            colon_template_component = ":";
         }
         if (!(value.find_first_of("T") == std::string::npos)) {
             // there is T in the string
-            T = "T";
+            T_template_component = "T";
         }
-        std::string date_template = "%Y" + dash + "%m" + dash + "%d" + T + "%H" + colon +"%M" + colon + "%S" + Z;
+        std::istringstream ss(*ptr);
+        std::ostringstream date_template;
+        date_template << "%Y" << dash_template_component << "%m" << dash_template_component << "%d" << T_template_component << "%H" << colon_template_component <<"%M" << colon_template_component << "%S" << Z_template_component;
         date::sys_time<std::chrono::system_clock::duration> tp;
-        std::istringstream ss(v);
-        date::from_stream(ss, date_template.c_str(), tp);
+        date::from_stream(ss, date_template.str().c_str(), tp);
 
         if (ss.fail() ) {
             throw std::invalid_argument("Date time string is not in valid ISO 8601 form!");
