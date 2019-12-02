@@ -42,17 +42,6 @@ stages:
           configuration: x86
           operating_system: Windows
 
-      # Note that the universal_linux build is generating code that produces runtime errors. Therefore, this
-      # build has been disabled in favor of an ubuntu-16.04-based build.
-      #
-      # - template: 'templates/BuildAndTest.job_template.yaml'
-      #   parameters:
-      #     agent_pool: ubuntu-16.04
-      #     agent_pool_container: universal_linux
-      #     configuration: universal_linux
-      #     operating_system: Linux
-
-      # Work-around for issues with the ubuntu-16.04-based build.
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
           agent_pool: ubuntu-16.04
@@ -69,18 +58,18 @@ stages:
       # Sanity Builds
 
       # When code coverage is enabled, we only test debug builds. Execute release tests to ensure that everything is working.
-      - template: 'templates/BuildAndTest.job_template.yaml'
+      - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
           # agent_pool: AI-Pytorch-Win-CPU
           # agent_pool_is_custom: true
           agent_pool: windows-2019
           configuration: x64
+          job_suffix: " (test only)"
           operating_system: Windows
           test_only: true
-          test_only_suffix: ' (test only)'
           tester_release_only: true
 
-      - template: 'templates/BuildAndTest.job_template.yaml'
+      - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
           # agent_pool: AI-Pytorch-Win-CPU
           # agent_pool_is_custom: true
@@ -88,7 +77,7 @@ stages:
           configuration: x64_MSVC
           operating_system: Windows
 
-      - template: 'templates/BuildAndTest.job_template.yaml'
+      - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
           # agent_pool: AI-Pytorch-Win-CPU
           # agent_pool_is_custom: true
@@ -96,11 +85,22 @@ stages:
           configuration: x86_MSVC
           operating_system: Windows
 
-      - template: 'templates/BuildAndTest.job_template.yaml'
+      - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
           agent_pool: ubuntu-16.04
           configuration: x64
           operating_system: Linux
+
+      # Note that the universal_linux build is generating code that produces runtime errors. This build remains to ensure
+      # that the code compiles on older platforms.
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: ubuntu-16.04
+          agent_pool_container: universal_linux
+          configuration: universal_linux
+          operating_system: Linux
+          job_suffix: " (build only)"
+          tester_build_only: true
 
   - stage: PostBuild_Stage
     displayName: "Post Build:"
