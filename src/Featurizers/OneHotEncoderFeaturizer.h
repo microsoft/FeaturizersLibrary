@@ -45,6 +45,8 @@ public:
 
     ~OneHotEncoderTransformer(void) override = default;
 
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(OneHotEncoderTransformer);
+
     void save(Archive &ar) const override;
 
     bool operator==(OneHotEncoderTransformer const &other) const;
