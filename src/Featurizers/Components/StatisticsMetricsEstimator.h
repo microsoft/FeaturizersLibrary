@@ -263,7 +263,6 @@ StandardStatisticalAnnotaionData<T>::StandardStatisticalAnnotaionData(long doubl
     Sum(std::move(sum)),
     Average(std::move(average))
     {
-        assert(Microsoft::Featurizer::Traits<T>::IsNumericalType::value);
         if(Average > BasicStatisticalAnnotationData<T>::Max || Average < BasicStatisticalAnnotationData<T>::Min)
             throw std::invalid_argument("average is not in the correct range");
 }
