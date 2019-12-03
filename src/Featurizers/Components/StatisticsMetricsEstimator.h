@@ -103,10 +103,10 @@ public:
 
     void fit(InputType const &input);
     BasicStatisticalAnnotationData<T> complete_training(void);
-private:
+
     // ----------------------------------------------------------------------
     // |
-    // |  Private Data
+    // |  Public Data
     // |
     // ----------------------------------------------------------------------
     InputType                                 _min;
@@ -154,10 +154,6 @@ private:
     // ----------------------------------------------------------------------
     long double                               _sum;
     std::double_t                             _average;
-    InputType                                 _min;
-    InputType                                 _max;
-    std::uint64_t                             _count;
-    bool                                      _first_element_flag;
 };
 
 template <typename T>
@@ -356,34 +352,33 @@ BasicStatisticalAnnotationData<T> Details::BasicStatsTrainingOnlyPolicy<T>::comp
 template <typename T>
 Details::StandardStatsTrainingOnlyPolicy<T>::StandardStatsTrainingOnlyPolicy(void) :
     _sum(0),
-    _average(0),
-    _min(0),
-    _max(0),
-    _count(0),
-    _first_element_flag(true) {
+    _average(0) {
+        BasicStatsTrainingOnlyPolicy<T>::_min = 0;
+        BasicStatsTrainingOnlyPolicy<T>::_max = 0;
+
 }
 
 template <typename T>
 void Details::StandardStatsTrainingOnlyPolicy<T>::fit(InputType const &input) {
     if(Microsoft::Featurizer::Traits<T>::IsNull(input))
         return;
-    update_basic_statistics(input, _min, _max, _count, _first_element_flag);
+    update_basic_statistics(input, BasicStatsTrainingOnlyPolicy<T>::_min, BasicStatsTrainingOnlyPolicy<T>::_max, BasicStatsTrainingOnlyPolicy<T>::_count, BasicStatsTrainingOnlyPolicy<T>::_first_element_flag);
     update_standard_statistics(input, _sum);
 }
 
 template <typename T>
 StandardStatisticalAnnotaionData<T> Details::StandardStatsTrainingOnlyPolicy<T>::complete_training(void) {
-    if (_count != 0) {
+    if (BasicStatsTrainingOnlyPolicy<T>::_count != 0) {
         // double and long double have the same size in some systems but in others, long doubles are of greater size
         // so there can be overflow when converting long double to double
-        if (_sum/static_cast<long double>(_count) > static_cast<long double>(std::numeric_limits<std::double_t>::max())) {
+        if (_sum/static_cast<long double>(BasicStatsTrainingOnlyPolicy<T>::_count) > static_cast<long double>(std::numeric_limits<std::double_t>::max())) {
             throw std::runtime_error("double and long double are different sizes on your system, overflow encountered when calculating average!");
         }
-        _average = static_cast<std::double_t>(_sum/static_cast<long double>(_count));
-        assert(_min<=_max);
-        assert(_average >= _min && _average <= _max);
+        _average = static_cast<std::double_t>(_sum/static_cast<long double>(BasicStatsTrainingOnlyPolicy<T>::_count));
+        assert(BasicStatsTrainingOnlyPolicy<T>::_min<=BasicStatsTrainingOnlyPolicy<T>::_max);
+        assert(_average >= BasicStatsTrainingOnlyPolicy<T>::_min && _average <= BasicStatsTrainingOnlyPolicy<T>::_max);
     }
-    return StandardStatisticalAnnotaionData<T>(std::move(_sum), std::move(_average), std::move(_min), std::move(_max), std::move(_count));
+    return StandardStatisticalAnnotaionData<T>(std::move(_sum), std::move(_average), std::move(BasicStatsTrainingOnlyPolicy<T>::_min), std::move(BasicStatsTrainingOnlyPolicy<T>::_max), std::move(BasicStatsTrainingOnlyPolicy<T>::_count));
 }
 
 #if (defined __clang__)
