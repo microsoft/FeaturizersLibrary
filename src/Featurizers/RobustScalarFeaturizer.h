@@ -46,6 +46,8 @@ public:
 
     ~RobustScalarTransformer(void) override = default;
 
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RobustScalarTransformer);
+
     void save(Archive &ar) const override;
 
 private:
