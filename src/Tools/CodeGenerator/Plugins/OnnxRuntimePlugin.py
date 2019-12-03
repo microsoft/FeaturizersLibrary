@@ -428,7 +428,7 @@ def _GenerateGlobalDefs(
                                 type_name=type_name,
                                 constraints=", ".join(
                                     [
-                                        '"tensor({})"'.format(constraint)
+                                        '"tensor({})"'.format(constraint[:-2] if constraint[-2:] == "_t" else constraint)
                                         for constraint in constraints
                                     ],
                                 ),
