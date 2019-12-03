@@ -218,7 +218,7 @@ inline DocumentStatisticsAnnotationData::DocumentStatisticsAnnotationData(Freque
     ),
     TermIndex(
         std::move(
-            [&termIndex](void) -> FrequencyMap & {
+            [&termIndex](void) -> IndexMap & {
                 if(termIndex.empty())
                     throw std::invalid_argument("termIndex");
 
