@@ -195,9 +195,6 @@ struct TraitsImpl {
     static bool IsNull(nullable_type const& value) {
         return !value.has_value();
     }
-    struct IsUnsignedInt {
-        static constexpr bool const value = false;
-    };
 
     static T const & GetNullableValue(nullable_type const &value) {
         if (IsNull(value))
@@ -418,10 +415,6 @@ struct Traits<std::uint8_t> : public TraitsImpl<std::uint8_t> {
         return static_cast<std::uint8_t>(v);
     }
 
-    struct IsUnsignedInt {
-        static constexpr bool const value = true;
-    };
-
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint8_t const &value) {
         return ar.serialize(value);
@@ -447,10 +440,6 @@ struct Traits<std::uint16_t> : public TraitsImpl<std::uint16_t> {
 
         return static_cast<std::uint16_t>(v);
     }
-
-    struct IsUnsignedInt {
-        static constexpr bool const value = true;
-    };
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint16_t const &value) {
@@ -496,10 +485,6 @@ struct Traits<std::uint32_t> : public TraitsImpl<std::uint32_t> {
         return static_cast<std::uint32_t>(v);
     }
 
-    struct IsUnsignedInt {
-        static constexpr bool const value = true;
-    };
-
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint32_t const &value) {
         return serialize_impl<ArchiveT, std::uint32_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
@@ -543,10 +528,6 @@ struct Traits<std::uint64_t> : public TraitsImpl<std::uint64_t> {
 
         return static_cast<std::uint64_t>(v);
     }
-
-    struct IsUnsignedInt {
-        static constexpr bool const value = false;
-    };
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint64_t const &value) {
@@ -604,10 +585,6 @@ struct Traits<std::float_t> {
         return std::stof(value.c_str());
     }
 
-    struct IsUnsignedInt {
-        static constexpr bool const value = false;
-    };
-
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, nullable_type const &value) {
         return serialize_impl<ArchiveT, nullable_type>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
@@ -663,9 +640,6 @@ struct Traits<std::double_t>  {
 
         return std::stod(value.c_str());
     }
-    struct IsUnsignedInt {
-        static constexpr bool const value = false;
-    };
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, nullable_type const &value) {
@@ -1076,9 +1050,6 @@ struct Traits<nonstd::optional<T>>  {
 
         return Traits<T>::FromString(value);
     }
-    struct IsUnsignedInt {
-        static constexpr bool const value = false;
-    };
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, nonstd::optional<T> const &value) {
