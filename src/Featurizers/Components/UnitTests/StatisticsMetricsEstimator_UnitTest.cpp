@@ -7,7 +7,7 @@
 
 #include "../../../3rdParty/optional.h"
 #include "../../TestHelpers.h"
-#include "../StatisticalMetricsEstimator.h"
+#include "../StatisticsMetricsEstimator.h"
 
 namespace NS = Microsoft::Featurizer;
 
@@ -25,7 +25,8 @@ TEST_CASE("correct cases") {
     inputType max = 0;
     std::uint64_t count = 0;
     bool first_element_flag = true;
-    NS::Featurizers::Components::update_statistics<inputType>(3, min, max, count, sum, first_element_flag);
+    NS::Featurizers::Components::update_basic_statistics<inputType>(3, min, max, count, first_element_flag);
+    NS::Featurizers::Components::update_standard_statistics<inputType>(3, sum);
     CHECK(min == 3);
     CHECK(max == 3);
     CHECK(sum == 3);
@@ -36,19 +37,22 @@ TEST_CASE("correct cases") {
     max = 100;
     count = 5;
     first_element_flag = false;
-    NS::Featurizers::Components::update_statistics<inputType>(3, min, max, count, sum, first_element_flag);
+    NS::Featurizers::Components::update_basic_statistics<inputType>(3, min, max, count, first_element_flag);
+    NS::Featurizers::Components::update_standard_statistics<inputType>(3, sum);
     CHECK(min == 0);
     CHECK(max == 100);
     CHECK(sum == 13);
     CHECK(count == 6);
 
-    NS::Featurizers::Components::update_statistics<inputType>(-9, min, max, count, sum, first_element_flag);
+    NS::Featurizers::Components::update_basic_statistics<inputType>(-9, min, max, count, first_element_flag);
+    NS::Featurizers::Components::update_standard_statistics<inputType>(-9, sum);
     CHECK(min == -9);
     CHECK(max == 100);
     CHECK(sum == 4);
     CHECK(count == 7);
 
-    NS::Featurizers::Components::update_statistics<inputType>(105, min, max, count, sum, first_element_flag);
+    NS::Featurizers::Components::update_basic_statistics<inputType>(105, min, max, count, first_element_flag);
+    NS::Featurizers::Components::update_standard_statistics<inputType>(105, sum);
     CHECK(min == -9);
     CHECK(max == 105);
     CHECK(sum == 109);
@@ -57,7 +61,7 @@ TEST_CASE("correct cases") {
     std::string smin = "kat";
     std::string smax = "nadelle";
     std::string sinput = "zed";
-    NS::Featurizers::Components::update_string_statistics(sinput, smin, smax, count, first_element_flag);
+    NS::Featurizers::Components::update_basic_statistics<std::string>(sinput, smin, smax, count, first_element_flag);
     CHECK(smin == "kat");
     CHECK(smax == "zed");
     CHECK(count == 9);
@@ -72,17 +76,17 @@ TEST_CASE("overflow") {
     inputType max = 100;
     std::uint64_t count = 5;
     bool first_element_flag = false;
-    CHECK_THROWS_WITH(NS::Featurizers::Components::update_statistics<inputType>(std::numeric_limits<long double>::max(), min, max, count, sum, first_element_flag), "Overflow occured for sum during calculating statistic metrics! Check your data!");
+    CHECK_THROWS_WITH(NS::Featurizers::Components::update_standard_statistics<inputType>(std::numeric_limits<long double>::max(), sum), "Overflow occured for sum during calculating statistic metrics! Check your data!");
     // when input cannot affect sum, an exception will be thrown
-    CHECK_THROWS_WITH(NS::Featurizers::Components::update_statistics<inputType>(1, min, max, count, sum, first_element_flag), "Input is so small comparing to sum that sum is the same after long double addition!");
+    CHECK_THROWS_WITH(NS::Featurizers::Components::update_standard_statistics<inputType>(1, sum), "Input is so small comparing to sum that sum is the same after long double addition!");
 
 
     sum = std::numeric_limits<long double>::lowest();
-    CHECK_THROWS_WITH(NS::Featurizers::Components::update_statistics<inputType>(std::numeric_limits<long double>::lowest(), min, max, count, sum, first_element_flag), "Overflow occured for sum during calculating statistic metrics! Check your data!");
+    CHECK_THROWS_WITH(NS::Featurizers::Components::update_standard_statistics<inputType>(std::numeric_limits<long double>::lowest(), sum), "Overflow occured for sum during calculating statistic metrics! Check your data!");
 
     sum = 10;
     count = std::numeric_limits<std::uint64_t>::max();
-    CHECK_THROWS_WITH(NS::Featurizers::Components::update_statistics<inputType>(4, min, max, count, sum, first_element_flag), "Overflow occured for count during calculating statistic metrics! Check your data!");
+    CHECK_THROWS_WITH(NS::Featurizers::Components::update_basic_statistics<inputType>(4, min, max, count, first_element_flag), "Overflow occured for count during calculating statistic metrics! Check your data!");
 }
 
 // test for overall estimator
@@ -99,7 +103,7 @@ TEST_CASE("int") {
     NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations,0);
 
     NS::TestHelpers::Train(estimator, list);
-    NS::Featurizers::Components::StatisticalMetricsAnnotationData<inputType> const& stats(estimator.get_annotation_data());
+    NS::Featurizers::Components::StandardStatisticalAnnotaionData<inputType> const& stats(estimator.get_annotation_data());
 
     CHECK(stats.Min == 8);
     CHECK(stats.Max == 30);
@@ -125,7 +129,7 @@ TEST_CASE("double") {
     NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, list);
-    NS::Featurizers::Components::StatisticalMetricsAnnotationData<inputType> const& stats(estimator.get_annotation_data());
+    NS::Featurizers::Components::StandardStatisticalAnnotaionData<inputType> const& stats(estimator.get_annotation_data());
 
     CHECK(NS::TestHelpers::FuzzyCheck<inputType>({stats.Min}, {8.2}));
     CHECK(NS::TestHelpers::FuzzyCheck<inputType>({stats.Max}, {30.4}));
@@ -147,7 +151,7 @@ TEST_CASE("string") {
     NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, list);
-    NS::Featurizers::Components::StatisticalMetricsAnnotationData<inputType> const& stats(estimator.get_annotation_data());
+    NS::Featurizers::Components::BasicStatisticalAnnotationData<inputType> const& stats(estimator.get_annotation_data());
 
     CHECK(stats.Min == "either");
     CHECK(stats.Max == "xayah");
@@ -167,7 +171,7 @@ TEST_CASE("all same input") {
     NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, list);
-    NS::Featurizers::Components::StatisticalMetricsAnnotationData<inputType> const& stats(estimator.get_annotation_data());
+    NS::Featurizers::Components::StandardStatisticalAnnotaionData<inputType> const& stats(estimator.get_annotation_data());
 
     CHECK(stats.Min == 10);
     CHECK(stats.Max == 10);
@@ -176,7 +180,7 @@ TEST_CASE("all same input") {
     CHECK(stats.Average == 10);
 }
 
-TEST_CASE("null input") {
+TEST_CASE("null input for numerical types") {
     using inputType = std::double_t;
 
     inputType null = NS::Traits<inputType>::CreateNullValue();
@@ -191,13 +195,33 @@ TEST_CASE("null input") {
     NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, list);
-    NS::Featurizers::Components::StatisticalMetricsAnnotationData<inputType> const& stats(estimator.get_annotation_data());
+    NS::Featurizers::Components::StandardStatisticalAnnotaionData<inputType> const& stats(estimator.get_annotation_data());
 
     CHECK(stats.Min == 0);
     CHECK(stats.Max == 0);
     CHECK(stats.Count == 0);
     CHECK(stats.Sum == 0);
     CHECK(stats.Average == 0);
+}
+
+TEST_CASE("null input for string") {
+    using inputType = nonstd::optional<std::string>;
+
+    inputType null = NS::Traits<inputType>::CreateNullValue();
+
+    std::vector<std::vector<inputType>> const list({{
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    null}});
+
+    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations, 0);
+
+    NS::TestHelpers::Train(estimator, list);
+    NS::Featurizers::Components::BasicStatisticalAnnotationData<inputType> const& stats(estimator.get_annotation_data());
+
+    CHECK(stats.Count == 0);
 }
 #if (defined __clang__)
 #   pragma clang diagnostic pop

@@ -49,7 +49,7 @@ public:
 ///                 for an input column. Template T can only be numerical types
 ///
 template <typename T>
-class StandardStatisticalAnnotaionData : BasicStatisticalAnnotationData {
+class StandardStatisticalAnnotaionData : public BasicStatisticalAnnotationData<T> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -73,11 +73,12 @@ public:
 namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         StatisticalMetricsTrainingOnlyPolicy
-///  \brief         `StatisticalMetricsEstimator` implementation details.
+///  \class         BasicStatsTrainingOnlyPolicy
+///  \brief         BasicStatsTrainingOnlyPolicy deals with basic stats include
+///                 min, max and count
 ///
 template <typename T>
-class StatisticalMetricsTrainingOnlyPolicy {
+class BasicStatsTrainingOnlyPolicy {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -98,11 +99,53 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    StatisticalMetricsTrainingOnlyPolicy(void);
+    BasicStatsTrainingOnlyPolicy(void);
 
     void fit(InputType const &input);
-    StatisticalMetricsAnnotationData<T> complete_training(void);
+    BasicStatisticalAnnotationData<T> complete_training(void);
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+    InputType                                 _min;
+    InputType                                 _max;
+    std::uint64_t                             _count;
+    bool                                      _first_element_flag;
+};
 
+/////////////////////////////////////////////////////////////////////////
+///  \class         StandardStatsTrainingOnlyPolicy
+///  \brief         StandardStatsTrainingOnlyPolicy deals with advanced stats include
+///                 sum and average
+///
+template <typename T>
+class StandardStatsTrainingOnlyPolicy : public BasicStatsTrainingOnlyPolicy<T> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using InputType                         = T;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Data
+    // |
+    // ----------------------------------------------------------------------
+    static constexpr char const * const     NameValue = StatisticalMetricsEstimatorName;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    StandardStatsTrainingOnlyPolicy(void);
+
+    void fit(InputType const &input);
+    StandardStatisticalAnnotaionData<T> complete_training(void);
 private:
     // ----------------------------------------------------------------------
     // |
@@ -117,6 +160,61 @@ private:
     bool                                      _first_element_flag;
 };
 
+template <typename T>
+struct StatsPolicySelector {
+    using type = BasicStatsTrainingOnlyPolicy<T>;
+};
+
+template <>
+struct StatsPolicySelector<std::int8_t> {
+    using type = StandardStatsTrainingOnlyPolicy<std::int8_t>;
+};
+
+template <>
+struct StatsPolicySelector<std::uint8_t> {
+    using type = StandardStatsTrainingOnlyPolicy<std::uint8_t>;
+};
+
+template <>
+struct StatsPolicySelector<std::int16_t> {
+    using type = StandardStatsTrainingOnlyPolicy<std::int16_t>;
+};
+
+template <>
+struct StatsPolicySelector<std::uint16_t> {
+    using type = StandardStatsTrainingOnlyPolicy<std::uint16_t>;
+};
+
+template <>
+struct StatsPolicySelector<std::int32_t> {
+    using type = StandardStatsTrainingOnlyPolicy<std::int32_t>;
+};
+
+template <>
+struct StatsPolicySelector<std::uint32_t> {
+    using type = StandardStatsTrainingOnlyPolicy<std::uint32_t>;
+};
+
+template <>
+struct StatsPolicySelector<std::int64_t> {
+    using type = StandardStatsTrainingOnlyPolicy<std::int64_t>;
+};
+
+template <>
+struct StatsPolicySelector<std::uint64_t> {
+    using type = StandardStatsTrainingOnlyPolicy<std::uint64_t>;
+};
+
+template <>
+struct StatsPolicySelector<std::float_t> {
+    using type = StandardStatsTrainingOnlyPolicy<std::float_t>;
+};
+
+template <>
+struct StatsPolicySelector<std::double_t> {
+    using type = StandardStatsTrainingOnlyPolicy<std::double_t>;
+};
+
 } // namespace Details
 
 /////////////////////////////////////////////////////////////////////////
@@ -127,7 +225,7 @@ template <
     typename InputT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-using StatisticalMetricsEstimator                       = TrainingOnlyEstimatorImpl<Details::StatisticalMetricsTrainingOnlyPolicy<InputT>, MaxNumTrainingItemsV>;
+using StatisticalMetricsEstimator                       = TrainingOnlyEstimatorImpl<typename Details::StatsPolicySelector<InputT>::type, MaxNumTrainingItemsV>;
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -141,54 +239,34 @@ using StatisticalMetricsEstimator                       = TrainingOnlyEstimatorI
 
 // ----------------------------------------------------------------------
 // |
-// |  StatisticalMetricsAnnotationData
+// |  BasicStatisticalAnnotationData
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-StatisticalMetricsAnnotationData<T>::StatisticalMetricsAnnotationData(long double sum, std::double_t average, T min, T max, std::uint64_t count) :
+BasicStatisticalAnnotationData<T>::BasicStatisticalAnnotationData(T min, T max, std::uint64_t count) :
+    Min(std::move(min)),
+    Max(std::move(max)),
+    Count(std::move(count)) {
+        if(Min > Max)
+            throw std::invalid_argument("min is > max");
+
+}
+
+// ----------------------------------------------------------------------
+// |
+// |  StandardStatisticalAnnotaionData
+// |
+// ----------------------------------------------------------------------
+template <typename T>
+StandardStatisticalAnnotaionData<T>::StandardStatisticalAnnotaionData(long double sum, std::double_t average, T min, T max, std::uint64_t count) :
+    BasicStatisticalAnnotationData<T>(min, max, count),
     Sum(std::move(sum)),
-    Average(std::move(average)),
-    Min(std::move(min)),
-    Max(std::move(max)),
-    Count(std::move(count)) {
-        if(Min > Max)
-            throw std::invalid_argument("min is > max");
-        if(Average > Max || Average < Min)
+    Average(std::move(average))
+    {
+        assert(Microsoft::Featurizer::Traits<T>::IsNumericalType::value);
+        if(Average > BasicStatisticalAnnotationData<T>::Max || Average < BasicStatisticalAnnotationData<T>::Min)
             throw std::invalid_argument("average is not in the correct range");
-
 }
-StatisticalMetricsAnnotationData<std::string>::StatisticalMetricsAnnotationData(std::string min, std::string max, std::uint64_t count) :
-    Min(std::move(min)),
-    Max(std::move(max)),
-    Count(std::move(count)) {
-        if(Min > Max)
-            throw std::invalid_argument("min is > max");
-
-}
-
-// ----------------------------------------------------------------------
-// |
-// |  Details::StatisticalMetricsTrainingOnlyPolicy
-// |
-// ----------------------------------------------------------------------
-template <typename T>
-Details::StatisticalMetricsTrainingOnlyPolicy<T>::StatisticalMetricsTrainingOnlyPolicy(void) :
-    // default values are 0
-    _sum(0),
-    _average(0),
-    _min(0),
-    _max(0),
-    _count(0),
-    _first_element_flag(true) {
-}
-template <>
-Details::StatisticalMetricsTrainingOnlyPolicy<std::string>::StatisticalMetricsTrainingOnlyPolicy(void) :
-    _min(""),
-    _max(""),
-    _count(0),
-    _first_element_flag(true) {
-}
-
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
@@ -196,14 +274,18 @@ Details::StatisticalMetricsTrainingOnlyPolicy<std::string>::StatisticalMetricsTr
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
 
+// ----------------------------------------------------------------------
+// |
+// |  update functions
+// |
+// ----------------------------------------------------------------------
+
 template <typename T>
-void update_statistics(T input, T& min, T& max, std::uint64_t& count, long double& sum, bool& first_element_flag) {
+void update_basic_statistics(T input, T& min, T& max, std::uint64_t& count, bool& first_element_flag) {
     // first non-null element will set min and max
-    // if there is no valid element, min and max will be 0
     if (first_element_flag) {
         min = input;
         max = input;
-        sum += static_cast<long double>(input);
         ++count;
         first_element_flag = false;
         return;
@@ -214,6 +296,16 @@ void update_statistics(T input, T& min, T& max, std::uint64_t& count, long doubl
     if(input > max) {
         max = input;
     }
+    // check if count will be out of bounds
+    if (std::numeric_limits<std::uint64_t>::max() == count) {
+        throw std::runtime_error("Overflow occured for count during calculating statistic metrics! Check your data!");
+    }
+    ++count;
+    return;
+}
+
+template <typename T>
+void update_standard_statistics(T input, long double& sum) {
     if ((sum + static_cast<long double>(input) == sum) && (input != 0)) {
         throw std::runtime_error("Input is so small comparing to sum that sum is the same after long double addition!");
     }
@@ -223,51 +315,65 @@ void update_statistics(T input, T& min, T& max, std::uint64_t& count, long doubl
     if (std::isinf(sum)) {
         throw std::runtime_error("Overflow occured for sum during calculating statistic metrics! Check your data!");
     }
-    // check if count will be out of bounds
-    if (std::numeric_limits<std::uint64_t>::max() == count) {
-        throw std::runtime_error("Overflow occured for count during calculating statistic metrics! Check your data!");
-    }
-    ++count;
     return;
 }
 
-void update_string_statistics(std::string input, std::string& min, std::string& max, std::uint64_t& count, bool& first_element_flag) {
-    // first non-null element will set min and max
-    // if there is no valid element, min and max will be 0
-    if (first_element_flag) {
-        min = input;
-        max = input;
-        ++count;
-        first_element_flag = false;
-        return;
-    }
-    if(input < min) {
-        min = input;
-    }
-    if(input > max) {
-        max = input;
-    }
-    // check if count will be out of bounds
-    if (std::numeric_limits<std::uint64_t>::max() == count) {
-        throw std::runtime_error("Overflow occured for count during calculating statistic metrics! Check your data!");
-    }
-    ++count;
-    return;
+// ----------------------------------------------------------------------
+// |
+// |  Details::BasicStatsTrainingOnlyPolicy
+// |
+// ----------------------------------------------------------------------
+template <typename T>
+Details::BasicStatsTrainingOnlyPolicy<T>::BasicStatsTrainingOnlyPolicy(void) :
+    _count(0),
+    _first_element_flag(true) {
 }
+
+
 
 template <typename T>
-void Details::StatisticalMetricsTrainingOnlyPolicy<T>::fit(InputType const &input) {
+void Details::BasicStatsTrainingOnlyPolicy<T>::fit(InputType const &input) {
     if(Microsoft::Featurizer::Traits<T>::IsNull(input))
         return;
-    update_statistics(input, _min, _max, _count, _sum, _first_element_flag);
-}
-template <>
-void Details::StatisticalMetricsTrainingOnlyPolicy<std::string>::fit(std::string const &input) {
-    update_string_statistics(input, _min, _max, _count, _first_element_flag);
+    update_basic_statistics(input, _min, _max, _count, _first_element_flag);
+
 }
 
 template <typename T>
-StatisticalMetricsAnnotationData<T> Details::StatisticalMetricsTrainingOnlyPolicy<T>::complete_training(void) {
+BasicStatisticalAnnotationData<T> Details::BasicStatsTrainingOnlyPolicy<T>::complete_training(void) {
+    if (_count != 0) {
+        assert(_min<=_max);
+    }
+    return BasicStatisticalAnnotationData<T>(std::move(_min), std::move(_max), std::move(_count));
+
+}
+
+
+// ----------------------------------------------------------------------
+// |
+// |  Details::StandardStatsTrainingOnlyPolicy
+// |
+// ----------------------------------------------------------------------
+template <typename T>
+Details::StandardStatsTrainingOnlyPolicy<T>::StandardStatsTrainingOnlyPolicy(void) :
+    _sum(0),
+    _average(0),
+    _min(0),
+    _max(0),
+    _count(0),
+    _first_element_flag(true) {
+}
+
+template <typename T>
+void Details::StandardStatsTrainingOnlyPolicy<T>::fit(InputType const &input) {
+    if(Microsoft::Featurizer::Traits<T>::IsNull(input))
+        return;
+    update_basic_statistics(input, _min, _max, _count, _first_element_flag);
+    update_standard_statistics(input, _sum);
+}
+
+template <typename T>
+StandardStatisticalAnnotaionData<T> Details::StandardStatsTrainingOnlyPolicy<T>::complete_training(void) {
     if (_count != 0) {
         // double and long double have the same size in some systems but in others, long doubles are of greater size
         // so there can be overflow when converting long double to double
@@ -277,32 +383,14 @@ StatisticalMetricsAnnotationData<T> Details::StatisticalMetricsTrainingOnlyPolic
         _average = static_cast<std::double_t>(_sum/static_cast<long double>(_count));
         assert(_min<=_max);
         assert(_average >= _min && _average <= _max);
-    } else {
-        // no input is taken
-        assert(_min == 0);
-        assert(_max == 0);
-        assert(_count == 0);
-        assert(_sum == 0);
-        assert(_average == 0);
     }
-    return StatisticalMetricsAnnotationData<T>(std::move(_sum), std::move(_average), std::move(_min), std::move(_max), std::move(_count));
-}
-template <>
-StatisticalMetricsAnnotationData<std::string> Details::StatisticalMetricsTrainingOnlyPolicy<std::string>::complete_training(void) {
-    if (_count != 0) {
-        assert(_min<=_max);
-    } else {
-        // no input is taken
-        assert(_min == "");
-        assert(_max == "");
-        assert(_count == 0);
-    }
-    return StatisticalMetricsAnnotationData<std::string>(std::move(_min), std::move(_max), std::move(_count));
+    return StandardStatisticalAnnotaionData<T>(std::move(_sum), std::move(_average), std::move(_min), std::move(_max), std::move(_count));
 }
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
+
 } // namespace Components
 } // namespace Featurizers
 } // namespace Featurizer
