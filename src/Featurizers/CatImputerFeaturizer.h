@@ -30,8 +30,6 @@ struct CatImputerTraits{
     static_assert(Traits<TransformedT>::IsNullableType == false || Traits<TransformedT>::IsNativeNullableType, "'TransformedT' must not be a nullable type");
 };
 
-
-
 /////////////////////////////////////////////////////////////////////////
 ///  \class         CatImputerTransformer
 ///  \brief         Transformer that populates null values with the most
