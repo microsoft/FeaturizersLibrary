@@ -136,9 +136,8 @@ TEST_CASE("CatImputer- All values Null") {
 }
 
 TEST_CASE("Serialization/Deserialization- Numeric") {
-    using type                              = nonstd::optional<std::int64_t>;
     using transformedType                   = std::int64_t;
-    using transformerType                   = NS::Featurizers::CatImputerTransformer<type,transformedType>;
+    using transformerType                   = NS::Featurizers::CatImputerTransformer<transformedType>;
 
     auto model = std::make_shared<transformerType>(10);
 
@@ -153,9 +152,8 @@ TEST_CASE("Serialization/Deserialization- Numeric") {
 }
 
 TEST_CASE("Serialization/Deserialization- string") {
-    using type                              = nonstd::optional<std::string>;
     using transformedType                   = std::string;
-    using transformerType                   = NS::Featurizers::CatImputerTransformer<type,transformedType>;
+    using transformerType                   = NS::Featurizers::CatImputerTransformer<transformedType>;
 
     auto model = std::make_shared<transformerType>("one");
 
