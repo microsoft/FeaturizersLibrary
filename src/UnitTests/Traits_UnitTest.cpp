@@ -259,6 +259,89 @@ bool SerializeOnly(T const &value) {
     T const                                 other(in.template deserialize<T>());
     return value == other;
 }
+TEST_CASE("Transformer_TimePoint") {
+    // without time offset
+    std::string tp_str = "1975-02-28T12:02:15Z";
+    std::chrono::system_clock::time_point tp = Traits<std::chrono::system_clock::time_point>::FromString(tp_str);
+    std::string tp_res = Traits<std::chrono::system_clock::time_point>::ToString(tp);
+    CHECK(tp_res == tp_str);
+
+    date::sys_days dp = date::floor<date::days>(tp);
+    date::year_month_day ymd = date::year_month_day{dp};
+    date::time_of_day<std::chrono::seconds> time = date::make_time(std::chrono::duration_cast<std::chrono::seconds>(tp-dp));
+
+    CHECK(ymd.year() == date::year(1975));
+    CHECK(ymd.month() == date::month(2));
+    CHECK(ymd.day() == date::day(28));
+    CHECK(time.hours().count() == 12);
+    CHECK(time.minutes().count() == 2);
+    CHECK(time.seconds().count() == 15);
+
+    // with time offset
+    tp_str = "1975-02-28T12:02:15-03:00";
+    tp = Traits<std::chrono::system_clock::time_point>::FromString(tp_str);
+
+    dp = date::floor<date::days>(tp);
+    ymd = date::year_month_day{dp};
+    time = date::make_time(std::chrono::duration_cast<std::chrono::seconds>(tp-dp));
+
+    CHECK(ymd.year() == date::year(1975));
+    CHECK(ymd.month() == date::month(2));
+    CHECK(ymd.day() == date::day(28));
+    CHECK(time.hours().count() == 15);
+    CHECK(time.minutes().count() == 2);
+    CHECK(time.seconds().count() == 15);
+
+    // with add ins
+    tp_str = "1975-12-31T20:50:15-07:45";
+    tp = Traits<std::chrono::system_clock::time_point>::FromString(tp_str);
+
+    dp = date::floor<date::days>(tp);
+    ymd = date::year_month_day{dp};
+    time = date::make_time(std::chrono::duration_cast<std::chrono::seconds>(tp-dp));
+
+    CHECK(ymd.year() == date::year(1976));
+    CHECK(ymd.month() == date::month(1));
+    CHECK(ymd.day() == date::day(1));
+    CHECK(time.hours().count() == 4);
+    CHECK(time.minutes().count() == 35);
+    CHECK(time.seconds().count() == 15);
+
+
+    // invalid 02/29 year
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-02-29T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid month
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-13-29T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid 31 day
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-31T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid hour
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-30T27:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid minute
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-30T12:61:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid second
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-30T12:02:79Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid dash
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-0428T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid colon
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T1202:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid T
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28S12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid Z
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T12:02:15")), "Date time string is not in valid ISO 8601 form!");
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T12:02:15-0700Z")), "Date time string is not in valid ISO 8601 form!");
+
+
+}
+
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
