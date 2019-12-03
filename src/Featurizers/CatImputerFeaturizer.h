@@ -17,6 +17,21 @@ namespace Featurizer {
 namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
+///  \class         CatImputerTraits
+///  \brief         Traits for mapping the input/output types for the CatImptuter.
+///                 This allows us to only change one place if typings need to change.
+///
+
+template <typename TransformedT>
+class CatImputerTraits{
+    using InputType = Traits<TransformedT>::nullable_type;
+    static_assert(Traits<InputType>::IsNullableType, "'InputT' must be a nullable type");
+    static_assert(Traits<TransformedT>::IsNullableType == false || Traits<TransformedT>::IsNativeNullableType, "'TransformedT' must not be a nullable type");
+};
+
+
+
+/////////////////////////////////////////////////////////////////////////
 ///  \class         CatImputerTransformer
 ///  \brief         Transformer that populates null values with the most
 ///                 frequent value found in the training data set.
@@ -29,8 +44,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    static_assert(Traits<InputT>::IsNullableType, "'InputT' must be a nullable type");
-    static_assert(Traits<TransformedT>::IsNullableType == false || Traits<TransformedT>::IsNativeNullableType, "'TransformedT' must not be a nullable type");
+    
 
     using BaseType                          = StandardTransformer<InputT, TransformedT>;
 
