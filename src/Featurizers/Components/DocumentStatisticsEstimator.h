@@ -248,7 +248,6 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTraining
 }
 
 inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTrainingOnlyPolicy(StringDecorator decorator) :
-    //DocumentStatisticsTrainingOnlyPolicy(), this gives the error: an initializer for a delegating constructor must appear alone
     _stringDecoratorFunc(
         [&decorator](void) -> StringDecorator & {
             if(!decorator)
@@ -291,7 +290,7 @@ inline void Details::DocumentStatisticsTrainingOnlyPolicy::fit(InputType const &
 }
 
 inline DocumentStatisticsAnnotationData Details::DocumentStatisticsTrainingOnlyPolicy::complete_training(void) {
-    IndexMap const                          termIndex(Microsoft::Featurizer::Featurizers::Components::CreateIndexMap<std::string>(_termFrequency, IndexMap()));
+    IndexMap                                termIndex(Microsoft::Featurizer::Featurizers::Components::CreateIndexMap<std::string>(_termFrequency, IndexMap()));
     return DocumentStatisticsAnnotationData(std::move(_termFrequency), std::move(termIndex), std::move(_totalNumDocuments));
 }
 

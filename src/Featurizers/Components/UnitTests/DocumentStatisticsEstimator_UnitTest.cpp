@@ -11,8 +11,6 @@
 
 namespace NS = Microsoft::Featurizer;
 
-// TODO: Test for DocumentStatisticsTrainingOnlyPolicy ctor - empty decorator
-
 void TestString (std::string const & input, std::vector<std::string> const & label) {
     std::vector<std::string> predict;
     NS::Featurizers::Components::split_temp(
@@ -25,7 +23,7 @@ void TestString (std::string const & input, std::vector<std::string> const & lab
     CHECK(predict == label);
 }
 
-NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap Test(std::vector<std::vector<std::string>> const &inputBatches) {
+NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap TrainTermFrequency(std::vector<std::vector<std::string>> const &inputBatches) {
     NS::AnnotationMapsPtr                                                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::DocumentStatisticsEstimator<std::numeric_limits<size_t>::max()>
                                                                             estimator(pAllColumnAnnotations, 0);
@@ -37,7 +35,7 @@ NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap Test
     return annotation.TermFrequency;
 }
 
-NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap TestIndexMap(std::vector<std::vector<std::string>> const &inputBatches) {
+NS::Featurizers::Components::DocumentStatisticsAnnotationData::IndexMap TrainTermIndex(std::vector<std::vector<std::string>> const &inputBatches) {
     NS::AnnotationMapsPtr                                                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::DocumentStatisticsEstimator<std::numeric_limits<size_t>::max()>
                                                                             estimator(pAllColumnAnnotations, 0);
@@ -49,7 +47,7 @@ NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap Test
     return annotation.TermIndex;
 }
 
-std::uint32_t TestNum(std::vector<std::vector<std::string>> const &inputBatches) {
+std::uint32_t TrainDocuNum(std::vector<std::vector<std::string>> const &inputBatches) {
     NS::AnnotationMapsPtr                                                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::DocumentStatisticsEstimator<std::numeric_limits<size_t>::max()>
                                                                             estimator(pAllColumnAnnotations, 0);
@@ -99,60 +97,66 @@ TEST_CASE("invalid_trainingpolicy") {
 
 TEST_CASE("string_idf") {
     using FrequencyMap                         = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap;
+    using IndexMap                             = NS::Featurizers::Components::DocumentStatisticsAnnotationData::IndexMap;
 
-    FrequencyMap const                         label({{"orange",3}, {"apple", 1}, {"peach", 3}, {"grape", 2}, {"banana",1}});
-    std::vector<std::vector<std::string>> const            inputBatches({{" orange  apple  apple peach  grape "},
-                                                                        {" grape orange     peach peach banana"},
-                                                                        {"orange orange peach   peach orange "}});
+    FrequencyMap const                         termFreqLabel({{"orange",3}, {"apple", 1}, {"peach", 3}, {"grape", 2}, {"banana",1}});
+    IndexMap const                             termIndexLabel({{"apple", 0}, {"banana",1}, {"grape", 2}, {"orange",3}, {"peach", 4}});
+    std::uint32_t const                        docuNumsLabel(3);
 
-    FrequencyMap const                         predict(Test(inputBatches));
-    CHECK(predict == label);
+    std::vector<std::vector<std::string>> const            
+                                               inputBatches({{" orange  apple  apple peach  grape "},
+                                                            {" grape orange     peach peach banana"},
+                                                            {"orange orange peach   peach orange "}});
+
+    FrequencyMap const                         termFreqAnnotation(TrainTermFrequency(inputBatches));
+    IndexMap const                             termIndexAnnotation(TrainTermIndex(inputBatches));
+    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches));
+
+    CHECK(termFreqAnnotation == termFreqLabel);
+    CHECK(termIndexAnnotation == termIndexLabel);
+    CHECK(docuNumsAnnotation == docuNumsLabel);
 }
 
 TEST_CASE("string_idf_single_appearance") {
     using FrequencyMap                         = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap;
+    using IndexMap                             = NS::Featurizers::Components::DocumentStatisticsAnnotationData::IndexMap;
 
-    FrequencyMap const                         label({{"orange", 1}, {"apple", 1}, {"grape", 1}});
-    std::vector<std::vector<std::string>> const            inputBatches({{" apple apple  apple"},
-                                                                        {"grape grape  grape "},
-                                                                        {" orange orange  orange "}});
+    FrequencyMap const                         termFreqLabel({{"orange", 1}, {"apple", 1}, {"grape", 1}});
+    IndexMap const                             termIndexLabel({{"apple", 0}, {"grape", 1}, {"orange", 2}});
+    std::uint32_t const                        docuNumsLabel(3);
 
-    FrequencyMap const                         predict(Test(inputBatches));
-    CHECK(predict == label);
+    std::vector<std::vector<std::string>> const            
+                                               inputBatches({{" apple apple  apple"},
+                                                            {"grape grape  grape "},
+                                                            {" orange orange  orange "}});
+
+    FrequencyMap const                         termFreqAnnotation(TrainTermFrequency(inputBatches));
+    IndexMap const                             termIndexAnnotation(TrainTermIndex(inputBatches));
+    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches));
+
+    CHECK(termFreqAnnotation == termFreqLabel);
+    CHECK(termIndexAnnotation == termIndexLabel);
+    CHECK(docuNumsAnnotation == docuNumsLabel);
 }
 
 TEST_CASE("string_idf_full_appearance") {
     using FrequencyMap                         = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap;
+    using IndexMap                             = NS::Featurizers::Components::DocumentStatisticsAnnotationData::IndexMap;
 
-    FrequencyMap const                         label({{"orange", 3}, {"apple", 3}, {"grape", 3}});
-    std::vector<std::vector<std::string>> const            inputBatches({{"apple  grape orange  "},
-                                                                         {"  apple grape   orange"},
-                                                                         {" apple grape orange  "}});
+    FrequencyMap const                         termFreqLabel({{"orange", 3}, {"apple", 3}, {"grape", 3}});
+    IndexMap const                             termIndexLabel({{"apple", 0}, {"grape", 1}, {"orange", 2}});
+    std::uint32_t const                        docuNumsLabel(3);
 
-    FrequencyMap const                         predict(Test(inputBatches));
-    CHECK(predict == label);
-}
+    std::vector<std::vector<std::string>> const            
+                                               inputBatches({{"apple  grape orange  "},
+                                                            {"  apple grape   orange"},
+                                                            {" apple grape orange  "}});
 
-TEST_CASE("string_num") {
-    using FrequencyMap                         = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap;
+    FrequencyMap const                         termFreqAnnotation(TrainTermFrequency(inputBatches));
+    IndexMap const                             termIndexAnnotation(TrainTermIndex(inputBatches));
+    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches));
 
-    FrequencyMap const                         label({{"orange",3}, {"apple", 1}, {"peach", 3}, {"grape", 2}, {"banana",1}});
-    std::vector<std::vector<std::string>> const            inputBatches({{"orange apple apple peach grape"},
-                                                                        {"grape orange peach peach banana"},
-                                                                        {"orange orange peach peach orange"}});
-
-    std::uint32_t const                        numOfDocuments(TestNum(inputBatches));
-    CHECK(numOfDocuments == 3);
-}
-
-TEST_CASE("string_indexmap") {
-    using IndexMap                         = NS::Featurizers::Components::DocumentStatisticsAnnotationData::IndexMap;
-
-    IndexMap const                         label({{"orange", 2}, {"apple", 0}, {"grape", 1}});
-    std::vector<std::vector<std::string>> const            inputBatches({{" apple apple  apple"},
-                                                                        {"grape grape  grape "},
-                                                                        {" orange orange  orange "}});
-
-    IndexMap const                         predict(TestIndexMap(inputBatches));
-    CHECK(predict == label);
+    CHECK(termFreqAnnotation == termFreqLabel);
+    CHECK(termIndexAnnotation == termIndexLabel);
+    CHECK(docuNumsAnnotation == docuNumsLabel);
 }
