@@ -17,11 +17,10 @@ namespace Featurizer {
 namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
-///  \struct         CatImputerTraits
+///  \class        CatImputerTraits
 ///  \brief         Traits for mapping the input/output types for the CatImptuter.
 ///                 This allows us to only change one place if typings need to change.
 ///
-
 template <typename TransformedT>
 struct CatImputerTraits{
     using InputType = typename Traits<TransformedT>::nullable_type;
@@ -59,7 +58,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    CatImputerTransformer(typename TransformedType value);
+    CatImputerTransformer(TransformedType value);
     CatImputerTransformer(Archive &ar);
 
     ~CatImputerTransformer(void) override = default;
@@ -74,7 +73,7 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    void execute_impl(typename InputType const &input, typename BaseType::CallbackFunction const &callback) override;
+    void execute_impl(InputType const &input, typename BaseType::CallbackFunction const &callback) override;
 };
 
 namespace Details {
@@ -96,7 +95,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using InputType                         = typename CatImputerTraits<TransformedT>::InputType;
-    using BaseType                          = TransformerEstimator<typename InputType, TransformedT>;
+    using BaseType                          = TransformerEstimator<InputType, TransformedT>;
     using TransformerType                   = CatImputerTransformer<TransformedT>;
 
     // ----------------------------------------------------------------------
@@ -123,7 +122,7 @@ private:
     // |
     // ----------------------------------------------------------------------
     bool begin_training_impl(void) override;
-    FitResult fit_impl(typename InputType const *, size_t) override;
+    FitResult fit_impl(InputType const *, size_t) override;
     void complete_training_impl(void) override;
 
     // MSVC runs into problems when separating the definition for this method
@@ -198,7 +197,7 @@ public:
 // |
 // ----------------------------------------------------------------------
 template <typename TransformedT>
-CatImputerTransformer<TransformedT>::CatImputerTransformer(typename TransformedType value) :
+CatImputerTransformer<TransformedT>::CatImputerTransformer(TransformedType value) :
     Value(std::move(value)) {
 }
 
@@ -216,7 +215,7 @@ void CatImputerTransformer<TransformedT>::save(Archive &ar) const /*override*/ {
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename TransformedT>
-void CatImputerTransformer<TransformedT>::execute_impl(typename InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
+void CatImputerTransformer<TransformedT>::execute_impl(InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
     // ----------------------------------------------------------------------
     using TheseTraits                       = Traits<InputType>;
     // ----------------------------------------------------------------------
@@ -272,7 +271,7 @@ bool Details::CatImputerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>::begin
 }
 
 template <typename TransformedT, size_t MaxNumTrainingItemsV>
-FitResult Details::CatImputerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>::fit_impl(typename InputType const *, size_t) /*override*/ {
+FitResult Details::CatImputerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>::fit_impl(InputType const *, size_t) /*override*/ {
     throw std::runtime_error("This should not be called");
 }
 
