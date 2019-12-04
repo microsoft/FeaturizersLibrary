@@ -51,6 +51,8 @@ public:
 
     ~CatImputerTransformer(void) override = default;
 
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(CatImputerTransformer);
+
     void save(Archive &ar) const override;
 
 private:
