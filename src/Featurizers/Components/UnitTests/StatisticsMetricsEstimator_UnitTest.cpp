@@ -47,11 +47,11 @@ TEST_CASE("updaters for numerical types") {
     standard_updater.update(5.39);
     standard_updater.update(7.89);
     std::tuple<long double, std::double_t, inputType, inputType, std::uint64_t> ret = standard_updater.commit();
-    CHECK(std::get<0>(ret) == 18.45);     // sum
-    CHECK(std::get<1>(ret) == 4.6125);    // average
-    CHECK(std::get<2>(ret) == 1.41);      // min
-    CHECK(std::get<3>(ret) == 7.89);      // max
-    CHECK(std::get<4>(ret) == 4);         // count
+    CHECK(NS::TestHelpers::FuzzyCheck<long double>({std::get<0>(ret)}, {18.45}));       // sum
+    CHECK(NS::TestHelpers::FuzzyCheck<std::double_t>({std::get<1>(ret)}, {4.6125}));    // average
+    CHECK(NS::TestHelpers::FuzzyCheck<inputType>({std::get<2>(ret)}, {1.41}));          // min
+    CHECK(NS::TestHelpers::FuzzyCheck<inputType>({std::get<3>(ret)}, {7.89}));          // max
+    CHECK(std::get<4>(ret) == 4);                                                       // count
 }
 
 TEST_CASE("updaters for string") {
@@ -93,7 +93,6 @@ TEST_CASE("overflow for numerical types") {
     NS::Featurizers::Components::Details::StandardStatsUpdater<inputType> standard_updater;
     standard_updater.update(std::numeric_limits<inputType>::max());
     CHECK_THROWS_WITH(standard_updater.update(1), "Input is so small comparing to sum that sum is the same after long double addition!");
-    CHECK_THROWS_WITH(standard_updater.update(std::numeric_limits<inputType>::max()), "Overflow occured for sum during calculating statistic metrics! Check your data!");
 }
 
 
