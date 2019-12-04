@@ -16,78 +16,86 @@ namespace NS = Microsoft::Featurizer;
 #   pragma clang diagnostic ignored "-Wfloat-equal"
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
-// test for update_statistics specifically
-TEST_CASE("correct cases") {
+// test for invalid argument for constructors
+TEST_CASE("invalid argument for constructors") {
+    CHECK_THROWS_WITH(NS::Featurizers::Components::BasicStatisticalAnnotationData<int>(10,1,3), "min is > max");
+    CHECK_THROWS_WITH(NS::Featurizers::Components::StandardStatisticalAnnotaionData<int>(100, 17, 18, 30, 3), "average is not in the correct range");
+}
+// test for updaters class specifically
+TEST_CASE("updaters for integer types") {
     using inputType = int;
 
-    long double sum = 0;
-    inputType min = 0;
-    inputType max = 0;
-    std::uint64_t count = 0;
-    bool first_element_flag = true;
-    NS::Featurizers::Components::update_basic_statistics<inputType>(3, min, max, count, first_element_flag);
-    NS::Featurizers::Components::update_standard_statistics<inputType>(3, sum);
-    CHECK(min == 3);
-    CHECK(max == 3);
-    CHECK(sum == 3);
-    CHECK(count == 1);
-
-    sum = 10;
-    min = 0;
-    max = 100;
-    count = 5;
-    first_element_flag = false;
-    NS::Featurizers::Components::update_basic_statistics<inputType>(3, min, max, count, first_element_flag);
-    NS::Featurizers::Components::update_standard_statistics<inputType>(3, sum);
-    CHECK(min == 0);
-    CHECK(max == 100);
-    CHECK(sum == 13);
-    CHECK(count == 6);
-
-    NS::Featurizers::Components::update_basic_statistics<inputType>(-9, min, max, count, first_element_flag);
-    NS::Featurizers::Components::update_standard_statistics<inputType>(-9, sum);
-    CHECK(min == -9);
-    CHECK(max == 100);
-    CHECK(sum == 4);
-    CHECK(count == 7);
-
-    NS::Featurizers::Components::update_basic_statistics<inputType>(105, min, max, count, first_element_flag);
-    NS::Featurizers::Components::update_standard_statistics<inputType>(105, sum);
-    CHECK(min == -9);
-    CHECK(max == 105);
-    CHECK(sum == 109);
-    CHECK(count == 8);
-
-    std::string smin = "kat";
-    std::string smax = "nadelle";
-    std::string sinput = "zed";
-    NS::Featurizers::Components::update_basic_statistics<std::string>(sinput, smin, smax, count, first_element_flag);
-    CHECK(smin == "kat");
-    CHECK(smax == "zed");
-    CHECK(count == 9);
+    NS::Featurizers::Components::Details::StandardStatsUpdater<inputType> standard_updater;
+    standard_updater.update(1);
+    standard_updater.update(3);
+    standard_updater.update(5);
+    standard_updater.update(7);
+    std::tuple<std::int64_t, std::double_t, inputType, inputType, std::uint64_t> ret = standard_updater.commit();
+    CHECK(std::get<0>(ret) == 16);       // sum
+    CHECK(std::get<1>(ret) == 4);        // average
+    CHECK(std::get<2>(ret) == 1);        // min
+    CHECK(std::get<3>(ret) == 7);        // max
+    CHECK(std::get<4>(ret) == 4);        // count
 }
 
-TEST_CASE("overflow") {
-    // min max wouldn't need to be tested for overflow because if min, max are out of range, it would cause compile error
-    using inputType = long double;
+TEST_CASE("updaters for numerical types") {
+    using inputType = std::double_t;
 
-    long double sum = std::numeric_limits<long double>::max();
-    inputType min = 0;
-    inputType max = 100;
-    std::uint64_t count = 5;
-    bool first_element_flag = false;
-    CHECK_THROWS_WITH(NS::Featurizers::Components::update_standard_statistics<inputType>(std::numeric_limits<long double>::max(), sum), "Overflow occured for sum during calculating statistic metrics! Check your data!");
-    // when input cannot affect sum, an exception will be thrown
-    CHECK_THROWS_WITH(NS::Featurizers::Components::update_standard_statistics<inputType>(1, sum), "Input is so small comparing to sum that sum is the same after long double addition!");
-
-
-    sum = std::numeric_limits<long double>::lowest();
-    CHECK_THROWS_WITH(NS::Featurizers::Components::update_standard_statistics<inputType>(std::numeric_limits<long double>::lowest(), sum), "Overflow occured for sum during calculating statistic metrics! Check your data!");
-
-    sum = 10;
-    count = std::numeric_limits<std::uint64_t>::max();
-    CHECK_THROWS_WITH(NS::Featurizers::Components::update_basic_statistics<inputType>(4, min, max, count, first_element_flag), "Overflow occured for count during calculating statistic metrics! Check your data!");
+    NS::Featurizers::Components::Details::StandardStatsUpdater<inputType> standard_updater;
+    standard_updater.update(1.41);
+    standard_updater.update(3.76);
+    standard_updater.update(5.39);
+    standard_updater.update(7.89);
+    std::tuple<long double, std::double_t, inputType, inputType, std::uint64_t> ret = standard_updater.commit();
+    CHECK(std::get<0>(ret) == 18.45);     // sum
+    CHECK(std::get<1>(ret) == 4.6125);    // average
+    CHECK(std::get<2>(ret) == 1.41);      // min
+    CHECK(std::get<3>(ret) == 7.89);      // max
+    CHECK(std::get<4>(ret) == 4);         // count
 }
+
+TEST_CASE("updaters for string") {
+    using inputType = std::string;
+
+    NS::Featurizers::Components::Details::BasicStatsUpdater<inputType> basic_updater;
+    basic_updater.update("zed");
+    basic_updater.update("xayah");
+    basic_updater.update("tydamire");
+    basic_updater.update("ryze");
+    basic_updater.update("teemmo");
+    std::tuple<inputType, inputType, std::uint64_t> ret = basic_updater.commit();
+    CHECK(std::get<0>(ret) == "ryze");     // min
+    CHECK(std::get<1>(ret) == "zed");      // max
+    CHECK(std::get<2>(ret) == 5);         // count
+}
+
+TEST_CASE("overflow for integer types") {
+    using inputType = std::int64_t;
+
+    // checks for upper bound
+    NS::Featurizers::Components::Details::StandardStatsUpdater<inputType> standard_updater;
+    standard_updater.update(std::numeric_limits<inputType>::max());
+    CHECK_THROWS_WITH(standard_updater.update(1), "Overflow occured for sum during calculating statistic metrics! Check your data!");
+
+    // checks for lower bound
+    // reset the sum to 0
+    standard_updater.update(std::numeric_limits<inputType>::lowest());
+    standard_updater.update(1);
+
+    standard_updater.update(std::numeric_limits<inputType>::lowest());
+    standard_updater.update(5);
+    CHECK_THROWS_WITH(standard_updater.update(-10), "Overflow occured for sum during calculating statistic metrics! Check your data!");
+}
+
+TEST_CASE("overflow for numerical types") {
+    using inputType = std::double_t;
+
+    NS::Featurizers::Components::Details::StandardStatsUpdater<inputType> standard_updater;
+    standard_updater.update(std::numeric_limits<inputType>::max());
+    CHECK_THROWS_WITH(standard_updater.update(1), "Input is so small comparing to sum that sum is the same after long double addition!");
+    CHECK_THROWS_WITH(standard_updater.update(std::numeric_limits<inputType>::max()), "Overflow occured for sum during calculating statistic metrics! Check your data!");
+}
+
 
 // test for overall estimator
 TEST_CASE("int") {
@@ -116,14 +124,14 @@ TEST_CASE("double") {
     using inputType = std::double_t;
 
     std::vector<std::vector<inputType>> const list({{
-                                                    static_cast<inputType>(10.3),
-                                                    static_cast<inputType>(20.1),
-                                                    static_cast<inputType>(8.4),
-                                                    static_cast<inputType>(8.2),
-                                                    static_cast<inputType>(10.3),
-                                                    static_cast<inputType>(30.1),
-                                                    static_cast<inputType>(30.4),
-                                                    static_cast<inputType>(15.8)}});
+                                                    10.3,
+                                                    20.1,
+                                                    8.4,
+                                                    8.2,
+                                                    10.3,
+                                                    30.1,
+                                                    30.4,
+                                                    15.8}});
 
     NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations, 0);
