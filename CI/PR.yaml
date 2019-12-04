@@ -42,7 +42,8 @@ stages:
 
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          agent_pool: ubuntu-16.04
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           configuration: system_compiler
           operating_system: Linux
 
@@ -82,7 +83,8 @@ stages:
 
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          agent_pool: ubuntu-16.04
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           configuration: x64
           operating_system: Linux
 
@@ -90,7 +92,8 @@ stages:
       # that the code compiles on older platforms.
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          agent_pool: ubuntu-16.04
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           agent_pool_container: universal_linux
           configuration: universal_linux
           operating_system: Linux
