@@ -28,6 +28,7 @@ enable_testing()
 
 foreach(_test_name IN ITEMS
     DocumentStatisticsEstimator_UnitTest
+    GrainEstimatorImpl_UnitTest
     HistogramEstimator_UnitTest
     IndexMapEstimator_UnitTest
     InferenceOnlyFeaturizerImpl_UnitTest

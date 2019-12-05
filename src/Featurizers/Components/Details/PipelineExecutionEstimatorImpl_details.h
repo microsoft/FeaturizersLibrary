@@ -4,6 +4,8 @@
 // ----------------------------------------------------------------------
 #pragma once
 
+#include "EstimatorTraits.h"
+
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
@@ -21,94 +23,6 @@ namespace Impl {
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         HasHasCreatedTransformerMethodImpl
-///  \brief         Base declaration to determine if a type has the method
-///                 'has_created_transformer'.
-///
-template <typename, typename T>
-struct HasHasCreatedTransformerMethodImpl {
-    static_assert(std::integral_constant<T, false>::value, "Second template parameter must be a function type");
-};
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         HasHasCreatedTransformerMethodImpl
-///  \brief         Partial template specialization that is able to detect
-///                 a method's return type and arguments.
-///
-template <typename T, typename ReturnT, typename... ArgTs>
-class HasHasCreatedTransformerMethodImpl<T, ReturnT (ArgTs...)> {
-private:
-    template <typename U> static constexpr std::false_type Check(...);
-
-    template <typename U>
-    static constexpr std::true_type Check(
-        U *,
-        std::enable_if_t<
-            std::is_same<
-                decltype(std::declval<U>().has_created_transformer(std::declval<ArgTs>()...)),
-                ReturnT
-            >::value,
-            void *
-        >
-    );
-
-public:
-    static constexpr bool const             value = std::is_same<std::true_type, decltype(Check<T>(nullptr, nullptr))>::value;
-};
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         HasHasCreatedTransformerMethod
-///  \brief         Has a constexpr bool value set to true if the provided
-///                 object has the method:
-///
-///                     bool has_created_transformer(void) const
-///
-template <typename T>
-class HasHasCreatedTransformerMethod : public HasHasCreatedTransformerMethodImpl<T, bool ()> {};
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         IsTransformerEstimator
-///  \brief         Contains a constant value of true if the provided `Estimator`
-///                 is a `TransformerEstimator`.
-///
-template <typename EstimatorT>
-struct IsTransformerEstimator {
-    static constexpr bool const             value = HasHasCreatedTransformerMethod<EstimatorT>::value;
-};
-
-#if (defined DEBUG)
-    static_assert(IsTransformerEstimator<TransformerEstimator<char, int>>::value, "");
-    static_assert(IsTransformerEstimator<TransformerEstimator<std::string, std::string>>::value, "");
-    static_assert(IsTransformerEstimator<FitEstimator<char>>::value == false, "");
-#endif
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         EstimatorOutputTypeImpl
-///  \brief         Output type for `TransformerEstimator` objects.
-///
-template <typename EstimatorT, bool IsTransformerEstimatorV>
-struct EstimatorOutputTypeImpl {
-    using type                              = typename EstimatorT::TransformedType;
-};
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         EstimatorOutputTypeImpl
-///  \brief         Output type for non-`TransformerEstimator` objects.
-///
-template <typename EstimatorT>
-struct EstimatorOutputTypeImpl<EstimatorT, false> {
-    using type                              = typename EstimatorT::InputType;
-};
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         EstimatorOutputType
-///  \brief         Provides a consistent interface for an `Estimator's` output
-///                 type.
-///
-template <typename EstimatorT>
-struct EstimatorOutputType : public EstimatorOutputTypeImpl<EstimatorT, IsTransformerEstimator<EstimatorT>::value> {};
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         ValidateEstimators
@@ -1142,7 +1056,7 @@ public:
     // ----------------------------------------------------------------------
     // |  Public Types
     using InputType                         = typename std::tuple_element<0, EstimatorTuple>::type::InputType;
-    using TransformedType                   = typename Impl::EstimatorOutputType<typename std::tuple_element<std::tuple_size<EstimatorTuple>::value - 1, EstimatorTuple>::type>::type;
+    using TransformedType                   = typename EstimatorOutputType<typename std::tuple_element<std::tuple_size<EstimatorTuple>::value - 1, EstimatorTuple>::type>::type;
 
     using TransformerChain                  = Impl::TransformerChainElement<0, EstimatorTuple>;
     using EstimatorChain                    = Impl::EstimatorChainElement<0, EstimatorTuple>;
