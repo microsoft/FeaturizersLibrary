@@ -38,63 +38,9 @@ struct SumTypeSelector<std::double_t> {
 
 }
 
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         BasicStatisticalAnnotationData
-///  \brief         An annotation class which contains the min, max and count
-///                 for an input column. Template T can be all types
-///
-template <typename T>
-class BasicStatisticalAnnotationData {
-public:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Data
-    // |
-    // ----------------------------------------------------------------------
-    T             const                           Min;
-    T             const                           Max;
-    std::uint64_t const                           Count;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-    BasicStatisticalAnnotationData(T min, T max, std::uint64_t count);
-    ~BasicStatisticalAnnotationData(void) = default;
-
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(BasicStatisticalAnnotationData);
-};
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         StandardStatisticalAnnotationData
-///  \brief         An annotation class which contains the sum and average
-///                 for an input column. Template T can only be numerical types
-///
-template <typename T>
-class StandardStatisticalAnnotationData : public BasicStatisticalAnnotationData<T> {
-public:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Data
-    // |
-    // ----------------------------------------------------------------------
-    typename TypeSelector::SumTypeSelector<T>::type   const                            Sum;
-    std::double_t                                     const                            Average;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-    StandardStatisticalAnnotationData(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count);
-    ~StandardStatisticalAnnotationData(void) = default;
-
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StandardStatisticalAnnotationData);
-};
-
 namespace Details {
+// TODO: Updaters should be extracted to a separate file
+
 /////////////////////////////////////////////////////////////////////////
 ///  \class         BasicStatsUpdater
 ///  \brief         BasicStatsUpdater updates basic stats include
@@ -103,6 +49,33 @@ namespace Details {
 template <typename T>
 class BasicStatsUpdater {
 public:
+    /////////////////////////////////////////////////////////////////////////
+    ///  \class         BasicResult
+    ///  \brief         A structure which contains the min, max and count
+    ///                 for an input column. Template T can be all types
+    ///
+    struct BasicResult {
+    public:
+        // ----------------------------------------------------------------------
+        // |
+        // |  Public Data
+        // |
+        // ----------------------------------------------------------------------
+        T             const                           Min;
+        T             const                           Max;
+        std::uint64_t const                           Count;
+
+        // ----------------------------------------------------------------------
+        // |
+        // |  Public Methods
+        // |
+        // ----------------------------------------------------------------------
+        BasicResult(T min, T max, std::uint64_t count);
+        ~BasicResult(void) = default;
+
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(BasicResult);
+    };
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
@@ -122,7 +95,7 @@ public:
 
     void update(InputType input);
     // commit returns the result of min, max and count
-    BasicStatisticalAnnotationData<T> commit(void);
+    BasicResult commit(void);
 private:
     // ----------------------------------------------------------------------
     // |
@@ -142,6 +115,31 @@ private:
 template <typename T>
 class StandardStatsUpdater : public BasicStatsUpdater<T> {
 public:
+    /////////////////////////////////////////////////////////////////////////
+    ///  \class         StandardResult
+    ///  \brief         A struct which contains the sum and average
+    ///                 for an input column. Template T can only be integer and numerical types
+    ///
+    struct StandardResult : public BasicStatsUpdater<T>::BasicResult {
+    public:
+        // ----------------------------------------------------------------------
+        // |
+        // |  Public Data
+        // |
+        // ----------------------------------------------------------------------
+        typename TypeSelector::SumTypeSelector<T>::type   const                            Sum;
+        std::double_t                                     const                            Average;
+
+        // ----------------------------------------------------------------------
+        // |
+        // |  Public Methods
+        // |
+        // ----------------------------------------------------------------------
+        StandardResult(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count);
+        ~StandardResult(void) = default;
+
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StandardResult);
+    };
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
@@ -159,7 +157,7 @@ public:
 
     void update(InputType input);
     // commit returns the result of min, max, count, sum and average
-    StandardStatisticalAnnotationData<T> commit(void);
+    StandardResult commit(void);
 private:
     // ----------------------------------------------------------------------
     // |
@@ -200,7 +198,7 @@ public:
     BasicStatsTrainingOnlyPolicy(void);
 
     void fit(InputType const &input);
-    BasicStatisticalAnnotationData<T> complete_training(void);
+    typename BasicStatsUpdater<T>::BasicResult complete_training(void);
 private:
     // ----------------------------------------------------------------------
     // |
@@ -240,7 +238,7 @@ public:
     StandardStatsTrainingOnlyPolicy(void);
 
     void fit(InputType const &input);
-    StandardStatisticalAnnotationData<T> complete_training(void);
+    typename StandardStatsUpdater<T>::StandardResult complete_training(void);
 private:
     // ----------------------------------------------------------------------
     // |
@@ -307,6 +305,15 @@ struct StatsPolicySelector<std::double_t> {
 
 } // namespace Details
 
+// Updater itself should contain the structure of return result
+// to avoid confusion for user who would expect annotation data from
+// the estimator, we put using statement here
+template <typename T>
+using BasicStatisticalAnnotationData = typename Details::BasicStatsUpdater<T>::BasicResult;
+template <typename T>
+using StandardStatisticalAnnotationData = typename Details::StandardStatsUpdater<T>::StandardResult;
+
+
 /////////////////////////////////////////////////////////////////////////
 ///  \typedef       StatisticalMetricsEstimator
 ///  \brief         A training-only class that finds the min, max
@@ -327,35 +334,6 @@ using StatisticalMetricsEstimator                       = TrainingOnlyEstimatorI
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 
-// ----------------------------------------------------------------------
-// |
-// |  BasicStatisticalAnnotationData
-// |
-// ----------------------------------------------------------------------
-template <typename T>
-BasicStatisticalAnnotationData<T>::BasicStatisticalAnnotationData(T min, T max, std::uint64_t count) :
-    Min(std::move(min)),
-    Max(std::move(max)),
-    Count(std::move(count)) {
-        if((Count != 0) && (Min > Max))
-            throw std::invalid_argument("min is > max");
-
-}
-
-// ----------------------------------------------------------------------
-// |
-// |  StandardStatisticalAnnotationData
-// |
-// ----------------------------------------------------------------------
-template <typename T>
-StandardStatisticalAnnotationData<T>::StandardStatisticalAnnotationData(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count) :
-    BasicStatisticalAnnotationData<T>(std::move(min), std::move(max), std::move(count)),
-    Sum(std::move(sum)),
-    Average(std::move(average))
-    {
-        if(Average > BasicStatisticalAnnotationData<T>::Max || Average < BasicStatisticalAnnotationData<T>::Min)
-            throw std::invalid_argument("average is not in the correct range");
-}
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
@@ -374,6 +352,14 @@ Details::BasicStatsUpdater<T>::BasicStatsUpdater(void) :
     _first_element_flag(true) {
 }
 
+template <typename T>
+Details::BasicStatsUpdater<T>::BasicResult::BasicResult(T min, T max, std::uint64_t count) :
+    Min(std::move(min)),
+    Max(std::move(max)),
+    Count(std::move(count)) {
+        if((Count != 0) && (Min > Max))
+            throw std::invalid_argument("min is > max");
+}
 
 template <typename T>
 void Details::BasicStatsUpdater<T>::update(T input) {
@@ -413,6 +399,16 @@ BasicStatisticalAnnotationData<T> Details::BasicStatsUpdater<T>::commit(void) {
 template <typename T>
 Details::StandardStatsUpdater<T>::StandardStatsUpdater(void) :
     _sum(0) {
+}
+
+template <typename T>
+Details::StandardStatsUpdater<T>::StandardResult::StandardResult(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count) :
+    Details::BasicStatsUpdater<T>::BasicResult(std::move(min), std::move(max), std::move(count)),
+    Sum(std::move(sum)),
+    Average(std::move(average))
+    {
+        if(Average > BasicStatisticalAnnotationData<T>::Max || Average < BasicStatisticalAnnotationData<T>::Min)
+            throw std::invalid_argument("average is not in the correct range");
 }
 
 template <typename T>
