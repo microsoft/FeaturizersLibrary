@@ -16,7 +16,9 @@ namespace Components {
 static constexpr char const * const         StatisticalMetricsEstimatorName("StatisticalMetricsEstimator");
 
 namespace TypeSelector {
-
+// sum type selector is created for selecting different types for sum based on input type
+// when input type is integer, int64 is chosen for performance
+// when input type is numeric, long double is chosen
 template <typename T>
 struct SumTypeSelector {
     using type = std::int64_t;
@@ -66,12 +68,12 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         StandardStatisticalAnnotaionData
+///  \class         StandardStatisticalAnnotationData
 ///  \brief         An annotation class which contains the sum and average
 ///                 for an input column. Template T can only be numerical types
 ///
 template <typename T>
-class StandardStatisticalAnnotaionData : public BasicStatisticalAnnotationData<T> {
+class StandardStatisticalAnnotationData : public BasicStatisticalAnnotationData<T> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -86,10 +88,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    StandardStatisticalAnnotaionData(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count);
-    ~StandardStatisticalAnnotaionData(void) = default;
+    StandardStatisticalAnnotationData(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count);
+    ~StandardStatisticalAnnotationData(void) = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StandardStatisticalAnnotaionData);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StandardStatisticalAnnotationData);
 };
 
 namespace Details {
@@ -120,11 +122,11 @@ public:
 
     void update(InputType input);
     // commit returns the result of min, max and count
-    std::tuple<InputType, InputType, std::uint64_t> commit(void);
-protected:
+    BasicStatisticalAnnotationData<T> commit(void);
+private:
     // ----------------------------------------------------------------------
     // |
-    // |  Protected Data
+    // |  Private Data
     // |
     // ----------------------------------------------------------------------
     InputType                                 _min;
@@ -157,7 +159,7 @@ public:
 
     void update(InputType input);
     // commit returns the result of min, max, count, sum and average
-    std::tuple<typename TypeSelector::SumTypeSelector<T>::type, std::double_t, InputType, InputType, std::uint64_t> commit(void);
+    StandardStatisticalAnnotationData<T> commit(void);
 private:
     // ----------------------------------------------------------------------
     // |
@@ -199,10 +201,10 @@ public:
 
     void fit(InputType const &input);
     BasicStatisticalAnnotationData<T> complete_training(void);
-protected:
+private:
     // ----------------------------------------------------------------------
     // |
-    // |  Protected Data
+    // |  Private Data
     // |
     // ----------------------------------------------------------------------
     BasicStatsUpdater<T>                         _updater;
@@ -238,7 +240,7 @@ public:
     StandardStatsTrainingOnlyPolicy(void);
 
     void fit(InputType const &input);
-    StandardStatisticalAnnotaionData<T> complete_training(void);
+    StandardStatisticalAnnotationData<T> complete_training(void);
 private:
     // ----------------------------------------------------------------------
     // |
@@ -335,18 +337,18 @@ BasicStatisticalAnnotationData<T>::BasicStatisticalAnnotationData(T min, T max, 
     Min(std::move(min)),
     Max(std::move(max)),
     Count(std::move(count)) {
-        if(Min > Max)
+        if((Count != 0) && (Min > Max))
             throw std::invalid_argument("min is > max");
 
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  StandardStatisticalAnnotaionData
+// |  StandardStatisticalAnnotationData
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-StandardStatisticalAnnotaionData<T>::StandardStatisticalAnnotaionData(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count) :
+StandardStatisticalAnnotationData<T>::StandardStatisticalAnnotationData(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count) :
     BasicStatisticalAnnotationData<T>(std::move(min), std::move(max), std::move(count)),
     Sum(std::move(sum)),
     Average(std::move(average))
@@ -396,11 +398,11 @@ void Details::BasicStatsUpdater<T>::update(T input) {
 }
 
 template <typename T>
-std::tuple<T, T, std::uint64_t> Details::BasicStatsUpdater<T>::commit(void) {
+BasicStatisticalAnnotationData<T> Details::BasicStatsUpdater<T>::commit(void) {
     if(_count != 0) {
         assert(_min <= _max);
     }
-    return std::tuple<T, T, std::uint64_t>(_min, _max, _count);
+    return BasicStatisticalAnnotationData<T>(std::move(_min), std::move(_max), std::move(_count));
 }
 
 // ----------------------------------------------------------------------
@@ -439,21 +441,22 @@ void Details::StandardStatsUpdater<T>::update(T input) {
 }
 
 template <typename T>
-std::tuple<typename TypeSelector::SumTypeSelector<T>::type, std::double_t, T, T, std::uint64_t> Details::StandardStatsUpdater<T>::commit(void) {
-    if (BasicStatsUpdater<T>::_count != 0) {
+StandardStatisticalAnnotationData<T> Details::StandardStatsUpdater<T>::commit(void) {
+    BasicStatisticalAnnotationData<T> basics = BasicStatsUpdater<T>::commit();
+    if (basics.Count != 0) {
         if (TypeSelector::SumTypeSelector<T>::IsNumeric) {
             // double and long double have the same size in some systems but in others, long doubles are of greater size
             // so there can be overflow when converting long double to double
-            if (_sum/static_cast<long double>(BasicStatsUpdater<T>::_count) > static_cast<long double>(std::numeric_limits<std::double_t>::max())) {
+            if (_sum/static_cast<long double>(basics.Count) > static_cast<long double>(std::numeric_limits<std::double_t>::max())) {
                 throw std::runtime_error("double and long double are different sizes on your system, overflow encountered when calculating average!");
             }
         }
-        std::double_t _average = static_cast<std::double_t>(static_cast<long double>(_sum)/static_cast<long double>(BasicStatsUpdater<T>::_count));
-        assert(BasicStatsUpdater<T>::_min<=BasicStatsUpdater<T>::_max);
-        assert(_average >= BasicStatsUpdater<T>::_min && _average <= BasicStatsUpdater<T>::_max);
-        return std::tuple<typename TypeSelector::SumTypeSelector<T>::type, std::double_t, T, T, std::uint64_t>(_sum, _average, BasicStatsUpdater<T>::_min, BasicStatsUpdater<T>::_max, BasicStatsUpdater<T>::_count);
+        std::double_t _average = static_cast<std::double_t>(static_cast<long double>(_sum)/static_cast<long double>(basics.Count));
+        assert(basics.Min <= basics.Max);
+        assert(_average >= basics.Min && _average <= basics.Max);
+        return StandardStatisticalAnnotationData<T>(std::move(_sum), std::move(_average), std::move(basics.Min), std::move(basics.Max), std::move(basics.Count));
     } else {
-        return std::tuple<typename TypeSelector::SumTypeSelector<T>::type, std::double_t, T, T, std::uint64_t>(0,0,0,0,0);
+        return StandardStatisticalAnnotationData<T>(0,0,0,0,0);
     }
 
 }
@@ -478,8 +481,7 @@ void Details::BasicStatsTrainingOnlyPolicy<T>::fit(InputType const &input) {
 
 template <typename T>
 BasicStatisticalAnnotationData<T> Details::BasicStatsTrainingOnlyPolicy<T>::complete_training(void) {
-    std::tuple<T, T, std::uint64_t> ret = _updater.commit();
-    return BasicStatisticalAnnotationData<T>(std::move(std::get<0>(ret)), std::move(std::get<1>(ret)), std::move(std::get<2>(ret)));
+    return _updater.commit();
 }
 
 // ----------------------------------------------------------------------
@@ -500,9 +502,8 @@ void Details::StandardStatsTrainingOnlyPolicy<T>::fit(InputType const &input) {
 }
 
 template <typename T>
-StandardStatisticalAnnotaionData<T> Details::StandardStatsTrainingOnlyPolicy<T>::complete_training(void) {
-    std::tuple<typename TypeSelector::SumTypeSelector<T>::type, std::double_t, T, T, std::uint64_t> ret = _updater.commit();
-    return StandardStatisticalAnnotaionData<T>(std::move(std::get<0>(ret)), std::move(std::get<1>(ret)), std::move(std::get<2>(ret)), std::move(std::get<3>(ret)), std::move(std::get<4>(ret)));
+StandardStatisticalAnnotationData<T> Details::StandardStatsTrainingOnlyPolicy<T>::complete_training(void) {
+    return _updater.commit();
 }
 
 #if (defined __clang__)

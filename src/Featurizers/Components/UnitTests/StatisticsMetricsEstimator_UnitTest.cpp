@@ -16,10 +16,48 @@ namespace NS = Microsoft::Featurizer;
 #   pragma clang diagnostic ignored "-Wfloat-equal"
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
+// test for valid argument for constructors
+TEST_CASE("valid argument for AnnotationData constructors") {
+    NS::Featurizers::Components::BasicStatisticalAnnotationData<int> basics(10,              // min
+                                                                            20,              // max
+                                                                             3               // count
+                                                                            );
+    CHECK(basics.Min  == 10);
+    CHECK(basics.Max  == 20);
+    CHECK(basics.Count == 3);
+
+    NS::Featurizers::Components::StandardStatisticalAnnotationData<int> standard(200,           // sum
+                                                                                  50,           // average
+                                                                                  10,           // min
+                                                                                  90,           // max
+                                                                                   4            // count
+                                                                                );
+    CHECK(standard.Sum  == 200);
+    CHECK(standard.Average  == 50);
+    CHECK(standard.Min  == 10);
+    CHECK(standard.Max  == 90);
+    CHECK(standard.Count == 4);
+}
 // test for invalid argument for constructors
-TEST_CASE("invalid argument for constructors") {
-    CHECK_THROWS_WITH(NS::Featurizers::Components::BasicStatisticalAnnotationData<int>(10,1,3), "min is > max");
-    CHECK_THROWS_WITH(NS::Featurizers::Components::StandardStatisticalAnnotaionData<int>(100, 17, 18, 30, 3), "average is not in the correct range");
+TEST_CASE("invalid argument for AnnotationData constructors") {
+    CHECK_THROWS_WITH(NS::Featurizers::Components::BasicStatisticalAnnotationData<int>(10,              // min
+                                                                                        1,              // max
+                                                                                        3               // count
+                                                                                        ), "min is > max");
+    // checks lower bound
+    CHECK_THROWS_WITH(NS::Featurizers::Components::StandardStatisticalAnnotationData<int>(100,           // sum
+                                                                                          17,           // average
+                                                                                          18,           // min
+                                                                                          30,           // max
+                                                                                           3            // count
+                                                                                         ), "average is not in the correct range");
+    // checks upper bound
+    CHECK_THROWS_WITH(NS::Featurizers::Components::StandardStatisticalAnnotationData<int>(100,           // sum
+                                                                                          35,           // average
+                                                                                          18,           // min
+                                                                                          30,           // max
+                                                                                           3            // count
+                                                                                         ), "average is not in the correct range");
 }
 // test for updaters class specifically
 TEST_CASE("updaters for integer types") {
@@ -30,12 +68,12 @@ TEST_CASE("updaters for integer types") {
     standard_updater.update(3);
     standard_updater.update(5);
     standard_updater.update(7);
-    std::tuple<std::int64_t, std::double_t, inputType, inputType, std::uint64_t> ret = standard_updater.commit();
-    CHECK(std::get<0>(ret) == 16);       // sum
-    CHECK(std::get<1>(ret) == 4);        // average
-    CHECK(std::get<2>(ret) == 1);        // min
-    CHECK(std::get<3>(ret) == 7);        // max
-    CHECK(std::get<4>(ret) == 4);        // count
+    NS::Featurizers::Components::StandardStatisticalAnnotationData<inputType> const& stats(standard_updater.commit());
+    CHECK(stats.Sum     == 16);
+    CHECK(stats.Average == 4);
+    CHECK(stats.Min     == 1);
+    CHECK(stats.Max     == 7);
+    CHECK(stats.Count   == 4);
 }
 
 TEST_CASE("updaters for numerical types") {
@@ -46,12 +84,12 @@ TEST_CASE("updaters for numerical types") {
     standard_updater.update(3.76);
     standard_updater.update(5.39);
     standard_updater.update(7.89);
-    std::tuple<long double, std::double_t, inputType, inputType, std::uint64_t> ret = standard_updater.commit();
-    CHECK(NS::TestHelpers::FuzzyCheck<long double>({std::get<0>(ret)}, {18.45}));       // sum
-    CHECK(NS::TestHelpers::FuzzyCheck<std::double_t>({std::get<1>(ret)}, {4.6125}));    // average
-    CHECK(NS::TestHelpers::FuzzyCheck<inputType>({std::get<2>(ret)}, {1.41}));          // min
-    CHECK(NS::TestHelpers::FuzzyCheck<inputType>({std::get<3>(ret)}, {7.89}));          // max
-    CHECK(std::get<4>(ret) == 4);                                                       // count
+    NS::Featurizers::Components::StandardStatisticalAnnotationData<inputType> const& stats(standard_updater.commit());
+    CHECK(NS::TestHelpers::FuzzyCheck<long double>({stats.Sum},       {18.45}));
+    CHECK(NS::TestHelpers::FuzzyCheck<std::double_t>({stats.Average}, {4.6125}));
+    CHECK(NS::TestHelpers::FuzzyCheck<inputType>({stats.Min},         {1.41}));
+    CHECK(NS::TestHelpers::FuzzyCheck<inputType>({stats.Max},         {7.89}));
+    CHECK(stats.Count == 4);
 }
 
 TEST_CASE("updaters for string") {
@@ -63,10 +101,10 @@ TEST_CASE("updaters for string") {
     basic_updater.update("tydamire");
     basic_updater.update("ryze");
     basic_updater.update("teemmo");
-    std::tuple<inputType, inputType, std::uint64_t> ret = basic_updater.commit();
-    CHECK(std::get<0>(ret) == "ryze");     // min
-    CHECK(std::get<1>(ret) == "zed");      // max
-    CHECK(std::get<2>(ret) == 5);         // count
+    NS::Featurizers::Components::BasicStatisticalAnnotationData<inputType> const& stats(basic_updater.commit());
+    CHECK(stats.Min   == "ryze");
+    CHECK(stats.Max   == "zed");
+    CHECK(stats.Count == 5);
 }
 
 TEST_CASE("overflow for integer types") {
@@ -100,49 +138,39 @@ TEST_CASE("overflow for numerical types") {
 TEST_CASE("int") {
     using inputType = int;
 
-    std::vector<std::vector<inputType>> const list({{10,
-                                                    20,
-                                                    8,
-                                                    10,
-                                                    30}});
-
     NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations,0);
 
-    NS::TestHelpers::Train(estimator, list);
-    NS::Featurizers::Components::StandardStatisticalAnnotaionData<inputType> const& stats(estimator.get_annotation_data());
+    NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{10,
+                                                                            20,
+                                                                            30,
+                                                                            40,
+                                                                            50}}));
+    NS::Featurizers::Components::StandardStatisticalAnnotationData<inputType> const& stats(estimator.get_annotation_data());
 
-    CHECK(stats.Min == 8);
-    CHECK(stats.Max == 30);
-    CHECK(stats.Count == 5);
-    CHECK(stats.Sum == 78);
-    CHECK(stats.Average == 15.6);
+    CHECK(stats.Min     == 10);
+    CHECK(stats.Max     == 50);
+    CHECK(stats.Count   == 5);
+    CHECK(stats.Sum     == 150);
+    CHECK(stats.Average == 30);
 }
 
 TEST_CASE("double") {
     using inputType = std::double_t;
 
-    std::vector<std::vector<inputType>> const list({{
-                                                    10.3,
-                                                    20.1,
-                                                    8.4,
-                                                    8.2,
-                                                    10.3,
-                                                    30.1,
-                                                    30.4,
-                                                    15.8}});
-
     NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations, 0);
+    // just have one input
+    NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{
+                                                                            10.3
+                                                                            }}));
+    NS::Featurizers::Components::StandardStatisticalAnnotationData<inputType> const& stats(estimator.get_annotation_data());
 
-    NS::TestHelpers::Train(estimator, list);
-    NS::Featurizers::Components::StandardStatisticalAnnotaionData<inputType> const& stats(estimator.get_annotation_data());
-
-    CHECK(NS::TestHelpers::FuzzyCheck<inputType>({stats.Min}, {8.2}));
-    CHECK(NS::TestHelpers::FuzzyCheck<inputType>({stats.Max}, {30.4}));
-    CHECK(stats.Count == 8);
-    CHECK(NS::TestHelpers::FuzzyCheck<long double>({stats.Sum}, {133.6}));
-    CHECK(NS::TestHelpers::FuzzyCheck<std::double_t>({stats.Average}, {16.7}));
+    CHECK(NS::TestHelpers::FuzzyCheck<inputType>({stats.Min},         {10.3}));
+    CHECK(NS::TestHelpers::FuzzyCheck<inputType>({stats.Max},         {10.3}));
+    CHECK(stats.Count == 1);
+    CHECK(NS::TestHelpers::FuzzyCheck<long double>({stats.Sum},       {10.3}));
+    CHECK(NS::TestHelpers::FuzzyCheck<std::double_t>({stats.Average}, {10.3}));
 }
 
 TEST_CASE("string") {
@@ -178,7 +206,7 @@ TEST_CASE("all same input") {
     NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, list);
-    NS::Featurizers::Components::StandardStatisticalAnnotaionData<inputType> const& stats(estimator.get_annotation_data());
+    NS::Featurizers::Components::StandardStatisticalAnnotationData<inputType> const& stats(estimator.get_annotation_data());
 
     CHECK(stats.Min == 10);
     CHECK(stats.Max == 10);
@@ -202,7 +230,7 @@ TEST_CASE("null input for numerical types") {
     NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, list);
-    NS::Featurizers::Components::StandardStatisticalAnnotaionData<inputType> const& stats(estimator.get_annotation_data());
+    NS::Featurizers::Components::StandardStatisticalAnnotationData<inputType> const& stats(estimator.get_annotation_data());
 
     CHECK(stats.Min == 0);
     CHECK(stats.Max == 0);
