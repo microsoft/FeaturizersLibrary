@@ -18,6 +18,11 @@ namespace Impl {
 
 static constexpr char const * const         SumTrainingOnlyEstimatorPolicyName("SumTest");
 
+/////////////////////////////////////////////////////////////////////////
+///  \class         SumTrainingOnlyEstimatorPolicy
+///  \brief         Simple Estimator that adds all of the values observed
+///                 during training.
+///
 class SumTrainingOnlyEstimatorPolicy {
 public:
     // ----------------------------------------------------------------------
@@ -73,6 +78,11 @@ template <
 >
 using SumTrainingOnlyEstimator              = Components::TrainingOnlyEstimatorImpl<Impl::SumTrainingOnlyEstimatorPolicy, MaxNumTrainingItemsV>;
 
+/////////////////////////////////////////////////////////////////////////
+///  \class         DeltaTransformer
+///  \brief         Transformer that adds a delta (which is considered to
+///                 be the Transformer's state) to each incoming value.
+///
 class DeltaTransformer : public NS::StandardTransformer<std::uint64_t, std::uint64_t> {
 public:
     // ----------------------------------------------------------------------
@@ -121,6 +131,10 @@ private:
     }
 };
 
+/////////////////////////////////////////////////////////////////////////
+///  \class         DeltaEstimator
+///  \brief         Estimator that creates the DeltaTransformer.
+///
 class DeltaEstimator : public NS::TransformerEstimator<std::uint64_t, std::uint64_t> {
 public:
     // ----------------------------------------------------------------------

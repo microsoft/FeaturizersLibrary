@@ -163,12 +163,12 @@ private:
 namespace Impl {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         GrainEstimatorImplBaseEx
+///  \class         GrainEstimatorImplBase
 ///  \brief         Functionality common to GrainEstimators based on
 ///                 FitEstimator or TransformerEstimator objects.
 ///
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-class GrainEstimatorImplBaseEx : public BaseT {
+class GrainEstimatorImplBase : public BaseT {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -189,12 +189,12 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    GrainEstimatorImplBaseEx(char const *name, AnnotationMapsPtr pAllColumnAnnotations);
-    GrainEstimatorImplBaseEx(char const *name, AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc const &createFunc);
+    GrainEstimatorImplBase(char const *name, AnnotationMapsPtr pAllColumnAnnotations);
+    GrainEstimatorImplBase(char const *name, AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc);
 
-    ~GrainEstimatorImplBaseEx(void) override = default;
+    ~GrainEstimatorImplBase(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GrainEstimatorImplBaseEx);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GrainEstimatorImplBase);
 
 protected:
     // ----------------------------------------------------------------------
@@ -254,7 +254,7 @@ class GrainEstimatorImpl<
     MaxNumTrainingItemsV,
     std::enable_if_t<Details::IsTransformerEstimator<EstimatorT>::value == false>
 > :
-    public Impl::GrainEstimatorImplBaseEx<
+    public Impl::GrainEstimatorImplBase<
         FitEstimator<typename GrainEstimatorTraits<GrainT, EstimatorT>::InputType>,
         GrainT,
         EstimatorT,
@@ -269,7 +269,7 @@ public:
     using TheseGrainTraits                  = GrainEstimatorTraits<GrainT, EstimatorT>;
 
     using BaseType =
-        Impl::GrainEstimatorImplBaseEx<
+        Impl::GrainEstimatorImplBase<
             FitEstimator<typename TheseGrainTraits::InputType>,
             GrainT,
             EstimatorT,
@@ -282,6 +282,10 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType::BaseType;
+
+    ~GrainEstimatorImpl(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GrainEstimatorImpl);
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -296,7 +300,7 @@ class GrainEstimatorImpl<
     MaxNumTrainingItemsV,
     std::enable_if_t<Details::IsTransformerEstimator<EstimatorT>::value>
 > :
-    public Impl::GrainEstimatorImplBaseEx<
+    public Impl::GrainEstimatorImplBase<
         TransformerEstimator<
             typename GrainEstimatorTraits<GrainT, EstimatorT>::InputType,
             typename GrainEstimatorTraits<GrainT, EstimatorT>::TransformedType
@@ -314,7 +318,7 @@ public:
     using TheseGrainTraits                  = GrainEstimatorTraits<GrainT, EstimatorT>;
 
     using BaseType =
-        Impl::GrainEstimatorImplBaseEx<
+        Impl::GrainEstimatorImplBase<
             TransformerEstimator<
                 typename TheseGrainTraits::InputType,
                 typename TheseGrainTraits::TransformedType
@@ -332,6 +336,10 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType::BaseType;
+
+    ~GrainEstimatorImpl(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GrainEstimatorImpl);
 
 private:
     // ----------------------------------------------------------------------
@@ -458,12 +466,12 @@ void GrainTransformer<GrainT, EstimatorT>::save(Archive &ar) const /*override*/ 
 
 // ----------------------------------------------------------------------
 // |
-// |  Impl::GrainEstimatorImplBaseEx
+// |  Impl::GrainEstimatorImplBase
 // |
 // ----------------------------------------------------------------------
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-Impl::GrainEstimatorImplBaseEx<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBaseEx(char const *name, AnnotationMapsPtr pAllColumnAnnotations) :
-    GrainEstimatorImplBaseEx(
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(char const *name, AnnotationMapsPtr pAllColumnAnnotations) :
+    GrainEstimatorImplBase(
         name,
         std::move(pAllColumnAnnotations),
         [](AnnotationMapsPtr pAllColumnAnnotationsParam) {
@@ -473,7 +481,7 @@ Impl::GrainEstimatorImplBaseEx<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>:
 }
 
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-Impl::GrainEstimatorImplBaseEx<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBaseEx(char const *name, AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc const &createFunc) :
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(char const *name, AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc) :
     BaseT(name, pAllColumnAnnotations),
     _pAllColumnAnnotations(pAllColumnAnnotations),
     _createFunc(
@@ -493,12 +501,12 @@ Impl::GrainEstimatorImplBaseEx<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>:
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-bool Impl::GrainEstimatorImplBaseEx<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+bool Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
     return _cRemainingTrainingItems != 0;
 }
 
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-FitResult Impl::GrainEstimatorImplBaseEx<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::fit_impl(InputType const *pItems, size_t cItems) /*override*/ {
+FitResult Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::fit_impl(InputType const *pItems, size_t cItems) /*override*/ {
     size_t const                            cRemainingItems(std::min(_cRemainingTrainingItems, cItems));
     InputType const * const                 pEndItems(pItems + cRemainingItems);
 
@@ -538,7 +546,7 @@ FitResult Impl::GrainEstimatorImplBaseEx<BaseT, GrainT, EstimatorT, MaxNumTraini
 }
 
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-void Impl::GrainEstimatorImplBaseEx<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+void Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
     // ----------------------------------------------------------------------
     using ThisAnnotation                    = GrainEstimatorAnnotation<GrainT>;
     using ThisAnnotationMap                 = typename ThisAnnotation::AnnotationMap;
