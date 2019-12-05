@@ -36,6 +36,7 @@ foreach(_test_name IN ITEMS
     ModeEstimator_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
     RobustScalarNormEstimator_UnitTest
+    StatisticsMetricsEstimator_UnitTest
     TrainingOnlyEstimatorImpl_UnitTest
     # TODO: Add tests for:
     #   - TimeSeriesFrequencyEstimator
