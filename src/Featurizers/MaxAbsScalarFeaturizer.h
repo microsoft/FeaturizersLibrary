@@ -48,6 +48,8 @@ public:
 
     ~MaxAbsScalarTransformer(void) override = default;
 
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MaxAbsScalarTransformer);
+
     void save(Archive & ar) const override;
 
 private:

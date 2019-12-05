@@ -986,16 +986,55 @@ struct Traits<std::chrono::system_clock::duration> : public Impl::CommonDuration
 template <typename ClockT, typename DurationT>
 struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<std::chrono::time_point<ClockT, DurationT>> {
     static std::string ToString(std::chrono::time_point<ClockT, DurationT> const &tp) {
-        std::ostringstream                  out;
-
-        date::operator <<(out, tp);
-        out.flush();
-
-        return out.str();
+        return date::format("%FT%TZ", date::floor<std::chrono::seconds>(tp));
     }
 
     static std::chrono::time_point<ClockT, DurationT> FromString(std::string const &value) {
-        std::ignore = value; throw std::logic_error("Not Implemented Yet");
+        // valid iso8601 format can be YYYY-MM-DDTHH:mm:ssZ
+        // dashes, T, colons and time zone offset can be optional
+        // so we search for these tokens and create a template to be used in parse
+        std::string dash_template_component = "";
+        std::string colon_template_component = "";
+        std::string T_template_component = " ";
+        std::string Z_template_component = "Z";
+
+        // use a pointer to make a copy only when necessary
+        std::string const * ptr(&value);
+        std::string modified;
+
+        if ((value.find_first_of("Z") == std::string::npos)) {
+            // there is no Z in the string
+            if (value.find_last_of(":") == value.size() - 3) {
+                // there is a colon in the time zone
+                // remove it
+                modified = *ptr;
+                modified.erase(modified.size() - 3, 1);
+                ptr = &modified;
+            }
+            Z_template_component = "%z";
+        }
+        if (!(value.find_first_of("-") == std::string::npos)) {
+            // there is - in the string
+            dash_template_component = "-";
+        }
+        if (!(value.find_first_of(":") == std::string::npos)) {
+            // there is : in the string
+            colon_template_component = ":";
+        }
+        if (!(value.find_first_of("T") == std::string::npos)) {
+            // there is T in the string
+            T_template_component = "T";
+        }
+        std::istringstream ss(*ptr);
+        std::ostringstream date_template;
+        date_template << "%Y" << dash_template_component << "%m" << dash_template_component << "%d" << T_template_component << "%H" << colon_template_component <<"%M" << colon_template_component << "%S" << Z_template_component;
+        date::sys_time<std::chrono::system_clock::duration> tp;
+        date::from_stream(ss, date_template.str().c_str(), tp);
+
+        if (ss.fail() ) {
+            throw std::invalid_argument("Date time string is not in valid ISO 8601 form!");
+        }
+        return tp;
     }
 
     template <typename ArchiveT>

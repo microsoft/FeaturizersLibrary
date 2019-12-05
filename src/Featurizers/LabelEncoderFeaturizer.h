@@ -45,6 +45,8 @@ public:
 
     ~LabelEncoderTransformer(void) override = default;
 
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(LabelEncoderTransformer);
+
     void save(Archive &ar) const override;
 
     bool operator==(LabelEncoderTransformer const &other) const;

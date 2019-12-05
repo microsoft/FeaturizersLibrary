@@ -27,10 +27,10 @@ get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 enable_testing()
 
 foreach(_test_name IN ITEMS
+    DocumentStatisticsEstimator_UnitTest
     HistogramEstimator_UnitTest
     IndexMapEstimator_UnitTest
     InferenceOnlyFeaturizerImpl_UnitTest
-    InverseDocumentFrequencyEstimator_UnitTests
     MaxAbsValueEstimator_UnitTest
     MinMaxEstimator_UnitTest
     ModeEstimator_UnitTest
