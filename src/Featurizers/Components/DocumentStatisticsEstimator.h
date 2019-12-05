@@ -75,6 +75,21 @@ struct IterRangeComp {
 static constexpr char const * const         DocumentStatisticsEstimatorName("DocumentStatisticsEstimator");
 
 /////////////////////////////////////////////////////////////////////////
+///  \struct        FrequencyAndIndexStruct
+///  \brief         This struct is a combination of values of FrequencyMap and 
+///                 IndexMap for the purpose of keys equivelence of two maps
+///
+struct FrequencyAndIndexStruct {
+    std::uint32_t const TermFrequency;                            // Words and the number of documents that it appears in
+    std::uint32_t const Index;                              
+
+    //will cause error if the struct marked deleted after copy
+    //FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FrequencyAndIndexStruct);
+    FrequencyAndIndexStruct(std::uint32_t termFrequency, std::uint32_t index);
+    bool operator==(FrequencyAndIndexStruct const &other) const;
+};
+
+/////////////////////////////////////////////////////////////////////////
 ///  \class         DocumentStatisticsAnnotationData
 ///  \brief         Collection about statistics found within a number of
 ///                 documents.
@@ -88,13 +103,16 @@ public:
     // ----------------------------------------------------------------------
     using FrequencyMap                      = std::unordered_map<std::string, std::uint32_t>;
     using IndexMap                          = FrequencyMap;
+
+    using FrequencyAndIndexMap              = std::unordered_map<std::string, FrequencyAndIndexStruct>;
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
     // |
     // ----------------------------------------------------------------------
-    FrequencyMap const                      TermFrequency;                  /// Words and the number of documents that it appears in
-    IndexMap const                          TermIndex;
+    // FrequencyMap const                      TermFrequency;                  /// Words and the number of documents that it appears in
+    // IndexMap const                          TermIndex;
+    FrequencyAndIndexMap const              TermFrequencyAndIndex;
     std::uint32_t const                     TotalNumDocuments;
 
     // ----------------------------------------------------------------------
@@ -102,11 +120,26 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    DocumentStatisticsAnnotationData(FrequencyMap termFreq, IndexMap termIndex, std::uint32_t totalNumDocuments);
+    DocumentStatisticsAnnotationData(FrequencyAndIndexMap termFrequencyAndIndex, std::uint32_t totalNumDocuments);
     ~DocumentStatisticsAnnotationData(void) = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DocumentStatisticsAnnotationData);
 };
+
+namespace {
+
+inline DocumentStatisticsAnnotationData::FrequencyAndIndexMap MergeTwoMapsWithSameKeys(DocumentStatisticsAnnotationData::FrequencyMap const & termFrequency, 
+                                                                                       DocumentStatisticsAnnotationData::IndexMap const & termIndex) {
+    //bugbug: assuming these two map has exactly the same key(shuold it be unioned here?)
+    DocumentStatisticsAnnotationData::FrequencyAndIndexMap termFrequencyAndIndex;
+    for (auto const & termFrequencyIter : termFrequency) {
+        termFrequencyAndIndex.insert(std::make_pair(termFrequencyIter.first, FrequencyAndIndexStruct(termFrequencyIter.second, termIndex.at(termFrequencyIter.first))));
+    }
+
+    return termFrequencyAndIndex;
+}
+
+}
 
 namespace Details {
 
@@ -125,6 +158,8 @@ public:
     using InputTypeConstIterator            = std::string::const_iterator;
     using StringDecorator                   = std::function<std::string (InputTypeConstIterator begin, InputTypeConstIterator end)>;
     using IndexMap                          = DocumentStatisticsAnnotationData::IndexMap;
+    using FrequencyMap                      = DocumentStatisticsAnnotationData::FrequencyMap;
+    using FrequencyAndIndexMap              = DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
@@ -202,27 +237,32 @@ using DocumentStatisticsEstimator           = Components::TrainingOnlyEstimatorI
 
 // ----------------------------------------------------------------------
 // |
+// |  FrequencyAndIndexStruct
+// |
+// ----------------------------------------------------------------------
+FrequencyAndIndexStruct::FrequencyAndIndexStruct(std::uint32_t termFrequency, std::uint32_t index) :
+    //bugbug: validate needed?
+    TermFrequency(std::move(termFrequency)),
+    Index(std::move(index)) {
+}
+
+bool FrequencyAndIndexStruct::operator==(FrequencyAndIndexStruct const &other) const {
+    return (TermFrequency == other.TermFrequency) && (Index == other.Index);
+}
+
+// ----------------------------------------------------------------------
+// |
 // |  DocumentStatisticsAnnotationData
 // |
 // ----------------------------------------------------------------------
-inline DocumentStatisticsAnnotationData::DocumentStatisticsAnnotationData(FrequencyMap termFreq, IndexMap termIndex, std::uint32_t totalNumDocuments) :
-    TermFrequency(
+inline DocumentStatisticsAnnotationData::DocumentStatisticsAnnotationData(FrequencyAndIndexMap termFrequencyAndIndex, std::uint32_t totalNumDocuments) :
+    TermFrequencyAndIndex(
         std::move(
-            [&termFreq](void) -> FrequencyMap & {
-                if(termFreq.empty())
-                    throw std::invalid_argument("termFreq");
+            [&termFrequencyAndIndex](void) -> FrequencyAndIndexMap & {
+                if(termFrequencyAndIndex.empty())
+                    throw std::invalid_argument("termFrequencyAndIndex");
 
-                return termFreq;
-            }()
-        )
-    ),
-    TermIndex(
-        std::move(
-            [&termIndex](void) -> IndexMap & {
-                if(termIndex.empty())
-                    throw std::invalid_argument("termIndex");
-
-                return termIndex;
+                return termFrequencyAndIndex;
             }()
         )
     ),
@@ -291,7 +331,8 @@ inline void Details::DocumentStatisticsTrainingOnlyPolicy::fit(InputType const &
 
 inline DocumentStatisticsAnnotationData Details::DocumentStatisticsTrainingOnlyPolicy::complete_training(void) {
     IndexMap                                termIndex(Microsoft::Featurizer::Featurizers::Components::CreateIndexMap<std::string>(_termFrequency, IndexMap()));
-    return DocumentStatisticsAnnotationData(std::move(_termFrequency), std::move(termIndex), std::move(_totalNumDocuments));
+    FrequencyAndIndexMap                    termFrequencyAndIndex(MergeTwoMapsWithSameKeys(_termFrequency, termIndex));
+    return DocumentStatisticsAnnotationData(std::move(termFrequencyAndIndex), std::move(_totalNumDocuments));
 }
 
 // ----------------------------------------------------------------------

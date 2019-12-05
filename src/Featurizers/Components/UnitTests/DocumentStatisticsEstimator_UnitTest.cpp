@@ -23,7 +23,7 @@ void TestString (std::string const & input, std::vector<std::string> const & lab
     CHECK(predict == label);
 }
 
-NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap TrainTermFrequency(std::vector<std::vector<std::string>> const &inputBatches) {
+NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyAndIndexMap TrainTermFrequencyAndIndex(std::vector<std::vector<std::string>> const &inputBatches) {
     NS::AnnotationMapsPtr                                                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::DocumentStatisticsEstimator<std::numeric_limits<size_t>::max()>
                                                                             estimator(pAllColumnAnnotations, 0);
@@ -32,19 +32,7 @@ NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap Trai
 
     NS::Featurizers::Components::DocumentStatisticsAnnotationData const &
                                                                             annotation(estimator.get_annotation_data());
-    return annotation.TermFrequency;
-}
-
-NS::Featurizers::Components::DocumentStatisticsAnnotationData::IndexMap TrainTermIndex(std::vector<std::vector<std::string>> const &inputBatches) {
-    NS::AnnotationMapsPtr                                                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::DocumentStatisticsEstimator<std::numeric_limits<size_t>::max()>
-                                                                            estimator(pAllColumnAnnotations, 0);
-
-    NS::TestHelpers::Train(estimator, inputBatches);
-
-    NS::Featurizers::Components::DocumentStatisticsAnnotationData const &
-                                                                            annotation(estimator.get_annotation_data());
-    return annotation.TermIndex;
+    return annotation.TermFrequencyAndIndex;
 }
 
 std::uint32_t TrainDocuNum(std::vector<std::vector<std::string>> const &inputBatches) {
@@ -80,13 +68,12 @@ TEST_CASE("string_split") {
 }
 
 TEST_CASE("invalid_annotation") {
-    using FrequencyMap = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap;
-    using IndexMap = NS::Featurizers::Components::DocumentStatisticsAnnotationData::IndexMap;
-    FrequencyMap termFreq(FrequencyMap{{"key", 1}});
-    IndexMap termIndex(IndexMap{{"key", 1}});
-    CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(FrequencyMap(),termIndex, 1), "termFreq");
-    CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(termFreq, termIndex, 0), "totalNumDocuments");
-    CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(termFreq, IndexMap(), 1), "termIndex");
+    using FrequencyAndIndexMap = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
+    using FrequencyAndIndexStruct = NS::Featurizers::Components::FrequencyAndIndexStruct;
+    FrequencyAndIndexMap termFreqAndIndex(FrequencyAndIndexMap{{"key", FrequencyAndIndexStruct(1, 1)}});
+    
+    CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(termFreqAndIndex, 0), "totalNumDocuments");
+    CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(FrequencyAndIndexMap(), 1), "termFrequencyAndIndex");
 }
 
 TEST_CASE("invalid_trainingpolicy") {
@@ -98,9 +85,11 @@ TEST_CASE("invalid_trainingpolicy") {
 TEST_CASE("string_idf") {
     using FrequencyMap                         = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap;
     using IndexMap                             = NS::Featurizers::Components::DocumentStatisticsAnnotationData::IndexMap;
+    using FrequencyAndIndexMap                 = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
 
     FrequencyMap const                         termFreqLabel({{"orange",3}, {"apple", 1}, {"peach", 3}, {"grape", 2}, {"banana",1}});
     IndexMap const                             termIndexLabel({{"apple", 0}, {"banana",1}, {"grape", 2}, {"orange",3}, {"peach", 4}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
     std::uint32_t const                        docuNumsLabel(3);
 
     std::vector<std::vector<std::string>> const            
@@ -108,21 +97,21 @@ TEST_CASE("string_idf") {
                                                             {" grape orange     peach peach banana"},
                                                             {"orange orange peach   peach orange "}});
 
-    FrequencyMap const                         termFreqAnnotation(TrainTermFrequency(inputBatches));
-    IndexMap const                             termIndexAnnotation(TrainTermIndex(inputBatches));
+    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches));
     std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches));
 
-    CHECK(termFreqAnnotation == termFreqLabel);
-    CHECK(termIndexAnnotation == termIndexLabel);
+    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
     CHECK(docuNumsAnnotation == docuNumsLabel);
 }
 
 TEST_CASE("string_idf_single_appearance") {
     using FrequencyMap                         = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap;
     using IndexMap                             = NS::Featurizers::Components::DocumentStatisticsAnnotationData::IndexMap;
+    using FrequencyAndIndexMap                 = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
 
     FrequencyMap const                         termFreqLabel({{"orange", 1}, {"apple", 1}, {"grape", 1}});
     IndexMap const                             termIndexLabel({{"apple", 0}, {"grape", 1}, {"orange", 2}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
     std::uint32_t const                        docuNumsLabel(3);
 
     std::vector<std::vector<std::string>> const            
@@ -130,21 +119,21 @@ TEST_CASE("string_idf_single_appearance") {
                                                             {"grape grape  grape "},
                                                             {" orange orange  orange "}});
 
-    FrequencyMap const                         termFreqAnnotation(TrainTermFrequency(inputBatches));
-    IndexMap const                             termIndexAnnotation(TrainTermIndex(inputBatches));
+    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches));
     std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches));
 
-    CHECK(termFreqAnnotation == termFreqLabel);
-    CHECK(termIndexAnnotation == termIndexLabel);
+    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
     CHECK(docuNumsAnnotation == docuNumsLabel);
 }
 
 TEST_CASE("string_idf_full_appearance") {
     using FrequencyMap                         = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyMap;
     using IndexMap                             = NS::Featurizers::Components::DocumentStatisticsAnnotationData::IndexMap;
+    using FrequencyAndIndexMap                 = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
 
     FrequencyMap const                         termFreqLabel({{"orange", 3}, {"apple", 3}, {"grape", 3}});
     IndexMap const                             termIndexLabel({{"apple", 0}, {"grape", 1}, {"orange", 2}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
     std::uint32_t const                        docuNumsLabel(3);
 
     std::vector<std::vector<std::string>> const            
@@ -152,11 +141,9 @@ TEST_CASE("string_idf_full_appearance") {
                                                             {"  apple grape   orange"},
                                                             {" apple grape orange  "}});
 
-    FrequencyMap const                         termFreqAnnotation(TrainTermFrequency(inputBatches));
-    IndexMap const                             termIndexAnnotation(TrainTermIndex(inputBatches));
+    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches));
     std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches));
 
-    CHECK(termFreqAnnotation == termFreqLabel);
-    CHECK(termIndexAnnotation == termIndexLabel);
+    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
     CHECK(docuNumsAnnotation == docuNumsLabel);
 }
