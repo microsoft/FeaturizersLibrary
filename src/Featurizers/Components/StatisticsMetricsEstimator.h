@@ -384,7 +384,7 @@ void Details::BasicStatsUpdater<T>::update(T input) {
 }
 
 template <typename T>
-BasicStatisticalAnnotationData<T> Details::BasicStatsUpdater<T>::commit(void) {
+typename Details::BasicStatsUpdater<T>::BasicResult Details::BasicStatsUpdater<T>::commit(void) {
     if(_count != 0) {
         assert(_min <= _max);
     }
@@ -437,7 +437,7 @@ void Details::StandardStatsUpdater<T>::update(T input) {
 }
 
 template <typename T>
-StandardStatisticalAnnotationData<T> Details::StandardStatsUpdater<T>::commit(void) {
+typename Details::StandardStatsUpdater<T>::StandardResult Details::StandardStatsUpdater<T>::commit(void) {
     BasicStatisticalAnnotationData<T> basics = BasicStatsUpdater<T>::commit();
     if (basics.Count != 0) {
         if (TypeSelector::SumTypeSelector<T>::IsNumeric) {
