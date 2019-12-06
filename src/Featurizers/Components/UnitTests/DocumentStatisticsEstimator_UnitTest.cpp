@@ -235,8 +235,13 @@ TEST_CASE("string_idf_df[0.0, 0.7]") {
 }
 
 TEST_CASE("string_idf_max1features") {
+#if (defined _WIN32)
     FrequencyMap const                         termFreqLabel({{"peach", 3}});
     IndexMap const                             termIndexLabel({{"peach", 0}});
+#else
+    FrequencyMap const                         termFreqLabel({{"orange", 3}});
+    IndexMap const                             termIndexLabel({{"orange", 0}});
+#endif
     FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
     std::uint32_t const                        docuNumsLabel(3);
 
@@ -259,8 +264,13 @@ TEST_CASE("string_idf_max1features") {
 }
 
 TEST_CASE("string_idf_max4features") {
+#if (defined _WIN32)
     FrequencyMap const                         termFreqLabel({{"orange",3}, {"apple", 1}, {"peach", 3}, {"grape", 2}});
     IndexMap const                             termIndexLabel({{"orange", 2}, {"apple", 0}, {"peach", 3}, {"grape", 1}});
+#else
+    FrequencyMap const                         termFreqLabel({{"orange",3}, {"banana", 1}, {"peach", 3}, {"grape", 2}});
+    IndexMap const                             termIndexLabel({{"orange", 2}, {"banana", 0}, {"peach", 3}, {"grape", 1}});
+#endif
     FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
     std::uint32_t const                        docuNumsLabel(3);
 
