@@ -29,9 +29,9 @@ namespace Components {
 ///
 ///                     Methods
 ///                     -------
-///                         void fit(ItemType const &item);
+///                         void fit(InputType const &item);
 ///                             or
-///                         void fit(ItemType const *pItems, size_t cItems);
+///                         void fit(InputType const *pItems, size_t cItems);
 ///
 ///                         <structure containing state data> complete_training(void);
 ///
@@ -80,6 +80,8 @@ public:
 
     static AnnotationData const & get_annotation_data(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name);
     static AnnotationData const * get_annotation_data_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name);
+
+    static AnnotationData const & get_annotation_data(Annotation const &annotation);
 
 private:
     // ----------------------------------------------------------------------
@@ -234,6 +236,12 @@ template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
 template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
 /*static*/ typename TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::AnnotationData const * TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::get_annotation_data_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name) {
     return BaseType::template get_annotation_impl<AnnotationImpl>(columnAnnotations, colIndex, name);
+}
+
+template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
+/*static*/ typename TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::AnnotationData const & TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::get_annotation_data(Annotation const &annotation) {
+    assert(dynamic_cast<AnnotationImpl const *>(&annotation));
+    return static_cast<AnnotationImpl const &>(annotation);
 }
 
 // ----------------------------------------------------------------------
