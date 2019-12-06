@@ -113,8 +113,6 @@ public:
     // |  Public Data
     // |
     // ----------------------------------------------------------------------
-    // FrequencyMap const                      TermFrequency;                  /// Words and the number of documents that it appears in
-    // IndexMap const                          TermIndex;
     FrequencyAndIndexMap const              TermFrequencyAndIndex;
     std::uint32_t const                     TotalNumDocuments;
 
@@ -229,7 +227,6 @@ public:
     using InputTypeConstIterator            = std::string::const_iterator;
     using StringDecorator                   = std::function<std::string (InputTypeConstIterator begin, InputTypeConstIterator end)>;
     using IndexMap                          = DocumentStatisticsAnnotationData::IndexMap;
-    using FrequencyMap                      = DocumentStatisticsAnnotationData::FrequencyMap;
     using FrequencyAndIndexMap              = DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
     // ----------------------------------------------------------------------
     // |
