@@ -4,7 +4,10 @@
 // ----------------------------------------------------------------------
 #pragma once
 
+#include <algorithm>
+#include <iterator> 
 #include <unordered_map>
+#include <queue>
 #include <set>
 
 #include "TrainingOnlyEstimatorImpl.h"
@@ -128,6 +131,74 @@ public:
 
 namespace {
 
+inline DocumentStatisticsAnnotationData::FrequencyMap PruneTermFreqMap(DocumentStatisticsAnnotationData::FrequencyMap const & prunedTermFreqByDf, 
+                                                                       std::uint32_t maxFeatures) {
+    std::vector<std::uint32_t> frequencyVector;
+
+    std::transform(prunedTermFreqByDf.begin(), 
+                   prunedTermFreqByDf.end(), 
+                   std::back_inserter(frequencyVector), 
+                   [](auto const & kv) { 
+                       return kv.second; 
+                   }
+    );
+
+    //partial sort, ave O(n)
+    std::nth_element(frequencyVector.begin(), 
+                     frequencyVector.begin() + maxFeatures, 
+                     frequencyVector.end(), 
+                     std::greater<std::uint32_t>()
+    );
+
+    std::uint32_t targetValue = frequencyVector[maxFeatures];
+    int remainingTargetValue = 
+
+    DocumentStatisticsAnnotationData::FrequencyMap prunedTermFreq;
+    for (auto const & termFrequencyPair : prunedTermFreqByDf) {
+
+        if (termFrequencyPair.second > targetValue)
+            prunedTermFreq.insert(termFrequencyPair);
+
+        if (termFrequencyPair.second == targetValue && remainingTargetValue > 0) {
+            prunedTermFreq.insert(termFrequencyPair);
+            --remainingTargetValue;
+        }
+    }
+
+    return prunedTermFreq;
+}
+
+inline DocumentStatisticsAnnotationData::FrequencyMap PruneTermFreqMap(DocumentStatisticsAnnotationData::FrequencyMap const & termFrequency, 
+                                                                       std::float_t minDf, 
+                                                                       std::float_t maxDf, 
+                                                                       std::float_t totalNumDocumentsFloat) {
+    if (!(minDf > 0.0f && maxDf < 1.0f))
+        return termFrequency;
+
+    DocumentStatisticsAnnotationData::FrequencyMap prunedTermFreq;
+    for (auto const & termFrequencyPair : termFrequency) {
+        std::float_t const freq = termFrequencyPair.second / totalNumDocumentsFloat;
+
+        if (freq >= minDf && freq <= maxDf) 
+            prunedTermFreq.insert(termFrequencyPair);
+    }
+
+    return prunedTermFreq;
+}
+
+inline DocumentStatisticsAnnotationData::FrequencyMap PruneTermFreqMap(DocumentStatisticsAnnotationData::FrequencyMap prunedTermFreqByDf, 
+                                                                       nonstd::optional<std::uint32_t> maxFeatures) {
+    if (!maxFeatures.has_value() || prunedTermFreqByDf.empty())
+        return prunedTermFreqByDf;
+
+    std::uint32_t maxFeaturesValue = std::move(*maxFeatures);
+
+    if (maxFeaturesValue > prunedTermFreqByDf.size())
+        throw std::invalid_argument("maxFeaturesUpperBound");
+
+    return PruneTermFreqMap(prunedTermFreqByDf, maxFeaturesValue);
+}
+
 inline DocumentStatisticsAnnotationData::FrequencyAndIndexMap MergeTwoMapsWithSameKeys(DocumentStatisticsAnnotationData::FrequencyMap const & termFrequency, 
                                                                                        DocumentStatisticsAnnotationData::IndexMap const & termIndex) {
     //bugbug: assuming these two map has exactly the same key(shuold it be unioned here?)
@@ -172,8 +243,9 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    DocumentStatisticsTrainingOnlyPolicy(void);
-    DocumentStatisticsTrainingOnlyPolicy(StringDecorator decorator);
+    DocumentStatisticsTrainingOnlyPolicy(StringDecorator decorator, nonstd::optional<IndexMap> vocabulary, nonstd::optional<std::uint32_t> maxFeatures, std::float_t minDf, std::float_t maxDf);
+    //I am not sure if this ctor is still necessary in this case
+    //DocumentStatisticsTrainingOnlyPolicy(void);
 
     void fit(InputType const &input);
     DocumentStatisticsAnnotationData complete_training(void);
@@ -193,6 +265,11 @@ private:
     // ----------------------------------------------------------------------
     StringDecorator const                   _stringDecoratorFunc;
 
+    nonstd::optional<IndexMap> const        _vocabulary;
+    nonstd::optional<std::uint32_t> const   _maxFeatures;
+    std::float_t const                      _minDf;
+    std::float_t const                      _maxDf;
+    
     FrequencyMap                            _termFrequency;
     std::uint32_t                           _totalNumDocuments;
 
@@ -223,8 +300,28 @@ private:
 template <
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-using DocumentStatisticsEstimator           = Components::TrainingOnlyEstimatorImpl<Details::DocumentStatisticsTrainingOnlyPolicy, MaxNumTrainingItemsV>;
+//using DocumentStatisticsEstimator           = Components::TrainingOnlyEstimatorImpl<Details::DocumentStatisticsTrainingOnlyPolicy, MaxNumTrainingItemsV>;
+class DocumentStatisticsEstimator : public TrainingOnlyEstimatorImpl<Details::DocumentStatisticsTrainingOnlyPolicy, MaxNumTrainingItemsV> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = TrainingOnlyEstimatorImpl<Details::DocumentStatisticsTrainingOnlyPolicy, MaxNumTrainingItemsV>;
+    using StringDecorator                   = Details::DocumentStatisticsTrainingOnlyPolicy::StringDecorator;
+    using IndexMap                          = DocumentStatisticsAnnotationData::IndexMap;
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    DocumentStatisticsEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, StringDecorator decorator, nonstd::optional<IndexMap> vocabulary, 
+                                nonstd::optional<std::uint32_t> maxFeatures, std::float_t minDf, std::float_t maxDf);
+    ~DocumentStatisticsEstimator(void) override = default;
 
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DocumentStatisticsEstimator);
+};
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -280,24 +377,92 @@ inline DocumentStatisticsAnnotationData::DocumentStatisticsAnnotationData(Freque
 
 // ----------------------------------------------------------------------
 // |
+// |  DocumentStatisticsEstimator
+// |
+// ----------------------------------------------------------------------
+//Would it be better to place default values during pipeline chaining(countvectorizer and tfidfvectorizer)? if so this ctor will show no default values
+template <size_t MaxNumTrainingItemsV>
+DocumentStatisticsEstimator<MaxNumTrainingItemsV>::DocumentStatisticsEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex,
+                                                                               StringDecorator decorator, nonstd::optional<IndexMap> vocabulary, 
+                                                                               nonstd::optional<std::uint32_t> maxFeatures, std::float_t minDf, std::float_t maxDf) :
+    BaseType(
+        std::move(pAllColumnAnnotations),
+        std::move(colIndex),
+        true,
+        std::move(decorator),
+        std::move(vocabulary),
+        std::move(maxFeatures),
+        std::move(minDf),
+        std::move(maxDf)
+    ) {
+}
+
+// ----------------------------------------------------------------------
+// |
 // |  Details::DocumentStatisticsTrainingOnlyPolicy
 // |
 // ----------------------------------------------------------------------
-inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTrainingOnlyPolicy(void) :
-    _totalNumDocuments(0) {
-}
-
-inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTrainingOnlyPolicy(StringDecorator decorator) :
+inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTrainingOnlyPolicy(StringDecorator decorator, nonstd::optional<IndexMap> vocabulary, 
+                                                                                           nonstd::optional<std::uint32_t> maxFeatures, std::float_t minDf, 
+                                                                                           std::float_t maxDf) :
     _stringDecoratorFunc(
         [&decorator](void) -> StringDecorator & {
-            if(!decorator)
-                throw std::invalid_argument("decorator");
+            //temporary mute this validate
+            // if(!decorator)
+            //     throw std::invalid_argument("decorator");
 
             return decorator;
         }()
     ),
+    _vocabulary(
+        std::move(
+            [&vocabulary](void) -> nonstd::optional<IndexMap> & {
+                if(vocabulary.has_value() && vocabulary->empty()) 
+                    throw std::invalid_argument("vocabulary");
+
+                return vocabulary;
+            }()
+        )
+    ),
+    _maxFeatures(
+        std::move(
+            [&maxFeatures](void) -> nonstd::optional<std::uint32_t> & {
+                if(maxFeatures.has_value() && *maxFeatures == 0)
+                    throw std::invalid_argument("maxFeaturesLowerBound");
+
+                return maxFeatures;
+            }()
+        )
+    ),
+    _minDf(
+        std::move(
+            [&minDf](void) -> std::float_t & {
+                if(minDf < 0.0f || minDf > 1.0f)
+                    throw std::invalid_argument("minDf");
+
+                return minDf;
+            }()
+        )
+    ),
+    _maxDf(
+        std::move(
+            [&maxDf](void) -> std::float_t & {
+                if(maxDf < 0.0f || maxDf > 1.0f)
+                    throw std::invalid_argument("maxDf");
+
+                return maxDf;
+            }()
+        )
+    ),
     _totalNumDocuments(0) {
+        if (_minDf > _maxDf)
+            throw std::invalid_argument("_minDf > _maxDf");
 }
+
+//I am not sure if this ctor is still necessary in this case
+// inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTrainingOnlyPolicy(void) :
+//     _totalNumDocuments(0) {
+// }
 
 inline void Details::DocumentStatisticsTrainingOnlyPolicy::fit(InputType const &input) {
     if(_stringDecoratorFunc) {
@@ -330,8 +495,18 @@ inline void Details::DocumentStatisticsTrainingOnlyPolicy::fit(InputType const &
 }
 
 inline DocumentStatisticsAnnotationData Details::DocumentStatisticsTrainingOnlyPolicy::complete_training(void) {
-    IndexMap                                termIndex(Microsoft::Featurizer::Featurizers::Components::CreateIndexMap<std::string>(_termFrequency, IndexMap()));
-    FrequencyAndIndexMap                    termFrequencyAndIndex(MergeTwoMapsWithSameKeys(_termFrequency, termIndex));
+
+    FrequencyMap prunedTermFreqByDf = PruneTermFreqMap(_termFrequency, _minDf, _maxDf, static_cast<std::float_t>(_totalNumDocuments));
+
+    FrequencyMap prunedTermFreqByMaxFeatures = PruneTermFreqMap(prunedTermFreqByDf, _maxFeatures);
+
+    IndexMap                                termIndex(Microsoft::Featurizer::Featurizers::Components::CreateIndexMap<std::string>(prunedTermFreqByMaxFeatures, _vocabulary.has_value() ? *_vocabulary : IndexMap()));
+
+    //here the termIndex includes(strictly) termFrequency, which means termIndex has all the keys that appear in termFrequency, but may has some keys not in termFrequency
+
+    //do something before merging !!!!
+
+    FrequencyAndIndexMap                    termFrequencyAndIndex(MergeTwoMapsWithSameKeys(prunedTermFreqByMaxFeatures, termIndex));
     return DocumentStatisticsAnnotationData(std::move(termFrequencyAndIndex), std::move(_totalNumDocuments));
 }
 
