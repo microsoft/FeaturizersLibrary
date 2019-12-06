@@ -140,18 +140,18 @@ inline DocumentStatisticsAnnotationData::FrequencyMap PruneTermFreqMap(DocumentS
                    std::back_inserter(frequencyVector), 
                    [](auto const & kv) { 
                        return kv.second; 
-                   }
-    );
+                   });
 
     //partial sort, ave O(n)
     std::nth_element(frequencyVector.begin(), 
                      frequencyVector.begin() + maxFeatures, 
                      frequencyVector.end(), 
-                     std::greater<std::uint32_t>()
-    );
+                     std::greater<std::uint32_t>());
 
     std::uint32_t targetValue = frequencyVector[maxFeatures];
-    int remainingTargetValue = 
+    long long remainingTargetValue = std::count(frequencyVector.begin(), 
+                                                    frequencyVector.begin() + maxFeatures,
+                                                    targetValue);
 
     DocumentStatisticsAnnotationData::FrequencyMap prunedTermFreq;
     for (auto const & termFrequencyPair : prunedTermFreqByDf) {
