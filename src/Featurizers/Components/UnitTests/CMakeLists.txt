@@ -45,10 +45,10 @@ SET(
     #   - TimeSeriesMedianEstimator
 )
 
-# GrainEstimatorImpl_UnitTest causes a compile error under the scenario:
+# GrainEstimatorImpl_UnitTest causes an internal compile error under the scenario:
 #
 #   - Windows (1)
-#   - Clang 8 (2)
+#   - Clang 8.0.0 and Clang 8.0.1 (the issue has been fixed on Clang 9.0.0) (2)
 #   - x86 (3)
 #   - Release (4)
 #
@@ -60,11 +60,6 @@ if(
     AND "$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" STREQUAL "x86"         # 3
     AND "${CMAKE_BUILD_TYPE}" MATCHES "^Release.*$"                             # 4
 )
-    # TODO: Test this with Clang 8.0.1
-    # TODO: Test this with Clang 9.0.0
-    # TODO: This becomes a biggger problem if we see this same error with Featurizers that
-    #       use the component.
-
     list(REMOVE_ITEM _test_names GrainEstimatorImpl_UnitTest)
 endif()
 

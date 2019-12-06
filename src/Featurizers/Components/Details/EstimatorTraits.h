@@ -15,7 +15,7 @@ namespace Details {
 ///  \brief         Base declaration to determine if a type has the method
 ///                 'has_created_transformer'.
 ///
-template <typename, typename T>
+template <typename T, typename FunctionT>
 struct HasHasCreatedTransformerMethodImpl {
     static_assert(std::integral_constant<T, false>::value, "Second template parameter must be a function type");
 };
