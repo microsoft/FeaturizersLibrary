@@ -185,3 +185,176 @@ TEST_CASE("string_idf_full_appearance") {
     CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
     CHECK(docuNumsAnnotation == docuNumsLabel);
 }
+
+TEST_CASE("string_idf_df[0.4, 0.8]") {
+    FrequencyMap const                         termFreqLabel({{"grape", 2}});
+    IndexMap const                             termIndexLabel({{"grape", 0}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
+    std::uint32_t const                        docuNumsLabel(3);
+
+    std::vector<std::vector<std::string>> const            
+                                               inputBatches({{" orange  apple  apple peach  grape "},
+                                                            {" grape orange     peach peach banana"},
+                                                            {"orange orange peach   peach orange "}});
+    //parameter initialization
+    StringDecorator decorator;
+    nonstd::optional<IndexMap> vocabulary = nonstd::optional<IndexMap>();
+    nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
+    std::float_t minDf = 0.4f;
+    std::float_t maxDf = 0.8f;
+
+    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+
+    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
+    CHECK(docuNumsAnnotation == docuNumsLabel);
+}
+
+TEST_CASE("string_idf_df[0.0, 0.7]") {
+    FrequencyMap const                         termFreqLabel({{"apple", 1}, {"grape", 2}, {"banana",1}});
+    IndexMap const                             termIndexLabel({{"apple", 0}, {"grape", 2}, {"banana",1}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
+    std::uint32_t const                        docuNumsLabel(3);
+
+    std::vector<std::vector<std::string>> const            
+                                               inputBatches({{" orange  apple  apple peach  grape "},
+                                                            {" grape orange     peach peach banana"},
+                                                            {"orange orange peach   peach orange "}});
+    //parameter initialization
+    StringDecorator decorator;
+    nonstd::optional<IndexMap> vocabulary = nonstd::optional<IndexMap>();
+    nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
+    std::float_t minDf = 0.0f;
+    std::float_t maxDf = 0.7f;
+
+    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+
+    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
+    CHECK(docuNumsAnnotation == docuNumsLabel);
+}
+
+TEST_CASE("string_idf_max1features") {
+    FrequencyMap const                         termFreqLabel({{"peach", 3}});
+    IndexMap const                             termIndexLabel({{"peach", 0}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
+    std::uint32_t const                        docuNumsLabel(3);
+
+    std::vector<std::vector<std::string>> const            
+                                               inputBatches({{" orange  apple  apple peach  grape "},
+                                                            {" grape orange     peach peach banana"},
+                                                            {"orange orange peach   peach orange "}});
+    //parameter initialization
+    StringDecorator decorator;
+    nonstd::optional<IndexMap> vocabulary = nonstd::optional<IndexMap>();
+    nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>(static_cast<std::uint32_t>(1));
+    std::float_t minDf = 0.0f;
+    std::float_t maxDf = 1.0f;
+
+    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+
+    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
+    CHECK(docuNumsAnnotation == docuNumsLabel);
+}
+
+TEST_CASE("string_idf_max4features") {
+    FrequencyMap const                         termFreqLabel({{"orange",3}, {"apple", 1}, {"peach", 3}, {"grape", 2}});
+    IndexMap const                             termIndexLabel({{"orange", 2}, {"apple", 0}, {"peach", 3}, {"grape", 1}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
+    std::uint32_t const                        docuNumsLabel(3);
+
+    std::vector<std::vector<std::string>> const            
+                                               inputBatches({{" orange  apple  apple peach  grape "},
+                                                            {" grape orange     peach peach banana"},
+                                                            {"orange orange peach   peach orange "}});
+    //parameter initialization
+    StringDecorator decorator;
+    nonstd::optional<IndexMap> vocabulary = nonstd::optional<IndexMap>();
+    nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>(static_cast<std::uint32_t>(4));
+    std::float_t minDf = 0.0f;
+    std::float_t maxDf = 1.0f;
+
+    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+
+    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
+    CHECK(docuNumsAnnotation == docuNumsLabel);
+}
+
+TEST_CASE("string_idf_custom_full_vocabulary") {
+    FrequencyMap const                         termFreqLabel({{"orange",3}, {"apple", 1}, {"peach", 3}, {"grape", 2}, {"banana",1}});
+    IndexMap const                             termIndexLabel({{"apple", 222}, {"banana",333}, {"grape", 666}, {"orange",999}, {"peach", 777}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
+    std::uint32_t const                        docuNumsLabel(3);
+
+    std::vector<std::vector<std::string>> const            
+                                               inputBatches({{" orange  apple  apple peach  grape "},
+                                                            {" grape orange     peach peach banana"},
+                                                            {"orange orange peach   peach orange "}});
+    //parameter initialization
+    StringDecorator decorator;
+    nonstd::optional<IndexMap> vocabulary = nonstd::optional<IndexMap>(IndexMap({{"apple", 222}, {"banana", 333}, {"grape", 666}, {"orange",999}, {"peach", 777}}));
+    nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
+    std::float_t minDf = 0.0f;
+    std::float_t maxDf = 1.0f;
+
+    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+
+    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
+    CHECK(docuNumsAnnotation == docuNumsLabel);
+}
+
+TEST_CASE("string_idf_custom_insufficient_vocabulary") {
+    FrequencyMap const                         termFreqLabel({{"orange",3}, {"apple", 1}, {"peach", 3}, {"grape", 2}, {"banana",1}});
+    IndexMap const                             termIndexLabel({{"apple", 222}, {"banana",333}, {"grape", 666}, {"orange", 3}, {"peach", 4}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
+    std::uint32_t const                        docuNumsLabel(3);
+
+    std::vector<std::vector<std::string>> const            
+                                               inputBatches({{" orange  apple  apple peach  grape "},
+                                                            {" grape orange     peach peach banana"},
+                                                            {"orange orange peach   peach orange "}});
+    //parameter initialization
+    StringDecorator decorator;
+    nonstd::optional<IndexMap> vocabulary = nonstd::optional<IndexMap>(IndexMap({{"apple", 222}, {"banana", 333}, {"grape", 666}}));
+    nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
+    std::float_t minDf = 0.0f;
+    std::float_t maxDf = 1.0f;
+
+    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+
+    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
+    CHECK(docuNumsAnnotation == docuNumsLabel);
+}
+
+TEST_CASE("string_idf_custom_over_vocabulary") {
+    FrequencyMap const                         termFreqLabel({{"orange",3}, {"apple", 1}, {"peach", 3}, {"grape", 2}, {"banana",1}});
+    IndexMap const                             termIndexLabel({{"apple", 222}, {"banana",333}, {"grape", 666}, {"orange",999}, {"peach", 777}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
+    std::uint32_t const                        docuNumsLabel(3);
+
+    std::vector<std::vector<std::string>> const            
+                                               inputBatches({{" orange  apple  apple peach  grape "},
+                                                            {" grape orange     peach peach banana"},
+                                                            {"orange orange peach   peach orange "}});
+    //parameter initialization
+    StringDecorator decorator;
+    nonstd::optional<IndexMap> vocabulary = nonstd::optional<IndexMap>(IndexMap({{"apple", 222}, {"banana", 333}, {"grape", 666}, {"orange",999}, {"peach", 777}, {"fruit", 444}}));
+    nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
+    std::float_t minDf = 0.0f;
+    std::float_t maxDf = 1.0f;
+
+    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, vocabulary, maxFeatures, minDf, maxDf));
+
+    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
+    CHECK(docuNumsAnnotation == docuNumsLabel);
+}
+
+
+
+
+

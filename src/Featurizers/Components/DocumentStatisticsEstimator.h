@@ -144,14 +144,14 @@ inline DocumentStatisticsAnnotationData::FrequencyMap PruneTermFreqMap(DocumentS
 
     //partial sort, ave O(n)
     std::nth_element(frequencyVector.begin(), 
-                     frequencyVector.begin() + maxFeatures, 
+                     frequencyVector.begin() + maxFeatures - 1, 
                      frequencyVector.end(), 
                      std::greater<std::uint32_t>());
 
-    std::uint32_t targetValue = frequencyVector[maxFeatures];
+    std::uint32_t targetValue = frequencyVector[maxFeatures - 1];
     long long remainingTargetValue = std::count(frequencyVector.begin(), 
-                                                    frequencyVector.begin() + maxFeatures,
-                                                    targetValue);
+                                                frequencyVector.begin() + maxFeatures,
+                                                targetValue);
 
     DocumentStatisticsAnnotationData::FrequencyMap prunedTermFreq;
     for (auto const & termFrequencyPair : prunedTermFreqByDf) {
@@ -172,7 +172,7 @@ inline DocumentStatisticsAnnotationData::FrequencyMap PruneTermFreqMap(DocumentS
                                                                        std::float_t minDf, 
                                                                        std::float_t maxDf, 
                                                                        std::float_t totalNumDocumentsFloat) {
-    if (!(minDf > 0.0f && maxDf < 1.0f))
+    if (!(minDf > 0.0f || maxDf < 1.0f))
         return termFrequency;
 
     DocumentStatisticsAnnotationData::FrequencyMap prunedTermFreq;
@@ -201,7 +201,7 @@ inline DocumentStatisticsAnnotationData::FrequencyMap PruneTermFreqMap(DocumentS
 
 inline DocumentStatisticsAnnotationData::FrequencyAndIndexMap MergeTwoMapsWithSameKeys(DocumentStatisticsAnnotationData::FrequencyMap const & termFrequency, 
                                                                                        DocumentStatisticsAnnotationData::IndexMap const & termIndex) {
-    //bugbug: assuming these two map has exactly the same key(shuold it be unioned here?)
+    
     DocumentStatisticsAnnotationData::FrequencyAndIndexMap termFrequencyAndIndex;
     for (auto const & termFrequencyIter : termFrequency) {
         termFrequencyAndIndex.insert(std::make_pair(termFrequencyIter.first, FrequencyAndIndexStruct(termFrequencyIter.second, termIndex.at(termFrequencyIter.first))));
@@ -338,7 +338,7 @@ public:
 // |
 // ----------------------------------------------------------------------
 FrequencyAndIndexStruct::FrequencyAndIndexStruct(std::uint32_t termFrequency, std::uint32_t index) :
-    //bugbug: validate needed?
+    //validate not necessary in this assignment
     TermFrequency(std::move(termFrequency)),
     Index(std::move(index)) {
 }
@@ -410,7 +410,6 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTraining
             //temporary mute this validate
             // if(!decorator)
             //     throw std::invalid_argument("decorator");
-
             return decorator;
         }()
     ),
@@ -496,17 +495,22 @@ inline void Details::DocumentStatisticsTrainingOnlyPolicy::fit(InputType const &
 
 inline DocumentStatisticsAnnotationData Details::DocumentStatisticsTrainingOnlyPolicy::complete_training(void) {
 
+    //prune map by maxDf and minDf
     FrequencyMap prunedTermFreqByDf = PruneTermFreqMap(_termFrequency, _minDf, _maxDf, static_cast<std::float_t>(_totalNumDocuments));
 
+    //prune map by maxFeatures
     FrequencyMap prunedTermFreqByMaxFeatures = PruneTermFreqMap(prunedTermFreqByDf, _maxFeatures);
 
-    IndexMap                                termIndex(Microsoft::Featurizer::Featurizers::Components::CreateIndexMap<std::string>(prunedTermFreqByMaxFeatures, _vocabulary.has_value() ? *_vocabulary : IndexMap()));
+    //In general, the custom vocabulary should assign values to words that no bigger than the map's size
+    //however, some may choose to use unique values. We do not check if the given vocabulary is appropriate
+    //But suggest customer use reasonable mapping 
+    IndexMap                                termIndex(Microsoft::Featurizer::Featurizers::Components::CreateIndexMap<std::string>(prunedTermFreqByMaxFeatures, 
+                                                                                                                                  _vocabulary.has_value() ? *_vocabulary : IndexMap()));
 
     //here the termIndex includes(strictly) termFrequency, which means termIndex has all the keys that appear in termFrequency, but may has some keys not in termFrequency
-
-    //do something before merging !!!!
-
+    //ignore the additional keys in termIndex
     FrequencyAndIndexMap                    termFrequencyAndIndex(MergeTwoMapsWithSameKeys(prunedTermFreqByMaxFeatures, termIndex));
+
     return DocumentStatisticsAnnotationData(std::move(termFrequencyAndIndex), std::move(_totalNumDocuments));
 }
 
