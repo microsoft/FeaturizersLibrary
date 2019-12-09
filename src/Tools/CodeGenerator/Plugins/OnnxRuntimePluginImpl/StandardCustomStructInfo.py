@@ -89,7 +89,7 @@ class StandardCustomStructInfo(CustomStructInfo):
                     [](ONNX_NAMESPACE::InferenceContext &ctx) {{
                         {statements}
 
-                        for(int i = 0; i < ctx.getNumOutputs(); ++i) {{
+                        for(size_t i = 0; i < ctx.getNumOutputs(); ++i) {{
                             *ctx.getOutputType(i)->mutable_tensor_type()->mutable_shape() = ctx.getInputType(1)->tensor_type().shape();
                         }}
                     }}
