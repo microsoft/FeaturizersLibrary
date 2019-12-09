@@ -572,7 +572,12 @@ typename StandardTransformer<InputT, TransformedT>::TransformedType StandardTran
     );
 
     assert(isSet);
-    return std::move(*pResult);
+    
+    TransformedT                            result(std::move(*pResult));
+
+    pResult->~TransformedT();
+
+    return result;
 }
 
 template <typename InputT, typename TransformedT>
