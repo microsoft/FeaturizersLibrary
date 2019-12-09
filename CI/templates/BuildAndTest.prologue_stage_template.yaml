@@ -49,12 +49,28 @@ stages:
                   ).decode("utf-8").strip()
 
                   # The output will be something like "(HEAD, origin/master)"
-                  git_output = git_output.split(",")
-                  assert len(git_output) == 2, git_output
+                  branch_names = git_output.split(",")
 
-                  git_output = git_output[1]
-                  assert git_output.endswith(")"), git_output
-                  git_output = git_output[:-1]
+                  assert branch_names[0] == "(HEAD", branch_names
+                  branch_names.pop(0)
+
+                  if len(branch_names) == 1:
+                      git_output = branch_names[0]
+                  else:
+                      this_git_output = None
+
+                      for branch_name in branch_names:
+                          if "master" in branch_name:
+                              this_git_output = branch_name
+                              break
+
+                      if this_git_output is None:
+                          this_git_output = branch_names[0]
+
+                      git_output = this_git_output
+
+                  if git_output.endswith(")"):
+                      git_output = git_output[:-1]
 
                   # Only take the last component of the branch name
                   git_branch = git_output.split("/")[-1]
