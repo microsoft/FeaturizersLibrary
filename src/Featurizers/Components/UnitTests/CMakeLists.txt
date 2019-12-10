@@ -36,6 +36,7 @@ SET(
     MaxAbsValueEstimator_UnitTest
     MinMaxEstimator_UnitTest
     ModeEstimator_UnitTest
+    NormUpdater_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
     RobustScalarNormEstimator_UnitTest
     StatisticsMetricsEstimator_UnitTest
