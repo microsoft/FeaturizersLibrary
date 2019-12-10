@@ -34,9 +34,9 @@ TEST_CASE("invalid argument for norm result") {
                                                                                           1               // max
                                                                                         ), "l2 norm shouldn't be less than 0!");
     CHECK_THROWS_WITH(NS::Featurizers::Components::Details::NormUpdater<std::double_t>::NormResult( 1,              // l1
-                                                                                          1,              // l2
-                                                                                         -1               // max
-                                                                                        ), "max norm shouldn't be less than 0!");
+                                                                                                    1,              // l2
+                                                                                                    -1               // max
+                                                                                                  ), "max norm shouldn't be less than 0!");
 }
 
 // updater tests
@@ -46,6 +46,11 @@ TEST_CASE("updater for statistic metrics usage") {
     NS::Featurizers::Components::Details::NormUpdater<inputType> updater(
                                                                          5                     // average
                                                                          );
+    NS::Featurizers::Components::Details::NormUpdater<inputType>::NormResult const & initial(updater.commit());
+    CHECK(initial.L1_norm  == 0);
+    CHECK(initial.L2_norm  == 0);
+    CHECK(initial.Max_norm == 0);
+
     updater.update_max(1);
     updater.update_l1l2(1);
     updater.update_max(3);
@@ -65,6 +70,11 @@ TEST_CASE("updater for statistic metrics usage") {
 TEST_CASE("updater for vectors' l1 l2 norm") {
     using inputType = int;
     NS::Featurizers::Components::Details::NormUpdater<inputType> updater;
+    NS::Featurizers::Components::Details::NormUpdater<inputType>::NormResult const & initial(updater.commit());
+    CHECK(initial.L1_norm  == 0);
+    CHECK(initial.L2_norm  == 0);
+    CHECK(initial.Max_norm == 0);
+
     updater.update_max(1);
     updater.update_l1l2(1);
     updater.update_max(2);
@@ -74,8 +84,8 @@ TEST_CASE("updater for vectors' l1 l2 norm") {
     updater.update_max(4);
     updater.update_l1l2(4);
     NS::Featurizers::Components::Details::NormUpdater<inputType>::NormResult const & result(updater.commit());
-    CHECK(result.L1_norm == 9);
-    CHECK(result.L2_norm == 5);
+    CHECK(result.L1_norm  == 9);
+    CHECK(result.L2_norm  == 5);
     CHECK(result.Max_norm == 4);
 }
 
