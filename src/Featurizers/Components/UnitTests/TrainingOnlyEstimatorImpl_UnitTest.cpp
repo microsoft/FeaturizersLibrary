@@ -162,3 +162,51 @@ TEST_CASE("Strings - multiple") {
 
     CHECK(counts == std::map<std::string, std::uint32_t>{{"one", 1}, {"two", 2}, {"three", 2}, {"four", 1}});
 }
+
+static constexpr char const * const     BeginTrainingEstimatorName("Begin Training Estimator");
+
+class BeginTrainingPolicy {
+public:
+    struct Result {};
+
+    using InputType                         = char;
+
+    static constexpr char const * const     NameValue = BeginTrainingEstimatorName;
+
+    BeginTrainingPolicy(int &value) : _value(value) {}
+
+    bool begin_training(NS::AnnotationMap const &) { _value += 1; return true; }
+    NS::FitResult fit(char const &) { return NS::FitResult::Continue; }
+    Result complete_training(void) { return Result(); }
+
+private:
+    int &                               _value;
+};
+
+TEST_CASE("Optional begin_training") {
+    using MyEstimator                       = NS::Featurizers::Components::TrainingOnlyEstimatorImpl<BeginTrainingPolicy, std::numeric_limits<size_t>::max()>;
+
+    int                                     ctr(0);
+    NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    MyEstimator                             estimator1(pAllColumnAnnotations, 0, true, ctr);
+
+    CHECK(ctr == 0);
+
+    estimator1.begin_training();
+    CHECK(ctr == 1);
+    CHECK(estimator1.get_state() == NS::TrainingState::Training);
+
+    estimator1.complete_training();
+    CHECK(ctr == 1);
+
+    // The annotation has already been created, so a second estimator should not train again
+    CHECK(ctr == 1);
+    MyEstimator                             estimator2(pAllColumnAnnotations, 0, true, ctr);
+
+    estimator2.begin_training();
+    CHECK(ctr == 1);
+    CHECK(estimator2.get_state() == NS::TrainingState::Finished);
+
+    estimator2.complete_training();
+    CHECK(ctr == 1);
+}
