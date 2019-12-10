@@ -40,7 +40,7 @@ TEST_CASE("std updater normal cases") {
 
     updater.update(0);
     NS::Featurizers::Components::Details::STDUpdater<inputType>::STDResult const & r1(updater.commit());
-    CHECK(r1.StandardDeviation == 0.4);
+    CHECK(NS::TestHelpers::FuzzyCheck<long double>({r1.StandardDeviation}, {0.4}));
 
     updater.update(1);
     updater.update(2);
