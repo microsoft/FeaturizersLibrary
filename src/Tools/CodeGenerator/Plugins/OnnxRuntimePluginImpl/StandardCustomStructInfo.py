@@ -5,6 +5,7 @@
 """Contains the StandardCustomStructInfo object"""
 
 import os
+import re
 import textwrap
 from collections import OrderedDict
 
@@ -78,7 +79,7 @@ class StandardCustomStructInfo(CustomStructInfo):
             output_statements,
             OrderedDict(
                 [
-                    (k, ["tensor({})".format(v.replace("std::", ""))])
+                    (k, ["{}".format(re.sub("_t$","", v.replace("std::", "")))])
                     for k,
                     v in six.iteritems(self._template_to_types)
                 ],
@@ -101,10 +102,7 @@ class StandardCustomStructInfo(CustomStructInfo):
                         [
                             "ctx.getOutputType({index})->mutable_tensor_type()->set_elem_type(ONNX_NAMESPACE::TensorProto_DataType_{type});".format(
                                 index=index,
-                                type=member.type.replace("std::", "").replace(
-                                    "_t",
-                                    "",
-                                ).upper(),
+                                type=re.sub("_t$","", member.type.replace("std::", "")).upper(),
                             ) for index,
                             member in enumerate(self._custom_struct.members)
                         ],
@@ -123,7 +121,7 @@ class StandardCustomStructInfo(CustomStructInfo):
 
         for index, member in enumerate(self._custom_struct.members):
             initialize_statements_part1.append(
-                "Tensor * {name}_tensor(ctr->Output({index}, input_tensor->Shape()));".format(
+                "Tensor * {name}_tensor(ctx->Output({index}, input_tensor->Shape()));".format(
                     name=member.name,
                     index=index,
                 ),
@@ -132,7 +130,7 @@ class StandardCustomStructInfo(CustomStructInfo):
             initialize_statements_part2.append(
                 "{type} * {name}_data({name}_tensor->MutableData<{type}>());".format(
                     name=member.name,
-                    type=member.type.replace("std::", ""),
+                    type=member.type if "string" in member.type else member.type.replace("std::", ""),
                 ),
             )
 
@@ -153,7 +151,8 @@ class StandardCustomStructInfo(CustomStructInfo):
                     1,
                     kCpuExecutionProvider,
                     KernelDefBuilder()
-                        {constraints}
+                        {constraints},
+                    {transformer_name}
                 );
                 """,
             ).format(
@@ -163,7 +162,7 @@ class StandardCustomStructInfo(CustomStructInfo):
                         [
                             '.TypeConstraint("{k}", DataTypeImpl::GetTensorType<{v}>())'.format(
                                 k=k,
-                                v=v.replace("std::", ""),
+                                v=v if "string" in  v else v.replace("std::", ""),
                             ) for k,
                             v in six.iteritems(self._template_to_types)
                         ],

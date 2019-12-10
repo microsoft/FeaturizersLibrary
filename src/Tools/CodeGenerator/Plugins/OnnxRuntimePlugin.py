@@ -5,6 +5,7 @@
 """Contains the Plugin object"""
 
 import os
+import re
 import sys
 import textwrap
 
@@ -373,6 +374,34 @@ def _GenerateGlobalDefs(
         ).format(index, output_name, output_documentation or "No information is available", output_type)
 
     # ----------------------------------------------------------------------
+    def CreateTypeInferenceConstraints(output_type_mappings):
+        code = []
+        mapping_length = len(output_type_mappings)
+        constraint_format = "input_elem_type == ONNX_NAMESPACE::TensorProto_DataType_{input_type_upper}"
+
+        for index, (output_type, input_types) in enumerate(output_type_mappings.items()):
+            constraints = []
+            for input_type in input_types:
+                constraints.append(constraint_format.format(
+                    input_type_upper = re.sub(r'^std::|_t$', '', input_type).upper()
+                    )
+                )
+            code.append(
+                textwrap.dedent(
+                    """\
+                    {end}if ({constraints}) {{
+                        ctx.getOutputType(0)->mutable_tensor_type()->set_elem_type(ONNX_NAMESPACE::TensorProto_DataType_{output_type_upper});
+                    }}""".format(
+                        end = "" if index == 0 else " else ",
+                        output_type_upper = re.sub(r'^std::|_t$', '', output_type).upper(),
+                        constraints = " ||\n".join(constraints),
+                    )
+                )
+            )
+        
+        return "".join(code)
+
+    # ----------------------------------------------------------------------
     def CreateMacro(
         input_type,
         input_documentation,
@@ -487,74 +516,107 @@ def _GenerateGlobalDefs(
             )
 
         else:
-            # We need to create one function per output type
+            # We need to create one combined function for all output types
+            all_output_types = []
+            all_input_types = []
             for output_type, input_types in six.iteritems(output_type_mappings):
-                type_constraints = OrderedDict()
+                all_output_types.append(re.sub("_t$", "", output_type))
+                all_input_types.extend(re.sub("_t$","", value) for value in input_types)
 
-                if len(input_types) == 1:
-                    input_type = "tensor({})".format(input_types[0])
-                else:
-                    input_type = "InputT"
-                    type_constraints[input_type] = [
-                        "tensor({})".format(value.replace("std::", ""))
-                        for value in input_types
-                    ]
+            type_constraints = OrderedDict()
 
-                if custom_struct_data is None or output_type not in custom_struct_data:
+            if len(all_input_types) == 1:
+                input_type = "tensor({})".format(all_input_types[0])
+            else:
+                input_type = "InputT"
+                type_constraints[input_type] = [
+                    "{}".format(value.replace("std::", ""))
+                    for value in all_input_types
+                ]
+
+            if custom_struct_data is None or all_output_types[0] not in custom_struct_data:
+                if len(all_output_types) == 1:
+                    output_type = all_output_types[0]
                     output_statements = [
                         CreateOutputStatement(
                             "tensor({})".format(output_type.replace("std::", "")),
                             item.output_description,
                         ),
                     ]
+                else:
+                    output_type = "OutputT"
+                    type_constraints[output_type] = [
+                        "{}".format(value.replace("std::", ""))
+                        for value in all_output_types
+                    ]
+                    output_statements = [
+                        CreateOutputStatement(
+                            "OutputT",
+                            item.output_description,
+                        ),
+                    ]
 
+                if (len(all_output_types) == 1):
                     suffix = textwrap.dedent(
                         """\
                         .TypeAndShapeInferenceFunction(
                             [](ONNX_NAMESPACE::InferenceContext& ctx) {{
                                 propagateElemTypeFromDtypeToOutput(ctx, ONNX_NAMESPACE::TensorProto_DataType_{output_type_upper}, 0);
-
+                                
                                 *ctx.getOutputType(0)->mutable_tensor_type()->mutable_shape() = ctx.getInputType(1)->tensor_type().shape();
                             }}
                         )
                         """,
                     ).format(
-                        output_type_upper=output_type.replace("std::", "").replace(
-                            "_t",
-                            "",
-                        ).upper(),
+                        output_type_upper=output_type.replace("std::", "").upper(),
+                    )
+                else:
+                    suffix = textwrap.dedent(
+                        """\
+                        .TypeAndShapeInferenceFunction(
+                            [](ONNX_NAMESPACE::InferenceContext& ctx) {{
+                                auto input_elem_type = ctx.getInputType(1)->tensor_type().elem_type();
+                                {constraints}
+                                
+                                *ctx.getOutputType(0)->mutable_tensor_type()->mutable_shape() = ctx.getInputType(1)->tensor_type().shape();
+                            }}
+                        )
+                        """,
+                    ).format(
+                        output_type_upper=output_type.replace("std::", "").upper(),
+                        constraints = CreateTypeInferenceConstraints(output_type_mappings),
                     )
 
-                else:
-                    assert custom_struct_data
-                    assert len(custom_struct_data) == 1, custom_struct_data
+            else:
+                assert custom_struct_data
+                assert len(custom_struct_data) == 1, custom_struct_data
 
-                    (
-                        output_statements,
-                        custom_type_constraints,
-                        suffix,
-                    ) = custom_struct_data[
-                        output_type
-                    ].GetDefOutputStatementsConstraintsAndSuffix()
+                (
+                    output_statements,
+                    custom_type_constraints,
+                    suffix,
+                ) = custom_struct_data[
+                    output_type
+                ].GetDefOutputStatementsConstraintsAndSuffix()
 
-                    for k, v in six.iteritems(custom_type_constraints):
-                        type_constraints[k] = v
+                for k, v in six.iteritems(custom_type_constraints):
+                    type_constraints[k] = v
 
-                # Populate the content
-                preprocessor_macros.append(
-                    CreateMacro(
-                        input_type,
-                        item.input_description,
-                        output_statements,
-                        type_constraints,
-                        suffix=suffix,
-                    ),
-                )
+            # Populate the content
+            preprocessor_macros.append(
+                CreateMacro(
+                    input_type.replace("std::", ""),
+                    item.input_description,
+                    output_statements,
+                    type_constraints,
+                    suffix=suffix,
+                ),
+            )
 
         func_definitions.append(
             textwrap.dedent(
                 """\
-                void Register{featurizer_name}(void) {{
+                void Register{featurizer_name}Ver1(void) {{
                     static const char * doc = R"DOC(
                         {documentation}
                     )DOC";
@@ -785,7 +847,7 @@ def _GenerateKernel(
                     """,
                 ).format(
                     transformer_name=transformer_name,
-                    input_type=mapping_input_type.replace("std::", ""),
+                    input_type= mapping_input_type if "string" in  mapping_input_type else mapping_input_type.replace("std::", ""),
                     template_input_type=input_type,
                 ) for mapping_input_type in six.iterkeys(input_type_mappings)
             ]
@@ -817,9 +879,8 @@ def _GenerateKernel(
                 #include "core/framework/data_types.h"
                 #include "core/framework/op_kernel.h"
 
-                #include "core/automl/featurizers/src/FeaturizerPrep/Featurizers/{featurizer_name}.h"
+                #include "core/automl/featurizers/src/Featurizers/{featurizer_name}.h"
 
-                using namespace std;
                 namespace featurizers = Microsoft::Featurizer::Featurizers;
 
                 namespace onnxruntime {{
@@ -834,8 +895,8 @@ def _GenerateKernel(
                     // Create the transformer
                     featurizers::{transformer_name}{template_suffix} transformer(
                       [ctx](void) {{
-                        auto state_tensor(ctx->Input<Tensor>(0));
-                        uint8_t const * const state_data(state_tensor->Data<uint8_t>());
+                        const auto * state_tensor(ctx->Input<Tensor>(0));
+                        const uint8_t * const state_data(state_tensor->Data<uint8_t>());
 
                         Microsoft::Featurizer::Archive archive(state_data, state_tensor->Shape().GetDims()[0]);
                         return featurizers::{transformer_name}{template_suffix}(archive);
@@ -843,14 +904,14 @@ def _GenerateKernel(
                     );
 
                     // Get the input
-                    auto input_tensor(ctx->Input<Tensor>(1));
-                    {input_type} * const input_data(input_tensor->Data<{input_type}>());
+                    const auto* input_tensor(ctx->Input<Tensor>(1));
+                    const {input_type} * input_data(input_tensor->Data<{input_type}>());
 
                     // Prepare the output
                     {prepare_output_statements}
 
                     // Execute
-                    int64_t const length(input_tensor->Shape().GetDims()[0]);
+                    const int64_t length(input_tensor->Shape().Size());
 
                     for(int64_t i = 0; i < length; ++i) {{
                       {output_statements}
