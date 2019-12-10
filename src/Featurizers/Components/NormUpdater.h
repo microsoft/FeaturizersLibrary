@@ -30,29 +30,30 @@ struct MaxNormTypeSelector<std::double_t> {
 };
 
 }
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#endif
+
 namespace Details{
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         NormUpdater
 ///  \brief         NormUpdater updates l1 norm and l2 norm
-///                 l1 norm is the sum of difference between elements and average
-///                 l2 norm is the sum of square of difference between elements and average
-///                 statistically, we have a average to calculate l2 norm for standard deviation
-///                 for vectors, average is 0
-///
-///                 for vectors, users should use NormUpdater(void), update_max and update_l1l2
-///
-///                 for statistical usage, such as standard deviation, users should use StatisticsMetricsEstimator first
-///                 and NormUpdater(InputType min, InputType max, std::double_t average), update_l1l2
+///                 l1 norm is the sum of elements absolute value
+///                 l2 norm is the sum of square of elements absolute value
 ///
 template <typename T>
 class NormUpdater {
 public:
+
     /////////////////////////////////////////////////////////////////////////
-    ///  \class         NormResult
-    ///  \brief         A structure which contains the l1 norm, l2 norm and max norm
+    ///  \class         L1NormResult
+    ///  \brief         A structure which contains the l1 norm
     ///
-    struct NormResult {
+    struct L1NormResult {
     public:
         // ----------------------------------------------------------------------
         // |
@@ -60,7 +61,54 @@ public:
         // |
         // ----------------------------------------------------------------------
         long double                                         const L1_norm;
+
+        // ----------------------------------------------------------------------
+        // |
+        // |  Public Methods
+        // |
+        // ----------------------------------------------------------------------
+        L1NormResult(long double l1_norm);
+        ~L1NormResult(void) = default;
+
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(L1NormResult);
+    };
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \class         L2NormResult
+    ///  \brief         A structure which contains the l2 norm and max norm
+    ///
+    struct L2NormResult {
+    public:
+        // ----------------------------------------------------------------------
+        // |
+        // |  Public Data
+        // |
+        // ----------------------------------------------------------------------
         long double                                         const L2_norm;
+
+        // ----------------------------------------------------------------------
+        // |
+        // |  Public Methods
+        // |
+        // ----------------------------------------------------------------------
+        L2NormResult(long double l2_norm);
+        ~L2NormResult(void) = default;
+
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(L2NormResult);
+    };
+
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \class         MaxNormResult
+    ///  \brief         A structure which contains the max norm
+    ///
+    struct MaxNormResult {
+    public:
+        // ----------------------------------------------------------------------
+        // |
+        // |  Public Data
+        // |
+        // ----------------------------------------------------------------------
         typename TypeSelector::MaxNormTypeSelector<T>::type const Max_norm;
 
         // ----------------------------------------------------------------------
@@ -68,10 +116,10 @@ public:
         // |  Public Methods
         // |
         // ----------------------------------------------------------------------
-        NormResult(long double l1_norm, long double l2_norm, typename TypeSelector::MaxNormTypeSelector<T>::type max_norm);
-        ~NormResult(void) = default;
+        MaxNormResult(typename TypeSelector::MaxNormTypeSelector<T>::type max_norm);
+        ~MaxNormResult(void) = default;
 
-        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(NormResult);
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MaxNormResult);
     };
 
     // ----------------------------------------------------------------------
@@ -88,16 +136,16 @@ public:
     // |
     // ----------------------------------------------------------------------
 
-    // NormUpdater(void), update_max, update_l1l2 will be used in calculating l1, l2 or max norm for vectors
-    // NormUpdater(InputType min, InputType max, std::double_t average), update_l1l2 will be used in calculating standard deviation for statistics
     NormUpdater(void);
-    NormUpdater(std::double_t average);
 
+    void update_l1(InputType input);
+    void update_l2(InputType input);
     void update_max(InputType input);
-    void update_l1l2(InputType input);
 
     // commit returns the result of min, max and count
-    NormResult commit(void);
+    L1NormResult commit_l1(void);
+    L2NormResult commit_l2(void);
+    MaxNormResult commit_max(void);
 private:
     // ----------------------------------------------------------------------
     // |
@@ -107,8 +155,11 @@ private:
     long double                                         _l1_norm;
     long double                                         _l2_norm;
     typename TypeSelector::MaxNormTypeSelector<T>::type _max_norm;
-    bool                                                _first_element_flag;
-    std::double_t const                                 _average;
+
+    // flags to check if update functions are called
+    bool                                                _update_l1_flag;
+    bool                                                _update_l2_flag;
+    bool                                                _update_max_flag;
 };
 }
 
@@ -124,22 +175,44 @@ private:
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::NormUpdater::NormResult
+// |  Details::NormUpdater::L1NormResult
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-Details::NormUpdater<T>::NormResult::NormResult(long double l1_norm, long double l2_norm, typename TypeSelector::MaxNormTypeSelector<T>::type max_norm) :
-    L1_norm(std::move(l1_norm)),
-    L2_norm(std::move(l2_norm)),
-    Max_norm(std::move(max_norm)) {
+Details::NormUpdater<T>::L1NormResult::L1NormResult(long double l1_norm) :
+    L1_norm(std::move(l1_norm)) {
         // input type can only be integer or numeric
         static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to norm updater has to be integer or numerical types!");
         if (L1_norm < 0) {
             throw std::invalid_argument("l1 norm shouldn't be less than 0!");
         }
+}
+
+// ----------------------------------------------------------------------
+// |
+// |  Details::NormUpdater::L2NormResult
+// |
+// ----------------------------------------------------------------------
+template <typename T>
+Details::NormUpdater<T>::L2NormResult::L2NormResult(long double l2_norm) :
+    L2_norm(std::move(l2_norm)) {
+        // input type can only be integer or numeric
+        static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to norm updater has to be integer or numerical types!");
         if (L2_norm < 0) {
             throw std::invalid_argument("l2 norm shouldn't be less than 0!");
         }
+}
+
+// ----------------------------------------------------------------------
+// |
+// |  Details::NormUpdater::MaxNormResult
+// |
+// ----------------------------------------------------------------------
+template <typename T>
+Details::NormUpdater<T>::MaxNormResult::MaxNormResult(typename TypeSelector::MaxNormTypeSelector<T>::type max_norm) :
+    Max_norm(std::move(max_norm)) {
+        // input type can only be integer or numeric
+        static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to norm updater has to be integer or numerical types!");
         if (Max_norm < 0) {
             throw std::invalid_argument("max norm shouldn't be less than 0!");
         }
@@ -156,48 +229,51 @@ Details::NormUpdater<T>::NormUpdater() :
     _l1_norm(0),
     _l2_norm(0),
     _max_norm(0),
-    _first_element_flag(true),
-    _average(0) {
-        // min, max will be updated with update
-        // since this constructor will be used in vector l1, l2 and max norms, average is set to 0
-}
-
-template <typename T>
-Details::NormUpdater<T>::NormUpdater(std::double_t average) :
-    _l1_norm(0),
-    _l2_norm(0),
-    _max_norm(0),
-    _first_element_flag(true),
-    _average(std::move(average)) {
+    _update_l1_flag(false),
+    _update_l2_flag(false),
+    _update_max_flag(false) {
         // input type can only be integer or numeric
         static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to norm updater has to be integer or numerical types!");
 }
 
 template <typename T>
 void Details::NormUpdater<T>::update_max(T input) {
-    if (_first_element_flag) {
+    if (!_update_max_flag) {
         _max_norm = static_cast<typename TypeSelector::MaxNormTypeSelector<T>::type>(std::abs(input));
-        _first_element_flag = false;
+        _update_max_flag = true;
     } else {
         _max_norm = std::max(static_cast<typename TypeSelector::MaxNormTypeSelector<T>::type>(std::abs(input)), _max_norm);
     }
 }
-
 template <typename T>
-void Details::NormUpdater<T>::update_l1l2(T input) {
-    long double diff = std::abs(static_cast<long double>(input) - static_cast<long double>(_average));
+void Details::NormUpdater<T>::update_l1(T input) {
+    if (!_update_l1_flag) {
+        _update_l1_flag = true;
+    }
+    long double diff = std::abs(static_cast<long double>(input));
 
     // check if diff is too small comparing to l1_norm
     if ((_l1_norm + diff == _l1_norm) && (diff != 0)) {
-        throw std::runtime_error("In l1 norm calculation, difference between input and average is so small comparing to l1_norm that l1_norm is the same after long double addition!");
+        throw std::runtime_error("In l1 norm calculation, input is so small comparing to l1_norm that l1_norm is the same after long double addition!");
     }
     _l1_norm += diff;
 
-    long double diff_square = std::pow(diff, 2);
+    // check if exceeds bound
+    // only check for l2_norm and no checks for l1_norm is because if l1_norm is out of upper bound, l2_norm is definitely out of bound
+    if (std::isinf(_l1_norm)) {
+        throw std::runtime_error("Overflows occured during calculating l1_norm! Check your data!");
+    }
+}
 
+template <typename T>
+void Details::NormUpdater<T>::update_l2(T input) {
+    if (!_update_l2_flag) {
+        _update_l2_flag = true;
+    }
+    long double diff_square = std::pow(std::abs(static_cast<long double>(input)), 2);
 
     if ((_l2_norm + diff_square == _l2_norm) && (diff_square != 0)) {
-        throw std::runtime_error("In l2 norm calculation, square of difference between input and average is so small comparing to l2_norm that l2_norm is the same after long double addition!");
+        throw std::runtime_error("In l2 norm calculation, square of input is so small comparing to l2_norm that l2_norm is the same after long double addition!");
     }
     _l2_norm += diff_square;
 
@@ -209,12 +285,34 @@ void Details::NormUpdater<T>::update_l1l2(T input) {
 }
 
 template <typename T>
-typename Details::NormUpdater<T>::NormResult Details::NormUpdater<T>::commit(void) {
+typename Details::NormUpdater<T>::L1NormResult Details::NormUpdater<T>::commit_l1(void) {
     assert(_l1_norm >= 0);
-    assert(_l2_norm >= 0);
-    assert(_max_norm >= 0);
-    return NormResult(std::move(_l1_norm), std::move(std::sqrt(_l2_norm)), std::move(_max_norm));
+    if (!_update_l1_flag) {
+        throw std::runtime_error("update_l1 is not called before l1 is committed!");
+    }
+    return L1NormResult(std::move(_l1_norm));
 }
+
+template <typename T>
+typename Details::NormUpdater<T>::L2NormResult Details::NormUpdater<T>::commit_l2(void) {
+    assert(_l2_norm >= 0);
+    if (!_update_l2_flag) {
+        throw std::runtime_error("update_l2 is not called before l2 is committed!");
+    }
+    return L2NormResult(std::move(std::sqrt(_l2_norm)));
+}
+template <typename T>
+typename Details::NormUpdater<T>::MaxNormResult Details::NormUpdater<T>::commit_max(void) {
+    assert(_max_norm >= 0);
+    if (!_update_max_flag) {
+        throw std::runtime_error("update_max is not called before max is committed!");
+    }
+    return MaxNormResult(std::move(_max_norm));
+}
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 }
 }

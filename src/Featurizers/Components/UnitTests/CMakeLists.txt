@@ -39,6 +39,7 @@ SET(
     NormUpdater_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
     RobustScalarNormEstimator_UnitTest
+    StandardDeviationUpdater_UnitTest
     StatisticsMetricsEstimator_UnitTest
     TrainingOnlyEstimatorImpl_UnitTest
     # TODO: Add tests for:
