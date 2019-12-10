@@ -33,7 +33,7 @@ TEST_CASE("updater ctor") {
     CHECK_THROWS_WITH(NS::Featurizers::Components::Details::STDUpdater<inputType>(10, 0), "Count is 0 when constructing STDUpdater to calculate standard deviation!");
 }
 
-TEST_CASE("l1 updater normal cases") {
+TEST_CASE("std updater normal cases") {
     using inputType = int;
     NS::Featurizers::Components::Details::STDUpdater<inputType> updater(2, 5);
     CHECK_THROWS_WITH(updater.commit(), "update_l2 is not called before l2 is committed!");
