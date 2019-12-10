@@ -54,7 +54,6 @@ TEST_CASE("l1 updater overflow") {
     NS::Featurizers::Components::Details::NormUpdater<inputType> updater;
     updater.update_l1(std::numeric_limits<inputType>::max());
     CHECK_THROWS_WITH(updater.update_l1(1), "In l1 norm calculation, input is so small comparing to l1_norm that l1_norm is the same after long double addition!");
-    CHECK_THROWS_WITH(updater.update_l1(std::numeric_limits<inputType>::max()), "Overflows occured during calculating l1_norm! Check your data!");
 }
 
 TEST_CASE("l2 updater normal cases") {
@@ -77,7 +76,6 @@ TEST_CASE("l2 updater overflow") {
     NS::Featurizers::Components::Details::NormUpdater<inputType> updater;
     updater.update_l2(std::sqrt(std::numeric_limits<inputType>::max()));
     CHECK_THROWS_WITH(updater.update_l2(1), "In l2 norm calculation, square of input is so small comparing to l2_norm that l2_norm is the same after long double addition!");
-    CHECK_THROWS_WITH(updater.update_l2(std::numeric_limits<inputType>::max()), "Overflows occured during calculating l2_norm! Check your data!");
 }
 
 TEST_CASE("max updater") {
