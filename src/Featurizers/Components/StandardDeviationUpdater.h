@@ -16,7 +16,7 @@ namespace Components {
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
 
-namespace Details{
+namespace Updaters{
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         STDUpdater
@@ -59,6 +59,8 @@ public:
     // ----------------------------------------------------------------------
     using InputType              = T;
 
+    // input type can only be integer or numeric
+    static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to standard deviation updater has to be integer or numerical types!");
 
     // ----------------------------------------------------------------------
     // |
@@ -94,16 +96,14 @@ private:
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::STDUpdater::STDResult
+// |  Updaters::STDUpdater::STDResult
 // |
 // ----------------------------------------------------------------------
 
 template <typename T>
-Details::STDUpdater<T>::STDResult::STDResult(long double standard_deviation, std::uint64_t counter) :
+Updaters::STDUpdater<T>::STDResult::STDResult(long double standard_deviation, std::uint64_t counter) :
     StandardDeviation(std::move(standard_deviation)),
     Count(std::move(counter)) {
-        // input type can only be integer or numeric
-        static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to standard deviation updater has to be integer or numerical types!");
         if (StandardDeviation < 0) {
             throw std::invalid_argument("Standard deviation shouldn't be less than 0!");
         }
@@ -114,22 +114,20 @@ Details::STDUpdater<T>::STDResult::STDResult(long double standard_deviation, std
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::STDUpdater
+// |  Updaters::STDUpdater
 // |
 // ----------------------------------------------------------------------
 
 template <typename T>
-Details::STDUpdater<T>::STDUpdater(std::double_t average) :
+Updaters::STDUpdater<T>::STDUpdater(std::double_t average) :
     _average(average),
     _counter(0),
     _updater(L2NormUpdater<std::double_t>()) {
-        // input type can only be integer or numeric
-        static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to standard deviation updater has to be integer or numerical types!");
 }
 
 template <typename T>
-void Details::STDUpdater<T>::update(T input) {
-    _updater.update_l2(static_cast<std::double_t>(input) - _average);
+void Updaters::STDUpdater<T>::update(T input) {
+    _updater.update(static_cast<std::double_t>(input) - _average);
     // check if count will be out of bounds
     if (std::numeric_limits<std::uint64_t>::max() == _counter) {
         throw std::runtime_error("Overflow occured for count during calculating standard deviation! You might input too much data");
@@ -138,8 +136,8 @@ void Details::STDUpdater<T>::update(T input) {
 }
 
 template <typename T>
-typename Details::STDUpdater<T>::STDResult Details::STDUpdater<T>::commit(void) {
-    long double const l2(_updater.commit_l2().L2_norm);
+typename Updaters::STDUpdater<T>::STDResult Updaters::STDUpdater<T>::commit(void) {
+    long double const l2(_updater.commit());
     return STDResult(std::move(l2/_counter), std::move(_counter));
 }
 
