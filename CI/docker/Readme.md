@@ -1,18 +1,11 @@
-Publishing a New Image for CI
-=============================
-The Azure DevOps functionality that makes containers available during builds
-assumes that `sudo` is available on the image. Unfortunately, the image that
-we use for universal linux builds (`phusion/holy-build-box-64`) does not enable
-`sudo` by default.
-
 Building the Image
-------------------
+==================
 These are the steps required to build an image locally and push it to an Azure
 Container Registry so that it can be used during builds.
 
     1) Build the image:
 
-            python Build.py Build
+            python Build.py Build <image_name>
 
     2) Login to the ACR:
 
@@ -27,7 +20,7 @@ Container Registry so that it can be used during builds.
 
     3) Publish the image:
 
-            python Build.py Publish featurizersbuild.azurecr.io
+            python Build.py Publish <image_name> featurizersbuild.azurecr.io
 
 Note that ../PR.yaml and ../CI.yaml (and potentially other files) are configured to use
 this image in this Container Registry.
