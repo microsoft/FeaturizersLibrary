@@ -838,7 +838,7 @@ def _GenerateKernel(
                         {transformer_name},
                         kMSAutoMLDomain,
                         1,
-                        {input_type},
+                        {input_type_no_namespace},
                         kCpuExecutionProvider,
                         KernelDefBuilder()
                             .TypeConstraint("{template_input_type}", DataTypeImpl::GetTensorType<{input_type}>()),
@@ -847,7 +847,8 @@ def _GenerateKernel(
                     """,
                 ).format(
                     transformer_name=transformer_name,
-                    input_type= mapping_input_type if "string" in  mapping_input_type else mapping_input_type.replace("std::", ""),
+                    input_type_no_namespace = mapping_input_type.replace("std::", ""),
+                    input_type = mapping_input_type if "string" in  mapping_input_type else mapping_input_type.replace("std::", ""),
                     template_input_type=input_type,
                 ) for mapping_input_type in six.iterkeys(input_type_mappings)
             ]
