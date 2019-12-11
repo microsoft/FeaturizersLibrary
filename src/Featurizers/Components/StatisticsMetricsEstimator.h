@@ -38,7 +38,7 @@ struct SumTypeSelector<std::double_t> {
 
 }
 
-namespace Details {
+namespace Updaters {
 // TODO: Updaters should be extracted to a separate file
 
 /////////////////////////////////////////////////////////////////////////
@@ -166,8 +166,9 @@ private:
     // ----------------------------------------------------------------------
     typename TypeSelector::SumTypeSelector<T>::type                               _sum;
 };
+}
 
-
+namespace Details {
 /////////////////////////////////////////////////////////////////////////
 ///  \class         BasicStatsTrainingOnlyPolicy
 ///  \brief         BasicStatsTrainingOnlyPolicy deals with basic stats include
@@ -198,14 +199,14 @@ public:
     BasicStatsTrainingOnlyPolicy(void);
 
     void fit(InputType const &input);
-    typename BasicStatsUpdater<T>::BasicResult complete_training(void);
+    typename Updaters::BasicStatsUpdater<T>::BasicResult complete_training(void);
 private:
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    BasicStatsUpdater<T>                         _updater;
+    Updaters::BasicStatsUpdater<T>                         _updater;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -238,14 +239,14 @@ public:
     StandardStatsTrainingOnlyPolicy(void);
 
     void fit(InputType const &input);
-    typename StandardStatsUpdater<T>::StandardResult complete_training(void);
+    typename Updaters::StandardStatsUpdater<T>::StandardResult complete_training(void);
 private:
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    StandardStatsUpdater<T>                      _updater;
+    Updaters::StandardStatsUpdater<T>                      _updater;
 };
 
 template <typename T>
@@ -309,9 +310,9 @@ struct StatsPolicySelector<std::double_t> {
 // to avoid confusion for user who would expect annotation data from
 // the estimator, we put using statement here
 template <typename T>
-using BasicStatisticalAnnotationData = typename Details::BasicStatsUpdater<T>::BasicResult;
+using BasicStatisticalAnnotationData = typename Updaters::BasicStatsUpdater<T>::BasicResult;
 template <typename T>
-using StandardStatisticalAnnotationData = typename Details::StandardStatsUpdater<T>::StandardResult;
+using StandardStatisticalAnnotationData = typename Updaters::StandardStatsUpdater<T>::StandardResult;
 
 
 /////////////////////////////////////////////////////////////////////////
@@ -343,17 +344,17 @@ using StatisticalMetricsEstimator                       = TrainingOnlyEstimatorI
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::BasicStatsUpdater
+// |  Updaters::BasicStatsUpdater
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-Details::BasicStatsUpdater<T>::BasicStatsUpdater(void) :
+Updaters::BasicStatsUpdater<T>::BasicStatsUpdater(void) :
     _count(0),
     _first_element_flag(true) {
 }
 
 template <typename T>
-Details::BasicStatsUpdater<T>::BasicResult::BasicResult(T min, T max, std::uint64_t count) :
+Updaters::BasicStatsUpdater<T>::BasicResult::BasicResult(T min, T max, std::uint64_t count) :
     Min(std::move(min)),
     Max(std::move(max)),
     Count(std::move(count)) {
@@ -362,7 +363,7 @@ Details::BasicStatsUpdater<T>::BasicResult::BasicResult(T min, T max, std::uint6
 }
 
 template <typename T>
-void Details::BasicStatsUpdater<T>::update(T input) {
+void Updaters::BasicStatsUpdater<T>::update(T input) {
     // first valid input element will set min and max
     if (_first_element_flag) {
         _min = input;
@@ -384,7 +385,7 @@ void Details::BasicStatsUpdater<T>::update(T input) {
 }
 
 template <typename T>
-typename Details::BasicStatsUpdater<T>::BasicResult Details::BasicStatsUpdater<T>::commit(void) {
+typename Updaters::BasicStatsUpdater<T>::BasicResult Updaters::BasicStatsUpdater<T>::commit(void) {
     if(_count != 0) {
         assert(_min <= _max);
     }
@@ -393,17 +394,17 @@ typename Details::BasicStatsUpdater<T>::BasicResult Details::BasicStatsUpdater<T
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::StandardStatsUpdater
+// |  Updaters::StandardStatsUpdater
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-Details::StandardStatsUpdater<T>::StandardStatsUpdater(void) :
+Updaters::StandardStatsUpdater<T>::StandardStatsUpdater(void) :
     _sum(0) {
 }
 
 template <typename T>
-Details::StandardStatsUpdater<T>::StandardResult::StandardResult(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count) :
-    Details::BasicStatsUpdater<T>::BasicResult(std::move(min), std::move(max), std::move(count)),
+Updaters::StandardStatsUpdater<T>::StandardResult::StandardResult(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count) :
+    Updaters::BasicStatsUpdater<T>::BasicResult(std::move(min), std::move(max), std::move(count)),
     Sum(std::move(sum)),
     Average(std::move(average))
     {
@@ -412,7 +413,7 @@ Details::StandardStatsUpdater<T>::StandardResult::StandardResult(typename TypeSe
 }
 
 template <typename T>
-void Details::StandardStatsUpdater<T>::update(T input) {
+void Updaters::StandardStatsUpdater<T>::update(T input) {
     BasicStatsUpdater<T>::update(input);
     if (TypeSelector::SumTypeSelector<T>::IsNumeric) {
         // if sum is of type long double, check for overflows
@@ -437,7 +438,7 @@ void Details::StandardStatsUpdater<T>::update(T input) {
 }
 
 template <typename T>
-typename Details::StandardStatsUpdater<T>::StandardResult Details::StandardStatsUpdater<T>::commit(void) {
+typename Updaters::StandardStatsUpdater<T>::StandardResult Updaters::StandardStatsUpdater<T>::commit(void) {
     BasicStatisticalAnnotationData<T> basics = BasicStatsUpdater<T>::commit();
     if (basics.Count != 0) {
         if (TypeSelector::SumTypeSelector<T>::IsNumeric) {
@@ -464,7 +465,7 @@ typename Details::StandardStatsUpdater<T>::StandardResult Details::StandardStats
 // ----------------------------------------------------------------------
 template <typename T>
 Details::BasicStatsTrainingOnlyPolicy<T>::BasicStatsTrainingOnlyPolicy(void) :
-    _updater(BasicStatsUpdater<T>()) {
+    _updater(Updaters::BasicStatsUpdater<T>()) {
 }
 
 template <typename T>
@@ -487,7 +488,7 @@ BasicStatisticalAnnotationData<T> Details::BasicStatsTrainingOnlyPolicy<T>::comp
 // ----------------------------------------------------------------------
 template <typename T>
 Details::StandardStatsTrainingOnlyPolicy<T>::StandardStatsTrainingOnlyPolicy(void) :
-    _updater(StandardStatsUpdater<T>()) {
+    _updater(Updaters::StandardStatsUpdater<T>()) {
 }
 
 template <typename T>

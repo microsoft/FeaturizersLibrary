@@ -63,7 +63,7 @@ TEST_CASE("invalid argument for AnnotationData constructors") {
 TEST_CASE("updaters for integer types") {
     using inputType = int;
 
-    NS::Featurizers::Components::Details::StandardStatsUpdater<inputType> standard_updater;
+    NS::Featurizers::Components::Updaters::StandardStatsUpdater<inputType> standard_updater;
     standard_updater.update(1);
     standard_updater.update(3);
     standard_updater.update(5);
@@ -79,7 +79,7 @@ TEST_CASE("updaters for integer types") {
 TEST_CASE("updaters for numerical types") {
     using inputType = std::double_t;
 
-    NS::Featurizers::Components::Details::StandardStatsUpdater<inputType> standard_updater;
+    NS::Featurizers::Components::Updaters::StandardStatsUpdater<inputType> standard_updater;
     standard_updater.update(1.41);
     standard_updater.update(3.76);
     standard_updater.update(5.39);
@@ -95,7 +95,7 @@ TEST_CASE("updaters for numerical types") {
 TEST_CASE("updaters for string") {
     using inputType = std::string;
 
-    NS::Featurizers::Components::Details::BasicStatsUpdater<inputType> basic_updater;
+    NS::Featurizers::Components::Updaters::BasicStatsUpdater<inputType> basic_updater;
     basic_updater.update("zed");
     basic_updater.update("xayah");
     basic_updater.update("tydamire");
@@ -111,7 +111,7 @@ TEST_CASE("overflow for integer types") {
     using inputType = std::int64_t;
 
     // checks for upper bound
-    NS::Featurizers::Components::Details::StandardStatsUpdater<inputType> standard_updater;
+    NS::Featurizers::Components::Updaters::StandardStatsUpdater<inputType> standard_updater;
     standard_updater.update(std::numeric_limits<inputType>::max());
     CHECK_THROWS_WITH(standard_updater.update(1), "Overflow occured for sum during calculating statistic metrics! Check your data!");
 
@@ -128,7 +128,7 @@ TEST_CASE("overflow for integer types") {
 TEST_CASE("overflow for numerical types") {
     using inputType = std::double_t;
 
-    NS::Featurizers::Components::Details::StandardStatsUpdater<inputType> standard_updater;
+    NS::Featurizers::Components::Updaters::StandardStatsUpdater<inputType> standard_updater;
     standard_updater.update(std::numeric_limits<inputType>::max());
     CHECK_THROWS_WITH(standard_updater.update(1), "Input is so small comparing to sum that sum is the same after long double addition!");
 }
