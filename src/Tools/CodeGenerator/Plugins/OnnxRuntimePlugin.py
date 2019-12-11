@@ -376,7 +376,6 @@ def _GenerateGlobalDefs(
     # ----------------------------------------------------------------------
     def CreateTypeInferenceConstraints(output_type_mappings):
         code = []
-        mapping_length = len(output_type_mappings)
         constraint_format = "input_elem_type == ONNX_NAMESPACE::TensorProto_DataType_{input_type_upper}"
 
         for index, (output_type, input_types) in enumerate(output_type_mappings.items()):
@@ -457,7 +456,7 @@ def _GenerateGlobalDefs(
                                 type_name=type_name,
                                 constraints=", ".join(
                                     [
-                                        '"tensor({})"'.format(constraint[:-2] if constraint[-2:] == "_t" else constraint)
+                                        '"tensor({})"'.format(re.sub("_t$", "", constraint))
                                         for constraint in constraints
                                     ],
                                 ),
@@ -543,20 +542,6 @@ def _GenerateGlobalDefs(
                             item.output_description,
                         ),
                     ]
-                else:
-                    output_type = "OutputT"
-                    type_constraints[output_type] = [
-                        "{}".format(value.replace("std::", ""))
-                        for value in all_output_types
-                    ]
-                    output_statements = [
-                        CreateOutputStatement(
-                            "OutputT",
-                            item.output_description,
-                        ),
-                    ]
-
-                if (len(all_output_types) == 1):
                     suffix = textwrap.dedent(
                         """\
                         .TypeAndShapeInferenceFunction(
@@ -571,6 +556,17 @@ def _GenerateGlobalDefs(
                         output_type_upper=output_type.replace("std::", "").upper(),
                     )
                 else:
+                    output_type = "OutputT"
+                    type_constraints[output_type] = [
+                        "{}".format(value.replace("std::", ""))
+                        for value in all_output_types
+                    ]
+                    output_statements = [
+                        CreateOutputStatement(
+                            "OutputT",
+                            item.output_description,
+                        ),
+                    ]
                     suffix = textwrap.dedent(
                         """\
                         .TypeAndShapeInferenceFunction(
@@ -586,7 +582,6 @@ def _GenerateGlobalDefs(
                         output_type_upper=output_type.replace("std::", "").upper(),
                         constraints = CreateTypeInferenceConstraints(output_type_mappings),
                     )
-
             else:
                 assert custom_struct_data
                 assert len(custom_struct_data) == 1, custom_struct_data
