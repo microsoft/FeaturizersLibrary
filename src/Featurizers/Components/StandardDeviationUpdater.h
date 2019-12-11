@@ -4,7 +4,7 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include "NormUpdater.h"
+#include "NormUpdaters.h"
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
@@ -21,6 +21,7 @@ namespace Details{
 /////////////////////////////////////////////////////////////////////////
 ///  \class         STDUpdater
 ///  \brief         STDUpdater uses NormUpdater to update standard deviation
+///                 STDUpdater also keeps track of the count of input elements
 ///
 template <typename T>
 class STDUpdater {
@@ -29,6 +30,7 @@ public:
     /////////////////////////////////////////////////////////////////////////
     ///  \class         STDResult
     ///  \brief         A structure which contains the standard deviation
+    ///                 and the count of input elements
     ///
     struct STDResult {
     public:
@@ -37,14 +39,14 @@ public:
         // |  Public Data
         // |
         // ----------------------------------------------------------------------
-        long double const StandardDeviation;
-
+        long double   const StandardDeviation;
+        std::uint64_t const Count;
         // ----------------------------------------------------------------------
         // |
         // |  Public Methods
         // |
         // ----------------------------------------------------------------------
-        STDResult(long double standard_deviation);
+        STDResult(long double standard_deviation, std::uint64_t counter);
         ~STDResult(void) = default;
 
         FEATURIZER_MOVE_CONSTRUCTOR_ONLY(STDResult);
@@ -55,7 +57,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using InputType                         = T;
+    using InputType              = T;
 
 
     // ----------------------------------------------------------------------
@@ -63,7 +65,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    STDUpdater(std::double_t average, std::uint64_t count);
+    STDUpdater(std::double_t average);
 
     void update(InputType input);
 
@@ -75,9 +77,9 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    std::double_t  const _average;
-    std::uint64_t  const _count;
-    NormUpdater<std::double_t> _updater;
+    std::double_t const          _average;
+    std::uint64_t                _counter;
+    L2NormUpdater<std::double_t> _updater;
 };
 
 // ----------------------------------------------------------------------
@@ -97,12 +99,16 @@ private:
 // ----------------------------------------------------------------------
 
 template <typename T>
-Details::STDUpdater<T>::STDResult::STDResult(long double standard_deviation) :
-    StandardDeviation(std::move(standard_deviation)) {
+Details::STDUpdater<T>::STDResult::STDResult(long double standard_deviation, std::uint64_t counter) :
+    StandardDeviation(std::move(standard_deviation)),
+    Count(std::move(counter)) {
         // input type can only be integer or numeric
         static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to standard deviation updater has to be integer or numerical types!");
         if (StandardDeviation < 0) {
             throw std::invalid_argument("Standard deviation shouldn't be less than 0!");
+        }
+        if ((Count == 0) && (StandardDeviation != 0)) {
+            throw std::invalid_argument("Standard deviation is not 0 when count is 0!");
         }
 }
 
@@ -113,26 +119,28 @@ Details::STDUpdater<T>::STDResult::STDResult(long double standard_deviation) :
 // ----------------------------------------------------------------------
 
 template <typename T>
-Details::STDUpdater<T>::STDUpdater(std::double_t average, std::uint64_t count) :
+Details::STDUpdater<T>::STDUpdater(std::double_t average) :
     _average(average),
-    _count(count),
-    _updater(NormUpdater<std::double_t>()) {
+    _counter(0),
+    _updater(L2NormUpdater<std::double_t>()) {
         // input type can only be integer or numeric
         static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to standard deviation updater has to be integer or numerical types!");
-        if (_count == 0) {
-            throw std::invalid_argument("Count is 0 when constructing STDUpdater to calculate standard deviation!");
-        }
 }
 
 template <typename T>
 void Details::STDUpdater<T>::update(T input) {
     _updater.update_l2(static_cast<std::double_t>(input) - _average);
+    // check if count will be out of bounds
+    if (std::numeric_limits<std::uint64_t>::max() == _counter) {
+        throw std::runtime_error("Overflow occured for count during calculating standard deviation! You might input too much data");
+    }
+    ++_counter;
 }
 
 template <typename T>
 typename Details::STDUpdater<T>::STDResult Details::STDUpdater<T>::commit(void) {
-    long double const & l2(_updater.commit_l2().L2_norm);
-    return STDResult(std::move(l2/_count));
+    long double const l2(_updater.commit_l2().L2_norm);
+    return STDResult(std::move(l2/_counter), std::move(_counter));
 }
 
 #if (defined __clang__)

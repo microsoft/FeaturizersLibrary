@@ -60,12 +60,16 @@ TEST_CASE("Transformer_Nullable") {
 TEST_CASE("Transformer_Binary") {
     bool arg_false = false;
     bool arg_true = true;
+    CHECK(!Traits<bool>::IsIntOrNumeric::value);
     CHECK(Traits<bool>::ToString(arg_false) == "False");
     CHECK(Traits<bool>::ToString(arg_true) == "True");
 }
 
 TEST_CASE("Transformer_Strings") {
     std::string arg_s = "isstring";
+
+    CHECK(!Traits<std::string>::IsIntOrNumeric::value);
+
     CHECK(Traits<std::string>::ToString(arg_s) == "isstring");
 }
 
@@ -79,6 +83,16 @@ TEST_CASE("Transformer_Integers") {
     std::uint16_t arg_u16 = 250;
     std::uint32_t arg_u32 = 480;
     std::uint64_t arg_u64 = 7799;
+
+    CHECK(Traits<std::int8_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::int16_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::int32_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::int64_t>::IsIntOrNumeric::value);
+
+    CHECK(Traits<std::uint8_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::uint16_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::uint32_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::uint64_t>::IsIntOrNumeric::value);
 
     CHECK(Traits<std::int8_t>::ToString(arg_8) == "20");
     CHECK(Traits<std::int16_t>::ToString(arg_16) == "-250");
@@ -131,6 +145,9 @@ TEST_CASE("Transformer_Numbers") {
     std::float_t arg_f = 123;
     std::double_t arg_d1 = 123.45;
     std::double_t arg_d2 = 135453984983490.5473;
+
+    CHECK(Traits<std::float_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::double_t>::IsIntOrNumeric::value);
 
     CHECK(Traits<std::float_t>::ToString(arg_f_ini) == "NaN");
     CHECK(Traits<std::double_t>::ToString(arg_d_ini) == "NaN");
