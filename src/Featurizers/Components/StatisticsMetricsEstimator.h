@@ -108,8 +108,8 @@ private:
     bool                                      _first_element_flag;
 };
 /////////////////////////////////////////////////////////////////////////
-///  \class         StandardStatsTrainingOnlyPolicy
-///  \brief         StandardStatsTrainingOnlyPolicy updates advanced stats include
+///  \class         StandardStatsUpdater
+///  \brief         StandardStatsUpdater updates advanced stats include
 ///                 sum and average
 ///
 template <typename T>
