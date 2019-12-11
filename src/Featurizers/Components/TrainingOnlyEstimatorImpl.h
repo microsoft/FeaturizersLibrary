@@ -29,6 +29,9 @@ namespace Components {
 ///
 ///                     Methods
 ///                     -------
+///                         [optional]
+///                         bool begin_training(AnnotationMap const &annotations);
+///
 ///                         void fit(InputType const &item);
 ///                             or
 ///                         void fit(InputType const *pItems, size_t cItems);
@@ -119,6 +122,8 @@ private:
     // |
     // ----------------------------------------------------------------------
     bool begin_training_impl(void) override;
+    bool begin_training_impl(std::true_type);
+    bool begin_training_impl(std::false_type);
 
     FitResult fit_impl(typename BaseType::InputType const *pItems, size_t cItems) override;
     void fit_impl(typename BaseType::InputType const *pItems, size_t cItems, std::true_type);
@@ -151,13 +156,13 @@ private:
     template <typename U>
     static constexpr std::true_type Check(
         U *,
-        std::enable_if_t<
+        typename std::enable_if<
             std::is_same<
                 decltype(std::declval<U>().fit(std::declval<ArgTs>()...)),
                 ReturnT
             >::value,
             void *
-        >
+        >::type
     );
 
 public:
@@ -166,6 +171,36 @@ public:
 
 template <typename InputT, typename T>
 class HasFitBufferMethod : public HasFitBufferMethodImpl<T, void (InputT const *, size_t)> {};
+
+// ----------------------------------------------------------------------
+template <typename, typename T>
+class HasBeginTrainingMethodImpl {
+    static_assert(std::integral_constant<T, false>::value, "Second template parameter must be a function type");
+};
+
+template <typename T, typename ReturnT, typename... ArgTs>
+class HasBeginTrainingMethodImpl<T, ReturnT (ArgTs...)> {
+private:
+    template <typename U> static constexpr std::false_type Check(...);
+
+    template <typename U>
+    static constexpr std::true_type Check(
+        U *,
+        typename std::enable_if<
+            std::is_same<
+                decltype(std::declval<U>().begin_training(std::declval<ArgTs>()...)),
+                ReturnT
+            >::value,
+            void *
+        >::type
+    );
+
+public:
+    static constexpr bool const             value = std::is_same<std::true_type, decltype(Check<T>(nullptr, nullptr))>::value;
+};
+
+template <typename T>
+class HasBeginTrainingMethod : public HasBeginTrainingMethodImpl<T, bool (AnnotationMap const &)> {};
 
 } // namespace Details
 
@@ -257,6 +292,20 @@ bool TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::begin_tr
     if(_hasAnnotation)
         return false;
 
+    return begin_training_impl(std::integral_constant<bool, Details::HasBeginTrainingMethod<EstimatorPolicyT>::value>());
+}
+
+template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
+bool TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::begin_training_impl(std::true_type) {
+    AnnotationMaps const &                  allColumnAnnotations(BaseType::get_column_annotations());
+
+    assert(_colIndex < allColumnAnnotations.size());
+    return EstimatorPolicyT::begin_training(allColumnAnnotations[_colIndex]);
+}
+
+template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
+bool TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::begin_training_impl(std::false_type) {
+    // Nothing to do here, allow training to continue
     return true;
 }
 
