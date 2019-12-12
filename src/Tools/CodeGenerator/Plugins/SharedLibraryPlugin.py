@@ -362,7 +362,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
 
                 // These methods are used internally but not exported
                 ErrorInfoHandle * CreateErrorInfo(std::exception const &ex) {
-                    std::unique_ptr<std::string> result(std::make_unique<std::string>(ex.what()));
+                    std::unique_ptr<std::string> result(new std::string(ex.what()));
 
                     size_t index = g_pointerTable.Add(result.release());
                     return reinterpret_cast<ErrorInfoHandle *>(index);
@@ -861,7 +861,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
 
                             Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(archive).release());
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType(archive));
 
                             size_t index = g_pointerTable.Add(pTransformer);
                             *ppTransformerHandle = reinterpret_cast<{name}{suffix}TransformerHandle*>(index);

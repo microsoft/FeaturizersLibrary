@@ -118,7 +118,7 @@ private:
 
         MinMaxAnnotationData const &        data(MinMaxEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::MinMaxEstimatorName));
 
-        return std::make_unique<MinMaxScalarTransformer<InputT, TransformedT>>(data.Min, data.Max);
+        return typename BaseType::TransformerUniquePtr(new MinMaxScalarTransformer<InputT, TransformedT>(data.Min, data.Max));
     }
 };
 

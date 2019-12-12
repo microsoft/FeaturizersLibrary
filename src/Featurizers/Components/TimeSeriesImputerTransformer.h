@@ -186,7 +186,7 @@ private:
         assert(dynamic_cast<TimeSeriesMedianAnnotation const *>(&medianAnnotation));
         TimeSeriesMedianAnnotation const &              tsMedianAnnotation(static_cast<TimeSeriesMedianAnnotation const &>(medianAnnotation));
 
-        return std::make_unique<Transformer>(tsFreqAnnotation.Value, std::move(_colsToImputeDataTypes), std::move(_tsImputeStrategy), std::move(_supressError), tsMedianAnnotation.Value);
+        return typename BaseType::TransformerUniquePtr(new Transformer(tsFreqAnnotation.Value, std::move(_colsToImputeDataTypes), std::move(_tsImputeStrategy), std::move(_supressError), tsMedianAnnotation.Value));
     }
 };
 

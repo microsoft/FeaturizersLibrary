@@ -92,7 +92,12 @@ void ImputationMarkerFeaturizer_int8_t_Test(
         REQUIRE(ImputationMarkerFeaturizer_int8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -190,7 +195,12 @@ void ImputationMarkerFeaturizer_int16_t_Test(
         REQUIRE(ImputationMarkerFeaturizer_int16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -288,7 +298,12 @@ void ImputationMarkerFeaturizer_int32_t_Test(
         REQUIRE(ImputationMarkerFeaturizer_int32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -386,7 +401,12 @@ void ImputationMarkerFeaturizer_int64_t_Test(
         REQUIRE(ImputationMarkerFeaturizer_int64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -484,7 +504,12 @@ void ImputationMarkerFeaturizer_uint8_t_Test(
         REQUIRE(ImputationMarkerFeaturizer_uint8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -582,7 +607,12 @@ void ImputationMarkerFeaturizer_uint16_t_Test(
         REQUIRE(ImputationMarkerFeaturizer_uint16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -680,7 +710,12 @@ void ImputationMarkerFeaturizer_uint32_t_Test(
         REQUIRE(ImputationMarkerFeaturizer_uint32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -778,7 +813,12 @@ void ImputationMarkerFeaturizer_uint64_t_Test(
         REQUIRE(ImputationMarkerFeaturizer_uint64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -876,7 +916,12 @@ void ImputationMarkerFeaturizer_float_t_Test(
         REQUIRE(ImputationMarkerFeaturizer_float_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -974,7 +1019,12 @@ void ImputationMarkerFeaturizer_double_t_Test(
         REQUIRE(ImputationMarkerFeaturizer_double_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -1072,7 +1122,12 @@ void ImputationMarkerFeaturizer_bool_Test(
         REQUIRE(ImputationMarkerFeaturizer_bool_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<bool>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<bool>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -1170,7 +1225,12 @@ void ImputationMarkerFeaturizer_string_Test(
         REQUIRE(ImputationMarkerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::string>::IsNull(input) ? nullptr : input->c_str(), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 

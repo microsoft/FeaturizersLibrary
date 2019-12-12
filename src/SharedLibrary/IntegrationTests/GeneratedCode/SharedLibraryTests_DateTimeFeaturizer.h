@@ -93,7 +93,12 @@ void DateTimeFeaturizer_Test(
         REQUIRE(DateTimeFeaturizer_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 

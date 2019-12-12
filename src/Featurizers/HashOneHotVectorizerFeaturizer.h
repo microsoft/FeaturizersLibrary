@@ -162,7 +162,7 @@ private:
 
     //MSVC will complain when the function is defined outside of the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        return std::make_unique<HashOneHotVectorizerTransformer<T>>(_hashingSeedVal, _numCols);
+        return typename BaseType::TransformerUniquePtr(new HashOneHotVectorizerTransformer<T>(_hashingSeedVal, _numCols));
     }
 };
 

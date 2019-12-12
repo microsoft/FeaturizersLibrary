@@ -74,7 +74,11 @@ class _ScalarTypeInfoFactory(TypeInfoFactory):
                 {cpp_type} const * const * const {name}_end({name}_ptr + {name}_items);
 
                 while({name}_ptr != {name}_end) {{
+                #if (defined __apple_build_version__)
+                    {name}_buffer.push_back(*{name}_ptr ? **{name}_ptr : Microsoft::Featurizer::Traits<{cpp_type}>::CreateNullValue());
+                #else
                     {name}_buffer.emplace_back(*{name}_ptr ? **{name}_ptr : Microsoft::Featurizer::Traits<{cpp_type}>::CreateNullValue());
+                #endif
                     ++{name}_ptr;
                 }}
                 """,

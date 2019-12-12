@@ -93,7 +93,12 @@ void RobustScalarFeaturizer_int8_t_Test(
         REQUIRE(RobustScalarFeaturizer_int8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -192,7 +197,12 @@ void RobustScalarFeaturizer_int16_t_Test(
         REQUIRE(RobustScalarFeaturizer_int16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -291,7 +301,12 @@ void RobustScalarFeaturizer_uint8_t_Test(
         REQUIRE(RobustScalarFeaturizer_uint8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -390,7 +405,12 @@ void RobustScalarFeaturizer_uint16_t_Test(
         REQUIRE(RobustScalarFeaturizer_uint16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -489,7 +509,12 @@ void RobustScalarFeaturizer_float_t_Test(
         REQUIRE(RobustScalarFeaturizer_float_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -588,7 +613,12 @@ void RobustScalarFeaturizer_int32_t_Test(
         REQUIRE(RobustScalarFeaturizer_int32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -687,7 +717,12 @@ void RobustScalarFeaturizer_int64_t_Test(
         REQUIRE(RobustScalarFeaturizer_int64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -786,7 +821,12 @@ void RobustScalarFeaturizer_uint32_t_Test(
         REQUIRE(RobustScalarFeaturizer_uint32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -885,7 +925,12 @@ void RobustScalarFeaturizer_uint64_t_Test(
         REQUIRE(RobustScalarFeaturizer_uint64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -984,7 +1029,12 @@ void RobustScalarFeaturizer_double_t_Test(
         REQUIRE(RobustScalarFeaturizer_double_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
