@@ -196,6 +196,10 @@ struct TraitsImpl {
         return !value.has_value();
     }
 
+    struct IsIntOrNumeric {
+        static constexpr bool const value = false;
+    };
+
     static T const & GetNullableValue(nullable_type const &value) {
         if (IsNull(value))
             throw std::runtime_error("GetNullableValue attempt on a null value.");
@@ -297,6 +301,10 @@ struct Traits<std::int8_t> : public TraitsImpl<std::int8_t> {
         return static_cast<std::int8_t>(v);
     }
 
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int8_t const &value) {
         return ar.serialize(value);
@@ -323,6 +331,10 @@ struct Traits<std::int16_t> : public TraitsImpl<std::int16_t> {
         return static_cast<std::int16_t>(v);
     }
 
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int16_t const &value) {
         return serialize_impl<ArchiveT, std::int16_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
@@ -344,6 +356,10 @@ struct Traits<std::int32_t> : public TraitsImpl<std::int32_t> {
         static_assert(sizeof(std::int32_t) == sizeof(int), "This code expects that an int is 32 bits");
         return std::stoi(value.c_str());
     }
+
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int32_t const &value) {
@@ -389,6 +405,10 @@ struct Traits<std::int64_t> : public TraitsImpl<std::int64_t> {
         return static_cast<std::int64_t>(v);
     }
 
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int64_t const &value) {
         return serialize_impl<ArchiveT, std::int64_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
@@ -415,6 +435,10 @@ struct Traits<std::uint8_t> : public TraitsImpl<std::uint8_t> {
         return static_cast<std::uint8_t>(v);
     }
 
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint8_t const &value) {
         return ar.serialize(value);
@@ -440,6 +464,10 @@ struct Traits<std::uint16_t> : public TraitsImpl<std::uint16_t> {
 
         return static_cast<std::uint16_t>(v);
     }
+
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint16_t const &value) {
@@ -485,6 +513,10 @@ struct Traits<std::uint32_t> : public TraitsImpl<std::uint32_t> {
         return static_cast<std::uint32_t>(v);
     }
 
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint32_t const &value) {
         return serialize_impl<ArchiveT, std::uint32_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
@@ -528,6 +560,10 @@ struct Traits<std::uint64_t> : public TraitsImpl<std::uint64_t> {
 
         return static_cast<std::uint64_t>(v);
     }
+
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint64_t const &value) {
@@ -585,6 +621,10 @@ struct Traits<std::float_t> {
         return std::stof(value.c_str());
     }
 
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, nullable_type const &value) {
         return serialize_impl<ArchiveT, nullable_type>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
@@ -640,6 +680,10 @@ struct Traits<std::double_t>  {
 
         return std::stod(value.c_str());
     }
+
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, nullable_type const &value) {
