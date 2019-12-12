@@ -13,11 +13,11 @@ parameters:
     - Release
 
   artifact_configurations:
-    - "Windows - x64"
-    - "Windows - x86"
-    # - 'Linux - universal_linux'
-    - "Linux - system_compiler"
-    - "MacOS - system_compiler"
+    - "Windows-x64-Clang 8"
+    - "Windows-x86-Clang 8"
+    # - 'Linux-Holy Build Box-GCC'
+    - "Ubuntu 16.04-x64-GCC"
+    - "MacOS 10.14-x64-Clang"
 
 steps:
   - task: PythonScript@0

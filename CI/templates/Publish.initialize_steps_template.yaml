@@ -10,7 +10,7 @@ parameters:
   # defined here and not in variables.
   artifacts:
     - Globals
-    - "Windows - x64"
+    - "Windows-x64-Clang 8"
     - Packages
     - Documentation
 
@@ -36,7 +36,7 @@ steps:
 
   # Download from a specific id
   - ${{ each artifact in parameters.artifacts }}:
-      - ? ${{ if or(not(eq(parameters.minimal_download, 'true')), eq(artifact, 'Globals'), eq(artifact, 'Windows - x64')) }}
+      - ? ${{ if or(not(eq(parameters.minimal_download, 'true')), eq(artifact, 'Globals'), eq(artifact, 'Windows-x64-Clang 8')) }}
         : - task: DownloadPipelineArtifact@2
             displayName: "Download Pipeline Artifacts (Manually Triggered Build [${{ artifact }}])"
 
@@ -55,7 +55,7 @@ steps:
 
   # Download from a triggered build
   - ${{ each artifact in parameters.artifacts }}:
-      - ? ${{ if or(not(eq(parameters.minimal_download, 'true')), eq(artifact, 'Globals'), eq(artifact, 'Windows - x64')) }}
+      - ? ${{ if or(not(eq(parameters.minimal_download, 'true')), eq(artifact, 'Globals'), eq(artifact, 'Windows-x64-Clang 8')) }}
         : - task: DownloadPipelineArtifact@2
             displayName: "Download Pipeline Artifacts (Pipeline Build [${{ artifact }}])"
 
@@ -88,7 +88,7 @@ steps:
 
         for info_filename in [
             os.path.join(r"$(Pipeline.Workspace)", "Globals", "globals.json"),
-            os.path.join(r"$(Pipeline.Workspace)", "Windows - x64", "Builder", "product_version_info.json"),
+            os.path.join(r"$(Pipeline.Workspace)", "Windows-x64-Clang 8", "Builder", "product_version_info.json"),
         ]:
             assert os.path.isdir(os.path.dirname(info_filename)), info_filename
             assert os.path.isfile(info_filename), info_filename

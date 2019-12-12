@@ -106,7 +106,16 @@ stages:
                           )
 
                   if build_name and git_branch != "master":
-                      build_name = "%s-%s" % (git_branch, build_name)
+                      # Update the branch name to only include semantic version-supported chars
+                      sem_ver_chars = []
+
+                      for c in git_branch:
+                          if not c.isalnum() and c != '.':
+                              c = '.'
+
+                          sem_ver_chars.append(c)
+
+                      build_name = "%s.%s" % (''.join(sem_ver_chars), build_name)
 
                   values["git_branch"] = git_branch
                   values["is_prerelease_build"] = is_prerelease_build

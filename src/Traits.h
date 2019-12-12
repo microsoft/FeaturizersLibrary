@@ -915,40 +915,40 @@ struct Traits<std::tuple<Types...>> : public TraitsImpl<std::tuple<Types...>> {
     }
 
 private:
-    template<std::size_t N> static inline std::enable_if_t<N < sizeof...(Types) - 1> ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj) {
+    template<std::size_t N> static inline typename std::enable_if<N < sizeof...(Types) - 1>::type ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         streamObj << Traits<type>::ToString(std::get<N>(value)) << ",";
         ToStringHelper<N + 1>(value, streamObj);
     }
 
-    template<std::size_t N> static inline std::enable_if_t<N == (sizeof...(Types) - 1)> ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj) {
+    template<std::size_t N> static inline typename std::enable_if<N == (sizeof...(Types) - 1)>::type ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         streamObj << Traits<type>::ToString(std::get<N>(value));
     }
 
-    template <std::size_t N, typename ArchiveT> static inline std::enable_if_t<N < sizeof...(Types) - 1> SerializeHelper(ArchiveT &ar, std::tuple<Types...> const &value) {
+    template <std::size_t N, typename ArchiveT> static inline typename std::enable_if<N < sizeof...(Types) - 1>::type SerializeHelper(ArchiveT &ar, std::tuple<Types...> const &value) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         Traits<type>::serialize(ar, std::get<N>(value));
         SerializeHelper<N + 1>(ar, value);
     }
 
-    template <std::size_t N, typename ArchiveT> static inline std::enable_if_t<N == sizeof...(Types) - 1> SerializeHelper(ArchiveT &ar, std::tuple<Types...> const &value) {
+    template <std::size_t N, typename ArchiveT> static inline typename std::enable_if<N == sizeof...(Types) - 1>::type SerializeHelper(ArchiveT &ar, std::tuple<Types...> const &value) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         Traits<type>::serialize(ar, std::get<N>(value));
     }
 
-    template <std::size_t N, typename ArchiveT> static inline std::enable_if_t<N < sizeof...(Types) - 1> DeserializeHelper(ArchiveT &ar, std::tuple<Types...> &value) {
+    template <std::size_t N, typename ArchiveT> static inline typename std::enable_if<N < sizeof...(Types) - 1>::type DeserializeHelper(ArchiveT &ar, std::tuple<Types...> &value) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         std::get<N>(value) = Traits<type>::deserialize(ar);
         DeserializeHelper<N + 1>(ar, value);
     }
 
-    template <std::size_t N, typename ArchiveT> static inline std::enable_if_t<N == sizeof...(Types) - 1> DeserializeHelper(ArchiveT &ar, std::tuple<Types...> &value) {
+    template <std::size_t N, typename ArchiveT> static inline typename std::enable_if<N == sizeof...(Types) - 1>::type DeserializeHelper(ArchiveT &ar, std::tuple<Types...> &value) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         std::get<N>(value) = Traits<type>::deserialize(ar);
