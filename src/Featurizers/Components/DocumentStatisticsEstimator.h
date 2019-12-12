@@ -142,7 +142,6 @@ public:
     using StringDecorator                   = std::function<std::string (InputTypeConstIterator begin, InputTypeConstIterator end)>;
     using IndexMap                          = std::unordered_map<std::string, std::uint32_t>;
     using FrequencyMap                      = IndexMap;
-    using FrequencyAndIndexMap              = DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
@@ -172,7 +171,7 @@ private:
     // |  Private Types
     // |
     // ----------------------------------------------------------------------
-
+    using FrequencyAndIndexMap              = DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
@@ -331,7 +330,7 @@ DocumentStatisticsEstimator<MaxNumTrainingItemsV>::DocumentStatisticsEstimator(
 // ----------------------------------------------------------------------
 namespace {
 
-inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreqMap(Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap & termFrequency, 
+inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreqMap(Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap termFrequency, 
                                                                                     std::float_t minDf, 
                                                                                     std::float_t maxDf, 
                                                                                     std::float_t totalNumDocumentsFloat,
@@ -341,7 +340,8 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreq
     
     //trim by minDf and maxDf
     if (minDf > 0.0f || maxDf < 1.0f) {
-        for (FrequencyMap::iterator termFrequencyIter = termFrequency.begin(); termFrequencyIter != termFrequency.end();) {
+        FrequencyMap::iterator termFrequencyIter = termFrequency.begin();
+        while (termFrequencyIter != termFrequency.end()) {
             std::float_t const freq = termFrequencyIter->second / totalNumDocumentsFloat;
 
             if (freq < minDf || freq > maxDf) {
@@ -353,44 +353,61 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreq
     }
 
     //trim by topKTerms
-    if (!topKTerms.has_value() || termFrequency.empty())
+    if (!topKTerms.has_value() || termFrequency.empty() || *topKTerms >= termFrequency.size())
         return termFrequency;
 
     std::uint32_t const & topKTermsValue(*topKTerms);
 
-    if (topKTermsValue > termFrequency.size())
-        throw std::invalid_argument("topKTermsUpperBound");
+    std::tuple<std::uint32_t, long long> targetPack(
+        [&termFrequency, &topKTermsValue]() -> std::tuple<std::uint32_t, long long> {
+            std::vector<std::uint32_t> frequencyVector;
+            frequencyVector.reserve(termFrequency.size());
 
-    std::vector<std::uint32_t> frequencyVector;
-    frequencyVector.reserve(termFrequency.size());
+            std::transform(
+                termFrequency.begin(), 
+                termFrequency.end(), 
+                std::back_inserter(frequencyVector), 
+                [](auto const & kv) { 
+                    return kv.second; 
+                }
+            );
 
-    std::transform(termFrequency.begin(), 
-                   termFrequency.end(), 
-                   std::back_inserter(frequencyVector), 
-                   [](auto const & kv) { 
-                       return kv.second; 
-                   });
+            //partial sort, ave O(n)
+            std::nth_element(
+                frequencyVector.begin(), 
+                frequencyVector.begin() + static_cast<int>(topKTermsValue) - 1, 
+                frequencyVector.end(), 
+                std::greater<std::uint32_t>()
+            );
 
-    //partial sort, ave O(n)
-    std::nth_element(frequencyVector.begin(), 
-                     frequencyVector.begin() + static_cast<int>(topKTermsValue) - 1, 
-                     frequencyVector.end(), 
-                     std::greater<std::uint32_t>());
+            std::uint32_t targetValue = frequencyVector[topKTermsValue - 1];
+            long long remainingTargetValue = std::count(
+                frequencyVector.begin(), 
+                frequencyVector.begin() + static_cast<int>(topKTermsValue),
+                targetValue
+            );
 
-    std::uint32_t targetValue = frequencyVector[topKTermsValue - 1];
-    long long remainingTargetValue = std::count(frequencyVector.begin(), 
-                                                frequencyVector.begin() + static_cast<int>(topKTermsValue),
-                                                targetValue);
+            return std::make_tuple<std::uint32_t, long long>(
+                std::move(targetValue), 
+                std::move(remainingTargetValue)
+            );
+        }()
+    );
+    
+    std::uint32_t targetValue = std::get<0>(targetPack);
+    long long remainingTargetValue = std::get<1>(targetPack);
 
-    for (FrequencyMap::iterator termFrequencyIter = termFrequency.begin(); termFrequencyIter != termFrequency.end();) {
+    FrequencyMap::iterator termFrequencyIter = termFrequency.begin();
+    while (termFrequencyIter != termFrequency.end()) {
         if (termFrequencyIter->second < targetValue) {
             termFrequencyIter = termFrequency.erase(termFrequencyIter);
             continue;
         } else if (termFrequencyIter->second == targetValue) {
-            if (remainingTargetValue-- <= 0) {
+            if (remainingTargetValue == 0) {
                termFrequencyIter = termFrequency.erase(termFrequencyIter);
             } else {
                 ++termFrequencyIter;
+                --remainingTargetValue;
             }
         } else {
             ++termFrequencyIter;
@@ -400,11 +417,23 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreq
     return termFrequency;
 }
 
-inline DocumentStatisticsAnnotationData::FrequencyAndIndexMap MergeTwoMapsWithSameKeys(Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap const & termFrequency, 
-                                                                                       Details::DocumentStatisticsTrainingOnlyPolicy::IndexMap const & termIndex) {
+inline DocumentStatisticsAnnotationData::FrequencyAndIndexMap MergeTwoMapsWithSameKeys(Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap const termFrequency, 
+                                                                                       Details::DocumentStatisticsTrainingOnlyPolicy::IndexMap const termIndex) {
     DocumentStatisticsAnnotationData::FrequencyAndIndexMap termFrequencyAndIndex;
     for (auto const & termFrequencyIter : termFrequency) {
-        termFrequencyAndIndex.insert(std::make_pair(termFrequencyIter.first, FrequencyAndIndexStruct(termFrequencyIter.second, termIndex.at(termFrequencyIter.first))));
+        //assert that termFrequencyIter.first is in termIndex
+        auto termIndexIter = termIndex.find(termFrequencyIter.first);
+        if (termIndexIter == termIndex.end())
+            throw std::invalid_argument("the keys in termFrequency and termIndex do not match");
+
+        FrequencyAndIndexStruct value(termFrequencyIter.second, termIndexIter->second);
+        termFrequencyAndIndex.emplace(DocumentStatisticsAnnotationData::FrequencyAndIndexMap::value_type(
+            termFrequencyIter.first, 
+            std::move(value))
+        );
+        // FrequencyAndIndexStruct value(termFrequencyIter.second, termIndex.at(termFrequencyIter.first));
+        // termFrequencyAndIndex.emplace(std::make_pair(termFrequencyIter.first, std::move(value)));
+        //termFrequencyAndIndex.emplace(std::make_pair(termFrequencyIter.first, FrequencyAndIndexStruct(termFrequencyIter.second, termIndex.at(termFrequencyIter.first))));
     }
     return termFrequencyAndIndex;
 }
@@ -509,7 +538,7 @@ inline void Details::DocumentStatisticsTrainingOnlyPolicy::fit(InputType const &
 inline DocumentStatisticsAnnotationData Details::DocumentStatisticsTrainingOnlyPolicy::complete_training(void) {
 
     //prune map by maxDf, minDf and topKTerms
-    FrequencyMap                            prunedTermFreq(PruneTermFreqMap(_termFrequency, _minDf, _maxDf, static_cast<std::float_t>(_totalNumDocuments), _topKTerms));
+    FrequencyMap                            prunedTermFreq(PruneTermFreqMap(std::move(_termFrequency), _minDf, _maxDf, static_cast<std::float_t>(_totalNumDocuments), _topKTerms));
 
     //In general, the custom vocabulary should assign values to words that no bigger than the map's size
     //however, some may choose to use unique values. We do not check if the given vocabulary is appropriate
@@ -519,7 +548,7 @@ inline DocumentStatisticsAnnotationData Details::DocumentStatisticsTrainingOnlyP
 
     //here the termIndex includes(strictly) termFrequency, which means termIndex has all the keys that appear in termFrequency, but may has some keys not in termFrequency
     //ignore the additional keys in termIndex
-    FrequencyAndIndexMap                    termFrequencyAndIndex(MergeTwoMapsWithSameKeys(prunedTermFreq, termIndex));
+    FrequencyAndIndexMap                    termFrequencyAndIndex(MergeTwoMapsWithSameKeys(std::move(prunedTermFreq), std::move(termIndex)));
 
     return DocumentStatisticsAnnotationData(std::move(termFrequencyAndIndex), std::move(_totalNumDocuments));
 }
