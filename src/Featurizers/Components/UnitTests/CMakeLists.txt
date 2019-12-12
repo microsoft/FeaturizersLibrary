@@ -36,8 +36,10 @@ SET(
     MaxAbsValueEstimator_UnitTest
     MinMaxEstimator_UnitTest
     ModeEstimator_UnitTest
+    NormUpdaters_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
     RobustScalarNormEstimator_UnitTest
+    StandardDeviationUpdater_UnitTest
     StatisticsMetricsEstimator_UnitTest
     TrainingOnlyEstimatorImpl_UnitTest
     # TODO: Add tests for:
