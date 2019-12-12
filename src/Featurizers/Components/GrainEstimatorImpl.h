@@ -252,7 +252,7 @@ class GrainEstimatorImpl<
     GrainT,
     EstimatorT,
     MaxNumTrainingItemsV,
-    std::enable_if_t<Details::IsTransformerEstimator<EstimatorT>::value == false>
+    typename std::enable_if<Details::IsTransformerEstimator<EstimatorT>::value == false>::type
 > :
     public Impl::GrainEstimatorImplBase<
         FitEstimator<typename GrainEstimatorTraits<GrainT, EstimatorT>::InputType>,
@@ -298,7 +298,7 @@ class GrainEstimatorImpl<
     GrainT,
     EstimatorT,
     MaxNumTrainingItemsV,
-    std::enable_if_t<Details::IsTransformerEstimator<EstimatorT>::value>
+    typename std::enable_if<Details::IsTransformerEstimator<EstimatorT>::value>::type
 > :
     public Impl::GrainEstimatorImplBase<
         TransformerEstimator<

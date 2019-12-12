@@ -33,13 +33,13 @@ private:
     template <typename U>
     static constexpr std::true_type Check(
         U *,
-        std::enable_if_t<
+        typename std::enable_if<
             std::is_same<
                 decltype(std::declval<U>().has_created_transformer(std::declval<ArgTs>()...)),
                 ReturnT
             >::value,
             void *
-        >
+        >::type
     );
 
 public:

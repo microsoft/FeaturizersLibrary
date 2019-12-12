@@ -12,7 +12,6 @@
 # |
 # ----------------------------------------------------------------------
 
-import copy
 import os
 import sys
 
@@ -87,44 +86,56 @@ def GetDependencies():
 
     d = OrderedDict()
 
-    d["x64"] = Configuration(
-        "Builds using Clang for a x64 architecture",
-        [
-            Dependency(
-                "3DE9F3430E494A6C8429B26A1503C895",
-                "Common_cpp_Clang_8",
-                "x64-ex",
-                "https://github.com/davidbrownell/Common_cpp_Clang_8.git",
-            ),
-        ],
-    )
+    architectures = ["x64"]
 
     if CurrentShell.CategoryName == "Windows":
-        d["x86"] = Configuration(
-            "Builds using Clang for a x86 architecture",
-            [
-                Dependency(
-                    "3DE9F3430E494A6C8429B26A1503C895",
-                    "Common_cpp_Clang_8",
-                    "x86-ex",
-                    "https://github.com/davidbrownell/Common_cpp_Clang_8.git",
-                ),
-            ],
-        )
+        architectures.append("x86")
 
-        for architecture in ["x64", "x86"]:
-            d["{}_MSVC".format(architecture)] = Configuration(
-                "Builds using MSVC 2019 for a {} architecture".format(architecture),
+    # Clang
+    for version, guid in [("8", "3DE9F3430E494A6C8429B26A1503C895")]:
+        for architecture in architectures:
+            d["{}_Clang_{}".format(architecture, version)] = Configuration(
+                "Builds using Clang {} for a {} architecture".format(
+                    version,
+                    architecture,
+                ),
                 [
                     Dependency(
-                        "AB7D87C49C2449F79D9F42E5195030FD",
-                        "Common_cpp_MSVC_2019",
-                        architecture,
-                        "https://github.com/davidbrownell/Common_cpp_MSVC_2019.git",
+                        guid,
+                        "Common_cpp_Clang_{}".format(version),
+                        "{}-ex".format(architecture),
+                        "https://github.com/davidbrownell/Common_cpp_Clang_{}".format(
+                            version,
+                        ),
                     ),
                 ],
             )
 
+    # MSVC
+    if CurrentShell.CategoryName == "Windows":
+        for version, guid in [
+            ("2019", "AB7D87C49C2449F79D9F42E5195030FD"),
+            ("2017", "8FC8ACE80A594D2EA996CAC5DBFFEBBC"),
+        ]:
+            for architecture in architectures:
+                d["{}_MSVC_{}".format(architecture, version)] = Configuration(
+                    "Builds using MSVC {} for a {} architecture".format(
+                        version,
+                        architecture,
+                    ),
+                    [
+                        Dependency(
+                            guid,
+                            "Common_cpp_MSVC_{}".format(version),
+                            architecture,
+                            "https://github.com/davidbrownell/Common_cpp_MSVC_{}.git".format(
+                                version,
+                            ),
+                        ),
+                    ],
+                )
+
+    # Misc
     d["system_compiler"] = Configuration(
         "Enables basic C++ tools (cmake, ninja, doxygen, etc.)",
         [
@@ -141,13 +152,27 @@ def GetDependencies():
         d["universal_linux"] = Configuration(
             "Builds using the Holy Build Box Docker Image (phusion/holy-build-box-64). More info at http://phusion.github.io/holy-build-box/",
             [
-                Dependency("F33C43DA6BB54336A7573B39509CDAD7",
-                "Common_cpp_Common",
-                "x64",
-                "https://github.com/davidbrownell/Common_cpp_Common.git",
-            ),
-        ],
-    )
+                Dependency(
+                    "F33C43DA6BB54336A7573B39509CDAD7",
+                    "Common_cpp_Common",
+                    "x64",
+                    "https://github.com/davidbrownell/Common_cpp_Common.git",
+                ),
+            ],
+        )
+
+    # Set the defaults
+    d["x64_Clang"] = d["x64_Clang_8"]
+    if "x86" in architectures:
+        d["x86_Clang"] = d["x86_Clang_8"]
+
+    if CurrentShell.CategoryName == "Windows":
+        d["x64_MSVC"] = d["x64_MSVC_2019"]
+        d["x86_MSVC"] = d["x86_MSVC_2019"]
+
+    d["x64"] = d["x64_Clang"]
+    if "x86" in architectures:
+        d["x86"] = d["x86_Clang"]
 
     return d
 

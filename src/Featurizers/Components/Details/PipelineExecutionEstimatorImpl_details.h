@@ -42,7 +42,7 @@ template <int N, typename EstimatorTupleT>
 struct ValidateEstimators<
     N,
     EstimatorTupleT,
-    std::enable_if_t<N != std::tuple_size<EstimatorTupleT>::value - 1>
+    typename std::enable_if<N != std::tuple_size<EstimatorTupleT>::value - 1>::type
 > {
     using ThisEstimator                     = typename std::tuple_element<N, EstimatorTupleT>::type;
     using NextEstimator                     = typename std::tuple_element<N + 1, EstimatorTupleT>::type;
@@ -67,7 +67,7 @@ template <int N, typename EstimatorTupleT>
 struct ValidateEstimators<
     N,
     EstimatorTupleT,
-    std::enable_if_t<N == std::tuple_size<EstimatorTupleT>::value - 1>
+    typename std::enable_if<N == std::tuple_size<EstimatorTupleT>::value - 1>::type
 > {
     static constexpr bool const             value = true;
 };
@@ -399,8 +399,8 @@ template <int N, typename EstimatorTupleT>
 class EstimatorChainElement<
     N,
     EstimatorTupleT,
-    std::enable_if_t<N == std::tuple_size<EstimatorTupleT>::value - 1>,
-    std::enable_if_t<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value == false>
+    typename std::enable_if<N == std::tuple_size<EstimatorTupleT>::value - 1>::type,
+    typename std::enable_if<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value == false>::type
 > :
     public EstimatorChainElement_TerminalMixin<
         EstimatorChainElement<N, EstimatorTupleT>,
@@ -464,8 +464,8 @@ template <int N, typename EstimatorTupleT>
 class EstimatorChainElement<
     N,
     EstimatorTupleT,
-    std::enable_if_t<N == std::tuple_size<EstimatorTupleT>::value - 1>,
-    std::enable_if_t<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value>
+    typename std::enable_if<N == std::tuple_size<EstimatorTupleT>::value - 1>::type,
+    typename std::enable_if<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value>::type
 > :
     public EstimatorChainElement_TerminalMixin<
         EstimatorChainElement<N, EstimatorTupleT>,
@@ -547,8 +547,8 @@ template <int N, typename EstimatorTupleT>
 class EstimatorChainElement<
     N,
     EstimatorTupleT,
-    std::enable_if_t<N != std::tuple_size<EstimatorTupleT>::value - 1>,
-    std::enable_if_t<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value == false>
+    typename std::enable_if<N != std::tuple_size<EstimatorTupleT>::value - 1>::type,
+    typename std::enable_if<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value == false>::type
 > :
     public EstimatorChainElement_IntraMixin<
         EstimatorChainElement<N, EstimatorTupleT>,
@@ -629,8 +629,8 @@ template <int N, typename EstimatorTupleT>
 class EstimatorChainElement<
     N,
     EstimatorTupleT,
-    std::enable_if_t<N != std::tuple_size<EstimatorTupleT>::value - 1>,
-    std::enable_if_t<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value>
+    typename std::enable_if<N != std::tuple_size<EstimatorTupleT>::value - 1>::type,
+    typename std::enable_if<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value>::type
 > :
     public EstimatorChainElement_IntraMixin<
         EstimatorChainElement<N, EstimatorTupleT>,
@@ -798,8 +798,8 @@ template <int N, typename EstimatorTupleT>
 class TransformerChainElement<
     N,
     EstimatorTupleT,
-    std::enable_if_t<N == std::tuple_size<EstimatorTupleT>::value - 1>,
-    std::enable_if_t<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value == false>
+    typename std::enable_if<N == std::tuple_size<EstimatorTupleT>::value - 1>::type,
+    typename std::enable_if<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value == false>::type
 > {
 private:
     // ----------------------------------------------------------------------
@@ -842,8 +842,8 @@ template <int N, typename EstimatorTupleT>
 class TransformerChainElement<
     N,
     EstimatorTupleT,
-    std::enable_if_t<N == std::tuple_size<EstimatorTupleT>::value - 1>,
-    std::enable_if_t<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value>
+    typename std::enable_if<N == std::tuple_size<EstimatorTupleT>::value - 1>::type,
+    typename std::enable_if<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value>::type
 > {
 private:
     // ----------------------------------------------------------------------
@@ -906,8 +906,8 @@ template <int N, typename EstimatorTupleT>
 class TransformerChainElement<
     N,
     EstimatorTupleT,
-    std::enable_if_t<N != std::tuple_size<EstimatorTupleT>::value - 1>,
-    std::enable_if_t<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value == false>
+    typename std::enable_if<N != std::tuple_size<EstimatorTupleT>::value - 1>::type,
+    typename std::enable_if<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value == false>::type
 > :
     private TransformerChainElement<N + 1, EstimatorTupleT> {
 private:
@@ -958,8 +958,8 @@ template <int N, typename EstimatorTupleT>
 class TransformerChainElement<
     N,
     EstimatorTupleT,
-    std::enable_if_t<N != std::tuple_size<EstimatorTupleT>::value - 1>,
-    std::enable_if_t<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value>
+    typename std::enable_if<N != std::tuple_size<EstimatorTupleT>::value - 1>::type,
+    typename std::enable_if<IsTransformerEstimator<typename std::tuple_element<N, EstimatorTupleT>::type>::value>::type
 > :
     private TransformerChainElement<N + 1, EstimatorTupleT> {
 private:

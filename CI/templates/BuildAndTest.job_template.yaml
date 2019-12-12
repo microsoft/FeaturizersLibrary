@@ -7,7 +7,8 @@ parameters:
   agent_pool_is_custom: False # Set this value to True if the agent is part of a custom pool
   configuration: "" # Environment Activation Configuration
   esrp_connected_service_name: "" # Name of service connection to use for code signing (or empty string if code signing is not required)
-  job_suffix: "" # Optional value to distinguish between standard- and custom-builds if both configurations are invoked as part of the same stage
+  job_display_name: ""
+  job_name_unique_id: ""
   operating_system: "" # Windows|Linux|MacOS
   test_only: False # Set to true to only run tests (no build)
   tester_code_coverage: False # Enable code coverage for tests
@@ -20,8 +21,8 @@ jobs:
       agent_pool: ${{ parameters.agent_pool }}
       agent_pool_container: ${{ parameters.agent_pool_container }}
       agent_pool_is_custom: ${{ parameters.agent_pool_is_custom }}
-      job_name: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration }}_${{ parameters.agent_pool_container }}_${{ parameters.test_only }}_Job
-      job_display_name: "${{ parameters.operating_system }} - ${{ parameters.configuration }}${{ parameters.job_suffix }}"
+      job_name: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration }}_${{ parameters.agent_pool_container }}_${{ parameters.test_only }}_Job${{ parameters.job_name_unique_id }}
+      job_display_name: "${{ parameters.job_display_name }}"
       operating_system: ${{ parameters.operating_system }}
       steps:
         - template: BuildAndTest.steps_template.yaml
@@ -30,7 +31,7 @@ jobs:
             esrp_connected_service_name: ${{ parameters.esrp_connected_service_name }}
             operating_system: ${{ parameters.operating_system }}
             test_only: ${{ parameters.test_only }}
-            artifact_suffix: ${{ parameters.job_suffix }}
+            artifact_name: "${{ parameters.job_display_name }}"
             tester_code_coverage: ${{ parameters.tester_code_coverage }}
             tester_release_only: ${{ parameters.tester_release_only }}
             tester_build_only: ${{ parameters.tester_build_only }}
