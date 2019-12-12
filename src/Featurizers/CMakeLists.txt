@@ -8,3 +8,5 @@ project(FeaturizersCode CXX)
 
 include(cmake/FeaturizersCode.cmake)
 
+set_target_properties(FeaturizersCode PROPERTIES CXX_STANDARD 11)
+
