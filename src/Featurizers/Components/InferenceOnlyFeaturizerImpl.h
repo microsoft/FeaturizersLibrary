@@ -97,7 +97,7 @@ private:
 
     // MSVC has problems when the definition for the func is separated from its declaration.
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        return std::make_unique<TransformerT>();
+        return BaseType::TransformerUniquePtr(new TransformerT());
     }
 };
 
