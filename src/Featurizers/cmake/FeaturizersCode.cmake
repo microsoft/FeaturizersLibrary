@@ -23,6 +23,8 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../Components/Details/PipelineExecutionEstimatorImpl_details.h
 )
 
+set_target_properties(FeaturizersCode PROPERTIES CXX_STANDARD 11)
+
 file(GLOB JSON_DATA "${_this_path}/../DateTimeFeaturizerData/GeneratedCode/*.json")
 
 foreach(df ${JSON_DATA})
