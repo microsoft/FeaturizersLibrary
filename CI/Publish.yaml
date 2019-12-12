@@ -17,11 +17,11 @@ stages:
     jobs:
       - template: "templates/_job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
+          # This job needs to be run on the Azure DevOps agents
           agent_pool: windows-2019
           job_name: AuzreUpload_Job
           job_display_name: "Azure Upload"
+          operating_system: Windows
           steps:
             - template: "Publish.azureupload_steps_template.yaml"
               parameters:
@@ -33,11 +33,11 @@ stages:
 
       - template: "templates/_job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           job_name: NuGet_Job
           job_display_name: "NuGet Packages"
+          operating_system: Windows
           steps:
             - template: "Publish.nuget_steps_template.yaml"
               parameters:
@@ -53,11 +53,11 @@ stages:
     jobs:
       - template: "templates/_job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           job_name: GitTag_Job
           job_display_name: "Tag Git Sources (for release builds)"
+          operating_system: Windows
           steps:
             - template: "Publish.tagsources_steps_template.yaml"
               parameters:
