@@ -17,6 +17,8 @@ namespace NS = Microsoft::Featurizer;
 class MyTransformer : public Microsoft::Featurizer::Featurizers::Components::InferenceOnlyTransformerImpl<int, bool> {
 public:
     MyTransformer(void) = default;
+    MyTransformer(Archive &) {}
+
     ~MyTransformer(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyTransformer);
@@ -65,4 +67,21 @@ TEST_CASE("MyEstimator") {
 
     CHECK(transformer.execute(3));
     CHECK(transformer.execute(4) == false);
+}
+
+TEST_CASE("Serialization") {
+    MyEstimator                             estimator(CreateTestAnnotationMapsPtr(1));
+
+    estimator.begin_training();
+    estimator.complete_training();
+
+    auto const                              pTransformer(estimator.create_transformer());
+    NS::Archive                             out;
+
+    pTransformer->save(out);
+
+    NS::Archive                             in(out.commit());
+    MyTransformer                           transformer2(in);
+
+    CHECK(true);
 }
