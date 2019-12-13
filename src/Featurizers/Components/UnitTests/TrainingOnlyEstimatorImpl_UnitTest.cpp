@@ -163,7 +163,7 @@ TEST_CASE("Strings - multiple") {
     CHECK(counts == std::map<std::string, std::uint32_t>{{"one", 1}, {"two", 2}, {"three", 2}, {"four", 1}});
 }
 
-static constexpr char const * const     BeginTrainingEstimatorName("Begin Training Estimator");
+static constexpr char const * const         BeginTrainingEstimatorName("Begin Training Estimator");
 
 class BeginTrainingPolicy {
 public:
@@ -180,7 +180,7 @@ public:
     Result complete_training(void) { return Result(); }
 
 private:
-    int &                               _value;
+    int &                                   _value;
 };
 
 TEST_CASE("Optional begin_training") {
@@ -209,4 +209,36 @@ TEST_CASE("Optional begin_training") {
 
     estimator2.complete_training();
     CHECK(ctr == 1);
+}
+
+static constexpr char const * const         ScalarReturnValueEstimatorName("Scalar Return Value");
+
+class ScalarReturnValuePolicy {
+public:
+    using InputType                         = int;
+
+    static constexpr char const * const     NameValue = ScalarReturnValueEstimatorName;
+
+    ScalarReturnValuePolicy(void) : _value(0) {}
+
+    NS::FitResult fit(int const &value) { _value += value; return NS::FitResult::Continue; }
+    int complete_training(void) { return _value; }
+
+private:
+    int                                     _value;
+};
+
+TEST_CASE("Scalar Return Value") {
+    using MyEstimator                       = NS::Featurizers::Components::TrainingOnlyEstimatorImpl<ScalarReturnValuePolicy, std::numeric_limits<size_t>::max()>;
+
+    NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    MyEstimator                             estimator(pAllColumnAnnotations, 0);
+
+    estimator.begin_training();
+    estimator.fit(10);
+    estimator.fit(20);
+    estimator.fit(30);
+    estimator.complete_training();
+
+    CHECK(estimator.get_annotation_data() == 60);
 }

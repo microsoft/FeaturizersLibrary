@@ -36,7 +36,7 @@ namespace Components {
 ///                             or
 ///                         void fit(InputType const *pItems, size_t cItems);
 ///
-///                         <structure containing state data> complete_training(void);
+///                         <structure or value containing state data> complete_training(void);
 ///
 template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
 class TrainingOnlyEstimatorImpl :
@@ -92,9 +92,41 @@ private:
     // |  Private Types
     // |
     // ----------------------------------------------------------------------
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \class         ScalarWrapper
+    ///  \brief         Type used if AnnotationData is a scalar
+    ///
+    template <typename T>
+    struct ScalarWrapper {
+        // ----------------------------------------------------------------------
+        // |  Public Data
+        T                                   Value;
+
+        // ----------------------------------------------------------------------
+        // |  Public Methods
+        ScalarWrapper(T value) :
+            Value(std::move(value)) {
+        }
+
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(ScalarWrapper);
+    };
+
+    using AnnotationImplBase =
+        typename std::conditional<
+            std::is_class<AnnotationData>::value,
+            AnnotationData,
+            ScalarWrapper<AnnotationData>
+        >::type;
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \class         AnnotationImpl
+    ///  \brief         Wraps the desired data into a class that can be stored
+    ///                 as a polymorphic Annotation.
+    ///
     class AnnotationImpl :
         public Annotation,
-        public AnnotationData {
+        public AnnotationImplBase {
     public:
         // ----------------------------------------------------------------------
         // |  Public Methods
@@ -121,6 +153,9 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
+    static AnnotationData const * get_annotation_data_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name, std::true_type);
+    static AnnotationData const * get_annotation_data_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name, std::false_type);
+
     bool begin_training_impl(void) override;
     bool begin_training_impl(std::true_type);
     bool begin_training_impl(std::false_type);
@@ -270,7 +305,7 @@ template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
 
 template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
 /*static*/ typename TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::AnnotationData const * TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::get_annotation_data_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name) {
-    return BaseType::template get_annotation_impl<AnnotationImpl>(columnAnnotations, colIndex, name);
+    return get_annotation_data_nothrow(columnAnnotations, colIndex, name, std::integral_constant<bool, std::is_class<AnnotationData>::value>());
 }
 
 template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
@@ -282,6 +317,21 @@ template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
+template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
+/*static*/ typename TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::AnnotationData const * TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::get_annotation_data_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name, std::true_type) {
+    return BaseType::template get_annotation_impl<AnnotationImpl>(columnAnnotations, colIndex, name);
+}
+
+template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
+/*static*/ typename TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::AnnotationData const * TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::get_annotation_data_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name, std::false_type) {
+    AnnotationImpl const * const            pAnnotation(BaseType::template get_annotation_impl<AnnotationImpl>(columnAnnotations, colIndex, name));
+
+    if(pAnnotation == nullptr)
+        return nullptr;
+
+    return &pAnnotation->Value;
+}
+
 template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
 bool TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
     if(_requiresTraining == false)
@@ -365,7 +415,7 @@ void TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::complete
 template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
 template <typename... ArgsT>
 TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::AnnotationImpl::AnnotationImpl(ArgsT &&... args) :
-    AnnotationData(std::forward<ArgsT>(args)...) {
+    AnnotationImplBase(std::forward<ArgsT>(args)...) {
 }
 
 } // namespace Components
