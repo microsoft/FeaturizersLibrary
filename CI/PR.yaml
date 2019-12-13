@@ -9,11 +9,11 @@ resources:
   containers:
     - container: universal_linux
       image: universal_linux
-      endpoint: featurizersbuild
+      endpoint: featurizerslibrarybuild
 
     - container: centos7
       image: centos7
-      endpoint: featurizersbuild
+      endpoint: featurizerslibrarybuild
 
 stages:
   - template: "templates/BuildAndTest.prologue_stage_template.yaml"
