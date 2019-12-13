@@ -93,7 +93,12 @@ void LabelEncoderFeaturizer_int8_t_Test(
         REQUIRE(LabelEncoderFeaturizer_int8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -192,7 +197,12 @@ void LabelEncoderFeaturizer_int16_t_Test(
         REQUIRE(LabelEncoderFeaturizer_int16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -291,7 +301,12 @@ void LabelEncoderFeaturizer_int32_t_Test(
         REQUIRE(LabelEncoderFeaturizer_int32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -390,7 +405,12 @@ void LabelEncoderFeaturizer_int64_t_Test(
         REQUIRE(LabelEncoderFeaturizer_int64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -489,7 +509,12 @@ void LabelEncoderFeaturizer_uint8_t_Test(
         REQUIRE(LabelEncoderFeaturizer_uint8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -588,7 +613,12 @@ void LabelEncoderFeaturizer_uint16_t_Test(
         REQUIRE(LabelEncoderFeaturizer_uint16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -687,7 +717,12 @@ void LabelEncoderFeaturizer_uint32_t_Test(
         REQUIRE(LabelEncoderFeaturizer_uint32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -786,7 +821,12 @@ void LabelEncoderFeaturizer_uint64_t_Test(
         REQUIRE(LabelEncoderFeaturizer_uint64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -885,7 +925,12 @@ void LabelEncoderFeaturizer_float_t_Test(
         REQUIRE(LabelEncoderFeaturizer_float_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -984,7 +1029,12 @@ void LabelEncoderFeaturizer_double_t_Test(
         REQUIRE(LabelEncoderFeaturizer_double_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -1083,7 +1133,12 @@ void LabelEncoderFeaturizer_bool_Test(
         REQUIRE(LabelEncoderFeaturizer_bool_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -1182,7 +1237,12 @@ void LabelEncoderFeaturizer_string_Test(
         REQUIRE(LabelEncoderFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 

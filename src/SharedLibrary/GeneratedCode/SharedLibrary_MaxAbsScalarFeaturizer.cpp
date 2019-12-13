@@ -213,7 +213,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_t_CreateTransformerFromS
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_int8_t_TransformerHandle*>(index);
@@ -503,7 +503,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_int16_t_TransformerHandle*>(index);
@@ -793,7 +793,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_uint8_t_TransformerHandle*>(index);
@@ -1083,7 +1083,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_uint16_t_TransformerHandle*>(index);
@@ -1373,7 +1373,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_float_t_TransformerHandle*>(index);
@@ -1663,7 +1663,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_int32_t_TransformerHandle*>(index);
@@ -1953,7 +1953,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_int64_t_TransformerHandle*>(index);
@@ -2243,7 +2243,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_uint32_t_TransformerHandle*>(index);
@@ -2533,7 +2533,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_uint64_t_TransformerHandle*>(index);
@@ -2823,7 +2823,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_double_t_TransformerHandle*>(index);

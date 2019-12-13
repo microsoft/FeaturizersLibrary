@@ -142,7 +142,7 @@ private:
 
         IndexMapAnnotationData const &       i_data(IndexMapEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::IndexMapEstimatorName));
 
-        return std::make_unique<OneHotEncoderTransformer<InputT>>(i_data.Value, _allowMissingValues);
+        return typename BaseType::TransformerUniquePtr(new OneHotEncoderTransformer<InputT>(i_data.Value, _allowMissingValues));
     }
 };
 

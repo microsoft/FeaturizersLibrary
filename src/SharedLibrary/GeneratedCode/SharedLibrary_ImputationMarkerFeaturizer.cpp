@@ -146,7 +146,11 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_FitBuffer(/*in*/ I
         std::int8_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int8_t>::CreateNullValue());
+        #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int8_t>::CreateNullValue());
+        #endif
             ++input_ptr;
         }
 
@@ -224,7 +228,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_CreateTransformerF
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<ImputationMarkerFeaturizer_int8_t_TransformerHandle*>(index);
@@ -447,7 +451,11 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_FitBuffer(/*in*/ 
         std::int16_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int16_t>::CreateNullValue());
+        #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int16_t>::CreateNullValue());
+        #endif
             ++input_ptr;
         }
 
@@ -525,7 +533,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_CreateTransformer
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<ImputationMarkerFeaturizer_int16_t_TransformerHandle*>(index);
@@ -748,7 +756,11 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_FitBuffer(/*in*/ 
         std::int32_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int32_t>::CreateNullValue());
+        #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int32_t>::CreateNullValue());
+        #endif
             ++input_ptr;
         }
 
@@ -826,7 +838,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_CreateTransformer
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<ImputationMarkerFeaturizer_int32_t_TransformerHandle*>(index);
@@ -1049,7 +1061,11 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_FitBuffer(/*in*/ 
         std::int64_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int64_t>::CreateNullValue());
+        #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int64_t>::CreateNullValue());
+        #endif
             ++input_ptr;
         }
 
@@ -1127,7 +1143,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_CreateTransformer
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<ImputationMarkerFeaturizer_int64_t_TransformerHandle*>(index);
@@ -1350,7 +1366,11 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_FitBuffer(/*in*/ 
         std::uint8_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint8_t>::CreateNullValue());
+        #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint8_t>::CreateNullValue());
+        #endif
             ++input_ptr;
         }
 
@@ -1428,7 +1448,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_CreateTransformer
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<ImputationMarkerFeaturizer_uint8_t_TransformerHandle*>(index);
@@ -1651,7 +1671,11 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_FitBuffer(/*in*/
         std::uint16_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint16_t>::CreateNullValue());
+        #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint16_t>::CreateNullValue());
+        #endif
             ++input_ptr;
         }
 
@@ -1729,7 +1753,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_CreateTransforme
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<ImputationMarkerFeaturizer_uint16_t_TransformerHandle*>(index);
@@ -1952,7 +1976,11 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_FitBuffer(/*in*/
         std::uint32_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue());
+        #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue());
+        #endif
             ++input_ptr;
         }
 
@@ -2030,7 +2058,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_CreateTransforme
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<ImputationMarkerFeaturizer_uint32_t_TransformerHandle*>(index);
@@ -2253,7 +2281,11 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_FitBuffer(/*in*/
         std::uint64_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint64_t>::CreateNullValue());
+        #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint64_t>::CreateNullValue());
+        #endif
             ++input_ptr;
         }
 
@@ -2331,7 +2363,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_CreateTransforme
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<ImputationMarkerFeaturizer_uint64_t_TransformerHandle*>(index);
@@ -2554,7 +2586,11 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_FitBuffer(/*in*/ 
         std::float_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+        #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+        #endif
             ++input_ptr;
         }
 
@@ -2632,7 +2668,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_CreateTransformer
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<ImputationMarkerFeaturizer_float_t_TransformerHandle*>(index);
@@ -2855,7 +2891,11 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_FitBuffer(/*in*/
         std::double_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue());
+        #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue());
+        #endif
             ++input_ptr;
         }
 
@@ -2933,7 +2973,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_CreateTransforme
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<ImputationMarkerFeaturizer_double_t_TransformerHandle*>(index);
@@ -3156,7 +3196,11 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_FitBuffer(/*in*/ Imp
         bool const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<bool>::CreateNullValue());
+        #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<bool>::CreateNullValue());
+        #endif
             ++input_ptr;
         }
 
@@ -3234,7 +3278,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<ImputationMarkerFeaturizer_bool_TransformerHandle*>(index);
@@ -3457,7 +3501,11 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_FitBuffer(/*in*/ I
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr ? *input_ptr : nonstd::optional<std::string>());
+        #else
             input_buffer.emplace_back(*input_ptr ? *input_ptr : nonstd::optional<std::string>());
+        #endif
             ++input_ptr;
         }
 
@@ -3535,7 +3583,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_CreateTransformerF
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<ImputationMarkerFeaturizer_string_TransformerHandle*>(index);

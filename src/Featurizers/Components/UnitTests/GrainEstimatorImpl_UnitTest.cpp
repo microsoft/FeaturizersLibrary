@@ -191,7 +191,7 @@ private:
     }
 
     TransformerUniquePtr create_transformer_impl(void) override {
-        return std::make_unique<DeltaTransformer>(std::move(_runningTotal));
+        return typename BaseType::TransformerUniquePtr(new DeltaTransformer(std::move(_runningTotal)));
     }
 };
 

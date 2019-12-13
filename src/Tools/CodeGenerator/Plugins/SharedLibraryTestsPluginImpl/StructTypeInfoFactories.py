@@ -55,7 +55,17 @@ class _StructTypeInfoFactory(TypeInfoFactory):
             self.TypeName,
             "{} {};".format(self.TypeName, result_name),
             "&{}".format(result_name),
-            "results.emplace_back({});".format(result_name),
+            textwrap.dedent(
+                """\
+                #if (defined __apple_build_version__)
+                results.push_back({result});
+                #else
+                results.emplace_back({result});
+                #endif
+                """,
+            ).format(
+                result=result_name,
+            ),
             "&{}".format(result_name),
             destroy_inline=False,
         )

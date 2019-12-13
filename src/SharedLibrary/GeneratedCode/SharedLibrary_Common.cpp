@@ -80,7 +80,7 @@ FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char cons
 
 // These methods are used internally but not exported
 ErrorInfoHandle * CreateErrorInfo(std::exception const &ex) {
-    std::unique_ptr<std::string> result(std::make_unique<std::string>(ex.what()));
+    std::unique_ptr<std::string> result(new std::string(ex.what()));
 
     size_t index = g_pointerTable.Add(result.release());
     return reinterpret_cast<ErrorInfoHandle *>(index);

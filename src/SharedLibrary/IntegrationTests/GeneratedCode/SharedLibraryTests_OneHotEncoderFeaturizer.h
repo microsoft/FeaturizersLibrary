@@ -93,7 +93,12 @@ void OneHotEncoderFeaturizer_int8_t_Test(
         REQUIRE(OneHotEncoderFeaturizer_int8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -195,7 +200,12 @@ void OneHotEncoderFeaturizer_int16_t_Test(
         REQUIRE(OneHotEncoderFeaturizer_int16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -297,7 +307,12 @@ void OneHotEncoderFeaturizer_int32_t_Test(
         REQUIRE(OneHotEncoderFeaturizer_int32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -399,7 +414,12 @@ void OneHotEncoderFeaturizer_int64_t_Test(
         REQUIRE(OneHotEncoderFeaturizer_int64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -501,7 +521,12 @@ void OneHotEncoderFeaturizer_uint8_t_Test(
         REQUIRE(OneHotEncoderFeaturizer_uint8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -603,7 +628,12 @@ void OneHotEncoderFeaturizer_uint16_t_Test(
         REQUIRE(OneHotEncoderFeaturizer_uint16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -705,7 +735,12 @@ void OneHotEncoderFeaturizer_uint32_t_Test(
         REQUIRE(OneHotEncoderFeaturizer_uint32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -807,7 +842,12 @@ void OneHotEncoderFeaturizer_uint64_t_Test(
         REQUIRE(OneHotEncoderFeaturizer_uint64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -909,7 +949,12 @@ void OneHotEncoderFeaturizer_float_t_Test(
         REQUIRE(OneHotEncoderFeaturizer_float_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -1011,7 +1056,12 @@ void OneHotEncoderFeaturizer_double_t_Test(
         REQUIRE(OneHotEncoderFeaturizer_double_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -1113,7 +1163,12 @@ void OneHotEncoderFeaturizer_bool_Test(
         REQUIRE(OneHotEncoderFeaturizer_bool_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -1215,7 +1270,12 @@ void OneHotEncoderFeaturizer_string_Test(
         REQUIRE(OneHotEncoderFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 

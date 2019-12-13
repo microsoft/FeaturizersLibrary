@@ -85,7 +85,7 @@ class _StructTypeInfoFactory(TypeInfoFactory):
 #
 #                 {member_statements}
 #
-#                 *{name} = std::make_unique<TimePoint>(std::move({result_time_point_name})).release();
+#                 *{name} = new TimePoint(std::move({result_time_point_name})).release();
 #                 """,
 #             ).format(
 #                 name=arg_name,
