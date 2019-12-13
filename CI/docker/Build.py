@@ -21,7 +21,7 @@ _script_fullpath                            = CommonEnvironment.ThisFullpath()
 _script_dir, _script_name                   = os.path.split(_script_fullpath)
 # ----------------------------------------------------------------------
 
-DOCKER_USER_NAME                            = "featurizersbuild"
+DOCKER_USER_NAME                            = "featurizerslibrarybuild"
 
 IMAGES                                      = [
     os.path.basename(potential_dir)
@@ -173,7 +173,7 @@ def Clean(
 # ----------------------------------------------------------------------
 @CommandLine.EntryPoint(
     registry_name=CommandLine.EntryPoint.Parameter(
-        "Name of the container registry to push to (e.g. 'featurizersbuild.azurecr.io')",
+        "Name of the container registry to push to (e.g. 'featurizerslibrarybuild.azurecr.io')",
     ),
 )
 @CommandLine.Constraints(

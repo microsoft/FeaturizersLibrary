@@ -13,11 +13,11 @@ resources:
   containers:
     - container: universal_linux
       image: universal_linux
-      endpoint: featurizersbuild
+      endpoint: featurizerslibrarybuild
 
     - container: centos7
       image: centos7
-      endpoint: featurizersbuild
+      endpoint: featurizerslibrarybuild
 
 # Note that any variable set in this file will always override a value set within the editor.
 # Therefore, do not set default values here but instead do it in an initialization script.
