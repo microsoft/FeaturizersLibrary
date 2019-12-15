@@ -40,7 +40,7 @@ SET(
     PipelineExecutionEstimatorImpl_UnitTest
     RobustScalarNormEstimator_UnitTest
     StandardDeviationEstimator_UnitTest
-    StatisticsMetricsEstimator_UnitTest
+    StatisticalMetricsEstimator_UnitTest
     TrainingOnlyEstimatorImpl_UnitTest
     # TODO: Add tests for:
     #   - TimeSeriesFrequencyEstimator

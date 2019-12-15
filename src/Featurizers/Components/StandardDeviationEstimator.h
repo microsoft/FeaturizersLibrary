@@ -9,7 +9,7 @@
 #include "TrainingOnlyEstimatorImpl.h"
 #include "../../Traits.h"
 #include "NormUpdaters.h"
-#include "StatisticsMetricsEstimator.h"
+#include "StatisticalMetricsEstimator.h"
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
@@ -77,7 +77,8 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    // this constructor is used for StandardDeviationEstimator following StatisticsMetricsEstimator
+    // this constructor is used for StandardDeviationEstimator following StatisticalMetricsEstimator
+    // which will retrieve average from AnnotationMap
     StandardDeviationTrainingOnlyPolicy(void);
     // this constructor is used for user inputs a specific average
     StandardDeviationTrainingOnlyPolicy(std::double_t average);
@@ -225,7 +226,6 @@ bool Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT
         StandardStatisticalAnnotationData const &          data(StatisticalMetricsEstimator::get_annotation_data(estimator.get_column_annotations(), estimator.get_column_index(), StatisticalMetricsEstimatorName));
 
         _average = data.Average;
-        _count = data.Count;
     }
     return true;
 }
