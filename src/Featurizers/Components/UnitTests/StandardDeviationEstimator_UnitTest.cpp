@@ -66,7 +66,7 @@ TEST_CASE("N random double input data") {
                                                                             15.8l}}));
     NS::Featurizers::Components::StandardDeviationAnnotationData const& stats(estimator.get_annotation_data());
 
-    CHECK(NS::TestHelpers::FuzzyCheck<long double>({stats.StandardDeviation}, {static_cast<long double>(3.068693)}));
+    CHECK(NS::TestHelpers::FuzzyCheck<long double>({stats.StandardDeviation}, {static_cast<long double>(8.679573)}));
     CHECK(stats.Count == 8);
 }
 
