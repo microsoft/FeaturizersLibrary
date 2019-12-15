@@ -7,6 +7,7 @@
 #include "Components/StatisticalMetricsEstimator.h"
 #include "Components/StandardDeviationEstimator.h"
 #include "Components/PipelineExecutionEstimatorImpl.h"
+#include "../Archive.h"
 
 namespace Microsoft {
 namespace Featurizer {
@@ -131,14 +132,24 @@ private:
         }
         if (_with_std) {
             StandardDeviationAnnotationData   const &        deviation_stats(StandardDeviationEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::StandardDeviationEstimatorName));
-            deviation = deviation_stats.StandardDeviation;
+            deviation = static_cast<std::double_t>(deviation_stats.StandardDeviation);
         }
+        
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#endif
         // check if deviation is 0
         // if it's 0, change it to 1
         if (deviation == 0) {
             deviation = 1;
         }
-        return typename BaseType::TransformerUniquePtr(new StandardScalerTransformer<InputT, TransformedT>>(std::move(average), std::move(deviation)));
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+        return std::make_unique<StandardScalerTransformer<InputT, TransformedT>>(average, deviation);
     }
 };
 
@@ -222,6 +233,12 @@ StandardScalerTransformer<InputT, TransformedT>::StandardScalerTransformer(Archi
 }
 
 template <typename InputT, typename TransformedT>
+void StandardScalerTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
+    Traits<std::double_t>::serialize(ar, _average);
+    Traits<std::double_t>::serialize(ar, _deviation);
+}
+
+template <typename InputT, typename TransformedT>
 bool StandardScalerTransformer<InputT, TransformedT>::operator==(StandardScalerTransformer const &other) const {
 
 #if (defined __clang__)
@@ -238,11 +255,6 @@ bool StandardScalerTransformer<InputT, TransformedT>::operator==(StandardScalerT
 
 }
 
-template <typename InputT, typename TransformedT>
-void StandardScalerTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
-    Traits<std::double_t>::serialize(ar, _average);
-    Traits<std::double_t>::serialize(ar, _deviation);
-}
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -287,7 +299,7 @@ StandardScalerEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::StandardSca
         pAllColumnAnnotations,
         [pAllColumnAnnotations, colIndex](void) { return Components::StatisticalMetricsEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
         [pAllColumnAnnotations, colIndex](void) { return Components::StandardDeviationEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
-        [pAllColumnAnnotations, colIndex](void) { return Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex), std::move(with_mean), std::move(with_std)); }
+        [pAllColumnAnnotations, colIndex, &with_mean, &with_std](void) { return Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex), std::move(with_mean), std::move(with_std)); }
     ) {
 }
 
@@ -297,7 +309,7 @@ StandardScalerEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::StandardSca
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::StandardScalerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::StandardScalerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std) :
     BaseType("StandardScalerEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
@@ -308,7 +320,9 @@ Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
                 return colIndex;
             }()
         )
-    ) {
+    ),
+    _with_mean(std::move(with_mean)),
+    _with_std(std::move(with_std)) {
 }
 
 // ----------------------------------------------------------------------
@@ -327,8 +341,6 @@ FitResult Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrain
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
 void Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
-
-
 
 }
 }

@@ -244,7 +244,7 @@ void Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT
 
 template <typename T, typename StandardDeviationEstimatorT>
 StandardDeviationAnnotationData Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::complete_training(void) {
-    long double deviation = _updater.commit()/static_cast<long double>(_count);
+    long double deviation = _updater.commit()/std::sqrt(static_cast<long double>(_count));
     assert(deviation >= 0);
     return StandardDeviationAnnotationData(std::move(deviation), std::move(_count));
 }
