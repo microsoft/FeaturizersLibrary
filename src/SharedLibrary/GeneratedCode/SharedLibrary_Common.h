@@ -51,6 +51,16 @@ FEATURIZER_LIBRARY_API bool DestroyErrorInfo(/*in*/ ErrorInfoHandle *pHandle);
 FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 // These values should match the values in Featurizer.h
+enum TrainingStateValue {
+    Pending = 1,
+    Training,
+    Finished,
+    Completed
+};
+
+typedef unsigned char TrainingState;
+
+// These values should match the values in Featurizer.h
 enum FitResultValue {
     Complete = 1,
     Continue,

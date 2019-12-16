@@ -187,6 +187,16 @@ def _GenerateCommonFiles(output_dir, output_stream):
                 FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
                 // These values should match the values in Featurizer.h
+                enum TrainingStateValue {
+                    Pending = 1,
+                    Training,
+                    Finished,
+                    Completed
+                };
+
+                typedef unsigned char TrainingState;
+
+                // These values should match the values in Featurizer.h
                 enum FitResultValue {
                     Complete = 1,
                     Continue,
@@ -493,9 +503,11 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                     FEATURIZER_LIBRARY_API bool {name}{suffix}CreateEstimator({construct_params}/*out*/ {name}{suffix}EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
                     FEATURIZER_LIBRARY_API bool {name}{suffix}DestroyEstimator(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+                    FEATURIZER_LIBRARY_API bool {name}{suffix}GetState(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
                     FEATURIZER_LIBRARY_API bool {name}{suffix}IsTrainingComplete(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
                     FEATURIZER_LIBRARY_API bool {name}{suffix}Fit(/*in*/ {name}{suffix}EstimatorHandle *pHandle, {input_param}, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
                     FEATURIZER_LIBRARY_API bool {name}{suffix}FitBuffer(/*in*/ {name}{suffix}EstimatorHandle *pHandle, {input_buffer_param}, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+                    FEATURIZER_LIBRARY_API bool {name}{suffix}OnDataCompleted(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
                     FEATURIZER_LIBRARY_API bool {name}{suffix}CompleteTraining(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
                     /* Inference Methods */
@@ -706,6 +718,25 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                 ).format(**d)
             )
 
+            # GetState
+            f.write(
+                textwrap.dedent(
+                    """\
+                    FEATURIZER_LIBRARY_API bool {name}{suffix}GetState(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
+                        {method_prefix}
+                            if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+                            if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
+
+                            *pState = static_cast<TrainingState>(estimator.get_state());
+                        {method_suffix}
+                    }}
+
+                    """,
+                ).format(**d),
+            )
+
             # IsTrainingComplete
             f.write(
                 textwrap.dedent(
@@ -716,7 +747,6 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                             if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
-
 
                             *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
                         {method_suffix}
@@ -804,6 +834,24 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                     ),
                     **d
                 )
+            )
+
+            # OnDataCompleted
+            f.write(
+                textwrap.dedent(
+                    """\
+                    FEATURIZER_LIBRARY_API bool {name}{suffix}OnDataCompleted(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
+                        {method_prefix}
+                            if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+                            
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
+
+                            estimator.on_data_completed();
+                        {method_suffix}
+                    }}
+
+                    """,
+                ).format(**d),
             )
 
             # CompleteTraining
