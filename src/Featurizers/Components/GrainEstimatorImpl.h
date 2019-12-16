@@ -353,7 +353,7 @@ private:
         for(auto & kvp: this->_estimators)
             transformers.emplace(std::make_pair(kvp.first, kvp.second.create_transformer()));
 
-        return std::make_unique<TransformerType>(std::move(transformers));
+        return typename BaseType::TransformerUniquePtr(new TransformerType(std::move(transformers)));
     }
 };
 
@@ -441,7 +441,7 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(Archive &ar) :
 
             while(cElements--) {
                 GrainT                                  grain(Traits<GrainT>::deserialize(ar));
-                GrainTransformerTypeUniquePtr           pTransformer(std::make_unique<typename EstimatorT::TransformerType>(ar));
+                GrainTransformerTypeUniquePtr           pTransformer(new typename EstimatorT::TransformerType(ar));
 
                 std::pair<typename TransformerMap::iterator, bool> const    result(transformers.emplace(std::make_pair(std::move(grain), std::move(pTransformer))));
 

@@ -74,7 +74,7 @@ void SampleAddEstimator::complete_training_impl(void) /*override*/ {
 }
 
 SampleAddEstimator::TransformerUniquePtr SampleAddEstimator::create_transformer_impl(void) /*override*/ {
-    return std::make_unique<SampleAddTransformer>(_accumulated_delta);
+    return typename BaseType::TransformerUniquePtr(new SampleAddTransformer(_accumulated_delta));
 }
 
 } // namespace Featurizers

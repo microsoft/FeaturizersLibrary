@@ -121,7 +121,7 @@ private:
 
         MaxAbsValueAnnotationData const &     data(MaxAbsValueEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::MaxAbsValueEstimatorName));
 
-        return std::make_unique<MaxAbsScalarTransformer<InputT, TransformedT>>(data.Value);
+        return typename BaseType::TransformerUniquePtr(new MaxAbsScalarTransformer<InputT, TransformedT>(data.Value));
     }
 };
 

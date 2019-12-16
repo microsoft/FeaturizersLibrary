@@ -503,7 +503,7 @@ private:
     }
 
     TransformerUniquePtr create_transformer_impl(void) override {
-        return std::make_unique<Transformer>(_result);
+        return typename BaseType::TransformerUniquePtr(new Transformer(_result));
     }
 };
 
@@ -670,7 +670,7 @@ private:
     }
 
     inline typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        return std::make_unique<CustomComponentTransformer>(OperateOnOdd, Delta);
+        return typename BaseType::TransformerUniquePtr(new CustomComponentTransformer(OperateOnOdd, Delta));
     }
 };
 

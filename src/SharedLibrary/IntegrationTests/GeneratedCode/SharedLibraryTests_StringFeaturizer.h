@@ -94,7 +94,12 @@ void StringFeaturizer_int8_t_Test(
         REQUIRE(StringFeaturizer_int8_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
+
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_int8_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -197,7 +202,12 @@ void StringFeaturizer_int16_t_Test(
         REQUIRE(StringFeaturizer_int16_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
+
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_int16_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -300,7 +310,12 @@ void StringFeaturizer_int32_t_Test(
         REQUIRE(StringFeaturizer_int32_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
+
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_int32_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -403,7 +418,12 @@ void StringFeaturizer_int64_t_Test(
         REQUIRE(StringFeaturizer_int64_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
+
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_int64_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -506,7 +526,12 @@ void StringFeaturizer_uint8_t_Test(
         REQUIRE(StringFeaturizer_uint8_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
+
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_uint8_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -609,7 +634,12 @@ void StringFeaturizer_uint16_t_Test(
         REQUIRE(StringFeaturizer_uint16_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
+
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_uint16_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -712,7 +742,12 @@ void StringFeaturizer_uint32_t_Test(
         REQUIRE(StringFeaturizer_uint32_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
+
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_uint32_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -815,7 +850,12 @@ void StringFeaturizer_uint64_t_Test(
         REQUIRE(StringFeaturizer_uint64_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
+
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_uint64_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -918,7 +958,12 @@ void StringFeaturizer_float_t_Test(
         REQUIRE(StringFeaturizer_float_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
+
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_float_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -1021,7 +1066,12 @@ void StringFeaturizer_double_t_Test(
         REQUIRE(StringFeaturizer_double_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
+
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_double_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -1124,7 +1174,12 @@ void StringFeaturizer_bool_Test(
         REQUIRE(StringFeaturizer_bool_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
+
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_bool_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -1227,7 +1282,12 @@ void StringFeaturizer_string_Test(
         REQUIRE(StringFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
+
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_string_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));

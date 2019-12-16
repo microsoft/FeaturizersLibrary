@@ -213,7 +213,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CreateTransformerFromS
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int8_t, std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int8_t, std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int8_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int8_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<RobustScalarFeaturizer_int8_t_TransformerHandle*>(index);
@@ -503,7 +503,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int16_t, std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int16_t, std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int16_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int16_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<RobustScalarFeaturizer_int16_t_TransformerHandle*>(index);
@@ -793,7 +793,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint8_t, std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint8_t, std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint8_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint8_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<RobustScalarFeaturizer_uint8_t_TransformerHandle*>(index);
@@ -1083,7 +1083,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint16_t, std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint16_t, std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint16_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint16_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<RobustScalarFeaturizer_uint16_t_TransformerHandle*>(index);
@@ -1373,7 +1373,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::float_t, std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::float_t, std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::float_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::float_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<RobustScalarFeaturizer_float_t_TransformerHandle*>(index);
@@ -1663,7 +1663,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int32_t, std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int32_t, std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int32_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int32_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<RobustScalarFeaturizer_int32_t_TransformerHandle*>(index);
@@ -1953,7 +1953,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int64_t, std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int64_t, std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int64_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::int64_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<RobustScalarFeaturizer_int64_t_TransformerHandle*>(index);
@@ -2243,7 +2243,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint32_t, std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint32_t, std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint32_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint32_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<RobustScalarFeaturizer_uint32_t_TransformerHandle*>(index);
@@ -2533,7 +2533,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint64_t, std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint64_t, std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint64_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::uint64_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<RobustScalarFeaturizer_uint64_t_TransformerHandle*>(index);
@@ -2823,7 +2823,7 @@ FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::double_t, std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::double_t, std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::double_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::RobustScalarEstimator<std::double_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<RobustScalarFeaturizer_double_t_TransformerHandle*>(index);

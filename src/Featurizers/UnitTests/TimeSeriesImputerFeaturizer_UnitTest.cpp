@@ -786,7 +786,7 @@ TEST_CASE("One Row input") {
 
     using transformerType = NS::Featurizers::Components::TimeSeriesImputerEstimator::Transformer;
 
-    auto model = std::make_unique<transformerType>(
+    auto model = new transformerType(
             []()->std::chrono::system_clock::duration {
                 std::chrono::system_clock::duration frequency;
                 std::chrono::system_clock::time_point now = std::chrono::system_clock::now();

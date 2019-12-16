@@ -213,7 +213,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerFromSavedDa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int8_t_TransformerHandle*>(index);
@@ -537,7 +537,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerFromSavedD
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int16_t_TransformerHandle*>(index);
@@ -861,7 +861,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerFromSavedD
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int32_t_TransformerHandle*>(index);
@@ -1185,7 +1185,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerFromSavedD
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int64_t_TransformerHandle*>(index);
@@ -1509,7 +1509,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerFromSavedD
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint8_t_TransformerHandle*>(index);
@@ -1833,7 +1833,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerFromSaved
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint16_t_TransformerHandle*>(index);
@@ -2157,7 +2157,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerFromSaved
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint32_t_TransformerHandle*>(index);
@@ -2481,7 +2481,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerFromSaved
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint64_t_TransformerHandle*>(index);
@@ -2805,7 +2805,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerFromSavedD
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<StringFeaturizer_float_t_TransformerHandle*>(index);
@@ -3129,7 +3129,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerFromSaved
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<StringFeaturizer_double_t_TransformerHandle*>(index);
@@ -3453,7 +3453,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateTransformerFromSavedData
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<bool>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<StringFeaturizer_bool_TransformerHandle*>(index);
@@ -3710,7 +3710,11 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_FitBuffer(/*in*/ StringFeatu
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr);
+        #else
             input_buffer.emplace_back(*input_ptr);
+        #endif
             ++input_ptr;
         }
 
@@ -3788,7 +3792,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateTransformerFromSavedDa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<StringFeaturizer_string_TransformerHandle*>(index);

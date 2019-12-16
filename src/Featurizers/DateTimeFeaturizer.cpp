@@ -437,10 +437,10 @@ void DateTimeEstimator::complete_training_impl(void) /*override*/ {
 }
 
 typename DateTimeEstimator::BaseType::TransformerUniquePtr DateTimeEstimator::create_transformer_impl(void) /*override*/ {
-    return std::make_unique<DateTimeTransformer>(
+    return typename BaseType::TransformerUniquePtr(new DateTimeTransformer(
         Country ? *Country : std::string(),
         DataRootDir ? *DataRootDir : std::string()
-    );
+    ));
 }
 
 } // namespace Featurizers

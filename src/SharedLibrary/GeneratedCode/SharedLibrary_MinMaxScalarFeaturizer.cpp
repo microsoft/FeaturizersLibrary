@@ -213,7 +213,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateTransformerFromS
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int8_t_TransformerHandle*>(index);
@@ -503,7 +503,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int16_t_TransformerHandle*>(index);
@@ -793,7 +793,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int32_t_TransformerHandle*>(index);
@@ -1083,7 +1083,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int64_t_TransformerHandle*>(index);
@@ -1373,7 +1373,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint8_t_TransformerHandle*>(index);
@@ -1663,7 +1663,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint16_t_TransformerHandle*>(index);
@@ -1953,7 +1953,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint32_t_TransformerHandle*>(index);
@@ -2243,7 +2243,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint64_t_TransformerHandle*>(index);
@@ -2533,7 +2533,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_float_t_TransformerHandle*>(index);
@@ -2823,7 +2823,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_double_t_TransformerHandle*>(index);

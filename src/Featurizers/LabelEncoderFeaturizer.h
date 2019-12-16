@@ -138,7 +138,7 @@ private:
 
         IndexMapAnnotationData const &      data(IndexMapEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::IndexMapEstimatorName));
 
-        return std::make_unique<LabelEncoderTransformer<InputT>>(data.Value, _allowMissingValues);
+        return typename BaseType::TransformerUniquePtr(new LabelEncoderTransformer<InputT>(data.Value, _allowMissingValues));
     }
 };
 

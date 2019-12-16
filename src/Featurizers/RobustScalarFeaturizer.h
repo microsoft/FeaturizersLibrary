@@ -118,7 +118,7 @@ private:
 
         RobustScalarNormAnnotationData const &          data(RobustScalarNormEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::RobustScalarNormEstimatorName));
 
-        return std::make_unique<RobustScalarTransformer<InputT, TransformedT>>(data.Median, data.Scale);
+        return typename BaseType::TransformerUniquePtr(new RobustScalarTransformer<InputT, TransformedT>(data.Median, data.Scale));
     }
 };
 

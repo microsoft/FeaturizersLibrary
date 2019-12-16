@@ -93,7 +93,12 @@ void HashOneHotVectorizerFeaturizer_int8_t_Test(
         REQUIRE(HashOneHotVectorizerFeaturizer_int8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -195,7 +200,12 @@ void HashOneHotVectorizerFeaturizer_int16_t_Test(
         REQUIRE(HashOneHotVectorizerFeaturizer_int16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -297,7 +307,12 @@ void HashOneHotVectorizerFeaturizer_int32_t_Test(
         REQUIRE(HashOneHotVectorizerFeaturizer_int32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -399,7 +414,12 @@ void HashOneHotVectorizerFeaturizer_int64_t_Test(
         REQUIRE(HashOneHotVectorizerFeaturizer_int64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -501,7 +521,12 @@ void HashOneHotVectorizerFeaturizer_uint8_t_Test(
         REQUIRE(HashOneHotVectorizerFeaturizer_uint8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -603,7 +628,12 @@ void HashOneHotVectorizerFeaturizer_uint16_t_Test(
         REQUIRE(HashOneHotVectorizerFeaturizer_uint16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -705,7 +735,12 @@ void HashOneHotVectorizerFeaturizer_uint32_t_Test(
         REQUIRE(HashOneHotVectorizerFeaturizer_uint32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -807,7 +842,12 @@ void HashOneHotVectorizerFeaturizer_uint64_t_Test(
         REQUIRE(HashOneHotVectorizerFeaturizer_uint64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -909,7 +949,12 @@ void HashOneHotVectorizerFeaturizer_float_t_Test(
         REQUIRE(HashOneHotVectorizerFeaturizer_float_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -1011,7 +1056,12 @@ void HashOneHotVectorizerFeaturizer_double_t_Test(
         REQUIRE(HashOneHotVectorizerFeaturizer_double_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -1113,7 +1163,12 @@ void HashOneHotVectorizerFeaturizer_bool_Test(
         REQUIRE(HashOneHotVectorizerFeaturizer_bool_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 
@@ -1215,7 +1270,12 @@ void HashOneHotVectorizerFeaturizer_string_Test(
         REQUIRE(HashOneHotVectorizerFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
+
         // No inline destroy statement
     }
 

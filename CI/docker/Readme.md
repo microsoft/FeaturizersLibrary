@@ -9,7 +9,7 @@ Container Registry so that it can be used during builds.
 
     2) Login to the ACR:
 
-            docker login --username featurizersbuild --password-stdin featurizersbuild.azurecr.io
+            docker login --username featurizerslibrarybuild --password-stdin featurizerslibrarybuild.azurecr.io
 
             Where '<password>` can be found by:
 
@@ -20,7 +20,7 @@ Container Registry so that it can be used during builds.
 
     3) Publish the image:
 
-            python Build.py Publish <image_name> featurizersbuild.azurecr.io
+            python Build.py Publish <image_name> featurizerslibrarybuild.azurecr.io
 
 Note that ../PR.yaml and ../CI.yaml (and potentially other files) are configured to use
 this image in this Container Registry.

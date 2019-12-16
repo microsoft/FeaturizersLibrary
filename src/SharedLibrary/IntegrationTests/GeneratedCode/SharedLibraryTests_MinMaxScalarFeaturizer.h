@@ -92,7 +92,12 @@ void MinMaxScalarFeaturizer_int8_t_Test(
         REQUIRE(MinMaxScalarFeaturizer_int8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -190,7 +195,12 @@ void MinMaxScalarFeaturizer_int16_t_Test(
         REQUIRE(MinMaxScalarFeaturizer_int16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -288,7 +298,12 @@ void MinMaxScalarFeaturizer_int32_t_Test(
         REQUIRE(MinMaxScalarFeaturizer_int32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -386,7 +401,12 @@ void MinMaxScalarFeaturizer_int64_t_Test(
         REQUIRE(MinMaxScalarFeaturizer_int64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -484,7 +504,12 @@ void MinMaxScalarFeaturizer_uint8_t_Test(
         REQUIRE(MinMaxScalarFeaturizer_uint8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -582,7 +607,12 @@ void MinMaxScalarFeaturizer_uint16_t_Test(
         REQUIRE(MinMaxScalarFeaturizer_uint16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -680,7 +710,12 @@ void MinMaxScalarFeaturizer_uint32_t_Test(
         REQUIRE(MinMaxScalarFeaturizer_uint32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -778,7 +813,12 @@ void MinMaxScalarFeaturizer_uint64_t_Test(
         REQUIRE(MinMaxScalarFeaturizer_uint64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -876,7 +916,12 @@ void MinMaxScalarFeaturizer_float_t_Test(
         REQUIRE(MinMaxScalarFeaturizer_float_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 
@@ -974,7 +1019,12 @@ void MinMaxScalarFeaturizer_double_t_Test(
         REQUIRE(MinMaxScalarFeaturizer_double_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
+
         // No inline destroy statement
     }
 

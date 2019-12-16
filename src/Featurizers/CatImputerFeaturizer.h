@@ -42,7 +42,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    
+
     using InputType                         = typename CatImputerTraits<TransformedT>::InputType;
     using BaseType                          = StandardTransformer<InputType, TransformedT>;
     using TransformedType                   = TransformedT;
@@ -137,7 +137,7 @@ private:
         ModeAnnotationData const &          data(ModeEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::ModeEstimatorName));
 
         assert(TheseTraits::IsNullableType);
-        return std::make_unique<CatImputerTransformer<TransformedT>>(TheseTraits::GetNullableValue(data.Value));
+        return typename BaseType::TransformerUniquePtr(new CatImputerTransformer<TransformedT>(TheseTraits::GetNullableValue(data.Value)));
     }
 };
 

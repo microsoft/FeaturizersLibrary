@@ -275,7 +275,7 @@ private:
     }
 
     TransformerUniquePtr create_transformer_impl(void) override {
-        return _return_invalid_transformer ? TransformerUniquePtr() : std::make_unique<MyTransformer>();
+        return _return_invalid_transformer ? TransformerUniquePtr() : TransformerUniquePtr(new MyTransformer());
     }
 };
 

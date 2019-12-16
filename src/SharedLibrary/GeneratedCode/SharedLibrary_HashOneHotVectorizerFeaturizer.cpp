@@ -213,7 +213,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateTransfor
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int8_t_TransformerHandle*>(index);
@@ -524,7 +524,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateTransfo
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int16_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int16_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int16_t_TransformerHandle*>(index);
@@ -835,7 +835,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateTransfo
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int32_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int32_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int32_t_TransformerHandle*>(index);
@@ -1146,7 +1146,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateTransfo
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int64_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int64_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int64_t_TransformerHandle*>(index);
@@ -1457,7 +1457,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateTransfo
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint8_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint8_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint8_t_TransformerHandle*>(index);
@@ -1768,7 +1768,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateTransf
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint16_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint16_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint16_t_TransformerHandle*>(index);
@@ -2079,7 +2079,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateTransf
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint32_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint32_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint32_t_TransformerHandle*>(index);
@@ -2390,7 +2390,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateTransf
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint64_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint64_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint64_t_TransformerHandle*>(index);
@@ -2701,7 +2701,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateTransfo
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_float_t_TransformerHandle*>(index);
@@ -3012,7 +3012,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateTransf
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_double_t_TransformerHandle*>(index);
@@ -3323,7 +3323,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_bool_CreateTransforme
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<bool>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<bool>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<bool>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<bool>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_bool_TransformerHandle*>(index);
@@ -3567,7 +3567,11 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_FitBuffer(/*in
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr);
+        #else
             input_buffer.emplace_back(*input_ptr);
+        #endif
             ++input_ptr;
         }
 
@@ -3645,7 +3649,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_string_CreateTransfor
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::string>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::string>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::string>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::string>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_string_TransformerHandle*>(index);

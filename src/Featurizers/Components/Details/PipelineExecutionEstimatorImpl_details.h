@@ -865,7 +865,7 @@ public:
     }
 
     TransformerChainElement(Archive &ar) :
-        _pTransformer(std::make_unique<typename ThisEstimator::TransformerType>(ar)) {
+        _pTransformer(new typename ThisEstimator::TransformerType(ar)) {
     }
 
     void save(Archive &ar) const {
@@ -988,7 +988,7 @@ public:
 
     TransformerChainElement(Archive &ar) :
         NextTransformerChainElement(ar),
-        _pTransformer(std::make_unique<ThisTransformer>(ar)) {
+        _pTransformer(new ThisTransformer(ar)) {
     }
 
     void save(Archive &ar) const {
