@@ -150,7 +150,7 @@ private:
 #   pragma clang diagnostic pop
 #endif
 
-        return std::make_unique<StandardScalerTransformer<InputT, TransformedT>>(average, deviation);
+        return typename BaseType::TransformerUniquePtr(new StandardScalerTransformer<InputT, TransformedT>(average, deviation));
     }
 };
 
