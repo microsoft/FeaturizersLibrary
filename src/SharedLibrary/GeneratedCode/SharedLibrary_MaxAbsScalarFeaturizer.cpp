@@ -75,6 +75,28 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_t_DestroyEstimator(/*in*
     }
 }
 
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_t_GetState(/*in*/ MaxAbsScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_t_IsTrainingComplete(/*in*/ MaxAbsScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -86,7 +108,6 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_t_IsTrainingComplete(/*i
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -142,6 +163,27 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_t_FitBuffer(/*in*/ MaxAb
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_t_OnDataCompleted(/*in*/ MaxAbsScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -365,6 +407,28 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_t_DestroyEstimator(/*in
     }
 }
 
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_t_GetState(/*in*/ MaxAbsScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_t_IsTrainingComplete(/*in*/ MaxAbsScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -376,7 +440,6 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_t_IsTrainingComplete(/*
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -432,6 +495,27 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_t_FitBuffer(/*in*/ MaxA
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_t_OnDataCompleted(/*in*/ MaxAbsScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -655,6 +739,28 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_t_DestroyEstimator(/*in
     }
 }
 
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_t_GetState(/*in*/ MaxAbsScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_t_IsTrainingComplete(/*in*/ MaxAbsScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -666,7 +772,6 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_t_IsTrainingComplete(/*
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -722,6 +827,27 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_t_FitBuffer(/*in*/ MaxA
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_t_OnDataCompleted(/*in*/ MaxAbsScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -945,6 +1071,28 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_t_DestroyEstimator(/*i
     }
 }
 
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_t_GetState(/*in*/ MaxAbsScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_t_IsTrainingComplete(/*in*/ MaxAbsScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -956,7 +1104,6 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_t_IsTrainingComplete(/
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -1012,6 +1159,27 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_t_FitBuffer(/*in*/ Max
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_t_OnDataCompleted(/*in*/ MaxAbsScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -1235,6 +1403,28 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_t_DestroyEstimator(/*in
     }
 }
 
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_t_GetState(/*in*/ MaxAbsScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_t_IsTrainingComplete(/*in*/ MaxAbsScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -1246,7 +1436,6 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_t_IsTrainingComplete(/*
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -1302,6 +1491,27 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_t_FitBuffer(/*in*/ MaxA
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_t_OnDataCompleted(/*in*/ MaxAbsScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -1525,6 +1735,28 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_t_DestroyEstimator(/*in
     }
 }
 
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_t_GetState(/*in*/ MaxAbsScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_t_IsTrainingComplete(/*in*/ MaxAbsScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -1536,7 +1768,6 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_t_IsTrainingComplete(/*
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -1592,6 +1823,27 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_t_FitBuffer(/*in*/ MaxA
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_t_OnDataCompleted(/*in*/ MaxAbsScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -1815,6 +2067,28 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_t_DestroyEstimator(/*in
     }
 }
 
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_t_GetState(/*in*/ MaxAbsScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_t_IsTrainingComplete(/*in*/ MaxAbsScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -1826,7 +2100,6 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_t_IsTrainingComplete(/*
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -1882,6 +2155,27 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_t_FitBuffer(/*in*/ MaxA
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_t_OnDataCompleted(/*in*/ MaxAbsScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -2105,6 +2399,28 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_t_DestroyEstimator(/*i
     }
 }
 
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_t_GetState(/*in*/ MaxAbsScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_t_IsTrainingComplete(/*in*/ MaxAbsScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -2116,7 +2432,6 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_t_IsTrainingComplete(/
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -2172,6 +2487,27 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_t_FitBuffer(/*in*/ Max
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_t_OnDataCompleted(/*in*/ MaxAbsScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -2395,6 +2731,28 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_t_DestroyEstimator(/*i
     }
 }
 
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_t_GetState(/*in*/ MaxAbsScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_t_IsTrainingComplete(/*in*/ MaxAbsScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -2406,7 +2764,6 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_t_IsTrainingComplete(/
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -2462,6 +2819,27 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_t_FitBuffer(/*in*/ Max
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_t_OnDataCompleted(/*in*/ MaxAbsScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -2685,6 +3063,28 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_t_DestroyEstimator(/*i
     }
 }
 
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_t_GetState(/*in*/ MaxAbsScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_t_IsTrainingComplete(/*in*/ MaxAbsScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -2696,7 +3096,6 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_t_IsTrainingComplete(/
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -2752,6 +3151,27 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_t_FitBuffer(/*in*/ Max
         Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_t_OnDataCompleted(/*in*/ MaxAbsScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }

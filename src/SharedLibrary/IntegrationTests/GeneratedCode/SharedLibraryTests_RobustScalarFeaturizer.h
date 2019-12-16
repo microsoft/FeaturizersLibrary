@@ -30,31 +30,32 @@ void RobustScalarFeaturizer_int8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(RobustScalarFeaturizer_int8_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(RobustScalarFeaturizer_int8_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(RobustScalarFeaturizer_int8_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -134,31 +135,32 @@ void RobustScalarFeaturizer_int16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(RobustScalarFeaturizer_int16_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(RobustScalarFeaturizer_int16_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(RobustScalarFeaturizer_int16_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -238,31 +240,32 @@ void RobustScalarFeaturizer_uint8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(RobustScalarFeaturizer_uint8_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(RobustScalarFeaturizer_uint8_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(RobustScalarFeaturizer_uint8_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -342,31 +345,32 @@ void RobustScalarFeaturizer_uint16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(RobustScalarFeaturizer_uint16_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(RobustScalarFeaturizer_uint16_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(RobustScalarFeaturizer_uint16_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -446,31 +450,32 @@ void RobustScalarFeaturizer_float_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(RobustScalarFeaturizer_float_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(RobustScalarFeaturizer_float_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(RobustScalarFeaturizer_float_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -550,31 +555,32 @@ void RobustScalarFeaturizer_int32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(RobustScalarFeaturizer_int32_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(RobustScalarFeaturizer_int32_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(RobustScalarFeaturizer_int32_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -654,31 +660,32 @@ void RobustScalarFeaturizer_int64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(RobustScalarFeaturizer_int64_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(RobustScalarFeaturizer_int64_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(RobustScalarFeaturizer_int64_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -758,31 +765,32 @@ void RobustScalarFeaturizer_uint32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(RobustScalarFeaturizer_uint32_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(RobustScalarFeaturizer_uint32_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(RobustScalarFeaturizer_uint32_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -862,31 +870,32 @@ void RobustScalarFeaturizer_uint64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(RobustScalarFeaturizer_uint64_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(RobustScalarFeaturizer_uint64_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(RobustScalarFeaturizer_uint64_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -966,31 +975,32 @@ void RobustScalarFeaturizer_double_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(RobustScalarFeaturizer_double_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(RobustScalarFeaturizer_double_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(RobustScalarFeaturizer_double_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 

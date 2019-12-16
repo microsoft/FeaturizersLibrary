@@ -29,31 +29,32 @@ void CatImputerFeaturizer_int8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(CatImputerFeaturizer_int8_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(CatImputerFeaturizer_int8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(CatImputerFeaturizer_int8_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -132,31 +133,32 @@ void CatImputerFeaturizer_int16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(CatImputerFeaturizer_int16_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(CatImputerFeaturizer_int16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(CatImputerFeaturizer_int16_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -235,31 +237,32 @@ void CatImputerFeaturizer_int32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(CatImputerFeaturizer_int32_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(CatImputerFeaturizer_int32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(CatImputerFeaturizer_int32_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -338,31 +341,32 @@ void CatImputerFeaturizer_int64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(CatImputerFeaturizer_int64_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(CatImputerFeaturizer_int64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(CatImputerFeaturizer_int64_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -441,31 +445,32 @@ void CatImputerFeaturizer_uint8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(CatImputerFeaturizer_uint8_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(CatImputerFeaturizer_uint8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(CatImputerFeaturizer_uint8_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -544,31 +549,32 @@ void CatImputerFeaturizer_uint16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(CatImputerFeaturizer_uint16_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(CatImputerFeaturizer_uint16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(CatImputerFeaturizer_uint16_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -647,31 +653,32 @@ void CatImputerFeaturizer_uint32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(CatImputerFeaturizer_uint32_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(CatImputerFeaturizer_uint32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(CatImputerFeaturizer_uint32_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -750,31 +757,32 @@ void CatImputerFeaturizer_uint64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(CatImputerFeaturizer_uint64_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(CatImputerFeaturizer_uint64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(CatImputerFeaturizer_uint64_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -853,31 +861,32 @@ void CatImputerFeaturizer_float_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(CatImputerFeaturizer_float_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(CatImputerFeaturizer_float_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(CatImputerFeaturizer_float_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -956,31 +965,32 @@ void CatImputerFeaturizer_double_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(CatImputerFeaturizer_double_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(CatImputerFeaturizer_double_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(CatImputerFeaturizer_double_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1059,31 +1069,32 @@ void CatImputerFeaturizer_bool_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(CatImputerFeaturizer_bool_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(CatImputerFeaturizer_bool_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<bool>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<bool>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(CatImputerFeaturizer_bool_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1162,31 +1173,32 @@ void CatImputerFeaturizer_string_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(CatImputerFeaturizer_string_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(CatImputerFeaturizer_string_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::string>::IsNull(input) ? nullptr : input->c_str(), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(CatImputerFeaturizer_string_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 

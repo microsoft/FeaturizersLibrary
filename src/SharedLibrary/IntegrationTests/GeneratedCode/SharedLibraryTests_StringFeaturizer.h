@@ -29,31 +29,32 @@ void StringFeaturizer_int8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_int8_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_int8_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_int8_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -137,31 +138,32 @@ void StringFeaturizer_int16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_int16_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_int16_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_int16_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -245,31 +247,32 @@ void StringFeaturizer_int32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_int32_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_int32_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_int32_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -353,31 +356,32 @@ void StringFeaturizer_int64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_int64_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_int64_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_int64_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -461,31 +465,32 @@ void StringFeaturizer_uint8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_uint8_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_uint8_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_uint8_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -569,31 +574,32 @@ void StringFeaturizer_uint16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_uint16_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_uint16_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_uint16_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -677,31 +683,32 @@ void StringFeaturizer_uint32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_uint32_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_uint32_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_uint32_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -785,31 +792,32 @@ void StringFeaturizer_uint64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_uint64_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_uint64_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_uint64_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -893,31 +901,32 @@ void StringFeaturizer_float_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_float_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_float_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_float_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1001,31 +1010,32 @@ void StringFeaturizer_double_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_double_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_double_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_double_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1109,31 +1119,32 @@ void StringFeaturizer_bool_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_bool_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_bool_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_bool_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1217,31 +1228,32 @@ void StringFeaturizer_string_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_string_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_string_Fit(pEstimatorHandle, input.c_str(), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_string_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
