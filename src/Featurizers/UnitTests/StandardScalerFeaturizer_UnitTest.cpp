@@ -42,7 +42,7 @@ TEST_CASE("no valid input") {
 }
 // test for int
 TEST_CASE("1 int") {
-    using InputType       = std::int8_t;
+    using InputType       = int;
     using TransformedType = std::double_t;
 
     auto trainingBatches  = NS::TestHelpers::make_vector<std::vector<InputType>>(
@@ -65,7 +65,7 @@ TEST_CASE("1 int") {
     ));
 }
 TEST_CASE("5 ints") {
-    using InputType       = std::int8_t;
+    using InputType       = int;
     using TransformedType = std::double_t;
 
     auto trainingBatches  = NS::TestHelpers::make_vector<std::vector<InputType>>(
