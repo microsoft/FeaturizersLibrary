@@ -126,15 +126,15 @@ private:
         std::double_t average = 0;
         // if _with_std is false, deviation is set to 1
         std::double_t deviation = 1;
+        StandardStatisticalAnnotationData const &        average_stats(StatisticalMetricsEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::StatisticalMetricsEstimatorName));
+        StandardDeviationAnnotationData   const &        deviation_stats(StandardDeviationEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::StandardDeviationEstimatorName));
         if (_with_mean) {
-            StandardStatisticalAnnotationData const &        average_stats(StatisticalMetricsEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::StatisticalMetricsEstimatorName));
             average = average_stats.Average;
         }
         if (_with_std) {
-            StandardDeviationAnnotationData   const &        deviation_stats(StandardDeviationEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::StandardDeviationEstimatorName));
             deviation = static_cast<std::double_t>(deviation_stats.StandardDeviation);
         }
-        
+        assert(average_stats.Count == deviation_stats.Count);
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wfloat-equal"
