@@ -124,7 +124,6 @@ class Plugin(PluginBase):
         status_stream.write("Generating Common Files...")
         with status_stream.DoneManager() as this_dm:
             for desc, func in [
-                ("Generating Global Include File...", _GenerateGlobalInclude),
                 ("Generating Global Kernel Files..", _GenerateGlobalKernels),
                 ("Generating Global Def Files...", _GenerateGlobalDefs),
             ]:
@@ -180,43 +179,6 @@ class Plugin(PluginBase):
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
-# ----------------------------------------------------------------------
-def _GenerateGlobalInclude(
-    output_dir,
-    all_items,
-    all_type_mappings,
-    all_custom_struct_data,
-    output_stream,
-):
-    output_dir = os.path.join(output_dir, "automl_ops")
-    FileSystem.MakeDirs(output_dir)
-
-    with open(os.path.join(output_dir, "automl_featurizers.h"), "w") as f:
-        f.write(
-            textwrap.dedent(
-                """\
-                // Copyright (c) Microsoft Corporation. All rights reserved.
-                // Licensed under the MIT License.
-
-                #pragma once
-
-                {}
-                """,
-            ).format(
-                "\n".join(
-                    [
-                        '#include "core/automl/featurizers/src/Featurizers/{}.h"'.format(
-                            items[0].name,
-                        )
-                        for items in all_items
-                    ],
-                ),
-            ),
-        )
-
-    return 0
-
-
 # ----------------------------------------------------------------------
 def _GenerateGlobalKernels(
     output_dir,
@@ -611,7 +573,7 @@ def _GenerateGlobalDefs(
         func_definitions.append(
             textwrap.dedent(
                 """\
-                void Register{featurizer_name}Ver1(void) {{
+                void Register{featurizer_name}Ver1() {{
                     static const char * doc = R"DOC(
                         {documentation}
                     )DOC";
@@ -690,13 +652,13 @@ def _GenerateGlobalDefs(
             ).format(
                 forward_declarations="\n".join(
                     [
-                        "static Register{}(void);".format(items[0].name)
+                        "static void Register{}Ver1();".format(items[0].name)
                         for items in all_items
                     ],
                 ),
                 func_calls=StringHelpers.LeftJustify(
                     "\n".join(
-                        ["Register{}();".format(items[0].name) for items in all_items],
+                        ["Register{}Ver1();".format(items[0].name) for items in all_items],
                     ),
                     4,
                 ),
@@ -875,7 +837,7 @@ def _GenerateKernel(
                 #include "core/framework/data_types.h"
                 #include "core/framework/op_kernel.h"
 
-                #include "core/automl/featurizers/src/Featurizers/{featurizer_name}.h"
+                #include "Featurizers/{featurizer_name}.h"
 
                 namespace featurizers = Microsoft::Featurizer::Featurizers;
 
