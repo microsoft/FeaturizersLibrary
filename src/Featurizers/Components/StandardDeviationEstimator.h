@@ -229,7 +229,7 @@ bool Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT
     }
     return true;
 }
-
+ 
 template <typename T, typename StandardDeviationEstimatorT>
 void Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::fit(InputType const &input) {
     if(Microsoft::Featurizer::Traits<T>::IsNull(input))
