@@ -12,19 +12,70 @@
 
 namespace NS = Microsoft::Featurizer;
 
+// test for no valid input
+TEST_CASE("no valid input") {
+    // when no valid input is passed in
+    // L2NormUpdater.commit() would throw an error becacuse no update() is called
+    using InputType       = std::double_t;
+    using TransformedType = std::double_t;
+
+    InputType null = NS::Traits<InputType>::CreateNullValue();
+    
+    auto trainingBatches  = NS::TestHelpers::make_vector<std::vector<InputType>>(
+                                    NS::TestHelpers::make_vector<InputType>(null),
+                                    NS::TestHelpers::make_vector<InputType>(null),
+                                    NS::TestHelpers::make_vector<InputType>(null),
+                                    NS::TestHelpers::make_vector<InputType>(null),
+                                    NS::TestHelpers::make_vector<InputType>(null));
+
+    auto inferencingInput  = NS::TestHelpers::make_vector<InputType>(2);
+
+    NS::AnnotationMapsPtr const                                          pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+
+    CHECK_THROWS_WITH(
+        NS::TestHelpers::TransformerEstimatorTest(
+            NS::Featurizers::StandardScalerEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, true, true),
+            trainingBatches,
+            inferencingInput
+        ), "update is not called before l2 is committed!"
+    );
+}
 // test for int
-TEST_CASE("int") {
+TEST_CASE("1 int") {
     using InputType       = std::int8_t;
     using TransformedType = std::double_t;
 
     auto trainingBatches  = NS::TestHelpers::make_vector<std::vector<InputType>>(
-                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(1)),
-                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(3)),
-                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(5)),
-                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(7)),
-                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(9)));
+                                    NS::TestHelpers::make_vector<InputType>(10));
 
-    auto inferencingInput  = NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(2));
+    auto inferencingInput  = NS::TestHelpers::make_vector<InputType>(15);
+
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
+        static_cast<TransformedType>(5)
+    );
+
+    NS::AnnotationMapsPtr const                                          pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+
+    CHECK(NS::TestHelpers::FuzzyCheck(
+        NS::TestHelpers::TransformerEstimatorTest(
+            NS::Featurizers::StandardScalerEstimator<InputType>(pAllColumnAnnotations, 0, true, true),
+            trainingBatches,
+            inferencingInput
+        ), inferencingOutput
+    ));
+}
+TEST_CASE("5 ints") {
+    using InputType       = std::int8_t;
+    using TransformedType = std::double_t;
+
+    auto trainingBatches  = NS::TestHelpers::make_vector<std::vector<InputType>>(
+                                    NS::TestHelpers::make_vector<InputType>(1),
+                                    NS::TestHelpers::make_vector<InputType>(3),
+                                    NS::TestHelpers::make_vector<InputType>(5),
+                                    NS::TestHelpers::make_vector<InputType>(7),
+                                    NS::TestHelpers::make_vector<InputType>(9));
+
+    auto inferencingInput  = NS::TestHelpers::make_vector<InputType>(2);
 
     auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
         static_cast<TransformedType>(-1.06066017)
@@ -41,80 +92,100 @@ TEST_CASE("int") {
     ));
 }
 
-// // test for float_t
-// TEST_CASE("float_t") {
-//     using InputType       = std::float_t;
-//     using TransformedType = std::double_t;
+// test for float_t
+TEST_CASE("8 random float_t") {
+    using InputType       = std::float_t;
+    using TransformedType = std::double_t;
 
-//     auto trainingBatches  = NS::TestHelpers::make_vector<std::vector<InputType>>(
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(10.3)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(20.1)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(8.4)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(8.2)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(10.3)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(30.1)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(30.4)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(15.8)));
+    auto trainingBatches  = NS::TestHelpers::make_vector<std::vector<InputType>>(
+                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(10.3)),
+                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(20.1)),
+                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(8.4)),
+                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(8.2)),
+                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(10.3)),
+                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(30.1)),
+                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(30.4)),
+                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(15.8)));
 
-//     auto inferencingInput  = NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(15.7));
+    auto inferencingInput  = NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(15.7));
 
-//     auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
-//         static_cast<TransformedType>(-0.11521303)
-//     );
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
+        static_cast<TransformedType>(-0.11521303)
+    );
 
-//     NS::AnnotationMapsPtr const                                          pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-//     NS::Featurizers::StandardScalarEstimator<InputType>   estimator(pAllColumnAnnotations);
-//     CHECK(NS::TestHelpers::FuzzyCheck(
-//         NS::TestHelpers::TransformerEstimatorTest(
-//             estimator,
-//             trainingBatches,
-//             inferencingInput
-//         ), inferencingOutput
-//     ));
-// }
+    NS::AnnotationMapsPtr const                                          pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    CHECK(NS::TestHelpers::FuzzyCheck(
+        NS::TestHelpers::TransformerEstimatorTest(
+            NS::Featurizers::StandardScalerEstimator<InputType>(pAllColumnAnnotations, 0, true, true),
+            trainingBatches,
+            inferencingInput
+        ), inferencingOutput
+    ));
+}
 
-// // test for with_mean, with_std
-// TEST_CASE("without_mean_std") {
-//     using InputType       = std::float_t;
-//     using TransformedType = std::double_t;
+// test for non valid inference input
+TEST_CASE("non-valid inference input") {
+    using InputType       = std::double_t;
+    using TransformedType = std::double_t;
 
-//     auto trainingBatches  = NS::TestHelpers::make_vector<std::vector<InputType>>(
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(10.3)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(20.1)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(8.4)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(8.2)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(10.3)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(30.1)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(30.4)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(15.8)));
+    InputType null = NS::Traits<TransformedType>::CreateNullValue();
+    
+    auto trainingBatches  = NS::TestHelpers::make_vector<std::vector<InputType>>(
+                                    NS::TestHelpers::make_vector<InputType>(1),
+                                    NS::TestHelpers::make_vector<InputType>(3),
+                                    NS::TestHelpers::make_vector<InputType>(5));
 
-//     auto inferencingInput  = NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(15.7));
+    auto inferencingInput  = NS::TestHelpers::make_vector<InputType>(null);
 
-//     auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
-//         static_cast<TransformedType>(15.7)
-//     );
+    NS::AnnotationMapsPtr const                                          pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
 
-//     NS::AnnotationMapsPtr const                                          pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-//     NS::Featurizers::StandardScalarEstimator<InputType>   estimator(pAllColumnAnnotations, false, false);
-//     CHECK(NS::TestHelpers::FuzzyCheck(
-//         NS::TestHelpers::TransformerEstimatorTest(
-//             estimator,
-//             trainingBatches,
-//             inferencingInput
-//         ), inferencingOutput
-//     ));
-// }
-// TEST_CASE("Serialization/Deserialization") {
-//     using InputType       = std::float_t;
-//     using TransformerType = NS::Featurizers::SScalingEstimator<InputType>::Transformer;
-//     auto model = std::make_shared<TransformerType>(static_cast<std::double_t>(-3.7), static_cast<std::double_t>(6.8), true, false);
+    // if inference input is null, inference output should also be null
+    CHECK( NS::Traits<TransformedType>::IsNull(
+            NS::TestHelpers::TransformerEstimatorTest(
+            NS::Featurizers::StandardScalerEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, true, true),
+            trainingBatches,
+            inferencingInput
+        )[0])
+    );
+}
+// test for with_mean, with_std
+TEST_CASE("without_mean_std") {
+    using InputType       = std::float_t;
+    using TransformedType = std::double_t;
 
-//     NS::Archive archive;
-//     model->save(archive);
-//     std::vector<unsigned char> vec = archive.commit();
-//     CHECK(vec.size() == 18);
+    auto trainingBatches  = NS::TestHelpers::make_vector<std::vector<InputType>>(
+                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(10.3)),
+                                    NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(20.1)));
 
-//     NS::Archive loader(vec);
-//     TransformerType modelLoaded(loader);
-//     CHECK(modelLoaded==*model);
-// }
+    auto inferencingInput  = NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(15.7));
+
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
+        static_cast<TransformedType>(15.7)
+    );
+
+    NS::AnnotationMapsPtr const                                          pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    
+    CHECK(NS::TestHelpers::FuzzyCheck(
+        NS::TestHelpers::TransformerEstimatorTest(
+            NS::Featurizers::StandardScalerEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, false, false),
+            trainingBatches,
+            inferencingInput
+        ), inferencingOutput
+    ));
+}
+TEST_CASE("Serialization/Deserialization") {
+    using InputType       = std::float_t;
+    using TransformedType = std::double_t;
+    using TransformerType = NS::Featurizers::StandardScalerTransformer<InputType, TransformedType>;
+
+    auto model = std::make_shared<TransformerType>(static_cast<std::double_t>(-3.7), static_cast<std::double_t>(6.8));
+
+    NS::Archive archive;
+    model->save(archive);
+    std::vector<unsigned char> vec = archive.commit();
+    CHECK(vec.size() == 16);
+
+    NS::Archive loader(vec);
+    TransformerType modelLoaded(loader);
+    CHECK(modelLoaded==*model);
+}

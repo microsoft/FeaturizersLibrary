@@ -149,6 +149,7 @@ private:
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
+
         return std::make_unique<StandardScalerTransformer<InputT, TransformedT>>(average, deviation);
     }
 };
