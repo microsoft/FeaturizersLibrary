@@ -214,7 +214,7 @@ Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::St
 }
 
 template <typename T, typename StandardDeviationEstimatorT>
-bool Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::begin_training(AnnotationMap const &annotations) {
+bool Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::begin_training(AnnotationMap const &) {
     // if user doesn't specify an average value, retrieve the StatisticalMetricsEstimator annotation to get average and count
     if (!_user_average_flag) {
         // ----------------------------------------------------------------------
