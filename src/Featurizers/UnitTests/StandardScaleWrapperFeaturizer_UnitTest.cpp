@@ -6,7 +6,7 @@
 #include "catch.hpp"
 
 #include "../../3rdParty/optional.h"
-#include "../../Featurizers/StandardScalerFeaturizer.h"
+#include "../../Featurizers/StandardScaleWrapperFeaturizer.h"
 #include "../TestHelpers.h"
 #include "../../Traits.h"
 
@@ -34,7 +34,7 @@ TEST_CASE("no valid input") {
 
     CHECK_THROWS_WITH(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::StandardScalerEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, true, true),
+            NS::Featurizers::StandardScaleWrapperEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, true, true),
             trainingBatches,
             inferencingInput
         ), "update is not called before l2 is committed!"
@@ -58,7 +58,7 @@ TEST_CASE("1 int") {
 
     CHECK(NS::TestHelpers::FuzzyCheck(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::StandardScalerEstimator<InputType>(pAllColumnAnnotations, 0, true, true),
+            NS::Featurizers::StandardScaleWrapperEstimator<InputType>(pAllColumnAnnotations, 0, true, true),
             trainingBatches,
             inferencingInput
         ), inferencingOutput
@@ -85,7 +85,7 @@ TEST_CASE("5 ints") {
 
     CHECK(NS::TestHelpers::FuzzyCheck(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::StandardScalerEstimator<InputType>(pAllColumnAnnotations, 0, true, true),
+            NS::Featurizers::StandardScaleWrapperEstimator<InputType>(pAllColumnAnnotations, 0, true, true),
             trainingBatches,
             inferencingInput
         ), inferencingOutput
@@ -116,7 +116,7 @@ TEST_CASE("8 random float_t") {
     NS::AnnotationMapsPtr const                                          pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     CHECK(NS::TestHelpers::FuzzyCheck(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::StandardScalerEstimator<InputType>(pAllColumnAnnotations, 0, true, true),
+            NS::Featurizers::StandardScaleWrapperEstimator<InputType>(pAllColumnAnnotations, 0, true, true),
             trainingBatches,
             inferencingInput
         ), inferencingOutput
@@ -142,7 +142,7 @@ TEST_CASE("non-valid inference input") {
     // if inference input is null, inference output should also be null
     CHECK( NS::Traits<TransformedType>::IsNull(
             NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::StandardScalerEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, true, true),
+            NS::Featurizers::StandardScaleWrapperEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, true, true),
             trainingBatches,
             inferencingInput
         )[0])
@@ -167,7 +167,7 @@ TEST_CASE("without_mean_std") {
     
     CHECK(NS::TestHelpers::FuzzyCheck(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::StandardScalerEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, false, false),
+            NS::Featurizers::StandardScaleWrapperEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, false, false),
             trainingBatches,
             inferencingInput
         ), inferencingOutput

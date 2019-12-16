@@ -65,7 +65,7 @@ private:
 namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         StandardScalerEstimatorImpl
+///  \class         StandardScaleWrapperEstimatorImpl
 ///  \brief         Estimator that reads an annotation created by the `StatisticalMetricsEstimator`
 ///                 and the `StandardDeviationEstimator` to create a `StandardScalerTransformer` object.
 ///
@@ -74,7 +74,7 @@ template <
     typename TransformedT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class StandardScalerEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
+class StandardScaleWrapperEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -89,10 +89,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    StandardScalerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std);
-    ~StandardScalerEstimatorImpl(void) override = default;
+    StandardScaleWrapperEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std);
+    ~StandardScaleWrapperEstimatorImpl(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StandardScalerEstimatorImpl);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StandardScaleWrapperEstimatorImpl);
 
 private:
     // ----------------------------------------------------------------------
@@ -157,7 +157,7 @@ private:
 } // namespace Details
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         StandardScalerEstimator
+///  \class         StandardScaleWrapperEstimator
 ///  \brief         Chains up StatisticalMetricsEstimator, StandardDeviationEstimator and StandardScalerTransformerImpl
 ///                 to scale input data set so that it's centered around 0 with unit standard deviation
 ///
@@ -166,11 +166,11 @@ template <
     typename TransformedT=std::double_t,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class StandardScalerEstimator :
+class StandardScaleWrapperEstimator :
     public Components::PipelineExecutionEstimatorImpl<
         Components::StatisticalMetricsEstimator<InputT, MaxNumTrainingItemsV>,
         Components::StandardDeviationEstimator<InputT, MaxNumTrainingItemsV>,
-        Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
+        Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -182,7 +182,7 @@ public:
         Components::PipelineExecutionEstimatorImpl<
             Components::StatisticalMetricsEstimator<InputT, MaxNumTrainingItemsV>,
             Components::StandardDeviationEstimator<InputT, MaxNumTrainingItemsV>,
-            Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
+            Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
         >;
 
     // ----------------------------------------------------------------------
@@ -190,10 +190,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    StandardScalerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std);
-    ~StandardScalerEstimator(void) override = default;
+    StandardScaleWrapperEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std);
+    ~StandardScaleWrapperEstimator(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StandardScalerEstimator);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StandardScaleWrapperEstimator);
 };
 
 
@@ -217,7 +217,7 @@ StandardScalerTransformer<InputT, TransformedT>::StandardScalerTransformer(std::
     _average(std::move(average)),
     _deviation(std::move(deviation)) {
         if(_deviation < 0) {
-            throw std::invalid_argument("Standard deviation should be greater or equal to 0 in StandardScalerFeaturizer!");
+            throw std::invalid_argument("Standard deviation should be greater or equal to 0 in StandardScaleWrapperFeaturizer!");
         }
 }
 
@@ -290,28 +290,28 @@ void StandardScalerTransformer<InputT, TransformedT>::execute_impl(typename Base
 
 // ----------------------------------------------------------------------
 // |
-// |  StandardScalerEstimator
+// |  StandardScaleWrapperEstimator
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-StandardScalerEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::StandardScalerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std) :
+StandardScaleWrapperEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::StandardScaleWrapperEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std) :
     BaseType(
-        "StandardScalerEstimator",
+        "StandardScaleWrapperEstimator",
         pAllColumnAnnotations,
         [pAllColumnAnnotations, colIndex](void) { return Components::StatisticalMetricsEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
         [pAllColumnAnnotations, colIndex](void) { return Components::StandardDeviationEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
-        [pAllColumnAnnotations, colIndex, &with_mean, &with_std](void) { return Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex), std::move(with_mean), std::move(with_std)); }
+        [pAllColumnAnnotations, colIndex, &with_mean, &with_std](void) { return Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex), std::move(with_mean), std::move(with_std)); }
     ) {
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::StandardScalerEstimatorImpl
+// |  Details::StandardScaleWrapperEstimatorImpl
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::StandardScalerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std) :
-    BaseType("StandardScalerEstimatorImpl", std::move(pAllColumnAnnotations)),
+Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::StandardScaleWrapperEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std) :
+    BaseType("StandardScaleWrapperEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
             [this, &colIndex](void) -> size_t & {
@@ -330,17 +330,17 @@ Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-bool Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+bool Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
     return false;
 }
 
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-FitResult Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
+FitResult Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
     throw std::runtime_error("This will never be called");
 }
 
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-void Details::StandardScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+void Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
 }
