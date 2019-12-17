@@ -38,6 +38,12 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(ImputationMarkerTransformer);
 
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
     // MSVC has problems when the function is defined outside of the declaration
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
 

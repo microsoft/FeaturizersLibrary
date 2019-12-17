@@ -54,3 +54,30 @@ TEST_CASE("Numeric NaNs") {
     CHECK(NS::Featurizers::MissingDummiesTransformer<std::float_t>().execute(std::numeric_limits<std::float_t>::quiet_NaN()) == 1);
     CHECK(NS::Featurizers::MissingDummiesTransformer<std::double_t>().execute(std::numeric_limits<std::double_t>::quiet_NaN()) == 1);
 }
+
+TEST_CASE("Serialization") {
+    NS::Featurizers::MissingDummiesTransformer<std::double_t>               original;
+    NS::Archive                                                             out;
+
+    original.save(out);
+
+    NS::Archive                             in(out.commit());
+
+    NS::Featurizers::MissingDummiesTransformer<std::double_t>               other(in);
+
+    CHECK(other == original);
+}
+
+TEST_CASE("Serialization Version Error") {
+    NS::Archive                             out;
+
+    out.serialize(static_cast<std::uint16_t>(2));
+    out.serialize(static_cast<std::uint16_t>(0));
+
+    NS::Archive                             in(out.commit());
+
+    CHECK_THROWS_WITH(
+        (NS::Featurizers::MissingDummiesTransformer<std::double_t>(in)),
+        Catch::Contains("Unsupported archive version")
+    );
+}

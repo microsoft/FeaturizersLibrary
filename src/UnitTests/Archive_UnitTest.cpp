@@ -85,3 +85,48 @@ TEST_CASE("Deserialize errors") {
 
     CHECK_THROWS_WITH(in.get_buffer_ptr(), "Invalid buffer");
 }
+
+bool TestLittleEndianess() {
+    uint32_t u = 0x01020304;
+    return (*(reinterpret_cast<uint8_t*>(&u))) == 4;
+}
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
+
+template <typename T>
+bool SerializeOnly(T const &value) {
+    NS::Archive                             out;
+
+    out.serialize(value);
+
+    NS::Archive                             in(out.commit());
+
+    T const                                 other(in.template deserialize<T>());
+    return value == other;
+}
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+
+TEST_CASE("Endianess") {
+    CHECK(TestLittleEndianess() == is_little_endian); // ISLITTLEENDIAN in Traits.h is set incorrectly!
+}
+
+TEST_CASE("Serialization_Based_On_Endianess") {
+    // checks if serialized output == original
+    // expected result would be true for little endian and false for big endian
+    bool                                    expected_result(TestLittleEndianess());
+
+    CHECK(SerializeOnly(static_cast<std::int16_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::int32_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::int64_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::uint16_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::uint32_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::uint64_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::double_t>(-23)) == expected_result);
+    CHECK(SerializeOnly(static_cast<std::float_t>(-23)) == expected_result);
+}

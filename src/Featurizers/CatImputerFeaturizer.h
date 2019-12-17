@@ -190,11 +190,28 @@ CatImputerTransformer<TransformedT>::CatImputerTransformer(TransformedType value
 
 template <typename TransformedT>
 CatImputerTransformer<TransformedT>::CatImputerTransformer(Archive &ar) :
-    Value(Traits<decltype(Value)>::deserialize(ar)) {
+    CatImputerTransformer(
+        [&ar](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
+
+            // Data
+            return CatImputerTransformer(Traits<TransformedT>::deserialize(ar));
+        }()
+    ) {
 }
 
 template <typename TransformedT>
 void CatImputerTransformer<TransformedT>::save(Archive &ar) const /*override*/ {
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1);
+    Traits<std::uint16_t>::serialize(ar, 0);
+
+    // Data
     Traits<decltype(Value)>::serialize(ar, Value);
 }
 

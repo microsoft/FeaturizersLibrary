@@ -14,7 +14,7 @@
 namespace NS = Microsoft::Featurizer;
 
 template <typename KeyT, typename IndexT>
-using IndexMap = std::map<KeyT, IndexT>;
+using IndexMap = std::unordered_map<KeyT, IndexT>;
 
 
 
@@ -102,34 +102,34 @@ TEST_CASE("not found value, throw mode") {
     );
 }
 
-#if 0 // TODO: Add unordered_map to Traits
-
 TEST_CASE("Serialization/Deserialization- Numeric") {
     using InputType       = std::uint32_t;
     using TransformedType = std::uint32_t;
     using TransformerType = NS::Featurizers::LabelEncoderTransformer<InputType>;
 
-    IndexMap<InputType, TransformedType> indexmap({
-                                   {6, 1},
-                                   {7, 2},
-                                   {8, 3},
-                                   {10, 4},
-                                   {11, 5},
-                                   {15, 6},
-                                   {18, 7},
-                                   {20, 8},
-                                   {30, 9}
-                                   });
-    auto model = std::make_shared<TransformerType>(indexmap, true);
+    IndexMap<InputType, TransformedType>    indexmap(
+        {
+            {6, 1},
+            {7, 2},
+            {8, 3},
+            {10, 4},
+            {11, 5},
+            {15, 6},
+            {18, 7},
+            {20, 8},
+            {30, 9}
+        }
+    );
 
-    NS::Archive archive;
-    model->save(archive);
-    std::vector<unsigned char> vec = archive.commit();
-    CHECK(vec.size() == 77);
+    TransformerType                         original(std::move(indexmap), true);
+    NS::Archive                             out;
 
-    NS::Archive loader(vec);
-    TransformerType modelLoaded(loader);
-    CHECK(modelLoaded==*model);
+    original.save(out);
+
+    NS::Archive                             in(out.commit());
+    TransformerType                         other(in);
+
+    CHECK(other == original);
 }
 
 TEST_CASE("Serialization/Deserialization- string") {
@@ -137,21 +137,37 @@ TEST_CASE("Serialization/Deserialization- string") {
     using TransformedType = std::uint32_t;
     using TransformerType = NS::Featurizers::LabelEncoderTransformer<InputType>;
 
-    IndexMap<InputType, TransformedType> indexmap({
-                                    {"apple", 1},
-                                    {"banana", 2},
-                                    {"grape", 3},
-                                    {"orange", 4},
-                                    {"peach", 5}});
-    auto model = std::make_shared<TransformerType>(indexmap, false);
+    IndexMap<InputType, TransformedType>    indexmap(
+        {
+            {"apple", 1},
+            {"banana", 2},
+            {"grape", 3},
+            {"orange", 4},
+            {"peach", 5}
+        }
+    );
 
-    NS::Archive archive;
-    model->save(archive);
-    std::vector<unsigned char> vec = archive.commit();
+    TransformerType                         original(indexmap, false);
+    NS::Archive                             out;
 
-    NS::Archive loader(vec);
-    TransformerType modelLoaded(loader);
-    CHECK(modelLoaded == *model);
+    original.save(out);
+
+    NS::Archive                             in(out.commit());
+    TransformerType                         other(in);
+
+    CHECK(other == original);
 }
-#endif
 
+TEST_CASE("Serialization Version Error") {
+    NS::Archive                             out;
+
+    out.serialize(static_cast<std::uint16_t>(2));
+    out.serialize(static_cast<std::uint16_t>(0));
+
+    NS::Archive                             in(out.commit());
+
+    CHECK_THROWS_WITH(
+        NS::Featurizers::LabelEncoderTransformer<std::string>(in),
+        Catch::Contains("Unsupported archive version")
+    );
+}
