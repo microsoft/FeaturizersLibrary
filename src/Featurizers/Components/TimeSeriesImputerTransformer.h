@@ -329,8 +329,8 @@ inline bool TimeSeriesImputerEstimator::Transformer::operator==(Transformer cons
 
 inline void TimeSeriesImputerEstimator::Transformer::save(Archive & ar) const {
     // Version
-    Traits<std::uint16_t>::serialize(ar, 1);
-    Traits<std::uint16_t>::serialize(ar, 0);
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
 

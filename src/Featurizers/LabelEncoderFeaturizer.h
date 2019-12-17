@@ -211,7 +211,7 @@ template <typename InputT>
 LabelEncoderTransformer<InputT>::LabelEncoderTransformer(Archive &ar) :
     LabelEncoderTransformer(
         [&ar](void) {
-            // Version 
+            // Version
             std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
             std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
 
@@ -230,9 +230,9 @@ LabelEncoderTransformer<InputT>::LabelEncoderTransformer(Archive &ar) :
 template <typename InputT>
 void LabelEncoderTransformer<InputT>::save(Archive &ar) const /*override*/ {
     // Version
-    Traits<std::uint16_t>::serialize(ar, 1);
-    Traits<std::uint16_t>::serialize(ar, 0);
-    
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
+
     // Data
     Traits<decltype(Labels)>::serialize(ar, Labels);
     Traits<decltype(AllowMissingValues)>::serialize(ar, AllowMissingValues);

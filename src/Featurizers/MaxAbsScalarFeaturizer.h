@@ -191,7 +191,7 @@ template <typename InputT, typename TransformedT>
 MaxAbsScalarTransformer<InputT, TransformedT>::MaxAbsScalarTransformer(Archive &ar) :
     MaxAbsScalarTransformer(
         [&ar](void) {
-            // Version 
+            // Version
             std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
             std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
 
@@ -221,8 +221,8 @@ bool MaxAbsScalarTransformer<InputT, TransformedT>::operator==(MaxAbsScalarTrans
 template <typename InputT, typename TransformedT>
 void MaxAbsScalarTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
     // Version
-    Traits<std::uint16_t>::serialize(ar, 1);
-    Traits<std::uint16_t>::serialize(ar, 0);
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
     Traits<decltype(Scale)>::serialize(ar, Scale);
