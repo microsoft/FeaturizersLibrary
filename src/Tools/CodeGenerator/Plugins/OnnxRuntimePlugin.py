@@ -826,7 +826,7 @@ def _GenerateKernel(
             transformer_name,
         )
 
-    with open(os.path.join(output_dir, "{}.cc".format(transformer_name)), "w") as f:
+    with open(os.path.join(output_dir, "{}.cc".format('_'.join(re.findall('[a-zA-Z][^A-Z]*', transformer_name)).lower())), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
