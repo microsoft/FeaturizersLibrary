@@ -89,7 +89,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    StandardScaleWrapperEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std);
+    StandardScaleWrapperEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool withMean, bool withStd);
     ~StandardScaleWrapperEstimatorImpl(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StandardScaleWrapperEstimatorImpl);
@@ -101,8 +101,8 @@ private:
     // |
     // ----------------------------------------------------------------------
     size_t const                            _colIndex;
-    bool          const                     _with_mean;
-    bool          const                     _with_std;
+    bool          const                     _withMean;
+    bool          const                     _withStd;
 
     // ----------------------------------------------------------------------
     // |
@@ -122,33 +122,29 @@ private:
         using StandardDeviationAnnotationData   = Components::StandardDeviationAnnotationData;
         using StandardDeviationEstimator        = Components::StandardDeviationEstimator<InputT, MaxNumTrainingItemsV>;
         // ----------------------------------------------------------------------
-        // if _with_mean is false, average is set to 0
+        // if _withMean is false, average is set to 0
         std::double_t average = 0;
-        // if _with_std is false, deviation is set to 1
+        // if _withStd is false, deviation is set to 1
         std::double_t deviation = 1;
-        StandardStatisticalAnnotationData const &        average_stats(StatisticalMetricsEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::StatisticalMetricsEstimatorName));
-        StandardDeviationAnnotationData   const &        deviation_stats(StandardDeviationEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::StandardDeviationEstimatorName));
-        if (_with_mean) {
+        std::uint64_t average_count = 0;
+        std::uint64_t deviation_count = 0;
+        if (_withMean) {
+            StandardStatisticalAnnotationData const &        average_stats(StatisticalMetricsEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::StatisticalMetricsEstimatorName));
             average = average_stats.Average;
         }
-        if (_with_std) {
+        if (_withStd) {
+            StandardDeviationAnnotationData   const &        deviation_stats(StandardDeviationEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::StandardDeviationEstimatorName));
             deviation = static_cast<std::double_t>(deviation_stats.StandardDeviation);
         }
-        assert(average_stats.Count == deviation_stats.Count);
-#if (defined __clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wfloat-equal"
-#   pragma clang diagnostic ignored "-Wdouble-promotion"
-#endif
-        // check if deviation is 0
-        // if it's 0, change it to 1
-        if (deviation == 0) {
-            deviation = 1;
+        if (_withMean && _withStd) {
+            assert(average_count == deviation_count);
         }
 
-#if (defined __clang__)
-#   pragma clang diagnostic pop
-#endif
+        // check if deviation is 0
+        // if it's 0, change it to 1
+        if (deviation == 0.0) {
+            deviation = 1.0;
+        }
 
         return typename BaseType::TransformerUniquePtr(new StandardScalerTransformer<InputT, TransformedT>(average, deviation));
     }
@@ -190,7 +186,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    StandardScaleWrapperEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std);
+    StandardScaleWrapperEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool withMean, bool withStd);
     ~StandardScaleWrapperEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StandardScaleWrapperEstimator);
@@ -267,24 +263,14 @@ void StandardScalerTransformer<InputT, TransformedT>::execute_impl(typename Base
     using TransformedTraits                 = Traits<TransformedT>;
     // ----------------------------------------------------------------------
 
-    // if input is Nan for numeric types, it will be treated as missing value
-    // and return a Nan
+    // TODO: Implement different strategies to handle nulls
+    // potential strategies can be returning 0s for nulls, throwing errors, returning nulls for nulls
     if(InputTraits::IsNull(input)) {
         callback(TransformedTraits::CreateNullValue());
         return;
     }
 
-#if (defined __clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wdouble-promotion"
-#   pragma clang diagnostic ignored "-Wfloat-equal"
-#endif
-
     callback((static_cast<TransformedT>(input) - _average) / _deviation);
-
-#if (defined __clang__)
-#   pragma clang diagnostic pop
-#endif
 
 }
 
@@ -294,13 +280,13 @@ void StandardScalerTransformer<InputT, TransformedT>::execute_impl(typename Base
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-StandardScaleWrapperEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::StandardScaleWrapperEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std) :
+StandardScaleWrapperEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::StandardScaleWrapperEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool withMean, bool withStd) :
     BaseType(
         "StandardScaleWrapperEstimator",
         pAllColumnAnnotations,
         [pAllColumnAnnotations, colIndex](void) { return Components::StatisticalMetricsEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
         [pAllColumnAnnotations, colIndex](void) { return Components::StandardDeviationEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
-        [pAllColumnAnnotations, colIndex, &with_mean, &with_std](void) { return Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex), std::move(with_mean), std::move(with_std)); }
+        [pAllColumnAnnotations, colIndex, &withMean, &withStd](void) { return Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex), std::move(withMean), std::move(withStd)); }
     ) {
 }
 
@@ -310,7 +296,7 @@ StandardScaleWrapperEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::Stand
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::StandardScaleWrapperEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_mean, bool with_std) :
+Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::StandardScaleWrapperEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool withMean, bool withStd) :
     BaseType("StandardScaleWrapperEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
@@ -322,8 +308,8 @@ Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingI
             }()
         )
     ),
-    _with_mean(std::move(with_mean)),
-    _with_std(std::move(with_std)) {
+    _withMean(std::move(withMean)),
+    _withStd(std::move(withStd)) {
 }
 
 // ----------------------------------------------------------------------

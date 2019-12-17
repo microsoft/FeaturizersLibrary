@@ -229,9 +229,10 @@ bool Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT
     }
     return true;
 }
- 
+
 template <typename T, typename StandardDeviationEstimatorT>
 void Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::fit(InputType const &input) {
+    // TODO: Implement different strategies for dealing with null
     if(Microsoft::Featurizer::Traits<T>::IsNull(input))
         return;
     _updater.update(static_cast<std::double_t>(input) - _average);
