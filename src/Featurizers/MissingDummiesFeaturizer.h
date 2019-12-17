@@ -12,6 +12,18 @@ namespace Featurizer {
 namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
+///  \class        MissingDummiesTraits
+///  \brief         Traits for mapping the input/output types for the MissingDummies.
+///                 This allows us to only change one place if typings need to change.
+///
+template <typename TransformedT>
+struct MissingDummiesTraits{
+    using InputType = typename Traits<TransformedT>::nullable_type;
+
+    static_assert(Traits<InputType>::IsNullableType, "'InputT' must be a nullable type");
+};
+
+/////////////////////////////////////////////////////////////////////////
 ///  \class         MissingDummiesTransformer
 ///  \brief         if input is Null, return 1. Otherwise return 0
 ///
@@ -29,17 +41,16 @@ namespace Featurizers {
 ///
 ///                 As a result, we would just create another class with a slightly different return
 ///
-template <typename T>
-class MissingDummiesTransformer : public Components::InferenceOnlyTransformerImpl<T, std::int8_t> {
+template <typename TransformedT>
+class MissingDummiesTransformer : public Components::InferenceOnlyTransformerImpl<typename MissingDummiesTraits<TransformedT>::InputType, std::int8_t> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    static_assert(std::is_same<T, typename Traits<T>::nullable_type>::value, "Input should be Nullable Type");
 
-    using Type                              = T;
+    using Type                              = typename MissingDummiesTraits<TransformedT>::InputType;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, std::int8_t>;
 
     // ----------------------------------------------------------------------
@@ -62,12 +73,12 @@ private:
 
     // MSVC has problems when the function is defined outside of the declaration
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-        callback(Traits<T>::IsNull(input) ? 1 : 0);
+        callback(Traits<Type>::IsNull(input) ? 1 : 0);
     }
 };
 
 template <typename T>
-class MissingDummiesEstimator : public Components::InferenceOnlyEstimatorImpl<MissingDummiesTransformer<typename Traits<T>::nullable_type>> {
+class MissingDummiesEstimator : public Components::InferenceOnlyEstimatorImpl<MissingDummiesTransformer<T>> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -75,7 +86,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using Type                              = typename Traits<T>::nullable_type;
-    using BaseType                          = Components::InferenceOnlyEstimatorImpl<MissingDummiesTransformer<Type>>;
+    using BaseType                          = Components::InferenceOnlyEstimatorImpl<MissingDummiesTransformer<T>>;
 
     // ----------------------------------------------------------------------
     // |
@@ -103,8 +114,8 @@ public:
 // |  MissingDummiesEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename T>
-MissingDummiesTransformer<T>::MissingDummiesTransformer(Archive &ar) :
+template <typename TransformedT>
+MissingDummiesTransformer<TransformedT>::MissingDummiesTransformer(Archive &ar) :
     BaseType(ar) {
 }
 

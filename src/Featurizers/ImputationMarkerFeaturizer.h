@@ -12,19 +12,30 @@ namespace Featurizer {
 namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
+///  \class        ImputationMarkerTraits
+///  \brief         Traits for mapping the input/output types for the ImputationMarker.
+///                 This allows us to only change one place if typings need to change.
+///
+template <typename TransformedT>
+struct ImputationMarkerTraits{
+    using InputType = typename Traits<TransformedT>::nullable_type;
+
+    static_assert(Traits<InputType>::IsNullableType, "'InputT' must be a nullable type");
+};
+
+/////////////////////////////////////////////////////////////////////////
 ///  \class         ImputationMarkerTransformer
 ///  \brief         if input is Null, return true. Otherwise return false
 ///
-template <typename T>
-class ImputationMarkerTransformer : public Components::InferenceOnlyTransformerImpl<T, bool> {
+template <typename TransformedT>
+class ImputationMarkerTransformer : public Components::InferenceOnlyTransformerImpl<typename ImputationMarkerTraits<TransformedT>::InputType, bool> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    static_assert(std::is_same<T, typename Traits<T>::nullable_type>::value, "Input should be Nullable Type");
-    using Type                              = T;
+    using Type                              = typename ImputationMarkerTraits<TransformedT>::InputType;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, bool>;
 
     // ----------------------------------------------------------------------
@@ -42,12 +53,12 @@ public:
     // MSVC has problems when the function is defined outside of the declaration
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
 
-        callback(Traits<T>::IsNull(input));
+        callback(Traits<Type>::IsNull(input));
     }
 };
 
 template <typename T>
-class ImputationMarkerEstimator : public Components::InferenceOnlyEstimatorImpl<ImputationMarkerTransformer<typename Traits<T>::nullable_type>> {
+class ImputationMarkerEstimator : public Components::InferenceOnlyEstimatorImpl<ImputationMarkerTransformer<T>> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -55,7 +66,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using Type                              = typename Traits<T>::nullable_type;
-    using BaseType                          = Components::InferenceOnlyEstimatorImpl<ImputationMarkerTransformer<Type>>;
+    using BaseType                          = Components::InferenceOnlyEstimatorImpl<ImputationMarkerTransformer<T>>;
 
     // ----------------------------------------------------------------------
     // |
@@ -83,8 +94,8 @@ public:
 // |  ImputationMarkerEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename T>
-ImputationMarkerTransformer<T>::ImputationMarkerTransformer(Archive &ar) :
+template <typename TransformedT>
+ImputationMarkerTransformer<TransformedT>::ImputationMarkerTransformer(Archive &ar) :
     BaseType(ar) {
 }
 

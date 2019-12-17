@@ -32,7 +32,7 @@ TEST_CASE("ImputationMarkerEstimator") {
         .begin_training()
         .complete_training();
 
-    CHECK(dynamic_cast<NS::Featurizers::ImputationMarkerTransformer<nonstd::optional<int>> *>(estimator.create_transformer().get()));
+    CHECK(dynamic_cast<NS::Featurizers::ImputationMarkerTransformer<int> *>(estimator.create_transformer().get()));
 }
 
 TEST_CASE("Single Tests") {

@@ -31,7 +31,7 @@ TEST_CASE("MissingDummiesEstimator") {
         .begin_training()
         .complete_training();
 
-    CHECK(dynamic_cast<NS::Featurizers::MissingDummiesTransformer<nonstd::optional<int>> *>(estimator.create_transformer().get()));
+    CHECK(dynamic_cast<NS::Featurizers::MissingDummiesTransformer<int> *>(estimator.create_transformer().get()));
 
 }
 
