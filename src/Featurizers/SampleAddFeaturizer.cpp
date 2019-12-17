@@ -27,7 +27,19 @@ public:
     }
 
     SampleAddTransformer(Archive &ar) :
-        Delta(ar.deserialize<decltype(Delta)>()) {
+        SampleAddTransformer(
+            [&ar](void) {
+                // Version 
+                std::uint16_t               majorVersion(Traits<std::uint16_t>::deserialize(ar));
+                std::uint16_t               minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+                if(majorVersion != 1 || minorVersion != 0)
+                    throw std::runtime_error("Unsupported archive version");
+
+                // Data
+                return SampleAddTransformer(ar.deserialize<decltype(Delta)>());
+            }()
+        ) {
     }
 
     ~SampleAddTransformer(void) override = default;
@@ -35,6 +47,11 @@ public:
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SampleAddTransformer);
 
     void save(Archive &ar) const override {
+        // Version
+        Traits<std::uint16_t>::serialize(ar, 1);
+        Traits<std::uint16_t>::serialize(ar, 0);
+
+        // Data
         ar.serialize(Delta);
     }
 

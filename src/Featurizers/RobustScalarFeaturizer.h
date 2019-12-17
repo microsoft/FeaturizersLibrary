@@ -18,7 +18,7 @@ namespace Featurizers {
 ///  \brief         This class retrieves a RobustScalarNormAnnotation and computes
 ///                 the scale.
 ///
-template <typename InputT,typename TransformedT>
+template <typename InputT, typename TransformedT>
 class RobustScalarTransformer : public StandardTransformer<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
@@ -47,6 +47,8 @@ public:
     ~RobustScalarTransformer(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RobustScalarTransformer);
+
+    bool operator==(RobustScalarTransformer const &other) const;
 
     void save(Archive &ar) const override;
 
@@ -199,12 +201,47 @@ RobustScalarTransformer<InputT, TransformedT>::RobustScalarTransformer(typename 
 
 template <typename InputT, typename TransformedT>
 RobustScalarTransformer<InputT, TransformedT>::RobustScalarTransformer(Archive &ar) :
-    Median(Traits<decltype(Median)>::deserialize(ar)),
-    Scale(Traits<decltype(Scale)>::deserialize(ar)) {
+    RobustScalarTransformer(
+        [&ar](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
+
+            // Data
+            TransformedT                    median(Traits<TransformedT>::deserialize(ar));
+            TransformedT                    scale(Traits<TransformedT>::deserialize(ar));
+
+            return RobustScalarTransformer(std::move(median), std::move(scale));
+        }()
+    ) {
+}
+
+template <typename InputT, typename TransformedT>
+bool RobustScalarTransformer<InputT, TransformedT>::operator==(RobustScalarTransformer const &other) const {
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
+
+    return Median == other.Median
+        && Scale == other.Scale;
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 }
 
 template <typename InputT, typename TransformedT>
 void RobustScalarTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1);
+    Traits<std::uint16_t>::serialize(ar, 0);
+
+    // Data
     Traits<decltype(Median)>::serialize(ar, Median);
     Traits<decltype(Scale)>::serialize(ar, Scale);
 }

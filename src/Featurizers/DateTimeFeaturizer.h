@@ -133,6 +133,8 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DateTimeTransformer);
 
+    bool operator==(DateTimeTransformer const &other) const;
+    
     void save(Archive & ar) const override;
 
 private:

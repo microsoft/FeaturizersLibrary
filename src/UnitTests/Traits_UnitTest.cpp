@@ -30,10 +30,11 @@ static_assert(std::is_same<Traits<std::uint64_t>::nullable_type, nonstd::optiona
 static_assert(std::is_same<Traits<std::string>::nullable_type, nonstd::optional<std::string>>::value, "Incorrect nullable type for std::string");
 static_assert(std::is_same<Traits<std::array<char, 4>>::nullable_type, nonstd::optional<std::array<char, 4>>>::value, "Incorrect nullable type for std::array");
 static_assert(std::is_same<Traits<bool>::nullable_type, nonstd::optional<bool>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<std::map<int,int>>::nullable_type, nonstd::optional<std::map<int,int>>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<std::vector<int>>::nullable_type, nonstd::optional<std::vector<int>>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<nonstd::optional<int>>::nullable_type, nonstd::optional<int>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<std::tuple<int>>::nullable_type, nonstd::optional<std::tuple<int>>>::value, "Incorrect nullable type for std::string");
+static_assert(std::is_same<Traits<std::map<int,int>>::nullable_type, nonstd::optional<std::map<int,int>>>::value, "Incorrect nullable type for std::map");
+static_assert(std::is_same<Traits<std::unordered_map<int,int>>::nullable_type, nonstd::optional<std::unordered_map<int,int>>>::value, "Incorrect nullable type for std::unordered_map");
+static_assert(std::is_same<Traits<std::vector<int>>::nullable_type, nonstd::optional<std::vector<int>>>::value, "Incorrect nullable type for std::vector");
+static_assert(std::is_same<Traits<nonstd::optional<int>>::nullable_type, nonstd::optional<int>>::value, "Incorrect nullable type for nonstd::optional");
+static_assert(std::is_same<Traits<std::tuple<int>>::nullable_type, nonstd::optional<std::tuple<int>>>::value, "Incorrect nullable type for std::tuple");
 
 TEST_CASE("Transformer_Nullable") {
     nonstd::optional<std::int8_t> arg_null;
@@ -239,6 +240,15 @@ TEST_CASE("Transformer_Maps") {
     CHECK_THROWS_WITH((Traits<std::map<std::int16_t, std::double_t>>::FromString(map_res)), "Not Implemented Yet");
 }
 
+TEST_CASE("Unordered map") {
+    std::unordered_map<std::int16_t, std::double_t> m;
+    m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(5), 35.8));
+    m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(93), 0.147));
+    std::string map_res = Traits<std::unordered_map<std::int16_t, std::double_t>>::ToString(m);
+    std::string map_s{ "{93:0.147000,5:35.800000}" };
+	CHECK(map_res == map_s);
+}
+
 TEST_CASE("Transformer_Tuples") {
     std::tuple<int, std::string, double> tu(42, "hi", -3.14);
     std::string tu_res = Traits<std::tuple<int, std::string, double>>::ToString(tu);
@@ -265,17 +275,6 @@ bool SerializationTestImpl(T const &value) {
     return in.AtEnd() && other == value;
 }
 
-template <typename T>
-bool SerializeOnly(T const &value) {
-    Archive                                 out;
-
-    Traits<T>::serialize(out,value);
-
-    Archive                                 in(out.commit());
-
-    T const                                 other(in.template deserialize<T>());
-    return value == other;
-}
 TEST_CASE("Transformer_TimePoint") {
     // without time offset
     std::string tp_str = "1975-02-28T12:02:15Z";
@@ -359,24 +358,9 @@ TEST_CASE("Transformer_TimePoint") {
 
 }
 
-
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
-
-
-/*
-There are three categories of tests about serialization:
-1. Round trip test
-2. Run time endianess check
-3. Big endianess serialization test
-*/
-
-bool TestLittleEndianess() {
-    uint32_t u = 0x01020304;
-    return (*(reinterpret_cast<uint8_t*>(&u))) == 4;
-}
-
 
 TEST_CASE("Serialization") {
     CHECK(SerializationTestImpl(true));
@@ -405,32 +389,16 @@ TEST_CASE("Serialization") {
     CHECK(SerializationTestImpl(std::map<int, std::string>{ {10, "ten"}, {20, "twenty"} }));
     CHECK(SerializationTestImpl(std::map<std::string, int>{ {"ten", 10}, {"twenty", 20} }));
 
+    CHECK(SerializationTestImpl(std::unordered_map<int, std::string>()));
+    CHECK(SerializationTestImpl(std::unordered_map<int, std::string>{ {10, "ten"}, {20, "twenty"} }));
+    CHECK(SerializationTestImpl(std::unordered_map<std::string, int>{ {"ten", 10}, {"twenty", 20} }));
+
     CHECK(SerializationTestImpl(nonstd::optional<int>()));
     CHECK(SerializationTestImpl(nonstd::optional<int>(23)));
     CHECK(SerializationTestImpl(nonstd::optional<std::string>("foo")));
 
     CHECK(SerializationTestImpl(std::tuple<std::string, int, bool>("one", 2, true)));
 }
-
-TEST_CASE("Run_Time_Check") {
-    CHECK(TestLittleEndianess() == is_little_endian); // ISLITTLEENDIAN in Traits.h is set incorrectly!
-}
-
-TEST_CASE("Serialization_Based_On_Endianess") {
-    // checks if serialized output == original
-    // expected result would be true for little endian and false for big endian
-    bool expected_result(TestLittleEndianess()?true:false);
-    CHECK(SerializeOnly(static_cast<std::int16_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::int32_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::int64_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::uint16_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::uint32_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::uint64_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::double_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::float_t>(-23)) == expected_result);
-}
-
-
 
 template <typename T>
 bool TestCreateNullValue(void) {
@@ -452,5 +420,6 @@ TEST_CASE("CreateNullValue") {
     CHECK(TestCreateNullValue<std::string>());
     CHECK(TestCreateNullValue<std::vector<std::string>>());
     CHECK(TestCreateNullValue<std::map<std::string, std::uint32_t>>());
+    CHECK(TestCreateNullValue<std::unordered_map<std::string, std::uint32_t>>());
     CHECK(TestCreateNullValue<nonstd::optional<std::int8_t>>());
 }
