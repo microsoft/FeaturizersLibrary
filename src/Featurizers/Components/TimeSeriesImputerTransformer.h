@@ -85,6 +85,8 @@ public:
 
         FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Transformer);
 
+        bool operator==(Transformer const &other) const;
+
         void save(Archive & ar) const override;
 
         // ----------------------------------------------------------------------
@@ -92,9 +94,6 @@ public:
         // |  Public Data
         // |
         // ----------------------------------------------------------------------
-        //Version must the first value to get (de)serialized- as during deserialization we validate this before deserializing others.
-        //Making this class variable so that we won't have to deserialize this in the ctor of first variable- (as that will be less cleaner).
-        uint8_t const                                   _version;
         FrequencyType const                             _frequency;
         std::vector<TypeId> const                       _colsToImputeDataTypes;
         TimeSeriesImputeStrategy const                  _tsImputeStrategy;
@@ -243,7 +242,6 @@ inline void TimeSeriesImputerEstimator::complete_training_impl(void) /*override 
 // |
 // ----------------------------------------------------------------------
 inline TimeSeriesImputerEstimator::Transformer::Transformer(TimeSeriesImputerEstimator::FrequencyType value, std::vector<TypeId> colsToImputeDataTypes,TimeSeriesImputeStrategy tsImputeStrategy, bool supressError, std::map<KeyType,std::vector<double_t>> medianValues) :
-    _version(1),
     _frequency(std::move(value)),
     _colsToImputeDataTypes(std::move(colsToImputeDataTypes)),
     _tsImputeStrategy(std::move(tsImputeStrategy)),
@@ -259,43 +257,82 @@ inline TimeSeriesImputerEstimator::Transformer::Transformer(TimeSeriesImputerEst
 }
 
 inline TimeSeriesImputerEstimator::Transformer::Transformer(Archive & ar) :
-    _version([&ar](void)->uint8_t {
-            uint8_t version = Traits<std::uint8_t>::deserialize(ar);
-            if(version != 1)
-                throw std::runtime_error("Invalid transformer version");
-            return version;
+    TimeSeriesImputerEstimator::Transformer(
+        [&ar](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
+
+            // Data
+            std::chrono::system_clock::duration         duration(Traits<std::chrono::system_clock::duration>::deserialize(ar));
+            std::vector<TypeId>                         colsToImputeTypes(
+                [&ar](void) {
+                    // ----------------------------------------------------------------------
+                    using TypeIdUnderlyingType          = typename std::underlying_type<TypeId>::type;
+                    // ----------------------------------------------------------------------
+
+                    std::vector<TypeIdUnderlyingType>   rawTypes(Traits<std::vector<TypeIdUnderlyingType>>::deserialize(ar));
+                    std::vector<TypeId>                 results;
+
+                    results.reserve(rawTypes.size());
+
+                    for(auto const &raw : rawTypes) {
+                        if(IsValid(static_cast<TypeId>(raw)) == false)
+                            throw std::runtime_error("Invalid type");
+
+                        results.emplace_back(TypeId(raw));
+                    }
+
+                    return results;
+                }()
+            );
+
+            TimeSeriesImputeStrategy                    strategy(
+                [&ar](void) {
+                    // ----------------------------------------------------------------------
+                    using UnderlyingType                = typename std::underlying_type<TimeSeriesImputeStrategy>::type;
+                    // ----------------------------------------------------------------------
+
+                    UnderlyingType          raw(Traits<UnderlyingType>::deserialize(ar));
+
+                    if(IsValid(static_cast<TimeSeriesImputeStrategy>(raw)) == false)
+                        throw std::runtime_error("Invalid type");
+
+                    return static_cast<TimeSeriesImputeStrategy>(raw);
+                }()
+            );
+
+            std::map<KeyType, std::vector<double_t>>    medianValues(Traits<std::map<KeyType, std::vector<double_t>>>::deserialize(ar));
+            bool                                        suppressError(Traits<bool>::deserialize(ar));
+
+            return Transformer(
+                std::move(duration),
+                std::move(colsToImputeTypes),
+                std::move(strategy),
+                std::move(suppressError),
+                std::move(medianValues)
+            );
         }()
-    ),
+    ) {
+}
 
-    _frequency(Traits<std::chrono::system_clock::duration>::deserialize(ar)),
+inline bool TimeSeriesImputerEstimator::Transformer::operator==(Transformer const &other) const {
+    return _frequency == other._frequency
+        && _colsToImputeDataTypes == other._colsToImputeDataTypes
+        && _tsImputeStrategy == other._tsImputeStrategy
+        && _medianValues == other._medianValues
+        && _supressError == other._supressError;
+}
 
-    _colsToImputeDataTypes( [&ar](void)->std::vector<TypeId> {
-            std::vector<TypeId> colsToImputeDataTypes;
-            using TypeIdUnderlyingType = std::underlying_type<TypeId>::type;
-            std::vector<TypeIdUnderlyingType> _colsToImputeDataTypesUnWrapped(Traits<std::vector<TypeIdUnderlyingType>>::deserialize(ar));
-            for (auto typeIdUnWrapped : _colsToImputeDataTypesUnWrapped)
-            {
-                TypeId typeId =  static_cast<TypeId>(typeIdUnWrapped);
-                if(!IsValid(typeId))
-                    throw std::runtime_error("Invalid TypeId");
-                colsToImputeDataTypes.push_back(std::move(typeId));
-            }
-            return colsToImputeDataTypes;
-        }()
-    ),
-    _tsImputeStrategy( static_cast<TimeSeriesImputeStrategy>(Traits<uint8_t>::deserialize(ar))),
+inline void TimeSeriesImputerEstimator::Transformer::save(Archive & ar) const {
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1);
+    Traits<std::uint16_t>::serialize(ar, 0);
 
-    _medianValues(Traits<
-            std::map<
-                KeyType,
-                std::vector<double_t>
-            >
-        >::deserialize(ar)),
-    _supressError(Traits<bool>::deserialize(ar))
-    {}
-
-inline void  TimeSeriesImputerEstimator::Transformer::save(Archive & ar) const {
-    Traits<std::uint8_t>::serialize(ar, 1); // Current version
+    // Data
 
     //_frequency
     Traits<std::chrono::system_clock::duration>::serialize(ar,_frequency);
@@ -320,7 +357,6 @@ inline void  TimeSeriesImputerEstimator::Transformer::save(Archive & ar) const {
 
     //_supressError
     Traits<bool>::serialize(ar,_supressError);
-
 }
 
 // ----------------------------------------------------------------------

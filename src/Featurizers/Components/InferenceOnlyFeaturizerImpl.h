@@ -44,6 +44,8 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(InferenceOnlyTransformerImpl);
 
+    bool operator==(InferenceOnlyTransformerImpl const &other) const;
+
     void save(Archive &ar) const override;
 };
 
@@ -117,13 +119,25 @@ private:
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
-InferenceOnlyTransformerImpl<InputT, TransformedT>::InferenceOnlyTransformerImpl(Archive &) {
-    // Nothing to do here
+InferenceOnlyTransformerImpl<InputT, TransformedT>::InferenceOnlyTransformerImpl(Archive &ar) {
+    // Version
+    std::uint16_t                           majorVersion(Traits<std::uint16_t>::deserialize(ar));
+    std::uint16_t                           minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+    if(majorVersion != 1 || minorVersion != 0)
+        throw std::runtime_error("Unsupported archive version");
 }
 
 template <typename InputT, typename TransformedT>
-void InferenceOnlyTransformerImpl<InputT, TransformedT>::save(Archive &) const /*override*/ {
-    // Nothing to do here
+bool InferenceOnlyTransformerImpl<InputT, TransformedT>::operator==(InferenceOnlyTransformerImpl const &) const {
+    return true;
+}
+
+template <typename InputT, typename TransformedT>
+void InferenceOnlyTransformerImpl<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1);
+    Traits<std::uint16_t>::serialize(ar, 0);
 }
 
 // ----------------------------------------------------------------------

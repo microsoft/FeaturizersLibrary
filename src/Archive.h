@@ -4,8 +4,15 @@
 // ----------------------------------------------------------------------
 #pragma once
 
+#include "Traits.h"
+
 #include <stdexcept>
-#include <vector>
+
+#if (!defined ISLITTLEENDIAN)
+# define ISLITTLEENDIAN 1
+#endif
+
+static bool constexpr is_little_endian = bool(ISLITTLEENDIAN);
 
 namespace Microsoft {
 namespace Featurizer {
@@ -84,6 +91,17 @@ private:
 
     unsigned char const *                   _pBuffer;
     unsigned char const * const             _pEndBuffer;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    template <typename T> Archive & serialize_impl(T const &value, std::true_type);
+    template <typename T> Archive & serialize_impl(T const &value, std::false_type);
+
+    template <typename T> T deserialize_impl(std::true_type);
+    template <typename T> T deserialize_impl(std::false_type);
 };
 
 // ----------------------------------------------------------------------
@@ -141,8 +159,7 @@ inline Archive & Archive::serialize(unsigned char const *pBuffer, size_t cBuffer
 
 template <typename T>
 Archive & Archive::serialize(T const &value) {
-    static_assert(std::is_pod<T>::value, "T must be a POD");
-    return serialize(reinterpret_cast<unsigned char const *>(&value), sizeof(value));
+    return serialize_impl(value, std::integral_constant<bool, ISLITTLEENDIAN>());
 }
 
 inline Archive::ByteArray Archive::commit(void) {
@@ -154,18 +171,7 @@ inline Archive::ByteArray Archive::commit(void) {
 
 template <typename T>
 T Archive::deserialize(void) {
-    static_assert(std::is_pod<T>::value, "T must be a POD");
-
-    if(Mode != ModeValue::Deserializing)
-        throw std::runtime_error("Invalid mode");
-
-    if(static_cast<size_t>(_pEndBuffer - _pBuffer) < sizeof(T))
-        throw std::runtime_error("Invalid buffer");
-
-    T                                       value(*reinterpret_cast<T const *>(_pBuffer));
-
-    _pBuffer += sizeof(T);
-    return value;
+    return deserialize_impl<T>(std::integral_constant<bool, ISLITTLEENDIAN>());
 }
 
 inline unsigned char const * Archive::get_buffer_ptr(void) const {
@@ -196,6 +202,56 @@ inline bool Archive::AtEnd(void) const {
         throw std::runtime_error("Invalid mode");
 
     return _pBuffer == _pEndBuffer;
+}
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+namespace {
+
+template <typename T>
+T swap_endian(T u) {
+    unsigned char* source(reinterpret_cast<unsigned char*>(&u));
+    unsigned char dest[sizeof(T)];
+
+    for (size_t k = 0; k < sizeof(T); k++)
+        dest[k] = *(source+sizeof(T) - k - 1);
+
+    return *reinterpret_cast<T*>(dest);
+}
+
+} // anonymous namespace
+
+template <typename T>
+Archive & Archive::serialize_impl(T const &value, std::true_type) {
+    static_assert(std::is_pod<T>::value, "T must be a POD");
+    return serialize(reinterpret_cast<unsigned char const *>(&value), sizeof(value));
+}
+
+template <typename T>
+Archive & Archive::serialize_impl(T const &value, std::false_type) {
+    return serialize_impl(swap_endian<T>(value), std::true_type());
+}
+
+template <typename T>
+T Archive::deserialize_impl(std::true_type) {
+    static_assert(std::is_pod<T>::value, "T must be a POD");
+
+    if(Mode != ModeValue::Deserializing)
+        throw std::runtime_error("Invalid mode");
+
+    if(static_cast<size_t>(_pEndBuffer - _pBuffer) < sizeof(T))
+        throw std::runtime_error("Invalid buffer");
+
+    T                                       value(*reinterpret_cast<T const *>(_pBuffer));
+
+    _pBuffer += sizeof(T);
+    return value;
+}
+
+template <typename T>
+T Archive::deserialize_impl(std::false_type) {
+    return swap_endian<T>(deserialize_impl<T>(std::true_type()));
 }
 
 } // namespace Featurizer
