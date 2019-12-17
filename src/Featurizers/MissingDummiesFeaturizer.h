@@ -12,18 +12,6 @@ namespace Featurizer {
 namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class        MissingDummiesTraits
-///  \brief         Traits for mapping the input/output types for the MissingDummies.
-///                 This allows us to only change one place if typings need to change.
-///
-template <typename TransformedT>
-struct MissingDummiesTraits{
-    using InputType = typename Traits<TransformedT>::nullable_type;
-
-    static_assert(Traits<InputType>::IsNullableType, "'InputT' must be a nullable type");
-};
-
-/////////////////////////////////////////////////////////////////////////
 ///  \class         MissingDummiesTransformer
 ///  \brief         if input is Null, return 1. Otherwise return 0
 ///
@@ -41,8 +29,8 @@ struct MissingDummiesTraits{
 ///
 ///                 As a result, we would just create another class with a slightly different return
 ///
-template <typename TransformedT>
-class MissingDummiesTransformer : public Components::InferenceOnlyTransformerImpl<typename MissingDummiesTraits<TransformedT>::InputType, std::int8_t> {
+template <typename T>
+class MissingDummiesTransformer : public Components::InferenceOnlyTransformerImpl<typename MakeNullableType<T>::InputType, std::int8_t> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -50,7 +38,7 @@ public:
     // |
     // ----------------------------------------------------------------------
 
-    using Type                              = typename MissingDummiesTraits<TransformedT>::InputType;
+    using Type                              = typename MakeNullableType<T>::InputType;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, std::int8_t>;
 
     // ----------------------------------------------------------------------
@@ -114,8 +102,8 @@ public:
 // |  MissingDummiesEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename TransformedT>
-MissingDummiesTransformer<TransformedT>::MissingDummiesTransformer(Archive &ar) :
+template <typename T>
+MissingDummiesTransformer<T>::MissingDummiesTransformer(Archive &ar) :
     BaseType(ar) {
 }
 

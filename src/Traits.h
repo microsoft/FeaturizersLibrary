@@ -1158,6 +1158,20 @@ struct Traits<nonstd::optional<T>>  {
 // TODO: ONNX (Sparse) Tensor
 // TODO: Apache Arrow
 
+/////////////////////////////////////////////////////////////////////////
+///  \class        MakeNullabeType
+///  \brief         We have many several situations where the transformer operates on nullable types,
+///                 but we don't want to instantiate the class as Transformer<optional<type>>.
+///                 This struct allows us to instantiate the class as Transformer<type>, but still be able to
+///                 operate on optional<type> and to make sure that optional<type> is not initially passed in.
+///
+template <typename T>
+struct MakeNullableType{
+    using InputType = typename Traits<T>::nullable_type;
+
+    static_assert(Traits<T>::IsNullableType == false || Traits<T>::IsNativeNullableType, "'T' must not be a nullable type");
+};
+
 } // namespace Featurizer
 } // namespace Microsoft
 

@@ -12,30 +12,18 @@ namespace Featurizer {
 namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class        ImputationMarkerTraits
-///  \brief         Traits for mapping the input/output types for the ImputationMarker.
-///                 This allows us to only change one place if typings need to change.
-///
-template <typename TransformedT>
-struct ImputationMarkerTraits{
-    using InputType = typename Traits<TransformedT>::nullable_type;
-
-    static_assert(Traits<InputType>::IsNullableType, "'InputT' must be a nullable type");
-};
-
-/////////////////////////////////////////////////////////////////////////
 ///  \class         ImputationMarkerTransformer
 ///  \brief         if input is Null, return true. Otherwise return false
 ///
-template <typename TransformedT>
-class ImputationMarkerTransformer : public Components::InferenceOnlyTransformerImpl<typename ImputationMarkerTraits<TransformedT>::InputType, bool> {
+template <typename T>
+class ImputationMarkerTransformer : public Components::InferenceOnlyTransformerImpl<typename MakeNullableType<T>::InputType, bool> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using Type                              = typename ImputationMarkerTraits<TransformedT>::InputType;
+    using Type                              = typename MakeNullableType<T>::InputType;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, bool>;
 
     // ----------------------------------------------------------------------
@@ -94,8 +82,8 @@ public:
 // |  ImputationMarkerEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename TransformedT>
-ImputationMarkerTransformer<TransformedT>::ImputationMarkerTransformer(Archive &ar) :
+template <typename T>
+ImputationMarkerTransformer<T>::ImputationMarkerTransformer(Archive &ar) :
     BaseType(ar) {
 }
 
