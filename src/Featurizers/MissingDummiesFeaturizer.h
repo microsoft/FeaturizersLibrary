@@ -30,7 +30,7 @@ namespace Featurizers {
 ///                 As a result, we would just create another class with a slightly different return
 ///
 template <typename T>
-class MissingDummiesTransformer : public Components::InferenceOnlyTransformerImpl<typename MakeNullableType<T>::InputType, std::int8_t> {
+class MissingDummiesTransformer : public Components::InferenceOnlyTransformerImpl<typename MakeNullableType<T>::type, std::int8_t> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -38,7 +38,7 @@ public:
     // |
     // ----------------------------------------------------------------------
 
-    using Type                              = typename MakeNullableType<T>::InputType;
+    using Type                              = typename MakeNullableType<T>::type;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, std::int8_t>;
 
     // ----------------------------------------------------------------------

@@ -22,17 +22,17 @@ namespace Featurizers {
 ///                 frequent value found in the training data set.
 ///
 template <typename TransformedT>
-class CatImputerTransformer : public StandardTransformer<typename MakeNullableType<TransformedT>::InputType, TransformedT> {
+class CatImputerTransformer : public StandardTransformer<typename MakeNullableType<TransformedT>::type, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-
-    using InputType                         = typename MakeNullableType<TransformedT>::InputType;
+    using InputType                         = typename MakeNullableType<TransformedT>::type;
     using BaseType                          = StandardTransformer<InputType, TransformedT>;
     using TransformedType                   = TransformedT;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
@@ -74,14 +74,14 @@ template <
     typename TransformedT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class CatImputerEstimatorImpl : public TransformerEstimator<typename MakeNullableType<TransformedT>::InputType, TransformedT> {
+class CatImputerEstimatorImpl : public TransformerEstimator<typename MakeNullableType<TransformedT>::type, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using InputType                         = typename MakeNullableType<TransformedT>::InputType;
+    using InputType                         = typename MakeNullableType<TransformedT>::type;
     using BaseType                          = TransformerEstimator<InputType, TransformedT>;
     using TransformerType                   = CatImputerTransformer<TransformedT>;
 
@@ -140,8 +140,8 @@ template <
 >
 class CatImputerEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-        Components::HistogramEstimator<typename MakeNullableType<TransformedT>::InputType, MaxNumTrainingItemsV>,
-        Components::ModeEstimator<typename MakeNullableType<TransformedT>::InputType, false, MaxNumTrainingItemsV>,
+        Components::HistogramEstimator<typename MakeNullableType<TransformedT>::type, MaxNumTrainingItemsV>,
+        Components::ModeEstimator<typename MakeNullableType<TransformedT>::type, false, MaxNumTrainingItemsV>,
         Details::CatImputerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>
     > {
 public:
@@ -152,8 +152,8 @@ public:
     // ----------------------------------------------------------------------
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
-            Components::HistogramEstimator<typename MakeNullableType<TransformedT>::InputType, MaxNumTrainingItemsV>,
-            Components::ModeEstimator<typename MakeNullableType<TransformedT>::InputType, false, MaxNumTrainingItemsV>,
+            Components::HistogramEstimator<typename MakeNullableType<TransformedT>::type, MaxNumTrainingItemsV>,
+            Components::ModeEstimator<typename MakeNullableType<TransformedT>::type, false, MaxNumTrainingItemsV>,
             Details::CatImputerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>
         >;
 
@@ -223,8 +223,8 @@ CatImputerEstimator<TransformedT, MaxNumTrainingItemsV>::CatImputerEstimator(Ann
     BaseType(
         "CatImputerEstimator",
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, colIndex](void) { return Components::HistogramEstimator<typename MakeNullableType<TransformedT>::InputType, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
-        [pAllColumnAnnotations, colIndex](void) { return Components::ModeEstimator<typename MakeNullableType<TransformedT>::InputType, false, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex](void) { return Components::HistogramEstimator<typename MakeNullableType<TransformedT>::type, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex](void) { return Components::ModeEstimator<typename MakeNullableType<TransformedT>::type, false, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
         [pAllColumnAnnotations, colIndex](void) { return Details::CatImputerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
     ) {
 }

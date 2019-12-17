@@ -16,14 +16,14 @@ namespace Featurizers {
 ///  \brief         if input is Null, return true. Otherwise return false
 ///
 template <typename T>
-class ImputationMarkerTransformer : public Components::InferenceOnlyTransformerImpl<typename MakeNullableType<T>::InputType, bool> {
+class ImputationMarkerTransformer : public Components::InferenceOnlyTransformerImpl<typename MakeNullableType<T>::type, bool> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using Type                              = typename MakeNullableType<T>::InputType;
+    using Type                              = typename MakeNullableType<T>::type;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, bool>;
 
     // ----------------------------------------------------------------------
