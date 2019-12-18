@@ -77,11 +77,8 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    // this constructor is used for StandardDeviationEstimator following StatisticalMetricsEstimator
-    // which will retrieve average from AnnotationMap
+
     StandardDeviationTrainingOnlyPolicy(void);
-    // this constructor is used for user inputs a specific average
-    StandardDeviationTrainingOnlyPolicy(std::double_t average);
 
     bool begin_training(AnnotationMap const &annotations);
     void fit(InputType const &input);
@@ -96,8 +93,6 @@ private:
     Updaters::L2NormUpdater<std::double_t>    _updater;
     std::double_t                             _average;
     std::uint64_t                             _count;
-    // this flag is to mark if user input a specific average
-    bool                                      _user_average_flag;
 };
 
 } // namespace Details
@@ -142,7 +137,6 @@ public:
     // |
     // ----------------------------------------------------------------------
     StandardDeviationEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
-    StandardDeviationEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, std::double_t average);
 
     ~StandardDeviationEstimator(void) override = default;
 
@@ -187,11 +181,6 @@ StandardDeviationEstimator<T, MaxNumTrainingItemsV>::StandardDeviationEstimator(
     BaseType(std::move(pAllColumnAnnotations), std::move(colIndex)) {
 }
 
-template <typename T, size_t MaxNumTrainingItemsV>
-StandardDeviationEstimator<T, MaxNumTrainingItemsV>::StandardDeviationEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, std::double_t average) :
-    BaseType(std::move(pAllColumnAnnotations), std::move(colIndex), true, std::move(average)) {
-}
-
 // ----------------------------------------------------------------------
 // |
 // |  Details::StandardDeviationTrainingOnlyPolicy
@@ -201,32 +190,21 @@ template <typename T, typename StandardDeviationEstimatorT>
 Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::StandardDeviationTrainingOnlyPolicy(void) :
     _updater(Updaters::L2NormUpdater<std::double_t>()),
     _average(0),
-    _count(0),
-    _user_average_flag(false) {
-}
-
-template <typename T, typename StandardDeviationEstimatorT>
-Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::StandardDeviationTrainingOnlyPolicy(std::double_t average) :
-    _updater(Updaters::L2NormUpdater<std::double_t>()),
-    _average(std::move(average)),
-    _count(0),
-    _user_average_flag(true) {
+    _count(0) {
 }
 
 template <typename T, typename StandardDeviationEstimatorT>
 bool Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::begin_training(AnnotationMap const &) {
-    // if user doesn't specify an average value, retrieve the StatisticalMetricsEstimator annotation to get average and count
-    if (!_user_average_flag) {
-        // ----------------------------------------------------------------------
-        using StandardStatisticalAnnotationData            = Components::StandardStatisticalAnnotationData<T>;
-        using StatisticalMetricsEstimator                  = Components::StatisticalMetricsEstimator<T, StandardDeviationEstimatorT::MaxNumTrainingItems>;
-        // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    using StandardStatisticalAnnotationData            = Components::StandardStatisticalAnnotationData<T>;
+    using StatisticalMetricsEstimator                  = Components::StatisticalMetricsEstimator<T, StandardDeviationEstimatorT::MaxNumTrainingItems>;
+    // ----------------------------------------------------------------------
 
-        StandardDeviationEstimatorT       const &          estimator(static_cast<StandardDeviationEstimatorT const &>(*this));
-        StandardStatisticalAnnotationData const &          data(StatisticalMetricsEstimator::get_annotation_data(estimator.get_column_annotations(), estimator.get_column_index(), StatisticalMetricsEstimatorName));
+    StandardDeviationEstimatorT       const &          estimator(static_cast<StandardDeviationEstimatorT const &>(*this));
+    StandardStatisticalAnnotationData const &          data(StatisticalMetricsEstimator::get_annotation_data(estimator.get_column_annotations(), estimator.get_column_index(), StatisticalMetricsEstimatorName));
 
-        _average = data.Average;
-    }
+    _average = data.Average;
+
     return true;
 }
 
@@ -245,7 +223,13 @@ void Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT
 
 template <typename T, typename StandardDeviationEstimatorT>
 StandardDeviationAnnotationData Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::complete_training(void) {
-    long double deviation = _updater.commit()/std::sqrt(static_cast<long double>(_count));
+    long double l2 = _updater.commit();
+    // normally, if count is 0, commit() should throw an error for not calling update before commit
+    // this is check for _count == 0 is a guarantee of safety if L2NormUpdater's implementation is changed in the future
+    if (_count == 0) {
+        throw std::runtime_error("Count is 0 when calculating standard deviation!");
+    }
+    long double deviation = l2/std::sqrt(static_cast<long double>(_count));
     assert(deviation >= 0);
     return StandardDeviationAnnotationData(std::move(deviation), std::move(_count));
 }

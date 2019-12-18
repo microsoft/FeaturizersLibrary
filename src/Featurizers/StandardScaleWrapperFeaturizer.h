@@ -101,8 +101,9 @@ private:
     // |
     // ----------------------------------------------------------------------
     size_t const                            _colIndex;
-    bool          const                     _withMean;
-    bool          const                     _withStd;
+    // TODO: change bools to bit flags
+    bool   const                            _withMean;
+    bool   const                            _withStd;
 
     // ----------------------------------------------------------------------
     // |

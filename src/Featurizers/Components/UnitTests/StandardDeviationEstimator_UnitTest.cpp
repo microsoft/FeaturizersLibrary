@@ -8,6 +8,7 @@
 #include "../../../3rdParty/optional.h"
 #include "../../TestHelpers.h"
 #include "../StandardDeviationEstimator.h"
+#include "../StatisticalMetricsEstimator.h"
 namespace NS = Microsoft::Featurizer;
 
 #if (defined __clang__)
@@ -32,13 +33,39 @@ TEST_CASE("invalid argument for annotation data") {
 
 
 // test for overall estimator
+TEST_CASE("0 valid double data") {
+    using inputType = std::double_t;
+    inputType null = NS::Traits<inputType>::CreateNullValue();
+
+    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+
+    NS::Featurizers::Components::StandardStatisticalAnnotationData<inputType> standard( 0,           // sum
+                                                                                        0,           // average
+                                                                                        0,           // min
+                                                                                        0,           // max
+                                                                                        0            // count
+                                                                                       );
+    NS::Featurizers::Components::StatisticalMetricsEstimator<inputType>::add_annotation(pAllColumnAnnotations, std::move(standard), 0, NS::Featurizers::Components::StatisticalMetricsEstimatorName);
+
+    NS::Featurizers::Components::StandardDeviationEstimator<inputType> estimator(pAllColumnAnnotations, 0);
+
+    CHECK_THROWS_WITH(NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{null}})), "update is not called before l2 is committed!");
+}
+
 TEST_CASE("one int input data") {
     using inputType = int;
 
     NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::StandardDeviationEstimator<inputType> estimator(pAllColumnAnnotations, 0,
-                                                                                 10                         // user defined average
-                                                                                 );
+
+    NS::Featurizers::Components::StandardStatisticalAnnotationData<inputType> standard( 10,           // sum
+                                                                                        10,           // average
+                                                                                        10,           // min
+                                                                                        10,           // max
+                                                                                         1            // count
+                                                                                      );
+    NS::Featurizers::Components::StatisticalMetricsEstimator<inputType>::add_annotation(pAllColumnAnnotations, std::move(standard), 0, NS::Featurizers::Components::StatisticalMetricsEstimatorName);
+
+    NS::Featurizers::Components::StandardDeviationEstimator<inputType> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{10}}));
     NS::Featurizers::Components::StandardDeviationAnnotationData const& stats(estimator.get_annotation_data());
@@ -51,9 +78,16 @@ TEST_CASE("N random double input data") {
     using inputType = std::double_t;
 
     NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::StandardDeviationEstimator<inputType> estimator(pAllColumnAnnotations, 0,
-                                                                                 16.7                         // user defined average
-                                                                                 );
+
+    NS::Featurizers::Components::StandardStatisticalAnnotationData<inputType> standard(133.6,           // sum
+                                                                                        16.7,           // average
+                                                                                         8.2,           // min
+                                                                                        30.4,           // max
+                                                                                           8            // count
+                                                                                      );
+    NS::Featurizers::Components::StatisticalMetricsEstimator<inputType>::add_annotation(pAllColumnAnnotations, std::move(standard), 0, NS::Featurizers::Components::StatisticalMetricsEstimatorName);
+
+    NS::Featurizers::Components::StandardDeviationEstimator<inputType> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{
                                                                             10.3l,
@@ -75,9 +109,16 @@ TEST_CASE("all same input") {
     using inputType = int;
 
     NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::StandardDeviationEstimator<inputType> estimator(pAllColumnAnnotations, 0,
-                                                                                 15                         // user defined average
-                                                                                 );
+
+    NS::Featurizers::Components::StandardStatisticalAnnotationData<inputType> standard(105,           // sum
+                                                                                        15,           // average
+                                                                                        15,           // min
+                                                                                        15,           // max
+                                                                                         7            // count
+                                                                                      );
+    NS::Featurizers::Components::StatisticalMetricsEstimator<inputType>::add_annotation(pAllColumnAnnotations, std::move(standard), 0, NS::Featurizers::Components::StatisticalMetricsEstimatorName);
+
+    NS::Featurizers::Components::StandardDeviationEstimator<inputType> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{15,
                                                                             15,
