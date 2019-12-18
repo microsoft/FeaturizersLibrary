@@ -124,7 +124,6 @@ class Plugin(PluginBase):
         status_stream.write("Generating Common Files...")
         with status_stream.DoneManager() as this_dm:
             for desc, func in [
-                ("Generating Global Include File...", _GenerateGlobalInclude),
                 ("Generating Global Kernel Files..", _GenerateGlobalKernels),
                 ("Generating Global Def Files...", _GenerateGlobalDefs),
             ]:
@@ -181,43 +180,6 @@ class Plugin(PluginBase):
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
-def _GenerateGlobalInclude(
-    output_dir,
-    all_items,
-    all_type_mappings,
-    all_custom_struct_data,
-    output_stream,
-):
-    output_dir = os.path.join(output_dir, "automl_ops")
-    FileSystem.MakeDirs(output_dir)
-
-    with open(os.path.join(output_dir, "automl_featurizers.h"), "w") as f:
-        f.write(
-            textwrap.dedent(
-                """\
-                // Copyright (c) Microsoft Corporation. All rights reserved.
-                // Licensed under the MIT License.
-
-                #pragma once
-
-                {}
-                """,
-            ).format(
-                "\n".join(
-                    [
-                        '#include "core/automl/featurizers/src/Featurizers/{}.h"'.format(
-                            items[0].name,
-                        )
-                        for items in all_items
-                    ],
-                ),
-            ),
-        )
-
-    return 0
-
-
-# ----------------------------------------------------------------------
 def _GenerateGlobalKernels(
     output_dir,
     all_items,
@@ -269,7 +231,7 @@ def _GenerateGlobalKernels(
 
         macros += [
             "ONNX_OPERATOR_TYPED_KERNEL_CLASS_NAME(kCpuExecutionProvider, kMSAutoMLDomain, 1, {}, {})".format(
-                input_type.replace("std::", ""),
+                re.sub(r'^std::|_t$', '', input_type),
                 transformer_name,
             )
             for input_type in six.iterkeys(input_type_mappings)
@@ -611,7 +573,7 @@ def _GenerateGlobalDefs(
         func_definitions.append(
             textwrap.dedent(
                 """\
-                void Register{featurizer_name}Ver1(void) {{
+                void Register{featurizer_name}Ver1() {{
                     static const char * doc = R"DOC(
                         {documentation}
                     )DOC";
@@ -690,13 +652,13 @@ def _GenerateGlobalDefs(
             ).format(
                 forward_declarations="\n".join(
                     [
-                        "static Register{}(void);".format(items[0].name)
+                        "static void Register{}Ver1();".format(items[0].name)
                         for items in all_items
                     ],
                 ),
                 func_calls=StringHelpers.LeftJustify(
                     "\n".join(
-                        ["Register{}();".format(items[0].name) for items in all_items],
+                        ["Register{}Ver1();".format(items[0].name) for items in all_items],
                     ),
                     4,
                 ),
@@ -780,7 +742,7 @@ def _GenerateKernel(
             """\
             inline float_t const & PreprocessOptional(float_t const &value) { return value; }
             inline double_t const & PreprocessOptional(double_t const &value) { return value; }
-            inline nonstd::optional<string> PreprocessOptional(string value) { return value.empty() ? nonstd::optional<string>() : nonstd::optional<string>(std::move(value)); }
+            inline nonstd::optional<std::string> PreprocessOptional(std::string value) { return value.empty() ? nonstd::optional<std::string>() : nonstd::optional<std::string>(std::move(value)); }
             """,
         )
 
@@ -842,8 +804,8 @@ def _GenerateKernel(
                     """,
                 ).format(
                     transformer_name=transformer_name,
-                    input_type_no_namespace = mapping_input_type.replace("std::", ""),
-                    input_type = mapping_input_type if "string" in  mapping_input_type else mapping_input_type.replace("std::", ""),
+                    input_type_no_namespace = re.sub(r'^std::|_t$', '', mapping_input_type),
+                    input_type = mapping_input_type if "string" in  mapping_input_type else re.sub(r'^std::|_t$', '', mapping_input_type),
                     template_input_type=input_type,
                 ) for mapping_input_type in six.iterkeys(input_type_mappings)
             ]
@@ -864,7 +826,7 @@ def _GenerateKernel(
             transformer_name,
         )
 
-    with open(os.path.join(output_dir, "{}.cc".format(transformer_name)), "w") as f:
+    with open(os.path.join(output_dir, "{}.cc".format('_'.join(re.findall('[a-zA-Z][^A-Z]*', transformer_name)).lower())), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -875,8 +837,8 @@ def _GenerateKernel(
                 #include "core/framework/data_types.h"
                 #include "core/framework/op_kernel.h"
 
-                #include "core/automl/featurizers/src/Featurizers/{featurizer_name}.h"
-
+                #include "Featurizers/{featurizer_name}.h"
+                #include "Archive.h"
                 namespace featurizers = Microsoft::Featurizer::Featurizers;
 
                 namespace onnxruntime {{

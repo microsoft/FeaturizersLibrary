@@ -47,9 +47,9 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(OneHotEncoderTransformer);
 
-    void save(Archive &ar) const override;
-
     bool operator==(OneHotEncoderTransformer const &other) const;
+
+    void save(Archive &ar) const override;
 
 private:
     // ----------------------------------------------------------------------
@@ -208,25 +208,46 @@ public:
 template <typename InputT>
 OneHotEncoderTransformer<InputT>::OneHotEncoderTransformer(IndexMap map, bool allowMissingValues) :
     Labels(
-        std::move([&map](void) ->  IndexMap & {
-            if (map.size() == 0) {
-                throw std::invalid_argument("Index map is empty!");
-            }
-            return map;
-        }()
-        )),
+        std::move(
+            [&map](void) ->  IndexMap & {
+                if (map.size() == 0) {
+                    throw std::invalid_argument("Index map is empty!");
+                }
+                return map;
+            }()
+        )
+    ),
     AllowMissingValues(std::move(allowMissingValues)) {
 }
 
 template <typename InputT>
 OneHotEncoderTransformer<InputT>::OneHotEncoderTransformer(Archive &ar) :
-    // TODO: Labels(Traits<decltype(Labels)>::deserialize(ar)),
-    AllowMissingValues(Traits<decltype(AllowMissingValues)>::deserialize(ar)) {
+    OneHotEncoderTransformer(
+        [&ar](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
+
+            // Data
+            IndexMap                        map(Traits<IndexMap>::deserialize(ar));
+            bool                            allowMissingValues(Traits<bool>::deserialize(ar));
+
+            return OneHotEncoderTransformer(std::move(map), std::move(allowMissingValues));
+        }()
+    ) {
 }
 
 template <typename InputT>
 void OneHotEncoderTransformer<InputT>::save(Archive &ar) const /*override*/ {
-    // TODO: Traits<decltype(Labels)>::serialize(ar, Labels);
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
+
+    // Data
+    Traits<decltype(Labels)>::serialize(ar, Labels);
     Traits<decltype(AllowMissingValues)>::serialize(ar, AllowMissingValues);
 }
 

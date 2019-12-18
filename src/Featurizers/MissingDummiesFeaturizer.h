@@ -30,16 +30,15 @@ namespace Featurizers {
 ///                 As a result, we would just create another class with a slightly different return
 ///
 template <typename T>
-class MissingDummiesTransformer : public Components::InferenceOnlyTransformerImpl<T, std::int8_t> {
+class MissingDummiesTransformer : public Components::InferenceOnlyTransformerImpl<typename MakeNullableType<T>::type, std::int8_t> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    static_assert(std::is_same<T, typename Traits<T>::nullable_type>::value, "Input should be Nullable Type");
 
-    using Type                              = T;
+    using Type                              = typename MakeNullableType<T>::type;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, std::int8_t>;
 
     // ----------------------------------------------------------------------
@@ -62,12 +61,12 @@ private:
 
     // MSVC has problems when the function is defined outside of the declaration
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-        callback(Traits<T>::IsNull(input) ? 1 : 0);
+        callback(Traits<Type>::IsNull(input) ? 1 : 0);
     }
 };
 
 template <typename T>
-class MissingDummiesEstimator : public Components::InferenceOnlyEstimatorImpl<MissingDummiesTransformer<typename Traits<T>::nullable_type>> {
+class MissingDummiesEstimator : public Components::InferenceOnlyEstimatorImpl<MissingDummiesTransformer<T>> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -75,7 +74,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using Type                              = typename Traits<T>::nullable_type;
-    using BaseType                          = Components::InferenceOnlyEstimatorImpl<MissingDummiesTransformer<Type>>;
+    using BaseType                          = Components::InferenceOnlyEstimatorImpl<MissingDummiesTransformer<T>>;
 
     // ----------------------------------------------------------------------
     // |

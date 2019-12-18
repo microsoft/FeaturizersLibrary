@@ -16,15 +16,14 @@ namespace Featurizers {
 ///  \brief         if input is Null, return true. Otherwise return false
 ///
 template <typename T>
-class ImputationMarkerTransformer : public Components::InferenceOnlyTransformerImpl<T, bool> {
+class ImputationMarkerTransformer : public Components::InferenceOnlyTransformerImpl<typename MakeNullableType<T>::type, bool> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    static_assert(std::is_same<T, typename Traits<T>::nullable_type>::value, "Input should be Nullable Type");
-    using Type                              = T;
+    using Type                              = typename MakeNullableType<T>::type;
     using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, bool>;
 
     // ----------------------------------------------------------------------
@@ -39,15 +38,21 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(ImputationMarkerTransformer);
 
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
     // MSVC has problems when the function is defined outside of the declaration
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
 
-        callback(Traits<T>::IsNull(input));
+        callback(Traits<Type>::IsNull(input));
     }
 };
 
 template <typename T>
-class ImputationMarkerEstimator : public Components::InferenceOnlyEstimatorImpl<ImputationMarkerTransformer<typename Traits<T>::nullable_type>> {
+class ImputationMarkerEstimator : public Components::InferenceOnlyEstimatorImpl<ImputationMarkerTransformer<T>> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -55,7 +60,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using Type                              = typename Traits<T>::nullable_type;
-    using BaseType                          = Components::InferenceOnlyEstimatorImpl<ImputationMarkerTransformer<Type>>;
+    using BaseType                          = Components::InferenceOnlyEstimatorImpl<ImputationMarkerTransformer<T>>;
 
     // ----------------------------------------------------------------------
     // |
