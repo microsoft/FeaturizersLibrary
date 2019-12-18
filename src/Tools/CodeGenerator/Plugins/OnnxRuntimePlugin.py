@@ -805,7 +805,7 @@ def _GenerateKernel(
                     """,
                 ).format(
                     transformer_name=transformer_name,
-                    input_type_no_namespace = re.sub(r'^std::', '', mapping_input_type),
+                    input_type_no_namespace = re.sub(r'^std::|_t$', '', mapping_input_type),
                     input_type = mapping_input_type if "string" in  mapping_input_type else re.sub(r'^std::', '', mapping_input_type),
                     template_input_type=input_type,
                 ) for mapping_input_type in six.iterkeys(input_type_mappings)
