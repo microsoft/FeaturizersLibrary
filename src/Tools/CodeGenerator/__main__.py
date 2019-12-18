@@ -79,7 +79,10 @@ if not PLUGINS:
 _PluginTypeInfo                             = CommandLine.EnumTypeInfo(list(six.iterkeys(PLUGINS)))
 
 # ----------------------------------------------------------------------
-@CommandLine.EntryPoint
+@CommandLine.EntryPoint(
+    include=CommandLine.EntryPoint.Parameter("Regular expression specifying the name of featurizers to include"),
+    exclude=CommandLine.EntryPoint.Parameter("Regular expression specifying the name of featurizers to exclude"),
+)
 @CommandLine.Constraints(
     plugin=_PluginTypeInfo,
     input_filename=CommandLine.FilenameTypeInfo(),
