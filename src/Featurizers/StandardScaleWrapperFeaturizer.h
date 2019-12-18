@@ -25,6 +25,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
+    // TODO: Add IsNumeric to Traits.h, and potentially for most types add IsSpecificType
     static_assert(Traits<TransformedT>::IsNullableType && Traits<TransformedT>::IsIntOrNumeric::value, "'TransformedT' must be a numeric type");
 
     using BaseType                          = StandardTransformer<InputT, TransformedT>;
@@ -127,8 +128,6 @@ private:
         std::double_t average = 0;
         // if _withStd is false, deviation is set to 1
         std::double_t deviation = 1;
-        std::uint64_t average_count = 0;
-        std::uint64_t deviation_count = 0;
         if (_withMean) {
             StandardStatisticalAnnotationData const &        average_stats(StatisticalMetricsEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::StatisticalMetricsEstimatorName));
             average = average_stats.Average;
@@ -136,9 +135,6 @@ private:
         if (_withStd) {
             StandardDeviationAnnotationData   const &        deviation_stats(StandardDeviationEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::StandardDeviationEstimatorName));
             deviation = static_cast<std::double_t>(deviation_stats.StandardDeviation);
-        }
-        if (_withMean && _withStd) {
-            assert(average_count == deviation_count);
         }
 
         // check if deviation is 0
