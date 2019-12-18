@@ -37,7 +37,7 @@ class CustomStructInfo(Interface.Interface):
     @Interface.abstractmethod
     def GetDefOutputStatementsConstraintsAndSuffix():
         """\
-        Returns '.Output' statements required when invoking MS_AUTOML_OPERATOR_SCHEMA.
+        Returns '.Output' statements required when invoking MS_FEATURIZER_OPERATOR_SCHEMA.
 
         Example result:
             [
@@ -62,10 +62,10 @@ class CustomStructInfo(Interface.Interface):
 
         Example result:
             [
-                'Tensor * year_tensor(ctx->Output(0, input_tensor->Shape()));'
-                'Tensor * month_tensor(ctx->Output(1, input_tensor->Shape()));',
-                'int32_t * year_data(year_tensor->MutableData<int32_t>());'
-                'uint8_t * month_data(month_tensor->MutableData<uint8_t>());'
+                'Tensor* year_tensor(ctx->Output(0, input_tensor->Shape()));'
+                'Tensor* month_tensor(ctx->Output(1, input_tensor->Shape()));',
+                'int32_t* year_data(year_tensor->MutableData<int32_t>());'
+                'uint8_t* month_data(month_tensor->MutableData<uint8_t>());'
             ],
             [
                 'auto time_point(transformer.execute(input_data[i]));',
