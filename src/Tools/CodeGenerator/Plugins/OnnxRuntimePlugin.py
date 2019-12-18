@@ -28,8 +28,6 @@ sys.path.insert(0, os.path.join(_script_dir, ".."))
 with CallOnExit(lambda: sys.path.pop(0)):
     from Plugin import Plugin as PluginBase
 
-# TODO: Change instances of 'automl' to 'FeaturizersLibrary'
-
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class Plugin(PluginBase):
@@ -187,10 +185,10 @@ def _GenerateGlobalKernels(
     all_custom_struct_data,
     output_stream,
 ):
-    output_dir = os.path.join(output_dir, "automl_ops")
+    output_dir = os.path.join(output_dir, "featurizers_ops")
     FileSystem.MakeDirs(output_dir)
 
-    with open(os.path.join(output_dir, "cpu_automl_kernels.h"), "w") as f:
+    with open(os.path.join(output_dir, "cpu_featurizers_kernels.h"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -203,11 +201,11 @@ def _GenerateGlobalKernels(
                 #include "core/framework/kernel_registry.h"
 
                 namespace onnxruntime {
-                namespace automl {
+                namespace featurizers {
 
-                Status RegisterCpuAutoMLKernels(KernelRegistry& kernel_registry);
+                Status RegisterCpuMSFeaturizersKernels(KernelRegistry& kernel_registry);
 
-                } // namespace automl
+                } // namespace featurizers
                 } // namespace onnxruntime
                 """,
             ),
@@ -223,39 +221,39 @@ def _GenerateGlobalKernels(
 
         if len(input_type_mappings) == 1:
             macros.append(
-                "ONNX_OPERATOR_KERNEL_CLASS_NAME(kCpuExecutionProvider, kMSAutoMLDomain, 1, {})".format(
+                "ONNX_OPERATOR_KERNEL_CLASS_NAME(kCpuExecutionProvider, kMSFeaturizersDomain, 1, {})".format(
                     transformer_name,
                 ),
             )
             continue
 
         macros += [
-            "ONNX_OPERATOR_TYPED_KERNEL_CLASS_NAME(kCpuExecutionProvider, kMSAutoMLDomain, 1, {}, {})".format(
+            "ONNX_OPERATOR_TYPED_KERNEL_CLASS_NAME(kCpuExecutionProvider, kMSFeaturizersDomain, 1, {}, {})".format(
                 re.sub(r'^std::|_t$', '', input_type),
                 transformer_name,
             )
             for input_type in six.iterkeys(input_type_mappings)
         ]
 
-    with open(os.path.join(output_dir, "cpu_automl_kernels.cc"), "w") as f:
+    with open(os.path.join(output_dir, "cpu_featurizers_kernels.cc"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
                 // Copyright (c) Microsoft Corporation. All rights reserved.
                 // Licensed under the MIT License.
 
-                #include "automl_ops/cpu_automl_kernels.h"
+                #include "featurizers_ops/cpu_featurizers_kernels.h"
 
                 #include "core/graph/constants.h"
                 #include "core/framework/data_types.h"
 
                 namespace onnxruntime {{
-                namespace automl {{
+                namespace featurizers {{
 
                 // Forward declarations
                 {kernel_classes}
 
-                Status RegisterCpuAutoMLKernels(KernelRegistry& kernel_registry) {{
+                Status RegisterCpuMSFeaturizersKernels(KernelRegistry& kernel_registry) {{
                   static const BuildKernelCreateInfoFn function_table[] = {{
                     {kernel_statements}
                   }};
@@ -267,8 +265,8 @@ def _GenerateGlobalKernels(
                   return Status::OK();
                 }}
 
-                }} // namespace automl
-                }} // namespace onnxruntime
+                }}  // namespace featurizers
+                }}  // namespace onnxruntime
                 """,
             ).format(
                 kernel_classes="\n".join(["class {};".format(macro) for macro in macros]),
@@ -292,10 +290,10 @@ def _GenerateGlobalDefs(
     all_custom_struct_data,
     output_stream,
 ):
-    output_dir = os.path.join(output_dir, "core", "graph", "automl_ops")
+    output_dir = os.path.join(output_dir, "core", "graph", "featurizers_ops")
     FileSystem.MakeDirs(output_dir)
 
-    with open(os.path.join(output_dir, "automl_defs.h"), "w") as f:
+    with open(os.path.join(output_dir, "featurizers_defs.h"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -305,11 +303,11 @@ def _GenerateGlobalDefs(
                 #pragma once
 
                 namespace onnxruntime {
-                namespace automl {
+                namespace featurizers {
 
-                void RegisterAutoMLSchemas(void);
+                void RegisterMSFeaturizersSchemas(void);
 
-                } // namespace automl
+                } // namespace featurizers
                 } // namespace onnxruntime
                 """,
             ),
@@ -359,7 +357,7 @@ def _GenerateGlobalDefs(
                     )
                 )
             )
-        
+
         return "".join(code)
 
     # ----------------------------------------------------------------------
@@ -372,9 +370,9 @@ def _GenerateGlobalDefs(
     ):
         return textwrap.dedent(
             """\
-            MS_AUTOML_OPERATOR_SCHEMA({transformer_name})
+            MS_FEATURIZERS_OPERATOR_SCHEMA({transformer_name})
                 .SinceVersion(1)
-                .SetDomain(kMSAutoMLDomain)
+                .SetDomain(kMSFeaturizersDomain)
                 .SetDoc(doc)
                 .Input(
                     0,
@@ -509,7 +507,7 @@ def _GenerateGlobalDefs(
                         .TypeAndShapeInferenceFunction(
                             [](ONNX_NAMESPACE::InferenceContext& ctx) {{
                                 propagateElemTypeFromDtypeToOutput(ctx, ONNX_NAMESPACE::TensorProto_DataType_{output_type_upper}, 0);
-                                
+
                                 *ctx.getOutputType(0)->mutable_tensor_type()->mutable_shape() = ctx.getInputType(1)->tensor_type().shape();
                             }}
                         )
@@ -535,7 +533,7 @@ def _GenerateGlobalDefs(
                             [](ONNX_NAMESPACE::InferenceContext& ctx) {{
                                 auto input_elem_type = ctx.getInputType(1)->tensor_type().elem_type();
                                 {constraints}
-                                
+
                                 *ctx.getOutputType(0)->mutable_tensor_type()->mutable_shape() = ctx.getInputType(1)->tensor_type().shape();
                             }}
                         )
@@ -574,7 +572,7 @@ def _GenerateGlobalDefs(
             textwrap.dedent(
                 """\
                 void Register{featurizer_name}Ver1() {{
-                    static const char * doc = R"DOC(
+                    static const char* doc = R"DOC(
                         {documentation}
                     )DOC";
 
@@ -594,7 +592,7 @@ def _GenerateGlobalDefs(
             ),
         )
 
-    with open(os.path.join(output_dir, "automl_defs.cc"), "w") as f:
+    with open(os.path.join(output_dir, "featurizers_defs.cc"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -602,30 +600,30 @@ def _GenerateGlobalDefs(
                 // Licensed under the MIT License.
 
                 #include "core/graph/constants.h"
-                #include "core/graph/automl_ops/automl_defs.h"
+                #include "core/graph/featurizers_ops/featurizers_defs.h"
                 #include "core/graph/op.h"
 
                 #include "onnx/defs/schema.h"
                 #include "onnx/defs/shape_inference.h"
 
-                #define MS_AUTOML_OPERATOR_SCHEMA(name)                         MS_AUTOML_OPERATOR_SCHEMA_UNIQ_HELPER(__COUNTER__, name)
-                #define MS_AUTOML_OPERATOR_SCHEMA_UNIQ_HELPER(Counter, name)    MS_AUTOML_OPERATOR_SCHEMA_UNIQ(Counter, name)
+                #define MS_FEATURIZERS_OPERATOR_SCHEMA(name)                        MS_FEATURIZERS_OPERATOR_SCHEMA_UNIQ_HELPER(__COUNTER__, name)
+                #define MS_FEATURIZERS_OPERATOR_SCHEMA_UNIQ_HELPER(Counter, name)   MS_FEATURIZERS_OPERATOR_SCHEMA_UNIQ(Counter, name)
 
-                #define MS_AUTOML_OPERATOR_SCHEMA_UNIQ(Counter, name)               \\
+                #define MS_FEATURIZERS_OPERATOR_SCHEMA_UNIQ(Counter, name)          \\
                   static ONNX_NAMESPACE::OpSchemaRegistry::OpSchemaRegisterOnce(    \\
                       op_schema_register_once##name##Counter) ONNX_UNUSED =         \\
                       ONNX_NAMESPACE::OpSchema(#name, __FILE__, __LINE__)
 
-                #define MS_AUTOML_OPERATOR_SCHEMA_ELSEWHERE(name, schema_func)                          MS_AUTOML_OPERATOR_SCHEMA_UNIQ_HELPER_ELSEWHERE(__COUNTER__, name, schema_func)
-                #define MS_AUTOML_OPERATOR_SCHEMA_UNIQ_HELPER_ELSEWHERE(Counter, name, schema_func)     MS_AUTOML_OPERATOR_SCHEMA_UNIQ_ELSEWHERE(Counter, name, schema_func)
+                #define MS_FEATURIZERS_OPERATOR_SCHEMA_ELSEWHERE(name, schema_func)                          MS_FEATURIZERS_OPERATOR_SCHEMA_UNIQ_HELPER_ELSEWHERE(__COUNTER__, name, schema_func)
+                #define MS_FEATURIZERS_OPERATOR_SCHEMA_UNIQ_HELPER_ELSEWHERE(Counter, name, schema_func)     MS_FEATURIZERS_OPERATOR_SCHEMA_UNIQ_ELSEWHERE(Counter, name, schema_func)
 
-                #define MS_AUTOML_OPERATOR_SCHEMA_UNIQ_ELSEWHERE(Counter, name, schema_func)    \\
-                  static ONNX_NAMESPACE::OpSchemaRegistry::OpSchemaRegisterOnce(                \\
-                      op_schema_register_once##name##Counter) ONNX_UNUSED =                     \\
+                #define MS_FEATURIZERS_OPERATOR_SCHEMA_UNIQ_ELSEWHERE(Counter, name, schema_func)   \\
+                  static ONNX_NAMESPACE::OpSchemaRegistry::OpSchemaRegisterOnce(                    \\
+                      op_schema_register_once##name##Counter) ONNX_UNUSED =                         \\
                       schema_func(ONNX_NAMESPACE::OpSchema(#name, __FILE__, __LINE__))
 
                 namespace onnxruntime {{
-                namespace automl {{
+                namespace featurizers {{
 
                 using ONNX_NAMESPACE::AttributeProto;
                 using ONNX_NAMESPACE::OpSchema;
@@ -637,7 +635,7 @@ def _GenerateGlobalDefs(
                 // ----------------------------------------------------------------------
                 // ----------------------------------------------------------------------
                 // ----------------------------------------------------------------------
-                void RegisterAutoMLSchemas() {{
+                void RegisterMSFeaturizersSchemas() {{
                     {func_calls}
                 }}
 
@@ -646,8 +644,8 @@ def _GenerateGlobalDefs(
                 // ----------------------------------------------------------------------
                 {func_definitions}
 
-                }} // namespace automl
-                }} // namespace onnxruntime
+                }}  // namespace featurizers
+                }}  // namespace onnxruntime
                 """,
             ).format(
                 forward_declarations="\n".join(
@@ -678,7 +676,7 @@ def _GenerateKernel(
     custom_struct_data,
     status_stream,
 ):
-    output_dir = os.path.join(output_dir, "automl_ops", "cpu")
+    output_dir = os.path.join(output_dir, "featurizers_ops", "cpu")
     FileSystem.MakeDirs(output_dir)
 
     assert all(
@@ -712,7 +710,8 @@ def _GenerateKernel(
                 overrides.append(
                     textwrap.dedent(
                         """\
-                        template <> struct OutputTypeMapper<{input_type}> {{ using type = {output_type}; }};
+                        template <>
+                        struct OutputTypeMapper<{input_type}> {{ using type = {output_type}; }};
                         """,
                     ).format(
                         input_type=mapped_input_type.replace("std::", ""),
@@ -722,7 +721,8 @@ def _GenerateKernel(
 
         prefix_statements = textwrap.dedent(
             """\
-            template <typename T> struct OutputTypeMapper {{}};
+            template <typename T>
+            struct OutputTypeMapper {{}};
             {}
             """,
         ).format("".join(overrides))
@@ -740,9 +740,11 @@ def _GenerateKernel(
     if item.is_input_optional:
         prefix_statements += textwrap.dedent(
             """\
-            inline float_t const & PreprocessOptional(float_t const &value) { return value; }
-            inline double_t const & PreprocessOptional(double_t const &value) { return value; }
-            inline nonstd::optional<std::string> PreprocessOptional(std::string value) { return value.empty() ? nonstd::optional<std::string>() : nonstd::optional<std::string>(std::move(value)); }
+            inline float_t const& PreprocessOptional(float_t const& value) { return value; }
+            inline double_t const& PreprocessOptional(double_t const& value) { return value; }
+            inline nonstd::optional<std::string> PreprocessOptional(std::string value) {
+              return value.empty() ? nonstd::optional<std::string>() : nonstd::optional<std::string>(std::move(value));
+            }
             """,
         )
 
@@ -756,8 +758,8 @@ def _GenerateKernel(
         prepare_output_statements = [
             textwrap.dedent(
                 """\
-                Tensor * output_tensor(ctx->Output(0, input_tensor->Shape()));
-                {output_type} * output_data(output_tensor->MutableData<{output_type}>());
+                Tensor* output_tensor(ctx->Output(0, input_tensor->Shape()));
+                {output_type}* output_data(output_tensor->MutableData<{output_type}>());
                 """,
             ).format(
                 output_type=output_type,
@@ -776,7 +778,7 @@ def _GenerateKernel(
                     """\
                     ONNX_OPERATOR_KERNEL_EX(
                         {transformer_name},
-                        kMSAutoMLDomain,
+                        kMSFeaturizersDomain,
                         1,
                         kCpuExecutionProvider,
                         KernelDefBuilder()
@@ -793,14 +795,13 @@ def _GenerateKernel(
                     """\
                     ONNX_OPERATOR_TYPED_KERNEL_EX(
                         {transformer_name},
-                        kMSAutoMLDomain,
+                        kMSFeaturizersDomain,
                         1,
                         {input_type_no_namespace},
                         kCpuExecutionProvider,
                         KernelDefBuilder()
                             .TypeConstraint("{template_input_type}", DataTypeImpl::GetTensorType<{input_type}>()),
-                        {transformer_name}<{input_type}>
-                    );
+                        {transformer_name}<{input_type}>);
                     """,
                 ).format(
                     transformer_name=transformer_name,
@@ -839,31 +840,31 @@ def _GenerateKernel(
 
                 #include "Featurizers/{featurizer_name}.h"
                 #include "Archive.h"
+
                 namespace featurizers = Microsoft::Featurizer::Featurizers;
 
                 namespace onnxruntime {{
-                namespace automl {{
+                namespace featurizers {{
 
                 {prefix_statements}{template_parameters}class {transformer_name} final : public OpKernel {{
-                public:
-                  explicit {transformer_name}(const OpKernelInfo &info) : OpKernel(info) {{
+                 public:
+                  explicit {transformer_name}(const OpKernelInfo& info) : OpKernel(info) {{
                   }}
 
-                  Status Compute(OpKernelContext *ctx) const override {{
+                  Status Compute(OpKernelContext* ctx) const override {{
                     // Create the transformer
                     featurizers::{transformer_name}{template_suffix} transformer(
-                      [ctx](void) {{
-                        const auto * state_tensor(ctx->Input<Tensor>(0));
-                        const uint8_t * const state_data(state_tensor->Data<uint8_t>());
+                        [ctx](void) {{
+                          const auto* state_tensor(ctx->Input<Tensor>(0));
+                          const uint8_t* const state_data(state_tensor->Data<uint8_t>());
 
-                        Microsoft::Featurizer::Archive archive(state_data, state_tensor->Shape().GetDims()[0]);
-                        return featurizers::{transformer_name}{template_suffix}(archive);
-                      }}()
-                    );
+                          Microsoft::Featurizer::Archive archive(state_data, state_tensor->Shape().GetDims()[0]);
+                          return featurizers::{transformer_name}{template_suffix}(archive);
+                        }}());
 
                     // Get the input
                     const auto* input_tensor(ctx->Input<Tensor>(1));
-                    const {input_type} * input_data(input_tensor->Data<{input_type}>());
+                    const {input_type}* input_data(input_tensor->Data<{input_type}>());
 
                     // Prepare the output
                     {prepare_output_statements}
@@ -871,7 +872,7 @@ def _GenerateKernel(
                     // Execute
                     const int64_t length(input_tensor->Shape().Size());
 
-                    for(int64_t i = 0; i < length; ++i) {{
+                    for (int64_t i = 0; i < length; ++i) {{
                       {output_statements}
                     }}
 
@@ -881,8 +882,8 @@ def _GenerateKernel(
 
                 {operator_statements}
 
-                }} // namespace automl
-                }} // namespace onnxruntime
+                }}  // namespace featurizers
+                }}  // namespace onnxruntime
                 """,
             ).format(
                 featurizer_name=items[0].name,
