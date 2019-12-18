@@ -714,8 +714,8 @@ def _GenerateKernel(
                         struct OutputTypeMapper<{input_type}> {{ using type = {output_type}; }};
                         """,
                     ).format(
-                        input_type=mapped_input_type.replace("std::", ""),
-                        output_type=output_type.replace("std::", ""),
+                        input_type=mapped_input_type if "string" in  mapped_input_type else mapped_input_type.replace("std::", ""),
+                        output_type=output_type if "string" in  output_type else output_type.replace("std::", ""),
                     ),
                 )
 
@@ -805,8 +805,8 @@ def _GenerateKernel(
                     """,
                 ).format(
                     transformer_name=transformer_name,
-                    input_type_no_namespace = re.sub(r'^std::|_t$', '', mapping_input_type),
-                    input_type = mapping_input_type if "string" in  mapping_input_type else re.sub(r'^std::|_t$', '', mapping_input_type),
+                    input_type_no_namespace = re.sub(r'^std::', '', mapping_input_type),
+                    input_type = mapping_input_type if "string" in  mapping_input_type else re.sub(r'^std::', '', mapping_input_type),
                     template_input_type=input_type,
                 ) for mapping_input_type in six.iterkeys(input_type_mappings)
             ]
