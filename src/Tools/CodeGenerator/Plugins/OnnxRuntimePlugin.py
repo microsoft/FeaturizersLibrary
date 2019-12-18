@@ -231,7 +231,7 @@ def _GenerateGlobalKernels(
 
         macros += [
             "ONNX_OPERATOR_TYPED_KERNEL_CLASS_NAME(kCpuExecutionProvider, kMSAutoMLDomain, 1, {}, {})".format(
-                input_type.replace("std::", ""),
+                re.sub(r'^std::|_t$', '', input_type),
                 transformer_name,
             )
             for input_type in six.iterkeys(input_type_mappings)
@@ -742,7 +742,7 @@ def _GenerateKernel(
             """\
             inline float_t const & PreprocessOptional(float_t const &value) { return value; }
             inline double_t const & PreprocessOptional(double_t const &value) { return value; }
-            inline nonstd::optional<string> PreprocessOptional(string value) { return value.empty() ? nonstd::optional<string>() : nonstd::optional<string>(std::move(value)); }
+            inline nonstd::optional<std::string> PreprocessOptional(std::string value) { return value.empty() ? nonstd::optional<std::string>() : nonstd::optional<std::string>(std::move(value)); }
             """,
         )
 
@@ -804,8 +804,8 @@ def _GenerateKernel(
                     """,
                 ).format(
                     transformer_name=transformer_name,
-                    input_type_no_namespace = mapping_input_type.replace("std::", ""),
-                    input_type = mapping_input_type if "string" in  mapping_input_type else mapping_input_type.replace("std::", ""),
+                    input_type_no_namespace = re.sub(r'^std::|_t$', '', mapping_input_type),
+                    input_type = mapping_input_type if "string" in  mapping_input_type else re.sub(r'^std::|_t$', '', mapping_input_type),
                     template_input_type=input_type,
                 ) for mapping_input_type in six.iterkeys(input_type_mappings)
             ]
@@ -826,7 +826,7 @@ def _GenerateKernel(
             transformer_name,
         )
 
-    with open(os.path.join(output_dir, "{}.cc".format(transformer_name)), "w") as f:
+    with open(os.path.join(output_dir, "{}.cc".format('_'.join(re.findall('[a-zA-Z][^A-Z]*', transformer_name)).lower())), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -838,7 +838,7 @@ def _GenerateKernel(
                 #include "core/framework/op_kernel.h"
 
                 #include "Featurizers/{featurizer_name}.h"
-
+                #include "Archive.h"
                 namespace featurizers = Microsoft::Featurizer::Featurizers;
 
                 namespace onnxruntime {{

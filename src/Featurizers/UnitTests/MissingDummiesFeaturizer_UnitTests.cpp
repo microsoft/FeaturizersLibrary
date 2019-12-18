@@ -18,8 +18,8 @@ template <typename T>
 void TestHelper(T const & input) {
     using Type = typename NS::Traits<T>::nullable_type;
     Type nullValue = NS::Traits<T>::CreateNullValue();
-    CHECK(NS::Featurizers::MissingDummiesTransformer<Type>().execute(input) == 0);
-    CHECK(NS::Featurizers::MissingDummiesTransformer<Type>().execute(nullValue) == 1);
+    CHECK(NS::Featurizers::MissingDummiesTransformer<T>().execute(input) == 0);
+    CHECK(NS::Featurizers::MissingDummiesTransformer<T>().execute(nullValue) == 1);
 }
 
 TEST_CASE("MissingDummiesEstimator") {
@@ -31,7 +31,7 @@ TEST_CASE("MissingDummiesEstimator") {
         .begin_training()
         .complete_training();
 
-    CHECK(dynamic_cast<NS::Featurizers::MissingDummiesTransformer<nonstd::optional<int>> *>(estimator.create_transformer().get()));
+    CHECK(dynamic_cast<NS::Featurizers::MissingDummiesTransformer<int> *>(estimator.create_transformer().get()));
 
 }
 
