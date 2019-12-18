@@ -147,7 +147,7 @@ class StandardCustomStructInfo(CustomStructInfo):
                 """\
                 ONNX_OPERATOR_KERNEL_EX(
                     {transformer_name},
-                    kMSFeaturizerDomain,
+                    kMSFeaturizersDomain,
                     1,
                     kCpuExecutionProvider,
                     KernelDefBuilder()
