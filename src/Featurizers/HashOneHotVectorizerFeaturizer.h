@@ -244,8 +244,8 @@ bool HashOneHotVectorizerTransformer<T>::operator ==(HashOneHotVectorizerTransfo
 template <typename T>
 void HashOneHotVectorizerTransformer<T>::save(Archive & ar) const {
     // Version
-    Traits<std::uint16_t>::serialize(ar, 1);
-    Traits<std::uint16_t>::serialize(ar, 0);
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
     Traits<std::uint32_t>::serialize(ar, _hashingSeedVal);

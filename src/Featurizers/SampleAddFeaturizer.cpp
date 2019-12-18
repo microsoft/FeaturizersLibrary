@@ -29,7 +29,7 @@ public:
     SampleAddTransformer(Archive &ar) :
         SampleAddTransformer(
             [&ar](void) {
-                // Version 
+                // Version
                 std::uint16_t               majorVersion(Traits<std::uint16_t>::deserialize(ar));
                 std::uint16_t               minorVersion(Traits<std::uint16_t>::deserialize(ar));
 
@@ -48,8 +48,8 @@ public:
 
     void save(Archive &ar) const override {
         // Version
-        Traits<std::uint16_t>::serialize(ar, 1);
-        Traits<std::uint16_t>::serialize(ar, 0);
+        Traits<std::uint16_t>::serialize(ar, 1); // Major
+        Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
         // Data
         ar.serialize(Delta);

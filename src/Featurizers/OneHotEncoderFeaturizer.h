@@ -243,8 +243,8 @@ OneHotEncoderTransformer<InputT>::OneHotEncoderTransformer(Archive &ar) :
 template <typename InputT>
 void OneHotEncoderTransformer<InputT>::save(Archive &ar) const /*override*/ {
     // Version
-    Traits<std::uint16_t>::serialize(ar, 1);
-    Traits<std::uint16_t>::serialize(ar, 0);
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
     Traits<decltype(Labels)>::serialize(ar, Labels);

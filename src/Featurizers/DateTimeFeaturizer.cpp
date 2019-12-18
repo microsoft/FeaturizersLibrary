@@ -302,7 +302,7 @@ DateTimeTransformer::DateTimeTransformer(Archive &ar) :
 DateTimeTransformer::DateTimeTransformer(Archive &ar, std::string dataRootDir) :
     DateTimeTransformer(
         [&ar, &dataRootDir](void) {
-            // Version 
+            // Version
             std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
             std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
 
@@ -360,9 +360,9 @@ bool DateTimeTransformer::operator==(DateTimeTransformer const &other) const {
 
 void DateTimeTransformer::save(Archive & ar) const /*override*/ {
     // Version
-    Traits<std::uint16_t>::serialize(ar, 1);
-    Traits<std::uint16_t>::serialize(ar, 0);
-    
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
+
     // Data
     Traits<std::string>::serialize(ar, _countryName);
 }
