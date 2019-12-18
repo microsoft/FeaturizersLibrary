@@ -86,17 +86,40 @@ _PluginTypeInfo                             = CommandLine.EnumTypeInfo(list(six.
     output_dir=CommandLine.DirectoryTypeInfo(
         ensure_exists=False,
     ),
+    include=CommandLine.StringTypeInfo(
+        arity="*",
+    ),
+    exclude=CommandLine.StringTypeInfo(
+        arity="*",
+    ),
     output_stream=None,
 )
 def EntryPoint(
     plugin,
     input_filename,
     output_dir,
+    include=None,
+    exclude=None,
     output_stream=sys.stdout,
 ):
     """Generates content based on a configuration file according to the specified plugin"""
 
     plugin = PLUGINS[plugin]
+
+    # ----------------------------------------------------------------------
+    def ToRegex(value):
+        try:
+            return re.compile(value)
+        except:
+            raise CommandLine.UsageException("'{}' is not a valid regular expression".format(value))
+
+    # ----------------------------------------------------------------------
+
+    includes = [ToRegex(arg) for arg in include]
+    del include
+
+    excludes = [ToRegex(arg) for arg in exclude]
+    del exclude
 
     with StreamDecorator(output_stream).DoneManager(
         line_prefix="",
@@ -149,6 +172,18 @@ def EntryPoint(
 
                     continue
 
+                if excludes and any(exclude.match(item.name) for exclude in excludes):
+                    this_dm.stream.write("'{}' has been explicitly excluded.\n".format(item.name))
+                    nonlocals.skipped += 1
+
+                    continue
+
+                if includes and not any(include.match(item.name) for include in includes):
+                    this_dm.stream.write("'{}' has not been included.\n".format(item.name))
+                    nonlocals.skipped += 1
+
+                    continue
+
                 if not hasattr(item, "templates"):
                     assert item.type_mappings
 
@@ -161,7 +196,9 @@ def EntryPoint(
                         new_item.is_output_optional = mapping.is_output_optional
 
                         new_data.append([new_item])
+
                     continue
+
                 new_data_items = []
                 for template in item.templates:
                     regex = re.compile(r"\b{}\b".format(template.name))
