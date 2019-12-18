@@ -841,8 +841,6 @@ def _GenerateKernel(
                 #include "Featurizers/{featurizer_name}.h"
                 #include "Archive.h"
 
-                namespace featurizers = Microsoft::Featurizer::Featurizers;
-
                 namespace onnxruntime {{
                 namespace featurizers {{
 
@@ -853,13 +851,13 @@ def _GenerateKernel(
 
                   Status Compute(OpKernelContext* ctx) const override {{
                     // Create the transformer
-                    featurizers::{transformer_name}{template_suffix} transformer(
+                    Microsoft::Featurizer::Featurizers::{transformer_name}{template_suffix} transformer(
                         [ctx](void) {{
                           const auto* state_tensor(ctx->Input<Tensor>(0));
                           const uint8_t* const state_data(state_tensor->Data<uint8_t>());
 
                           Microsoft::Featurizer::Archive archive(state_data, state_tensor->Shape().GetDims()[0]);
-                          return featurizers::{transformer_name}{template_suffix}(archive);
+                          return Microsoft::Featurizer::Featurizers::{transformer_name}{template_suffix}(archive);
                         }}());
 
                     // Get the input
