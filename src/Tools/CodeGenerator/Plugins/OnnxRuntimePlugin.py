@@ -205,8 +205,8 @@ def _GenerateGlobalKernels(
 
                 Status RegisterCpuMSFeaturizersKernels(KernelRegistry& kernel_registry);
 
-                } // namespace featurizers
-                } // namespace onnxruntime
+                }  // namespace featurizers
+                }  // namespace onnxruntime
                 """,
             ),
         )
@@ -307,8 +307,8 @@ def _GenerateGlobalDefs(
 
                 void RegisterMSFeaturizersSchemas(void);
 
-                } // namespace featurizers
-                } // namespace onnxruntime
+                }  // namespace featurizers
+                }  // namespace onnxruntime
                 """,
             ),
         )
