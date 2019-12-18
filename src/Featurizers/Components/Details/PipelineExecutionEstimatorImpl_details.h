@@ -821,6 +821,10 @@ public:
     TransformerChainElement(Archive &) {
     }
 
+    bool operator==(TransformerChainElement const &) const {
+        return true;
+    }
+
     void save(Archive &) const {
     }
 
@@ -870,6 +874,14 @@ public:
 
     void save(Archive &ar) const {
         _pTransformer->save(ar);
+    }
+
+    bool operator==(TransformerChainElement const &other) const {
+        // ----------------------------------------------------------------------
+        using ThisTransformer               = typename ThisEstimator::TransformerType;
+        // ----------------------------------------------------------------------
+
+        return static_cast<ThisTransformer const &>(*_pTransformer) == static_cast<ThisTransformer const &>(*other._pTransformer);
     }
 
     template <typename InputT, typename CallbackT>
@@ -935,6 +947,10 @@ public:
         NextTransformerChainElement(ar) {
     }
 
+    bool operator==(TransformerChainElement const &other) const {
+        return NextTransformerChainElement::operator==(other);
+    }
+
     void save(Archive &ar) const {
         NextTransformerChainElement::save(ar);
     }
@@ -989,6 +1005,11 @@ public:
     TransformerChainElement(Archive &ar) :
         NextTransformerChainElement(ar),
         _pTransformer(new ThisTransformer(ar)) {
+    }
+
+    bool operator==(TransformerChainElement const &other) const {
+        return NextTransformerChainElement::operator==(other)
+            && static_cast<ThisTransformer const &>(*_pTransformer) == static_cast<ThisTransformer const &>(*other._pTransformer);
     }
 
     void save(Archive &ar) const {

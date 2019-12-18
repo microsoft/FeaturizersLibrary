@@ -296,11 +296,22 @@ bool DoesCountryMatch(std::string const &country, std::string query) {
 } // anonymous namespace
 
 DateTimeTransformer::DateTimeTransformer(Archive &ar) :
-    DateTimeTransformer(Traits<std::string>::deserialize(ar), "") {
+    DateTimeTransformer(ar, "") {
 }
 
 DateTimeTransformer::DateTimeTransformer(Archive &ar, std::string dataRootDir) :
-    DateTimeTransformer(Traits<std::string>::deserialize(ar), std::move(dataRootDir)) {
+    DateTimeTransformer(
+        [&ar, &dataRootDir](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
+
+            return DateTimeTransformer(Traits<std::string>::deserialize(ar), std::move(dataRootDir));
+        }()
+    ) {
 }
 
 DateTimeTransformer::DateTimeTransformer(std::string optionalCountryName, std::string optionalDataRootDir):
@@ -343,7 +354,16 @@ DateTimeTransformer::DateTimeTransformer(std::string optionalCountryName, std::s
     }
 }
 
+bool DateTimeTransformer::operator==(DateTimeTransformer const &other) const {
+    return _countryName == other._countryName;
+}
+
 void DateTimeTransformer::save(Archive & ar) const /*override*/ {
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
+
+    // Data
     Traits<std::string>::serialize(ar, _countryName);
 }
 

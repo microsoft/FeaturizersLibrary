@@ -17,9 +17,11 @@ struct ImputationMarkerFeaturizer_int8_t_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_CreateEstimator(/*out*/ ImputationMarkerFeaturizer_int8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_DestroyEstimator(/*in*/ ImputationMarkerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_GetState(/*in*/ ImputationMarkerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_Fit(/*in*/ ImputationMarkerFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_FitBuffer(/*in*/ ImputationMarkerFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
@@ -40,9 +42,11 @@ struct ImputationMarkerFeaturizer_int16_t_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_CreateEstimator(/*out*/ ImputationMarkerFeaturizer_int16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_DestroyEstimator(/*in*/ ImputationMarkerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_GetState(/*in*/ ImputationMarkerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_Fit(/*in*/ ImputationMarkerFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_FitBuffer(/*in*/ ImputationMarkerFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
@@ -63,9 +67,11 @@ struct ImputationMarkerFeaturizer_int32_t_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_CreateEstimator(/*out*/ ImputationMarkerFeaturizer_int32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_DestroyEstimator(/*in*/ ImputationMarkerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_GetState(/*in*/ ImputationMarkerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_Fit(/*in*/ ImputationMarkerFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_FitBuffer(/*in*/ ImputationMarkerFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
@@ -86,9 +92,11 @@ struct ImputationMarkerFeaturizer_int64_t_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_CreateEstimator(/*out*/ ImputationMarkerFeaturizer_int64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_DestroyEstimator(/*in*/ ImputationMarkerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_GetState(/*in*/ ImputationMarkerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_Fit(/*in*/ ImputationMarkerFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_FitBuffer(/*in*/ ImputationMarkerFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
@@ -109,9 +117,11 @@ struct ImputationMarkerFeaturizer_uint8_t_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_CreateEstimator(/*out*/ ImputationMarkerFeaturizer_uint8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_DestroyEstimator(/*in*/ ImputationMarkerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_GetState(/*in*/ ImputationMarkerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_Fit(/*in*/ ImputationMarkerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_FitBuffer(/*in*/ ImputationMarkerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
@@ -132,9 +142,11 @@ struct ImputationMarkerFeaturizer_uint16_t_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_CreateEstimator(/*out*/ ImputationMarkerFeaturizer_uint16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_DestroyEstimator(/*in*/ ImputationMarkerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_GetState(/*in*/ ImputationMarkerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_Fit(/*in*/ ImputationMarkerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_FitBuffer(/*in*/ ImputationMarkerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
@@ -155,9 +167,11 @@ struct ImputationMarkerFeaturizer_uint32_t_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_CreateEstimator(/*out*/ ImputationMarkerFeaturizer_uint32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_DestroyEstimator(/*in*/ ImputationMarkerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_GetState(/*in*/ ImputationMarkerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_Fit(/*in*/ ImputationMarkerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_FitBuffer(/*in*/ ImputationMarkerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
@@ -178,9 +192,11 @@ struct ImputationMarkerFeaturizer_uint64_t_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_CreateEstimator(/*out*/ ImputationMarkerFeaturizer_uint64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_DestroyEstimator(/*in*/ ImputationMarkerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_GetState(/*in*/ ImputationMarkerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_Fit(/*in*/ ImputationMarkerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_FitBuffer(/*in*/ ImputationMarkerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
@@ -201,9 +217,11 @@ struct ImputationMarkerFeaturizer_float_t_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_CreateEstimator(/*out*/ ImputationMarkerFeaturizer_float_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_DestroyEstimator(/*in*/ ImputationMarkerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_GetState(/*in*/ ImputationMarkerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_Fit(/*in*/ ImputationMarkerFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_FitBuffer(/*in*/ ImputationMarkerFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
@@ -224,9 +242,11 @@ struct ImputationMarkerFeaturizer_double_t_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_CreateEstimator(/*out*/ ImputationMarkerFeaturizer_double_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_DestroyEstimator(/*in*/ ImputationMarkerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_GetState(/*in*/ ImputationMarkerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_Fit(/*in*/ ImputationMarkerFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_FitBuffer(/*in*/ ImputationMarkerFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
@@ -247,9 +267,11 @@ struct ImputationMarkerFeaturizer_bool_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_CreateEstimator(/*out*/ ImputationMarkerFeaturizer_bool_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_DestroyEstimator(/*in*/ ImputationMarkerFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_GetState(/*in*/ ImputationMarkerFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_Fit(/*in*/ ImputationMarkerFeaturizer_bool_EstimatorHandle *pHandle, /*in*/ bool const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_FitBuffer(/*in*/ ImputationMarkerFeaturizer_bool_EstimatorHandle *pHandle, /*in*/ bool const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
@@ -270,9 +292,11 @@ struct ImputationMarkerFeaturizer_string_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_CreateEstimator(/*out*/ ImputationMarkerFeaturizer_string_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_DestroyEstimator(/*in*/ ImputationMarkerFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_GetState(/*in*/ ImputationMarkerFeaturizer_string_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_string_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_Fit(/*in*/ ImputationMarkerFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const *input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_FitBuffer(/*in*/ ImputationMarkerFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const * const * input_ptr, std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_string_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */

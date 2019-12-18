@@ -124,9 +124,22 @@ TEST_CASE("Serialization/Deserialization") {
     NS::Archive archive;
     model->save(archive);
     std::vector<unsigned char> vec = archive.commit();
-    CHECK(vec.size() == 8);
-
+    
     NS::Archive loader(vec);
     TransformerType modelLoaded(loader);
     CHECK(modelLoaded == *model);
+}
+
+TEST_CASE("Serialization Version Error") {
+    NS::Archive                             out;
+
+    out.serialize(static_cast<std::uint16_t>(2));
+    out.serialize(static_cast<std::uint16_t>(0));
+
+    NS::Archive                             in(out.commit());
+
+    CHECK_THROWS_WITH(
+        (NS::Featurizers::MinMaxScalarTransformer<std::uint8_t, std::double_t>(in)),
+        Catch::Contains("Unsupported archive version")
+    );
 }

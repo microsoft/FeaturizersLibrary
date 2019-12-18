@@ -18,8 +18,8 @@ template <typename T>
 void TestHelper(T const & input) {
     using Type = typename NS::Traits<T>::nullable_type;
     Type nullValue = NS::Traits<T>::CreateNullValue();
-    CHECK(NS::Featurizers::ImputationMarkerTransformer<Type>().execute(input) == false);
-    CHECK(NS::Featurizers::ImputationMarkerTransformer<Type>().execute(nullValue) == true);
+    CHECK(NS::Featurizers::ImputationMarkerTransformer<T>().execute(input) == false);
+    CHECK(NS::Featurizers::ImputationMarkerTransformer<T>().execute(nullValue) == true);
 }
 
 TEST_CASE("ImputationMarkerEstimator") {
@@ -32,7 +32,7 @@ TEST_CASE("ImputationMarkerEstimator") {
         .begin_training()
         .complete_training();
 
-    CHECK(dynamic_cast<NS::Featurizers::ImputationMarkerTransformer<nonstd::optional<int>> *>(estimator.create_transformer().get()));
+    CHECK(dynamic_cast<NS::Featurizers::ImputationMarkerTransformer<int> *>(estimator.create_transformer().get()));
 }
 
 TEST_CASE("Single Tests") {
@@ -55,3 +55,29 @@ TEST_CASE("Numeric NaNs") {
     CHECK(NS::Featurizers::ImputationMarkerTransformer<std::double_t>().execute(std::numeric_limits<std::double_t>::quiet_NaN()) == true);
 }
 
+TEST_CASE("Serialization") {
+    NS::Featurizers::ImputationMarkerTransformer<std::double_t>             original;
+    NS::Archive                                                             out;
+
+    original.save(out);
+
+    NS::Archive                             in(out.commit());
+
+    NS::Featurizers::ImputationMarkerTransformer<std::double_t>             other(in);
+
+    CHECK(other == original);
+}
+
+TEST_CASE("Serialization Version Error") {
+    NS::Archive                             out;
+
+    out.serialize(static_cast<std::uint16_t>(2));
+    out.serialize(static_cast<std::uint16_t>(0));
+
+    NS::Archive                             in(out.commit());
+
+    CHECK_THROWS_WITH(
+        NS::Featurizers::ImputationMarkerTransformer<std::double_t>(in),
+        Catch::Contains("Unsupported archive version")
+    );
+}

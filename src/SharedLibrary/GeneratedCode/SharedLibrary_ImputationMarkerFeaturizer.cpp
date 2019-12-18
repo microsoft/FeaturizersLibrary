@@ -75,6 +75,28 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_DestroyEstimator(/
     }
 }
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_GetState(/*in*/ ImputationMarkerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -86,7 +108,6 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_IsTrainingComplete
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -157,6 +178,27 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_FitBuffer(/*in*/ I
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -380,6 +422,28 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_DestroyEstimator(
     }
 }
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_GetState(/*in*/ ImputationMarkerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -391,7 +455,6 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_IsTrainingComplet
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -462,6 +525,27 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_FitBuffer(/*in*/ 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -685,6 +769,28 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_DestroyEstimator(
     }
 }
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_GetState(/*in*/ ImputationMarkerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -696,7 +802,6 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_IsTrainingComplet
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -767,6 +872,27 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_FitBuffer(/*in*/ 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -990,6 +1116,28 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_DestroyEstimator(
     }
 }
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_GetState(/*in*/ ImputationMarkerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -1001,7 +1149,6 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_IsTrainingComplet
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -1072,6 +1219,27 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_FitBuffer(/*in*/ 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -1295,6 +1463,28 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_DestroyEstimator(
     }
 }
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_GetState(/*in*/ ImputationMarkerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -1306,7 +1496,6 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_IsTrainingComplet
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -1377,6 +1566,27 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_FitBuffer(/*in*/ 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -1600,6 +1810,28 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_DestroyEstimator
     }
 }
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_GetState(/*in*/ ImputationMarkerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -1611,7 +1843,6 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_IsTrainingComple
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -1682,6 +1913,27 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_FitBuffer(/*in*/
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -1905,6 +2157,28 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_DestroyEstimator
     }
 }
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_GetState(/*in*/ ImputationMarkerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -1916,7 +2190,6 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_IsTrainingComple
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -1987,6 +2260,27 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_FitBuffer(/*in*/
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -2210,6 +2504,28 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_DestroyEstimator
     }
 }
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_GetState(/*in*/ ImputationMarkerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -2221,7 +2537,6 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_IsTrainingComple
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -2292,6 +2607,27 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_FitBuffer(/*in*/
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -2515,6 +2851,28 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_DestroyEstimator(
     }
 }
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_GetState(/*in*/ ImputationMarkerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -2526,7 +2884,6 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_IsTrainingComplet
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -2597,6 +2954,27 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_FitBuffer(/*in*/ 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -2820,6 +3198,28 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_DestroyEstimator
     }
 }
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_GetState(/*in*/ ImputationMarkerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -2831,7 +3231,6 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_IsTrainingComple
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -2902,6 +3301,27 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_FitBuffer(/*in*/
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_t_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -3125,6 +3545,28 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_DestroyEstimator(/*i
     }
 }
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_GetState(/*in*/ ImputationMarkerFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -3136,7 +3578,6 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_IsTrainingComplete(/
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -3207,6 +3648,27 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_FitBuffer(/*in*/ Imp
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
@@ -3430,6 +3892,28 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_DestroyEstimator(/
     }
 }
 
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_GetState(/*in*/ ImputationMarkerFeaturizer_string_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_string_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
@@ -3441,7 +3925,6 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_IsTrainingComplete
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -3512,6 +3995,27 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_FitBuffer(/*in*/ I
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
     
         return true;
     }
