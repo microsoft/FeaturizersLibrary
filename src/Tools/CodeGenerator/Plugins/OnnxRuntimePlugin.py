@@ -72,6 +72,9 @@ class Plugin(PluginBase):
                 output_types = OrderedDict()
 
                 for item in items:
+                    item.input_type = re.sub("_t$", item.input_type) if ("float" in item.input_type or "double" in item.input_type) else item.input_type
+                    item.output_type = re.sub("_t$", item.output_type) if ("float" in item.output_type or "double" in item.output_type) else item.output_type
+                    #item.input_type = re.sub("_t$", item.input_type) if ("float" in item.input_type or "double" in item.input_type) else item.input_type
                     if (
                         item.is_input_optional
                         and item.input_type not in supported_optional_types
