@@ -48,7 +48,7 @@ class Plugin(PluginBase):
         status_stream.write("Preprocessing data...")
         with status_stream.DoneManager():
             supported_optional_types = set(
-                ["std::string", "std::float_t", "std::double_t"],
+                ["std::string", "std::float", "std::double"],
             )
 
             type_mappings = []
@@ -72,6 +72,9 @@ class Plugin(PluginBase):
                 output_types = OrderedDict()
 
                 for item in items:
+                    item.input_type = re.sub("_t$", '', item.input_type) if ("float" in item.input_type or "double" in item.input_type) else item.input_type
+                    item.output_type = re.sub("_t$", '', item.output_type) if ("float" in item.output_type or "double" in item.output_type) else item.output_type
+
                     if (
                         item.is_input_optional
                         and item.input_type not in supported_optional_types
@@ -740,8 +743,8 @@ def _GenerateKernel(
     if item.is_input_optional:
         prefix_statements += textwrap.dedent(
             """\
-            inline float_t const& PreprocessOptional(float_t const& value) { return value; }
-            inline double_t const& PreprocessOptional(double_t const& value) { return value; }
+            inline float const& PreprocessOptional(float const& value) { return value; }
+            inline double const& PreprocessOptional(double const& value) { return value; }
             inline nonstd::optional<std::string> PreprocessOptional(std::string value) {
               return value.empty() ? nonstd::optional<std::string>() : nonstd::optional<std::string>(std::move(value));
             }
@@ -805,7 +808,7 @@ def _GenerateKernel(
                     """,
                 ).format(
                     transformer_name=transformer_name,
-                    input_type_no_namespace = re.sub(r'^std::', '', mapping_input_type),
+                    input_type_no_namespace = re.sub(r'^std::|_t$', '', mapping_input_type),
                     input_type = mapping_input_type if "string" in  mapping_input_type else re.sub(r'^std::', '', mapping_input_type),
                     template_input_type=input_type,
                 ) for mapping_input_type in six.iterkeys(input_type_mappings)
