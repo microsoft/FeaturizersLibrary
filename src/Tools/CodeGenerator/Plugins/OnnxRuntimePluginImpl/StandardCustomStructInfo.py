@@ -150,24 +150,11 @@ class StandardCustomStructInfo(CustomStructInfo):
                     kMSFeaturizersDomain,
                     1,
                     kCpuExecutionProvider,
-                    KernelDefBuilder()
-                        {constraints},
+                    KernelDefBuilder(),
                     {transformer_name}
                 );
                 """,
             ).format(
                 transformer_name=transformer_name,
-                constraints=StringHelpers.LeftJustify(
-                    "\n".join(
-                        [
-                            '.TypeConstraint("{k}", DataTypeImpl::GetTensorType<{v}>())'.format(
-                                k=k,
-                                v=v if "string" in  v else v.replace("std::", ""),
-                            ) for k,
-                            v in six.iteritems(self._template_to_types)
-                        ],
-                    ),
-                    8,
-                ),
             )]
         )
