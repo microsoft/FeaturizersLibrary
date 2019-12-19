@@ -15,7 +15,10 @@ namespace Featurizers {
 ///  \class         MinMaxScalarTransformer
 ///  \brief         Scales values based on learned min and max values.
 ///
-template <typename InputT, typename TransformedT>
+template <
+    typename InputT,
+    typename TransformedT=std::double_t
+>
 class MinMaxScalarTransformer : public StandardTransformer<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
@@ -69,7 +72,7 @@ namespace Details {
 ///
 template <
     typename InputT,
-    typename TransformedT,
+    typename TransformedT=std::double_t,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class MinMaxScalarEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
