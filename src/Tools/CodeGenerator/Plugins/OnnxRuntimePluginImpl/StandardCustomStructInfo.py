@@ -87,7 +87,7 @@ class StandardCustomStructInfo(CustomStructInfo):
             textwrap.dedent(
                 """\
                 .TypeAndShapeInferenceFunction(
-                    [](ONNX_NAMESPACE::InferenceContext &ctx) {{
+                    [](ONNX_NAMESPACE::InferenceContext& ctx) {{
                         {statements}
 
                         for(size_t i = 0; i < ctx.getNumOutputs(); ++i) {{
@@ -121,14 +121,14 @@ class StandardCustomStructInfo(CustomStructInfo):
 
         for index, member in enumerate(self._custom_struct.members):
             initialize_statements_part1.append(
-                "Tensor * {name}_tensor(ctx->Output({index}, input_tensor->Shape()));".format(
+                "Tensor* {name}_tensor(ctx->Output({index}, input_tensor->Shape()));".format(
                     name=member.name,
                     index=index,
                 ),
             )
 
             initialize_statements_part2.append(
-                "{type} * {name}_data({name}_tensor->MutableData<{type}>());".format(
+                "{type}* {name}_data({name}_tensor->MutableData<{type}>());".format(
                     name=member.name,
                     type=member.type if "string" in member.type else member.type.replace("std::", ""),
                 ),
@@ -147,27 +147,14 @@ class StandardCustomStructInfo(CustomStructInfo):
                 """\
                 ONNX_OPERATOR_KERNEL_EX(
                     {transformer_name},
-                    kMSAutoMLDomain,
+                    kMSFeaturizersDomain,
                     1,
                     kCpuExecutionProvider,
-                    KernelDefBuilder()
-                        {constraints},
+                    KernelDefBuilder(),
                     {transformer_name}
                 );
                 """,
             ).format(
                 transformer_name=transformer_name,
-                constraints=StringHelpers.LeftJustify(
-                    "\n".join(
-                        [
-                            '.TypeConstraint("{k}", DataTypeImpl::GetTensorType<{v}>())'.format(
-                                k=k,
-                                v=v if "string" in  v else v.replace("std::", ""),
-                            ) for k,
-                            v in six.iteritems(self._template_to_types)
-                        ],
-                    ),
-                    8,
-                ),
             )]
         )
