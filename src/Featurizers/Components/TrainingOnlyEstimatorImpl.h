@@ -81,6 +81,8 @@ public:
     AnnotationData const & get_annotation_data(void) const;
     AnnotationData const * get_annotation_data_nothrow(void) const;
 
+    static void add_annotation(AnnotationMapsPtr pAllColumnAnnotations, AnnotationData annotation, size_t colIndex, char const* name);
+
     static AnnotationData const & get_annotation_data(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name);
     static AnnotationData const * get_annotation_data_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name);
 
@@ -155,6 +157,7 @@ private:
     // ----------------------------------------------------------------------
     static AnnotationData const * get_annotation_data_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name, std::true_type);
     static AnnotationData const * get_annotation_data_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name, std::false_type);
+
 
     bool begin_training_impl(void) override;
     bool begin_training_impl(std::true_type);
@@ -314,6 +317,11 @@ template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
     return static_cast<AnnotationImpl const &>(annotation);
 }
 
+// template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
+// /*static*/ void TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::add_annotation(AnnotationMapsPtr pAllColumnAnnotations, AnnotationData annotation, size_t colIndex, char const* name) {
+//     return BaseType::add_annotation(pAllColumnAnnotations, std::make_shared<AnnotationImpl>(annotation), colIndex, name);
+// }
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -407,6 +415,10 @@ void TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::complete
         BaseType::add_annotation(std::make_shared<AnnotationImpl>(EstimatorPolicyT::complete_training()), _colIndex);
 }
 
+template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
+/*static*/ void TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::add_annotation(AnnotationMapsPtr pAllColumnAnnotations, AnnotationData annotation, size_t colIndex, char const* name) {
+    return BaseType::add_annotation(pAllColumnAnnotations, std::make_shared<AnnotationImpl>(std::move(annotation)), colIndex, name);
+}
 // ----------------------------------------------------------------------
 // |
 // |  TrainingOnlyEstimatorImpl::AnnotationImpl

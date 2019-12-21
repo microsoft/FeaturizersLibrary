@@ -280,6 +280,8 @@ protected:
     ///
     void add_annotation(AnnotationPtr pAnnotation, size_t colIndex) const;
 
+    static void add_annotation(AnnotationMapsPtr const allColumnAnnotations, AnnotationPtr pAnnotation, size_t colIndex, char const *name);
+
     /////////////////////////////////////////////////////////////////////////
     ///  \fn            get_annotation_impl
     ///  \brief         Helper method that can be used by derived class when implementation functionality
@@ -572,7 +574,7 @@ typename StandardTransformer<InputT, TransformedT>::TransformedType StandardTran
     );
 
     assert(isSet);
-    
+
     TransformedT                            result(std::move(*pResult));
 
     pResult->~TransformedT();
@@ -628,27 +630,27 @@ inline Estimator::Estimator(char const *name, AnnotationMapsPtr pAllColumnAnnota
     ) {
 }
 
-inline void Estimator::add_annotation(AnnotationPtr pAnnotation, size_t colIndex) const {
+/*static*/ inline void Estimator::add_annotation(AnnotationMapsPtr const allColumnAnnotations, AnnotationPtr pAnnotation, size_t colIndex, char const *name) {
     if(!pAnnotation)
         throw std::invalid_argument("pAnnotation");
 
-    AnnotationMaps &                        allAnnotations(*_allColumnAnnotations);
+    AnnotationMaps &                        allAnnotations(*allColumnAnnotations);
 
     if(colIndex >= allAnnotations.size())
         throw std::invalid_argument("colIndex");
 
     AnnotationPtrs &                        annotations(
-        [&allAnnotations, &colIndex, this](void) -> AnnotationPtrs & {
+        [&allAnnotations, &colIndex, &name](void) -> AnnotationPtrs & {
             AnnotationMap &                 columnAnnotations(allAnnotations[colIndex]);
 
             // TODO: Acquire read map lock
-            AnnotationMap::iterator const   iter(columnAnnotations.find(Name));
+            AnnotationMap::iterator const   iter(columnAnnotations.find(name));
 
             if(iter != columnAnnotations.end())
                 return iter->second;
 
             // TODO: Promote read lock to write lock
-            std::pair<AnnotationMap::iterator, bool> const result(columnAnnotations.emplace(std::make_pair(Name, AnnotationPtrs())));
+            std::pair<AnnotationMap::iterator, bool> const result(columnAnnotations.emplace(std::make_pair(name, AnnotationPtrs())));
 
             if(result.first == columnAnnotations.end() || result.second == false)
                 throw std::runtime_error("Invalid insertion");
@@ -659,6 +661,10 @@ inline void Estimator::add_annotation(AnnotationPtr pAnnotation, size_t colIndex
 
     // TODO: Acquire vector read lock
     annotations.emplace_back(std::move(pAnnotation));
+}
+
+inline void Estimator::add_annotation(AnnotationPtr pAnnotation, size_t colIndex) const {
+    return add_annotation(_allColumnAnnotations, pAnnotation, colIndex, Name);
 }
 
 template <typename DerivedAnnotationT>

@@ -40,6 +40,7 @@ foreach(_test_name IN ITEMS
     OneHotEncoderFeaturizer_UnitTests
     RobustScalarFeaturizer_UnitTests
     SampleAddFeaturizer_UnitTest
+    StandardScaleWrapperFeaturizer_UnitTest
     StringFeaturizer_UnitTest
     Structs_UnitTest
     TimeSeriesImputerFeaturizer_UnitTest
