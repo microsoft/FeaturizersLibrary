@@ -240,7 +240,7 @@ StandardDeviationAnnotationData Details::StandardDeviationTrainingOnlyPolicy<T, 
 #endif
 
 
-}
-}
-}
-}
+} // namespace Components
+} // namespace Featurizers
+} // namespace Featurizer
+} // namespace Microsoft

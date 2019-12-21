@@ -326,6 +326,6 @@ template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
 void Details::StandardScaleWrapperEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
-}
-}
-}
+} // namespace Featurizers
+} // namespace Featurizer
+} // namespace Microsoft
