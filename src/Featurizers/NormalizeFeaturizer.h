@@ -23,6 +23,30 @@ struct GetNullableType<nonstd::optional<U>> {
     using type = U;
 };
 
+namespace {
+    // tag dispatching functions for potential nullable values within iterators
+    
+    template <typename IteratorT>
+    bool is_null(IteratorT const &input, std::true_type) {
+        return Traits<typename std::iterator_traits<IteratorT>::value_type>::IsNull(*input);
+    }
+
+    template <typename IteratorT>
+    bool is_null(IteratorT const &input, std::false_type) {
+        return false;
+    }
+
+    template <typename IteratorT>
+    typename GetNullableType<typename std::iterator_traits<IteratorT>::value_type>::type const& get_value(IteratorT const &input, std::true_type) {
+        return Traits<typename std::iterator_traits<IteratorT>::value_type>::GetNullableValue(*input);
+    }
+
+    template <typename IteratorT>
+    typename std::iterator_traits<IteratorT>::value_type const& get_value(IteratorT const &input, std::false_type) {
+        return *input;
+    }
+} // anonymous namespace
+
 /////////////////////////////////////////////////////////////////////////
 ///  \class         NormalizeTransformer
 ///  \brief         Normalize based on l1, l2 or max norm
@@ -84,18 +108,12 @@ private:
 
     void execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::true_type);
     void execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::false_type);
-
-    bool is_null(IteratorType const &input, std::true_type);
-    bool is_null(IteratorType const &input, std::false_type);
-
-    typename GetNullableType<ValueType>::type get_value(IteratorType const &input, std::true_type);
-    ValueType get_value(IteratorType const &input, std::false_type);
 };
 
 namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         NormalizeEstimatorImpl
+///  \class         NormalizeEstimatorImplx
 ///  \brief         Estimator that reads an annotation created by the `VectorNormsEstimator`
 ///                 to create a `NormalizeTransformer` object.
 ///
@@ -104,7 +122,7 @@ template <
     typename UpdaterT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class NormalizeEstimatorImpl : public TransformerEstimator<IteratorRangeT, std::vector<std::double_t>> {
+class NormalizeEstimatorImplx : public TransformerEstimator<IteratorRangeT, std::vector<std::double_t>> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -120,10 +138,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    NormalizeEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
-    ~NormalizeEstimatorImpl(void) override = default;
+    NormalizeEstimatorImplx(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~NormalizeEstimatorImplx(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(NormalizeEstimatorImpl);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(NormalizeEstimatorImplx);
 
 private:
     // ----------------------------------------------------------------------
@@ -158,7 +176,7 @@ private:
 } // namespace Details
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         NormalizeEstimator
+///  \class         NormalizeEstimatorImpl
 ///  \brief         Chains up VectorNormsEstimator and NormalizeTransformerImpl
 ///                 to normalize input vector data so that it's norm becoming 1
 ///
@@ -167,10 +185,10 @@ template <
     typename UpdaterT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class NormalizeEstimator :
+class NormalizeEstimatorImpl :
     public Components::PipelineExecutionEstimatorImpl<
         Components::VectorNormsEstimator<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>,
-        Details::NormalizeEstimatorImpl<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>
+        Details::NormalizeEstimatorImplx<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -181,7 +199,7 @@ public:
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
             Components::VectorNormsEstimator<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>,
-            Details::NormalizeEstimatorImpl<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>
+            Details::NormalizeEstimatorImplx<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>
         >;
 
     // ----------------------------------------------------------------------
@@ -189,47 +207,47 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    NormalizeEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
-    ~NormalizeEstimator(void) override = default;
+    NormalizeEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~NormalizeEstimatorImpl(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(NormalizeEstimator);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(NormalizeEstimatorImpl);
 };
 
 /////////////////////////////////////////////////////////////////////////
 ///  \typedef       L1NormalizeEstimator
-///  \brief         Used to differentiate different NormalizeEstimator depends on norms
+///  \brief         Used to differentiate different NormalizeEstimatorImpl depends on norms
 ///
 template <
     typename IteratorRangeT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-using L1NormalizeEstimator = NormalizeEstimator<
+using L1NormalizeEstimator = NormalizeEstimatorImpl<
                                     IteratorRangeT,
                                     Components::Updaters::L1NormUpdater<typename std::iterator_traits<typename std::tuple_element<0, IteratorRangeT>::type>::value_type>,
                                     MaxNumTrainingItemsV>;
 
 /////////////////////////////////////////////////////////////////////////
 ///  \typedef       L2NormalizeEstimator
-///  \brief         Used to differentiate different NormalizeEstimator depends on norms
+///  \brief         Used to differentiate different NormalizeEstimatorImpl depends on norms
 ///
 template <
     typename IteratorRangeT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-using L2NormalizeEstimator = NormalizeEstimator<
+using L2NormalizeEstimator = NormalizeEstimatorImpl<
                                     IteratorRangeT,
                                     Components::Updaters::L2NormUpdater<typename std::iterator_traits<typename std::tuple_element<0, IteratorRangeT>::type>::value_type>,
                                     MaxNumTrainingItemsV>;
 
 /////////////////////////////////////////////////////////////////////////
 ///  \typedef       MaxNormalizeEstimator
-///  \brief         Used to differentiate different NormalizeEstimator depends on norms
+///  \brief         Used to differentiate different NormalizeEstimatorImpl depends on norms
 ///
 template <
     typename IteratorRangeT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-using MaxNormalizeEstimator = NormalizeEstimator<
+using MaxNormalizeEstimator = NormalizeEstimatorImpl<
                                     IteratorRangeT,
                                     Components::Updaters::MaxNormUpdater<typename std::iterator_traits<typename std::tuple_element<0, IteratorRangeT>::type>::value_type>,
                                     MaxNumTrainingItemsV>;
@@ -340,49 +358,31 @@ void NormalizeTransformer<IteratorRangeT>::execute_impl(IteratorRangeT const &in
     callback(res);
 }
 
-template <typename IteratorRangeT>
-bool NormalizeTransformer<IteratorRangeT>::is_null(IteratorType const &input, std::true_type) {
-    return Traits<ValueType>::IsNull(*input);
-}
-template <typename IteratorRangeT>
-bool NormalizeTransformer<IteratorRangeT>::is_null(IteratorType const &, std::false_type) {
-    return false;
-}
-
-
-template <typename IteratorRangeT>
-typename GetNullableType<typename std::iterator_traits<typename std::tuple_element<0, IteratorRangeT>::type>::value_type>::type NormalizeTransformer<IteratorRangeT>::get_value(IteratorType const &input, std::true_type) {
-    return Traits<ValueType>::GetNullableValue(*input);
-}
-template <typename IteratorRangeT>
-typename std::iterator_traits<typename std::tuple_element<0, IteratorRangeT>::type>::value_type NormalizeTransformer<IteratorRangeT>::get_value(IteratorType const &input, std::false_type) {
-    return *input;
-}
 
 
 // ----------------------------------------------------------------------
 // |
-// |  NormalizeEstimator
+// |  NormalizeEstimatorImpl
 // |
 // ----------------------------------------------------------------------
 template <typename IteratorRangeT, typename UpdaterT, size_t MaxNumTrainingItemsV>
-NormalizeEstimator<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>::NormalizeEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+NormalizeEstimatorImpl<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>::NormalizeEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
     BaseType(
-        "NormalizeEstimator",
+        "NormalizeEstimatorImpl",
         pAllColumnAnnotations,
         [pAllColumnAnnotations, colIndex](void) { return Components::VectorNormsEstimator<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
-        [pAllColumnAnnotations, colIndex](void) { return Details::NormalizeEstimatorImpl<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
+        [pAllColumnAnnotations, colIndex](void) { return Details::NormalizeEstimatorImplx<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
     ) {
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::NormalizeEstimatorImpl
+// |  Details::NormalizeEstimatorImplx
 // |
 // ----------------------------------------------------------------------
 template <typename IteratorRangeT, typename UpdaterT, size_t MaxNumTrainingItemsV>
-Details::NormalizeEstimatorImpl<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>::NormalizeEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
-    BaseType("NormalizeEstimatorImpl", std::move(pAllColumnAnnotations)),
+Details::NormalizeEstimatorImplx<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>::NormalizeEstimatorImplx(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+    BaseType("NormalizeEstimatorImplx", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
             [this, &colIndex](void) -> size_t & {
@@ -399,17 +399,17 @@ Details::NormalizeEstimatorImpl<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>:
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename IteratorRangeT, typename UpdaterT, size_t MaxNumTrainingItemsV>
-bool Details::NormalizeEstimatorImpl<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+bool Details::NormalizeEstimatorImplx<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
     return false;
 }
 
 template <typename IteratorRangeT, typename UpdaterT, size_t MaxNumTrainingItemsV>
-FitResult Details::NormalizeEstimatorImpl<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>::fit_impl(IteratorRangeT const *, size_t) /*override*/ {
+FitResult Details::NormalizeEstimatorImplx<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>::fit_impl(IteratorRangeT const *, size_t) /*override*/ {
     throw std::runtime_error("This will never be called");
 }
 
 template <typename IteratorRangeT, typename UpdaterT, size_t MaxNumTrainingItemsV>
-void Details::NormalizeEstimatorImpl<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+void Details::NormalizeEstimatorImplx<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
 } // namespace Featurizers
