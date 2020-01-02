@@ -71,17 +71,6 @@ class Plugin(PluginBase):
                 output_types = OrderedDict()
 
                 for item in items:
-                    item.input_type = (
-                        item.input_type
-                        if ("float" in item.input_type or "double" in item.input_type)
-                        else item.input_type
-                    )
-                    item.output_type = (
-                        item.output_type
-                        if ("float" in item.output_type or "double" in item.output_type)
-                        else item.output_type
-                    )
-
                     if (
                         item.is_input_optional
                         and item.input_type not in supported_optional_types
@@ -766,8 +755,8 @@ def _GenerateKernel(
     if item.is_input_optional:
         prefix_statements += textwrap.dedent(
             """\
-            inline float const& PreprocessOptional(float const& value) { return value; }
-            inline double const& PreprocessOptional(double const& value) { return value; }
+            inline float_t const& PreprocessOptional(float_t const& value) { return value; }
+            inline double_t const& PreprocessOptional(double_t const& value) { return value; }
             inline nonstd::optional<std::string> PreprocessOptional(std::string value) {
               return value.empty() ? nonstd::optional<std::string>() : nonstd::optional<std::string>(std::move(value));
             }
