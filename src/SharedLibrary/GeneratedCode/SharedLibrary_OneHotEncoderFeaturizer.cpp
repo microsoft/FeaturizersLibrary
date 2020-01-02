@@ -24,10 +24,10 @@ extern "C" {
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  OneHotEncoderFeaturizer <int8_t> */
+/* |  OneHotEncoderFeaturizer <int8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_int8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_int8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -40,7 +40,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateEstimator(/*in*
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_int8_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_int8_EstimatorHandle*>(index);
 
 
     
@@ -52,7 +52,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateEstimator(/*in*
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -75,7 +75,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_DestroyEstimator(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_GetState(/*in*/ OneHotEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_GetState(/*in*/ OneHotEncoderFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -97,7 +97,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_GetState(/*in*/ OneHo
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -119,7 +119,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_IsTrainingComplete(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_Fit(/*in*/ OneHotEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_Fit(/*in*/ OneHotEncoderFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -145,7 +145,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_Fit(/*in*/ OneHotEnco
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_FitBuffer(/*in*/ OneHotEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_FitBuffer(/*in*/ OneHotEncoderFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -172,7 +172,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_FitBuffer(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -193,7 +193,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_OnDataCompleted(/*in*
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -214,7 +214,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CompleteTraining(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_int8_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_int8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -232,7 +232,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateTransformerFrom
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int8_TransformerHandle*>(index);
     
         return true;
     }
@@ -242,7 +242,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_int8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -258,7 +258,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateTransformerFrom
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int8_TransformerHandle*>(index);
     
         return true;
     }
@@ -268,7 +268,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_int8_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -292,7 +292,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_DestroyTransformer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_int8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -325,7 +325,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_Transform(/*in*/ OneHotEncoderFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_Transform(/*in*/ OneHotEncoderFeaturizer_int8_TransformerHandle *pHandle, /*in*/ int8_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -356,7 +356,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_Transform(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -377,10 +377,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_t_DestroyTransformedDat
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  OneHotEncoderFeaturizer <int16_t> */
+/* |  OneHotEncoderFeaturizer <int16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_int16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_int16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -393,7 +393,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateEstimator(/*in
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_int16_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_int16_EstimatorHandle*>(index);
 
 
     
@@ -405,7 +405,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateEstimator(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -428,7 +428,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_DestroyEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_GetState(/*in*/ OneHotEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_GetState(/*in*/ OneHotEncoderFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -450,7 +450,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_GetState(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -472,7 +472,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_IsTrainingComplete(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_Fit(/*in*/ OneHotEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_Fit(/*in*/ OneHotEncoderFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -498,7 +498,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_Fit(/*in*/ OneHotEnc
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_FitBuffer(/*in*/ OneHotEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_FitBuffer(/*in*/ OneHotEncoderFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -525,7 +525,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_FitBuffer(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -546,7 +546,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_OnDataCompleted(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -567,7 +567,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CompleteTraining(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_int16_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_int16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -585,7 +585,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateTransformerFro
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int16_TransformerHandle*>(index);
     
         return true;
     }
@@ -595,7 +595,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_int16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -611,7 +611,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateTransformerFro
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int16_TransformerHandle*>(index);
     
         return true;
     }
@@ -621,7 +621,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_int16_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -645,7 +645,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_DestroyTransformer(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_int16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -678,7 +678,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_Transform(/*in*/ OneHotEncoderFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_Transform(/*in*/ OneHotEncoderFeaturizer_int16_TransformerHandle *pHandle, /*in*/ int16_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -709,7 +709,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_Transform(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -730,10 +730,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_t_DestroyTransformedDa
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  OneHotEncoderFeaturizer <int32_t> */
+/* |  OneHotEncoderFeaturizer <int32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_int32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_int32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -746,7 +746,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateEstimator(/*in
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_int32_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_int32_EstimatorHandle*>(index);
 
 
     
@@ -758,7 +758,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateEstimator(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -781,7 +781,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_DestroyEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_GetState(/*in*/ OneHotEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_GetState(/*in*/ OneHotEncoderFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -803,7 +803,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_GetState(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -825,7 +825,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_IsTrainingComplete(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_Fit(/*in*/ OneHotEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_Fit(/*in*/ OneHotEncoderFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -851,7 +851,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_Fit(/*in*/ OneHotEnc
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_FitBuffer(/*in*/ OneHotEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_FitBuffer(/*in*/ OneHotEncoderFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -878,7 +878,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_FitBuffer(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -899,7 +899,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_OnDataCompleted(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -920,7 +920,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CompleteTraining(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_int32_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_int32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -938,7 +938,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateTransformerFro
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int32_TransformerHandle*>(index);
     
         return true;
     }
@@ -948,7 +948,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_int32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -964,7 +964,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateTransformerFro
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int32_TransformerHandle*>(index);
     
         return true;
     }
@@ -974,7 +974,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_int32_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -998,7 +998,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_DestroyTransformer(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_int32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1031,7 +1031,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_Transform(/*in*/ OneHotEncoderFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_Transform(/*in*/ OneHotEncoderFeaturizer_int32_TransformerHandle *pHandle, /*in*/ int32_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1062,7 +1062,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_Transform(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1083,10 +1083,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_t_DestroyTransformedDa
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  OneHotEncoderFeaturizer <int64_t> */
+/* |  OneHotEncoderFeaturizer <int64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_int64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_int64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1099,7 +1099,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateEstimator(/*in
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_int64_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_int64_EstimatorHandle*>(index);
 
 
     
@@ -1111,7 +1111,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateEstimator(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1134,7 +1134,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_DestroyEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_GetState(/*in*/ OneHotEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_GetState(/*in*/ OneHotEncoderFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1156,7 +1156,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_GetState(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1178,7 +1178,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_IsTrainingComplete(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_Fit(/*in*/ OneHotEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_Fit(/*in*/ OneHotEncoderFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1204,7 +1204,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_Fit(/*in*/ OneHotEnc
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_FitBuffer(/*in*/ OneHotEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_FitBuffer(/*in*/ OneHotEncoderFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1231,7 +1231,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_FitBuffer(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1252,7 +1252,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_OnDataCompleted(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1273,7 +1273,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CompleteTraining(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_int64_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_int64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1291,7 +1291,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateTransformerFro
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int64_TransformerHandle*>(index);
     
         return true;
     }
@@ -1301,7 +1301,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_int64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1317,7 +1317,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateTransformerFro
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::int64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_int64_TransformerHandle*>(index);
     
         return true;
     }
@@ -1327,7 +1327,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_int64_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1351,7 +1351,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_DestroyTransformer(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_int64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1384,7 +1384,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_Transform(/*in*/ OneHotEncoderFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_Transform(/*in*/ OneHotEncoderFeaturizer_int64_TransformerHandle *pHandle, /*in*/ int64_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1415,7 +1415,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_Transform(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1436,10 +1436,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_t_DestroyTransformedDa
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  OneHotEncoderFeaturizer <uint8_t> */
+/* |  OneHotEncoderFeaturizer <uint8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_uint8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_uint8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1452,7 +1452,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateEstimator(/*in
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint8_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint8_EstimatorHandle*>(index);
 
 
     
@@ -1464,7 +1464,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateEstimator(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1487,7 +1487,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_DestroyEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_GetState(/*in*/ OneHotEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_GetState(/*in*/ OneHotEncoderFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1509,7 +1509,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_GetState(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1531,7 +1531,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_IsTrainingComplete(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_Fit(/*in*/ OneHotEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_Fit(/*in*/ OneHotEncoderFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1557,7 +1557,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_Fit(/*in*/ OneHotEnc
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_FitBuffer(/*in*/ OneHotEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_FitBuffer(/*in*/ OneHotEncoderFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1584,7 +1584,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_FitBuffer(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1605,7 +1605,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_OnDataCompleted(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1626,7 +1626,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CompleteTraining(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_uint8_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_uint8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1644,7 +1644,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateTransformerFro
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint8_TransformerHandle*>(index);
     
         return true;
     }
@@ -1654,7 +1654,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_uint8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1670,7 +1670,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateTransformerFro
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint8_TransformerHandle*>(index);
     
         return true;
     }
@@ -1680,7 +1680,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1704,7 +1704,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_DestroyTransformer(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1737,7 +1737,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_Transform(/*in*/ OneHotEncoderFeaturizer_uint8_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1768,7 +1768,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_Transform(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1789,10 +1789,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_t_DestroyTransformedDa
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  OneHotEncoderFeaturizer <uint16_t> */
+/* |  OneHotEncoderFeaturizer <uint16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_uint16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_uint16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1805,7 +1805,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateEstimator(/*i
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint16_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint16_EstimatorHandle*>(index);
 
 
     
@@ -1817,7 +1817,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1840,7 +1840,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_DestroyEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_GetState(/*in*/ OneHotEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_GetState(/*in*/ OneHotEncoderFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1862,7 +1862,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_GetState(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1884,7 +1884,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_IsTrainingComplete(
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_Fit(/*in*/ OneHotEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_Fit(/*in*/ OneHotEncoderFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1910,7 +1910,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_Fit(/*in*/ OneHotEn
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_FitBuffer(/*in*/ OneHotEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_FitBuffer(/*in*/ OneHotEncoderFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1937,7 +1937,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_FitBuffer(/*in*/ On
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1958,7 +1958,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_OnDataCompleted(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1979,7 +1979,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CompleteTraining(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_uint16_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_uint16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1997,7 +1997,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateTransformerFr
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint16_TransformerHandle*>(index);
     
         return true;
     }
@@ -2007,7 +2007,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_uint16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2023,7 +2023,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateTransformerFr
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint16_TransformerHandle*>(index);
     
         return true;
     }
@@ -2033,7 +2033,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2057,7 +2057,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_DestroyTransformer(
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2090,7 +2090,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_Transform(/*in*/ OneHotEncoderFeaturizer_uint16_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2121,7 +2121,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_Transform(/*in*/ On
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2142,10 +2142,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_t_DestroyTransformedD
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  OneHotEncoderFeaturizer <uint32_t> */
+/* |  OneHotEncoderFeaturizer <uint32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_uint32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_uint32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2158,7 +2158,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateEstimator(/*i
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint32_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint32_EstimatorHandle*>(index);
 
 
     
@@ -2170,7 +2170,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2193,7 +2193,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_DestroyEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_GetState(/*in*/ OneHotEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_GetState(/*in*/ OneHotEncoderFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2215,7 +2215,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_GetState(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2237,7 +2237,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_IsTrainingComplete(
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_Fit(/*in*/ OneHotEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_Fit(/*in*/ OneHotEncoderFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2263,7 +2263,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_Fit(/*in*/ OneHotEn
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_FitBuffer(/*in*/ OneHotEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_FitBuffer(/*in*/ OneHotEncoderFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2290,7 +2290,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_FitBuffer(/*in*/ On
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2311,7 +2311,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_OnDataCompleted(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2332,7 +2332,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CompleteTraining(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_uint32_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_uint32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2350,7 +2350,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateTransformerFr
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint32_TransformerHandle*>(index);
     
         return true;
     }
@@ -2360,7 +2360,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_uint32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2376,7 +2376,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateTransformerFr
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint32_TransformerHandle*>(index);
     
         return true;
     }
@@ -2386,7 +2386,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2410,7 +2410,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_DestroyTransformer(
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2443,7 +2443,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_Transform(/*in*/ OneHotEncoderFeaturizer_uint32_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2474,7 +2474,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_Transform(/*in*/ On
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2495,10 +2495,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_t_DestroyTransformedD
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  OneHotEncoderFeaturizer <uint64_t> */
+/* |  OneHotEncoderFeaturizer <uint64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_uint64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_uint64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2511,7 +2511,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateEstimator(/*i
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint64_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint64_EstimatorHandle*>(index);
 
 
     
@@ -2523,7 +2523,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2546,7 +2546,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_DestroyEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_GetState(/*in*/ OneHotEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_GetState(/*in*/ OneHotEncoderFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2568,7 +2568,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_GetState(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2590,7 +2590,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_IsTrainingComplete(
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_Fit(/*in*/ OneHotEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_Fit(/*in*/ OneHotEncoderFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2616,7 +2616,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_Fit(/*in*/ OneHotEn
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_FitBuffer(/*in*/ OneHotEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_FitBuffer(/*in*/ OneHotEncoderFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2643,7 +2643,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_FitBuffer(/*in*/ On
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2664,7 +2664,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_OnDataCompleted(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2685,7 +2685,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CompleteTraining(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_uint64_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_uint64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2703,7 +2703,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateTransformerFr
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint64_TransformerHandle*>(index);
     
         return true;
     }
@@ -2713,7 +2713,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_uint64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2729,7 +2729,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateTransformerFr
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::uint64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_uint64_TransformerHandle*>(index);
     
         return true;
     }
@@ -2739,7 +2739,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2763,7 +2763,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_DestroyTransformer(
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2796,7 +2796,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_Transform(/*in*/ OneHotEncoderFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_Transform(/*in*/ OneHotEncoderFeaturizer_uint64_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2827,7 +2827,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_Transform(/*in*/ On
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2848,10 +2848,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_t_DestroyTransformedD
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  OneHotEncoderFeaturizer <float_t> */
+/* |  OneHotEncoderFeaturizer <float> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_float_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_float_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2864,7 +2864,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateEstimator(/*in
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_float_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_float_EstimatorHandle*>(index);
 
 
     
@@ -2876,7 +2876,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateEstimator(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2899,7 +2899,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_DestroyEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_GetState(/*in*/ OneHotEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_GetState(/*in*/ OneHotEncoderFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2921,7 +2921,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_GetState(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_float_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2943,7 +2943,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_IsTrainingComplete(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_Fit(/*in*/ OneHotEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_Fit(/*in*/ OneHotEncoderFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2969,7 +2969,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_Fit(/*in*/ OneHotEnc
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_FitBuffer(/*in*/ OneHotEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_FitBuffer(/*in*/ OneHotEncoderFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2996,7 +2996,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_FitBuffer(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3017,7 +3017,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_OnDataCompleted(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3038,7 +3038,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CompleteTraining(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_float_t_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_float_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_float_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3056,7 +3056,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateTransformerFro
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_float_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_float_TransformerHandle*>(index);
     
         return true;
     }
@@ -3066,7 +3066,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_float_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3082,7 +3082,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateTransformerFro
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_float_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_float_TransformerHandle*>(index);
     
         return true;
     }
@@ -3092,7 +3092,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_float_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3116,7 +3116,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_DestroyTransformer(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_float_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3149,7 +3149,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_Transform(/*in*/ OneHotEncoderFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_Transform(/*in*/ OneHotEncoderFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3180,7 +3180,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_Transform(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3201,10 +3201,10 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_t_DestroyTransformedDa
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  OneHotEncoderFeaturizer <double_t> */
+/* |  OneHotEncoderFeaturizer <double> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_double_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_CreateEstimator(/*in*/ bool suppressUnrecognizedErrors, /*out*/ OneHotEncoderFeaturizer_double_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3217,7 +3217,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateEstimator(/*i
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_double_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<OneHotEncoderFeaturizer_double_EstimatorHandle*>(index);
 
 
     
@@ -3229,7 +3229,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_DestroyEstimator(/*in*/ OneHotEncoderFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3252,7 +3252,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_DestroyEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_GetState(/*in*/ OneHotEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_GetState(/*in*/ OneHotEncoderFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3274,7 +3274,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_GetState(/*in*/ One
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_IsTrainingComplete(/*in*/ OneHotEncoderFeaturizer_double_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3296,7 +3296,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_IsTrainingComplete(
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_Fit(/*in*/ OneHotEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_Fit(/*in*/ OneHotEncoderFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3322,7 +3322,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_Fit(/*in*/ OneHotEn
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_FitBuffer(/*in*/ OneHotEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_FitBuffer(/*in*/ OneHotEncoderFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3349,7 +3349,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_FitBuffer(/*in*/ On
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_OnDataCompleted(/*in*/ OneHotEncoderFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3370,7 +3370,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_OnDataCompleted(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_CompleteTraining(/*in*/ OneHotEncoderFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3391,7 +3391,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CompleteTraining(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_double_t_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_CreateTransformerFromEstimator(/*in*/ OneHotEncoderFeaturizer_double_EstimatorHandle *pEstimatorHandle, /*out*/ OneHotEncoderFeaturizer_double_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3409,7 +3409,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateTransformerFr
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_double_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_double_TransformerHandle*>(index);
     
         return true;
     }
@@ -3419,7 +3419,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ OneHotEncoderFeaturizer_double_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3435,7 +3435,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateTransformerFr
         Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::OneHotEncoderEstimator<std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_double_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<OneHotEncoderFeaturizer_double_TransformerHandle*>(index);
     
         return true;
     }
@@ -3445,7 +3445,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_DestroyTransformer(/*in*/ OneHotEncoderFeaturizer_double_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3469,7 +3469,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_DestroyTransformer(
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_CreateTransformerSaveData(/*in*/ OneHotEncoderFeaturizer_double_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3502,7 +3502,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_Transform(/*in*/ OneHotEncoderFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_Transform(/*in*/ OneHotEncoderFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3533,7 +3533,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_Transform(/*in*/ On
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_t_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 

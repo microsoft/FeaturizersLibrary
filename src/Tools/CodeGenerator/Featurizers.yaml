@@ -19,8 +19,8 @@
     within the host frameworks and programming languages.
 
     C++-style pseudo signature:
-      std::float_t execute(std::float_t const &value);
-      std::double_t execute(std::double_t const &value);
+      float execute(float const &value);
+      double execute(double const &value);
       template <typename T> T execute(std::optional<T> const &value);
 
     Examples (where 55.5 is the mode value):
@@ -31,18 +31,18 @@
   templates:
     - name: T
       types:
-        - std::int8_t
-        - std::int16_t
-        - std::int32_t
-        - std::int64_t
-        - std::uint8_t
-        - std::uint16_t
-        - std::uint32_t
-        - std::uint64_t
-        - std::float_t
-        - std::double_t
+        - int8
+        - int16
+        - int32
+        - int64
+        - uint8
+        - uint16
+        - uint32
+        - uint64
+        - float
+        - double
         - bool
-        - std::string
+        - string
 
   type_mappings:
     - input_type: T
@@ -74,7 +74,7 @@
     Extracts various datetime-related values from a UTC time_point.
 
     C++-style pseudo signature:
-      TimePoint execute(std::chron::system_clock::time_point const &value);
+      TimePoint execute(std::chrono::system_clock::time_point const &value);
 
     Examples:
       Given a time_point 'value' representing "November 17, 1976 12:27:04PM":
@@ -104,62 +104,62 @@
       }
 
   type_mappings:
-    - input_type: std::int64_t
+    - input_type: int64
       output_type: TimePoint
 
   configuration_params:
-    - type: std::string
+    - type: string
       name: optionalCountryName
       is_optional: true
 
-    - type: std::string
+    - type: string
       name: optionalDataRootDir
       is_optional: true
 
   custom_structs:
     - name: TimePoint
       members:
-        - type: std::int32_t
+        - type: int32
           name: year
-        - type: std::uint8_t
+        - type: uint8
           name: month
-        - type: std::uint8_t
+        - type: uint8
           name: day
-        - type: std::uint8_t
+        - type: uint8
           name: hour
-        - type: std::uint8_t
+        - type: uint8
           name: minute
-        - type: std::uint8_t
+        - type: uint8
           name: second
-        - type: std::uint8_t
+        - type: uint8
           name: amPm
-        - type: std::uint8_t
+        - type: uint8
           name: hour12
-        - type: std::uint8_t
+        - type: uint8
           name: dayOfWeek
-        - type: std::uint8_t
+        - type: uint8
           name: dayOfQuarter
-        - type: std::uint16_t
+        - type: uint16
           name: dayOfYear
-        - type: std::uint16_t
+        - type: uint16
           name: weekOfMonth
-        - type: std::uint8_t
+        - type: uint8
           name: quarterOfYear
-        - type: std::uint8_t
+        - type: uint8
           name: halfOfYear
-        - type: std::uint8_t
+        - type: uint8
           name: weekIso
-        - type: std::int32_t
+        - type: int32
           name: yearIso
-        - type: std::string
+        - type: string
           name: monthLabel
-        - type: std::string
+        - type: string
           name: amPmLabel
-        - type: std::string
+        - type: string
           name: dayOfWeekLabel
-        - type: std::string
+        - type: string
           name: holidayName
-        - type: std::uint8_t
+        - type: uint8
           name: isPaidTimeOff
 
 # ----------------------------------------------------------------------
@@ -189,29 +189,29 @@
   templates:
     - name: T
       types:
-        - std::int8_t
-        - std::int16_t
-        - std::int32_t
-        - std::int64_t
-        - std::uint8_t
-        - std::uint16_t
-        - std::uint32_t
-        - std::uint64_t
-        - std::float_t
-        - std::double_t
+        - int8
+        - int16
+        - int32
+        - int64
+        - uint8
+        - uint16
+        - uint32
+        - uint64
+        - float
+        - double
         - bool
-        - std::string
+        - string
 
   type_mappings:
     - input_type: T
       output_type: HashOneHotVectorizerStruct
 
   configuration_params:
-    - type: std::uint32_t
+    - type: uint32
       name: hashingSeedVal
       is_optional: false
 
-    - type: std::uint32_t
+    - type: uint32
       name: numCols
       is_optional: false
 
@@ -223,9 +223,9 @@
         itself.
 
       members:
-        - type: std::uint32_t
+        - type: uint32
           name: ColIndex
-        - type: std::uint32_t
+        - type: uint32
           name: NumCols
         - type: bool
           name: Val
@@ -239,32 +239,32 @@
     Returns true if the input is null, false if it is not.
 
     C++-style pseudo signature:
-      bool execute(std::float_t const &value);
-      bool execute(std::double_t const &value);
+      bool execute(float const &value);
+      bool execute(double const &value);
       template <typename T> bool execute(std::optional<T> const &value);
 
     Examples:
       3.0 -> false
       NaN -> true
       "foo" -> false
-      std::optional<std::string>() -> true
-      std::optional<std::string>("bar") -> false
+      std::optional<string>() -> true
+      std::optional<string>("bar") -> false
 
   templates:
     - name: T
       types:
-        - std::int8_t
-        - std::int16_t
-        - std::int32_t
-        - std::int64_t
-        - std::uint8_t
-        - std::uint16_t
-        - std::uint32_t
-        - std::uint64_t
-        - std::float_t
-        - std::double_t
+        - int8
+        - int16
+        - int32
+        - int64
+        - uint8
+        - uint16
+        - uint32
+        - uint64
+        - float
+        - double
         - bool
-        - std::string
+        - string
 
   type_mappings:
     - input_type: T
@@ -284,9 +284,9 @@
       - mode: Most common value encountered during training (valid for all types)
 
     C++-style pseudo signature:
-      std::float_t execute(std::float_t const &value);                      // Valid for mean, median, mode
-      std::double_t execute(std::double_t const &value);                    // Valid for mean, median, mode
-      std::string execute(std::optional<std::string> const &value);         // Valid for mode
+      float execute(float const &value);                      // Valid for mean, median, mode
+      double execute(double const &value);                    // Valid for mean, median, mode
+      string execute(std::optional<string> const &value);     // Valid for mode
 
     Examples:
       Mean, with training data [1, 2, 3, 4]: mean of 2.5
@@ -302,7 +302,7 @@
       Mode, with training data ["one", "two", "three", "two"]: mode of "two"
 
         execute("foo") -> "foo"
-        execute(std::optional<std::string>()) -> "two"
+        execute(std::optional<string>()) -> "two"
 
   status: Pending
 
@@ -314,7 +314,7 @@
     Returns a unique id for the input based on all values encountered during training.
 
     C++-style pseudo signature:
-      template <typename T> std::uint32_t execute(T const &value);
+      template <typename T> uint32 execute(T const &value);
 
     Examples:
       Assuming the training data of ["A", "B", "C"]...
@@ -327,22 +327,22 @@
   templates:
     - name: T
       types:
-        - std::int8_t
-        - std::int16_t
-        - std::int32_t
-        - std::int64_t
-        - std::uint8_t
-        - std::uint16_t
-        - std::uint32_t
-        - std::uint64_t
-        - std::float_t
-        - std::double_t
+        - int8
+        - int16
+        - int32
+        - int64
+        - uint8
+        - uint16
+        - uint32
+        - uint64
+        - float
+        - double
         - bool
-        - std::string
+        - string
 
   type_mappings:
     - input_type: T
-      output_type: std::uint32_t
+      output_type: uint32
 
   configuration_params:
     - type: bool
@@ -358,8 +358,8 @@
     Scales input based on the maximum absolute value of all data encountered during training.
 
     C++-style pseudo signature:
-      std::float_t execute(std::uint16_t value);
-      std::double_t execute(std::uint32_t value);
+      float execute(uint16 value);
+      double execute(uint32 value);
 
     Examples:
       Given a training set of [1.0, -2.0, 3.0, -4.0], where 4.0 is the absolute value of the
@@ -372,26 +372,26 @@
   templates:
     - name: TInputFloat
       types:
-        - std::int8_t
-        - std::int16_t
-        - std::uint8_t
-        - std::uint16_t
-        - std::float_t
+        - int8
+        - int16
+        - uint8
+        - uint16
+        - float
 
     - name: TInputDouble
       types:
-        - std::int32_t
-        - std::int64_t
-        - std::uint32_t
-        - std::uint64_t
-        - std::double_t
+        - int32
+        - int64
+        - uint32
+        - uint64
+        - double
 
   type_mappings:
     - input_type: TInputFloat
-      output_type: std::float_t
+      output_type: float
 
     - input_type: TInputDouble
-      output_type: std::double_t
+      output_type: double
 
 # ----------------------------------------------------------------------
 - name: MinMaxScalarFeaturizer
@@ -402,7 +402,7 @@
     during training.
 
     C++-style pseudo signature:
-        template <typeanem T> std::double_t(T const &value);
+        template <typeanem T> double(T const &value);
 
     Examples:
       Given the training data [1, 2, 3, 4, 5];
@@ -416,20 +416,20 @@
   templates:
     - name: T
       types:
-        - std::int8_t
-        - std::int16_t
-        - std::int32_t
-        - std::int64_t
-        - std::uint8_t
-        - std::uint16_t
-        - std::uint32_t
-        - std::uint64_t
-        - std::float_t
-        - std::double_t
+        - int8
+        - int16
+        - int32
+        - int64
+        - uint8
+        - uint16
+        - uint32
+        - uint64
+        - float
+        - double
 
   type_mappings:
     - input_type: T
-      output_type: std::double_t
+      output_type: double
 
 # ----------------------------------------------------------------------
 - name: MissingDummiesFeaturizer
@@ -440,37 +440,37 @@
     Returns 1 if the input is null, 0 if it is not.
 
     C++-style pseudo signature:
-        std::int8_t execute(std::float_t const &value);
-        std::int8_t execute(std::double_t const &value);
-        template <typename T> std::int8_t execute(T const &value);
+        int8 execute(float const &value);
+        int8 execute(double const &value);
+        template <typename T> int8 execute(T const &value);
 
     Examples:
       1.0 -> 0
       NaN -> 1
       "foo" -> 0
-      std::optional<std::string>() -> 1
-      std::optional<std::string>("bar") -> 0
+      std::optional<string>() -> 1
+      std::optional<string>("bar") -> 0
 
   templates:
     - name: T
       types:
-        - std::int8_t
-        - std::int16_t
-        - std::int32_t
-        - std::int64_t
-        - std::uint8_t
-        - std::uint16_t
-        - std::uint32_t
-        - std::uint64_t
-        - std::float_t
-        - std::double_t
+        - int8
+        - int16
+        - int32
+        - int64
+        - uint8
+        - uint16
+        - uint32
+        - uint64
+        - float
+        - double
         - bool
-        - std::string
+        - string
 
   type_mappings:
     - input_type: T
       is_input_optional: true
-      output_type: std::int8_t
+      output_type: int8
 
 # ----------------------------------------------------------------------
 - name: NumericalizeFeaturizer
@@ -480,7 +480,7 @@
     This is the LabelEncoder, but returns a null value for categories not encountered during training.
 
     C++-style pseudo signature:
-      template <typename T> std::float_t execute(T const &value);
+      template <typename T> float execute(T const &value);
 
     Examples:
       execute("encountered") -> <unique id>
@@ -511,18 +511,18 @@
   templates:
     - name: T
       types:
-        - std::int8_t
-        - std::int16_t
-        - std::int32_t
-        - std::int64_t
-        - std::uint8_t
-        - std::uint16_t
-        - std::uint32_t
-        - std::uint64_t
-        - std::float_t
-        - std::double_t
+        - int8
+        - int16
+        - int32
+        - int64
+        - uint8
+        - uint16
+        - uint32
+        - uint64
+        - float
+        - double
         - bool
-        - std::string
+        - string
 
   type_mappings:
     - input_type: T
@@ -536,11 +536,11 @@
   custom_structs:
     - name: OneHotStruct
       members:
-        - type: std::uint32_t
+        - type: uint32
           name: index
-        - type: std::uint32_t
+        - type: uint32
           name: size
-        - type: std::uint32_t
+        - type: uint32
           name: appearances
 
 # ----------------------------------------------------------------------
@@ -575,37 +575,37 @@
   templates:
     - name: TInputFloat
       types:
-        - std::int8_t
-        - std::int16_t
-        - std::uint8_t
-        - std::uint16_t
-        - std::float_t
+        - int8
+        - int16
+        - uint8
+        - uint16
+        - float
 
     - name: TInputDouble
       types:
-        - std::int32_t
-        - std::int64_t
-        - std::uint32_t
-        - std::uint64_t
-        - std::double_t
+        - int32
+        - int64
+        - uint32
+        - uint64
+        - double
 
   type_mappings:
     - input_type: TInputFloat
-      output_type: std::float_t
+      output_type: float
 
     - input_type: TInputDouble
-      output_type: std::double_t
+      output_type: double
 
   configuration_params:
     - type: bool
       name: withCentering
       is_optional: false
 
-    - type: std::float_t
+    - type: float
       name: qRangeMin
       is_optional: true
 
-    - type: std::float_t
+    - type: float
       name: qRangeMax
       is_optional: true
 
@@ -617,7 +617,7 @@
     Computes the L1 and/or L2 norm for a provided data set.
 
     C++-style pseudo signature:
-      template <typename T> std::tuple<std::float_t, std::float_t> execute(std::vector<T> const &value);
+      template <typename T> std::tuple<float, float> execute(std::vector<T> const &value);
 
     Examples:
       TODO
@@ -648,7 +648,7 @@
     Converts the input into a string representation based on the input's type.
 
     C++-style pseudo signature:
-      template <typename T> std::string execute(T const &value);
+      template <typename T> string execute(T const &value);
 
     Examples:
       execute(1) -> "1"
@@ -657,22 +657,22 @@
   templates:
     - name: T
       types:
-        - std::int8_t
-        - std::int16_t
-        - std::int32_t
-        - std::int64_t
-        - std::uint8_t
-        - std::uint16_t
-        - std::uint32_t
-        - std::uint64_t
-        - std::float_t
-        - std::double_t
+        - int8
+        - int16
+        - int32
+        - int64
+        - uint8
+        - uint16
+        - uint32
+        - uint64
+        - float
+        - double
         - bool
-        - std::string
+        - string
 
   type_mappings:
     - input_type: T
-      output_type: std::string
+      output_type: string
 
 # ----------------------------------------------------------------------
 - name: TfidfVectorizerFeaturizer

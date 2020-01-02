@@ -8,20 +8,20 @@
 #include "Traits.h"
 
 /* ---------------------------------------------------------------------- */
-/* |  RobustScalarFeaturizer <int8_t> */
+/* |  RobustScalarFeaturizer <int8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void RobustScalarFeaturizer_int8_t_Test(
+void RobustScalarFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<float> const &)> const &verify_func,
+    std::function<bool (std::vector<std::float_t> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    RobustScalarFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalarFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_int8_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int8_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -32,7 +32,7 @@ void RobustScalarFeaturizer_int8_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(RobustScalarFeaturizer_int8_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_int8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -41,7 +41,7 @@ void RobustScalarFeaturizer_int8_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(RobustScalarFeaturizer_int8_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_int8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -51,7 +51,7 @@ void RobustScalarFeaturizer_int8_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(RobustScalarFeaturizer_int8_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalarFeaturizer_int8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -59,7 +59,7 @@ void RobustScalarFeaturizer_int8_t_Test(
         }
     }
 
-    RobustScalarFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalarFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -67,31 +67,31 @@ void RobustScalarFeaturizer_int8_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(RobustScalarFeaturizer_int8_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_int8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    RobustScalarFeaturizer_int8_t_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalarFeaturizer_int8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_int8_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(RobustScalarFeaturizer_int8_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<float> results;
+    std::vector<std::float_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        float result;
+        std::float_t result;
 
-        REQUIRE(RobustScalarFeaturizer_int8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -108,25 +108,25 @@ void RobustScalarFeaturizer_int8_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(RobustScalarFeaturizer_int8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  RobustScalarFeaturizer <int16_t> */
+/* |  RobustScalarFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void RobustScalarFeaturizer_int16_t_Test(
+void RobustScalarFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<float> const &)> const &verify_func,
+    std::function<bool (std::vector<std::float_t> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    RobustScalarFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalarFeaturizer_int16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_int16_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int16_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -137,7 +137,7 @@ void RobustScalarFeaturizer_int16_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(RobustScalarFeaturizer_int16_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_int16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -146,7 +146,7 @@ void RobustScalarFeaturizer_int16_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(RobustScalarFeaturizer_int16_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_int16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -156,7 +156,7 @@ void RobustScalarFeaturizer_int16_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(RobustScalarFeaturizer_int16_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalarFeaturizer_int16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -164,7 +164,7 @@ void RobustScalarFeaturizer_int16_t_Test(
         }
     }
 
-    RobustScalarFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalarFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -172,31 +172,31 @@ void RobustScalarFeaturizer_int16_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(RobustScalarFeaturizer_int16_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_int16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    RobustScalarFeaturizer_int16_t_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalarFeaturizer_int16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_int16_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(RobustScalarFeaturizer_int16_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<float> results;
+    std::vector<std::float_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        float result;
+        std::float_t result;
 
-        REQUIRE(RobustScalarFeaturizer_int16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -213,25 +213,25 @@ void RobustScalarFeaturizer_int16_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(RobustScalarFeaturizer_int16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  RobustScalarFeaturizer <uint8_t> */
+/* |  RobustScalarFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void RobustScalarFeaturizer_uint8_t_Test(
+void RobustScalarFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<float> const &)> const &verify_func,
+    std::function<bool (std::vector<std::float_t> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    RobustScalarFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalarFeaturizer_uint8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_uint8_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint8_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -242,7 +242,7 @@ void RobustScalarFeaturizer_uint8_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(RobustScalarFeaturizer_uint8_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_uint8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -251,7 +251,7 @@ void RobustScalarFeaturizer_uint8_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(RobustScalarFeaturizer_uint8_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_uint8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -261,7 +261,7 @@ void RobustScalarFeaturizer_uint8_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(RobustScalarFeaturizer_uint8_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalarFeaturizer_uint8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -269,7 +269,7 @@ void RobustScalarFeaturizer_uint8_t_Test(
         }
     }
 
-    RobustScalarFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalarFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -277,31 +277,31 @@ void RobustScalarFeaturizer_uint8_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(RobustScalarFeaturizer_uint8_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_uint8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    RobustScalarFeaturizer_uint8_t_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalarFeaturizer_uint8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_uint8_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(RobustScalarFeaturizer_uint8_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<float> results;
+    std::vector<std::float_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        float result;
+        std::float_t result;
 
-        REQUIRE(RobustScalarFeaturizer_uint8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -318,25 +318,25 @@ void RobustScalarFeaturizer_uint8_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(RobustScalarFeaturizer_uint8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  RobustScalarFeaturizer <uint16_t> */
+/* |  RobustScalarFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void RobustScalarFeaturizer_uint16_t_Test(
+void RobustScalarFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<float> const &)> const &verify_func,
+    std::function<bool (std::vector<std::float_t> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    RobustScalarFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalarFeaturizer_uint16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_uint16_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint16_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -347,7 +347,7 @@ void RobustScalarFeaturizer_uint16_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(RobustScalarFeaturizer_uint16_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_uint16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -356,7 +356,7 @@ void RobustScalarFeaturizer_uint16_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(RobustScalarFeaturizer_uint16_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_uint16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -366,7 +366,7 @@ void RobustScalarFeaturizer_uint16_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(RobustScalarFeaturizer_uint16_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalarFeaturizer_uint16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -374,7 +374,7 @@ void RobustScalarFeaturizer_uint16_t_Test(
         }
     }
 
-    RobustScalarFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalarFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -382,31 +382,31 @@ void RobustScalarFeaturizer_uint16_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(RobustScalarFeaturizer_uint16_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_uint16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    RobustScalarFeaturizer_uint16_t_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalarFeaturizer_uint16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_uint16_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(RobustScalarFeaturizer_uint16_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<float> results;
+    std::vector<std::float_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        float result;
+        std::float_t result;
 
-        REQUIRE(RobustScalarFeaturizer_uint16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -423,25 +423,25 @@ void RobustScalarFeaturizer_uint16_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(RobustScalarFeaturizer_uint16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  RobustScalarFeaturizer <float_t> */
+/* |  RobustScalarFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void RobustScalarFeaturizer_float_t_Test(
+void RobustScalarFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<float> const &)> const &verify_func,
+    std::function<bool (std::vector<std::float_t> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    RobustScalarFeaturizer_float_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalarFeaturizer_float_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_float_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_float_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -452,7 +452,7 @@ void RobustScalarFeaturizer_float_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(RobustScalarFeaturizer_float_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_float_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -461,7 +461,7 @@ void RobustScalarFeaturizer_float_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(RobustScalarFeaturizer_float_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_float_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -471,7 +471,7 @@ void RobustScalarFeaturizer_float_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(RobustScalarFeaturizer_float_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalarFeaturizer_float_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -479,7 +479,7 @@ void RobustScalarFeaturizer_float_t_Test(
         }
     }
 
-    RobustScalarFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalarFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -487,31 +487,31 @@ void RobustScalarFeaturizer_float_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(RobustScalarFeaturizer_float_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_float_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    RobustScalarFeaturizer_float_t_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalarFeaturizer_float_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_float_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_float_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(RobustScalarFeaturizer_float_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_float_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<float> results;
+    std::vector<std::float_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        float result;
+        std::float_t result;
 
-        REQUIRE(RobustScalarFeaturizer_float_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -528,25 +528,25 @@ void RobustScalarFeaturizer_float_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(RobustScalarFeaturizer_float_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  RobustScalarFeaturizer <int32_t> */
+/* |  RobustScalarFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void RobustScalarFeaturizer_int32_t_Test(
+void RobustScalarFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<double> const &)> const &verify_func,
+    std::function<bool (std::vector<std::double_t> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    RobustScalarFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalarFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_int32_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int32_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -557,7 +557,7 @@ void RobustScalarFeaturizer_int32_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(RobustScalarFeaturizer_int32_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_int32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -566,7 +566,7 @@ void RobustScalarFeaturizer_int32_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(RobustScalarFeaturizer_int32_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_int32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -576,7 +576,7 @@ void RobustScalarFeaturizer_int32_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(RobustScalarFeaturizer_int32_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalarFeaturizer_int32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -584,7 +584,7 @@ void RobustScalarFeaturizer_int32_t_Test(
         }
     }
 
-    RobustScalarFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalarFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -592,31 +592,31 @@ void RobustScalarFeaturizer_int32_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(RobustScalarFeaturizer_int32_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_int32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    RobustScalarFeaturizer_int32_t_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalarFeaturizer_int32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_int32_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(RobustScalarFeaturizer_int32_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<double> results;
+    std::vector<std::double_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double result;
+        std::double_t result;
 
-        REQUIRE(RobustScalarFeaturizer_int32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -633,25 +633,25 @@ void RobustScalarFeaturizer_int32_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(RobustScalarFeaturizer_int32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  RobustScalarFeaturizer <int64_t> */
+/* |  RobustScalarFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void RobustScalarFeaturizer_int64_t_Test(
+void RobustScalarFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<double> const &)> const &verify_func,
+    std::function<bool (std::vector<std::double_t> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    RobustScalarFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalarFeaturizer_int64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_int64_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int64_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -662,7 +662,7 @@ void RobustScalarFeaturizer_int64_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(RobustScalarFeaturizer_int64_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_int64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -671,7 +671,7 @@ void RobustScalarFeaturizer_int64_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(RobustScalarFeaturizer_int64_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_int64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -681,7 +681,7 @@ void RobustScalarFeaturizer_int64_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(RobustScalarFeaturizer_int64_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalarFeaturizer_int64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -689,7 +689,7 @@ void RobustScalarFeaturizer_int64_t_Test(
         }
     }
 
-    RobustScalarFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalarFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -697,31 +697,31 @@ void RobustScalarFeaturizer_int64_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(RobustScalarFeaturizer_int64_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_int64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    RobustScalarFeaturizer_int64_t_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalarFeaturizer_int64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_int64_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(RobustScalarFeaturizer_int64_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<double> results;
+    std::vector<std::double_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double result;
+        std::double_t result;
 
-        REQUIRE(RobustScalarFeaturizer_int64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -738,25 +738,25 @@ void RobustScalarFeaturizer_int64_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(RobustScalarFeaturizer_int64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  RobustScalarFeaturizer <uint32_t> */
+/* |  RobustScalarFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void RobustScalarFeaturizer_uint32_t_Test(
+void RobustScalarFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<double> const &)> const &verify_func,
+    std::function<bool (std::vector<std::double_t> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    RobustScalarFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalarFeaturizer_uint32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_uint32_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint32_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -767,7 +767,7 @@ void RobustScalarFeaturizer_uint32_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(RobustScalarFeaturizer_uint32_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_uint32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -776,7 +776,7 @@ void RobustScalarFeaturizer_uint32_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(RobustScalarFeaturizer_uint32_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_uint32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -786,7 +786,7 @@ void RobustScalarFeaturizer_uint32_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(RobustScalarFeaturizer_uint32_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalarFeaturizer_uint32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -794,7 +794,7 @@ void RobustScalarFeaturizer_uint32_t_Test(
         }
     }
 
-    RobustScalarFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalarFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -802,31 +802,31 @@ void RobustScalarFeaturizer_uint32_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(RobustScalarFeaturizer_uint32_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_uint32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    RobustScalarFeaturizer_uint32_t_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalarFeaturizer_uint32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_uint32_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(RobustScalarFeaturizer_uint32_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<double> results;
+    std::vector<std::double_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double result;
+        std::double_t result;
 
-        REQUIRE(RobustScalarFeaturizer_uint32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -843,25 +843,25 @@ void RobustScalarFeaturizer_uint32_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(RobustScalarFeaturizer_uint32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  RobustScalarFeaturizer <uint64_t> */
+/* |  RobustScalarFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void RobustScalarFeaturizer_uint64_t_Test(
+void RobustScalarFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<double> const &)> const &verify_func,
+    std::function<bool (std::vector<std::double_t> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    RobustScalarFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalarFeaturizer_uint64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_uint64_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint64_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -872,7 +872,7 @@ void RobustScalarFeaturizer_uint64_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(RobustScalarFeaturizer_uint64_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_uint64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -881,7 +881,7 @@ void RobustScalarFeaturizer_uint64_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(RobustScalarFeaturizer_uint64_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_uint64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -891,7 +891,7 @@ void RobustScalarFeaturizer_uint64_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(RobustScalarFeaturizer_uint64_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalarFeaturizer_uint64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -899,7 +899,7 @@ void RobustScalarFeaturizer_uint64_t_Test(
         }
     }
 
-    RobustScalarFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalarFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -907,31 +907,31 @@ void RobustScalarFeaturizer_uint64_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(RobustScalarFeaturizer_uint64_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_uint64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    RobustScalarFeaturizer_uint64_t_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalarFeaturizer_uint64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_uint64_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(RobustScalarFeaturizer_uint64_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<double> results;
+    std::vector<std::double_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double result;
+        std::double_t result;
 
-        REQUIRE(RobustScalarFeaturizer_uint64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -948,25 +948,25 @@ void RobustScalarFeaturizer_uint64_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(RobustScalarFeaturizer_uint64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  RobustScalarFeaturizer <double_t> */
+/* |  RobustScalarFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void RobustScalarFeaturizer_double_t_Test(
+void RobustScalarFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<double> const &)> const &verify_func,
+    std::function<bool (std::vector<std::double_t> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    RobustScalarFeaturizer_double_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalarFeaturizer_double_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_double_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_double_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -977,7 +977,7 @@ void RobustScalarFeaturizer_double_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(RobustScalarFeaturizer_double_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_double_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -986,7 +986,7 @@ void RobustScalarFeaturizer_double_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(RobustScalarFeaturizer_double_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalarFeaturizer_double_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -996,7 +996,7 @@ void RobustScalarFeaturizer_double_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(RobustScalarFeaturizer_double_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalarFeaturizer_double_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -1004,7 +1004,7 @@ void RobustScalarFeaturizer_double_t_Test(
         }
     }
 
-    RobustScalarFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalarFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -1012,31 +1012,31 @@ void RobustScalarFeaturizer_double_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(RobustScalarFeaturizer_double_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_double_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    RobustScalarFeaturizer_double_t_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalarFeaturizer_double_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_double_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_double_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(RobustScalarFeaturizer_double_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_double_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<double> results;
+    std::vector<std::double_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double result;
+        std::double_t result;
 
-        REQUIRE(RobustScalarFeaturizer_double_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalarFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -1053,7 +1053,7 @@ void RobustScalarFeaturizer_double_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(RobustScalarFeaturizer_double_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalarFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 

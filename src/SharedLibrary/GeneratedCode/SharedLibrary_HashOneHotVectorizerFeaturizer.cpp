@@ -24,10 +24,10 @@ extern "C" {
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  HashOneHotVectorizerFeaturizer <int8_t> */
+/* |  HashOneHotVectorizerFeaturizer <int8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_int8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -40,7 +40,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateEstimato
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int8_EstimatorHandle*>(index);
 
 
     
@@ -52,7 +52,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateEstimato
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -75,7 +75,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_DestroyEstimat
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_GetState(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_GetState(/*in*/ HashOneHotVectorizerFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -97,7 +97,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_GetState(/*in*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -119,7 +119,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_IsTrainingComp
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_Fit(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_Fit(/*in*/ HashOneHotVectorizerFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -145,7 +145,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_Fit(/*in*/ Has
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -172,7 +172,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_FitBuffer(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -193,7 +193,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_OnDataComplete
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -214,7 +214,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CompleteTraini
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int8_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_int8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -232,7 +232,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateTransfor
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int8_TransformerHandle*>(index);
     
         return true;
     }
@@ -242,7 +242,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateTransfor
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_int8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -258,7 +258,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateTransfor
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int8_TransformerHandle*>(index);
     
         return true;
     }
@@ -268,7 +268,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateTransfor
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_int8_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -292,7 +292,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_DestroyTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_int8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -325,7 +325,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_CreateTransfor
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int8_TransformerHandle *pHandle, /*in*/ int8_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -356,7 +356,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_Transform(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -377,10 +377,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int8_t_DestroyTransfo
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  HashOneHotVectorizerFeaturizer <int16_t> */
+/* |  HashOneHotVectorizerFeaturizer <int16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_int16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -393,7 +393,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateEstimat
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int16_EstimatorHandle*>(index);
 
 
     
@@ -405,7 +405,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateEstimat
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -428,7 +428,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_DestroyEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_GetState(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_GetState(/*in*/ HashOneHotVectorizerFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -450,7 +450,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_GetState(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -472,7 +472,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_IsTrainingCom
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_Fit(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_Fit(/*in*/ HashOneHotVectorizerFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -498,7 +498,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_Fit(/*in*/ Ha
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -525,7 +525,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_FitBuffer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -546,7 +546,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_OnDataComplet
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -567,7 +567,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CompleteTrain
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int16_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_int16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -585,7 +585,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateTransfo
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int16_TransformerHandle*>(index);
     
         return true;
     }
@@ -595,7 +595,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_int16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -611,7 +611,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateTransfo
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int16_TransformerHandle*>(index);
     
         return true;
     }
@@ -621,7 +621,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_int16_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -645,7 +645,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_DestroyTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_int16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -678,7 +678,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int16_TransformerHandle *pHandle, /*in*/ int16_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -709,7 +709,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_Transform(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -730,10 +730,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int16_t_DestroyTransf
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  HashOneHotVectorizerFeaturizer <int32_t> */
+/* |  HashOneHotVectorizerFeaturizer <int32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_int32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -746,7 +746,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateEstimat
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int32_EstimatorHandle*>(index);
 
 
     
@@ -758,7 +758,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateEstimat
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -781,7 +781,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_DestroyEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_GetState(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_GetState(/*in*/ HashOneHotVectorizerFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -803,7 +803,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_GetState(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -825,7 +825,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_IsTrainingCom
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_Fit(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_Fit(/*in*/ HashOneHotVectorizerFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -851,7 +851,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_Fit(/*in*/ Ha
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -878,7 +878,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_FitBuffer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -899,7 +899,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_OnDataComplet
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -920,7 +920,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CompleteTrain
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int32_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_int32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -938,7 +938,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateTransfo
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int32_TransformerHandle*>(index);
     
         return true;
     }
@@ -948,7 +948,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_int32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -964,7 +964,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateTransfo
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int32_TransformerHandle*>(index);
     
         return true;
     }
@@ -974,7 +974,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_int32_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -998,7 +998,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_DestroyTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_int32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1031,7 +1031,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int32_TransformerHandle *pHandle, /*in*/ int32_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1062,7 +1062,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_Transform(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1083,10 +1083,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int32_t_DestroyTransf
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  HashOneHotVectorizerFeaturizer <int64_t> */
+/* |  HashOneHotVectorizerFeaturizer <int64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_int64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1099,7 +1099,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateEstimat
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int64_EstimatorHandle*>(index);
 
 
     
@@ -1111,7 +1111,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateEstimat
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1134,7 +1134,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_DestroyEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_GetState(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_GetState(/*in*/ HashOneHotVectorizerFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1156,7 +1156,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_GetState(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1178,7 +1178,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_IsTrainingCom
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_Fit(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_Fit(/*in*/ HashOneHotVectorizerFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1204,7 +1204,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_Fit(/*in*/ Ha
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1231,7 +1231,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_FitBuffer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1252,7 +1252,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_OnDataComplet
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1273,7 +1273,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CompleteTrain
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_int64_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_int64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1291,7 +1291,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateTransfo
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int64_TransformerHandle*>(index);
     
         return true;
     }
@@ -1301,7 +1301,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_int64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1317,7 +1317,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateTransfo
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::int64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_int64_TransformerHandle*>(index);
     
         return true;
     }
@@ -1327,7 +1327,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_int64_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1351,7 +1351,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_DestroyTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_int64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1384,7 +1384,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_Transform(/*in*/ HashOneHotVectorizerFeaturizer_int64_TransformerHandle *pHandle, /*in*/ int64_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1415,7 +1415,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_Transform(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1436,10 +1436,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_int64_t_DestroyTransf
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  HashOneHotVectorizerFeaturizer <uint8_t> */
+/* |  HashOneHotVectorizerFeaturizer <uint8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_uint8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1452,7 +1452,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateEstimat
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint8_EstimatorHandle*>(index);
 
 
     
@@ -1464,7 +1464,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateEstimat
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1487,7 +1487,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_DestroyEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_GetState(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_GetState(/*in*/ HashOneHotVectorizerFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1509,7 +1509,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_GetState(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1531,7 +1531,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_IsTrainingCom
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_Fit(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_Fit(/*in*/ HashOneHotVectorizerFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1557,7 +1557,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_Fit(/*in*/ Ha
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1584,7 +1584,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_FitBuffer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1605,7 +1605,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_OnDataComplet
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1626,7 +1626,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CompleteTrain
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint8_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_uint8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1644,7 +1644,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateTransfo
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint8_TransformerHandle*>(index);
     
         return true;
     }
@@ -1654,7 +1654,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_uint8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1670,7 +1670,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateTransfo
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint8_TransformerHandle*>(index);
     
         return true;
     }
@@ -1680,7 +1680,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1704,7 +1704,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_DestroyTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1737,7 +1737,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint8_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1768,7 +1768,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_Transform(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1789,10 +1789,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint8_t_DestroyTransf
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  HashOneHotVectorizerFeaturizer <uint16_t> */
+/* |  HashOneHotVectorizerFeaturizer <uint16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_uint16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1805,7 +1805,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateEstima
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint16_EstimatorHandle*>(index);
 
 
     
@@ -1817,7 +1817,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1840,7 +1840,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_DestroyEstim
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_GetState(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_GetState(/*in*/ HashOneHotVectorizerFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1862,7 +1862,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_GetState(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1884,7 +1884,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_IsTrainingCo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_Fit(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_Fit(/*in*/ HashOneHotVectorizerFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1910,7 +1910,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_Fit(/*in*/ H
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1937,7 +1937,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_FitBuffer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1958,7 +1958,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_OnDataComple
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1979,7 +1979,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CompleteTrai
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint16_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_uint16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1997,7 +1997,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateTransf
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint16_TransformerHandle*>(index);
     
         return true;
     }
@@ -2007,7 +2007,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_uint16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2023,7 +2023,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateTransf
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint16_TransformerHandle*>(index);
     
         return true;
     }
@@ -2033,7 +2033,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2057,7 +2057,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_DestroyTrans
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2090,7 +2090,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_CreateTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint16_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2121,7 +2121,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_Transform(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2142,10 +2142,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint16_t_DestroyTrans
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  HashOneHotVectorizerFeaturizer <uint32_t> */
+/* |  HashOneHotVectorizerFeaturizer <uint32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_uint32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2158,7 +2158,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateEstima
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint32_EstimatorHandle*>(index);
 
 
     
@@ -2170,7 +2170,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2193,7 +2193,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_DestroyEstim
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_GetState(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_GetState(/*in*/ HashOneHotVectorizerFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2215,7 +2215,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_GetState(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2237,7 +2237,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_IsTrainingCo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_Fit(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_Fit(/*in*/ HashOneHotVectorizerFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2263,7 +2263,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_Fit(/*in*/ H
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2290,7 +2290,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_FitBuffer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2311,7 +2311,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_OnDataComple
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2332,7 +2332,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CompleteTrai
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint32_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_uint32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2350,7 +2350,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateTransf
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint32_TransformerHandle*>(index);
     
         return true;
     }
@@ -2360,7 +2360,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_uint32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2376,7 +2376,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateTransf
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint32_TransformerHandle*>(index);
     
         return true;
     }
@@ -2386,7 +2386,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2410,7 +2410,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_DestroyTrans
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2443,7 +2443,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_CreateTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint32_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2474,7 +2474,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_Transform(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2495,10 +2495,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint32_t_DestroyTrans
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  HashOneHotVectorizerFeaturizer <uint64_t> */
+/* |  HashOneHotVectorizerFeaturizer <uint64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_uint64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2511,7 +2511,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateEstima
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint64_EstimatorHandle*>(index);
 
 
     
@@ -2523,7 +2523,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2546,7 +2546,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_DestroyEstim
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_GetState(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_GetState(/*in*/ HashOneHotVectorizerFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2568,7 +2568,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_GetState(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2590,7 +2590,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_IsTrainingCo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_Fit(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_Fit(/*in*/ HashOneHotVectorizerFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2616,7 +2616,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_Fit(/*in*/ H
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2643,7 +2643,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_FitBuffer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2664,7 +2664,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_OnDataComple
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2685,7 +2685,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CompleteTrai
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_uint64_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_uint64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2703,7 +2703,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateTransf
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint64_TransformerHandle*>(index);
     
         return true;
     }
@@ -2713,7 +2713,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_uint64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2729,7 +2729,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateTransf
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::uint64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_uint64_TransformerHandle*>(index);
     
         return true;
     }
@@ -2739,7 +2739,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2763,7 +2763,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_DestroyTrans
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2796,7 +2796,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_CreateTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_Transform(/*in*/ HashOneHotVectorizerFeaturizer_uint64_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2827,7 +2827,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_Transform(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2848,10 +2848,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_uint64_t_DestroyTrans
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  HashOneHotVectorizerFeaturizer <float_t> */
+/* |  HashOneHotVectorizerFeaturizer <float> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_float_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2864,7 +2864,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateEstimat
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_float_EstimatorHandle*>(index);
 
 
     
@@ -2876,7 +2876,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateEstimat
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2899,7 +2899,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_DestroyEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_GetState(/*in*/ HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_GetState(/*in*/ HashOneHotVectorizerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2921,7 +2921,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_GetState(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2943,7 +2943,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_IsTrainingCom
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_Fit(/*in*/ HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_Fit(/*in*/ HashOneHotVectorizerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2969,7 +2969,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_Fit(/*in*/ Ha
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2996,7 +2996,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_FitBuffer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3017,7 +3017,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_OnDataComplet
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3038,7 +3038,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CompleteTrain
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_float_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_float_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3056,7 +3056,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateTransfo
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_float_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_float_TransformerHandle*>(index);
     
         return true;
     }
@@ -3066,7 +3066,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_float_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3082,7 +3082,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateTransfo
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_float_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_float_TransformerHandle*>(index);
     
         return true;
     }
@@ -3092,7 +3092,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_float_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3116,7 +3116,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_DestroyTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_float_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3149,7 +3149,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_CreateTransfo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_Transform(/*in*/ HashOneHotVectorizerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3180,7 +3180,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_Transform(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3201,10 +3201,10 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_float_t_DestroyTransf
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  HashOneHotVectorizerFeaturizer <double_t> */
+/* |  HashOneHotVectorizerFeaturizer <double> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_CreateEstimator(/*in*/ uint32_t hashingSeedVal, /*in*/ uint32_t numCols, /*out*/ HashOneHotVectorizerFeaturizer_double_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3217,7 +3217,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateEstima
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_double_EstimatorHandle*>(index);
 
 
     
@@ -3229,7 +3229,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_DestroyEstimator(/*in*/ HashOneHotVectorizerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3252,7 +3252,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_DestroyEstim
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_GetState(/*in*/ HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_GetState(/*in*/ HashOneHotVectorizerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3274,7 +3274,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_GetState(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_IsTrainingComplete(/*in*/ HashOneHotVectorizerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3296,7 +3296,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_IsTrainingCo
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_Fit(/*in*/ HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_Fit(/*in*/ HashOneHotVectorizerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3322,7 +3322,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_Fit(/*in*/ H
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_FitBuffer(/*in*/ HashOneHotVectorizerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3349,7 +3349,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_FitBuffer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_OnDataCompleted(/*in*/ HashOneHotVectorizerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3370,7 +3370,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_OnDataComple
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_CompleteTraining(/*in*/ HashOneHotVectorizerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3391,7 +3391,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CompleteTrai
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_CreateTransformerFromEstimator(/*in*/ HashOneHotVectorizerFeaturizer_double_EstimatorHandle *pEstimatorHandle, /*out*/ HashOneHotVectorizerFeaturizer_double_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3409,7 +3409,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateTransf
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_double_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_double_TransformerHandle*>(index);
     
         return true;
     }
@@ -3419,7 +3419,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ HashOneHotVectorizerFeaturizer_double_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3435,7 +3435,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateTransf
         Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::HashOneHotVectorizerEstimator<std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_double_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<HashOneHotVectorizerFeaturizer_double_TransformerHandle*>(index);
     
         return true;
     }
@@ -3445,7 +3445,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_DestroyTransformer(/*in*/ HashOneHotVectorizerFeaturizer_double_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3469,7 +3469,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_DestroyTrans
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_CreateTransformerSaveData(/*in*/ HashOneHotVectorizerFeaturizer_double_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3502,7 +3502,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_CreateTransf
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_Transform(/*in*/ HashOneHotVectorizerFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_Transform(/*in*/ HashOneHotVectorizerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out via struct*/ HashOneHotVectorizerStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3533,7 +3533,7 @@ FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_Transform(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_t_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool HashOneHotVectorizerFeaturizer_double_DestroyTransformedData(/*in*/ HashOneHotVectorizerStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 

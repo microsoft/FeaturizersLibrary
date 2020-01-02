@@ -24,10 +24,10 @@ extern "C" {
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  StringFeaturizer <int8_t> */
+/* |  StringFeaturizer <int8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateEstimator(/*out*/ StringFeaturizer_int8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_CreateEstimator(/*out*/ StringFeaturizer_int8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -40,7 +40,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateEstimator(/*out*/ Stri
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<StringFeaturizer_int8_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<StringFeaturizer_int8_EstimatorHandle*>(index);
 
 
     
@@ -52,7 +52,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateEstimator(/*out*/ Stri
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyEstimator(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_DestroyEstimator(/*in*/ StringFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -75,7 +75,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyEstimator(/*in*/ Stri
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_GetState(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_GetState(/*in*/ StringFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -97,7 +97,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_GetState(/*in*/ StringFeatur
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_IsTrainingComplete(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_IsTrainingComplete(/*in*/ StringFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -119,7 +119,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_IsTrainingComplete(/*in*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_Fit(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_Fit(/*in*/ StringFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -145,7 +145,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_Fit(/*in*/ StringFeaturizer_
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_FitBuffer(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_FitBuffer(/*in*/ StringFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -172,7 +172,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_FitBuffer(/*in*/ StringFeatu
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_OnDataCompleted(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_OnDataCompleted(/*in*/ StringFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -193,7 +193,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_OnDataCompleted(/*in*/ Strin
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CompleteTraining(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_CompleteTraining(/*in*/ StringFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -214,7 +214,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CompleteTraining(/*in*/ Stri
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_int8_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_int8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -232,7 +232,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerFromEstimat
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int8_TransformerHandle*>(index);
     
         return true;
     }
@@ -242,7 +242,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerFromEstimat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_int8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -258,7 +258,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerFromSavedDa
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int8_TransformerHandle*>(index);
     
         return true;
     }
@@ -268,7 +268,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerFromSavedDa
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyTransformer(/*in*/ StringFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_DestroyTransformer(/*in*/ StringFeaturizer_int8_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -292,7 +292,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyTransformer(/*in*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_CreateTransformerSaveData(/*in*/ StringFeaturizer_int8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -325,7 +325,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_CreateTransformerSaveData(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_Transform(/*in*/ StringFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_Transform(/*in*/ StringFeaturizer_int8_TransformerHandle *pHandle, /*in*/ int8_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -367,7 +367,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_Transform(/*in*/ StringFeatu
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -390,10 +390,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_t_DestroyTransformedData(/*in*
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  StringFeaturizer <int16_t> */
+/* |  StringFeaturizer <int16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateEstimator(/*out*/ StringFeaturizer_int16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_CreateEstimator(/*out*/ StringFeaturizer_int16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -406,7 +406,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateEstimator(/*out*/ Str
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<StringFeaturizer_int16_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<StringFeaturizer_int16_EstimatorHandle*>(index);
 
 
     
@@ -418,7 +418,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateEstimator(/*out*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyEstimator(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_DestroyEstimator(/*in*/ StringFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -441,7 +441,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyEstimator(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_GetState(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_GetState(/*in*/ StringFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -463,7 +463,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_GetState(/*in*/ StringFeatu
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_IsTrainingComplete(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_IsTrainingComplete(/*in*/ StringFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -485,7 +485,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_IsTrainingComplete(/*in*/ S
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_Fit(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_Fit(/*in*/ StringFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -511,7 +511,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_Fit(/*in*/ StringFeaturizer
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_FitBuffer(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_FitBuffer(/*in*/ StringFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -538,7 +538,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_FitBuffer(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_OnDataCompleted(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_OnDataCompleted(/*in*/ StringFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -559,7 +559,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_OnDataCompleted(/*in*/ Stri
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CompleteTraining(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_CompleteTraining(/*in*/ StringFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -580,7 +580,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CompleteTraining(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_int16_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_int16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -598,7 +598,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerFromEstima
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int16_TransformerHandle*>(index);
     
         return true;
     }
@@ -608,7 +608,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerFromEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_int16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -624,7 +624,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerFromSavedD
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int16_TransformerHandle*>(index);
     
         return true;
     }
@@ -634,7 +634,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerFromSavedD
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyTransformer(/*in*/ StringFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_DestroyTransformer(/*in*/ StringFeaturizer_int16_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -658,7 +658,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyTransformer(/*in*/ S
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_CreateTransformerSaveData(/*in*/ StringFeaturizer_int16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -691,7 +691,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_CreateTransformerSaveData(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_Transform(/*in*/ StringFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_Transform(/*in*/ StringFeaturizer_int16_TransformerHandle *pHandle, /*in*/ int16_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -733,7 +733,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_Transform(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -756,10 +756,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_t_DestroyTransformedData(/*in
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  StringFeaturizer <int32_t> */
+/* |  StringFeaturizer <int32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateEstimator(/*out*/ StringFeaturizer_int32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_CreateEstimator(/*out*/ StringFeaturizer_int32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -772,7 +772,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateEstimator(/*out*/ Str
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<StringFeaturizer_int32_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<StringFeaturizer_int32_EstimatorHandle*>(index);
 
 
     
@@ -784,7 +784,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateEstimator(/*out*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyEstimator(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_DestroyEstimator(/*in*/ StringFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -807,7 +807,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyEstimator(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_GetState(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_GetState(/*in*/ StringFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -829,7 +829,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_GetState(/*in*/ StringFeatu
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_IsTrainingComplete(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_IsTrainingComplete(/*in*/ StringFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -851,7 +851,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_IsTrainingComplete(/*in*/ S
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_Fit(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_Fit(/*in*/ StringFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -877,7 +877,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_Fit(/*in*/ StringFeaturizer
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_FitBuffer(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_FitBuffer(/*in*/ StringFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -904,7 +904,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_FitBuffer(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_OnDataCompleted(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_OnDataCompleted(/*in*/ StringFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -925,7 +925,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_OnDataCompleted(/*in*/ Stri
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CompleteTraining(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_CompleteTraining(/*in*/ StringFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -946,7 +946,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CompleteTraining(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_int32_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_int32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -964,7 +964,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerFromEstima
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int32_TransformerHandle*>(index);
     
         return true;
     }
@@ -974,7 +974,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerFromEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_int32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -990,7 +990,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerFromSavedD
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int32_TransformerHandle*>(index);
     
         return true;
     }
@@ -1000,7 +1000,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerFromSavedD
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyTransformer(/*in*/ StringFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_DestroyTransformer(/*in*/ StringFeaturizer_int32_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1024,7 +1024,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyTransformer(/*in*/ S
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_CreateTransformerSaveData(/*in*/ StringFeaturizer_int32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1057,7 +1057,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_CreateTransformerSaveData(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_Transform(/*in*/ StringFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_Transform(/*in*/ StringFeaturizer_int32_TransformerHandle *pHandle, /*in*/ int32_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1099,7 +1099,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_Transform(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1122,10 +1122,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_t_DestroyTransformedData(/*in
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  StringFeaturizer <int64_t> */
+/* |  StringFeaturizer <int64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateEstimator(/*out*/ StringFeaturizer_int64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_CreateEstimator(/*out*/ StringFeaturizer_int64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1138,7 +1138,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateEstimator(/*out*/ Str
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<StringFeaturizer_int64_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<StringFeaturizer_int64_EstimatorHandle*>(index);
 
 
     
@@ -1150,7 +1150,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateEstimator(/*out*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyEstimator(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_DestroyEstimator(/*in*/ StringFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1173,7 +1173,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyEstimator(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_GetState(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_GetState(/*in*/ StringFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1195,7 +1195,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_GetState(/*in*/ StringFeatu
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_IsTrainingComplete(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_IsTrainingComplete(/*in*/ StringFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1217,7 +1217,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_IsTrainingComplete(/*in*/ S
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_Fit(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_Fit(/*in*/ StringFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1243,7 +1243,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_Fit(/*in*/ StringFeaturizer
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_FitBuffer(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_FitBuffer(/*in*/ StringFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1270,7 +1270,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_FitBuffer(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_OnDataCompleted(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_OnDataCompleted(/*in*/ StringFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1291,7 +1291,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_OnDataCompleted(/*in*/ Stri
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CompleteTraining(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_CompleteTraining(/*in*/ StringFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1312,7 +1312,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CompleteTraining(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_int64_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_int64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1330,7 +1330,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerFromEstima
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int64_TransformerHandle*>(index);
     
         return true;
     }
@@ -1340,7 +1340,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerFromEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_int64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1356,7 +1356,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerFromSavedD
         Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_int64_TransformerHandle*>(index);
     
         return true;
     }
@@ -1366,7 +1366,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerFromSavedD
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyTransformer(/*in*/ StringFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_DestroyTransformer(/*in*/ StringFeaturizer_int64_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1390,7 +1390,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyTransformer(/*in*/ S
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_CreateTransformerSaveData(/*in*/ StringFeaturizer_int64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1423,7 +1423,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_CreateTransformerSaveData(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_Transform(/*in*/ StringFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_Transform(/*in*/ StringFeaturizer_int64_TransformerHandle *pHandle, /*in*/ int64_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1465,7 +1465,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_Transform(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1488,10 +1488,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_t_DestroyTransformedData(/*in
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  StringFeaturizer <uint8_t> */
+/* |  StringFeaturizer <uint8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateEstimator(/*out*/ StringFeaturizer_uint8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_CreateEstimator(/*out*/ StringFeaturizer_uint8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1504,7 +1504,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateEstimator(/*out*/ Str
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<StringFeaturizer_uint8_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<StringFeaturizer_uint8_EstimatorHandle*>(index);
 
 
     
@@ -1516,7 +1516,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateEstimator(/*out*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyEstimator(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_DestroyEstimator(/*in*/ StringFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1539,7 +1539,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyEstimator(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_GetState(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_GetState(/*in*/ StringFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1561,7 +1561,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_GetState(/*in*/ StringFeatu
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_IsTrainingComplete(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_IsTrainingComplete(/*in*/ StringFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1583,7 +1583,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_IsTrainingComplete(/*in*/ S
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_Fit(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_Fit(/*in*/ StringFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1609,7 +1609,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_Fit(/*in*/ StringFeaturizer
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_FitBuffer(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_FitBuffer(/*in*/ StringFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1636,7 +1636,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_FitBuffer(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_OnDataCompleted(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_OnDataCompleted(/*in*/ StringFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1657,7 +1657,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_OnDataCompleted(/*in*/ Stri
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CompleteTraining(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_CompleteTraining(/*in*/ StringFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1678,7 +1678,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CompleteTraining(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_uint8_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_uint8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1696,7 +1696,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerFromEstima
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint8_TransformerHandle*>(index);
     
         return true;
     }
@@ -1706,7 +1706,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerFromEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_uint8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1722,7 +1722,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerFromSavedD
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint8_TransformerHandle*>(index);
     
         return true;
     }
@@ -1732,7 +1732,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerFromSavedD
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyTransformer(/*in*/ StringFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_DestroyTransformer(/*in*/ StringFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1756,7 +1756,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyTransformer(/*in*/ S
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_CreateTransformerSaveData(/*in*/ StringFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1789,7 +1789,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_CreateTransformerSaveData(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_Transform(/*in*/ StringFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_Transform(/*in*/ StringFeaturizer_uint8_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1831,7 +1831,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_Transform(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1854,10 +1854,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_t_DestroyTransformedData(/*in
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  StringFeaturizer <uint16_t> */
+/* |  StringFeaturizer <uint16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateEstimator(/*out*/ StringFeaturizer_uint16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_CreateEstimator(/*out*/ StringFeaturizer_uint16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1870,7 +1870,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateEstimator(/*out*/ St
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<StringFeaturizer_uint16_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<StringFeaturizer_uint16_EstimatorHandle*>(index);
 
 
     
@@ -1882,7 +1882,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateEstimator(/*out*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyEstimator(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_DestroyEstimator(/*in*/ StringFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1905,7 +1905,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyEstimator(/*in*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_GetState(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_GetState(/*in*/ StringFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1927,7 +1927,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_GetState(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_IsTrainingComplete(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_IsTrainingComplete(/*in*/ StringFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1949,7 +1949,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_IsTrainingComplete(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_Fit(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_Fit(/*in*/ StringFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1975,7 +1975,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_Fit(/*in*/ StringFeaturize
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_FitBuffer(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_FitBuffer(/*in*/ StringFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2002,7 +2002,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_FitBuffer(/*in*/ StringFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_OnDataCompleted(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_OnDataCompleted(/*in*/ StringFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2023,7 +2023,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_OnDataCompleted(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CompleteTraining(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_CompleteTraining(/*in*/ StringFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2044,7 +2044,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CompleteTraining(/*in*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_uint16_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_uint16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2062,7 +2062,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerFromEstim
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint16_TransformerHandle*>(index);
     
         return true;
     }
@@ -2072,7 +2072,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerFromEstim
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_uint16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2088,7 +2088,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerFromSaved
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint16_TransformerHandle*>(index);
     
         return true;
     }
@@ -2098,7 +2098,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerFromSaved
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyTransformer(/*in*/ StringFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_DestroyTransformer(/*in*/ StringFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2122,7 +2122,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyTransformer(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_CreateTransformerSaveData(/*in*/ StringFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2155,7 +2155,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_CreateTransformerSaveData(
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_Transform(/*in*/ StringFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_Transform(/*in*/ StringFeaturizer_uint16_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2197,7 +2197,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_Transform(/*in*/ StringFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2220,10 +2220,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_t_DestroyTransformedData(/*i
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  StringFeaturizer <uint32_t> */
+/* |  StringFeaturizer <uint32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateEstimator(/*out*/ StringFeaturizer_uint32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_CreateEstimator(/*out*/ StringFeaturizer_uint32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2236,7 +2236,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateEstimator(/*out*/ St
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<StringFeaturizer_uint32_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<StringFeaturizer_uint32_EstimatorHandle*>(index);
 
 
     
@@ -2248,7 +2248,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateEstimator(/*out*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyEstimator(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_DestroyEstimator(/*in*/ StringFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2271,7 +2271,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyEstimator(/*in*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_GetState(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_GetState(/*in*/ StringFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2293,7 +2293,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_GetState(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_IsTrainingComplete(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_IsTrainingComplete(/*in*/ StringFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2315,7 +2315,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_IsTrainingComplete(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_Fit(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_Fit(/*in*/ StringFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2341,7 +2341,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_Fit(/*in*/ StringFeaturize
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_FitBuffer(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_FitBuffer(/*in*/ StringFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2368,7 +2368,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_FitBuffer(/*in*/ StringFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_OnDataCompleted(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_OnDataCompleted(/*in*/ StringFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2389,7 +2389,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_OnDataCompleted(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CompleteTraining(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_CompleteTraining(/*in*/ StringFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2410,7 +2410,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CompleteTraining(/*in*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_uint32_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_uint32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2428,7 +2428,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerFromEstim
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint32_TransformerHandle*>(index);
     
         return true;
     }
@@ -2438,7 +2438,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerFromEstim
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_uint32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2454,7 +2454,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerFromSaved
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint32_TransformerHandle*>(index);
     
         return true;
     }
@@ -2464,7 +2464,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerFromSaved
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyTransformer(/*in*/ StringFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_DestroyTransformer(/*in*/ StringFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2488,7 +2488,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyTransformer(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_CreateTransformerSaveData(/*in*/ StringFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2521,7 +2521,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_CreateTransformerSaveData(
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_Transform(/*in*/ StringFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_Transform(/*in*/ StringFeaturizer_uint32_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2563,7 +2563,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_Transform(/*in*/ StringFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2586,10 +2586,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_t_DestroyTransformedData(/*i
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  StringFeaturizer <uint64_t> */
+/* |  StringFeaturizer <uint64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateEstimator(/*out*/ StringFeaturizer_uint64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_CreateEstimator(/*out*/ StringFeaturizer_uint64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2602,7 +2602,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateEstimator(/*out*/ St
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<StringFeaturizer_uint64_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<StringFeaturizer_uint64_EstimatorHandle*>(index);
 
 
     
@@ -2614,7 +2614,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateEstimator(/*out*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyEstimator(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_DestroyEstimator(/*in*/ StringFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2637,7 +2637,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyEstimator(/*in*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_GetState(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_GetState(/*in*/ StringFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2659,7 +2659,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_GetState(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_IsTrainingComplete(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_IsTrainingComplete(/*in*/ StringFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2681,7 +2681,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_IsTrainingComplete(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_Fit(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_Fit(/*in*/ StringFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2707,7 +2707,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_Fit(/*in*/ StringFeaturize
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_FitBuffer(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_FitBuffer(/*in*/ StringFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2734,7 +2734,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_FitBuffer(/*in*/ StringFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_OnDataCompleted(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_OnDataCompleted(/*in*/ StringFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2755,7 +2755,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_OnDataCompleted(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CompleteTraining(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_CompleteTraining(/*in*/ StringFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2776,7 +2776,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CompleteTraining(/*in*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_uint64_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_uint64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2794,7 +2794,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerFromEstim
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint64_TransformerHandle*>(index);
     
         return true;
     }
@@ -2804,7 +2804,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerFromEstim
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_uint64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2820,7 +2820,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerFromSaved
         Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_uint64_TransformerHandle*>(index);
     
         return true;
     }
@@ -2830,7 +2830,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerFromSaved
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyTransformer(/*in*/ StringFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_DestroyTransformer(/*in*/ StringFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2854,7 +2854,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyTransformer(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_CreateTransformerSaveData(/*in*/ StringFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2887,7 +2887,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_CreateTransformerSaveData(
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_Transform(/*in*/ StringFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_Transform(/*in*/ StringFeaturizer_uint64_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2929,7 +2929,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_Transform(/*in*/ StringFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2952,10 +2952,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_t_DestroyTransformedData(/*i
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  StringFeaturizer <float_t> */
+/* |  StringFeaturizer <float> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateEstimator(/*out*/ StringFeaturizer_float_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_CreateEstimator(/*out*/ StringFeaturizer_float_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2968,7 +2968,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateEstimator(/*out*/ Str
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<StringFeaturizer_float_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<StringFeaturizer_float_EstimatorHandle*>(index);
 
 
     
@@ -2980,7 +2980,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateEstimator(/*out*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyEstimator(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_DestroyEstimator(/*in*/ StringFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3003,7 +3003,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyEstimator(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_GetState(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_GetState(/*in*/ StringFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3025,7 +3025,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_GetState(/*in*/ StringFeatu
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_IsTrainingComplete(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_IsTrainingComplete(/*in*/ StringFeaturizer_float_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3047,7 +3047,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_IsTrainingComplete(/*in*/ S
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_Fit(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_Fit(/*in*/ StringFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3073,7 +3073,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_Fit(/*in*/ StringFeaturizer
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_FitBuffer(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_FitBuffer(/*in*/ StringFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3100,7 +3100,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_FitBuffer(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_OnDataCompleted(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_OnDataCompleted(/*in*/ StringFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3121,7 +3121,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_OnDataCompleted(/*in*/ Stri
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CompleteTraining(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_CompleteTraining(/*in*/ StringFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3142,7 +3142,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CompleteTraining(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_float_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_float_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_float_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3160,7 +3160,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerFromEstima
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_float_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_float_TransformerHandle*>(index);
     
         return true;
     }
@@ -3170,7 +3170,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerFromEstima
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_float_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3186,7 +3186,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerFromSavedD
         Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_float_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_float_TransformerHandle*>(index);
     
         return true;
     }
@@ -3196,7 +3196,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerFromSavedD
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyTransformer(/*in*/ StringFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_DestroyTransformer(/*in*/ StringFeaturizer_float_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3220,7 +3220,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyTransformer(/*in*/ S
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_CreateTransformerSaveData(/*in*/ StringFeaturizer_float_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3253,7 +3253,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_CreateTransformerSaveData(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_Transform(/*in*/ StringFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_Transform(/*in*/ StringFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3295,7 +3295,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_Transform(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3318,10 +3318,10 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_t_DestroyTransformedData(/*in
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  StringFeaturizer <double_t> */
+/* |  StringFeaturizer <double> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateEstimator(/*out*/ StringFeaturizer_double_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_CreateEstimator(/*out*/ StringFeaturizer_double_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3334,7 +3334,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateEstimator(/*out*/ St
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<StringFeaturizer_double_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<StringFeaturizer_double_EstimatorHandle*>(index);
 
 
     
@@ -3346,7 +3346,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateEstimator(/*out*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_DestroyEstimator(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_DestroyEstimator(/*in*/ StringFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3369,7 +3369,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_DestroyEstimator(/*in*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_GetState(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_GetState(/*in*/ StringFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3391,7 +3391,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_GetState(/*in*/ StringFeat
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_IsTrainingComplete(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_IsTrainingComplete(/*in*/ StringFeaturizer_double_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3413,7 +3413,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_IsTrainingComplete(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_Fit(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_Fit(/*in*/ StringFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3439,7 +3439,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_Fit(/*in*/ StringFeaturize
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_FitBuffer(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_FitBuffer(/*in*/ StringFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3466,7 +3466,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_FitBuffer(/*in*/ StringFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_OnDataCompleted(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_OnDataCompleted(/*in*/ StringFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3487,7 +3487,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_OnDataCompleted(/*in*/ Str
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CompleteTraining(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_CompleteTraining(/*in*/ StringFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3508,7 +3508,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CompleteTraining(/*in*/ St
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_double_t_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_CreateTransformerFromEstimator(/*in*/ StringFeaturizer_double_EstimatorHandle *pEstimatorHandle, /*out*/ StringFeaturizer_double_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3526,7 +3526,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerFromEstim
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_double_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_double_TransformerHandle*>(index);
     
         return true;
     }
@@ -3536,7 +3536,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerFromEstim
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ StringFeaturizer_double_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3552,7 +3552,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerFromSaved
         Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_double_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<StringFeaturizer_double_TransformerHandle*>(index);
     
         return true;
     }
@@ -3562,7 +3562,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerFromSaved
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_DestroyTransformer(/*in*/ StringFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_DestroyTransformer(/*in*/ StringFeaturizer_double_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3586,7 +3586,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_DestroyTransformer(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerSaveData(/*in*/ StringFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_CreateTransformerSaveData(/*in*/ StringFeaturizer_double_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3619,7 +3619,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_CreateTransformerSaveData(
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_Transform(/*in*/ StringFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_Transform(/*in*/ StringFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3661,7 +3661,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_Transform(/*in*/ StringFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_t_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 

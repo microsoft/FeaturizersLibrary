@@ -49,43 +49,43 @@ bool RobustScalarFeaturizer_CreateEstimatorWithDefault( /*in*/ bool withCenterin
 
 extern "C" {
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_t_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_int8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int8_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_int8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     return RobustScalarFeaturizer_CreateEstimatorWithDefault<std::int8_t, std::float_t>(withCentering, ppHandle, ppErrorInfo);
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_t_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_int16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int16_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_int16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     return RobustScalarFeaturizer_CreateEstimatorWithDefault<std::int16_t, std::float_t>(withCentering, ppHandle, ppErrorInfo);
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_t_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_uint8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint8_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_uint8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     return RobustScalarFeaturizer_CreateEstimatorWithDefault<std::uint8_t, std::float_t>(withCentering, ppHandle, ppErrorInfo);
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_t_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_uint16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint16_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_uint16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     return RobustScalarFeaturizer_CreateEstimatorWithDefault<std::uint16_t, std::float_t>(withCentering, ppHandle, ppErrorInfo);
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_t_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_int32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int32_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_int32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     return RobustScalarFeaturizer_CreateEstimatorWithDefault<std::int32_t, std::double_t>(withCentering, ppHandle, ppErrorInfo);
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_t_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_uint32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint32_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_uint32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     return RobustScalarFeaturizer_CreateEstimatorWithDefault<std::uint32_t, std::double_t>(withCentering, ppHandle, ppErrorInfo);
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_t_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_int64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_int64_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_int64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     return RobustScalarFeaturizer_CreateEstimatorWithDefault<std::int64_t, std::double_t>(withCentering, ppHandle, ppErrorInfo);
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_t_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_uint64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_uint64_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_uint64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     return RobustScalarFeaturizer_CreateEstimatorWithDefault<std::uint64_t, std::double_t>(withCentering, ppHandle, ppErrorInfo);
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_t_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_float_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_float_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_float_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     return RobustScalarFeaturizer_CreateEstimatorWithDefault<std::float_t, std::float_t>(withCentering, ppHandle, ppErrorInfo);
 }
 
-FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_t_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_double_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalarFeaturizer_double_CreateEstimatorWithDefault( /*in*/ bool withCentering, /*out*/ RobustScalarFeaturizer_double_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     return RobustScalarFeaturizer_CreateEstimatorWithDefault<std::double_t, std::double_t>(withCentering, ppHandle, ppErrorInfo);
 }
 

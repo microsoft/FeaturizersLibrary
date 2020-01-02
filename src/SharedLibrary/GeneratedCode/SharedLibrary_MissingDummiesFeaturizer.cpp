@@ -24,10 +24,10 @@ extern "C" {
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MissingDummiesFeaturizer <int8_t> */
+/* |  MissingDummiesFeaturizer <int8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateEstimator(/*out*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_CreateEstimator(/*out*/ MissingDummiesFeaturizer_int8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -40,7 +40,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateEstimator(/*ou
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_int8_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_int8_EstimatorHandle*>(index);
 
 
     
@@ -52,7 +52,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateEstimator(/*ou
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -75,7 +75,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_DestroyEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_GetState(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_GetState(/*in*/ MissingDummiesFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -97,7 +97,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_GetState(/*in*/ Miss
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -119,7 +119,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_IsTrainingComplete(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_Fit(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_Fit(/*in*/ MissingDummiesFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -145,7 +145,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_Fit(/*in*/ MissingDu
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_FitBuffer(/*in*/ MissingDummiesFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -187,7 +187,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_FitBuffer(/*in*/ Mis
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -208,7 +208,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_OnDataCompleted(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -229,7 +229,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CompleteTraining(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_int8_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_int8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -247,7 +247,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateTransformerFro
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int8_TransformerHandle*>(index);
     
         return true;
     }
@@ -257,7 +257,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_int8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -273,7 +273,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateTransformerFro
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int8_TransformerHandle*>(index);
     
         return true;
     }
@@ -283,7 +283,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_int8_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -307,7 +307,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_DestroyTransformer(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_int8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -340,7 +340,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_Transform(/*in*/ MissingDummiesFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_Transform(/*in*/ MissingDummiesFeaturizer_int8_TransformerHandle *pHandle, /*in*/ int8_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -371,10 +371,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_t_Transform(/*in*/ Mis
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MissingDummiesFeaturizer <int16_t> */
+/* |  MissingDummiesFeaturizer <int16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateEstimator(/*out*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_CreateEstimator(/*out*/ MissingDummiesFeaturizer_int16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -387,7 +387,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateEstimator(/*o
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_int16_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_int16_EstimatorHandle*>(index);
 
 
     
@@ -399,7 +399,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateEstimator(/*o
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -422,7 +422,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_DestroyEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_GetState(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_GetState(/*in*/ MissingDummiesFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -444,7 +444,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_GetState(/*in*/ Mis
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -466,7 +466,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_IsTrainingComplete(
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_Fit(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_Fit(/*in*/ MissingDummiesFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -492,7 +492,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_Fit(/*in*/ MissingD
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_FitBuffer(/*in*/ MissingDummiesFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -534,7 +534,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_FitBuffer(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -555,7 +555,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_OnDataCompleted(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -576,7 +576,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CompleteTraining(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_int16_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_int16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -594,7 +594,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateTransformerFr
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int16_TransformerHandle*>(index);
     
         return true;
     }
@@ -604,7 +604,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_int16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -620,7 +620,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateTransformerFr
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int16_TransformerHandle*>(index);
     
         return true;
     }
@@ -630,7 +630,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_int16_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -654,7 +654,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_DestroyTransformer(
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_int16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -687,7 +687,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_Transform(/*in*/ MissingDummiesFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_Transform(/*in*/ MissingDummiesFeaturizer_int16_TransformerHandle *pHandle, /*in*/ int16_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -718,10 +718,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_t_Transform(/*in*/ Mi
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MissingDummiesFeaturizer <int32_t> */
+/* |  MissingDummiesFeaturizer <int32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateEstimator(/*out*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_CreateEstimator(/*out*/ MissingDummiesFeaturizer_int32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -734,7 +734,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateEstimator(/*o
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_int32_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_int32_EstimatorHandle*>(index);
 
 
     
@@ -746,7 +746,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateEstimator(/*o
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -769,7 +769,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_DestroyEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_GetState(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_GetState(/*in*/ MissingDummiesFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -791,7 +791,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_GetState(/*in*/ Mis
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -813,7 +813,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_IsTrainingComplete(
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_Fit(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_Fit(/*in*/ MissingDummiesFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -839,7 +839,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_Fit(/*in*/ MissingD
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_FitBuffer(/*in*/ MissingDummiesFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -881,7 +881,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_FitBuffer(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -902,7 +902,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_OnDataCompleted(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -923,7 +923,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CompleteTraining(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_int32_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_int32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -941,7 +941,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateTransformerFr
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int32_TransformerHandle*>(index);
     
         return true;
     }
@@ -951,7 +951,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_int32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -967,7 +967,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateTransformerFr
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int32_TransformerHandle*>(index);
     
         return true;
     }
@@ -977,7 +977,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_int32_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1001,7 +1001,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_DestroyTransformer(
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_int32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1034,7 +1034,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_Transform(/*in*/ MissingDummiesFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_Transform(/*in*/ MissingDummiesFeaturizer_int32_TransformerHandle *pHandle, /*in*/ int32_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1065,10 +1065,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_t_Transform(/*in*/ Mi
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MissingDummiesFeaturizer <int64_t> */
+/* |  MissingDummiesFeaturizer <int64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateEstimator(/*out*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_CreateEstimator(/*out*/ MissingDummiesFeaturizer_int64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1081,7 +1081,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateEstimator(/*o
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_int64_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_int64_EstimatorHandle*>(index);
 
 
     
@@ -1093,7 +1093,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateEstimator(/*o
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1116,7 +1116,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_DestroyEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_GetState(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_GetState(/*in*/ MissingDummiesFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1138,7 +1138,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_GetState(/*in*/ Mis
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1160,7 +1160,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_IsTrainingComplete(
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_Fit(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_Fit(/*in*/ MissingDummiesFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1186,7 +1186,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_Fit(/*in*/ MissingD
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_FitBuffer(/*in*/ MissingDummiesFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1228,7 +1228,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_FitBuffer(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1249,7 +1249,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_OnDataCompleted(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_CompleteTraining(/*in*/ MissingDummiesFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1270,7 +1270,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CompleteTraining(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_int64_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_int64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1288,7 +1288,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateTransformerFr
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int64_TransformerHandle*>(index);
     
         return true;
     }
@@ -1298,7 +1298,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_int64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1314,7 +1314,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateTransformerFr
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::int64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_int64_TransformerHandle*>(index);
     
         return true;
     }
@@ -1324,7 +1324,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_int64_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1348,7 +1348,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_DestroyTransformer(
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_int64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1381,7 +1381,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_Transform(/*in*/ MissingDummiesFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_Transform(/*in*/ MissingDummiesFeaturizer_int64_TransformerHandle *pHandle, /*in*/ int64_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1412,10 +1412,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_t_Transform(/*in*/ Mi
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MissingDummiesFeaturizer <uint8_t> */
+/* |  MissingDummiesFeaturizer <uint8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateEstimator(/*out*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_CreateEstimator(/*out*/ MissingDummiesFeaturizer_uint8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1428,7 +1428,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateEstimator(/*o
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_uint8_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_uint8_EstimatorHandle*>(index);
 
 
     
@@ -1440,7 +1440,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateEstimator(/*o
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1463,7 +1463,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_DestroyEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_GetState(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_GetState(/*in*/ MissingDummiesFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1485,7 +1485,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_GetState(/*in*/ Mis
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1507,7 +1507,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_IsTrainingComplete(
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_Fit(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_Fit(/*in*/ MissingDummiesFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1533,7 +1533,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_Fit(/*in*/ MissingD
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_FitBuffer(/*in*/ MissingDummiesFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1575,7 +1575,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_FitBuffer(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1596,7 +1596,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_OnDataCompleted(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1617,7 +1617,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CompleteTraining(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_uint8_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_uint8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1635,7 +1635,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateTransformerFr
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint8_TransformerHandle*>(index);
     
         return true;
     }
@@ -1645,7 +1645,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_uint8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1661,7 +1661,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateTransformerFr
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint8_TransformerHandle*>(index);
     
         return true;
     }
@@ -1671,7 +1671,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1695,7 +1695,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_DestroyTransformer(
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1728,7 +1728,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_Transform(/*in*/ MissingDummiesFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_Transform(/*in*/ MissingDummiesFeaturizer_uint8_TransformerHandle *pHandle, /*in*/ uint8_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1759,10 +1759,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_t_Transform(/*in*/ Mi
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MissingDummiesFeaturizer <uint16_t> */
+/* |  MissingDummiesFeaturizer <uint16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateEstimator(/*out*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_CreateEstimator(/*out*/ MissingDummiesFeaturizer_uint16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1775,7 +1775,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateEstimator(/*
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_uint16_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_uint16_EstimatorHandle*>(index);
 
 
     
@@ -1787,7 +1787,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1810,7 +1810,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_DestroyEstimator(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_GetState(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_GetState(/*in*/ MissingDummiesFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1832,7 +1832,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_GetState(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1854,7 +1854,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_IsTrainingComplete
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_Fit(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_Fit(/*in*/ MissingDummiesFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1880,7 +1880,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_Fit(/*in*/ Missing
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_FitBuffer(/*in*/ MissingDummiesFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1922,7 +1922,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_FitBuffer(/*in*/ M
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1943,7 +1943,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_OnDataCompleted(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1964,7 +1964,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CompleteTraining(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_uint16_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_uint16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1982,7 +1982,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateTransformerF
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint16_TransformerHandle*>(index);
     
         return true;
     }
@@ -1992,7 +1992,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateTransformerF
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_uint16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2008,7 +2008,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateTransformerF
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint16_TransformerHandle*>(index);
     
         return true;
     }
@@ -2018,7 +2018,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateTransformerF
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2042,7 +2042,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_DestroyTransformer
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2075,7 +2075,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_CreateTransformerS
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_Transform(/*in*/ MissingDummiesFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_Transform(/*in*/ MissingDummiesFeaturizer_uint16_TransformerHandle *pHandle, /*in*/ uint16_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2106,10 +2106,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_t_Transform(/*in*/ M
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MissingDummiesFeaturizer <uint32_t> */
+/* |  MissingDummiesFeaturizer <uint32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateEstimator(/*out*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_CreateEstimator(/*out*/ MissingDummiesFeaturizer_uint32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2122,7 +2122,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateEstimator(/*
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_uint32_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_uint32_EstimatorHandle*>(index);
 
 
     
@@ -2134,7 +2134,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2157,7 +2157,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_DestroyEstimator(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_GetState(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_GetState(/*in*/ MissingDummiesFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2179,7 +2179,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_GetState(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2201,7 +2201,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_IsTrainingComplete
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_Fit(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_Fit(/*in*/ MissingDummiesFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2227,7 +2227,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_Fit(/*in*/ Missing
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_FitBuffer(/*in*/ MissingDummiesFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2269,7 +2269,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_FitBuffer(/*in*/ M
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2290,7 +2290,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_OnDataCompleted(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2311,7 +2311,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CompleteTraining(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_uint32_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_uint32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2329,7 +2329,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateTransformerF
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint32_TransformerHandle*>(index);
     
         return true;
     }
@@ -2339,7 +2339,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateTransformerF
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_uint32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2355,7 +2355,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateTransformerF
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint32_TransformerHandle*>(index);
     
         return true;
     }
@@ -2365,7 +2365,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateTransformerF
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2389,7 +2389,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_DestroyTransformer
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2422,7 +2422,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_CreateTransformerS
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_Transform(/*in*/ MissingDummiesFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_Transform(/*in*/ MissingDummiesFeaturizer_uint32_TransformerHandle *pHandle, /*in*/ uint32_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2453,10 +2453,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_t_Transform(/*in*/ M
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MissingDummiesFeaturizer <uint64_t> */
+/* |  MissingDummiesFeaturizer <uint64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateEstimator(/*out*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_CreateEstimator(/*out*/ MissingDummiesFeaturizer_uint64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2469,7 +2469,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateEstimator(/*
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_uint64_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_uint64_EstimatorHandle*>(index);
 
 
     
@@ -2481,7 +2481,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2504,7 +2504,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_DestroyEstimator(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_GetState(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_GetState(/*in*/ MissingDummiesFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2526,7 +2526,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_GetState(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2548,7 +2548,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_IsTrainingComplete
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_Fit(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_Fit(/*in*/ MissingDummiesFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2574,7 +2574,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_Fit(/*in*/ Missing
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_FitBuffer(/*in*/ MissingDummiesFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2616,7 +2616,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_FitBuffer(/*in*/ M
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2637,7 +2637,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_OnDataCompleted(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_CompleteTraining(/*in*/ MissingDummiesFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2658,7 +2658,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CompleteTraining(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_uint64_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_uint64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2676,7 +2676,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateTransformerF
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint64_TransformerHandle*>(index);
     
         return true;
     }
@@ -2686,7 +2686,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateTransformerF
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_uint64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2702,7 +2702,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateTransformerF
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::uint64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_uint64_TransformerHandle*>(index);
     
         return true;
     }
@@ -2712,7 +2712,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateTransformerF
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2736,7 +2736,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_DestroyTransformer
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2769,7 +2769,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_CreateTransformerS
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_Transform(/*in*/ MissingDummiesFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_Transform(/*in*/ MissingDummiesFeaturizer_uint64_TransformerHandle *pHandle, /*in*/ uint64_t const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2800,10 +2800,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_t_Transform(/*in*/ M
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MissingDummiesFeaturizer <float_t> */
+/* |  MissingDummiesFeaturizer <float> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateEstimator(/*out*/ MissingDummiesFeaturizer_float_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_CreateEstimator(/*out*/ MissingDummiesFeaturizer_float_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2816,7 +2816,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateEstimator(/*o
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_float_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_float_EstimatorHandle*>(index);
 
 
     
@@ -2828,7 +2828,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateEstimator(/*o
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2851,7 +2851,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_DestroyEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_GetState(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_GetState(/*in*/ MissingDummiesFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2873,7 +2873,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_GetState(/*in*/ Mis
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_float_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2895,7 +2895,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_IsTrainingComplete(
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_Fit(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_Fit(/*in*/ MissingDummiesFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2921,7 +2921,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_Fit(/*in*/ MissingD
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_FitBuffer(/*in*/ MissingDummiesFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2963,7 +2963,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_FitBuffer(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2984,7 +2984,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_OnDataCompleted(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_CompleteTraining(/*in*/ MissingDummiesFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3005,7 +3005,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CompleteTraining(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_float_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_float_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_float_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3023,7 +3023,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateTransformerFr
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_float_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_float_TransformerHandle*>(index);
     
         return true;
     }
@@ -3033,7 +3033,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_float_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3049,7 +3049,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateTransformerFr
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_float_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_float_TransformerHandle*>(index);
     
         return true;
     }
@@ -3059,7 +3059,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateTransformerFr
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_float_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3083,7 +3083,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_DestroyTransformer(
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_float_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3116,7 +3116,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_Transform(/*in*/ MissingDummiesFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_Transform(/*in*/ MissingDummiesFeaturizer_float_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3147,10 +3147,10 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_t_Transform(/*in*/ Mi
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MissingDummiesFeaturizer <double_t> */
+/* |  MissingDummiesFeaturizer <double> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateEstimator(/*out*/ MissingDummiesFeaturizer_double_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_CreateEstimator(/*out*/ MissingDummiesFeaturizer_double_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3163,7 +3163,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateEstimator(/*
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_double_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MissingDummiesFeaturizer_double_EstimatorHandle*>(index);
 
 
     
@@ -3175,7 +3175,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_DestroyEstimator(/*in*/ MissingDummiesFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3198,7 +3198,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_DestroyEstimator(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_GetState(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_GetState(/*in*/ MissingDummiesFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3220,7 +3220,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_GetState(/*in*/ Mi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_IsTrainingComplete(/*in*/ MissingDummiesFeaturizer_double_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3242,7 +3242,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_IsTrainingComplete
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_Fit(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_Fit(/*in*/ MissingDummiesFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3268,7 +3268,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_Fit(/*in*/ Missing
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_FitBuffer(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_FitBuffer(/*in*/ MissingDummiesFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3310,7 +3310,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_FitBuffer(/*in*/ M
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_OnDataCompleted(/*in*/ MissingDummiesFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3331,7 +3331,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_OnDataCompleted(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CompleteTraining(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_CompleteTraining(/*in*/ MissingDummiesFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3352,7 +3352,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CompleteTraining(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_double_t_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_CreateTransformerFromEstimator(/*in*/ MissingDummiesFeaturizer_double_EstimatorHandle *pEstimatorHandle, /*out*/ MissingDummiesFeaturizer_double_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3370,7 +3370,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateTransformerF
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_double_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_double_TransformerHandle*>(index);
     
         return true;
     }
@@ -3380,7 +3380,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateTransformerF
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MissingDummiesFeaturizer_double_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3396,7 +3396,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateTransformerF
         Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MissingDummiesEstimator<std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_double_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MissingDummiesFeaturizer_double_TransformerHandle*>(index);
     
         return true;
     }
@@ -3406,7 +3406,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateTransformerF
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_DestroyTransformer(/*in*/ MissingDummiesFeaturizer_double_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3430,7 +3430,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_DestroyTransformer
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_CreateTransformerSaveData(/*in*/ MissingDummiesFeaturizer_double_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3463,7 +3463,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_CreateTransformerS
     }
 }
 
-FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_t_Transform(/*in*/ MissingDummiesFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_Transform(/*in*/ MissingDummiesFeaturizer_double_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ int8_t * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 

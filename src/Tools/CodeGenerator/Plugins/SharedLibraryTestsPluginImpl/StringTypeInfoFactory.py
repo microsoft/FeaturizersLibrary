@@ -25,7 +25,8 @@ class StringTypeInfoFactory(TypeInfoFactory):
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
-    TypeName                                = Interface.DerivedProperty("std::string")
+    TypeName                                = Interface.DerivedProperty("string")
+    CppType                                 = Interface.DerivedProperty("std::string")
 
     # ----------------------------------------------------------------------
     # |

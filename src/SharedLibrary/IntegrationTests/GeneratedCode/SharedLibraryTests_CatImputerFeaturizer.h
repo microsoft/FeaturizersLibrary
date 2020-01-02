@@ -8,19 +8,19 @@
 #include "Traits.h"
 
 /* ---------------------------------------------------------------------- */
-/* |  CatImputerFeaturizer <int8_t> */
+/* |  CatImputerFeaturizer <int8> */
 template <typename VectorInputT>
-void CatImputerFeaturizer_int8_t_Test(
+void CatImputerFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    CatImputerFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    CatImputerFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_int8_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -31,7 +31,7 @@ void CatImputerFeaturizer_int8_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(CatImputerFeaturizer_int8_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_int8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -40,7 +40,7 @@ void CatImputerFeaturizer_int8_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_int8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_int8_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int8_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -50,7 +50,7 @@ void CatImputerFeaturizer_int8_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(CatImputerFeaturizer_int8_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(CatImputerFeaturizer_int8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -58,7 +58,7 @@ void CatImputerFeaturizer_int8_t_Test(
         }
     }
 
-    CatImputerFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    CatImputerFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -66,31 +66,31 @@ void CatImputerFeaturizer_int8_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(CatImputerFeaturizer_int8_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_int8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    CatImputerFeaturizer_int8_t_TransformerHandle * pTransformerHandle(nullptr);
+    CatImputerFeaturizer_int8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_int8_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(CatImputerFeaturizer_int8_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(CatImputerFeaturizer_int8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_int8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int8_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -107,24 +107,24 @@ void CatImputerFeaturizer_int8_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(CatImputerFeaturizer_int8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  CatImputerFeaturizer <int16_t> */
+/* |  CatImputerFeaturizer <int16> */
 template <typename VectorInputT>
-void CatImputerFeaturizer_int16_t_Test(
+void CatImputerFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int16_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int16_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    CatImputerFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    CatImputerFeaturizer_int16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_int16_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -135,7 +135,7 @@ void CatImputerFeaturizer_int16_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(CatImputerFeaturizer_int16_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_int16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -144,7 +144,7 @@ void CatImputerFeaturizer_int16_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_int16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_int16_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int16_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -154,7 +154,7 @@ void CatImputerFeaturizer_int16_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(CatImputerFeaturizer_int16_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(CatImputerFeaturizer_int16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -162,7 +162,7 @@ void CatImputerFeaturizer_int16_t_Test(
         }
     }
 
-    CatImputerFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    CatImputerFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -170,31 +170,31 @@ void CatImputerFeaturizer_int16_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(CatImputerFeaturizer_int16_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_int16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    CatImputerFeaturizer_int16_t_TransformerHandle * pTransformerHandle(nullptr);
+    CatImputerFeaturizer_int16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_int16_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(CatImputerFeaturizer_int16_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int16_t> results;
+    std::vector<std::int16_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int16_t result;
+        std::int16_t result;
 
-        REQUIRE(CatImputerFeaturizer_int16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_int16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int16_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -211,24 +211,24 @@ void CatImputerFeaturizer_int16_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(CatImputerFeaturizer_int16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  CatImputerFeaturizer <int32_t> */
+/* |  CatImputerFeaturizer <int32> */
 template <typename VectorInputT>
-void CatImputerFeaturizer_int32_t_Test(
+void CatImputerFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int32_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int32_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    CatImputerFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    CatImputerFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_int32_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -239,7 +239,7 @@ void CatImputerFeaturizer_int32_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(CatImputerFeaturizer_int32_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_int32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -248,7 +248,7 @@ void CatImputerFeaturizer_int32_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_int32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_int32_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int32_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -258,7 +258,7 @@ void CatImputerFeaturizer_int32_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(CatImputerFeaturizer_int32_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(CatImputerFeaturizer_int32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -266,7 +266,7 @@ void CatImputerFeaturizer_int32_t_Test(
         }
     }
 
-    CatImputerFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    CatImputerFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -274,31 +274,31 @@ void CatImputerFeaturizer_int32_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(CatImputerFeaturizer_int32_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_int32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    CatImputerFeaturizer_int32_t_TransformerHandle * pTransformerHandle(nullptr);
+    CatImputerFeaturizer_int32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_int32_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(CatImputerFeaturizer_int32_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int32_t> results;
+    std::vector<std::int32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int32_t result;
+        std::int32_t result;
 
-        REQUIRE(CatImputerFeaturizer_int32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_int32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int32_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -315,24 +315,24 @@ void CatImputerFeaturizer_int32_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(CatImputerFeaturizer_int32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  CatImputerFeaturizer <int64_t> */
+/* |  CatImputerFeaturizer <int64> */
 template <typename VectorInputT>
-void CatImputerFeaturizer_int64_t_Test(
+void CatImputerFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int64_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int64_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    CatImputerFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    CatImputerFeaturizer_int64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_int64_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -343,7 +343,7 @@ void CatImputerFeaturizer_int64_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(CatImputerFeaturizer_int64_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_int64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -352,7 +352,7 @@ void CatImputerFeaturizer_int64_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_int64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_int64_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int64_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -362,7 +362,7 @@ void CatImputerFeaturizer_int64_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(CatImputerFeaturizer_int64_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(CatImputerFeaturizer_int64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -370,7 +370,7 @@ void CatImputerFeaturizer_int64_t_Test(
         }
     }
 
-    CatImputerFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    CatImputerFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -378,31 +378,31 @@ void CatImputerFeaturizer_int64_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(CatImputerFeaturizer_int64_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_int64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    CatImputerFeaturizer_int64_t_TransformerHandle * pTransformerHandle(nullptr);
+    CatImputerFeaturizer_int64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_int64_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(CatImputerFeaturizer_int64_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int64_t> results;
+    std::vector<std::int64_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int64_t result;
+        std::int64_t result;
 
-        REQUIRE(CatImputerFeaturizer_int64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_int64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int64_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -419,24 +419,24 @@ void CatImputerFeaturizer_int64_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(CatImputerFeaturizer_int64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  CatImputerFeaturizer <uint8_t> */
+/* |  CatImputerFeaturizer <uint8> */
 template <typename VectorInputT>
-void CatImputerFeaturizer_uint8_t_Test(
+void CatImputerFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<uint8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::uint8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    CatImputerFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    CatImputerFeaturizer_uint8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_uint8_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -447,7 +447,7 @@ void CatImputerFeaturizer_uint8_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(CatImputerFeaturizer_uint8_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_uint8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -456,7 +456,7 @@ void CatImputerFeaturizer_uint8_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_uint8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_uint8_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -466,7 +466,7 @@ void CatImputerFeaturizer_uint8_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(CatImputerFeaturizer_uint8_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(CatImputerFeaturizer_uint8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -474,7 +474,7 @@ void CatImputerFeaturizer_uint8_t_Test(
         }
     }
 
-    CatImputerFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    CatImputerFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -482,31 +482,31 @@ void CatImputerFeaturizer_uint8_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(CatImputerFeaturizer_uint8_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_uint8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    CatImputerFeaturizer_uint8_t_TransformerHandle * pTransformerHandle(nullptr);
+    CatImputerFeaturizer_uint8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_uint8_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(CatImputerFeaturizer_uint8_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<uint8_t> results;
+    std::vector<std::uint8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint8_t result;
+        std::uint8_t result;
 
-        REQUIRE(CatImputerFeaturizer_uint8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_uint8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -523,24 +523,24 @@ void CatImputerFeaturizer_uint8_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(CatImputerFeaturizer_uint8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  CatImputerFeaturizer <uint16_t> */
+/* |  CatImputerFeaturizer <uint16> */
 template <typename VectorInputT>
-void CatImputerFeaturizer_uint16_t_Test(
+void CatImputerFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<uint16_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::uint16_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    CatImputerFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    CatImputerFeaturizer_uint16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_uint16_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -551,7 +551,7 @@ void CatImputerFeaturizer_uint16_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(CatImputerFeaturizer_uint16_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_uint16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -560,7 +560,7 @@ void CatImputerFeaturizer_uint16_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_uint16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_uint16_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -570,7 +570,7 @@ void CatImputerFeaturizer_uint16_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(CatImputerFeaturizer_uint16_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(CatImputerFeaturizer_uint16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -578,7 +578,7 @@ void CatImputerFeaturizer_uint16_t_Test(
         }
     }
 
-    CatImputerFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    CatImputerFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -586,31 +586,31 @@ void CatImputerFeaturizer_uint16_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(CatImputerFeaturizer_uint16_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_uint16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    CatImputerFeaturizer_uint16_t_TransformerHandle * pTransformerHandle(nullptr);
+    CatImputerFeaturizer_uint16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_uint16_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(CatImputerFeaturizer_uint16_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<uint16_t> results;
+    std::vector<std::uint16_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint16_t result;
+        std::uint16_t result;
 
-        REQUIRE(CatImputerFeaturizer_uint16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_uint16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -627,24 +627,24 @@ void CatImputerFeaturizer_uint16_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(CatImputerFeaturizer_uint16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  CatImputerFeaturizer <uint32_t> */
+/* |  CatImputerFeaturizer <uint32> */
 template <typename VectorInputT>
-void CatImputerFeaturizer_uint32_t_Test(
+void CatImputerFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<uint32_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    CatImputerFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    CatImputerFeaturizer_uint32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_uint32_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -655,7 +655,7 @@ void CatImputerFeaturizer_uint32_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(CatImputerFeaturizer_uint32_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_uint32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -664,7 +664,7 @@ void CatImputerFeaturizer_uint32_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_uint32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_uint32_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -674,7 +674,7 @@ void CatImputerFeaturizer_uint32_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(CatImputerFeaturizer_uint32_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(CatImputerFeaturizer_uint32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -682,7 +682,7 @@ void CatImputerFeaturizer_uint32_t_Test(
         }
     }
 
-    CatImputerFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    CatImputerFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -690,31 +690,31 @@ void CatImputerFeaturizer_uint32_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(CatImputerFeaturizer_uint32_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_uint32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    CatImputerFeaturizer_uint32_t_TransformerHandle * pTransformerHandle(nullptr);
+    CatImputerFeaturizer_uint32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_uint32_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(CatImputerFeaturizer_uint32_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<uint32_t> results;
+    std::vector<std::uint32_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint32_t result;
+        std::uint32_t result;
 
-        REQUIRE(CatImputerFeaturizer_uint32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_uint32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -731,24 +731,24 @@ void CatImputerFeaturizer_uint32_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(CatImputerFeaturizer_uint32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  CatImputerFeaturizer <uint64_t> */
+/* |  CatImputerFeaturizer <uint64> */
 template <typename VectorInputT>
-void CatImputerFeaturizer_uint64_t_Test(
+void CatImputerFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<uint64_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::uint64_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    CatImputerFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    CatImputerFeaturizer_uint64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_uint64_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -759,7 +759,7 @@ void CatImputerFeaturizer_uint64_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(CatImputerFeaturizer_uint64_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_uint64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -768,7 +768,7 @@ void CatImputerFeaturizer_uint64_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_uint64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_uint64_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -778,7 +778,7 @@ void CatImputerFeaturizer_uint64_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(CatImputerFeaturizer_uint64_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(CatImputerFeaturizer_uint64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -786,7 +786,7 @@ void CatImputerFeaturizer_uint64_t_Test(
         }
     }
 
-    CatImputerFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    CatImputerFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -794,31 +794,31 @@ void CatImputerFeaturizer_uint64_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(CatImputerFeaturizer_uint64_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_uint64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    CatImputerFeaturizer_uint64_t_TransformerHandle * pTransformerHandle(nullptr);
+    CatImputerFeaturizer_uint64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_uint64_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(CatImputerFeaturizer_uint64_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<uint64_t> results;
+    std::vector<std::uint64_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result;
+        std::uint64_t result;
 
-        REQUIRE(CatImputerFeaturizer_uint64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_uint64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -835,24 +835,24 @@ void CatImputerFeaturizer_uint64_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(CatImputerFeaturizer_uint64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  CatImputerFeaturizer <float_t> */
+/* |  CatImputerFeaturizer <float> */
 template <typename VectorInputT>
-void CatImputerFeaturizer_float_t_Test(
+void CatImputerFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<float> const &)> const &verify_func
+    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    CatImputerFeaturizer_float_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    CatImputerFeaturizer_float_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_float_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_float_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -863,7 +863,7 @@ void CatImputerFeaturizer_float_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(CatImputerFeaturizer_float_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_float_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -872,7 +872,7 @@ void CatImputerFeaturizer_float_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_float_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_float_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::float_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::float_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -882,7 +882,7 @@ void CatImputerFeaturizer_float_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(CatImputerFeaturizer_float_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(CatImputerFeaturizer_float_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -890,7 +890,7 @@ void CatImputerFeaturizer_float_t_Test(
         }
     }
 
-    CatImputerFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    CatImputerFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -898,31 +898,31 @@ void CatImputerFeaturizer_float_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(CatImputerFeaturizer_float_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_float_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    CatImputerFeaturizer_float_t_TransformerHandle * pTransformerHandle(nullptr);
+    CatImputerFeaturizer_float_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_float_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_float_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(CatImputerFeaturizer_float_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_float_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<float> results;
+    std::vector<std::float_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        float result;
+        std::float_t result;
 
-        REQUIRE(CatImputerFeaturizer_float_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_float_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::float_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::float_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -939,24 +939,24 @@ void CatImputerFeaturizer_float_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(CatImputerFeaturizer_float_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  CatImputerFeaturizer <double_t> */
+/* |  CatImputerFeaturizer <double> */
 template <typename VectorInputT>
-void CatImputerFeaturizer_double_t_Test(
+void CatImputerFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<double> const &)> const &verify_func
+    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    CatImputerFeaturizer_double_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    CatImputerFeaturizer_double_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_double_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_double_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -967,7 +967,7 @@ void CatImputerFeaturizer_double_t_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(CatImputerFeaturizer_double_t_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_double_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -976,7 +976,7 @@ void CatImputerFeaturizer_double_t_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(CatImputerFeaturizer_double_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(CatImputerFeaturizer_double_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::double_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::double_t>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -986,7 +986,7 @@ void CatImputerFeaturizer_double_t_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(CatImputerFeaturizer_double_t_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(CatImputerFeaturizer_double_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -994,7 +994,7 @@ void CatImputerFeaturizer_double_t_Test(
         }
     }
 
-    CatImputerFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    CatImputerFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -1002,31 +1002,31 @@ void CatImputerFeaturizer_double_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(CatImputerFeaturizer_double_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_double_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    CatImputerFeaturizer_double_t_TransformerHandle * pTransformerHandle(nullptr);
+    CatImputerFeaturizer_double_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(CatImputerFeaturizer_double_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_double_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(CatImputerFeaturizer_double_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_double_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<double> results;
+    std::vector<std::double_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double result;
+        std::double_t result;
 
-        REQUIRE(CatImputerFeaturizer_double_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(CatImputerFeaturizer_double_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::double_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::double_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -1043,7 +1043,7 @@ void CatImputerFeaturizer_double_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(CatImputerFeaturizer_double_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(CatImputerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 

@@ -23,16 +23,6 @@ class _ScalarTypeInfoFactory(TypeInfoFactory):
 
     # ----------------------------------------------------------------------
     # |
-    # |  Public Properties
-    # |
-    # ----------------------------------------------------------------------
-    @Interface.abstractproperty
-    def CppType(self):
-        """C++ type"""
-        raise Exception("Abstract property")
-
-    # ----------------------------------------------------------------------
-    # |
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
@@ -77,71 +67,71 @@ class _ScalarTypeInfoFactory(TypeInfoFactory):
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class Int8TypeInfoFactory(_ScalarTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("std::int8_t")
-    CppType                                 = Interface.DerivedProperty("int8_t")
+    TypeName                                = Interface.DerivedProperty("int8")
+    CppType                                 = Interface.DerivedProperty("std::int8_t")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class Int16TypeInfoFactory(_ScalarTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("std::int16_t")
-    CppType                                 = Interface.DerivedProperty("int16_t")
+    TypeName                                = Interface.DerivedProperty("int16")
+    CppType                                 = Interface.DerivedProperty("std::int16_t")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class Int32TypeInfoFactory(_ScalarTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("std::int32_t")
-    CppType                                 = Interface.DerivedProperty("int32_t")
+    TypeName                                = Interface.DerivedProperty("int32")
+    CppType                                 = Interface.DerivedProperty("std::int32_t")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class Int64TypeInfoFactory(_ScalarTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("std::int64_t")
-    CppType                                 = Interface.DerivedProperty("int64_t")
+    TypeName                                = Interface.DerivedProperty("int64")
+    CppType                                 = Interface.DerivedProperty("std::int64_t")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class UInt8TypeInfoFactory(_ScalarTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("std::uint8_t")
-    CppType                                 = Interface.DerivedProperty("uint8_t")
+    TypeName                                = Interface.DerivedProperty("uint8")
+    CppType                                 = Interface.DerivedProperty("std::uint8_t")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class UInt16TypeInfoFactory(_ScalarTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("std::uint16_t")
-    CppType                                 = Interface.DerivedProperty("uint16_t")
+    TypeName                                = Interface.DerivedProperty("uint16")
+    CppType                                 = Interface.DerivedProperty("std::uint16_t")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class UInt32TypeInfoFactory(_ScalarTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("std::uint32_t")
-    CppType                                 = Interface.DerivedProperty("uint32_t")
+    TypeName                                = Interface.DerivedProperty("uint32")
+    CppType                                 = Interface.DerivedProperty("std::uint32_t")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class UInt64TypeInfoFactory(_ScalarTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("std::uint64_t")
-    CppType                                 = Interface.DerivedProperty("uint64_t")
+    TypeName                                = Interface.DerivedProperty("uint64")
+    CppType                                 = Interface.DerivedProperty("std::uint64_t")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class FloatTypeInfoFactory(_ScalarTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("std::float_t")
-    CppType                                 = Interface.DerivedProperty("float")
+    TypeName                                = Interface.DerivedProperty("float")
+    CppType                                 = Interface.DerivedProperty("std::float_t")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class DoubleTypeInfoFactory(_ScalarTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("std::double_t")
-    CppType                                 = Interface.DerivedProperty("double")
+    TypeName                                = Interface.DerivedProperty("double")
+    CppType                                 = Interface.DerivedProperty("std::double_t")
 
 
 # ----------------------------------------------------------------------

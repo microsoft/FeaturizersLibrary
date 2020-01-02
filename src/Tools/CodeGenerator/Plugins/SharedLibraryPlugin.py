@@ -102,14 +102,14 @@ def _CreateInterfaceSubstitutionDict(item, c_data):
         type_desc = ""
         cpp_template_suffix = ""
     else:
-        template_desc = template.replace("std::", "")
-
-        suffix = "_{}_".format(template_desc)
-        type_desc = " <{}>".format(template_desc)
+        suffix = "_{}_".format(template)
+        type_desc = " <{}>".format(template)
         if item.is_output_a_template:
-            cpp_template_suffix = "<{}>".format(template + ", " + item.output_type)
+            cpp_template_suffix = "<{}>".format(
+                c_data.InputTypeInfoFactory.CppType + ", " + item.output_type,
+            )
         else:
-            cpp_template_suffix = "<{}>".format(template)
+            cpp_template_suffix = "<{}>".format(c_data.InputTypeInfoFactory.CppType)
 
     # ----------------------------------------------------------------------
     def ToParamsString(params, arg_desc):
@@ -409,9 +409,7 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
         custom_struct_flag = False
 
         for item, c_data in zip(items, c_data_items):
-            template = (
-                item.template.replace("std::", "") if hasattr(item, "template") else None
-            )
+            template = item.template if hasattr(item, "template") else None
 
             d = _CreateInterfaceSubstitutionDict(item, c_data)
 
@@ -595,9 +593,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
         )
 
         for item, c_data in zip(items, c_data_items):
-            template = (
-                item.template.replace("std::", "") if hasattr(item, "template") else None
-            )
+            template = item.template if hasattr(item, "template") else None
 
             d = _CreateInterfaceSubstitutionDict(item, c_data)
 
@@ -734,7 +730,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                     }}
 
                     """,
-                ).format(**d),
+                ).format(**d)
             )
 
             # IsTrainingComplete
@@ -843,7 +839,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                     FEATURIZER_LIBRARY_API bool {name}{suffix}OnDataCompleted(/*in*/ {name}{suffix}EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
                         {method_prefix}
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-                            
+
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
 
                             estimator.on_data_completed();
@@ -851,7 +847,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
                     }}
 
                     """,
-                ).format(**d),
+                ).format(**d)
             )
 
             # CompleteTraining

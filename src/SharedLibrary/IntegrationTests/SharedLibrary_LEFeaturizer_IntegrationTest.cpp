@@ -9,7 +9,7 @@
 
 
 TEST_CASE("int8") {
-    LabelEncoderFeaturizer_int8_t_Test(
+    LabelEncoderFeaturizer_int8_Test(
         std::vector<std::int8_t>{
             static_cast<std::int8_t>(10),
             static_cast<std::int8_t>(20),
