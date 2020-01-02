@@ -33,6 +33,7 @@ SET(
     HistogramEstimator_UnitTest
     IndexMapEstimator_UnitTest
     InferenceOnlyFeaturizerImpl_UnitTest
+    MatrixDecompositionEstimator_UnitTest
     MaxAbsValueEstimator_UnitTest
     MinMaxEstimator_UnitTest
     ModeEstimator_UnitTest
