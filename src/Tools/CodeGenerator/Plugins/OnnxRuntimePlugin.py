@@ -4,6 +4,7 @@
 # ----------------------------------------------------------------------
 """Contains the Plugin object"""
 
+import copy
 import os
 import re
 import sys
@@ -47,9 +48,7 @@ class Plugin(PluginBase):
 
         status_stream.write("Preprocessing data...")
         with status_stream.DoneManager():
-            supported_optional_types = set(
-                ["std::string", "std::float", "std::double"],
-            )
+            supported_optional_types = set(["string", "float", "double"])
 
             type_mappings = []
             custom_struct_data = []
@@ -72,8 +71,16 @@ class Plugin(PluginBase):
                 output_types = OrderedDict()
 
                 for item in items:
-                    item.input_type = re.sub("_t$", '', item.input_type) if ("float" in item.input_type or "double" in item.input_type) else item.input_type
-                    item.output_type = re.sub("_t$", '', item.output_type) if ("float" in item.output_type or "double" in item.output_type) else item.output_type
+                    item.input_type = (
+                        item.input_type
+                        if ("float" in item.input_type or "double" in item.input_type)
+                        else item.input_type
+                    )
+                    item.output_type = (
+                        item.output_type
+                        if ("float" in item.output_type or "double" in item.output_type)
+                        else item.output_type
+                    )
 
                     if (
                         item.is_input_optional
@@ -181,6 +188,25 @@ class Plugin(PluginBase):
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
+_cpp_type_mapping                           = {
+    "int8": "int8_t",
+    "int16": "int16_t",
+    "int32": "int32_t",
+    "int64": "int64_t",
+    "uint8": "uint8_t",
+    "uint16": "uint16_t",
+    "uint32": "uint32_t",
+    "uint64": "uint64_t",
+    "float": "float_t",
+    "double": "double_t",
+    "string": "std::string",
+    "bool": "bool",
+}
+
+
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 def _GenerateGlobalKernels(
     output_dir,
     all_items,
@@ -232,7 +258,7 @@ def _GenerateGlobalKernels(
 
         macros += [
             "ONNX_OPERATOR_TYPED_KERNEL_CLASS_NAME(kCpuExecutionProvider, kMSFeaturizersDomain, 1, {}, {})".format(
-                re.sub(r'^std::|_t$', '', input_type),
+                input_type,
                 transformer_name,
             )
             for input_type in six.iterkeys(input_type_mappings)
@@ -339,14 +365,17 @@ def _GenerateGlobalDefs(
     # ----------------------------------------------------------------------
     def CreateTypeInferenceConstraints(output_type_mappings):
         code = []
-        constraint_format = "input_elem_type == ONNX_NAMESPACE::TensorProto_DataType_{input_type_upper}"
+        constraint_format = (
+            "input_elem_type == ONNX_NAMESPACE::TensorProto_DataType_{input_type_upper}"
+        )
 
         for index, (output_type, input_types) in enumerate(output_type_mappings.items()):
             constraints = []
             for input_type in input_types:
-                constraints.append(constraint_format.format(
-                    input_type_upper = re.sub(r'^std::|_t$', '', input_type).upper()
-                    )
+                constraints.append(
+                    constraint_format.format(
+                        input_type_upper=input_type.upper(),
+                    ),
                 )
             code.append(
                 textwrap.dedent(
@@ -354,11 +383,11 @@ def _GenerateGlobalDefs(
                     {end}if ({constraints}) {{
                         ctx.getOutputType(0)->mutable_tensor_type()->set_elem_type(ONNX_NAMESPACE::TensorProto_DataType_{output_type_upper});
                     }}""".format(
-                        end = "" if index == 0 else " else ",
-                        output_type_upper = re.sub(r'^std::|_t$', '', output_type).upper(),
-                        constraints = " ||\n".join(constraints),
-                    )
-                )
+                        end="" if index == 0 else " else ",
+                        output_type_upper=output_type.upper(),
+                        constraints=" ||\n".join(constraints),
+                    ),
+                ),
             )
 
         return "".join(code)
@@ -419,7 +448,7 @@ def _GenerateGlobalDefs(
                                 type_name=type_name,
                                 constraints=", ".join(
                                     [
-                                        '"tensor({})"'.format(re.sub("_t$", "", constraint))
+                                        '"tensor({})"'.format(constraint)
                                         for constraint in constraints
                                     ],
                                 ),
@@ -455,12 +484,7 @@ def _GenerateGlobalDefs(
                     "T",
                     item.input_description,
                     [CreateOutputStatement("T", item.output_description)],
-                    {
-                        "T": [
-                            key.replace("std::", "")
-                            for key in six.iterkeys(input_type_mappings)
-                        ],
-                    },
+                    {"T": list(six.iterkeys(input_type_mappings))},
                     suffix=textwrap.dedent(
                         """\
                         .TypeAndShapeInferenceFunction(
@@ -481,9 +505,10 @@ def _GenerateGlobalDefs(
             # We need to create one combined function for all output types
             all_output_types = []
             all_input_types = []
+
             for output_type, input_types in six.iteritems(output_type_mappings):
-                all_output_types.append(re.sub("_t$", "", output_type))
-                all_input_types.extend(re.sub("_t$","", value) for value in input_types)
+                all_output_types.append(output_type)
+                all_input_types += input_types
 
             type_constraints = OrderedDict()
 
@@ -491,17 +516,17 @@ def _GenerateGlobalDefs(
                 input_type = "tensor({})".format(all_input_types[0])
             else:
                 input_type = "InputT"
-                type_constraints[input_type] = [
-                    "{}".format(value.replace("std::", ""))
-                    for value in all_input_types
-                ]
+                type_constraints[input_type] = all_input_types
 
-            if custom_struct_data is None or all_output_types[0] not in custom_struct_data:
+            if (
+                custom_struct_data is None
+                or all_output_types[0] not in custom_struct_data
+            ):
                 if len(all_output_types) == 1:
                     output_type = all_output_types[0]
                     output_statements = [
                         CreateOutputStatement(
-                            "tensor({})".format(output_type.replace("std::", "")),
+                            "tensor({})".format(output_type),
                             item.output_description,
                         ),
                     ]
@@ -516,19 +541,13 @@ def _GenerateGlobalDefs(
                         )
                         """,
                     ).format(
-                        output_type_upper=output_type.replace("std::", "").upper(),
+                        output_type_upper=output_type.upper(),
                     )
                 else:
                     output_type = "OutputT"
-                    type_constraints[output_type] = [
-                        "{}".format(value.replace("std::", ""))
-                        for value in all_output_types
-                    ]
+                    type_constraints[output_type] = all_output_types
                     output_statements = [
-                        CreateOutputStatement(
-                            "OutputT",
-                            item.output_description,
-                        ),
+                        CreateOutputStatement("OutputT", item.output_description),
                     ]
                     suffix = textwrap.dedent(
                         """\
@@ -542,18 +561,14 @@ def _GenerateGlobalDefs(
                         )
                         """,
                     ).format(
-                        output_type_upper=output_type.replace("std::", "").upper(),
-                        constraints = CreateTypeInferenceConstraints(output_type_mappings),
+                        output_type_upper=output_type.upper(),
+                        constraints=CreateTypeInferenceConstraints(output_type_mappings),
                     )
             else:
                 assert custom_struct_data
                 assert len(custom_struct_data) == 1, custom_struct_data
 
-                (
-                    output_statements,
-                    custom_type_constraints,
-                    suffix,
-                ) = custom_struct_data[
+                (output_statements, custom_type_constraints, suffix) = custom_struct_data[
                     output_type
                 ].GetDefOutputStatementsConstraintsAndSuffix()
 
@@ -563,7 +578,7 @@ def _GenerateGlobalDefs(
             # Populate the content
             preprocessor_macros.append(
                 CreateMacro(
-                    input_type.replace("std::", ""),
+                    input_type,
                     item.input_description,
                     output_statements,
                     type_constraints,
@@ -696,7 +711,7 @@ def _GenerateKernel(
     if len(input_type_mappings) == 1:
         assert len(output_type_mappings) == 1, output_type_mappings
 
-        input_type = next(six.iterkeys(input_type_mappings))
+        input_type = _cpp_type_mapping[next(six.iterkeys(input_type_mappings))]
     else:
         input_type = "T" if _IsIdentityTypeMapping(input_type_mappings) else "InputT"
 
@@ -705,11 +720,19 @@ def _GenerateKernel(
 
     if len(output_type_mappings) == 1:
         output_type = next(six.iterkeys(output_type_mappings))
+        output_type = _cpp_type_mapping.get(output_type, output_type)
     else:
         overrides = []
 
         for output_type, mapped_input_types in six.iteritems(output_type_mappings):
+            output_type = _cpp_type_mapping.get(output_type, output_type)
+
             for mapped_input_type in mapped_input_types:
+                mapped_input_type = _cpp_type_mapping.get(
+                    mapped_input_type,
+                    mapped_input_type,
+                )
+
                 overrides.append(
                     textwrap.dedent(
                         """\
@@ -717,8 +740,8 @@ def _GenerateKernel(
                         struct OutputTypeMapper<{input_type}> {{ using type = {output_type}; }};
                         """,
                     ).format(
-                        input_type=mapped_input_type if "string" in  mapped_input_type else mapped_input_type.replace("std::", ""),
-                        output_type=output_type if "string" in  output_type else output_type.replace("std::", ""),
+                        input_type=mapped_input_type,
+                        output_type=output_type,
                     ),
                 )
 
@@ -765,7 +788,7 @@ def _GenerateKernel(
                 {output_type}* output_data(output_tensor->MutableData<{output_type}>());
                 """,
             ).format(
-                output_type=output_type,
+                output_type=_cpp_type_mapping.get(output_type, output_type),
             ),
         ]
 
@@ -808,8 +831,11 @@ def _GenerateKernel(
                     """,
                 ).format(
                     transformer_name=transformer_name,
-                    input_type_no_namespace = re.sub(r'^std::|_t$', '', mapping_input_type),
-                    input_type = mapping_input_type if "string" in  mapping_input_type else re.sub(r'^std::', '', mapping_input_type),
+                    input_type_no_namespace=mapping_input_type,
+                    input_type=_cpp_type_mapping.get(
+                        mapping_input_type,
+                        mapping_input_type,
+                    ),
                     template_input_type=input_type,
                 ) for mapping_input_type in six.iterkeys(input_type_mappings)
             ]
@@ -830,7 +856,15 @@ def _GenerateKernel(
             transformer_name,
         )
 
-    with open(os.path.join(output_dir, "{}.cc".format('_'.join(re.findall('[a-zA-Z][^A-Z]*', transformer_name)).lower())), "w") as f:
+    with open(
+        os.path.join(
+            output_dir,
+            "{}.cc".format(
+                "_".join(re.findall("[a-zA-Z][^A-Z]*", transformer_name)).lower(),
+            ),
+        ),
+        "w",
+    ) as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -917,6 +951,11 @@ def _GetCustomStructTypeInfo(custom_struct):
     from Plugins.OnnxRuntimePluginImpl.StandardCustomStructInfo import (
         StandardCustomStructInfo,
     )
+
+    custom_struct = copy.deepcopy(custom_struct)
+
+    for member in custom_struct.members:
+        member.type = _cpp_type_mapping.get(member.type, member.type)
 
     return StandardCustomStructInfo(custom_struct)
 

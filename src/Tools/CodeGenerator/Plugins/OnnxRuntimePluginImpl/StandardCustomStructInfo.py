@@ -63,6 +63,12 @@ class StandardCustomStructInfo(CustomStructInfo):
     # ----------------------------------------------------------------------
     @Interface.override
     def GetDefOutputStatementsConstraintsAndSuffix(self):
+        # ----------------------------------------------------------------------
+        def ToOrtTypeString(value):
+            return value.replace("std::", "").replace("_t", "")
+
+        # ----------------------------------------------------------------------
+
         output_statements = []
 
         for index, member in enumerate(self._custom_struct.members):
@@ -79,7 +85,7 @@ class StandardCustomStructInfo(CustomStructInfo):
             output_statements,
             OrderedDict(
                 [
-                    (k, ["{}".format(re.sub("_t$","", v.replace("std::", "")))])
+                    (k, [ToOrtTypeString(v)])
                     for k,
                     v in six.iteritems(self._template_to_types)
                 ],
@@ -102,7 +108,7 @@ class StandardCustomStructInfo(CustomStructInfo):
                         [
                             "ctx.getOutputType({index})->mutable_tensor_type()->set_elem_type(ONNX_NAMESPACE::TensorProto_DataType_{type});".format(
                                 index=index,
-                                type=re.sub("_t$","", member.type.replace("std::", "")).upper(),
+                                type=ToOrtTypeString(member.type).upper(),
                             ) for index,
                             member in enumerate(self._custom_struct.members)
                         ],
@@ -130,7 +136,7 @@ class StandardCustomStructInfo(CustomStructInfo):
             initialize_statements_part2.append(
                 "{type}* {name}_data({name}_tensor->MutableData<{type}>());".format(
                     name=member.name,
-                    type=member.type if "string" in member.type else member.type.replace("std::", ""),
+                    type=member.type,
                 ),
             )
 
@@ -156,5 +162,5 @@ class StandardCustomStructInfo(CustomStructInfo):
                 """,
             ).format(
                 transformer_name=transformer_name,
-            )]
+            )],
         )
