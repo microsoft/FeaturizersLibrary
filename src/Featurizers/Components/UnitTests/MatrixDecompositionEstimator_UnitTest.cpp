@@ -60,17 +60,17 @@ void PCAEstimator_Test(std::vector<std::vector<dataT>> const &inputBatches) {
 
 template<typename dataT>
 void TestWrapperSVD(){
-    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<dataT>>(
-        NS::TestHelpers::make_vector<dataT>( 1.0, 2.0, 3.0),
-        NS::TestHelpers::make_vector<dataT>(-1.0,-2.0,-3.0),
-        NS::TestHelpers::make_vector<dataT>( 1.0,-2.0, 3.0)
+    auto trainingBatches = NS::TestHelpers::make_vector<std::vector<dataT>>(
+        NS::TestHelpers::make_vector<dataT>( 1.0, 2.0),
+        NS::TestHelpers::make_vector<dataT>(-1.0,-2.0),
+        NS::TestHelpers::make_vector<dataT>( 1.0,-2.0)
     );
     SVDEstimator_Test<dataT>(trainingBatches);
 }
 
 template<typename dataT>
 void TestWrapperPCA(){
-    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<dataT>>(
+    auto trainingBatches = NS::TestHelpers::make_vector<std::vector<dataT>>(
         NS::TestHelpers::make_vector<dataT>(-1.0, -1.0),
         NS::TestHelpers::make_vector<dataT>(-2.0, -1.0),
         NS::TestHelpers::make_vector<dataT>(-3.0, -2.0),
@@ -81,15 +81,26 @@ void TestWrapperPCA(){
     PCAEstimator_Test<dataT>(trainingBatches);
 }
 
-// TEST_CASE("Invalid_Annotation") {
+TEST_CASE("Invalid_Annotation") {
+    using dataT = std::float_t;
+    auto validCharacteristicValue = NS::TestHelpers::make_vector<dataT>(0.0);
+    auto validFeatureVector = NS::TestHelpers::make_vector<std::vector<dataT>>(NS::TestHelpers::make_vector<dataT>(0.0));
+    auto invalidCharacteristicValue = NS::TestHelpers::make_vector<dataT>();
+    auto invalidFeatureVector = NS::TestHelpers::make_vector<std::vector<dataT>>(NS::TestHelpers::make_vector<dataT>());
+    CHECK_THROWS_WITH(NS::Featurizers::Components::MatrixDecompositionAnnotationData<dataT>(invalidCharacteristicValue, validFeatureVector, validFeatureVector), "sigma");
+    CHECK_THROWS_WITH(NS::Featurizers::Components::MatrixDecompositionAnnotationData<dataT>(validCharacteristicValue, invalidFeatureVector, validFeatureVector), "u");
+    CHECK_THROWS_WITH(NS::Featurizers::Components::MatrixDecompositionAnnotationData<dataT>(validCharacteristicValue, validFeatureVector, invalidFeatureVector), "v");
+}
 
-// }
-
-// TEST_CASE("Invalid_TrainingPolicy") {
-    
-// }
+TEST_CASE("Invalid_TrainingPolicy") {
+    using dataT = std::float_t;
+    CHECK_THROWS_WITH(NS::Featurizers::Components::Details::SVDTrainingOnlyPolicy<dataT>(0), "numRows");
+    CHECK_THROWS_WITH(NS::Featurizers::Components::Details::PCATrainingOnlyPolicy<dataT>(0), "numRows");
+}
 
 TEST_CASE("Eigen_Itegration") {
-    TestWrapperSVD<float>();
-    TestWrapperPCA<float>();
+    TestWrapperSVD<std::float_t>();
+    TestWrapperPCA<std::float_t>();
+    TestWrapperSVD<std::double_t>();
+    TestWrapperPCA<std::double_t>();
 }

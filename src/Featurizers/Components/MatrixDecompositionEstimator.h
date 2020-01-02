@@ -20,8 +20,8 @@
 #endif
 
 #include "../../3rdParty/eigen-git-mirror/Eigen/Core"
-#include "../../3rdParty/eigen-git-mirror/Eigen/SVD"
 #include "../../3rdParty/eigen-git-mirror/Eigen/Eigen"
+#include "../../3rdParty/eigen-git-mirror/Eigen/SVD"
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
@@ -287,14 +287,11 @@ void Details::SVDTrainingOnlyPolicy<T>::fit(InputType const &input) {
 template <typename T>
 MatrixDecompositionAnnotationData<T> Details::SVDTrainingOnlyPolicy<T>::complete_training(void) {
 
-    //svd, pca solver goes here
-    // ----------------------------------------------------------------------
-    // ----------------------------------------------------------------------
-    size_t const numColsConst = _matrix.size() / _numRows;
-    size_t const numRowsConst = _numRows;
+    size_t numColsConst = _matrix.size() / _numRows;
+    size_t numRowsConst = _numRows;
     
     //consider use lambda
-    Eigen::MatrixXf M(numRowsConst, numColsConst);
+    Eigen::MatrixX<T> M(numRowsConst, numColsConst);
 
     size_t count = 0;
     for (T const & val : _matrix) {
@@ -302,16 +299,16 @@ MatrixDecompositionAnnotationData<T> Details::SVDTrainingOnlyPolicy<T>::complete
         ++count;
     }
 
-    Eigen::JacobiSVD<Eigen::MatrixXf> svd(M, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::JacobiSVD<Eigen::MatrixX<T>> svd(M, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
-    Eigen::MatrixXf sigma = svd.singularValues();
+    Eigen::MatrixX<T> sigma = svd.singularValues();
     for (Eigen::Index i = 0; i < sigma.rows(); i++) {
         for (Eigen::Index j = 0; j < sigma.cols(); j++) {
             _sigma.emplace_back(sigma(i, j));
         }
     }
 
-    Eigen::MatrixXf u = svd.matrixU();
+    Eigen::MatrixX<T> u = svd.matrixU();
     for (Eigen::Index i = 0; i < u.rows(); i++) {
         std::vector<T> tempU;
         for (Eigen::Index j = 0; j < u.cols(); j++) {
@@ -320,7 +317,7 @@ MatrixDecompositionAnnotationData<T> Details::SVDTrainingOnlyPolicy<T>::complete
         _u.emplace_back(tempU);
     }
 
-    Eigen::MatrixXf v = svd.matrixV();
+    Eigen::MatrixX<T> v = svd.matrixV();
     for (Eigen::Index i = 0; i < v.rows(); i++) {
         std::vector<T> tempV;
         for (Eigen::Index j = 0; j < v.cols(); j++) {
@@ -361,7 +358,7 @@ MatrixDecompositionAnnotationData<T> Details::PCATrainingOnlyPolicy<T>::complete
     size_t const numRowsConst = _numRows;
     
     //consider use lambda
-    Eigen::MatrixXf M(numRowsConst, numColsConst);
+    Eigen::MatrixX<T> M(numRowsConst, numColsConst);
 
     size_t count = 0;
     for (T const & val : _matrix) {
@@ -369,19 +366,19 @@ MatrixDecompositionAnnotationData<T> Details::PCATrainingOnlyPolicy<T>::complete
         ++count;
     }
 
-    Eigen::MatrixXf centered = M.rowwise() - M.colwise().mean();
-    Eigen::MatrixXf cov = centered.adjoint() * centered;
+    Eigen::MatrixX<T> centered = M.rowwise() - M.colwise().mean();
+    Eigen::MatrixX<T> cov = centered.adjoint() * centered;
 
-    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXf> eig(cov);
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixX<T>> eig(cov);
 
-    Eigen::MatrixXf sigma = eig.eigenvalues();
+    Eigen::MatrixX<T> sigma = eig.eigenvalues();
     for (Eigen::Index i = 0; i < sigma.rows(); i++) {
         for (Eigen::Index j = 0; j < sigma.cols(); j++) {
             _sigma.emplace_back(sigma(i, j));
         }
     }
 
-    Eigen::MatrixXf u = eig.eigenvectors();
+    Eigen::MatrixX<T> u = eig.eigenvectors();
     for (Eigen::Index i = 0; i < u.rows(); i++) {
         std::vector<T> tempU;
         for (Eigen::Index j = 0; j < u.cols(); j++) {
@@ -390,7 +387,7 @@ MatrixDecompositionAnnotationData<T> Details::PCATrainingOnlyPolicy<T>::complete
         _u.emplace_back(tempU);
     }
 
-    Eigen::MatrixXf v = u.transpose();
+    Eigen::MatrixX<T> v = u.transpose();
     for (Eigen::Index i = 0; i < v.rows(); i++) {
         std::vector<T> tempV;
         for (Eigen::Index j = 0; j < v.cols(); j++) {
