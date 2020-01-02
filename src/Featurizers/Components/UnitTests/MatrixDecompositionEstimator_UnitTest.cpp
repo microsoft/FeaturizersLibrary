@@ -13,11 +13,10 @@
 namespace NS = Microsoft::Featurizer;
 
 template<typename dataT, typename DecompositionPolicy>
-void Estimator_Test(std::vector<std::vector<dataT>> const &inputBatches,
-                       std::vector<dataT> const &sigmaLabel,
-                       std::vector<std::vector<dataT>> const &uLabel,
-                       std::vector<std::vector<dataT>> const &vLabel) {
-    //using SVD                           = NS::Featurizers::Components::Details::SVDTrainingOnlyPolicy<dataT>;
+void EstimatorTest(std::vector<std::vector<dataT>> const &inputBatches,
+                    std::vector<dataT> const &sigmaLabel,
+                    std::vector<std::vector<dataT>> const &uLabel,
+                    std::vector<std::vector<dataT>> const &vLabel) {
 
     using MDEstimator                   = NS::Featurizers::Components::MatrixDecompositionEstimator<DecompositionPolicy>;
     using MDAnnotationData              = NS::Featurizers::Components::MatrixDecompositionAnnotationData<dataT>;
@@ -39,6 +38,7 @@ void Estimator_Test(std::vector<std::vector<dataT>> const &inputBatches,
     for (size_t rowNum = 0; rowNum < vLabel.size(); ++rowNum)
         CHECK(NS::TestHelpers::FuzzyCheck(vMat[rowNum], vLabel[rowNum]));
 
+    // commented and remain for future checking
     // std::cout << "U: " << NS::Traits<std::vector<std::vector<dataT>>>::ToString(uMat) << std::endl;
     // std::cout << "V: " << NS::Traits<std::vector<std::vector<dataT>>>::ToString(vMat) << std::endl;
     // std::cout << "S: " << NS::Traits<std::vector<dataT>>::ToString(sMat) << std::endl;
@@ -63,7 +63,7 @@ void TestWrapperSVD(){
         NS::TestHelpers::make_vector<dataT>( 0.207592, 0.978216),
         NS::TestHelpers::make_vector<dataT>( 0.978216,-0.207592)
     );
-    Estimator_Test<dataT, SVD>(trainingBatches, sigmaLabel, uLabel, vLabel);
+    EstimatorTest<dataT, SVD>(trainingBatches, sigmaLabel, uLabel, vLabel);
 }
 
 template<typename dataT>
@@ -87,7 +87,7 @@ void TestWrapperPCA(){
         NS::TestHelpers::make_vector<dataT>(-0.544914, 0.838492),
         NS::TestHelpers::make_vector<dataT>( 0.838492, 0.544914)
     );
-    Estimator_Test<dataT, PCA>(trainingBatches, sigmaLabel, uLabel, vLabel);
+    EstimatorTest<dataT, PCA>(trainingBatches, sigmaLabel, uLabel, vLabel);
 }
 
 TEST_CASE("Invalid_Annotation") {

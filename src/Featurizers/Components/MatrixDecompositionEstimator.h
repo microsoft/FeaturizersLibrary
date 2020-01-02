@@ -70,6 +70,50 @@ public:
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MatrixDecompositionAnnotationData);
 };
 
+// ----------------------------------------------------------------------
+// |
+// |  2d Eigen::MatrixX<T> -> vector<vector<T>>
+// |
+// ----------------------------------------------------------------------
+namespace {
+
+template <typename T>
+inline std::vector<std::vector<T>> EigenMatrixX2VectorContainer(Eigen::MatrixX<T> const & eigenMatrix) {
+    std::vector<std::vector<T>> returnVector;
+    for (Eigen::Index rowIdx = 0; rowIdx < eigenMatrix.rows(); ++rowIdx) {
+        std::vector<T> tempRow;
+        for (Eigen::Index colIdx = 0; colIdx < eigenMatrix.cols(); ++colIdx) {
+            tempRow.emplace_back(eigenMatrix(rowIdx, colIdx));
+        }
+        returnVector.emplace_back(tempRow);
+    }
+    return returnVector;
+}
+
+template <typename T>
+inline std::vector<T> EigenMatrixX2Vector(Eigen::MatrixX<T> const & eigenMatrix) {
+    std::vector<T> returnVector;
+    for (Eigen::Index rowIdx = 0; rowIdx < eigenMatrix.rows(); ++rowIdx) { 
+        for (Eigen::Index colIdx = 0; colIdx < eigenMatrix.cols(); ++colIdx) {
+            returnVector.emplace_back(eigenMatrix(rowIdx, colIdx));
+        }
+    }
+    return returnVector;
+}
+
+template <typename T>
+inline Eigen::MatrixX<T> VectorContainer2EigenMatrix(std::vector<T> const & vector, size_t numRows, size_t numCols) {
+    Eigen::MatrixX<T> eigenMatrix(numRows, numCols);
+    size_t count = 0;
+    for (T const & val : vector) {
+        eigenMatrix(static_cast<Eigen::Index>(count / numCols), static_cast<Eigen::Index>(count % numCols)) = val;
+        ++count;
+    }
+    return eigenMatrix;
+}
+
+}
+
 namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
@@ -288,44 +332,19 @@ void Details::SVDTrainingOnlyPolicy<T>::fit(InputType const &input) {
 template <typename T>
 MatrixDecompositionAnnotationData<T> Details::SVDTrainingOnlyPolicy<T>::complete_training(void) {
 
-    size_t numColsConst = _matrix.size() / _numRows;
-    size_t numRowsConst = _numRows;
-    
-    //consider use lambda
-    Eigen::MatrixX<T> M(numRowsConst, numColsConst);
+    Eigen::JacobiSVD<Eigen::MatrixX<T>> svd(
+        [&]() -> Eigen::MatrixX<T> {
+            size_t const numColsConst = _matrix.size() / _numRows;
+            size_t const numRowsConst = _numRows;
+           
+            return VectorContainer2EigenMatrix(_matrix, numRowsConst, numColsConst);
+        }(),
+        Eigen::ComputeThinU | Eigen::ComputeThinV
+    );
 
-    size_t count = 0;
-    for (T const & val : _matrix) {
-        M(static_cast<Eigen::Index>(count / numColsConst), static_cast<Eigen::Index>(count % numColsConst)) = val;
-        ++count;
-    }
-
-    Eigen::JacobiSVD<Eigen::MatrixX<T>> svd(M, Eigen::ComputeThinU | Eigen::ComputeThinV);
-
-    Eigen::MatrixX<T> sigma = svd.singularValues();
-    for (Eigen::Index i = 0; i < sigma.rows(); i++) {
-        for (Eigen::Index j = 0; j < sigma.cols(); j++) {
-            _sigma.emplace_back(sigma(i, j));
-        }
-    }
-
-    Eigen::MatrixX<T> u = svd.matrixU();
-    for (Eigen::Index i = 0; i < u.rows(); i++) {
-        std::vector<T> tempU;
-        for (Eigen::Index j = 0; j < u.cols(); j++) {
-            tempU.emplace_back(u(i, j));
-        }
-        _u.emplace_back(tempU);
-    }
-
-    Eigen::MatrixX<T> v = svd.matrixV();
-    for (Eigen::Index i = 0; i < v.rows(); i++) {
-        std::vector<T> tempV;
-        for (Eigen::Index j = 0; j < v.cols(); j++) {
-            tempV.emplace_back(v(i, j));
-        }
-        _v.emplace_back(tempV);
-    }
+    _sigma = EigenMatrixX2Vector<T>(svd.singularValues());
+    _u = EigenMatrixX2VectorContainer<T>(svd.matrixU());
+    _v = EigenMatrixX2VectorContainer<T>(svd.matrixV());
     
     return MatrixDecompositionAnnotationData<T>(std::move(_sigma), std::move(_u), std::move(_v));
 }
@@ -355,47 +374,26 @@ void Details::PCATrainingOnlyPolicy<T>::fit(InputType const &input) {
 template <typename T>
 MatrixDecompositionAnnotationData<T> Details::PCATrainingOnlyPolicy<T>::complete_training(void) {
 
-    size_t const numColsConst = _matrix.size() / _numRows;
-    size_t const numRowsConst = _numRows;
-    
-    //consider use lambda
-    Eigen::MatrixX<T> M(numRowsConst, numColsConst);
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixX<T>> eig(
+        [&]() -> Eigen::MatrixX<T> {
+            size_t const numColsConst = _matrix.size() / _numRows;
+            size_t const numRowsConst = _numRows;
+           
+            Eigen::MatrixX<T> M = VectorContainer2EigenMatrix(_matrix, numRowsConst, numColsConst);
 
-    size_t count = 0;
-    for (T const & val : _matrix) {
-        M(static_cast<Eigen::Index>(count / numColsConst), static_cast<Eigen::Index>(count % numColsConst)) = val;
-        ++count;
-    }
+            //compute for centered training data
+            Eigen::MatrixX<T> centered = M.rowwise() - M.colwise().mean();
+            //compute for covariance matrix
+            Eigen::MatrixX<T> cov = centered.adjoint() * centered;
+            //using covariance matrix to compute PCA
+            return cov;
+        }()
+    );
 
-    Eigen::MatrixX<T> centered = M.rowwise() - M.colwise().mean();
-    Eigen::MatrixX<T> cov = centered.adjoint() * centered;
-
-    Eigen::SelfAdjointEigenSolver<Eigen::MatrixX<T>> eig(cov);
-
-    Eigen::MatrixX<T> sigma = eig.eigenvalues();
-    for (Eigen::Index i = 0; i < sigma.rows(); i++) {
-        for (Eigen::Index j = 0; j < sigma.cols(); j++) {
-            _sigma.emplace_back(sigma(i, j));
-        }
-    }
-
-    Eigen::MatrixX<T> u = eig.eigenvectors();
-    for (Eigen::Index i = 0; i < u.rows(); i++) {
-        std::vector<T> tempU;
-        for (Eigen::Index j = 0; j < u.cols(); j++) {
-            tempU.emplace_back(u(i, j));
-        }
-        _u.emplace_back(tempU);
-    }
-
-    Eigen::MatrixX<T> v = u.transpose();
-    for (Eigen::Index i = 0; i < v.rows(); i++) {
-        std::vector<T> tempV;
-        for (Eigen::Index j = 0; j < v.cols(); j++) {
-            tempV.emplace_back(v(i, j));
-        }
-        _v.emplace_back(tempV);
-    }
+    //PCA uses sigma but sklearn PCA uses sqrt(sigma), this implementation follows first concept. 
+    _sigma = EigenMatrixX2Vector<T>(eig.eigenvalues());
+    _u = EigenMatrixX2VectorContainer<T>(eig.eigenvectors());
+    _v = EigenMatrixX2VectorContainer<T>(eig.eigenvectors().transpose());
     
     return MatrixDecompositionAnnotationData<T>(std::move(_sigma), std::move(_u), std::move(_v));
 }
