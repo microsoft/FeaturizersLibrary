@@ -36,8 +36,9 @@ static constexpr char const * const         MatrixDecompositionEstimatorName("Ma
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         MatrixDecompositionAnnotationData
-///  \brief         Contains 
-///
+///  \brief         Contains matrix decomposition components: 
+///                 for PCA, they are eigenvalues and eigenvectors
+///                 for SVD, they are singularvalues and singularvectors
 template <typename T>
 class MatrixDecompositionAnnotationData {
 public:
@@ -72,7 +73,7 @@ public:
 namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MatrixDecompositionTrainingOnlyPolicy
+///  \class         SVDTrainingOnlyPolicy
 ///  \brief         `MatrixDecompositionEstimator` implementation details.
 ///
 template <typename T>
@@ -118,7 +119,7 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MatrixDecompositionTrainingOnlyPolicy
+///  \class         PCATrainingOnlyPolicy
 ///  \brief         `MatrixDecompositionEstimator` implementation details.
 ///
 template <typename T>
@@ -167,8 +168,8 @@ private:
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         MatrixDecompositionEstimator
-///  \brief         This class 
-///                
+///  \brief         This class generates MatrixDecompositionAnnotationData
+///                 by processing input matrix using Eigen
 ///
 template <
     typename DecompositionPolicy,
