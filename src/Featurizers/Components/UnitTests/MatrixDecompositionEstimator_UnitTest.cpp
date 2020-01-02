@@ -49,19 +49,19 @@ void TestWrapperSVD(){
     using SVD                           = NS::Featurizers::Components::Details::SVDTrainingOnlyPolicy<dataT>;
 
     auto trainingBatches = NS::TestHelpers::make_vector<std::vector<dataT>>(
-        NS::TestHelpers::make_vector<dataT>( 1.0, 2.0),
-        NS::TestHelpers::make_vector<dataT>(-1.0,-2.0),
-        NS::TestHelpers::make_vector<dataT>( 1.0,-2.0)
+        NS::TestHelpers::make_vector<dataT>( 1.0f, 2.0f),
+        NS::TestHelpers::make_vector<dataT>(-1.0f,-2.0f),
+        NS::TestHelpers::make_vector<dataT>( 1.0f,-2.0f)
     );
-    auto sigmaLabel = NS::TestHelpers::make_vector<dataT>( 3.524830, 1.604859);
+    auto sigmaLabel = NS::TestHelpers::make_vector<dataT>( 3.524830f, 1.604859f);
     auto uLabel = NS::TestHelpers::make_vector<std::vector<dataT>>(
-        NS::TestHelpers::make_vector<dataT>( 0.613937, 0.350830),
-        NS::TestHelpers::make_vector<dataT>(-0.613937,-0.350830),
-        NS::TestHelpers::make_vector<dataT>(-0.496149, 0.868238)
+        NS::TestHelpers::make_vector<dataT>( 0.613937f, 0.350830f),
+        NS::TestHelpers::make_vector<dataT>(-0.613937f,-0.350830f),
+        NS::TestHelpers::make_vector<dataT>(-0.496149f, 0.868238f)
     );
     auto vLabel = NS::TestHelpers::make_vector<std::vector<dataT>>(
-        NS::TestHelpers::make_vector<dataT>( 0.207592, 0.978216),
-        NS::TestHelpers::make_vector<dataT>( 0.978216,-0.207592)
+        NS::TestHelpers::make_vector<dataT>( 0.207592f, 0.978216f),
+        NS::TestHelpers::make_vector<dataT>( 0.978216f,-0.207592f)
     );
     EstimatorTest<dataT, SVD>(trainingBatches, sigmaLabel, uLabel, vLabel);
 }
@@ -71,29 +71,29 @@ void TestWrapperPCA(){
     using PCA                           = NS::Featurizers::Components::Details::PCATrainingOnlyPolicy<dataT>;
 
     auto trainingBatches = NS::TestHelpers::make_vector<std::vector<dataT>>(
-        NS::TestHelpers::make_vector<dataT>(-1.0, -1.0),
-        NS::TestHelpers::make_vector<dataT>(-2.0, -1.0),
-        NS::TestHelpers::make_vector<dataT>(-3.0, -2.0),
-        NS::TestHelpers::make_vector<dataT>( 1.0,  1.0),
-        NS::TestHelpers::make_vector<dataT>( 2.0,  1.0),
-        NS::TestHelpers::make_vector<dataT>( 3.0,  2.0)
+        NS::TestHelpers::make_vector<dataT>(-1.0f, -1.0f),
+        NS::TestHelpers::make_vector<dataT>(-2.0f, -1.0f),
+        NS::TestHelpers::make_vector<dataT>(-3.0f, -2.0f),
+        NS::TestHelpers::make_vector<dataT>( 1.0f,  1.0f),
+        NS::TestHelpers::make_vector<dataT>( 2.0f,  1.0f),
+        NS::TestHelpers::make_vector<dataT>( 3.0f,  2.0f)
     );
-    auto sigmaLabel = NS::TestHelpers::make_vector<dataT>( 0.302284, 39.697716);
+    auto sigmaLabel = NS::TestHelpers::make_vector<dataT>( 0.302284f, 39.697716f);
     auto uLabel = NS::TestHelpers::make_vector<std::vector<dataT>>(
-        NS::TestHelpers::make_vector<dataT>(-0.544914, 0.838492),
-        NS::TestHelpers::make_vector<dataT>( 0.838492, 0.544914)
+        NS::TestHelpers::make_vector<dataT>(-0.544914f, 0.838492f),
+        NS::TestHelpers::make_vector<dataT>( 0.838492f, 0.544914f)
     );
     auto vLabel = NS::TestHelpers::make_vector<std::vector<dataT>>(
-        NS::TestHelpers::make_vector<dataT>(-0.544914, 0.838492),
-        NS::TestHelpers::make_vector<dataT>( 0.838492, 0.544914)
+        NS::TestHelpers::make_vector<dataT>(-0.544914f, 0.838492f),
+        NS::TestHelpers::make_vector<dataT>( 0.838492f, 0.544914f)
     );
     EstimatorTest<dataT, PCA>(trainingBatches, sigmaLabel, uLabel, vLabel);
 }
 
 TEST_CASE("Invalid_Annotation") {
     using dataT = std::float_t;
-    auto validCharacteristicValue = NS::TestHelpers::make_vector<dataT>(0.0);
-    auto validFeatureVector = NS::TestHelpers::make_vector<std::vector<dataT>>(NS::TestHelpers::make_vector<dataT>(0.0));
+    auto validCharacteristicValue = NS::TestHelpers::make_vector<dataT>(0.0f);
+    auto validFeatureVector = NS::TestHelpers::make_vector<std::vector<dataT>>(NS::TestHelpers::make_vector<dataT>(0.0f));
     auto invalidCharacteristicValue = NS::TestHelpers::make_vector<dataT>();
     auto invalidFeatureVector = NS::TestHelpers::make_vector<std::vector<dataT>>(NS::TestHelpers::make_vector<dataT>());
     CHECK_THROWS_WITH(NS::Featurizers::Components::MatrixDecompositionAnnotationData<dataT>(invalidCharacteristicValue, validFeatureVector, validFeatureVector), "sigma");

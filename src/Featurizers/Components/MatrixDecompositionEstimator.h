@@ -17,6 +17,9 @@
 #   pragma clang diagnostic ignored "-Wdocumentation"
 #   pragma clang diagnostic ignored "-Wcast-align"
 #   pragma clang diagnostic ignored "-Wfloat-equal"
+#elif (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4127)
 #endif
 
 #include "../../3rdParty/eigen-git-mirror/Eigen/Core"
@@ -25,6 +28,8 @@
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
+#elif (defined _MSC_VER)
+#   pragma warning(pop)
 #endif
 
 namespace Microsoft {
