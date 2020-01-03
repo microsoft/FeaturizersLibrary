@@ -8,7 +8,7 @@
 #include "GeneratedCode/SharedLibraryTests_HashOneHotVectorizerFeaturizer.h"
 
 TEST_CASE("int8") {
-    HashOneHotVectorizerFeaturizer_int8_t_Test(
+    HashOneHotVectorizerFeaturizer_int8_Test(
         std::vector<std::int8_t>(),
         std::vector<std::int8_t>{
             static_cast<std::int8_t>(15)

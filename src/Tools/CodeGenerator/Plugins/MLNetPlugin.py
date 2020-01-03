@@ -903,8 +903,6 @@ class CSharpData(object):
             # so that we only need to perform this initialization once.
             cls._type_info_factory_classes = type_info_factory_classes
 
-        the_type = the_type.replace("std::", "").replace("_t", "")
-
         for type_info_factory_class in cls._type_info_factory_classes:
             if type_info_factory_class.TypeName == the_type:
                 return type_info_factory_class

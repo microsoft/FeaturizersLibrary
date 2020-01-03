@@ -9,7 +9,7 @@
 
 
 TEST_CASE("int8") {
-    OneHotEncoderFeaturizer_int8_t_Test(
+    OneHotEncoderFeaturizer_int8_Test(
         std::vector<std::int8_t>{
             static_cast<std::int8_t>(10),
             static_cast<std::int8_t>(20),

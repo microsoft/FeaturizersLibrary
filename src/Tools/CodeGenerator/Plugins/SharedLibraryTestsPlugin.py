@@ -110,11 +110,11 @@ def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
         for item, type_info_data in zip(items, all_type_info_data):
             template = getattr(item, "template", None)
             if template:
-                template_desc = template.replace("std::", "")
-
-                suffix = "_{}_".format(template_desc)
-                type_desc = " <{}>".format(template_desc)
-                cpp_template_suffix = "<{}>".format(template)
+                suffix = "_{}_".format(template)
+                type_desc = " <{}>".format(template)
+                cpp_template_suffix = "<{}>".format(
+                    type_info_data.InputTypeInfoFactory.CppType,
+                )
             else:
                 suffix = "_"
                 type_desc = ""
