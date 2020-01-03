@@ -6,8 +6,8 @@ name: $(TeamProject)-$(BuildDefinitionName)-$(SourceBranchName)-$(Date:yyyy.MM.d
 trigger: none
 
 steps:
-- checkout: self
-  submodules: true
+  - checkout: self
+    submodules: true
 
 resources:
   containers:
