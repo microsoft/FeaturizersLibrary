@@ -5,11 +5,11 @@ name: $(TeamProject)-$(BuildDefinitionName)-$(SourceBranchName)-$(Date:yyyy.MM.d
 
 trigger: none
 
-steps:
-  - checkout: self
-    submodules: true
-
 resources:
+  repositories:
+    - repository: self
+      checkoutOptions:
+        submodules: true
   containers:
     - container: universal_linux
       image: universal_linux
