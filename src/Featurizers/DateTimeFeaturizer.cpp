@@ -387,8 +387,8 @@ void DateTimeTransformer::execute_impl(InputType const &input, CallbackFunction 
         // Values in the holiday map are based on midnight of the corresponding day. When looking up holidays for this time,
         // remove any seconds since midnight.
         long long const                     totalSeconds(std::chrono::time_point_cast<std::chrono::seconds>(input).time_since_epoch().count());
-        long long const                     holidayKey(totalSeconds - (totalSeconds % secondsPerDay));
-        HolidayMap::const_iterator const    iter(_dateHolidayMap.find(static_cast<std::int64_t>(holidayKey)));
+        int64_t const                       holidayKey(static_cast<int64_t>((static_cast<double>(totalSeconds) / secondsPerDay)) * secondsPerDay);
+        HolidayMap::const_iterator const    iter(_dateHolidayMap.find(holidayKey));
 
         if(iter != _dateHolidayMap.end())
             result.holidayName = iter->second;
