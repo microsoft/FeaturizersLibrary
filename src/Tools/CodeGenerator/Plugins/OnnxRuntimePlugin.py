@@ -190,11 +190,36 @@ _cpp_type_mapping                           = {
     "double": "double_t",
     "string": "std::string",
     "bool": "bool",
+    "datetime": "int64",
+}
+
+
+_cpp_input_type_transformations             = {
+    # Datetimes are always int64_t in ORT, which is the posix time
+    "datetime": lambda var_name: "std::chrono::system_clock::from_time_t({})".format(var_name),
 }
 
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+def _GetCppTypeMapping(
+    the_type,
+    recurse=True,
+):
+    while the_type in _cpp_type_mapping:
+        the_new_type = _cpp_type_mapping[the_type]
+        if the_new_type == the_type:
+            break
+
+        the_type = the_new_type
+
+        if not recurse:
+            break
+
+    return the_type
+
+
 # ----------------------------------------------------------------------
 def _GenerateGlobalKernels(
     output_dir,
@@ -502,7 +527,12 @@ def _GenerateGlobalDefs(
             type_constraints = OrderedDict()
 
             if len(all_input_types) == 1:
-                input_type = "tensor({})".format(all_input_types[0])
+                input_type = "tensor({})".format(
+                    _GetCppTypeMapping(
+                        all_input_types[0],
+                        recurse=False,
+                    ),
+                )
             else:
                 input_type = "InputT"
                 type_constraints[input_type] = all_input_types
@@ -700,7 +730,7 @@ def _GenerateKernel(
     if len(input_type_mappings) == 1:
         assert len(output_type_mappings) == 1, output_type_mappings
 
-        input_type = _cpp_type_mapping[next(six.iterkeys(input_type_mappings))]
+        input_type = _GetCppTypeMapping(next(six.iterkeys(input_type_mappings)))
     else:
         input_type = "T" if _IsIdentityTypeMapping(input_type_mappings) else "InputT"
 
@@ -709,18 +739,15 @@ def _GenerateKernel(
 
     if len(output_type_mappings) == 1:
         output_type = next(six.iterkeys(output_type_mappings))
-        output_type = _cpp_type_mapping.get(output_type, output_type)
+        output_type = _GetCppTypeMapping(output_type)
     else:
         overrides = []
 
         for output_type, mapped_input_types in six.iteritems(output_type_mappings):
-            output_type = _cpp_type_mapping.get(output_type, output_type)
+            output_type = _GetCppTypeMapping(output_type)
 
             for mapped_input_type in mapped_input_types:
-                mapped_input_type = _cpp_type_mapping.get(
-                    mapped_input_type,
-                    mapped_input_type,
-                )
+                mapped_input_type = _GetCppTypeMapping(mapped_input_type)
 
                 overrides.append(
                     textwrap.dedent(
@@ -752,6 +779,11 @@ def _GenerateKernel(
     else:
         template_suffix = ""
 
+    input_transformation_statement = "input_data[i]"
+
+    if item.input_type in _cpp_input_type_transformations:
+        input_transformation_statement = _cpp_input_type_transformations[item.input_type](input_transformation_statement)
+
     if item.is_input_optional:
         prefix_statements += textwrap.dedent(
             """\
@@ -765,9 +797,7 @@ def _GenerateKernel(
 
         # We do not want a move here, as the floats and doubles don't gain anything from a move,
         # and the string will be copied to optional anyway.
-        input_transformation_statement = "PreprocessOptional(input_data[i])"
-    else:
-        input_transformation_statement = "input_data[i]"
+        input_transformation_statement = "PreprocessOptional({})".format(input_transformation_statement)
 
     if custom_struct_data is None or output_type not in custom_struct_data:
         prepare_output_statements = [
@@ -777,7 +807,7 @@ def _GenerateKernel(
                 {output_type}* output_data(output_tensor->MutableData<{output_type}>());
                 """,
             ).format(
-                output_type=_cpp_type_mapping.get(output_type, output_type),
+                output_type=_GetCppTypeMapping(output_type),
             ),
         ]
 
@@ -821,10 +851,7 @@ def _GenerateKernel(
                 ).format(
                     transformer_name=transformer_name,
                     input_type_no_namespace=mapping_input_type,
-                    input_type=_cpp_type_mapping.get(
-                        mapping_input_type,
-                        mapping_input_type,
-                    ),
+                    input_type=_GetCppTypeMapping(mapping_input_type),
                     template_input_type=input_type,
                 ) for mapping_input_type in six.iterkeys(input_type_mappings)
             ]
@@ -843,6 +870,7 @@ def _GenerateKernel(
             six.itervalues(custom_struct_data),
         ).GetKernelInitializeAssignAndPreprocessorStatements(
             transformer_name,
+            input_transformation_statement,
         )
 
     with open(
@@ -944,7 +972,7 @@ def _GetCustomStructTypeInfo(custom_struct):
     custom_struct = copy.deepcopy(custom_struct)
 
     for member in custom_struct.members:
-        member.type = _cpp_type_mapping.get(member.type, member.type)
+        member.type = _GetCppTypeMapping(member.type)
 
     return StandardCustomStructInfo(custom_struct)
 

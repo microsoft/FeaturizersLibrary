@@ -7,6 +7,8 @@
 #include "SharedLibrary_OneHotEncoderFeaturizer.h"
 #include "Traits.h"
 
+#include "SharedLibrary_Common.hpp"
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <int8> */
 template <typename VectorInputT, typename... ConstructorArgTs>

@@ -50,6 +50,36 @@ FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr,
 FEATURIZER_LIBRARY_API bool DestroyErrorInfo(/*in*/ ErrorInfoHandle *pHandle);
 FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API_PACK_PREFIX;
+
+struct DateTimeParameter {
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    enum DateTimeTypeValue {
+        DateTimeInt64,      // Posix time
+        DateTimeString      // ISO 8601
+    };
+
+    typedef unsigned char DateTimeType;
+
+    struct StringData {
+        char const *        pBuffer;
+        size_t              cBufferElements;
+    } FEATURIZER_LIBRARY_API_PACK_INLINE;
+
+    union DataType {
+        int64_t             posix;
+        StringData          isoStr;
+    };
+
+    // ----------------------------------------------------------------------
+    // |  Public Data
+    DateTimeType            dataType;
+    DataType                data;
+} FEATURIZER_LIBRARY_API_PACK_INLINE;
+
+FEATURIZER_LIBRARY_API_PACK_SUFFIX;
+
 // These values should match the values in Featurizer.h
 enum TrainingStateValue {
     Pending = 1,
@@ -104,4 +134,3 @@ enum TypeIdValue {
 typedef uint32_t TypeId;
 
 } // extern "C"
-

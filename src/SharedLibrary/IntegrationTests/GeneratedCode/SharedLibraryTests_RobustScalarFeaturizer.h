@@ -7,6 +7,8 @@
 #include "SharedLibrary_RobustScalarFeaturizer.h"
 #include "Traits.h"
 
+#include "SharedLibrary_Common.hpp"
+
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalarFeaturizer <int8> */
 template <typename VectorInputT, typename... ConstructorArgTs>

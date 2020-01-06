@@ -56,7 +56,7 @@ class CustomStructInfo(Interface.Interface):
     # ----------------------------------------------------------------------
     @staticmethod
     @Interface.abstractmethod
-    def GetKernelInitializeAssignAndPreprocessorStatements(transformer_name):
+    def GetKernelInitializeAssignAndPreprocessorStatements(transformer_name, input_transformation_statement):
         """\
         Returns statements required when implementing the kernal.
 

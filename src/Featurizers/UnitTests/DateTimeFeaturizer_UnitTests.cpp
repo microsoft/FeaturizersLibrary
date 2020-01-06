@@ -147,7 +147,7 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:04", "[DateTimeTransformer][DateTime]") {
 
 TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeTransformer][DateTimeTransformer]") {
     NS::Featurizers::DateTimeTransformer    dt("");
-    NS::Featurizers::TimePoint              tp(dt.execute(217081625));
+    NS::Featurizers::TimePoint              tp(dt.execute(SysClock::from_time_t(217081625)));
 
     CHECK(tp.year == 1976);
     CHECK(tp.month == NS::Featurizers::TimePoint::NOVEMBER);
@@ -165,7 +165,7 @@ TEST_CASE("Past - 1976 Nov 17, 12:27:05", "[DateTimeTransformer][DateTimeTransfo
 
 TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]") {
     NS::Featurizers::DateTimeTransformer dt("");
-    NS::Featurizers::TimePoint tp = dt.execute(1751241600);
+    NS::Featurizers::TimePoint tp = dt.execute(SysClock::from_time_t(1751241600));
     CHECK(tp.year == 2025);
     CHECK(tp.month == NS::Featurizers::TimePoint::JUNE);
     CHECK(tp.day == 30);
@@ -191,37 +191,41 @@ TEST_CASE("Future - 2025 June 30", "[DateTimeTransformer][DateTimeTransformer]")
 
 TEST_CASE("Holidays - No CountryName input - No Holiday date", "[DateTimeTransformer][DateTimeTransformer]") {
     NS::Featurizers::DateTimeTransformer dt("");
-    NS::Featurizers::TimePoint tp = dt.execute(157161600);
+    NS::Featurizers::TimePoint tp = dt.execute(SysClock::from_time_t(157161600));
     CHECK(tp.holidayName == "");
 }
 
 TEST_CASE("Holidays - Canada - Christmas Day", "[DateTimeTransformer][DateTimeTransformer]") {
     NS::Featurizers::DateTimeTransformer dt("Canada");
-    NS::Featurizers::TimePoint tp = dt.execute(157161600);
+    NS::Featurizers::TimePoint tp = dt.execute(SysClock::from_time_t(157161600));
     CHECK(tp.holidayName == "Christmas Day");
 }
 
 TEST_CASE("Holidays - Canada - Christmas Day ++", "[DateTimeTransformer][DateTimeTransformer]") {
     NS::Featurizers::DateTimeTransformer dt("Canada");
-    NS::Featurizers::TimePoint tp = dt.execute(157161650);
+    NS::Featurizers::TimePoint tp = dt.execute(SysClock::from_time_t(157161650));
     CHECK(tp.holidayName == "Christmas Day");
 }
 
 TEST_CASE("Holidays - Canada - 1 day before Christmas Day", "[DateTimeTransformer][DateTimeTransformer]") {
     NS::Featurizers::DateTimeTransformer dt("Canada");
-    NS::Featurizers::TimePoint tp = dt.execute(157161599);
+    NS::Featurizers::TimePoint tp = dt.execute(SysClock::from_time_t(157161599));
     CHECK(tp.holidayName == "1 day before Christmas Day");
 }
 
 TEST_CASE("Holidays - Finland - 1 day before Juhannusaatto", "[DateTimeTransformer][DateTimeTransformer]") {
     NS::Featurizers::DateTimeTransformer dt("Finland");
-    NS::Featurizers::TimePoint tp = dt.execute(1088035200);
-    CHECK(tp.holidayName == "1 day before Juhannusaatto");
+
+    NS::Featurizers::TimePoint tp1 = dt.execute(SysClock::from_time_t(1088035200));
+    CHECK(tp1.holidayName == "1 day before Juhannusaatto");
+
+    NS::Featurizers::TimePoint tp2 = dt.execute(SysClock::from_time_t(1088035200 + 1000)); // Ensure that the conversion to midnight is working as expected
+    CHECK(tp2.holidayName == "1 day before Juhannusaatto");
 }
 
 TEST_CASE("Holidays - Finland - No Holiday date", "[DateTimeTransformer][DateTimeTransformer]") {
     NS::Featurizers::DateTimeTransformer dt("Finland");
-    NS::Featurizers::TimePoint tp = dt.execute(227813600);
+    NS::Featurizers::TimePoint tp = dt.execute(SysClock::from_time_t(227813600));
     CHECK(tp.holidayName == "");
 }
 
@@ -231,7 +235,7 @@ TEST_CASE("Holidays - Finland - No Holiday date", "[DateTimeTransformer][DateTim
 TEST_CASE("Far Future - 2998 March 2, 14:03:02", "[DateTimeTransformer][DateTimeTransformer]") {
 
     NS::Featurizers::DateTimeTransformer dt("");
-    NS::Featurizers::TimePoint tp = dt.execute(32445842582);
+    NS::Featurizers::TimePoint tp = dt.execute(SysClock::from_time_t(32445842582));
     CHECK(tp.year == 2998);
     CHECK(tp.month == NS::Featurizers::TimePoint::MARCH);
     CHECK(tp.day == 2);
@@ -252,7 +256,7 @@ TEST_CASE("Pre-Epoch - 1776 July 4", "[DateTimeTransformer][DateTimeTransformer]
 
     // Constructor
     NS::Featurizers::DateTimeTransformer dt("");
-    NS::Featurizers::TimePoint tp = dt.execute(-6106060800);
+    NS::Featurizers::TimePoint tp = dt.execute(SysClock::from_time_t(-6106060800));
     CHECK(tp.year == 1776);
     CHECK(tp.month == NS::Featurizers::TimePoint::JULY);
     CHECK(tp.day == 4);

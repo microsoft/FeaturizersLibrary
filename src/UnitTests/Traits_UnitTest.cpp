@@ -38,24 +38,24 @@ static_assert(std::is_same<Traits<std::tuple<int>>::nullable_type, nonstd::optio
 
 TEST_CASE("Transformer_Nullable") {
     nonstd::optional<std::int8_t> arg_null;
-	std::float_t arg_f_ini = std::numeric_limits<std::float_t>::quiet_NaN();
-	std::double_t arg_d_ini = std::numeric_limits<std::double_t>::quiet_NaN();
+    std::float_t arg_f_ini = std::numeric_limits<std::float_t>::quiet_NaN();
+    std::double_t arg_d_ini = std::numeric_limits<std::double_t>::quiet_NaN();
 
-	nonstd::optional<std::int64_t> arg_64(-7799);
+    nonstd::optional<std::int64_t> arg_64(-7799);
     std::float_t arg_f = 123;
     std::double_t arg_d = 123.45;
 
     CHECK(Traits<nonstd::optional<std::int8_t>>::ToString(arg_null) == "NULL");
-	CHECK(Traits<std::float_t>::ToString(Traits<std::float_t>::GetNullableValue(arg_f)) == "123.000000");
-	CHECK(Traits<nonstd::optional<std::int64_t>>::GetNullableValue(arg_64) == -7799);
-	CHECK(Traits<std::double_t>::ToString(Traits<std::double_t>::GetNullableValue(arg_d)) == "123.450000");
+    CHECK(Traits<std::float_t>::ToString(Traits<std::float_t>::GetNullableValue(arg_f)) == "123.000000");
+    CHECK(Traits<nonstd::optional<std::int64_t>>::GetNullableValue(arg_64) == -7799);
+    CHECK(Traits<std::double_t>::ToString(Traits<std::double_t>::GetNullableValue(arg_d)) == "123.450000");
 
-	CHECK_THROWS_WITH(Traits<nonstd::optional<std::int8_t>>::GetNullableValue(arg_null)
-				, Catch::Contains("GetNullableValue attempt on a null optional type."));
-	CHECK_THROWS_WITH(Traits<float_t>::GetNullableValue(arg_f_ini)
-				, Catch::Contains("GetNullableValue attempt on a float_t NaN."));
-	CHECK_THROWS_WITH(Traits<double_t>::GetNullableValue(arg_d_ini)
-				, Catch::Contains("GetNullableValue attempt on a double_t NaN."));
+    CHECK_THROWS_WITH(Traits<nonstd::optional<std::int8_t>>::GetNullableValue(arg_null)
+                , Catch::Contains("GetNullableValue attempt on a null optional type."));
+    CHECK_THROWS_WITH(Traits<float_t>::GetNullableValue(arg_f_ini)
+                , Catch::Contains("GetNullableValue attempt on a float_t NaN."));
+    CHECK_THROWS_WITH(Traits<double_t>::GetNullableValue(arg_d_ini)
+                , Catch::Contains("GetNullableValue attempt on a double_t NaN."));
 }
 
 TEST_CASE("Transformer_Binary") {
@@ -141,8 +141,8 @@ TEST_CASE("Transformer_Integers") {
 }
 
 TEST_CASE("Transformer_Numbers") {
-	std::float_t arg_f_ini = std::numeric_limits<std::float_t>::quiet_NaN();
-	std::double_t arg_d_ini = std::numeric_limits<std::double_t>::quiet_NaN();
+    std::float_t arg_f_ini = std::numeric_limits<std::float_t>::quiet_NaN();
+    std::double_t arg_d_ini = std::numeric_limits<std::double_t>::quiet_NaN();
     std::float_t arg_f = 123;
     std::double_t arg_d1 = 123.45;
     std::double_t arg_d2 = 135453984983490.5473;
@@ -182,9 +182,9 @@ TEST_CASE("Transformer_Arrays") {
 
     //array<optional>
     nonstd::optional<std::double_t> arg_null;
-	std::array<nonstd::optional<std::double_t>, 3> arr_hasnull{1.5,arg_null,-47.1};
-	std::string arr_hasnull_s{"[1.500000,NULL,-47.100000]"};
-	CHECK(Traits<std::array<nonstd::optional<std::double_t>, 3>>::ToString(arr_hasnull) == arr_hasnull_s);
+    std::array<nonstd::optional<std::double_t>, 3> arr_hasnull{1.5,arg_null,-47.1};
+    std::string arr_hasnull_s{"[1.500000,NULL,-47.100000]"};
+    CHECK(Traits<std::array<nonstd::optional<std::double_t>, 3>>::ToString(arr_hasnull) == arr_hasnull_s);
 
     //vectors in arrays
     std::vector<std::double_t> vect{ 1.03, -20.1, 305.8 };
@@ -199,16 +199,16 @@ TEST_CASE("Transformer_Arrays") {
 TEST_CASE("Transformer_Vectors") {
     std::vector<std::double_t> vect{ 1.03, -20.1, 305.8 };
     std::string vect_s{ "[1.030000,-20.100000,305.800000]" };
-	CHECK(Traits<std::vector<std::double_t>>::ToString(vect) == vect_s);
+    CHECK(Traits<std::vector<std::double_t>>::ToString(vect) == vect_s);
 
-	//vector<optional>
-	nonstd::optional<std::int8_t> arg_null;
-	std::vector<nonstd::optional<std::int8_t>> vect_hasnull{static_cast<std::int8_t>(1), static_cast<std::int8_t>(2), arg_null, static_cast<std::int8_t>(4)};
-	std::string vect_hasnull_s{"[1,2,NULL,4]"};
-	CHECK(Traits<std::vector<nonstd::optional<std::int8_t>>>::ToString(vect_hasnull) == vect_hasnull_s);
+    //vector<optional>
+    nonstd::optional<std::int8_t> arg_null;
+    std::vector<nonstd::optional<std::int8_t>> vect_hasnull{static_cast<std::int8_t>(1), static_cast<std::int8_t>(2), arg_null, static_cast<std::int8_t>(4)};
+    std::string vect_hasnull_s{"[1,2,NULL,4]"};
+    CHECK(Traits<std::vector<nonstd::optional<std::int8_t>>>::ToString(vect_hasnull) == vect_hasnull_s);
 
-	//vectors in vectors
-	std::vector<std::int16_t> Bvect{2, 3, 7, -9};
+    //vectors in vectors
+    std::vector<std::int16_t> Bvect{2, 3, 7, -9};
     std::vector<std::vector<std::int16_t>> Rvect(2, Bvect);
     std::vector<std::vector<std::vector<std::int16_t>>> R2vect(2, Rvect);
     std::string Rvect_res = Traits<std::vector<std::vector<std::int16_t>>>::ToString(Rvect);
@@ -235,7 +235,7 @@ TEST_CASE("Transformer_Maps") {
     m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(93), 0.147));
     std::string map_res = Traits<std::map<std::int16_t, std::double_t>>::ToString(m);
     std::string map_s{ "{5:35.800000,93:0.147000}" };
-	CHECK(map_res == map_s);
+    CHECK(map_res == map_s);
 
     CHECK_THROWS_WITH((Traits<std::map<std::int16_t, std::double_t>>::FromString(map_res)), "Not Implemented Yet");
 }
@@ -246,7 +246,7 @@ TEST_CASE("Unordered map") {
     m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(93), 0.147));
     std::string map_res = Traits<std::unordered_map<std::int16_t, std::double_t>>::ToString(m);
     std::string map_s{ "{93:0.147000,5:35.800000}" };
-	CHECK(map_res == map_s);
+    CHECK(map_res == map_s);
 }
 
 TEST_CASE("Transformer_Tuples") {

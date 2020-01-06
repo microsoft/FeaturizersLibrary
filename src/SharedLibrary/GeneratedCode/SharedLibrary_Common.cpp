@@ -9,6 +9,7 @@
 
 #include "SharedLibrary_Common.h"
 #include "SharedLibrary_PointerTable.h"
+#include "Traits.h"
 
 // Forward declaration for DestroyTransformerSaveData
 ErrorInfoHandle* CreateErrorInfo(std::exception const &ex);
@@ -86,3 +87,12 @@ ErrorInfoHandle * CreateErrorInfo(std::exception const &ex) {
     return reinterpret_cast<ErrorInfoHandle *>(index);
 }
 
+std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &param) {
+    if(param.dataType == DateTimeParameter::DateTimeTypeValue::DateTimeInt64)
+        return std::chrono::system_clock::from_time_t(param.data.posix);
+
+    if(param.dataType == DateTimeParameter::DateTimeTypeValue::DateTimeString)
+        return Microsoft::Featurizer::Traits<std::chrono::system_clock::time_point>::FromString(param.data.isoStr.pBuffer);
+
+    throw std::runtime_error("'type' is invalid");
+}

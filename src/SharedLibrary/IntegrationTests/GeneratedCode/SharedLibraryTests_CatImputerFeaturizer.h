@@ -7,6 +7,8 @@
 #include "SharedLibrary_CatImputerFeaturizer.h"
 #include "Traits.h"
 
+#include "SharedLibrary_Common.hpp"
+
 /* ---------------------------------------------------------------------- */
 /* |  CatImputerFeaturizer <int8> */
 template <typename VectorInputT>
