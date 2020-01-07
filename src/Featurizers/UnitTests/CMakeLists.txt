@@ -38,6 +38,7 @@ foreach(_test_name IN ITEMS
     MinMaxScalarFeaturizer_UnitTests
     MissingDummiesFeaturizer_UnitTests
     OneHotEncoderFeaturizer_UnitTests
+    PCAFeaturizer_UnitTests
     RobustScalarFeaturizer_UnitTests
     SampleAddFeaturizer_UnitTest
     StandardScaleWrapperFeaturizer_UnitTest
