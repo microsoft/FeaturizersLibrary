@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Components/PipelineExecutionEstimatorImpl.h"
+#include "Components/TrainingOnlyEstimatorImpl.h"
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
@@ -17,6 +18,7 @@
 #   pragma clang diagnostic ignored "-Wdocumentation"
 #   pragma clang diagnostic ignored "-Wcast-align"
 #   pragma clang diagnostic ignored "-Wfloat-equal"
+#   pragma clang diagnostic ignored "-Wshadow"
 #elif (defined _MSC_VER)
 #   pragma warning(push)
 #   pragma warning(disable: 4127)
@@ -40,10 +42,10 @@ namespace {
 template <typename T>
 inline std::vector<std::vector<T>> EigenMatrixX2VectorContainer(Eigen::MatrixX<T> const & eigenMatrix) {
     std::vector<std::vector<T>> returnVector;
-    returnVector.reserve(eigenMatrix.rows());
+    returnVector.reserve(static_cast<size_t>(eigenMatrix.rows()));
     for (Eigen::Index rowIdx = 0; rowIdx < eigenMatrix.rows(); ++rowIdx) {
         std::vector<T> tempRow;
-        tempRow.reserve(eigenMatrix.cols());
+        tempRow.reserve(static_cast<size_t>(eigenMatrix.cols()));
         for (Eigen::Index colIdx = 0; colIdx < eigenMatrix.cols(); ++colIdx) {
             tempRow.emplace_back(std::move(eigenMatrix(rowIdx, colIdx)));
         }
@@ -55,7 +57,7 @@ inline std::vector<std::vector<T>> EigenMatrixX2VectorContainer(Eigen::MatrixX<T
 template <typename T>
 inline std::vector<T> EigenMatrixX2Vector(Eigen::MatrixX<T> const & eigenMatrix) {
     std::vector<T> returnVector;
-    returnVector.reserve(eigenMatrix.rows() * eigenMatrix.cols());
+    returnVector.reserve(static_cast<size_t>(eigenMatrix.rows() * eigenMatrix.cols()));
     for (Eigen::Index rowIdx = 0; rowIdx < eigenMatrix.rows(); ++rowIdx) { 
         for (Eigen::Index colIdx = 0; colIdx < eigenMatrix.cols(); ++colIdx) {
             returnVector.emplace_back(std::move(eigenMatrix(rowIdx, colIdx)));
@@ -139,7 +141,7 @@ public:
     // |  Public Data
     // |
     // ----------------------------------------------------------------------
-    static constexpr char const * const     NameValue = PCAComponentsEstimator;
+    static constexpr char const * const     NameValue = PCAComponentsEstimatorName;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -148,7 +150,7 @@ public:
     PCATrainingOnlyPolicy(size_t numRows);
 
     void fit(InputType const &input);
-    PCAComponentsAnnotationData<T> complete_training(void);
+    PCAComponentsAnnotationData<TransformedT> complete_training(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -177,8 +179,8 @@ template <
 >
 //InputT and TransformedT are primitive type
 class PCAComponentsEstimator :
-    public TrainingOnlyEstimatorImpl<
-        PCATrainingOnlyPolicy<InputT, TransformedT>,
+    public Components::TrainingOnlyEstimatorImpl<
+        ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>,
         MaxNumTrainingItemsV
     > {
 public:
@@ -188,8 +190,8 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType =
-        TrainingOnlyEstimatorImpl<
-            PCATrainingOnlyPolicy<InputT, TransformedT>,
+        Components::TrainingOnlyEstimatorImpl<
+            ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>,
             MaxNumTrainingItemsV
         >;
 
@@ -224,7 +226,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                                   = StandardTransformer<InputT, TransformedT>;
-    using EigenValues                                = BaseType::TransformedT;
+    using EigenValues                                = typename BaseType::TransformedT;
     using EigenValuesContainer                       = std::vector<EigenValues>;
 
     // ----------------------------------------------------------------------
@@ -395,7 +397,7 @@ PCAComponentsAnnotationData<T>::PCAComponentsAnnotationData(EigenValues eigenval
                 if(eigenvectors.size() == 0)
                     throw std::invalid_argument("eigenvectors");
 
-                for (T const & eigenvector : eigenvectors) {
+                for (std::vector<T> const & eigenvector : eigenvectors) {
                     if (eigenvector.size() == 0)
                         throw std::invalid_argument("eigenvector");
                 }
@@ -422,7 +424,7 @@ PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::PCAComponent
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
-ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::SVDTrainingOnlyPolicy(size_t numRows) :
+ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::PCATrainingOnlyPolicy(size_t numRows) :
     _numRows(
         [&numRows](void) -> size_t & {
             if(numRows == 0)
@@ -441,7 +443,7 @@ void ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::fit(InputTy
 }
 
 template <typename InputT, typename TransformedT>
-PCAComponentsAnnotationData<InputT, TransformedT> ComponentsDetails::PCATrainingOnlyPolicy<T>::complete_training(void) {
+PCAComponentsAnnotationData<TransformedT> ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::complete_training(void) {
 
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixX<TransformedT>> eig(
         [&]() -> Eigen::MatrixX<TransformedT> {
@@ -460,7 +462,7 @@ PCAComponentsAnnotationData<InputT, TransformedT> ComponentsDetails::PCATraining
     );
 
     //PCA uses sigma but sklearn PCA uses sqrt(sigma), this implementation follows sklearn. 
-    _eigenvalues = EigenMatrixX2Vector<TransformedT>(eig.eigenvalues().sqrt());
+    _eigenvalues = EigenMatrixX2Vector<TransformedT>(eig.eigenvalues());
     _eigenvectors = EigenMatrixX2VectorContainer<TransformedT>(eig.eigenvectors());
     
     return PCAComponentsAnnotationData<TransformedT>(std::move(_eigenvalues), std::move(_eigenvectors));
