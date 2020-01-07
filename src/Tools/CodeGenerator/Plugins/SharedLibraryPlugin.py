@@ -193,7 +193,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
                     // ----------------------------------------------------------------------
                     // |  Public Types
                     enum DateTimeTypeValue {
-                        DateTimeInt64,      // Posix time
+                        DateTimeInt64 = 1,  // Posix time
                         DateTimeString      // ISO 8601
                     };
 
