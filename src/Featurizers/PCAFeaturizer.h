@@ -226,7 +226,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                                   = StandardTransformer<InputT, TransformedT>;
-    using EigenValues                                = typename BaseType::TransformedT;
+    using EigenValues                                = TransformedT;
     using EigenValuesContainer                       = std::vector<EigenValues>;
 
     // ----------------------------------------------------------------------

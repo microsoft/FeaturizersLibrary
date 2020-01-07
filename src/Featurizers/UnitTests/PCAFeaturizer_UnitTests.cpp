@@ -26,8 +26,8 @@ void EstimatorTest(std::vector<std::vector<InputT>> const &inputBatches,
 
     PCAComponentsAnnotationData const &                mdAnnotation(estimator.get_annotation_data());
 
-    std::vector<TransformedT> const &     eigenValuesMat(mdAnnotation.Eigenvalues);
-    std::vector<std::vector<TransformedT>>              const &     eigenVectorsMat(mdAnnotation.Eigenvectors);
+    std::vector<TransformedT> const &                  eigenValuesMat(mdAnnotation.Eigenvalues);
+    std::vector<std::vector<TransformedT>> const &     eigenVectorsMat(mdAnnotation.Eigenvectors);
 
     CHECK(NS::TestHelpers::FuzzyCheck(eigenValuesMat, eigenValuesLabel));
     for (size_t rowNum = 0; rowNum < eigenVectorsLabel.size(); ++rowNum)
@@ -54,10 +54,6 @@ void TestWrapperPCA(){
         NS::TestHelpers::make_vector<TransformedT>(-0.544914f, 0.838492f),
         NS::TestHelpers::make_vector<TransformedT>( 0.838492f, 0.544914f)
     );
-    // auto vLabel = NS::TestHelpers::make_vector<std::vector<dataT>>(
-    //     NS::TestHelpers::make_vector<dataT>(-0.544914f, 0.838492f),
-    //     NS::TestHelpers::make_vector<dataT>( 0.838492f, 0.544914f)
-    // );
     EstimatorTest<InputT, TransformedT>(trainingBatches, eigenValuesLabel, eigenVectorsLabel);
 }
 
@@ -86,33 +82,43 @@ TEST_CASE("Eigen_Estimator_Itegration") {
     TestWrapperPCA<std::double_t, std::double_t>();
 }
 
-
-// test for int
-// TEST_CASE("int") {
-//     using InputType       = std::int8_t;
-//     using TransformedType = std::double_t;
-
-//     auto trainingBatches  = NS::TestHelpers::make_vector<std::vector<InputType>>(
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(1)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(3)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(5)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(7)),
-//                                     NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(9)));
-
-//     auto inferencingInput  = NS::TestHelpers::make_vector<InputType>(static_cast<InputType>(15));
-
-//     auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
-//         static_cast<TransformedType>(1.75)
+// TEST_CASE("PCA_Transformer") {
+//     using InputT = std::vector<std::float_t>;
+//     using TransformedT = std::vector<std::float_t>;
+//     std::vector<InputT> trainingBatches = NS::TestHelpers::make_vector<InputT>(
+//         NS::TestHelpers::make_vector<typename InputT::value_type>(-1.0f, -1.0f),
+//         NS::TestHelpers::make_vector<typename InputT::value_type>(-2.0f, -1.0f),
+//         NS::TestHelpers::make_vector<typename InputT::value_type>(-3.0f, -2.0f),
+//         NS::TestHelpers::make_vector<typename InputT::value_type>( 1.0f,  1.0f),
+//         NS::TestHelpers::make_vector<typename InputT::value_type>( 2.0f,  1.0f),
+//         NS::TestHelpers::make_vector<typename InputT::value_type>( 3.0f,  2.0f)
 //     );
-
+//     std::vector<InputT> input = NS::TestHelpers::make_vector<InputT>(
+//         NS::TestHelpers::make_vector<typename InputT::value_type>(-1.0f, -1.0f),
+//         NS::TestHelpers::make_vector<typename InputT::value_type>(-2.0f, -1.0f),
+//         NS::TestHelpers::make_vector<typename InputT::value_type>(-3.0f, -2.0f),
+//         NS::TestHelpers::make_vector<typename InputT::value_type>( 1.0f,  1.0f),
+//         NS::TestHelpers::make_vector<typename InputT::value_type>( 2.0f,  1.0f),
+//         NS::TestHelpers::make_vector<typename InputT::value_type>( 3.0f,  2.0f)
+//     );
+//     std::vector<TransformedT> label = NS::TestHelpers::make_vector<TransformedT>(
+//         NS::TestHelpers::make_vector<typename TransformedT::value_type>(-1.0f, -1.0f),
+//         NS::TestHelpers::make_vector<typename TransformedT::value_type>(-2.0f, -1.0f),
+//         NS::TestHelpers::make_vector<typename TransformedT::value_type>(-3.0f, -2.0f),
+//         NS::TestHelpers::make_vector<typename TransformedT::value_type>( 1.0f,  1.0f),
+//         NS::TestHelpers::make_vector<typename TransformedT::value_type>( 2.0f,  1.0f),
+//         NS::TestHelpers::make_vector<typename TransformedT::value_type>( 3.0f,  2.0f)
+//     );
 //     CHECK(
 //         NS::TestHelpers::TransformerEstimatorTest(
-//             NS::Featurizers::MinMaxScalarEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
+//             NS::Featurizers::PCAEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0, trainingBatches.size()),
 //             trainingBatches,
-//             inferencingInput
-//         ) == inferencingOutput
+//             input
+//         ) == label
 //     );
 // }
+
+
 
 // TEST_CASE("Serialization/Deserialization") {
 //     using InputType       = std::float_t;
