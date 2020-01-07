@@ -7,6 +7,8 @@
 #include "SharedLibrary_MinMaxScalarFeaturizer.h"
 #include "Traits.h"
 
+#include "SharedLibrary_Common.hpp"
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxScalarFeaturizer <int8> */
 template <typename VectorInputT>

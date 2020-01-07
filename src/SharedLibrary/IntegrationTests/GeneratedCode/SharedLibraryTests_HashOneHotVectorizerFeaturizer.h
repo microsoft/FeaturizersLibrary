@@ -7,6 +7,8 @@
 #include "SharedLibrary_HashOneHotVectorizerFeaturizer.h"
 #include "Traits.h"
 
+#include "SharedLibrary_Common.hpp"
+
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <int8> */
 template <typename VectorInputT, typename... ConstructorArgTs>

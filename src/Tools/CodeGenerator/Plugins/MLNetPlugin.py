@@ -880,13 +880,14 @@ class CSharpData(object):
     @classmethod
     def _GetTypeInfoClass(cls, the_type):
         if cls._type_info_factory_classes is None:
+            from Plugins.MLNetPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
             from Plugins.MLNetPluginImpl import ScalarTypeInfoFactories
             from Plugins.MLNetPluginImpl.StringTypeInfoFactory import (
                 StringTypeInfoFactory,
             )
             from Plugins.MLNetPluginImpl import StructTypeInfoFactories
 
-            type_info_factory_classes = [StringTypeInfoFactory]
+            type_info_factory_classes = [DatetimeTypeInfoFactory, StringTypeInfoFactory]
 
             for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
                 for obj_name in dir(compound_module):

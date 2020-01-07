@@ -7,6 +7,8 @@
 #include "SharedLibrary_StringFeaturizer.h"
 #include "Traits.h"
 
+#include "SharedLibrary_Common.hpp"
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int8> */
 template <typename VectorInputT>

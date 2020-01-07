@@ -120,10 +120,10 @@ class StandardCustomStructInfo(CustomStructInfo):
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetKernelInitializeAssignAndPreprocessorStatements(self, transformer_name):
+    def GetKernelInitializeAssignAndPreprocessorStatements(self, transformer_name, input_transformation_statement):
         initialize_statements_part1 = []
         initialize_statements_part2 = []
-        assign_statements = ["auto result(transformer.execute(input_data[i]));\n"]
+        assign_statements = ["auto result(transformer.execute({}));\n".format(input_transformation_statement)]
 
         for index, member in enumerate(self._custom_struct.members):
             initialize_statements_part1.append(

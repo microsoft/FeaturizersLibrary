@@ -7,6 +7,8 @@
 #include "SharedLibrary_MissingDummiesFeaturizer.h"
 #include "Traits.h"
 
+#include "SharedLibrary_Common.hpp"
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <int8> */
 template <typename VectorInputT>

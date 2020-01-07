@@ -7,6 +7,8 @@
 #include "SharedLibrary_ImputationMarkerFeaturizer.h"
 #include "Traits.h"
 
+#include "SharedLibrary_Common.hpp"
+
 /* ---------------------------------------------------------------------- */
 /* |  ImputationMarkerFeaturizer <int8> */
 template <typename VectorInputT>

@@ -104,7 +104,7 @@
       }
 
   type_mappings:
-    - input_type: int64
+    - input_type: datetime
       output_type: TimePoint
 
   configuration_params:

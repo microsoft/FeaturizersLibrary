@@ -12,6 +12,7 @@
 
 // These method(s) are defined in SharedLibrary_Common.cpp
 ErrorInfoHandle * CreateErrorInfo(std::exception const &ex);
+std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &param);
 
 extern "C" {
 

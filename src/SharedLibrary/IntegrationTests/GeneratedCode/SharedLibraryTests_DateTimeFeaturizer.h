@@ -7,6 +7,8 @@
 #include "SharedLibrary_DateTimeFeaturizer.h"
 #include "Traits.h"
 
+#include "SharedLibrary_Common.hpp"
+
 /* ---------------------------------------------------------------------- */
 /* |  DateTimeFeaturizer */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -41,7 +43,7 @@ void DateTimeFeaturizer_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(DateTimeFeaturizer_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(DateTimeFeaturizer_Fit(pEstimatorHandle, CreateDateTimeParameter(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -91,7 +93,7 @@ void DateTimeFeaturizer_Test(
     for(auto const & input : inference_input) {
         TimePoint result;
 
-        REQUIRE(DateTimeFeaturizer_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(DateTimeFeaturizer_Transform(pTransformerHandle, CreateDateTimeParameter(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)

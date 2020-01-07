@@ -79,9 +79,32 @@ if not PLUGINS:
 _PluginTypeInfo                             = CommandLine.EnumTypeInfo(list(six.iterkeys(PLUGINS)))
 
 # ----------------------------------------------------------------------
+SUPPORTED_TYPES                             = set(
+    [
+        "int8",
+        "int16",
+        "int32",
+        "int64",
+        "uint8",
+        "uint16",
+        "uint32",
+        "uint64",
+        "float",
+        "double",
+        "string",
+        "bool",
+        "datetime",
+    ],
+)
+
+# ----------------------------------------------------------------------
 @CommandLine.EntryPoint(
-    include=CommandLine.EntryPoint.Parameter("Regular expression specifying the name of featurizers to include"),
-    exclude=CommandLine.EntryPoint.Parameter("Regular expression specifying the name of featurizers to exclude"),
+    include=CommandLine.EntryPoint.Parameter(
+        "Regular expression specifying the name of featurizers to include",
+    ),
+    exclude=CommandLine.EntryPoint.Parameter(
+        "Regular expression specifying the name of featurizers to exclude",
+    ),
 )
 @CommandLine.Constraints(
     plugin=_PluginTypeInfo,
@@ -114,7 +137,9 @@ def EntryPoint(
         try:
             return re.compile(value)
         except:
-            raise CommandLine.UsageException("'{}' is not a valid regular expression".format(value))
+            raise CommandLine.UsageException(
+                "'{}' is not a valid regular expression".format(value),
+            )
 
     # ----------------------------------------------------------------------
 
@@ -176,13 +201,17 @@ def EntryPoint(
                     continue
 
                 if excludes and any(exclude.match(item.name) for exclude in excludes):
-                    this_dm.stream.write("'{}' has been explicitly excluded.\n".format(item.name))
+                    this_dm.stream.write(
+                        "'{}' has been explicitly excluded.\n".format(item.name),
+                    )
                     nonlocals.skipped += 1
 
                     continue
 
                 if includes and not any(include.match(item.name) for include in includes):
-                    this_dm.stream.write("'{}' has not been included.\n".format(item.name))
+                    this_dm.stream.write(
+                        "'{}' has not been included.\n".format(item.name),
+                    )
                     nonlocals.skipped += 1
 
                     continue
@@ -253,6 +282,42 @@ def EntryPoint(
                 new_data.append(new_data_items)
 
             data = new_data
+
+        # Validate parameters
+        dm.stream.write("Validating types...")
+        with dm.stream.DoneManager():
+            for items in data:
+                for item in items:
+                    # ----------------------------------------------------------------------
+                    def IsCustomStructType(typename):
+                        return any(
+                            custom_struct
+                            for custom_struct in getattr(item, "custom_structs", [])
+                            if custom_struct.name == typename
+                        )
+
+                    # ----------------------------------------------------------------------
+
+                    if item.input_type not in SUPPORTED_TYPES and not IsCustomStructType(
+                        item.input_type,
+                    ):
+                        raise Exception(
+                            "The input type '{}' defined in '{}' is not valid.".format(
+                                item.input_type,
+                                item.name,
+                            ),
+                        ) from None
+
+                    if (
+                        item.output_type not in SUPPORTED_TYPES
+                        and not IsCustomStructType(item.output_type)
+                    ):
+                        raise Exception(
+                            "The output type '{}' defined in '{}' is not valid.".format(
+                                item.output_type,
+                                item.name,
+                            ),
+                        ) from None
 
         dm.stream.write("Generating content...")
         with dm.stream.DoneManager() as this_dm:

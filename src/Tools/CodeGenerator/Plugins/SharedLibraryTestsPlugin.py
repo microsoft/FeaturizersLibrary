@@ -101,6 +101,8 @@ def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
                 #include "SharedLibrary_{name}.h"
                 #include "Traits.h"
 
+                #include "SharedLibrary_Common.hpp"
+
                 """,
             ).format(
                 name=items[0].name,
@@ -366,13 +368,14 @@ class TypeInfoData(object):
     @classmethod
     def _GetTypeInfoClass(cls, the_type):
         if cls._type_info_factory_classes is None:
+            from Plugins.SharedLibraryTestsPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl import ScalarTypeInfoFactories
             from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfoFactory import (
                 StringTypeInfoFactory,
             )
             from Plugins.SharedLibraryTestsPluginImpl import StructTypeInfoFactories
 
-            type_info_factory_classes = [StringTypeInfoFactory]
+            type_info_factory_classes = [DatetimeTypeInfoFactory, StringTypeInfoFactory]
 
             for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
                 for obj_name in dir(compound_module):

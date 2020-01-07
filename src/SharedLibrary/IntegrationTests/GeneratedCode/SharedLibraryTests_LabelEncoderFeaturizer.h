@@ -7,6 +7,8 @@
 #include "SharedLibrary_LabelEncoderFeaturizer.h"
 #include "Traits.h"
 
+#include "SharedLibrary_Common.hpp"
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <int8> */
 template <typename VectorInputT, typename... ConstructorArgTs>

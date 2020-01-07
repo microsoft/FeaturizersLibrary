@@ -8,7 +8,7 @@
 #include "GeneratedCode/SharedLibraryTests_DateTimeFeaturizer.h"
 #include "../SharedLibrary_DateTimeFeaturizerCustom.h"
 
-TEST_CASE("Standard") {
+TEST_CASE("Standard - int64") {
     DateTimeFeaturizer_Test(
         std::vector<std::int64_t>(),
         std::vector<std::int64_t>{1751241600, 217081625},
@@ -30,6 +30,43 @@ TEST_CASE("Standard") {
             if(tp2.year != 1976) return false;
             if(tp2.month != 11) return false;
             if(tp2.day != 17) return false;
+            if(strcmp(tp2.monthLabel_ptr, "November") != 0) return false;
+
+            return true;
+        },
+        nullptr,
+        nullptr
+    );
+}
+
+TEST_CASE("Standard - string") {
+    DateTimeFeaturizer_Test(
+        std::vector<std::string>(),
+        std::vector<std::string>{"2025-06-30T10:23:01Z", "1976-11-17T21:22:23Z"},
+        [](std::vector<TimePoint> const &args) {
+            if(args.size() != 2)
+                return false;
+
+            // First value
+            TimePoint const &               tp1(args[0]);
+
+            if(tp1.year != 2025) return false;
+            if(tp1.month != 6) return false;
+            if(tp1.day != 30) return false;
+            if(tp1.hour != 10) return false;
+            if(tp1.minute != 23) return false;
+            if(tp1.second != 1) return false;
+            if(strcmp(tp1.monthLabel_ptr, "June") != 0) return false;
+
+            // Second value
+            TimePoint const &               tp2(args[1]);
+
+            if(tp2.year != 1976) return false;
+            if(tp2.month != 11) return false;
+            if(tp2.day != 17) return false;
+            if(tp2.hour != 21) return false;
+            if(tp2.minute != 22) return false;
+            if(tp2.second != 23) return false;
             if(strcmp(tp2.monthLabel_ptr, "November") != 0) return false;
 
             return true;

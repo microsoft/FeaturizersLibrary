@@ -7,6 +7,8 @@
 #include "SharedLibrary_MaxAbsScalarFeaturizer.h"
 #include "Traits.h"
 
+#include "SharedLibrary_Common.hpp"
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxAbsScalarFeaturizer <int8> */
 template <typename VectorInputT>
