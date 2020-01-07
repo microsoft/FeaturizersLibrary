@@ -83,6 +83,7 @@ static constexpr char const * const         PCAComponentsEstimatorName("PCACompo
 ///  \class         MatrixDecompositionAnnotationData
 ///  \brief         Contains PCA components: Eigenvalues and Eigenvectors
 template <typename T>
+//T is primitive type
 class PCAComponentsAnnotationData {
 public:
     // ----------------------------------------------------------------------
@@ -122,6 +123,7 @@ namespace ComponentsDetails {
 ///  \brief         `PCAComponentsEstimator` implementation details.
 ///
 template <typename InputT, typename TransformedT>
+//InputT and TransformedT are primitive type
 class PCATrainingOnlyPolicy {
 public:
     // ----------------------------------------------------------------------
@@ -173,6 +175,7 @@ template <
     typename TransformedT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
+//InputT and TransformedT are primitive type
 class PCAComponentsEstimator :
     public TrainingOnlyEstimatorImpl<
         PCATrainingOnlyPolicy<InputT, TransformedT>,
@@ -211,9 +214,8 @@ public:
 template <
     typename InputT,
     typename TransformedT
-    //If Input is float or double, suggest TransformedT = InputT
-    //If Input is Integers, TransformedT = double
 >
+//InputT and TransformedT are Containers type
 class PCATransformer : public StandardTransformer<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
@@ -222,7 +224,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                                   = StandardTransformer<InputT, TransformedT>;
-    using EigenValues                                = std::vector<BaseType::TransformedT>;
+    using EigenValues                                = BaseType::TransformedT;
     using EigenValuesContainer                       = std::vector<EigenValues>;
 
     // ----------------------------------------------------------------------
@@ -270,6 +272,7 @@ template <
     typename TransformedT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
+////InputT and TransformedT are Containers type
 class PCAEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
@@ -310,8 +313,8 @@ private:
     // MSVC has problems when the definition is separate from the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
         //----------------------------------------------------------------------
-        using PCAComponentsAnnotationData                = PCAComponentsAnnotationData<InputT, TransformedT>;
-        using PCAComponentsEstimator                     = PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>;
+        using PCAComponentsAnnotationData                = PCAComponentsAnnotationData<typename TransformedT::value_type>;
+        using PCAComponentsEstimator                     = PCAComponentsEstimator<typename InputT::value_type, typename TransformedT::value_type, MaxNumTrainingItemsV>;
         // ----------------------------------------------------------------------
 
         PCAComponentsAnnotationData const &              data(PCAComponentsEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, PCAComponentsEstimatorName));
@@ -333,7 +336,7 @@ template <
 >
 class PCAEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-        PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>,
+        PCAComponentsEstimator<typename InputT::value_type, typename TransformedT::value_type, MaxNumTrainingItemsV>,
         Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
     > {
 public:
@@ -344,7 +347,7 @@ public:
     // ----------------------------------------------------------------------
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
-            PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>,
+            PCAComponentsEstimator<typename InputT::value_type, typename TransformedT::value_type, MaxNumTrainingItemsV>,
             Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
         >;
 
@@ -353,7 +356,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    PCAEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    PCAEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, size_t numRows);
     ~PCAEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(PCAEstimator);
@@ -428,6 +431,7 @@ ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::SVDTrainingOnlyP
             return numRows;
         }()
     ) {
+    //_matrix.reserve()
 }
 
 //consider flush in a row each time
@@ -501,10 +505,16 @@ bool PCATransformer<InputT, TransformedT>::operator==(PCATransformer const &othe
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wfloat-equal"
 #endif
+    //vector(s) has been validated not empty
+    if (this->_eigenvalues != other._eigenvalues || this->_eigenvectors.size() != other._eigenvectors.size())
+        return false;
 
-    
-    return this->_eigenvalues == other._eigenvalues
-        && this->_span == other._span;
+    for (size_t rowId = 0; rowId < this->_eigenvectors.size(); ++rowId) {
+        if (this->_eigenvectors[rowId] != other._eigenvectors[rowId])
+            return false;
+    }
+
+    return true;
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
@@ -519,12 +529,8 @@ void PCATransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ 
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
-    Traits<decltype(_min)>::serialize(ar, _min);
-
-    // Note that we are serializing the max value rather than just the span so
-    // that we can deserialize in a way that is consistent with the constructor's
-    // parameters (min, max).
-    Traits<decltype(_span)>::serialize(ar, _min + _span);
+    Traits<decltype(_eigenvalues)>::serialize(ar, _eigenvalues);
+    Traits<decltype(_eigenvectors)>::serialize(ar, _eigenvectors);
 }
 
 // ----------------------------------------------------------------------
@@ -532,33 +538,22 @@ void PCATransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ 
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
 void PCATransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
-    // ----------------------------------------------------------------------
-    using InputTraits                       = Traits<InputT>;
-    using TransformedTraits                 = Traits<TransformedT>;
-    // ----------------------------------------------------------------------
 
-    if(InputTraits::IsNull(input)) {
-        callback(TransformedTraits::CreateNullValue());
-        return;
+    if (input.size() != _eigenvectors[0].size())
+        throw std::invalid_argument("input feature size not fit with training data");
+    
+    TransformedT projectedVector;
+    projectedVector.reserve(_eigenvectors.size());
+
+    for (size_t eigenVId = 0; eigenVId < projectedVector.size(); ++eigenVId) {
+        typename TransformedT::value_type projectedItem = 0;
+        for (size_t inputVId = 0; inputVId < input.size(); ++inputVId) {
+            projectedItem += static_cast<typename TransformedT::value_type>(input[inputVId]) * _eigenvectors[eigenVId][inputVId];
+        }
+        projectedVector.emplace_back(projectedItem);
     }
 
-#if (defined __clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wdouble-promotion"
-#   pragma clang diagnostic ignored "-Wfloat-equal"
-#endif
-
-    if(_span == static_cast<InputT>(0)) {
-        callback(static_cast<TransformedT>(0));
-        return;
-    }
-
-    callback((static_cast<TransformedT>(input) - _min) / _span);
-
-#if (defined __clang__)
-#   pragma clang diagnostic pop
-#endif
-
+    callback(std::move(projectedVector));
 }
 
 // ----------------------------------------------------------------------
@@ -567,11 +562,11 @@ void PCATransformer<InputT, TransformedT>::execute_impl(typename BaseType::Input
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-PCAEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::PCAEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+PCAEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::PCAEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, size_t numRows) :
     BaseType(
         "PCAEstimator",
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, colIndex](void) { return Components::MinMaxEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex, &numRows](void) { return PCAComponentsEstimator<typename InputT::value_type, typename TransformedT::value_type, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex), std::move(numRows)); },
         [pAllColumnAnnotations, colIndex](void) { return Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
     ) {
 }
