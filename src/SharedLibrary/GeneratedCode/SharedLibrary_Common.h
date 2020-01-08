@@ -56,7 +56,7 @@ struct DateTimeParameter {
     // ----------------------------------------------------------------------
     // |  Public Types
     enum DateTimeTypeValue {
-        DateTimeInt64,      // Posix time
+        DateTimeInt64 = 1,  // Posix time
         DateTimeString      // ISO 8601
     };
 

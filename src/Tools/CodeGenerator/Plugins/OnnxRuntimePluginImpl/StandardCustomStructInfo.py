@@ -94,11 +94,9 @@ class StandardCustomStructInfo(CustomStructInfo):
                 """\
                 .TypeAndShapeInferenceFunction(
                     [](ONNX_NAMESPACE::InferenceContext& ctx) {{
-                        {statements}
+                      const bool has_shape = hasInputShape(ctx, 1);
 
-                        for(size_t i = 0; i < ctx.getNumOutputs(); ++i) {{
-                            *ctx.getOutputType(i)->mutable_tensor_type()->mutable_shape() = ctx.getInputType(1)->tensor_type().shape();
-                        }}
+                      {statements}
                     }}
                 )
                 """,
@@ -106,14 +104,21 @@ class StandardCustomStructInfo(CustomStructInfo):
                 statements=StringHelpers.LeftJustify(
                     "\n".join(
                         [
-                            "ctx.getOutputType({index})->mutable_tensor_type()->set_elem_type(ONNX_NAMESPACE::TensorProto_DataType_{type});".format(
+                            textwrap.dedent(
+                                """\
+                                propagateElemTypeFromDtypeToOutput(ctx, ONNX_NAMESPACE::TensorProto_DataType_{type}, {index});
+                                if(has_shape) {{
+                                  propagateShapeFromInputToOutput(ctx, 1, {index});
+                                }}
+                                """,
+                            ).format(
                                 index=index,
                                 type=ToOrtTypeString(member.type).upper(),
-                            ) for index,
-                            member in enumerate(self._custom_struct.members)
+                            )
+                            for index, member in enumerate(self._custom_struct.members)
                         ],
                     ),
-                    8,
+                    6,
                 ),
             )
         )
@@ -149,18 +154,4 @@ class StandardCustomStructInfo(CustomStructInfo):
         return (
             initialize_statements_part1 + [""] + initialize_statements_part2,
             assign_statements,
-            [textwrap.dedent(
-                """\
-                ONNX_OPERATOR_KERNEL_EX(
-                    {transformer_name},
-                    kMSFeaturizersDomain,
-                    1,
-                    kCpuExecutionProvider,
-                    KernelDefBuilder(),
-                    {transformer_name}
-                );
-                """,
-            ).format(
-                transformer_name=transformer_name,
-            )],
         )
