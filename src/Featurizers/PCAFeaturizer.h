@@ -85,7 +85,7 @@ static constexpr char const * const         PCAComponentsEstimatorName("PCACompo
 ///  \class         MatrixDecompositionAnnotationData
 ///  \brief         Contains PCA components: Eigenvalues and Eigenvectors
 template <typename T>
-//T is primitive type
+//T is Containers type
 class PCAComponentsAnnotationData {
 public:
     // ----------------------------------------------------------------------
@@ -93,7 +93,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using EigenValues                                = std::vector<T>;
+    using EigenValues                                = T;
     //EigenValuesContainer is the type of EigenVector space
     using EigenValuesContainer                       = std::vector<EigenValues>;
 
@@ -125,7 +125,7 @@ namespace ComponentsDetails {
 ///  \brief         `PCAComponentsEstimator` implementation details.
 ///
 template <typename InputT, typename TransformedT>
-//InputT and TransformedT are primitive type
+//InputT and TransformedT are Containers type
 class PCATrainingOnlyPolicy {
 public:
     // ----------------------------------------------------------------------
@@ -134,7 +134,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using InputType                                  = InputT;
-    using EigenValues                                = std::vector<TransformedT>;
+    using EigenValues                                = TransformedT;
     using EigenValuesContainer                       = std::vector<EigenValues>;
     // ----------------------------------------------------------------------
     // |
@@ -160,7 +160,7 @@ private:
     // ----------------------------------------------------------------------
     size_t const                                     _numRows;
 
-    std::vector<InputType>                           _matrix;
+    InputType                                        _matrix;
     EigenValues                                      _eigenvalues;
     EigenValuesContainer                             _eigenvectors;
 };
@@ -177,7 +177,7 @@ template <
     typename TransformedT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-//InputT and TransformedT are primitive type
+//InputT and TransformedT are Containers type
 class PCAComponentsEstimator :
     public Components::TrainingOnlyEstimatorImpl<
         ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>,
@@ -315,8 +315,8 @@ private:
     // MSVC has problems when the definition is separate from the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
         //----------------------------------------------------------------------
-        using PCAComponentsAnnotationData                = PCAComponentsAnnotationData<typename TransformedT::value_type>;
-        using PCAComponentsEstimator                     = PCAComponentsEstimator<typename InputT::value_type, typename TransformedT::value_type, MaxNumTrainingItemsV>;
+        using PCAComponentsAnnotationData                = PCAComponentsAnnotationData<TransformedT>;
+        using PCAComponentsEstimator                     = PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>;
         // ----------------------------------------------------------------------
 
         PCAComponentsAnnotationData const &              data(PCAComponentsEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, PCAComponentsEstimatorName));
@@ -338,7 +338,7 @@ template <
 >
 class PCAEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-        PCAComponentsEstimator<typename InputT::value_type, typename TransformedT::value_type, MaxNumTrainingItemsV>,
+        PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>,
         Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
     > {
 public:
@@ -349,7 +349,7 @@ public:
     // ----------------------------------------------------------------------
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
-            PCAComponentsEstimator<typename InputT::value_type, typename TransformedT::value_type, MaxNumTrainingItemsV>,
+            PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>,
             Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
         >;
 
@@ -397,7 +397,7 @@ PCAComponentsAnnotationData<T>::PCAComponentsAnnotationData(EigenValues eigenval
                 if(eigenvectors.size() == 0)
                     throw std::invalid_argument("eigenvectors");
 
-                for (std::vector<T> const & eigenvector : eigenvectors) {
+                for (T const & eigenvector : eigenvectors) {
                     if (eigenvector.size() == 0)
                         throw std::invalid_argument("eigenvector");
                 }
@@ -439,31 +439,32 @@ ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::PCATrainingOnlyP
 //consider flush in a row each time
 template <typename InputT, typename TransformedT>
 void ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::fit(InputType const &input) {
-    _matrix.emplace_back(std::move(input));
+    //_matrix.emplace_back(std::move(input));
+    _matrix.insert(_matrix.end(), input.begin(), input.end());
 }
 
 template <typename InputT, typename TransformedT>
 PCAComponentsAnnotationData<TransformedT> ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::complete_training(void) {
 
-    Eigen::SelfAdjointEigenSolver<Eigen::MatrixX<TransformedT>> eig(
-        [&]() -> Eigen::MatrixX<TransformedT> {
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixX<typename TransformedT::value_type>> eig(
+        [&]() -> Eigen::MatrixX<typename TransformedT::value_type> {
             size_t const numColsConst = _matrix.size() / _numRows;
             size_t const numRowsConst = _numRows;
            
-            Eigen::MatrixX<TransformedT> M = VectorContainer2EigenMatrix<InputT, TransformedT>(std::move(_matrix), numRowsConst, numColsConst);
+            Eigen::MatrixX<typename TransformedT::value_type> M = VectorContainer2EigenMatrix<typename InputT::value_type, typename TransformedT::value_type>(std::move(_matrix), numRowsConst, numColsConst);
 
             //compute for centered training data
-            Eigen::MatrixX<TransformedT> centered = M.rowwise() - M.colwise().mean();
+            Eigen::MatrixX<typename TransformedT::value_type> centered = M.rowwise() - M.colwise().mean();
             //compute for covariance matrix
-            Eigen::MatrixX<TransformedT> cov = centered.adjoint() * centered;
+            Eigen::MatrixX<typename TransformedT::value_type> cov = centered.adjoint() * centered;
             //using covariance matrix to compute PCA
             return cov;
         }()
     );
 
     //PCA uses sigma but sklearn PCA uses sqrt(sigma), this implementation follows sklearn. 
-    _eigenvalues = EigenMatrixX2Vector<TransformedT>(eig.eigenvalues());
-    _eigenvectors = EigenMatrixX2VectorContainer<TransformedT>(eig.eigenvectors());
+    _eigenvalues = EigenMatrixX2Vector<typename TransformedT::value_type>(eig.eigenvalues());
+    _eigenvectors = EigenMatrixX2VectorContainer<typename TransformedT::value_type>(eig.eigenvectors());
     
     return PCAComponentsAnnotationData<TransformedT>(std::move(_eigenvalues), std::move(_eigenvectors));
 }
@@ -568,7 +569,7 @@ PCAEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::PCAEstimator(Annotatio
     BaseType(
         "PCAEstimator",
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, colIndex, &numRows](void) { return PCAComponentsEstimator<typename InputT::value_type, typename TransformedT::value_type, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex), std::move(numRows)); },
+        [pAllColumnAnnotations, colIndex, &numRows](void) { return PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex), std::move(numRows)); },
         [pAllColumnAnnotations, colIndex](void) { return Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
     ) {
 }
