@@ -83,8 +83,8 @@ void TestWrapperPCA(){
 
     TransformedT eigenVectorsLabel(2, 2);
     eigenVectorsLabel(0, 0) = -0.544914f;
-    eigenVectorsLabel(0, 1) = 0.838492f;
-    eigenVectorsLabel(1, 0) = 0.838492f;
+    eigenVectorsLabel(0, 1) =  0.838492f;
+    eigenVectorsLabel(1, 0) =  0.838492f;
     eigenVectorsLabel(1, 1) =  0.544914f;
 
 #if (defined __clang__)
@@ -97,94 +97,121 @@ void TestWrapperPCA(){
 }
 
 TEST_CASE("Invalid_Annotation") {
-    // using dataT = std::float_t;
-    // std::vector<dataT> validEigenValues = NS::TestHelpers::make_vector<dataT>(0.0f);
-    // std::vector<std::vector<dataT>> validEigenVectors = NS::TestHelpers::make_vector<std::vector<dataT>>(NS::TestHelpers::make_vector<dataT>(0.0f));
-    // std::vector<dataT> invalidEigenValues = NS::TestHelpers::make_vector<dataT>();
-    // std::vector<std::vector<dataT>> invalidEigenVectors1 = NS::TestHelpers::make_vector<std::vector<dataT>>();
-    // std::vector<std::vector<dataT>> invalidEigenVectors2 = NS::TestHelpers::make_vector<std::vector<dataT>>(NS::TestHelpers::make_vector<dataT>());
-    // CHECK_THROWS_WITH(NS::Featurizers::PCAComponentsAnnotationData<std::vector<dataT>>(invalidEigenValues, validEigenVectors), "eigenvalues");
-    // CHECK_THROWS_WITH(NS::Featurizers::PCAComponentsAnnotationData<std::vector<dataT>>(validEigenValues, invalidEigenVectors1), "eigenvectors");
-    // CHECK_THROWS_WITH(NS::Featurizers::PCAComponentsAnnotationData<std::vector<dataT>>(validEigenValues, invalidEigenVectors2), "eigenvector");
+    using dataT = Eigen::MatrixX<float>;
+    dataT invalidEigenValues;
+    dataT invalidEigenVectors;
+    dataT validEigenValues(2, 2);
+    dataT validEigenVectors(2, 2);
+    CHECK_THROWS_WITH(NS::Featurizers::PCAComponentsAnnotationData<dataT>(invalidEigenValues, validEigenVectors), "eigenvalues");
+    CHECK_THROWS_WITH(NS::Featurizers::PCAComponentsAnnotationData<dataT>(validEigenValues, invalidEigenVectors), "eigenvectors");
 }
 
+//TODO: error: too many arguments provided to function-like macro invocation
 TEST_CASE("Invalid_TrainingPolicy") {
-    //using InputT = std::float_t;
-    //using TransformedT = std::float_t;
+    //using InputT = Eigen::MatrixX<float>;
+    //using TransformedT = Eigen::MatrixX<float>;
     //CHECK_THROWS_WITH(NS::Featurizers::ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>(0), "numRows");
-    //error: too many arguments provided to function-like macro invocation
 }
 
 TEST_CASE("Eigen_Estimator_Itegration") {
     TestWrapperPCA<Eigen::MatrixX<float>, Eigen::MatrixX<float>>();
-    //TestWrapperPCA<Eigen::MatrixX<float>, Eigen::MatrixX<double>>();
+    TestWrapperPCA<Eigen::MatrixX<float>, Eigen::MatrixX<double>>();
     TestWrapperPCA<Eigen::MatrixX<double>, Eigen::MatrixX<double>>();
 }
 
-// TEST_CASE("PCA_Transformer") {
-//     using InputT = std::vector<std::float_t>;
-//     using TransformedT = std::vector<std::float_t>;
-//     std::vector<InputT> trainingBatches = NS::TestHelpers::make_vector<InputT>(
-//         NS::TestHelpers::make_vector<typename InputT::value_type>(-1.0f, -1.0f),
-//         NS::TestHelpers::make_vector<typename InputT::value_type>(-2.0f, -1.0f),
-//         NS::TestHelpers::make_vector<typename InputT::value_type>(-3.0f, -2.0f),
-//         NS::TestHelpers::make_vector<typename InputT::value_type>( 1.0f,  1.0f),
-//         NS::TestHelpers::make_vector<typename InputT::value_type>( 2.0f,  1.0f),
-//         NS::TestHelpers::make_vector<typename InputT::value_type>( 3.0f,  2.0f)
-//     );
-//     std::vector<InputT> input = NS::TestHelpers::make_vector<InputT>(
-//         NS::TestHelpers::make_vector<typename InputT::value_type>(-1.0f, -1.0f),
-//         NS::TestHelpers::make_vector<typename InputT::value_type>(-2.0f, -1.0f),
-//         NS::TestHelpers::make_vector<typename InputT::value_type>(-3.0f, -2.0f),
-//         NS::TestHelpers::make_vector<typename InputT::value_type>( 1.0f,  1.0f),
-//         NS::TestHelpers::make_vector<typename InputT::value_type>( 2.0f,  1.0f),
-//         NS::TestHelpers::make_vector<typename InputT::value_type>( 3.0f,  2.0f)
-//     );
-//     std::vector<TransformedT> label = NS::TestHelpers::make_vector<TransformedT>(
-//         NS::TestHelpers::make_vector<typename TransformedT::value_type>(-1.0f, -1.0f),
-//         NS::TestHelpers::make_vector<typename TransformedT::value_type>(-2.0f, -1.0f),
-//         NS::TestHelpers::make_vector<typename TransformedT::value_type>(-3.0f, -2.0f),
-//         NS::TestHelpers::make_vector<typename TransformedT::value_type>( 1.0f,  1.0f),
-//         NS::TestHelpers::make_vector<typename TransformedT::value_type>( 2.0f,  1.0f),
-//         NS::TestHelpers::make_vector<typename TransformedT::value_type>( 3.0f,  2.0f)
-//     );
-//     CHECK(
-//         NS::TestHelpers::TransformerEstimatorTest(
-//             NS::Featurizers::PCAEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0, trainingBatches.size()),
-//             trainingBatches,
-//             input
-//         ) == label
-//     );
-// }
+TEST_CASE("PCA_Transformer") {
+    using InputT = Eigen::MatrixX<float>;
+    using TransformedT = Eigen::MatrixX<float>;
+    std::float_t eps = 0.000001f;
 
+    InputT trainingMatrix(6, 2);
+    trainingMatrix(0, 0) = -1;
+    trainingMatrix(0, 1) = -1;
+    trainingMatrix(1, 0) = -2;
+    trainingMatrix(1, 1) = -1;
+    trainingMatrix(2, 0) = -3;
+    trainingMatrix(2, 1) = -2;
+    trainingMatrix(3, 0) = 1;
+    trainingMatrix(3, 1) = 1;
+    trainingMatrix(4, 0) = 2;
+    trainingMatrix(4, 1) = 1;
+    trainingMatrix(5, 0) = 3;
+    trainingMatrix(5, 1) = 2;
 
+    InputT input = trainingMatrix;
 
-// TEST_CASE("Serialization/Deserialization") {
-//     using InputType       = std::float_t;
-//     using TransformedType = std::double_t;
-//     using TransformerType = NS::Featurizers::MinMaxScalarTransformer<InputType, TransformedType>;
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#elif (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4127)
+#endif
 
-//     auto model = std::make_shared<TransformerType>(static_cast<InputType>(-5), static_cast<InputType>(9));
+    TransformedT label(6, 2);
+    label(0, 0) = -0.2935787f;
+    label(0, 1) = -1.3834058f;
+    label(1, 0) =  0.2513348f;
+    label(1, 1) = -2.2218980f;
+    label(2, 0) = -0.0422439f;
+    label(2, 1) = -3.6053038f;
+    label(3, 0) =  0.2935787f;
+    label(3, 1) =  1.3834058f;
+    label(4, 0) = -0.2513348f;
+    label(4, 1) =  2.2218980f;
+    label(5, 0) =  0.0422439f;
+    label(5, 1) =  3.6053038f;
 
-//     NS::Archive archive;
-//     model->save(archive);
-//     std::vector<unsigned char> vec = archive.commit();
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#elif (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
+
+    using PCAEstimator                                 = NS::Featurizers::PCAEstimator<InputT, TransformedT>;
+    NS::AnnotationMapsPtr const                        pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+
+    PCAEstimator                                       estimator(pAllColumnAnnotations, 0);
+
+    estimator.begin_training();
+    estimator.fit(trainingMatrix);
+    estimator.complete_training();
+
+    typename PCAEstimator::TransformerUniquePtr        pTransformer(estimator.create_transformer());
+
+    TransformedT                                       output;
+    auto const                                         callback(
+        [&output](TransformedT value) {
+            output = std::move(value);
+        }
+    );
+
+    pTransformer->execute(input, callback);
+    pTransformer->flush(callback);
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#elif (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4127)
+#endif
+
+    CHECK((output - label).norm() < eps);
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#elif (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
+}
+
+//TODO
+TEST_CASE("Serialization/Deserialization") {
+
+}
+
+//TODO
+TEST_CASE("Serialization Version Error") {
     
-//     NS::Archive loader(vec);
-//     TransformerType modelLoaded(loader);
-//     CHECK(modelLoaded == *model);
-// }
-
-// TEST_CASE("Serialization Version Error") {
-//     NS::Archive                             out;
-
-//     out.serialize(static_cast<std::uint16_t>(2));
-//     out.serialize(static_cast<std::uint16_t>(0));
-
-//     NS::Archive                             in(out.commit());
-
-//     CHECK_THROWS_WITH(
-//         (NS::Featurizers::MinMaxScalarTransformer<std::uint8_t, std::double_t>(in)),
-//         Catch::Contains("Unsupported archive version")
-//     );
-// }
+}
