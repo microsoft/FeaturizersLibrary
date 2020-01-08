@@ -12,61 +12,100 @@
 namespace NS = Microsoft::Featurizer;
 
 template<typename InputT, typename TransformedT>
-void EstimatorTest(std::vector<std::vector<InputT>> const &inputBatches,
-                    std::vector<TransformedT> const &eigenValuesLabel,
-                    std::vector<std::vector<TransformedT>> const &eigenVectorsLabel) {
+void EstimatorTest(InputT const &trainingMatrix,
+                   TransformedT const &eigenValuesLabel,
+                   TransformedT const &eigenVectorsLabel,
+                   std::float_t eps = 0.000001f) {
 
-    using PCAComponentsEstimator                       = NS::Featurizers::PCAComponentsEstimator<std::vector<InputT>, std::vector<TransformedT>>;
-    using PCAComponentsAnnotationData                  = NS::Featurizers::PCAComponentsAnnotationData<std::vector<TransformedT>>;
+    using PCAComponentsEstimator                       = NS::Featurizers::PCAComponentsEstimator<InputT, TransformedT>;
+    using PCAComponentsAnnotationData                  = NS::Featurizers::PCAComponentsAnnotationData<TransformedT>;
 
     NS::AnnotationMapsPtr const                        pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    PCAComponentsEstimator                             estimator(pAllColumnAnnotations, 0, inputBatches.size());
+    PCAComponentsEstimator                             estimator(pAllColumnAnnotations, 0);
 
-    NS::TestHelpers::Train(estimator, inputBatches);
+    estimator.begin_training();
+    estimator.fit(trainingMatrix);
+    estimator.complete_training();
 
     PCAComponentsAnnotationData const &                mdAnnotation(estimator.get_annotation_data());
 
-    std::vector<TransformedT> const &                  eigenValuesMat(mdAnnotation.Eigenvalues);
-    std::vector<std::vector<TransformedT>> const &     eigenVectorsMat(mdAnnotation.Eigenvectors);
+    TransformedT const &                               eigenValuesMat(mdAnnotation.Eigenvalues);
+    TransformedT const &                               eigenVectorsMat(mdAnnotation.Eigenvectors);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(eigenValuesMat, eigenValuesLabel));
-    for (size_t rowNum = 0; rowNum < eigenVectorsLabel.size(); ++rowNum)
-        CHECK(NS::TestHelpers::FuzzyCheck(eigenVectorsMat[rowNum], eigenVectorsLabel[rowNum]));
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#elif (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4127)
+#endif
 
-    // commented and remain for future checking
-    // std::cout << "U: " << NS::Traits<std::vector<std::vector<dataT>>>::ToString(uMat) << std::endl;
-    // std::cout << "V: " << NS::Traits<std::vector<std::vector<dataT>>>::ToString(vMat) << std::endl;
-    // std::cout << "S: " << NS::Traits<std::vector<dataT>>::ToString(sMat) << std::endl;
+    CHECK((eigenValuesMat - eigenValuesLabel).norm() < eps);
+    CHECK((eigenVectorsMat - eigenVectorsLabel).norm() < eps);
+
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#elif (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
+
 }
 
 template<typename InputT, typename TransformedT>
 void TestWrapperPCA(){
-    std::vector<std::vector<InputT>> trainingBatches = NS::TestHelpers::make_vector<std::vector<InputT>>(
-        NS::TestHelpers::make_vector<InputT>(-1.0f, -1.0f),
-        NS::TestHelpers::make_vector<InputT>(-2.0f, -1.0f),
-        NS::TestHelpers::make_vector<InputT>(-3.0f, -2.0f),
-        NS::TestHelpers::make_vector<InputT>( 1.0f,  1.0f),
-        NS::TestHelpers::make_vector<InputT>( 2.0f,  1.0f),
-        NS::TestHelpers::make_vector<InputT>( 3.0f,  2.0f)
-    );
-    std::vector<TransformedT> eigenValuesLabel = NS::TestHelpers::make_vector<TransformedT>( 0.302284f, 39.697716f);
-    std::vector<std::vector<TransformedT>> eigenVectorsLabel = NS::TestHelpers::make_vector<std::vector<TransformedT>>(
-        NS::TestHelpers::make_vector<TransformedT>(-0.544914f, 0.838492f),
-        NS::TestHelpers::make_vector<TransformedT>( 0.838492f, 0.544914f)
-    );
-    EstimatorTest<InputT, TransformedT>(trainingBatches, eigenValuesLabel, eigenVectorsLabel);
+
+    InputT trainingMatrix(6, 2);
+    trainingMatrix(0, 0) = -1;
+    trainingMatrix(0, 1) = -1;
+    trainingMatrix(1, 0) = -2;
+    trainingMatrix(1, 1) = -1;
+    trainingMatrix(2, 0) = -3;
+    trainingMatrix(2, 1) = -2;
+    trainingMatrix(3, 0) = 1;
+    trainingMatrix(3, 1) = 1;
+    trainingMatrix(4, 0) = 2;
+    trainingMatrix(4, 1) = 1;
+    trainingMatrix(5, 0) = 3;
+    trainingMatrix(5, 1) = 2;
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#elif (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4127)
+#endif
+
+    TransformedT eigenValuesLabel(2, 1);
+    eigenValuesLabel(0, 0) = 0.302284f;
+    eigenValuesLabel(1, 0) = 39.697716f;
+
+    TransformedT eigenVectorsLabel(2, 2);
+    eigenVectorsLabel(0, 0) = -0.544914f;
+    eigenVectorsLabel(0, 1) = 0.838492f;
+    eigenVectorsLabel(1, 0) = 0.838492f;
+    eigenVectorsLabel(1, 1) =  0.544914f;
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#elif (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
+
+    EstimatorTest<InputT, TransformedT>(trainingMatrix, eigenValuesLabel, eigenVectorsLabel);
 }
 
 TEST_CASE("Invalid_Annotation") {
-    using dataT = std::float_t;
-    std::vector<dataT> validEigenValues = NS::TestHelpers::make_vector<dataT>(0.0f);
-    std::vector<std::vector<dataT>> validEigenVectors = NS::TestHelpers::make_vector<std::vector<dataT>>(NS::TestHelpers::make_vector<dataT>(0.0f));
-    std::vector<dataT> invalidEigenValues = NS::TestHelpers::make_vector<dataT>();
-    std::vector<std::vector<dataT>> invalidEigenVectors1 = NS::TestHelpers::make_vector<std::vector<dataT>>();
-    std::vector<std::vector<dataT>> invalidEigenVectors2 = NS::TestHelpers::make_vector<std::vector<dataT>>(NS::TestHelpers::make_vector<dataT>());
-    CHECK_THROWS_WITH(NS::Featurizers::PCAComponentsAnnotationData<std::vector<dataT>>(invalidEigenValues, validEigenVectors), "eigenvalues");
-    CHECK_THROWS_WITH(NS::Featurizers::PCAComponentsAnnotationData<std::vector<dataT>>(validEigenValues, invalidEigenVectors1), "eigenvectors");
-    CHECK_THROWS_WITH(NS::Featurizers::PCAComponentsAnnotationData<std::vector<dataT>>(validEigenValues, invalidEigenVectors2), "eigenvector");
+    // using dataT = std::float_t;
+    // std::vector<dataT> validEigenValues = NS::TestHelpers::make_vector<dataT>(0.0f);
+    // std::vector<std::vector<dataT>> validEigenVectors = NS::TestHelpers::make_vector<std::vector<dataT>>(NS::TestHelpers::make_vector<dataT>(0.0f));
+    // std::vector<dataT> invalidEigenValues = NS::TestHelpers::make_vector<dataT>();
+    // std::vector<std::vector<dataT>> invalidEigenVectors1 = NS::TestHelpers::make_vector<std::vector<dataT>>();
+    // std::vector<std::vector<dataT>> invalidEigenVectors2 = NS::TestHelpers::make_vector<std::vector<dataT>>(NS::TestHelpers::make_vector<dataT>());
+    // CHECK_THROWS_WITH(NS::Featurizers::PCAComponentsAnnotationData<std::vector<dataT>>(invalidEigenValues, validEigenVectors), "eigenvalues");
+    // CHECK_THROWS_WITH(NS::Featurizers::PCAComponentsAnnotationData<std::vector<dataT>>(validEigenValues, invalidEigenVectors1), "eigenvectors");
+    // CHECK_THROWS_WITH(NS::Featurizers::PCAComponentsAnnotationData<std::vector<dataT>>(validEigenValues, invalidEigenVectors2), "eigenvector");
 }
 
 TEST_CASE("Invalid_TrainingPolicy") {
@@ -77,9 +116,9 @@ TEST_CASE("Invalid_TrainingPolicy") {
 }
 
 TEST_CASE("Eigen_Estimator_Itegration") {
-    TestWrapperPCA<std::float_t, std::float_t>();
-    //TestWrapperPCA<std::float_t, std::double_t>();
-    //TestWrapperPCA<std::double_t, std::double_t>();
+    TestWrapperPCA<Eigen::MatrixX<float>, Eigen::MatrixX<float>>();
+    //TestWrapperPCA<Eigen::MatrixX<float>, Eigen::MatrixX<double>>();
+    TestWrapperPCA<Eigen::MatrixX<double>, Eigen::MatrixX<double>>();
 }
 
 // TEST_CASE("PCA_Transformer") {

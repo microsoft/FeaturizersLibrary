@@ -100,17 +100,6 @@ std::vector<typename EstimatorT::TransformedType> TransformerEstimatorTest(
     return Predict(estimator, data);   
 }
 
-//This test is for vector type template
-template <typename EstimatorT>
-std::vector<typename EstimatorT::TransformedType> TransformerEstimatorTest(
-    EstimatorT estimator,
-    std::vector<typename EstimatorT::InputType> const &inputBatches,
-    typename EstimatorT::InputType const &data
-) {
-    Train<EstimatorT, typename EstimatorT::InputType::value_type>(estimator, inputBatches);
-    return Predict(estimator, data);   
-}
-
 template <typename EstimatorT>
 std::vector<typename EstimatorT::TransformedType> TransformerTest(
     EstimatorT estimator,
