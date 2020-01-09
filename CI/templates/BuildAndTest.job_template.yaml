@@ -26,7 +26,7 @@ jobs:
       operating_system: ${{ parameters.operating_system }}
       steps:
         - checkout: self
-          clean: true  # if true, run `execute git clean -ffdx && git reset --hard HEAD` before fetching
+          clean: false  # if true, run `execute git clean -ffdx && git reset --hard HEAD` before fetching
           submodules: recursive  # set to 'true' for a single level of submodules or 'recursive' to get submodules of submodules; defaults to not checking out submodules
         - template: BuildAndTest.steps_template.yaml
           parameters:
