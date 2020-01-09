@@ -5,6 +5,7 @@
 """Contains the Plugin object"""
 
 import copy
+import itertools
 import os
 import sys
 import textwrap
@@ -42,7 +43,7 @@ class Plugin(PluginBase):
     # |  Methods
     @staticmethod
     @Interface.override
-    def Generate(data, output_dir, status_stream):
+    def Generate(global_custom_structs, data, output_dir, status_stream):
         result_code = 0
 
         status_stream.write("Preprocessing data...")
@@ -52,7 +53,7 @@ class Plugin(PluginBase):
             c_data = []
 
             for items in data:
-                c_data.append([CData(item) for item in items])
+                c_data.append([CData(item, global_custom_structs) for item in items])
 
         status_stream.write("Generating Common Files...")
         with status_stream.DoneManager() as this_dm:
@@ -1170,17 +1171,18 @@ class CData(object):
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
-    def __init__(self, item):
+    def __init__(self, item, global_custom_structs):
         # Create the custom structs
         custom_structs = OrderedDict()
 
-        for custom_struct in getattr(item, "custom_structs", []):
+        for custom_struct in itertools.chain(global_custom_structs, getattr(item, "custom_structs", [])):
             members = OrderedDict()
 
             for member in custom_struct.members:
                 tif = self._GetTypeInfoClass(member.type)
                 assert tif, member.type
 
+                assert member.name not in members, member.name
                 members[member.name] = tif()
 
             custom_structs[custom_struct.name] = members
@@ -1229,12 +1231,15 @@ class CData(object):
         if cls._type_info_factory_classes is None:
             from Plugins.SharedLibraryPluginImpl.DatetimeTypeInfoFactory import DateTimeTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl import ScalarTypeInfoFactories
-            from Plugins.SharedLibraryPluginImpl.StringTypeInfoFactory import (
-                StringTypeInfoFactory,
-            )
+            from Plugins.SharedLibraryPluginImpl.SparseVectorEncodingTypeInfoFactory import SparseVectorEncodingTypeInfoFactory
+            from Plugins.SharedLibraryPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl import StructTypeInfoFactories
 
-            type_info_factory_classes = [DateTimeTypeInfoFactory, StringTypeInfoFactory]
+            type_info_factory_classes = [
+                DateTimeTypeInfoFactory,
+                SparseVectorEncodingTypeInfoFactory,
+                StringTypeInfoFactory,
+            ]
 
             for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
                 for obj_name in dir(compound_module):
@@ -1252,7 +1257,12 @@ class CData(object):
             cls._type_info_factory_classes = type_info_factory_classes
 
         for type_info_factory_class in cls._type_info_factory_classes:
-            if type_info_factory_class.TypeName == the_type:
-                return type_info_factory_class
+            if isinstance(type_info_factory_class.TypeName, six.string_types):
+                if type_info_factory_class.TypeName == the_type:
+                    return type_info_factory_class
+
+            elif hasattr(type_info_factory_class.TypeName, "match"):
+                if type_info_factory_class.TypeName.match(the_type):
+                    return type_info_factory_class
 
         return None

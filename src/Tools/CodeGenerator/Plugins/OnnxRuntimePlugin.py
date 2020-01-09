@@ -43,7 +43,7 @@ class Plugin(PluginBase):
     # |  Methods
     @staticmethod
     @Interface.override
-    def Generate(data, output_dir, status_stream):
+    def Generate(global_custom_structs, data, output_dir, status_stream):
         result_code = 0
 
         status_stream.write("Preprocessing data...")

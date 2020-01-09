@@ -5,7 +5,9 @@
 #pragma once
 
 #include "SharedLibrary_DateTimeFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
 
 #include "SharedLibrary_Common.hpp"
 
@@ -101,7 +103,6 @@ void DateTimeFeaturizer_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 

@@ -6,6 +6,7 @@
 
 import copy
 import importlib
+import itertools
 import os
 import re
 import sys
@@ -185,10 +186,20 @@ def EntryPoint(
             ),
             suffix=lambda: "\n" if nonlocals.skipped else None,
         ) as this_dm:
+            global_custom_struct_names = set()
+            global_custom_structs = []
+
+            for item in data.custom_structs:
+                if item.name in global_custom_struct_names:
+                    raise Exception("The custom struct '{}' has already been defined".format(item.name))
+
+                global_custom_struct_names.add(item.name)
+                global_custom_structs.append(item)
+
             # If there are templates at play, preprocess the content and expand the values
             new_data = []
 
-            for item in data:
+            for item in data.featurizers:
                 if item.status != "Available":
                     this_dm.stream.write(
                         "The status for '{}' is set to '{}' and will not be processed.\n".format(
@@ -254,6 +265,9 @@ def EntryPoint(
                             )
 
                         for custom_struct in getattr(new_item, "custom_structs", []):
+                            if any(gcs for gcs in global_custom_structs if gcs.name == custom_struct.name):
+                                raise Exception("The custom structure '{}' in '{}' has already been defined as a global custom struct.\n".format(custom_struct.name, item.name))
+
                             for member in custom_struct.members:
                                 member.type = regex.sub(template_type, member.type)
 
@@ -292,7 +306,7 @@ def EntryPoint(
                     def IsCustomStructType(typename):
                         return any(
                             custom_struct
-                            for custom_struct in getattr(item, "custom_structs", [])
+                            for custom_struct in itertools.chain(getattr(item, "custom_structs", []), global_custom_structs)
                             if custom_struct.name == typename
                         )
 
@@ -323,7 +337,7 @@ def EntryPoint(
         with dm.stream.DoneManager() as this_dm:
             FileSystem.MakeDirs(output_dir)
 
-            this_dm.result = plugin.Generate(data, output_dir, this_dm.stream)
+            this_dm.result = plugin.Generate(global_custom_structs, data, output_dir, this_dm.stream)
             if this_dm.result != 0:
                 return this_dm.result
 

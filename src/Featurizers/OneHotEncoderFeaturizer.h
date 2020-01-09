@@ -8,6 +8,7 @@
 #include "Components/HistogramEstimator.h"
 #include "Components/IndexMapEstimator.h"
 #include "Structs.h"
+
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
@@ -17,14 +18,14 @@ namespace Featurizers {
 ///  \brief         Returns a unique one hot struct for each input.
 ///
 template <typename InputT>
-class OneHotEncoderTransformer : public StandardTransformer<InputT, OneHotStruct> {
+class OneHotEncoderTransformer : public StandardTransformer<InputT, SingleValueSparseVectorEncoding<std::uint8_t>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = StandardTransformer<InputT, OneHotStruct>;
+    using BaseType                          = StandardTransformer<InputT, SingleValueSparseVectorEncoding<std::uint8_t>>;
     using IndexMap                          = typename Components::IndexMapAnnotationData<InputT>::IndexMap;
 
     // ----------------------------------------------------------------------
@@ -60,21 +61,24 @@ private:
 
     // MSVC has problems when the definition and declaration are separated
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-        typename IndexMap::const_iterator const         lable_iter(Labels.find(input));
-        if(lable_iter == Labels.end()) {
-            if(AllowMissingValues) {
-                callback(OneHotStruct(0, static_cast<std::uint32_t>(Labels.size()) + 1, 1));
-                return;
-            }
-            throw std::invalid_argument("'input' was not found");
-        }
         // when missing values are allowed, the total size is increased by 1 and the 0th element in the vector represent missing values
-        std::uint32_t offset = AllowMissingValues ? 1 : 0;
-        callback(OneHotStruct(static_cast<std::uint32_t>(lable_iter->second + offset),   // category index
-                              static_cast<std::uint32_t>(Labels.size() + offset),        // category total size
-                              static_cast<std::uint32_t>(1)                              // number of appearances and
-                                                                                         // this will just be 1 and 0 in one hot encoder
-        ));
+        std::uint64_t const                 offset(AllowMissingValues ? 1 : 0);
+
+        // Create the encoding value
+        std::uint64_t                       encodingIndex;
+
+        typename IndexMap::const_iterator const         label_iter(Labels.find(input));
+
+        if(label_iter == Labels.end()) {
+            if(AllowMissingValues == false)
+                throw std::invalid_argument("'input' was not found");
+
+            encodingIndex = 0;
+        }
+        else
+            encodingIndex = static_cast<std::uint64_t>(label_iter->second + offset);
+
+        callback(SingleValueSparseVectorEncoding<std::uint8_t>(Labels.size() + offset, 1, encodingIndex));
     }
 };
 
@@ -90,14 +94,14 @@ template <
     typename InputT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class OneHotEncoderEstimatorImpl : public TransformerEstimator<InputT, OneHotStruct> {
+class OneHotEncoderEstimatorImpl : public TransformerEstimator<InputT, SingleValueSparseVectorEncoding<std::uint8_t>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = TransformerEstimator<InputT, OneHotStruct>;
+    using BaseType                          = TransformerEstimator<InputT, SingleValueSparseVectorEncoding<std::uint8_t>>;
     using TransformerType                   = OneHotEncoderTransformer<InputT>;
 
     // ----------------------------------------------------------------------
@@ -311,6 +315,6 @@ template <typename InputT, size_t MaxNumTrainingItemsV>
 void Details::OneHotEncoderEstimatorImpl<InputT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
-}
-}
-}
+} // namespace Featurizers
+} // namespace Featurizers
+} // namespace Microsoft

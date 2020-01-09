@@ -40,7 +40,7 @@ class Plugin(PluginBase):
     # |  Methods
     @staticmethod
     @Interface.override
-    def Generate(data, output_dir, status_stream):
+    def Generate(global_custom_structs, data, output_dir, status_stream):
         result_code = 0
 
         status_stream.write("Preprocessing data...")
@@ -99,7 +99,9 @@ def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
                 #pragma once
 
                 #include "SharedLibrary_{name}.h"
+
                 #include "Traits.h"
+                #include "Featurizers/Structs.h"
 
                 #include "SharedLibrary_Common.hpp"
 
@@ -281,13 +283,13 @@ def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
                     constructor_args=constructor_args,
                     fit_input_args=transform_input_args,
                     transform_vars=StringHelpers.LeftJustify(
-                        output_statement_info.TransformVars,
+                        output_statement_info.TransformVars.rstrip(),
                         8,
                     ),
                     transform_input_args=transform_input_args,
                     transform_output_args=output_statement_info.TransformOutputVars,
                     transform_statement=StringHelpers.LeftJustify(
-                        output_statement_info.AppendResultStatement,
+                        output_statement_info.AppendResultStatement.rstrip(),
                         8,
                     ),
                     inline_destroy_statement=StringHelpers.LeftJustify(
@@ -370,12 +372,15 @@ class TypeInfoData(object):
         if cls._type_info_factory_classes is None:
             from Plugins.SharedLibraryTestsPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl import ScalarTypeInfoFactories
-            from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfoFactory import (
-                StringTypeInfoFactory,
-            )
+            from Plugins.SharedLibraryTestsPluginImpl.SparseVectorEncodingTypeInfoFactory import SparseVectorEncodingTypeInfoFactory
+            from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl import StructTypeInfoFactories
 
-            type_info_factory_classes = [DatetimeTypeInfoFactory, StringTypeInfoFactory]
+            type_info_factory_classes = [
+                DatetimeTypeInfoFactory,
+                SparseVectorEncodingTypeInfoFactory,
+                StringTypeInfoFactory,
+            ]
 
             for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
                 for obj_name in dir(compound_module):
