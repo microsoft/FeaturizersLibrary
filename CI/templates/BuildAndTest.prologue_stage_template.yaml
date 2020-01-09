@@ -14,9 +14,6 @@ stages:
       runCodesignValidationInjection: False
 
     jobs:
-      - job: clean
-        workspace:
-          clean: all
       - template: "_job_template.yaml"
         parameters:
           agent_pool: FeaturizersLibrary

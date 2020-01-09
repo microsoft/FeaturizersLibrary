@@ -15,6 +15,10 @@ parameters:
 # the container attribute is only present when there is a container provided.
 
 jobs:
+  - job: clean
+    workspace:
+      clean: all
+      
     - ${{ if eq(parameters.agent_pool_is_custom, 'true') }}:
         - ${{ if eq(parameters.operating_system, 'Windows') }}:
             - job: ${{ parameters.job_name }}
