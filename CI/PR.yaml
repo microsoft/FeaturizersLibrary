@@ -6,10 +6,6 @@ name: $(TeamProject)-$(BuildDefinitionName)-$(SourceBranchName)-$(Date:yyyy.MM.d
 trigger: none
 
 resources:
-  repositories:
-    - repository: self
-      checkoutOptions:
-        submodules: true
 
   containers:
     - container: universal_linux
@@ -19,6 +15,12 @@ resources:
     - container: centos7
       image: centos7
       endpoint: featurizerslibrarybuild
+
+resources:
+  repositories:
+    - repository: self
+      checkoutOptions:
+        submodules: true
 
 stages:
   - template: "templates/BuildAndTest.prologue_stage_template.yaml"
