@@ -354,11 +354,11 @@ PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::PCAComponent
 template <typename InputT, typename TransformedT>
 void ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::fit(InputType const &input) {
 
+    //assume same type but remain InputT and TransformedT for flexibility
     if (!std::is_same<InputT,TransformedT>::value)
         throw std::invalid_argument("InputT should be equal with TransformedT");
     
     _matrix = input;
-
 }
 
 template <typename InputT, typename TransformedT>

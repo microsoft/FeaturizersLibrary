@@ -35,19 +35,13 @@ void EstimatorTest(InputT const &trainingMatrix,
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
-#elif (defined _MSC_VER)
-#   pragma warning(push)
-#   pragma warning(disable: 4127)
 #endif
 
     CHECK((eigenValuesMat - eigenValuesLabel).norm() < eps);
     CHECK((eigenVectorsMat - eigenVectorsLabel).norm() < eps);
 
-
 #if (defined __clang__)
 #   pragma clang diagnostic pop
-#elif (defined _MSC_VER)
-#   pragma warning(pop)
 #endif
 
 }
@@ -72,9 +66,6 @@ void TestWrapperPCA(){
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
-#elif (defined _MSC_VER)
-#   pragma warning(push)
-#   pragma warning(disable: 4127)
 #endif
 
     TransformedT eigenValuesLabel(2, 1);
@@ -89,8 +80,6 @@ void TestWrapperPCA(){
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
-#elif (defined _MSC_VER)
-#   pragma warning(pop)
 #endif
 
     EstimatorTest<InputT, TransformedT>(trainingMatrix, eigenValuesLabel, eigenVectorsLabel);
@@ -142,9 +131,6 @@ TEST_CASE("PCA_Transformer") {
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
-#elif (defined _MSC_VER)
-#   pragma warning(push)
-#   pragma warning(disable: 4127)
 #endif
 
     TransformedT label(6, 2);
@@ -163,8 +149,6 @@ TEST_CASE("PCA_Transformer") {
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
-#elif (defined _MSC_VER)
-#   pragma warning(pop)
 #endif
 
     using PCAEstimator                                 = NS::Featurizers::PCAEstimator<InputT, TransformedT>;
@@ -191,17 +175,12 @@ TEST_CASE("PCA_Transformer") {
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
-#elif (defined _MSC_VER)
-#   pragma warning(push)
-#   pragma warning(disable: 4127)
 #endif
 
     CHECK((output - label).norm() < eps);
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
-#elif (defined _MSC_VER)
-#   pragma warning(pop)
 #endif
 }
 
