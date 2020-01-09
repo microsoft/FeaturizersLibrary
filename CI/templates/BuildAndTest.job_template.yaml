@@ -16,6 +16,8 @@ parameters:
   tester_build_only: False # Only build tests (but do not execute them)
 
 jobs:
+  workspace:
+    clean: resources 
   - template: "_job_template.yaml"
     parameters:
       agent_pool: ${{ parameters.agent_pool }}

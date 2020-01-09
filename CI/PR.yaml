@@ -25,10 +25,6 @@ stages:
   - stage: BuildAndTest_Stage
     displayName: "Build and Test:"
     dependsOn: Prologue_Stage
-
-    jobs:
-      workspace:
-        clean: resources 
       # ----------------------------------------------------------------------
       # Official Builds
 
