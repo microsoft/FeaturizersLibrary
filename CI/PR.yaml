@@ -16,7 +16,6 @@ resources:
       image: centos7
       endpoint: featurizerslibrarybuild
 
-resources:
   repositories:
     - repository: self
       checkoutOptions:
