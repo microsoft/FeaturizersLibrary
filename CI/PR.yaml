@@ -16,11 +16,6 @@ resources:
       image: centos7
       endpoint: featurizerslibrarybuild
 
-  repositories:
-    - repository: self
-      checkoutOptions:
-        submodules: true
-
 stages:
   - template: "templates/BuildAndTest.prologue_stage_template.yaml"
     parameters:
@@ -43,42 +38,6 @@ stages:
           configuration: system_compiler
           job_display_name: "Ubuntu 16.04-x64-GCC"
           operating_system: Linux
-
-
-      # ----------------------------------------------------------------------
-      # Sanity Builds
-
-      # When code coverage is enabled, we only test debug builds. Execute release tests to ensure that everything is working.
-
-
-      - template: "templates/BuildAndTest.job_template.yaml"
-        parameters:
-          agent_pool: FeaturizersLibrary
-          agent_pool_is_custom: true
-          configuration: x64_Clang_8
-          job_display_name: "Ubuntu 16.04-x64-Clang 8"
-          operating_system: Linux
-
-      # TODO: Disabled for now - template: "templates/BuildAndTest.job_template.yaml"
-      # TODO: Disabled for now   parameters:
-      # TODO: Disabled for now     agent_pool: FeaturizersLibrary
-      # TODO: Disabled for now     agent_pool_is_custom: true
-      # TODO: Disabled for now     agent_pool_container: centos7
-      # TODO: Disabled for now     configuration: system_compiler
-      # TODO: Disabled for now     job_display_name: "CentOS 7-x64-GCC"
-      # TODO: Disabled for now     operating_system: Linux
-
-      # Note that the universal_linux build is generating code that produces runtime errors. This build remains to ensure
-      # that the code compiles on older platforms.
-      - template: "templates/BuildAndTest.job_template.yaml"
-        parameters:
-          agent_pool: FeaturizersLibrary
-          agent_pool_is_custom: true
-          agent_pool_container: universal_linux
-          configuration: universal_linux
-          operating_system: Linux
-          job_display_name: "[Build Only] Holy Build Box-x64-GCC"
-          tester_build_only: true
 
   - stage: PostBuild_Stage
     displayName: "Post Build:"
