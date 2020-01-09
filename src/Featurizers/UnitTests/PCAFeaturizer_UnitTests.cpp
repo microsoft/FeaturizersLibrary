@@ -78,7 +78,7 @@ void TestWrapperPCA(){
 #endif
 
     TransformedT eigenValuesLabel(2, 1);
-    eigenValuesLabel(0, 0) = 0.302284f;
+    eigenValuesLabel(0, 0) =  0.302284f;
     eigenValuesLabel(1, 0) = 39.697716f;
 
     TransformedT eigenVectorsLabel(2, 2);
@@ -115,7 +115,6 @@ TEST_CASE("Invalid_TrainingPolicy") {
 
 TEST_CASE("Eigen_Estimator_Itegration") {
     TestWrapperPCA<Eigen::MatrixX<float>, Eigen::MatrixX<float>>();
-    TestWrapperPCA<Eigen::MatrixX<float>, Eigen::MatrixX<double>>();
     TestWrapperPCA<Eigen::MatrixX<double>, Eigen::MatrixX<double>>();
 }
 

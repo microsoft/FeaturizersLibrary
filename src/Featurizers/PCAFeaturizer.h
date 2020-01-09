@@ -354,36 +354,11 @@ PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::PCAComponent
 template <typename InputT, typename TransformedT>
 void ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::fit(InputType const &input) {
 
-    if (std::is_same<InputT,TransformedT>::value) {
-        _matrix = input;
-    } else {
+    if (!std::is_same<InputT,TransformedT>::value)
+        throw std::invalid_argument("InputT should be equal with TransformedT");
+    
+    _matrix = input;
 
-        _matrix.resize(input.rows(), input.cols());
-
-#if (defined __clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wdouble-promotion"
-#elif (defined _MSC_VER)
-#   pragma warning(push)
-#   pragma warning(disable: 4127)
-#endif
-
-        using TransformedElementType = decltype(_matrix(0, 0));
-
-        for (Eigen::Index rowIdx = 0; rowIdx < input.rows(); ++rowIdx) {
-            for (Eigen::Index colIdx = 0; colIdx < input.cols(); ++colIdx) {
-                auto item = input(rowIdx, colIdx);
-                _matrix(rowIdx, colIdx) = static_cast<TransformedElementType>(item);
-            }
-        }
-
-#if (defined __clang__)
-#   pragma clang diagnostic pop
-#elif (defined _MSC_VER)
-#   pragma warning(pop)
-#endif
-
-    }
 }
 
 template <typename InputT, typename TransformedT>
