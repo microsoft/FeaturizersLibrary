@@ -6,7 +6,6 @@ name: $(TeamProject)-$(BuildDefinitionName)-$(SourceBranchName)-$(Date:yyyy.MM.d
 trigger: none
 
 resources:
-
   containers:
     - container: universal_linux
       image: universal_linux
@@ -28,6 +27,8 @@ stages:
     dependsOn: Prologue_Stage
 
     jobs:
+      workspace:
+        clean: resources 
       # ----------------------------------------------------------------------
       # Official Builds
 
