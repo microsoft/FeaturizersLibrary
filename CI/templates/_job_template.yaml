@@ -35,7 +35,6 @@ jobs:
                   clean: false  # if true, run `execute git clean -ffdx && git reset --hard HEAD` before fetching
                   submodules: recursive
                 ${{ parameters.steps }}
-                
 
         - ${{ if eq(parameters.operating_system, 'Linux') }}:
             - ${{ if eq(parameters.agent_pool_container, '') }}:
