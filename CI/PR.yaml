@@ -157,7 +157,6 @@ stages:
           job_name: Package_Job
           job_display_name: "Package"
           operating_system: Windows
-          checkout: self
           steps:
             - template: "BuildAndTest.package_steps_template.yaml"
               parameters:
