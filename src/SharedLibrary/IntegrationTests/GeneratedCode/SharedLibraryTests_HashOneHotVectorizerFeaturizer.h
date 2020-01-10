@@ -5,7 +5,9 @@
 #pragma once
 
 #include "SharedLibrary_HashOneHotVectorizerFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
 
 #include "SharedLibrary_Common.hpp"
 
@@ -15,7 +17,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -86,12 +88,12 @@ void HashOneHotVectorizerFeaturizer_int8_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -101,7 +103,6 @@ void HashOneHotVectorizerFeaturizer_int8_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 
@@ -123,7 +124,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -194,12 +195,12 @@ void HashOneHotVectorizerFeaturizer_int16_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -209,7 +210,6 @@ void HashOneHotVectorizerFeaturizer_int16_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 
@@ -231,7 +231,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -302,12 +302,12 @@ void HashOneHotVectorizerFeaturizer_int32_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -317,7 +317,6 @@ void HashOneHotVectorizerFeaturizer_int32_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 
@@ -339,7 +338,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -410,12 +409,12 @@ void HashOneHotVectorizerFeaturizer_int64_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -425,7 +424,6 @@ void HashOneHotVectorizerFeaturizer_int64_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 
@@ -447,7 +445,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -518,12 +516,12 @@ void HashOneHotVectorizerFeaturizer_uint8_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -533,7 +531,6 @@ void HashOneHotVectorizerFeaturizer_uint8_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 
@@ -555,7 +552,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -626,12 +623,12 @@ void HashOneHotVectorizerFeaturizer_uint16_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -641,7 +638,6 @@ void HashOneHotVectorizerFeaturizer_uint16_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 
@@ -663,7 +659,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -734,12 +730,12 @@ void HashOneHotVectorizerFeaturizer_uint32_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -749,7 +745,6 @@ void HashOneHotVectorizerFeaturizer_uint32_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 
@@ -771,7 +766,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -842,12 +837,12 @@ void HashOneHotVectorizerFeaturizer_uint64_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -857,7 +852,6 @@ void HashOneHotVectorizerFeaturizer_uint64_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 
@@ -879,7 +873,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -950,12 +944,12 @@ void HashOneHotVectorizerFeaturizer_float_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -965,7 +959,6 @@ void HashOneHotVectorizerFeaturizer_float_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 
@@ -987,7 +980,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -1058,12 +1051,12 @@ void HashOneHotVectorizerFeaturizer_double_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1073,7 +1066,6 @@ void HashOneHotVectorizerFeaturizer_double_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 
@@ -1095,7 +1087,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_bool_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -1166,12 +1158,12 @@ void HashOneHotVectorizerFeaturizer_bool_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_bool_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1181,7 +1173,6 @@ void HashOneHotVectorizerFeaturizer_bool_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 
@@ -1203,7 +1194,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_string_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -1274,12 +1265,12 @@ void HashOneHotVectorizerFeaturizer_string_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1289,7 +1280,6 @@ void HashOneHotVectorizerFeaturizer_string_Test(
         #else
         results.emplace_back(result);
         #endif
-
         // No inline destroy statement
     }
 

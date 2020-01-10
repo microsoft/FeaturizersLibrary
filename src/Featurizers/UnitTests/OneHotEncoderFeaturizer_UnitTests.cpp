@@ -22,7 +22,7 @@ using Histogram = typename NS::Featurizers::Components::HistogramAnnotationData<
 // test for unsigned int
 TEST_CASE("uint32_t") {
     using InputType       = std::uint32_t;
-    using TransformedType = NS::Featurizers::OneHotStruct;
+    using TransformedType = NS::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                 NS::TestHelpers::make_vector<InputType>(10, 20, 10),
@@ -33,11 +33,11 @@ TEST_CASE("uint32_t") {
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>(11, 8, 10, 15, 20);
 
     auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
-        TransformedType(2,7,1),
-        TransformedType(0,7,1),
-        TransformedType(1,7,1),
-        TransformedType(3,7,1),
-        TransformedType(5,7,1)
+        TransformedType(7, 1, 2),
+        TransformedType(7, 1, 0),
+        TransformedType(7, 1, 1),
+        TransformedType(7, 1, 3),
+        TransformedType(7, 1, 5)
     );
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
@@ -51,7 +51,8 @@ TEST_CASE("uint32_t") {
 // test for string
 TEST_CASE("string") {
     using InputType       = std::string;
-    using TransformedType = NS::Featurizers::OneHotStruct;
+    using TransformedType = NS::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>;
+
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                             NS::TestHelpers::make_vector<InputType>("orange", "apple",  "orange",
                                                                     "grape",  "carrot", "carrot",
@@ -61,10 +62,10 @@ TEST_CASE("string") {
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("banana", "grape", "apple","orange");
 
     auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
-                                                                           TransformedType(1,6,1),
-                                                                           TransformedType(3,6,1),
-                                                                           TransformedType(0,6,1),
-                                                                           TransformedType(4,6,1)
+        TransformedType(6, 1, 1),
+        TransformedType(6, 1, 3),
+        TransformedType(6, 1, 0),
+        TransformedType(6, 1, 4)
     );
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
@@ -81,7 +82,8 @@ TEST_CASE("Empty index map") {
 
 TEST_CASE("unseen values") {
     using InputType       = std::string;
-    using TransformedType = NS::Featurizers::OneHotStruct;
+    using TransformedType = NS::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>;
+
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                             NS::TestHelpers::make_vector<InputType>("orange", "apple",  "orange",
                                                                     "grape",  "carrot", "carrot",
@@ -91,11 +93,11 @@ TEST_CASE("unseen values") {
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("banana", "grape", "apple","orange", "hello");
 
     auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
-                                                                           TransformedType(2,7,1),
-                                                                           TransformedType(4,7,1),
-                                                                           TransformedType(1,7,1),
-                                                                           TransformedType(5,7,1),
-                                                                           TransformedType(0,7,1)
+        TransformedType(7, 1, 2),
+        TransformedType(7, 1, 4),
+        TransformedType(7, 1, 1),
+        TransformedType(7, 1, 5),
+        TransformedType(7, 1, 0)
     );
     // when an inference data is not seen before, in the non-throw mode, the featurizer should generate 0
     CHECK(
@@ -177,4 +179,3 @@ TEST_CASE("Serialization Version Error") {
         Catch::Contains("Unsupported archive version")
     );
 }
-

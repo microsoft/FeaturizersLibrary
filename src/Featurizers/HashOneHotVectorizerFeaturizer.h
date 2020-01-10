@@ -4,6 +4,7 @@
 // ----------------------------------------------------------------------
 #pragma once
 
+#include "Structs.h"
 #include "../Traits.h"
 #include "Components/InferenceOnlyFeaturizerImpl.h"
 #include "../3rdParty/MurmurHash3.h"
@@ -25,7 +26,6 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
-
 namespace {
 
 static inline std::uint32_t MurmurHashHelper(std::string const &input, std::uint32_t hashingSeedVal) {
@@ -37,35 +37,20 @@ static inline std::uint32_t MurmurHashHelper(std::string const &input, std::uint
 template<typename T>
 static inline std::uint32_t MurmurHashHelper(T const &input, std::uint32_t hashingSeedVal) {
     static_assert(std::is_pod<T>::value, "Input must be PODs");
+
     std::uint32_t colHashVal;
     MurmurHash3_x86_32(reinterpret_cast<unsigned char const*>(&input), sizeof(input), hashingSeedVal, &colHashVal);
     return colHashVal;
 }
 
-}
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         HashOneHotVectorizer Struct
-///  \brief         <std::uint32_t colIndex, std::uint32_t numCols, bool val>
-///
-//todo:This structure is shared between the HashOneHotVectorizerFeaturizer and the OneHotFeaturizer.
-//Consider moving to a common location.
-struct HashOneHotVectorizerStruct {
-    std::uint32_t const ColIndex;
-    std::uint32_t const NumCols;
-    bool          const Val;
-
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(HashOneHotVectorizerStruct);
-    HashOneHotVectorizerStruct(std::uint32_t colIndex, std::uint32_t numCols, bool val);
-    bool operator==(HashOneHotVectorizerStruct const &obj) const;
-};
+} // anonymous namespace
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         HashOneHotVectorizerTransformer
 ///  \brief         Convert input to hash and encode to one hot encoded vector
 ///
 template <typename T>
-class HashOneHotVectorizerTransformer : public Components::InferenceOnlyTransformerImpl<T, HashOneHotVectorizerStruct> {
+class HashOneHotVectorizerTransformer : public Components::InferenceOnlyTransformerImpl<T, SingleValueSparseVectorEncoding<std::uint8_t>> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -73,7 +58,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using Type                              = T;
-    using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, HashOneHotVectorizerStruct>;
+    using BaseType                          = Components::InferenceOnlyTransformerImpl<Type, SingleValueSparseVectorEncoding<std::uint8_t>>;
 
     // ----------------------------------------------------------------------
     // |
@@ -110,28 +95,25 @@ private:
 
         std::uint32_t colHashVal = MurmurHashHelper(input, _hashingSeedVal);
 
-        // TODO _numCols should be the number of bits
         callback(
-            HashOneHotVectorizerStruct(
-                static_cast<std::uint32_t>(colHashVal % _numCols),
-                static_cast<std::uint32_t>(_numCols),
-                true
+            SingleValueSparseVectorEncoding<std::uint8_t>(
+                _numCols,
+                1,
+                static_cast<std::uint64_t>(colHashVal % _numCols)
             )
         );
     }
 };
 
-// TODO: This should be implemented in terms of Components::InferenceOnlyFeaturizerImpl
-
 template <typename T>
-class HashOneHotVectorizerEstimator : public TransformerEstimator<T, HashOneHotVectorizerStruct> {
+class HashOneHotVectorizerEstimator : public TransformerEstimator<T, SingleValueSparseVectorEncoding<std::uint8_t>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = TransformerEstimator<T, HashOneHotVectorizerStruct>;
+    using BaseType                          = TransformerEstimator<T, SingleValueSparseVectorEncoding<std::uint8_t>>;
     using TransformerType                   = HashOneHotVectorizerTransformer<T>;
 
     // ----------------------------------------------------------------------
@@ -181,23 +163,6 @@ private:
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-
-// ----------------------------------------------------------------------
-// |
-// |  HashOneHotVectorizerStruct
-// |
-// ----------------------------------------------------------------------
-HashOneHotVectorizerStruct::HashOneHotVectorizerStruct(std::uint32_t colIndex, std::uint32_t numCols, bool val) :
-    ColIndex(std::move(colIndex)),
-    NumCols(std::move(numCols)),
-    Val(std::move(val)) {
-}
-
-bool HashOneHotVectorizerStruct::operator==(HashOneHotVectorizerStruct const &obj) const {
-    return ColIndex == obj.ColIndex
-        && NumCols == obj.NumCols
-        && Val == obj.Val;
-}
 
 // ----------------------------------------------------------------------
 // |

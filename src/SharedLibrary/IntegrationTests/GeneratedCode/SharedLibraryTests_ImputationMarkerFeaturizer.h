@@ -5,7 +5,9 @@
 #pragma once
 
 #include "SharedLibrary_ImputationMarkerFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
 
 #include "SharedLibrary_Common.hpp"
 
@@ -100,7 +102,6 @@ void ImputationMarkerFeaturizer_int8_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -204,7 +205,6 @@ void ImputationMarkerFeaturizer_int16_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -308,7 +308,6 @@ void ImputationMarkerFeaturizer_int32_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -412,7 +411,6 @@ void ImputationMarkerFeaturizer_int64_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -516,7 +514,6 @@ void ImputationMarkerFeaturizer_uint8_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -620,7 +617,6 @@ void ImputationMarkerFeaturizer_uint16_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -724,7 +720,6 @@ void ImputationMarkerFeaturizer_uint32_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -828,7 +823,6 @@ void ImputationMarkerFeaturizer_uint64_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -932,7 +926,6 @@ void ImputationMarkerFeaturizer_float_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -1036,7 +1029,6 @@ void ImputationMarkerFeaturizer_double_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -1140,7 +1132,6 @@ void ImputationMarkerFeaturizer_bool_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -1244,7 +1235,6 @@ void ImputationMarkerFeaturizer_string_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
