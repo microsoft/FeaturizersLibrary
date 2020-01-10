@@ -8,10 +8,9 @@ parameters:
   job_name: ""
   job_display_name: ""
   operating_system: "" # Windows|Linux|MacOS
-  steps: []
   checkout: self
   submodule_checkout: 
-    - checkout: ${{ parameters.checkout }}
+    - checkout: self
       clean: false  #if true, git clean will have problems on Linux machine
       submodules: recursive
   timeout_in_minutes: 240
@@ -36,7 +35,10 @@ jobs:
                 clean: All
 
               steps:
-                - ${{ parameters.submodule_checkout }}
+                - ${{ if eq(parameters.checkout, 'self') }}:
+                    - ${{ parameters.submodule_checkout }}
+                - ${{ if eq(parameters.checkout, 'none') }}:
+                    - checkout: none
                 - ${{ parameters.steps }}
 
         - ${{ if eq(parameters.operating_system, 'Linux') }}:
