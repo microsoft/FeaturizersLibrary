@@ -56,7 +56,7 @@ class CustomStructInfo(Interface.Interface):
     # ----------------------------------------------------------------------
     @staticmethod
     @Interface.abstractmethod
-    def GetKernelInitializeAssignAndPreprocessorStatements(transformer_name):
+    def GetKernelInitializeAssignAndPreprocessorStatements(transformer_name, input_transformation_statement):
         """\
         Returns statements required when implementing the kernal.
 
@@ -72,20 +72,6 @@ class CustomStructInfo(Interface.Interface):
                 'year_data[i] = time_point.year;'
                 'month_data[i] = time_point.month;',
             ],
-            [
-                textwrap.dedent(
-                    '''\
-                    ONNX_OPERATOR_KERNEL_EX(
-                        DateTimeTransformer,
-                        kMSUatoMLDomain,
-                        1,
-                        kCpuExecutionProvider,
-                        KernelDefBuilder()
-                            .TypeConstraint("OutputT0", DataTypeImpl::GetTensorType<int64_t>())
-                            .TypeConstraint("OutputT1", DataTypeImpl::GetTensorType<uint8_t>())
-                    );
-                    ''',
-                ),
-            ]
         """
+
         raise Exception("Abstract method")

@@ -5,7 +5,11 @@
 #pragma once
 
 #include "SharedLibrary_RobustScalarFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
+
+#include "SharedLibrary_Common.hpp"
 
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalarFeaturizer <int8> */
@@ -99,7 +103,6 @@ void RobustScalarFeaturizer_int8_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -204,7 +207,6 @@ void RobustScalarFeaturizer_int16_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -309,7 +311,6 @@ void RobustScalarFeaturizer_uint8_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -414,7 +415,6 @@ void RobustScalarFeaturizer_uint16_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -519,7 +519,6 @@ void RobustScalarFeaturizer_float_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -624,7 +623,6 @@ void RobustScalarFeaturizer_int32_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -729,7 +727,6 @@ void RobustScalarFeaturizer_int64_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -834,7 +831,6 @@ void RobustScalarFeaturizer_uint32_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -939,7 +935,6 @@ void RobustScalarFeaturizer_uint64_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -1044,7 +1039,6 @@ void RobustScalarFeaturizer_double_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 

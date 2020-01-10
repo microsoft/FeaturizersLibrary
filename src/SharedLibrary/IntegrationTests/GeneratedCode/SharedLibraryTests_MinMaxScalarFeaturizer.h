@@ -5,7 +5,11 @@
 #pragma once
 
 #include "SharedLibrary_MinMaxScalarFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
+
+#include "SharedLibrary_Common.hpp"
 
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxScalarFeaturizer <int8> */
@@ -98,7 +102,6 @@ void MinMaxScalarFeaturizer_int8_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -202,7 +205,6 @@ void MinMaxScalarFeaturizer_int16_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -306,7 +308,6 @@ void MinMaxScalarFeaturizer_int32_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -410,7 +411,6 @@ void MinMaxScalarFeaturizer_int64_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -514,7 +514,6 @@ void MinMaxScalarFeaturizer_uint8_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -618,7 +617,6 @@ void MinMaxScalarFeaturizer_uint16_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -722,7 +720,6 @@ void MinMaxScalarFeaturizer_uint32_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -826,7 +823,6 @@ void MinMaxScalarFeaturizer_uint64_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -930,7 +926,6 @@ void MinMaxScalarFeaturizer_float_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -1034,7 +1029,6 @@ void MinMaxScalarFeaturizer_double_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 

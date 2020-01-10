@@ -9,9 +9,7 @@
 #include "../HashOneHotVectorizerFeaturizer.h"
 
 namespace NS = Microsoft::Featurizer;
-
-using HOHVStruct = NS::Featurizers::HashOneHotVectorizerStruct;
-
+using Encoding = NS::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>;
 
 TEST_CASE("HashOneHotVectorizerEstimator") {
     CHECK(strcmp(NS::Featurizers::HashOneHotVectorizerEstimator<std::int8_t>(NS::CreateTestAnnotationMapsPtr(1), 2, 100).Name, "HashOneHotVectorizerEstimator") == 0);
@@ -26,29 +24,29 @@ TEST_CASE("HashOneHotVectorizerEstimator") {
 
 TEST_CASE("HashOneHotVectorizerTransformer_int8") {
     NS::Featurizers::HashOneHotVectorizerTransformer<std::int8_t> hvtransformer(2, 100);
-    HOHVStruct out = hvtransformer.execute(15);
-    HOHVStruct label = HOHVStruct{29, 100, true};
+    Encoding out = hvtransformer.execute(15);
+    Encoding label(100, 1, 29);
     CHECK(label == out);
 }
 
 TEST_CASE("HashOneHotVectorizerTransformer_int32") {
     NS::Featurizers::HashOneHotVectorizerTransformer<std::int32_t> hvtransformer(2, 100);
-    HOHVStruct out = hvtransformer.execute(15);
-    HOHVStruct label = HOHVStruct{22, 100, true};
+    Encoding out = hvtransformer.execute(15);
+    Encoding label(100, 1, 22);
     CHECK(label == out);
 }
 
 TEST_CASE("HashOneHotVectorizerTransformer_double") {
     NS::Featurizers::HashOneHotVectorizerTransformer<std::double_t> hvtransformer(2, 100);
-    HOHVStruct out = hvtransformer.execute(15.0);
-    HOHVStruct label = HOHVStruct{99, 100, true};
+    Encoding out = hvtransformer.execute(15.0);
+    Encoding label(100, 1, 99);
     CHECK(label == out);
 }
 
 TEST_CASE("HashOneHotVectorizerTransformer_string") {
     NS::Featurizers::HashOneHotVectorizerTransformer<std::string> hvtransformer(2, 100);
-    HOHVStruct out = hvtransformer.execute("hello");
-    HOHVStruct label = HOHVStruct{25, 100, true};
+    Encoding out = hvtransformer.execute("hello");
+    Encoding label(100, 1, 25);
     CHECK(label == out);
 }
 

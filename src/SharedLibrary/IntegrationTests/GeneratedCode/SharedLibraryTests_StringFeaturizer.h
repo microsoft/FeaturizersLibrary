@@ -5,7 +5,11 @@
 #pragma once
 
 #include "SharedLibrary_StringFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
+
+#include "SharedLibrary_Common.hpp"
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int8> */
@@ -91,7 +95,6 @@ void StringFeaturizer_int8_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_int8_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -100,7 +103,6 @@ void StringFeaturizer_int8_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_int8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -200,7 +202,6 @@ void StringFeaturizer_int16_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_int16_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -209,7 +210,6 @@ void StringFeaturizer_int16_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_int16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -309,7 +309,6 @@ void StringFeaturizer_int32_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_int32_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -318,7 +317,6 @@ void StringFeaturizer_int32_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_int32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -418,7 +416,6 @@ void StringFeaturizer_int64_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_int64_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -427,7 +424,6 @@ void StringFeaturizer_int64_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_int64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -527,7 +523,6 @@ void StringFeaturizer_uint8_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_uint8_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -536,7 +531,6 @@ void StringFeaturizer_uint8_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_uint8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -636,7 +630,6 @@ void StringFeaturizer_uint16_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_uint16_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -645,7 +638,6 @@ void StringFeaturizer_uint16_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_uint16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -745,7 +737,6 @@ void StringFeaturizer_uint32_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_uint32_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -754,7 +745,6 @@ void StringFeaturizer_uint32_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_uint32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -854,7 +844,6 @@ void StringFeaturizer_uint64_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_uint64_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -863,7 +852,6 @@ void StringFeaturizer_uint64_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_uint64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -963,7 +951,6 @@ void StringFeaturizer_float_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_float_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -972,7 +959,6 @@ void StringFeaturizer_float_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_float_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -1072,7 +1058,6 @@ void StringFeaturizer_double_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_double_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -1081,7 +1066,6 @@ void StringFeaturizer_double_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_double_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -1181,7 +1165,6 @@ void StringFeaturizer_bool_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_bool_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -1190,7 +1173,6 @@ void StringFeaturizer_bool_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_bool_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -1290,7 +1272,6 @@ void StringFeaturizer_string_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -1299,7 +1280,6 @@ void StringFeaturizer_string_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_string_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));

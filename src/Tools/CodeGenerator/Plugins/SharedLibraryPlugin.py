@@ -4,6 +4,8 @@
 # ----------------------------------------------------------------------
 """Contains the Plugin object"""
 
+import copy
+import itertools
 import os
 import sys
 import textwrap
@@ -41,7 +43,7 @@ class Plugin(PluginBase):
     # |  Methods
     @staticmethod
     @Interface.override
-    def Generate(data, output_dir, status_stream):
+    def Generate(global_custom_structs, data, output_dir, status_stream):
         result_code = 0
 
         status_stream.write("Preprocessing data...")
@@ -51,7 +53,7 @@ class Plugin(PluginBase):
             c_data = []
 
             for items in data:
-                c_data.append([CData(item) for item in items])
+                c_data.append([CData(item, global_custom_structs) for item in items])
 
         status_stream.write("Generating Common Files...")
         with status_stream.DoneManager() as this_dm:
@@ -186,6 +188,36 @@ def _GenerateCommonFiles(output_dir, output_stream):
                 FEATURIZER_LIBRARY_API bool DestroyErrorInfo(/*in*/ ErrorInfoHandle *pHandle);
                 FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+                FEATURIZER_LIBRARY_API_PACK_PREFIX;
+
+                struct DateTimeParameter {
+                    // ----------------------------------------------------------------------
+                    // |  Public Types
+                    enum DateTimeTypeValue {
+                        DateTimeInt64 = 1,  // Posix time
+                        DateTimeString      // ISO 8601
+                    };
+
+                    typedef unsigned char DateTimeType;
+
+                    struct StringData {
+                        char const *        pBuffer;
+                        size_t              cBufferElements;
+                    } FEATURIZER_LIBRARY_API_PACK_INLINE;
+
+                    union DataType {
+                        int64_t             posix;
+                        StringData          isoStr;
+                    };
+
+                    // ----------------------------------------------------------------------
+                    // |  Public Data
+                    DateTimeType            dataType;
+                    DataType                data;
+                } FEATURIZER_LIBRARY_API_PACK_INLINE;
+
+                FEATURIZER_LIBRARY_API_PACK_SUFFIX;
+
                 // These values should match the values in Featurizer.h
                 enum TrainingStateValue {
                     Pending = 1,
@@ -240,48 +272,6 @@ def _GenerateCommonFiles(output_dir, output_stream):
                 typedef uint32_t TypeId;
 
                 } // extern "C"
-
-                """,
-            ),
-        )
-
-    with open(os.path.join(output_dir, "SharedLibrary_PointerTable.h"), "w") as f:
-        f.write(
-            textwrap.dedent(
-                """\
-                /* ---------------------------------------------------------------------- */
-                /* Copyright (c) Microsoft Corporation. All rights reserved.              */
-                /* Licensed under the MIT License                                         */
-                /* ---------------------------------------------------------------------- */
-                #pragma once
-
-                #include "../PointerTable.h"
-
-                extern Microsoft::Featurizer::PointerTable g_pointerTable;
-                """,
-            ),
-        )
-
-    with open(os.path.join(output_dir, "SharedLibrary_PointerTable.cpp"), "w") as f:
-        f.write(
-            textwrap.dedent(
-                """\
-                /* ---------------------------------------------------------------------- */
-                /* Copyright (c) Microsoft Corporation. All rights reserved.              */
-                /* Licensed under the MIT License                                         */
-                /* ---------------------------------------------------------------------- */
-                #include "SharedLibrary_PointerTable.h"
-
-                #if (defined __clang__)
-                #   pragma clang diagnostic push
-                #   pragma clang diagnostic ignored "-Wexit-time-destructors"
-                #endif
-
-                Microsoft::Featurizer::PointerTable g_pointerTable;
-
-                #if (defined __clang__)
-                #   pragma clang diagnostic pop
-                #endif
                 """,
             ),
         )
@@ -301,6 +291,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
 
                 #include "SharedLibrary_Common.h"
                 #include "SharedLibrary_PointerTable.h"
+                #include "Traits.h"
 
                 // Forward declaration for DestroyTransformerSaveData
                 ErrorInfoHandle* CreateErrorInfo(std::exception const &ex);
@@ -378,6 +369,96 @@ def _GenerateCommonFiles(output_dir, output_stream):
                     return reinterpret_cast<ErrorInfoHandle *>(index);
                 }
 
+                std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &param) {
+                    if(param.dataType == DateTimeParameter::DateTimeTypeValue::DateTimeInt64)
+                        return std::chrono::system_clock::from_time_t(param.data.posix);
+
+                    if(param.dataType == DateTimeParameter::DateTimeTypeValue::DateTimeString)
+                        return Microsoft::Featurizer::Traits<std::chrono::system_clock::time_point>::FromString(param.data.isoStr.pBuffer);
+
+                    throw std::runtime_error("'type' is invalid");
+                }
+                """,
+            ),
+        )
+
+    with open(os.path.join(output_dir, "SharedLibrary_Common.hpp"), "w") as f:
+        f.write(
+            textwrap.dedent(
+                """\
+                // ----------------------------------------------------------------------
+                // Copyright (c) Microsoft Corporation. All rights reserved.
+                // Licensed under the MIT License
+                // ----------------------------------------------------------------------
+                #pragma once
+
+                #include "SharedLibrary_Common.h"
+
+                DateTimeParameter CreateDateTimeParameter(int64_t const &value);
+                DateTimeParameter CreateDateTimeParameter(std::string const &value);
+
+                // ----------------------------------------------------------------------
+                // ----------------------------------------------------------------------
+                // ----------------------------------------------------------------------
+                inline DateTimeParameter CreateDateTimeParameter(int64_t const &value) {
+                    DateTimeParameter       result;
+
+                    result.dataType = DateTimeParameter::DateTimeTypeValue::DateTimeInt64;
+                    result.data.posix = value;
+
+                    return result;
+                }
+
+                inline DateTimeParameter CreateDateTimeParameter(std::string const &value) {
+                    DateTimeParameter       result;
+
+                    result.dataType = DateTimeParameter::DateTimeTypeValue::DateTimeString;
+                    result.data.isoStr.pBuffer = value.c_str();
+                    result.data.isoStr.cBufferElements = value.size();
+
+                    return result;
+                }
+                """,
+            ),
+        )
+
+    with open(os.path.join(output_dir, "SharedLibrary_PointerTable.h"), "w") as f:
+        f.write(
+            textwrap.dedent(
+                """\
+                /* ---------------------------------------------------------------------- */
+                /* Copyright (c) Microsoft Corporation. All rights reserved.              */
+                /* Licensed under the MIT License                                         */
+                /* ---------------------------------------------------------------------- */
+                #pragma once
+
+                #include "../PointerTable.h"
+
+                extern Microsoft::Featurizer::PointerTable g_pointerTable;
+                """,
+            ),
+        )
+
+    with open(os.path.join(output_dir, "SharedLibrary_PointerTable.cpp"), "w") as f:
+        f.write(
+            textwrap.dedent(
+                """\
+                /* ---------------------------------------------------------------------- */
+                /* Copyright (c) Microsoft Corporation. All rights reserved.              */
+                /* Licensed under the MIT License                                         */
+                /* ---------------------------------------------------------------------- */
+                #include "SharedLibrary_PointerTable.h"
+
+                #if (defined __clang__)
+                #   pragma clang diagnostic push
+                #   pragma clang diagnostic ignored "-Wexit-time-destructors"
+                #endif
+
+                Microsoft::Featurizer::PointerTable g_pointerTable;
+
+                #if (defined __clang__)
+                #   pragma clang diagnostic pop
+                #endif
                 """,
             ),
         )
@@ -409,7 +490,7 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
         custom_struct_flag = False
 
         for item, c_data in zip(items, c_data_items):
-            template = item.template if hasattr(item, "template") else None
+            template = getattr(item, "template", None)
 
             d = _CreateInterfaceSubstitutionDict(item, c_data)
 
@@ -576,6 +657,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
 
                 // These method(s) are defined in SharedLibrary_Common.cpp
                 ErrorInfoHandle * CreateErrorInfo(std::exception const &ex);
+                std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &param);
 
                 extern "C" {{
 
@@ -593,7 +675,7 @@ def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
         )
 
         for item, c_data in zip(items, c_data_items):
-            template = item.template if hasattr(item, "template") else None
+            template = getattr(item, "template", None)
 
             d = _CreateInterfaceSubstitutionDict(item, c_data)
 
@@ -1089,17 +1171,18 @@ class CData(object):
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
-    def __init__(self, item):
+    def __init__(self, item, global_custom_structs):
         # Create the custom structs
         custom_structs = OrderedDict()
 
-        for custom_struct in getattr(item, "custom_structs", []):
+        for custom_struct in itertools.chain(global_custom_structs, getattr(item, "custom_structs", [])):
             members = OrderedDict()
 
             for member in custom_struct.members:
                 tif = self._GetTypeInfoClass(member.type)
                 assert tif, member.type
 
+                assert member.name not in members, member.name
                 members[member.name] = tif()
 
             custom_structs[custom_struct.name] = members
@@ -1146,13 +1229,17 @@ class CData(object):
     @classmethod
     def _GetTypeInfoClass(cls, the_type):
         if cls._type_info_factory_classes is None:
+            from Plugins.SharedLibraryPluginImpl.DatetimeTypeInfoFactory import DateTimeTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl import ScalarTypeInfoFactories
-            from Plugins.SharedLibraryPluginImpl.StringTypeInfoFactory import (
-                StringTypeInfoFactory,
-            )
+            from Plugins.SharedLibraryPluginImpl.SparseVectorEncodingTypeInfoFactory import SparseVectorEncodingTypeInfoFactory
+            from Plugins.SharedLibraryPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl import StructTypeInfoFactories
 
-            type_info_factory_classes = [StringTypeInfoFactory]
+            type_info_factory_classes = [
+                DateTimeTypeInfoFactory,
+                SparseVectorEncodingTypeInfoFactory,
+                StringTypeInfoFactory,
+            ]
 
             for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
                 for obj_name in dir(compound_module):
@@ -1170,7 +1257,12 @@ class CData(object):
             cls._type_info_factory_classes = type_info_factory_classes
 
         for type_info_factory_class in cls._type_info_factory_classes:
-            if type_info_factory_class.TypeName == the_type:
-                return type_info_factory_class
+            if isinstance(type_info_factory_class.TypeName, six.string_types):
+                if type_info_factory_class.TypeName == the_type:
+                    return type_info_factory_class
+
+            elif hasattr(type_info_factory_class.TypeName, "match"):
+                if type_info_factory_class.TypeName.match(the_type):
+                    return type_info_factory_class
 
         return None

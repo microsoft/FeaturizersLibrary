@@ -5,7 +5,11 @@
 #pragma once
 
 #include "SharedLibrary_CatImputerFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
+
+#include "SharedLibrary_Common.hpp"
 
 /* ---------------------------------------------------------------------- */
 /* |  CatImputerFeaturizer <int8> */
@@ -98,7 +102,6 @@ void CatImputerFeaturizer_int8_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -202,7 +205,6 @@ void CatImputerFeaturizer_int16_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -306,7 +308,6 @@ void CatImputerFeaturizer_int32_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -410,7 +411,6 @@ void CatImputerFeaturizer_int64_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -514,7 +514,6 @@ void CatImputerFeaturizer_uint8_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -618,7 +617,6 @@ void CatImputerFeaturizer_uint16_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -722,7 +720,6 @@ void CatImputerFeaturizer_uint32_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -826,7 +823,6 @@ void CatImputerFeaturizer_uint64_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -930,7 +926,6 @@ void CatImputerFeaturizer_float_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -1034,7 +1029,6 @@ void CatImputerFeaturizer_double_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -1138,7 +1132,6 @@ void CatImputerFeaturizer_bool_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -1235,7 +1228,6 @@ void CatImputerFeaturizer_string_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(CatImputerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::string>::IsNull(input) ? nullptr : input->c_str(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
@@ -1244,7 +1236,6 @@ void CatImputerFeaturizer_string_Test(
         #else
         results.emplace_back(std::string(result_ptr));
         #endif
-
         
         // Destroy the contents
         REQUIRE(CatImputerFeaturizer_string_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));

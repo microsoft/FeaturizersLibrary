@@ -1,783 +1,788 @@
----
-# ----------------------------------------------------------------------
-- name: CategoryBinarizerFeaturizer
-  estimator_name: CategoryBinarizerEstimator
-  num_output_columns: 1
-  description: |-
-    See OneHotEncoderFeaturizer.
+featurizers:
+  # ----------------------------------------------------------------------
+  - name: CategoryBinarizerFeaturizer
+    estimator_name: CategoryBinarizerEstimator
+    num_output_columns: 1
+    description: |-
+      See OneHotEncoderFeaturizer.
 
-  status: Pending
+    status: Pending
 
-# ----------------------------------------------------------------------
-- name: CatImputerFeaturizer
-  estimator_name: CatImputerEstimator
-  num_output_columns: 1
-  description: |-
-    Imputes (populates) values with the mode (most common value) encountered during
-    training. This featurizer supports float and double for most (if not all) frameworks
-    due to the existance of NaN in those types. Other types require 'optional' support
-    within the host frameworks and programming languages.
+  # ----------------------------------------------------------------------
+  - name: CatImputerFeaturizer
+    estimator_name: CatImputerEstimator
+    num_output_columns: 1
+    description: |-
+      Imputes (populates) values with the mode (most common value) encountered during
+      training. This featurizer supports float and double for most (if not all) frameworks
+      due to the existance of NaN in those types. Other types require 'optional' support
+      within the host frameworks and programming languages.
 
-    C++-style pseudo signature:
-      float execute(float const &value);
-      double execute(double const &value);
-      template <typename T> T execute(std::optional<T> const &value);
+      C++-style pseudo signature:
+        float execute(float const &value);
+        double execute(double const &value);
+        template <typename T> T execute(std::optional<T> const &value);
 
-    Examples (where 55.5 is the mode value):
-      execute(1.0) -> 1.0
-      execute(NaN) -> 55.5
-      execute(2.0) -> 2.0
-
-  templates:
-    - name: T
-      types:
-        - int8
-        - int16
-        - int32
-        - int64
-        - uint8
-        - uint16
-        - uint32
-        - uint64
-        - float
-        - double
-        - bool
-        - string
-
-  type_mappings:
-    - input_type: T
-      is_input_optional: true
-      output_type: T
-
-# ----------------------------------------------------------------------
-- name: CountVectorizerFeaturizer
-  estimator_name: CountVectorizerEstimator
-  num_output_columns: 1
-  description: |-
-    Returns the count of the number of occurrances of each distinct item according to a
-    vocabulary established during training.
-
-    C++-style pseudo signature:
-      TODO
-
-    Examples:
-      TODO
-
-  status: Pending
-
-# ----------------------------------------------------------------------
-- name: DateTimeFeaturizer
-  estimator_name: DateTimeEstimator
-  num_output_columns: 21
-  creates_annotations: false
-  description: |-
-    Extracts various datetime-related values from a UTC time_point.
-
-    C++-style pseudo signature:
-      TimePoint execute(std::chrono::system_clock::time_point const &value);
-
-    Examples:
-      Given a time_point 'value' representing "November 17, 1976 12:27:04PM":
-
-      "November 17, 1976 12:27:04PM" => {
-        "year": 1976,
-        "month": 11,
-        "day": 17,
-        "hour": 12,
-        "minute": 27,
-        "second": 04,
-        "amPm": 2,        // PM
-        "hour12": 12,
-        "dayOfWeek": 3,   // Wednesday
-        "dayOfQuarter": 48,
-        "dayOfYear": 321,
-        "weekOfMonth": 2,
-        "quarterOfYear": 4,
-        "halfOfYear": 2,
-        "weekIso": 47,
-        "yearIso": 1976,
-        "monthLabel": "November",
-        "amPmLabel": "pm",
-        "dayOfWeekLabel": "Wednesday",
-        "holidayName": "",
-        "isPaidTimeOff": 0
-      }
-
-  type_mappings:
-    - input_type: int64
-      output_type: TimePoint
-
-  configuration_params:
-    - type: string
-      name: optionalCountryName
-      is_optional: true
-
-    - type: string
-      name: optionalDataRootDir
-      is_optional: true
-
-  custom_structs:
-    - name: TimePoint
-      members:
-        - type: int32
-          name: year
-        - type: uint8
-          name: month
-        - type: uint8
-          name: day
-        - type: uint8
-          name: hour
-        - type: uint8
-          name: minute
-        - type: uint8
-          name: second
-        - type: uint8
-          name: amPm
-        - type: uint8
-          name: hour12
-        - type: uint8
-          name: dayOfWeek
-        - type: uint8
-          name: dayOfQuarter
-        - type: uint16
-          name: dayOfYear
-        - type: uint16
-          name: weekOfMonth
-        - type: uint8
-          name: quarterOfYear
-        - type: uint8
-          name: halfOfYear
-        - type: uint8
-          name: weekIso
-        - type: int32
-          name: yearIso
-        - type: string
-          name: monthLabel
-        - type: string
-          name: amPmLabel
-        - type: string
-          name: dayOfWeekLabel
-        - type: string
-          name: holidayName
-        - type: uint8
-          name: isPaidTimeOff
-
-# ----------------------------------------------------------------------
-- name: HashOneHotVectorizerFeaturizer
-  estimator_name: HashOneHotVectorizerEstimator
-  num_output_columns: 1
-  creates_annotations: false
-  description: |-
-    Hashes the input to a categorical value, then produces a one hot encoded vector
-    based on that value.
-
-    C++-style pseudo signature:
-        template <typename T> HashOneHotVectorizerStruct execute(T const &value);
-
-    Examples:
-      Assuming the hashing algorithm...
-        "A" -> 1
-        "B" -> 2
-        "C" -> 5
-
-      and 'numCols' set to 8:
-
-        execute("A") -> [1, 0, 0, 0, 0, 0, 0, 0]
-        execute("B") -> [0, 1, 0, 0, 0, 0, 0, 0]
-        execute("C") -> [0, 0, 0, 0, 1, 0, 0, 0]
-
-  templates:
-    - name: T
-      types:
-        - int8
-        - int16
-        - int32
-        - int64
-        - uint8
-        - uint16
-        - uint32
-        - uint64
-        - float
-        - double
-        - bool
-        - string
-
-  type_mappings:
-    - input_type: T
-      output_type: HashOneHotVectorizerStruct
-
-  configuration_params:
-    - type: uint32
-      name: hashingSeedVal
-      is_optional: false
-
-    - type: uint32
-      name: numCols
-      is_optional: false
-
-  custom_structs:
-    - name: HashOneHotVectorizerStruct
-      description: |-
-        A structure is returned rather than the vector, as the vector is sparse and can be
-        recreated within the framework according to optimizations specific to the framework
-        itself.
-
-      members:
-        - type: uint32
-          name: ColIndex
-        - type: uint32
-          name: NumCols
-        - type: bool
-          name: Val
-
-# ----------------------------------------------------------------------
-- name: ImputationMarkerFeaturizer
-  estimator_name: ImputationMarkerEstimator
-  num_output_columns: 1
-  creates_annotations: false
-  description: |-
-    Returns true if the input is null, false if it is not.
-
-    C++-style pseudo signature:
-      bool execute(float const &value);
-      bool execute(double const &value);
-      template <typename T> bool execute(std::optional<T> const &value);
-
-    Examples:
-      3.0 -> false
-      NaN -> true
-      "foo" -> false
-      std::optional<string>() -> true
-      std::optional<string>("bar") -> false
-
-  templates:
-    - name: T
-      types:
-        - int8
-        - int16
-        - int32
-        - int64
-        - uint8
-        - uint16
-        - uint32
-        - uint64
-        - float
-        - double
-        - bool
-        - string
-
-  type_mappings:
-    - input_type: T
-      is_input_optional: true
-      output_type: bool
-
-# ----------------------------------------------------------------------
-- name: ImputerFeaturizer
-  estimator_name: ImputerEstimator
-  num_output_columns: 1
-  description: |-
-    Imputes missing values based on a strategy employed during training time. Strategies
-    are:
-
-      - mean: average of training data (valid for integer and number types)
-      - median: middle point of all values encountered during training (valid for integer and number types)
-      - mode: Most common value encountered during training (valid for all types)
-
-    C++-style pseudo signature:
-      float execute(float const &value);                      // Valid for mean, median, mode
-      double execute(double const &value);                    // Valid for mean, median, mode
-      string execute(std::optional<string> const &value);     // Valid for mode
-
-    Examples:
-      Mean, with training data [1, 2, 3, 4]: mean of 2.5
-
-        execute(3.0) -> 3.0
-        execute(NaN) -> 2.5
-
-      Median, with training data [1, 2, 3, 4, 5]: median of 3
-
+      Examples (where 55.5 is the mode value):
+        execute(1.0) -> 1.0
+        execute(NaN) -> 55.5
         execute(2.0) -> 2.0
-        execute(NaN) -> 3.0
 
-      Mode, with training data ["one", "two", "three", "two"]: mode of "two"
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+          - string
 
-        execute("foo") -> "foo"
-        execute(std::optional<string>()) -> "two"
+    type_mappings:
+      - input_type: T
+        is_input_optional: true
+        output_type: T
 
-  status: Pending
+  # ----------------------------------------------------------------------
+  - name: CountVectorizerFeaturizer
+    estimator_name: CountVectorizerEstimator
+    num_output_columns: 1
+    description: |-
+      Returns the count of the number of occurrances of each distinct item according to a
+      vocabulary established during training.
 
-# ----------------------------------------------------------------------
-- name: LabelEncoderFeaturizer
-  estimator_name: LabelEncoderEstimator
-  num_output_columns: 1
-  description: |-
-    Returns a unique id for the input based on all values encountered during training.
-
-    C++-style pseudo signature:
-      template <typename T> uint32 execute(T const &value);
-
-    Examples:
-      Assuming the training data of ["A", "B", "C"]...
-
-      execute("A") -> 1
-      execute("B") -> 2
-      execute("C") -> 3
-      execute("This value was not seen during training") -> 0
-
-  templates:
-    - name: T
-      types:
-        - int8
-        - int16
-        - int32
-        - int64
-        - uint8
-        - uint16
-        - uint32
-        - uint64
-        - float
-        - double
-        - bool
-        - string
-
-  type_mappings:
-    - input_type: T
-      output_type: uint32
-
-  configuration_params:
-    - type: bool
-      name: suppressUnrecognizedErrors
-      is_optional: false
-
-# ----------------------------------------------------------------------
-- name: MaxAbsScalarFeaturizer
-  estimator_name: MaxAbsScalarEstimator
-  num_output_columns: 1
-  is_output_a_template: true
-  description: |-
-    Scales input based on the maximum absolute value of all data encountered during training.
-
-    C++-style pseudo signature:
-      float execute(uint16 value);
-      double execute(uint32 value);
-
-    Examples:
-      Given a training set of [1.0, -2.0, 3.0, -4.0], where 4.0 is the absolute value of the
-      maximum value encountered...
-
-      execute(1.0) -> 1.0 / 4.0
-      execute(-4.0) -> -4.0 / 4.0
-      execute(100.0) -> 100 / 4.0
-
-  templates:
-    - name: TInputFloat
-      types:
-        - int8
-        - int16
-        - uint8
-        - uint16
-        - float
-
-    - name: TInputDouble
-      types:
-        - int32
-        - int64
-        - uint32
-        - uint64
-        - double
-
-  type_mappings:
-    - input_type: TInputFloat
-      output_type: float
-
-    - input_type: TInputDouble
-      output_type: double
-
-# ----------------------------------------------------------------------
-- name: MinMaxScalarFeaturizer
-  estimator_name: MinMaxScalarEstimator
-  num_output_columns: 1
-  description: |-
-    Scales input based on the scale that results from the minimum and maximum values encountered
-    during training.
-
-    C++-style pseudo signature:
-        template <typeanem T> double(T const &value);
-
-    Examples:
-      Given the training data [1, 2, 3, 4, 5];
-        min: 1
-        max: 5
-        scale (<max> - <min>): 4
-
-      execute(2) = 2 / 4
-      execute(20) = 20 / 4
-
-  templates:
-    - name: T
-      types:
-        - int8
-        - int16
-        - int32
-        - int64
-        - uint8
-        - uint16
-        - uint32
-        - uint64
-        - float
-        - double
-
-  type_mappings:
-    - input_type: T
-      output_type: double
-
-# ----------------------------------------------------------------------
-- name: MissingDummiesFeaturizer
-  estimator_name: MissingDummiesEstimator
-  num_output_columns: 1
-  creates_annotations: false
-  description: |-
-    Returns 1 if the input is null, 0 if it is not.
-
-    C++-style pseudo signature:
-        int8 execute(float const &value);
-        int8 execute(double const &value);
-        template <typename T> int8 execute(T const &value);
-
-    Examples:
-      1.0 -> 0
-      NaN -> 1
-      "foo" -> 0
-      std::optional<string>() -> 1
-      std::optional<string>("bar") -> 0
-
-  templates:
-    - name: T
-      types:
-        - int8
-        - int16
-        - int32
-        - int64
-        - uint8
-        - uint16
-        - uint32
-        - uint64
-        - float
-        - double
-        - bool
-        - string
-
-  type_mappings:
-    - input_type: T
-      is_input_optional: true
-      output_type: int8
-
-# ----------------------------------------------------------------------
-- name: NumericalizeFeaturizer
-  estimator_name: NumericalizeEstimator
-  num_output_columns: 1
-  description: |-
-    This is the LabelEncoder, but returns a null value for categories not encountered during training.
-
-    C++-style pseudo signature:
-      template <typename T> float execute(T const &value);
-
-    Examples:
-      execute("encountered") -> <unique id>
-      execute("not encountered") -> NaN
-
-  status: Pending
-
-# ----------------------------------------------------------------------
-- name: OneHotEncoderFeaturizer
-  estimator_name: OneHotEncoderEstimator
-  num_output_columns: 1
-  description: |-
-    Produces a one hot vector based on categories calculated during training.
-
-    C++-style pseudo signature:
-      template <typename T> OneHotVector execute(T const &value);
-
-    Examples:
-      Assuming the training data [10, 20, 30, 40]...
-
-      execute(10) -> [0, 1, 0, 0, 0]
-      execute(20) -> [0, 0, 1, 0, 0]
-      execute(30) -> [0, 0, 0, 1, 0]
-      execute(40) -> [0, 0, 0, 0, 1]
-      execute(200) -> [1, 0, 0, 0, 0]
-      execute(-1) -> [1, 0, 0, 0, 0]
-
-  templates:
-    - name: T
-      types:
-        - int8
-        - int16
-        - int32
-        - int64
-        - uint8
-        - uint16
-        - uint32
-        - uint64
-        - float
-        - double
-        - bool
-        - string
-
-  type_mappings:
-    - input_type: T
-      output_type: OneHotStruct
-
-  configuration_params:
-    - type: bool
-      name: suppressUnrecognizedErrors
-      is_optional: false
-
-  custom_structs:
-    - name: OneHotStruct
-      members:
-        - type: uint32
-          name: index
-        - type: uint32
-          name: size
-        - type: uint32
-          name: appearances
-
-# ----------------------------------------------------------------------
-- name: PCAFeaturizer
-  estimator_name: PCAEstimator
-  num_output_columns: 1
-  description: |-
-    TODO
-
-    C++-style pseudo signature:
-      TODO
-
-    Examples:
-      TODO
-
-  status: Pending
-
-# ----------------------------------------------------------------------
-- name: RobustScalarFeaturizer
-  estimator_name: RobustScalarEstimator
-  num_output_columns: 1
-  is_output_a_template: true
-  description: |-
-    MinMaxScalarEstimator + centering?
-
-    C++-style pseudo signature:
+      C++-style pseudo signature:
         TODO
 
-    Examples:
+      Examples:
+        TODO
+
+    status: Pending
+
+  # ----------------------------------------------------------------------
+  - name: DateTimeFeaturizer
+    estimator_name: DateTimeEstimator
+    num_output_columns: 21
+    creates_annotations: false
+    description: |-
+      Extracts various datetime-related values from a UTC time_point.
+
+      C++-style pseudo signature:
+        TimePoint execute(std::chrono::system_clock::time_point const &value);
+
+      Examples:
+        Given a time_point 'value' representing "November 17, 1976 12:27:04PM":
+
+        "November 17, 1976 12:27:04PM" => {
+          "year": 1976,
+          "month": 11,
+          "day": 17,
+          "hour": 12,
+          "minute": 27,
+          "second": 04,
+          "amPm": 2,        // PM
+          "hour12": 12,
+          "dayOfWeek": 3,   // Wednesday
+          "dayOfQuarter": 48,
+          "dayOfYear": 321,
+          "weekOfMonth": 2,
+          "quarterOfYear": 4,
+          "halfOfYear": 2,
+          "weekIso": 47,
+          "yearIso": 1976,
+          "monthLabel": "November",
+          "amPmLabel": "pm",
+          "dayOfWeekLabel": "Wednesday",
+          "holidayName": "",
+          "isPaidTimeOff": 0
+        }
+
+    type_mappings:
+      - input_type: datetime
+        output_type: TimePoint
+
+    configuration_params:
+      - type: string
+        name: optionalCountryName
+        is_optional: true
+
+      - type: string
+        name: optionalDataRootDir
+        is_optional: true
+
+    custom_structs:
+      - name: TimePoint
+        members:
+          - type: int32
+            name: year
+          - type: uint8
+            name: month
+          - type: uint8
+            name: day
+          - type: uint8
+            name: hour
+          - type: uint8
+            name: minute
+          - type: uint8
+            name: second
+          - type: uint8
+            name: amPm
+          - type: uint8
+            name: hour12
+          - type: uint8
+            name: dayOfWeek
+          - type: uint8
+            name: dayOfQuarter
+          - type: uint16
+            name: dayOfYear
+          - type: uint16
+            name: weekOfMonth
+          - type: uint8
+            name: quarterOfYear
+          - type: uint8
+            name: halfOfYear
+          - type: uint8
+            name: weekIso
+          - type: int32
+            name: yearIso
+          - type: string
+            name: monthLabel
+          - type: string
+            name: amPmLabel
+          - type: string
+            name: dayOfWeekLabel
+          - type: string
+            name: holidayName
+          - type: uint8
+            name: isPaidTimeOff
+
+  # ----------------------------------------------------------------------
+  - name: HashOneHotVectorizerFeaturizer
+    estimator_name: HashOneHotVectorizerEstimator
+    num_output_columns: 1
+    creates_annotations: false
+    description: |-
+      Hashes the input to a categorical value, then produces a one hot encoded vector
+      based on that value.
+
+      C++-style pseudo signature:
+          template <typename T> HashOneHotVectorizerStruct execute(T const &value);
+
+      Examples:
+        Assuming the hashing algorithm...
+          "A" -> 1
+          "B" -> 2
+          "C" -> 5
+
+        and 'numCols' set to 8:
+
+          execute("A") -> [1, 0, 0, 0, 0, 0, 0, 0]
+          execute("B") -> [0, 1, 0, 0, 0, 0, 0, 0]
+          execute("C") -> [0, 0, 0, 0, 1, 0, 0, 0]
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+          - string
+
+    type_mappings:
+      - input_type: T
+        output_type: HashOneHotEncoding
+
+    configuration_params:
+      - type: uint32
+        name: hashingSeedVal
+        is_optional: false
+
+      - type: uint32
+        name: numCols
+        is_optional: false
+
+    custom_structs:
+      - name: HashOneHotEncoding
+        description: |-
+          A structure is returned rather than the vector, as the vector is sparse and can be
+          recreated within the framework according to optimizations specific to the framework
+          itself.
+
+        members:
+          - type: uint64
+            name: NumElements
+          - type: uint8
+            name: Value
+          - type: uint64
+            name: Index
+
+  # ----------------------------------------------------------------------
+  - name: ImputationMarkerFeaturizer
+    estimator_name: ImputationMarkerEstimator
+    num_output_columns: 1
+    creates_annotations: false
+    description: |-
+      Returns true if the input is null, false if it is not.
+
+      C++-style pseudo signature:
+        bool execute(float const &value);
+        bool execute(double const &value);
+        template <typename T> bool execute(std::optional<T> const &value);
+
+      Examples:
+        3.0 -> false
+        NaN -> true
+        "foo" -> false
+        std::optional<string>() -> true
+        std::optional<string>("bar") -> false
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+          - string
+
+    type_mappings:
+      - input_type: T
+        is_input_optional: true
+        output_type: bool
+
+  # ----------------------------------------------------------------------
+  - name: ImputerFeaturizer
+    estimator_name: ImputerEstimator
+    num_output_columns: 1
+    description: |-
+      Imputes missing values based on a strategy employed during training time. Strategies
+      are:
+
+        - mean: average of training data (valid for integer and number types)
+        - median: middle point of all values encountered during training (valid for integer and number types)
+        - mode: Most common value encountered during training (valid for all types)
+
+      C++-style pseudo signature:
+        float execute(float const &value);                      // Valid for mean, median, mode
+        double execute(double const &value);                    // Valid for mean, median, mode
+        string execute(std::optional<string> const &value);     // Valid for mode
+
+      Examples:
+        Mean, with training data [1, 2, 3, 4]: mean of 2.5
+
+          execute(3.0) -> 3.0
+          execute(NaN) -> 2.5
+
+        Median, with training data [1, 2, 3, 4, 5]: median of 3
+
+          execute(2.0) -> 2.0
+          execute(NaN) -> 3.0
+
+        Mode, with training data ["one", "two", "three", "two"]: mode of "two"
+
+          execute("foo") -> "foo"
+          execute(std::optional<string>()) -> "two"
+
+    status: Pending
+
+  # ----------------------------------------------------------------------
+  - name: LabelEncoderFeaturizer
+    estimator_name: LabelEncoderEstimator
+    num_output_columns: 1
+    description: |-
+      Returns a unique id for the input based on all values encountered during training.
+
+      C++-style pseudo signature:
+        template <typename T> uint32 execute(T const &value);
+
+      Examples:
+        Assuming the training data of ["A", "B", "C"]...
+
+        execute("A") -> 1
+        execute("B") -> 2
+        execute("C") -> 3
+        execute("This value was not seen during training") -> 0
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+          - string
+
+    type_mappings:
+      - input_type: T
+        output_type: uint32
+
+    configuration_params:
+      - type: bool
+        name: suppressUnrecognizedErrors
+        is_optional: false
+
+  # ----------------------------------------------------------------------
+  - name: MaxAbsScalarFeaturizer
+    estimator_name: MaxAbsScalarEstimator
+    num_output_columns: 1
+    is_output_a_template: true
+    description: |-
+      Scales input based on the maximum absolute value of all data encountered during training.
+
+      C++-style pseudo signature:
+        float execute(uint16 value);
+        double execute(uint32 value);
+
+      Examples:
+        Given a training set of [1.0, -2.0, 3.0, -4.0], where 4.0 is the absolute value of the
+        maximum value encountered...
+
+        execute(1.0) -> 1.0 / 4.0
+        execute(-4.0) -> -4.0 / 4.0
+        execute(100.0) -> 100 / 4.0
+
+    templates:
+      - name: TInputFloat
+        types:
+          - int8
+          - int16
+          - uint8
+          - uint16
+          - float
+
+      - name: TInputDouble
+        types:
+          - int32
+          - int64
+          - uint32
+          - uint64
+          - double
+
+    type_mappings:
+      - input_type: TInputFloat
+        output_type: float
+
+      - input_type: TInputDouble
+        output_type: double
+
+  # ----------------------------------------------------------------------
+  - name: MinMaxScalarFeaturizer
+    estimator_name: MinMaxScalarEstimator
+    num_output_columns: 1
+    description: |-
+      Scales input based on the scale that results from the minimum and maximum values encountered
+      during training.
+
+      C++-style pseudo signature:
+          template <typeanem T> double(T const &value);
+
+      Examples:
+        Given the training data [1, 2, 3, 4, 5];
+          min: 1
+          max: 5
+          scale (<max> - <min>): 4
+
+        execute(2) = 2 / 4
+        execute(20) = 20 / 4
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+
+    type_mappings:
+      - input_type: T
+        output_type: double
+
+  # ----------------------------------------------------------------------
+  - name: MissingDummiesFeaturizer
+    estimator_name: MissingDummiesEstimator
+    num_output_columns: 1
+    creates_annotations: false
+    description: |-
+      Returns 1 if the input is null, 0 if it is not.
+
+      C++-style pseudo signature:
+          int8 execute(float const &value);
+          int8 execute(double const &value);
+          template <typename T> int8 execute(T const &value);
+
+      Examples:
+        1.0 -> 0
+        NaN -> 1
+        "foo" -> 0
+        std::optional<string>() -> 1
+        std::optional<string>("bar") -> 0
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+          - string
+
+    type_mappings:
+      - input_type: T
+        is_input_optional: true
+        output_type: int8
+
+  # ----------------------------------------------------------------------
+  - name: NumericalizeFeaturizer
+    estimator_name: NumericalizeEstimator
+    num_output_columns: 1
+    description: |-
+      This is the LabelEncoder, but returns a null value for categories not encountered during training.
+
+      C++-style pseudo signature:
+        template <typename T> float execute(T const &value);
+
+      Examples:
+        execute("encountered") -> <unique id>
+        execute("not encountered") -> NaN
+
+    status: Pending
+
+  # ----------------------------------------------------------------------
+  - name: OneHotEncoderFeaturizer
+    estimator_name: OneHotEncoderEstimator
+    num_output_columns: 1
+    description: |-
+      Produces a one hot vector based on categories calculated during training.
+
+      C++-style pseudo signature:
+        template <typename T> OneHotVector execute(T const &value);
+
+      Examples:
+        Assuming the training data [10, 20, 30, 40]...
+
+        execute(10) -> [0, 1, 0, 0, 0]
+        execute(20) -> [0, 0, 1, 0, 0]
+        execute(30) -> [0, 0, 0, 1, 0]
+        execute(40) -> [0, 0, 0, 0, 1]
+        execute(200) -> [1, 0, 0, 0, 0]
+        execute(-1) -> [1, 0, 0, 0, 0]
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+          - string
+
+    type_mappings:
+      - input_type: T
+        output_type: OneHotEncoding
+
+    configuration_params:
+      - type: bool
+        name: suppressUnrecognizedErrors
+        is_optional: false
+
+    custom_structs:
+      - name: OneHotEncoding
+        description: |-
+          A structure is returned rather than the vector, as the vector is sparse and can be
+          recreated within the framework according to optimizations specific to the framework
+          itself.
+
+        members:
+          - type: uint64
+            name: NumElements
+          - type: uint8
+            name: Value
+          - type: uint64
+            name: Index
+
+    # ----------------------------------------------------------------------
+  - name: PCAFeaturizer
+    estimator_name: PCAEstimator
+    num_output_columns: 1
+    description: |-
       TODO
 
-  templates:
-    - name: TInputFloat
-      types:
-        - int8
-        - int16
-        - uint8
-        - uint16
-        - float
+      C++-style pseudo signature:
+        TODO
 
-    - name: TInputDouble
-      types:
-        - int32
-        - int64
-        - uint32
-        - uint64
-        - double
+      Examples:
+        TODO
 
-  type_mappings:
-    - input_type: TInputFloat
-      output_type: float
+    status: Pending
 
-    - input_type: TInputDouble
-      output_type: double
+  # ----------------------------------------------------------------------
+  - name: RobustScalarFeaturizer
+    estimator_name: RobustScalarEstimator
+    num_output_columns: 1
+    is_output_a_template: true
+    description: |-
+      MinMaxScalarEstimator + centering?
 
-  configuration_params:
-    - type: bool
-      name: withCentering
-      is_optional: false
+      C++-style pseudo signature:
+          TODO
 
-    - type: float
-      name: qRangeMin
-      is_optional: true
+      Examples:
+        TODO
 
-    - type: float
-      name: qRangeMax
-      is_optional: true
+    templates:
+      - name: TInputFloat
+        types:
+          - int8
+          - int16
+          - uint8
+          - uint16
+          - float
 
-# ----------------------------------------------------------------------
-- name: SparseNormalizerFeaturizer
-  estimator_name: SparseNormalizerEstimator
-  num_output_columns: 1
-  description: |-
-    Computes the L1 and/or L2 norm for a provided data set.
+      - name: TInputDouble
+        types:
+          - int32
+          - int64
+          - uint32
+          - uint64
+          - double
 
-    C++-style pseudo signature:
-      template <typename T> std::tuple<float, float> execute(std::vector<T> const &value);
+    type_mappings:
+      - input_type: TInputFloat
+        output_type: float
 
-    Examples:
+      - input_type: TInputDouble
+        output_type: double
+
+    configuration_params:
+      - type: bool
+        name: withCentering
+        is_optional: false
+
+      - type: float
+        name: qRangeMin
+        is_optional: true
+
+      - type: float
+        name: qRangeMax
+        is_optional: true
+
+  # ----------------------------------------------------------------------
+  - name: SparseNormalizerFeaturizer
+    estimator_name: SparseNormalizerEstimator
+    num_output_columns: 1
+    description: |-
+      Computes the L1 and/or L2 norm for a provided data set.
+
+      C++-style pseudo signature:
+        template <typename T> std::tuple<float, float> execute(std::vector<T> const &value);
+
+      Examples:
+        TODO
+
+    status: Pending
+
+  # ----------------------------------------------------------------------
+  - name: StandardScaleWrapperFeaturizer
+    estimator_name: StandardScaleWrapperEstimator
+    num_output_columns: 1
+    description: |-
       TODO
 
-  status: Pending
+      C++-style pseudo signature:
+        TODO
 
-# ----------------------------------------------------------------------
-- name: StandardScaleWrapperFeaturizer
-  estimator_name: StandardScaleWrapperEstimator
-  num_output_columns: 1
-  description: |-
-    TODO
+      Examples:
+        TODO
 
-    C++-style pseudo signature:
+    status: Pending
+
+  # ----------------------------------------------------------------------
+  - name: StringFeaturizer
+    estimator_name: StringEstimator
+    num_output_columns: 1
+    creates_annotations: false
+    description: |-
+      Converts the input into a string representation based on the input's type.
+
+      C++-style pseudo signature:
+        template <typename T> string execute(T const &value);
+
+      Examples:
+        execute(1) -> "1"
+        execute(3.14) -> "3.14"
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+          - string
+
+    type_mappings:
+      - input_type: T
+        output_type: string
+
+  # ----------------------------------------------------------------------
+  - name: TfidfVectorizerFeaturizer
+    estimator_name: TfidfVectorizerEstimator
+    num_output_columns: 1
+    description: |-
       TODO
 
-    Examples:
+      C++-style pseudo signature:
+        TODO
+
+      Examples:
+        TODO
+
+    status: Pending
+
+  # ----------------------------------------------------------------------
+  - name: TimeSeriesImputerFeaturizer
+    estimator_name: TimeSeriesImputerEstimator
+    num_output_columns: 1
+    description: |-
+      Imputes rows and column values such that the generated output does not contain any
+      time gaps per grain (based on the time gaps encountered during training) and that
+      all missing column values are populated according to a strategy (forward fill,
+      backward fill, mode, etc.).
+
+      This Featurizer is unique in that it will produce 0:N rows, depending upon the
+      input data.
+
+      C++-style pseudo signature:
+        template <typename... GrainColValueTs, typename... DataColValueTs>
+        std::vector<
+          std::tuple<
+            bool, // true if the row was added
+            std::chrono::system_clock::time_point,
+            std::tuple<GrainColValueTs...>,
+            std::tuple<DataColValueTs...>
+          >
+        > execute(
+          std::chrono::system_clock::time_point const &value,
+          std::tuple<GrainColValueTs...> const &grain,
+          std::tuple<DataColValueTs...> const &colData
+        );
+
+      Examples:
+        During training, the time period was found to be 1 day...
+
+        Input:
+          +------+-------+------------------+-------------------+
+          | time | grain | forward fill col | backward fill col |
+          +======+=======+==================+===================+
+          | 1    | A     | 10               | None              |
+          +------+-------+------------------+-------------------+
+          | 2    | A     | None             | 200               |
+          +------+-------+------------------+-------------------+
+          | 1    | B     | -10              | -100              |
+          +------+-------+------------------+-------------------+
+          | 4    | A     | 40               | 400               |
+          +------+-------+------------------+-------------------+
+          | 6    | A     | 60               | 600               |
+          +------+-------+------------------+-------------------+
+          | 3    | B     | -30              | -300              |
+          +------+-------+------------------+-------------------+
+
+        Output:
+          +-------+------+-------+------------------+-------------------+
+          | Added | time | grain | forward fill col | backward fill col |
+          +=======+======+=======+==================+===================+
+          | false | 1    | A     | 10               | 200 (from 2)      |
+          +-------+------+-------+------------------+-------------------+
+          | false | 2    | A     | 10 (from 1)      | 200               |
+          +-------+------+-------+------------------+-------------------+
+          | true  | 3    | A     | 10 (from 2)      | 400 (from 4)      |
+          +-------+------+-------+------------------+-------------------+
+          | false | 4    | A     | 40               | 400               |
+          +-------+------+-------+------------------+-------------------+
+          | true  | 5    | A     | 40 (from 4)      | 600 (from 6)      |
+          +-------+------+-------+------------------+-------------------+
+          | false | 6    | A     | 60               | 600               |
+          +-------+------+-------+------------------+-------------------+
+          | false | 1    | B     | -10              | -100              |
+          +-------+------+-------+------------------+-------------------+
+          | true  | 2    | B     | -10 (from 1)     | -300 (from 3)     |
+          +-------+------+-------+------------------+-------------------+
+          | false | 3    | B     | -30              | -300              |
+          +-------+------+-------+------------------+-------------------+
+
+    # The TimeSeriesImputerFeaturizer operates on tabular data, which is different from the
+    # other featurizers that typically operate on a single input. Because of these differences,
+    # wrappers are generated by hand. In the future, we should strive to update the code
+    # generators so that they can handle tabular data input (this will likely come when
+    # we introduce the tabular data type itself).
+    status: External
+
+  # ----------------------------------------------------------------------
+  - name: TruncatedSVDWrapperFeaturizer
+    estimator_name: TruncatedSVDWrapperEstimator
+    num_output_columns: 1
+    description: |-
       TODO
 
-  status: Pending
+      C++-style pseudo signature:
+        TODO
 
-# ----------------------------------------------------------------------
-- name: StringFeaturizer
-  estimator_name: StringEstimator
-  num_output_columns: 1
-  creates_annotations: false
-  description: |-
-    Converts the input into a string representation based on the input's type.
+      Examples:
+        TODO
 
-    C++-style pseudo signature:
-      template <typename T> string execute(T const &value);
-
-    Examples:
-      execute(1) -> "1"
-      execute(3.14) -> "3.14"
-
-  templates:
-    - name: T
-      types:
-        - int8
-        - int16
-        - int32
-        - int64
-        - uint8
-        - uint16
-        - uint32
-        - uint64
-        - float
-        - double
-        - bool
-        - string
-
-  type_mappings:
-    - input_type: T
-      output_type: string
-
-# ----------------------------------------------------------------------
-- name: TfidfVectorizerFeaturizer
-  estimator_name: TfidfVectorizerEstimator
-  num_output_columns: 1
-  description: |-
-    TODO
-
-    C++-style pseudo signature:
-      TODO
-
-    Examples:
-      TODO
-
-  status: Pending
-
-# ----------------------------------------------------------------------
-- name: TimeSeriesImputerFeaturizer
-  estimator_name: TimeSeriesImputerEstimator
-  num_output_columns: 1
-  description: |-
-    Imputes rows and column values such that the generated output does not contain any
-    time gaps per grain (based on the time gaps encountered during training) and that
-    all missing column values are populated according to a strategy (forward fill,
-    backward fill, mode, etc.).
-
-    This Featurizer is unique in that it will produce 0:N rows, depending upon the
-    input data.
-
-    C++-style pseudo signature:
-      template <typename... GrainColValueTs, typename... DataColValueTs>
-      std::vector<
-        std::tuple<
-          bool, // true if the row was added
-          std::chrono::system_clock::time_point,
-          std::tuple<GrainColValueTs...>,
-          std::tuple<DataColValueTs...>
-        >
-      > execute(
-        std::chrono::system_clock::time_point const &value,
-        std::tuple<GrainColValueTs...> const &grain,
-        std::tuple<DataColValueTs...> const &colData
-      );
-
-    Examples:
-      During training, the time period was found to be 1 day...
-
-      Input:
-        +------+-------+------------------+-------------------+
-        | time | grain | forward fill col | backward fill col |
-        +======+=======+==================+===================+
-        | 1    | A     | 10               | None              |
-        +------+-------+------------------+-------------------+
-        | 2    | A     | None             | 200               |
-        +------+-------+------------------+-------------------+
-        | 1    | B     | -10              | -100              |
-        +------+-------+------------------+-------------------+
-        | 4    | A     | 40               | 400               |
-        +------+-------+------------------+-------------------+
-        | 6    | A     | 60               | 600               |
-        +------+-------+------------------+-------------------+
-        | 3    | B     | -30              | -300              |
-        +------+-------+------------------+-------------------+
-
-      Output:
-        +-------+------+-------+------------------+-------------------+
-        | Added | time | grain | forward fill col | backward fill col |
-        +=======+======+=======+==================+===================+
-        | false | 1    | A     | 10               | 200 (from 2)      |
-        +-------+------+-------+------------------+-------------------+
-        | false | 2    | A     | 10 (from 1)      | 200               |
-        +-------+------+-------+------------------+-------------------+
-        | true  | 3    | A     | 10 (from 2)      | 400 (from 4)      |
-        +-------+------+-------+------------------+-------------------+
-        | false | 4    | A     | 40               | 400               |
-        +-------+------+-------+------------------+-------------------+
-        | true  | 5    | A     | 40 (from 4)      | 600 (from 6)      |
-        +-------+------+-------+------------------+-------------------+
-        | false | 6    | A     | 60               | 600               |
-        +-------+------+-------+------------------+-------------------+
-        | false | 1    | B     | -10              | -100              |
-        +-------+------+-------+------------------+-------------------+
-        | true  | 2    | B     | -10 (from 1)     | -300 (from 3)     |
-        +-------+------+-------+------------------+-------------------+
-        | false | 3    | B     | -30              | -300              |
-        +-------+------+-------+------------------+-------------------+
-
-  # The TimeSeriesImputerFeaturizer operates on tabular data, which is different from the
-  # other featurizers that typically operate on a single input. Because of these differences,
-  # wrappers are generated by hand. In the future, we should strive to update the code
-  # generators so that they can handle tabular data input (this will likely come when
-  # we introduce the tabular data type itself).
-  status: External
-
-# ----------------------------------------------------------------------
-- name: TruncatedSVDWrapperFeaturizer
-  estimator_name: TruncatedSVDWrapperEstimator
-  num_output_columns: 1
-  description: |-
-    TODO
-
-    C++-style pseudo signature:
-      TODO
-
-    Examples:
-      TODO
-
-  status: Pending
+    status: Pending
