@@ -51,7 +51,7 @@ class Plugin(Interface.Interface):
     # ----------------------------------------------------------------------
     @staticmethod
     @Interface.abstractmethod
-    def Generate(data, output_dir, status_stream):
+    def Generate(global_custom_structs, data, output_dir, status_stream):
         """Generates content based on the provided data. Returns a result code."""
         raise Exception("Abstract method")
 

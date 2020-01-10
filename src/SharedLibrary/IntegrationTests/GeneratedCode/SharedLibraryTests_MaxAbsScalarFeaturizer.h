@@ -5,7 +5,9 @@
 #pragma once
 
 #include "SharedLibrary_MaxAbsScalarFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
 
 #include "SharedLibrary_Common.hpp"
 
@@ -100,7 +102,6 @@ void MaxAbsScalarFeaturizer_int8_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -204,7 +205,6 @@ void MaxAbsScalarFeaturizer_int16_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -308,7 +308,6 @@ void MaxAbsScalarFeaturizer_uint8_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -412,7 +411,6 @@ void MaxAbsScalarFeaturizer_uint16_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -516,7 +514,6 @@ void MaxAbsScalarFeaturizer_float_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -620,7 +617,6 @@ void MaxAbsScalarFeaturizer_int32_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -724,7 +720,6 @@ void MaxAbsScalarFeaturizer_int64_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -828,7 +823,6 @@ void MaxAbsScalarFeaturizer_uint32_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -932,7 +926,6 @@ void MaxAbsScalarFeaturizer_uint64_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 
@@ -1036,7 +1029,6 @@ void MaxAbsScalarFeaturizer_double_Test(
         #else
         results.emplace_back(std::move(result));
         #endif
-
         // No inline destroy statement
     }
 

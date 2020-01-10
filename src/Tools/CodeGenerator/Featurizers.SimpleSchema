@@ -1,5 +1,17 @@
 (Description string min_length=0 default="" ?)
 
+(Param):
+    [type string]
+    [name string]
+    [description Description]
+    [is_optional bool default="false" ?]
+
+<custom_structs *>:
+    [name string]
+    [description Description]
+
+    <members Param +>
+
 <featurizers +>:
     [name string]
     [estimator_name string]
@@ -11,20 +23,8 @@
     #       annotations in favor of "ModelContexts".
     [creates_annotations bool default=true ?]
 
-    <custom_structs *>:
-        [name string]
-        [description Description]
-
-        <members +>:
-            [type string]
-            [name string]
-            [description Description]
-
-    <configuration_params *>:
-        [type string]
-        [name string]
-        [description Description]
-        [is_optional bool default="false" ?]
+    <custom_structs custom_structs>
+    <configuration_params Param *>
 
     <templates *>:
         [name string]

@@ -326,7 +326,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_CreateTransformerSaveDa
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_Transform(/*in*/ OneHotEncoderFeaturizer_int8_TransformerHandle *pHandle, /*in*/ int8_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_Transform(/*in*/ OneHotEncoderFeaturizer_int8_TransformerHandle *pHandle, /*in*/ int8_t input, /*out via struct*/ OneHotEncoding * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -345,9 +345,9 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_Transform(/*in*/ OneHot
         auto result(transformer.execute(input));
 
         // Output
-        output->index = result.index;
-        output->size = result.size;
-        output->appearances = result.appearances;
+        output->NumElements = result.NumElements;
+        output->Value = result.Value;
+        output->Index = result.Index;
     
         return true;
     }
@@ -357,7 +357,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_Transform(/*in*/ OneHot
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int8_DestroyTransformedData(/*in*/ OneHotEncoding * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -679,7 +679,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_CreateTransformerSaveD
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_Transform(/*in*/ OneHotEncoderFeaturizer_int16_TransformerHandle *pHandle, /*in*/ int16_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_Transform(/*in*/ OneHotEncoderFeaturizer_int16_TransformerHandle *pHandle, /*in*/ int16_t input, /*out via struct*/ OneHotEncoding * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -698,9 +698,9 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_Transform(/*in*/ OneHo
         auto result(transformer.execute(input));
 
         // Output
-        output->index = result.index;
-        output->size = result.size;
-        output->appearances = result.appearances;
+        output->NumElements = result.NumElements;
+        output->Value = result.Value;
+        output->Index = result.Index;
     
         return true;
     }
@@ -710,7 +710,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_Transform(/*in*/ OneHo
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int16_DestroyTransformedData(/*in*/ OneHotEncoding * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1032,7 +1032,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_CreateTransformerSaveD
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_Transform(/*in*/ OneHotEncoderFeaturizer_int32_TransformerHandle *pHandle, /*in*/ int32_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_Transform(/*in*/ OneHotEncoderFeaturizer_int32_TransformerHandle *pHandle, /*in*/ int32_t input, /*out via struct*/ OneHotEncoding * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1051,9 +1051,9 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_Transform(/*in*/ OneHo
         auto result(transformer.execute(input));
 
         // Output
-        output->index = result.index;
-        output->size = result.size;
-        output->appearances = result.appearances;
+        output->NumElements = result.NumElements;
+        output->Value = result.Value;
+        output->Index = result.Index;
     
         return true;
     }
@@ -1063,7 +1063,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_Transform(/*in*/ OneHo
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int32_DestroyTransformedData(/*in*/ OneHotEncoding * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1385,7 +1385,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_CreateTransformerSaveD
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_Transform(/*in*/ OneHotEncoderFeaturizer_int64_TransformerHandle *pHandle, /*in*/ int64_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_Transform(/*in*/ OneHotEncoderFeaturizer_int64_TransformerHandle *pHandle, /*in*/ int64_t input, /*out via struct*/ OneHotEncoding * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1404,9 +1404,9 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_Transform(/*in*/ OneHo
         auto result(transformer.execute(input));
 
         // Output
-        output->index = result.index;
-        output->size = result.size;
-        output->appearances = result.appearances;
+        output->NumElements = result.NumElements;
+        output->Value = result.Value;
+        output->Index = result.Index;
     
         return true;
     }
@@ -1416,7 +1416,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_Transform(/*in*/ OneHo
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_int64_DestroyTransformedData(/*in*/ OneHotEncoding * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1738,7 +1738,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_CreateTransformerSaveD
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_Transform(/*in*/ OneHotEncoderFeaturizer_uint8_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_Transform(/*in*/ OneHotEncoderFeaturizer_uint8_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out via struct*/ OneHotEncoding * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1757,9 +1757,9 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_Transform(/*in*/ OneHo
         auto result(transformer.execute(input));
 
         // Output
-        output->index = result.index;
-        output->size = result.size;
-        output->appearances = result.appearances;
+        output->NumElements = result.NumElements;
+        output->Value = result.Value;
+        output->Index = result.Index;
     
         return true;
     }
@@ -1769,7 +1769,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_Transform(/*in*/ OneHo
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint8_DestroyTransformedData(/*in*/ OneHotEncoding * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2091,7 +2091,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_Transform(/*in*/ OneHotEncoderFeaturizer_uint16_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_Transform(/*in*/ OneHotEncoderFeaturizer_uint16_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out via struct*/ OneHotEncoding * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2110,9 +2110,9 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_Transform(/*in*/ OneH
         auto result(transformer.execute(input));
 
         // Output
-        output->index = result.index;
-        output->size = result.size;
-        output->appearances = result.appearances;
+        output->NumElements = result.NumElements;
+        output->Value = result.Value;
+        output->Index = result.Index;
     
         return true;
     }
@@ -2122,7 +2122,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_Transform(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint16_DestroyTransformedData(/*in*/ OneHotEncoding * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2444,7 +2444,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_Transform(/*in*/ OneHotEncoderFeaturizer_uint32_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_Transform(/*in*/ OneHotEncoderFeaturizer_uint32_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out via struct*/ OneHotEncoding * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2463,9 +2463,9 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_Transform(/*in*/ OneH
         auto result(transformer.execute(input));
 
         // Output
-        output->index = result.index;
-        output->size = result.size;
-        output->appearances = result.appearances;
+        output->NumElements = result.NumElements;
+        output->Value = result.Value;
+        output->Index = result.Index;
     
         return true;
     }
@@ -2475,7 +2475,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_Transform(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint32_DestroyTransformedData(/*in*/ OneHotEncoding * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2797,7 +2797,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_Transform(/*in*/ OneHotEncoderFeaturizer_uint64_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_Transform(/*in*/ OneHotEncoderFeaturizer_uint64_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out via struct*/ OneHotEncoding * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2816,9 +2816,9 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_Transform(/*in*/ OneH
         auto result(transformer.execute(input));
 
         // Output
-        output->index = result.index;
-        output->size = result.size;
-        output->appearances = result.appearances;
+        output->NumElements = result.NumElements;
+        output->Value = result.Value;
+        output->Index = result.Index;
     
         return true;
     }
@@ -2828,7 +2828,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_Transform(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_uint64_DestroyTransformedData(/*in*/ OneHotEncoding * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3150,7 +3150,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_CreateTransformerSaveD
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_Transform(/*in*/ OneHotEncoderFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_Transform(/*in*/ OneHotEncoderFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out via struct*/ OneHotEncoding * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3169,9 +3169,9 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_Transform(/*in*/ OneHo
         auto result(transformer.execute(input));
 
         // Output
-        output->index = result.index;
-        output->size = result.size;
-        output->appearances = result.appearances;
+        output->NumElements = result.NumElements;
+        output->Value = result.Value;
+        output->Index = result.Index;
     
         return true;
     }
@@ -3181,7 +3181,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_Transform(/*in*/ OneHo
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_float_DestroyTransformedData(/*in*/ OneHotEncoding * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3503,7 +3503,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_Transform(/*in*/ OneHotEncoderFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_Transform(/*in*/ OneHotEncoderFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out via struct*/ OneHotEncoding * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3522,9 +3522,9 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_Transform(/*in*/ OneH
         auto result(transformer.execute(input));
 
         // Output
-        output->index = result.index;
-        output->size = result.size;
-        output->appearances = result.appearances;
+        output->NumElements = result.NumElements;
+        output->Value = result.Value;
+        output->Index = result.Index;
     
         return true;
     }
@@ -3534,7 +3534,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_Transform(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_double_DestroyTransformedData(/*in*/ OneHotEncoding * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3856,7 +3856,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_CreateTransformerSaveDa
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_Transform(/*in*/ OneHotEncoderFeaturizer_bool_TransformerHandle *pHandle, /*in*/ bool input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_Transform(/*in*/ OneHotEncoderFeaturizer_bool_TransformerHandle *pHandle, /*in*/ bool input, /*out via struct*/ OneHotEncoding * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3875,9 +3875,9 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_Transform(/*in*/ OneHot
         auto result(transformer.execute(input));
 
         // Output
-        output->index = result.index;
-        output->size = result.size;
-        output->appearances = result.appearances;
+        output->NumElements = result.NumElements;
+        output->Value = result.Value;
+        output->Index = result.Index;
     
         return true;
     }
@@ -3887,7 +3887,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_Transform(/*in*/ OneHot
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_bool_DestroyTransformedData(/*in*/ OneHotEncoding * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -4224,7 +4224,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_Transform(/*in*/ OneHotEncoderFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out via struct*/ OneHotStruct * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_Transform(/*in*/ OneHotEncoderFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out via struct*/ OneHotEncoding * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -4243,9 +4243,9 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_Transform(/*in*/ OneH
         auto result(transformer.execute(input));
 
         // Output
-        output->index = result.index;
-        output->size = result.size;
-        output->appearances = result.appearances;
+        output->NumElements = result.NumElements;
+        output->Value = result.Value;
+        output->Index = result.Index;
     
         return true;
     }
@@ -4255,7 +4255,7 @@ FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_Transform(/*in*/ OneH
     }
 }
 
-FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_DestroyTransformedData(/*in*/ OneHotStruct * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool OneHotEncoderFeaturizer_string_DestroyTransformedData(/*in*/ OneHotEncoding * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
