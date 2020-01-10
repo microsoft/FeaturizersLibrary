@@ -9,9 +9,10 @@ parameters:
   job_display_name: ""
   operating_system: "" # Windows|Linux|MacOS
   steps: []
+  checkout: self
   submodule_checkout: 
-    - checkout: self
-      clean: false  # if true, run `execute git clean -ffdx && git reset --hard HEAD` before fetching
+    - checkout: ${{ parameters.checkout }}
+      clean: false  #if true, git clean will have problems on Linux machine
       submodules: recursive
   timeout_in_minutes: 240
 
