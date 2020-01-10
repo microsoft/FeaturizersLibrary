@@ -9,6 +9,10 @@ parameters:
   job_display_name: ""
   operating_system: "" # Windows|Linux|MacOS
   steps: []
+  submodule_checkout: 
+    - checkout: self
+      clean: false  # if true, run `execute git clean -ffdx && git reset --hard HEAD` before fetching
+      submodules: recursive
   timeout_in_minutes: 240
 
 # This template is necessary because we can't create a job with an empty container string. Therefore,
@@ -31,7 +35,8 @@ jobs:
                 clean: All
 
               steps:
-                ${{ parameters.steps }}
+                - ${{ parameters.submodule_checkout }}
+                - ${{ parameters.steps }}
 
         - ${{ if eq(parameters.operating_system, 'Linux') }}:
             - ${{ if eq(parameters.agent_pool_container, '') }}:
@@ -56,7 +61,8 @@ jobs:
                   #   clean: All
 
                   steps:
-                    ${{ parameters.steps }}
+                    - ${{ parameters.submodule_checkout }}
+                    - ${{ parameters.steps }}
 
             - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
                 - job: ${{ parameters.job_name }}
@@ -82,7 +88,8 @@ jobs:
                   #   clean: All
 
                   steps:
-                    ${{ parameters.steps }}
+                    - ${{ parameters.submodule_checkout }}
+                    - ${{ parameters.steps }}
 
     - ${{ if not(eq(parameters.agent_pool_is_custom, 'true')) }}:
         - ${{ if eq(parameters.agent_pool_container, '') }}:
@@ -98,7 +105,8 @@ jobs:
                 clean: All
 
               steps:
-                ${{ parameters.steps }}
+                - ${{ parameters.submodule_checkout }}
+                - ${{ parameters.steps }}
 
         - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
             - job: ${{ parameters.job_name }}
@@ -115,4 +123,5 @@ jobs:
                 clean: All
 
               steps:
-                ${{ parameters.steps }}
+                - ${{ parameters.submodule_checkout }}
+                - ${{ parameters.steps }}

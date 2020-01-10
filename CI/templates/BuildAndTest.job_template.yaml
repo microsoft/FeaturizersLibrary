@@ -25,9 +25,6 @@ jobs:
       job_display_name: "${{ parameters.job_display_name }}"
       operating_system: ${{ parameters.operating_system }}
       steps:
-        - checkout: self
-          clean: false  #if true, git clean will have problems on Linux machine
-          submodules: recursive 
         - template: BuildAndTest.steps_template.yaml
           parameters:
             configuration: ${{ parameters.configuration }}
