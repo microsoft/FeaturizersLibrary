@@ -24,6 +24,7 @@ jobs:
       job_name: BuildAndTest_${{ parameters.operating_system }}_${{ parameters.configuration }}_${{ parameters.agent_pool_container }}_${{ parameters.test_only }}_Job${{ parameters.job_name_unique_id }}
       job_display_name: "${{ parameters.job_display_name }}"
       operating_system: ${{ parameters.operating_system }}
+      checkout: self
       steps:
         - template: BuildAndTest.steps_template.yaml
           parameters:

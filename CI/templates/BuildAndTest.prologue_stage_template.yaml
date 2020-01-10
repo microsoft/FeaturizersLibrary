@@ -21,6 +21,7 @@ stages:
           job_name: "Globals_Job"
           job_display_name: "Global Variables"
           operating_system: Windows
+          checkout: self
           steps:
             - task: PythonScript@0
               displayName: "[IMPL] Create JSON"
