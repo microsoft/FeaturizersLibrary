@@ -131,4 +131,4 @@ jobs:
                 - checkout: self
                   clean: false  # if true, run `execute git clean -ffdx && git reset --hard HEAD` before fetching
                   submodules: recursive
-                ${{ parameters.steps }}
+                - ${{ parameters.steps }}
