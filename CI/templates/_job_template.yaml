@@ -8,7 +8,7 @@ parameters:
   job_name: ""
   job_display_name: ""
   operating_system: "" # Windows|Linux|MacOS
-  checkout: self
+  checkout: ""
   submodule_checkout: 
     - checkout: self
       clean: false  #if true, git clean will have problems on Linux machine
@@ -64,7 +64,10 @@ jobs:
                   #   clean: All
 
                   steps:
-                    - ${{ parameters.submodule_checkout }}
+                    - ${{ if eq(parameters.checkout, 'self') }}:
+                        - ${{ parameters.submodule_checkout }}
+                    - ${{ if eq(parameters.checkout, 'none') }}:
+                        - checkout: none
                     - ${{ parameters.steps }}
                 
 
@@ -92,7 +95,10 @@ jobs:
                   #   clean: All
 
                   steps:
-                    - ${{ parameters.submodule_checkout }}
+                    - ${{ if eq(parameters.checkout, 'self') }}:
+                        - ${{ parameters.submodule_checkout }}
+                    - ${{ if eq(parameters.checkout, 'none') }}:
+                        - checkout: none
                     - ${{ parameters.steps }}
                    
     - ${{ if not(eq(parameters.agent_pool_is_custom, 'true')) }}:
@@ -109,7 +115,10 @@ jobs:
                 clean: All
 
               steps:
-                - ${{ parameters.submodule_checkout }}
+                - ${{ if eq(parameters.checkout, 'self') }}:
+                    - ${{ parameters.submodule_checkout }}
+                - ${{ if eq(parameters.checkout, 'none') }}:
+                    - checkout: none
                 - ${{ parameters.steps }}
 
         - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
@@ -127,5 +136,8 @@ jobs:
                 clean: All
 
               steps:
-                - ${{ parameters.submodule_checkout }}
+                - ${{ if eq(parameters.checkout, 'self') }}:
+                    - ${{ parameters.submodule_checkout }}
+                - ${{ if eq(parameters.checkout, 'none') }}:
+                    - checkout: none
                 - ${{ parameters.steps }}
