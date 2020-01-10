@@ -52,8 +52,7 @@ public:
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-
-TimeSeriesImputerEstimator::TimeSeriesImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::vector<TypeId> colsToImputeDataTypes, bool suppresserror, Components::TimeSeriesImputeStrategy tsImputeStrategy) :
+inline TimeSeriesImputerEstimator::TimeSeriesImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::vector<TypeId> colsToImputeDataTypes, bool suppresserror, Components::TimeSeriesImputeStrategy tsImputeStrategy) :
     BaseType("TimeSeriesImputerEstimator",
         pAllColumnAnnotations,
         [&pAllColumnAnnotations](void) { return Components::TimeSeriesFrequencyEstimator(pAllColumnAnnotations); },

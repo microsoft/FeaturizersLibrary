@@ -12,6 +12,7 @@
 
 // These method(s) are defined in SharedLibrary_Common.cpp
 ErrorInfoHandle * CreateErrorInfo(std::exception const &ex);
+std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &param);
 
 extern "C" {
 
@@ -24,10 +25,10 @@ extern "C" {
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MinMaxScalarFeaturizer <int8_t> */
+/* |  MinMaxScalarFeaturizer <int8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_int8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -40,7 +41,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateEstimator(/*out*
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_int8_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_int8_EstimatorHandle*>(index);
 
 
     
@@ -52,7 +53,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateEstimator(/*out*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -75,7 +76,29 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_DestroyEstimator(/*in*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_GetState(/*in*/ MinMaxScalarFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -87,7 +110,6 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_IsTrainingComplete(/*i
 
         Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
@@ -98,7 +120,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_IsTrainingComplete(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_Fit(/*in*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_Fit(/*in*/ MinMaxScalarFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -124,7 +146,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_Fit(/*in*/ MinMaxScala
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_FitBuffer(/*in*/ MinMaxScalarFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -151,7 +173,28 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_FitBuffer(/*in*/ MinMa
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_OnDataCompleted(/*in*/ MinMaxScalarFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -172,7 +215,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CompleteTraining(/*in*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_int8_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_int8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -190,7 +233,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateTransformerFromE
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int8_TransformerHandle*>(index);
     
         return true;
     }
@@ -200,7 +243,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateTransformerFromE
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_int8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_int8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -213,10 +256,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateTransformerFromS
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int8_TransformerHandle*>(index);
     
         return true;
     }
@@ -226,7 +269,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateTransformerFromS
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_int8_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -250,7 +293,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_DestroyTransformer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_int8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_int8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -283,7 +326,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_CreateTransformerSaveD
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_Transform(/*in*/ MinMaxScalarFeaturizer_int8_t_TransformerHandle *pHandle, /*in*/ int8_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_Transform(/*in*/ MinMaxScalarFeaturizer_int8_TransformerHandle *pHandle, /*in*/ int8_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -314,10 +357,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int8_t_Transform(/*in*/ MinMa
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MinMaxScalarFeaturizer <int16_t> */
+/* |  MinMaxScalarFeaturizer <int16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_int16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -330,7 +373,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateEstimator(/*out
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_int16_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_int16_EstimatorHandle*>(index);
 
 
     
@@ -342,7 +385,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateEstimator(/*out
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -365,7 +408,29 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_DestroyEstimator(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_GetState(/*in*/ MinMaxScalarFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -377,7 +442,6 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_IsTrainingComplete(/*
 
         Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
@@ -388,7 +452,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_IsTrainingComplete(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_Fit(/*in*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_Fit(/*in*/ MinMaxScalarFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -414,7 +478,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_Fit(/*in*/ MinMaxScal
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_FitBuffer(/*in*/ MinMaxScalarFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -441,7 +505,28 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_FitBuffer(/*in*/ MinM
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_OnDataCompleted(/*in*/ MinMaxScalarFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -462,7 +547,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CompleteTraining(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_int16_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_int16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -480,7 +565,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateTransformerFrom
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int16_TransformerHandle*>(index);
     
         return true;
     }
@@ -490,7 +575,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_int16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_int16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -503,10 +588,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int16_TransformerHandle*>(index);
     
         return true;
     }
@@ -516,7 +601,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_int16_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -540,7 +625,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_DestroyTransformer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_int16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_int16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -573,7 +658,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_Transform(/*in*/ MinMaxScalarFeaturizer_int16_t_TransformerHandle *pHandle, /*in*/ int16_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_Transform(/*in*/ MinMaxScalarFeaturizer_int16_TransformerHandle *pHandle, /*in*/ int16_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -604,10 +689,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int16_t_Transform(/*in*/ MinM
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MinMaxScalarFeaturizer <int32_t> */
+/* |  MinMaxScalarFeaturizer <int32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_int32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -620,7 +705,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateEstimator(/*out
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_int32_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_int32_EstimatorHandle*>(index);
 
 
     
@@ -632,7 +717,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateEstimator(/*out
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -655,7 +740,29 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_DestroyEstimator(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_GetState(/*in*/ MinMaxScalarFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -667,7 +774,6 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_IsTrainingComplete(/*
 
         Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
@@ -678,7 +784,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_IsTrainingComplete(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_Fit(/*in*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_Fit(/*in*/ MinMaxScalarFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -704,7 +810,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_Fit(/*in*/ MinMaxScal
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_FitBuffer(/*in*/ MinMaxScalarFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -731,7 +837,28 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_FitBuffer(/*in*/ MinM
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_OnDataCompleted(/*in*/ MinMaxScalarFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -752,7 +879,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CompleteTraining(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_int32_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_int32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -770,7 +897,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateTransformerFrom
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int32_TransformerHandle*>(index);
     
         return true;
     }
@@ -780,7 +907,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_int32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_int32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -793,10 +920,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int32_TransformerHandle*>(index);
     
         return true;
     }
@@ -806,7 +933,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_int32_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -830,7 +957,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_DestroyTransformer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_int32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_int32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -863,7 +990,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_Transform(/*in*/ MinMaxScalarFeaturizer_int32_t_TransformerHandle *pHandle, /*in*/ int32_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_Transform(/*in*/ MinMaxScalarFeaturizer_int32_TransformerHandle *pHandle, /*in*/ int32_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -894,10 +1021,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int32_t_Transform(/*in*/ MinM
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MinMaxScalarFeaturizer <int64_t> */
+/* |  MinMaxScalarFeaturizer <int64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_int64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -910,7 +1037,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateEstimator(/*out
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_int64_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_int64_EstimatorHandle*>(index);
 
 
     
@@ -922,7 +1049,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateEstimator(/*out
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -945,7 +1072,29 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_DestroyEstimator(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_GetState(/*in*/ MinMaxScalarFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -957,7 +1106,6 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_IsTrainingComplete(/*
 
         Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
@@ -968,7 +1116,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_IsTrainingComplete(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_Fit(/*in*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_Fit(/*in*/ MinMaxScalarFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -994,7 +1142,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_Fit(/*in*/ MinMaxScal
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_FitBuffer(/*in*/ MinMaxScalarFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1021,7 +1169,28 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_FitBuffer(/*in*/ MinM
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_OnDataCompleted(/*in*/ MinMaxScalarFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1042,7 +1211,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CompleteTraining(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_int64_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_int64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1060,7 +1229,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateTransformerFrom
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int64_TransformerHandle*>(index);
     
         return true;
     }
@@ -1070,7 +1239,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_int64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_int64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1083,10 +1252,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::int64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_int64_TransformerHandle*>(index);
     
         return true;
     }
@@ -1096,7 +1265,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_int64_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1120,7 +1289,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_DestroyTransformer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_int64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_int64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1153,7 +1322,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_Transform(/*in*/ MinMaxScalarFeaturizer_int64_t_TransformerHandle *pHandle, /*in*/ int64_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_Transform(/*in*/ MinMaxScalarFeaturizer_int64_TransformerHandle *pHandle, /*in*/ int64_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1184,10 +1353,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_int64_t_Transform(/*in*/ MinM
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MinMaxScalarFeaturizer <uint8_t> */
+/* |  MinMaxScalarFeaturizer <uint8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_uint8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1200,7 +1369,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateEstimator(/*out
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint8_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint8_EstimatorHandle*>(index);
 
 
     
@@ -1212,7 +1381,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateEstimator(/*out
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1235,7 +1404,29 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_DestroyEstimator(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_GetState(/*in*/ MinMaxScalarFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1247,7 +1438,6 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_IsTrainingComplete(/*
 
         Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
@@ -1258,7 +1448,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_IsTrainingComplete(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_Fit(/*in*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_Fit(/*in*/ MinMaxScalarFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1284,7 +1474,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_Fit(/*in*/ MinMaxScal
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_FitBuffer(/*in*/ MinMaxScalarFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1311,7 +1501,28 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_FitBuffer(/*in*/ MinM
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_OnDataCompleted(/*in*/ MinMaxScalarFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1332,7 +1543,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CompleteTraining(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_uint8_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_uint8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1350,7 +1561,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateTransformerFrom
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint8_TransformerHandle*>(index);
     
         return true;
     }
@@ -1360,7 +1571,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_uint8_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_uint8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1373,10 +1584,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint8_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint8_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint8_TransformerHandle*>(index);
     
         return true;
     }
@@ -1386,7 +1597,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1410,7 +1621,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_DestroyTransformer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_uint8_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1443,7 +1654,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_Transform(/*in*/ MinMaxScalarFeaturizer_uint8_t_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_Transform(/*in*/ MinMaxScalarFeaturizer_uint8_TransformerHandle *pHandle, /*in*/ uint8_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1474,10 +1685,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint8_t_Transform(/*in*/ MinM
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MinMaxScalarFeaturizer <uint16_t> */
+/* |  MinMaxScalarFeaturizer <uint16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_uint16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1490,7 +1701,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateEstimator(/*ou
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint16_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint16_EstimatorHandle*>(index);
 
 
     
@@ -1502,7 +1713,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateEstimator(/*ou
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1525,7 +1736,29 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_DestroyEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_GetState(/*in*/ MinMaxScalarFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1537,7 +1770,6 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_IsTrainingComplete(/
 
         Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
@@ -1548,7 +1780,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_IsTrainingComplete(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_Fit(/*in*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_Fit(/*in*/ MinMaxScalarFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1574,7 +1806,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_Fit(/*in*/ MinMaxSca
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_FitBuffer(/*in*/ MinMaxScalarFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1601,7 +1833,28 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_FitBuffer(/*in*/ Min
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_OnDataCompleted(/*in*/ MinMaxScalarFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1622,7 +1875,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CompleteTraining(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_uint16_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_uint16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1640,7 +1893,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateTransformerFro
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint16_TransformerHandle*>(index);
     
         return true;
     }
@@ -1650,7 +1903,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_uint16_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_uint16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1663,10 +1916,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint16_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint16_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint16_TransformerHandle*>(index);
     
         return true;
     }
@@ -1676,7 +1929,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1700,7 +1953,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_DestroyTransformer(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_uint16_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1733,7 +1986,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_Transform(/*in*/ MinMaxScalarFeaturizer_uint16_t_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_Transform(/*in*/ MinMaxScalarFeaturizer_uint16_TransformerHandle *pHandle, /*in*/ uint16_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1764,10 +2017,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint16_t_Transform(/*in*/ Min
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MinMaxScalarFeaturizer <uint32_t> */
+/* |  MinMaxScalarFeaturizer <uint32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_uint32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1780,7 +2033,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateEstimator(/*ou
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint32_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint32_EstimatorHandle*>(index);
 
 
     
@@ -1792,7 +2045,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateEstimator(/*ou
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1815,7 +2068,29 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_DestroyEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_GetState(/*in*/ MinMaxScalarFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1827,7 +2102,6 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_IsTrainingComplete(/
 
         Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
@@ -1838,7 +2112,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_IsTrainingComplete(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_Fit(/*in*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_Fit(/*in*/ MinMaxScalarFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1864,7 +2138,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_Fit(/*in*/ MinMaxSca
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_FitBuffer(/*in*/ MinMaxScalarFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1891,7 +2165,28 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_FitBuffer(/*in*/ Min
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_OnDataCompleted(/*in*/ MinMaxScalarFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1912,7 +2207,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CompleteTraining(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_uint32_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_uint32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1930,7 +2225,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateTransformerFro
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint32_TransformerHandle*>(index);
     
         return true;
     }
@@ -1940,7 +2235,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_uint32_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_uint32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1953,10 +2248,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint32_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint32_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint32_TransformerHandle*>(index);
     
         return true;
     }
@@ -1966,7 +2261,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1990,7 +2285,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_DestroyTransformer(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_uint32_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2023,7 +2318,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_Transform(/*in*/ MinMaxScalarFeaturizer_uint32_t_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_Transform(/*in*/ MinMaxScalarFeaturizer_uint32_TransformerHandle *pHandle, /*in*/ uint32_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2054,10 +2349,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint32_t_Transform(/*in*/ Min
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MinMaxScalarFeaturizer <uint64_t> */
+/* |  MinMaxScalarFeaturizer <uint64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_uint64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2070,7 +2365,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateEstimator(/*ou
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint64_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint64_EstimatorHandle*>(index);
 
 
     
@@ -2082,7 +2377,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateEstimator(/*ou
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2105,7 +2400,29 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_DestroyEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_GetState(/*in*/ MinMaxScalarFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2117,7 +2434,6 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_IsTrainingComplete(/
 
         Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
@@ -2128,7 +2444,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_IsTrainingComplete(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_Fit(/*in*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_Fit(/*in*/ MinMaxScalarFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2154,7 +2470,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_Fit(/*in*/ MinMaxSca
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_FitBuffer(/*in*/ MinMaxScalarFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2181,7 +2497,28 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_FitBuffer(/*in*/ Min
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_OnDataCompleted(/*in*/ MinMaxScalarFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2202,7 +2539,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CompleteTraining(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_uint64_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_uint64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2220,7 +2557,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateTransformerFro
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint64_TransformerHandle*>(index);
     
         return true;
     }
@@ -2230,7 +2567,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_uint64_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_uint64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2243,10 +2580,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::uint64_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint64_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_uint64_TransformerHandle*>(index);
     
         return true;
     }
@@ -2256,7 +2593,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2280,7 +2617,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_DestroyTransformer(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_uint64_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2313,7 +2650,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_Transform(/*in*/ MinMaxScalarFeaturizer_uint64_t_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_Transform(/*in*/ MinMaxScalarFeaturizer_uint64_TransformerHandle *pHandle, /*in*/ uint64_t input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2344,10 +2681,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_uint64_t_Transform(/*in*/ Min
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MinMaxScalarFeaturizer <float_t> */
+/* |  MinMaxScalarFeaturizer <float> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_float_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2360,7 +2697,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateEstimator(/*out
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_float_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_float_EstimatorHandle*>(index);
 
 
     
@@ -2372,7 +2709,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateEstimator(/*out
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2395,7 +2732,29 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_DestroyEstimator(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_GetState(/*in*/ MinMaxScalarFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_float_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2407,7 +2766,6 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_IsTrainingComplete(/*
 
         Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
@@ -2418,7 +2776,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_IsTrainingComplete(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_Fit(/*in*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_Fit(/*in*/ MinMaxScalarFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2444,7 +2802,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_Fit(/*in*/ MinMaxScal
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_FitBuffer(/*in*/ MinMaxScalarFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2471,7 +2829,28 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_FitBuffer(/*in*/ MinM
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_OnDataCompleted(/*in*/ MinMaxScalarFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2492,7 +2871,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CompleteTraining(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_float_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_float_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_float_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2510,7 +2889,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateTransformerFrom
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_float_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_float_TransformerHandle*>(index);
     
         return true;
     }
@@ -2520,7 +2899,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_float_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_float_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2533,10 +2912,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateTransformerFrom
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_float_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_float_TransformerHandle*>(index);
     
         return true;
     }
@@ -2546,7 +2925,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_float_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2570,7 +2949,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_DestroyTransformer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_float_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_float_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2603,7 +2982,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_Transform(/*in*/ MinMaxScalarFeaturizer_float_t_TransformerHandle *pHandle, /*in*/ float input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_Transform(/*in*/ MinMaxScalarFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2634,10 +3013,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_float_t_Transform(/*in*/ MinM
 
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
-/* |  MinMaxScalarFeaturizer <double_t> */
+/* |  MinMaxScalarFeaturizer <double> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_CreateEstimator(/*out*/ MinMaxScalarFeaturizer_double_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2650,7 +3029,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateEstimator(/*ou
         pEstimator->begin_training();
 
         size_t index(g_pointerTable.Add(pEstimator));
-        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_double_t_EstimatorHandle*>(index);
+        *ppHandle = reinterpret_cast<MinMaxScalarFeaturizer_double_EstimatorHandle*>(index);
 
 
     
@@ -2662,7 +3041,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateEstimator(/*ou
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_DestroyEstimator(/*in*/ MinMaxScalarFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2685,7 +3064,29 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_DestroyEstimator(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_GetState(/*in*/ MinMaxScalarFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_IsTrainingComplete(/*in*/ MinMaxScalarFeaturizer_double_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2697,7 +3098,6 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_IsTrainingComplete(/
 
         Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
         return true;
@@ -2708,7 +3108,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_IsTrainingComplete(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_Fit(/*in*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_Fit(/*in*/ MinMaxScalarFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2734,7 +3134,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_Fit(/*in*/ MinMaxSca
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_FitBuffer(/*in*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_FitBuffer(/*in*/ MinMaxScalarFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2761,7 +3161,28 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_FitBuffer(/*in*/ Min
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_OnDataCompleted(/*in*/ MinMaxScalarFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_CompleteTraining(/*in*/ MinMaxScalarFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2782,7 +3203,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CompleteTraining(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_double_t_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_CreateTransformerFromEstimator(/*in*/ MinMaxScalarFeaturizer_double_EstimatorHandle *pEstimatorHandle, /*out*/ MinMaxScalarFeaturizer_double_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2800,7 +3221,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateTransformerFro
 
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_double_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_double_TransformerHandle*>(index);
     
         return true;
     }
@@ -2810,7 +3231,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_double_t_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MinMaxScalarFeaturizer_double_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2823,10 +3244,10 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateTransformerFro
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t>::TransformerType* pTransformer= (std::make_unique<Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t>::TransformerType>(archive).release());
+        Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MinMaxScalarEstimator<std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
-        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_double_t_TransformerHandle*>(index);
+        *ppTransformerHandle = reinterpret_cast<MinMaxScalarFeaturizer_double_TransformerHandle*>(index);
     
         return true;
     }
@@ -2836,7 +3257,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateTransformerFro
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_DestroyTransformer(/*in*/ MinMaxScalarFeaturizer_double_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2860,7 +3281,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_DestroyTransformer(/
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_double_t_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_CreateTransformerSaveData(/*in*/ MinMaxScalarFeaturizer_double_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2893,7 +3314,7 @@ FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_CreateTransformerSav
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_t_Transform(/*in*/ MinMaxScalarFeaturizer_double_t_TransformerHandle *pHandle, /*in*/ double input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxScalarFeaturizer_double_Transform(/*in*/ MinMaxScalarFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 

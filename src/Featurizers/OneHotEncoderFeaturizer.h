@@ -8,6 +8,7 @@
 #include "Components/HistogramEstimator.h"
 #include "Components/IndexMapEstimator.h"
 #include "Structs.h"
+
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
@@ -17,14 +18,14 @@ namespace Featurizers {
 ///  \brief         Returns a unique one hot struct for each input.
 ///
 template <typename InputT>
-class OneHotEncoderTransformer : public StandardTransformer<InputT, OneHotStruct> {
+class OneHotEncoderTransformer : public StandardTransformer<InputT, SingleValueSparseVectorEncoding<std::uint8_t>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = StandardTransformer<InputT, OneHotStruct>;
+    using BaseType                          = StandardTransformer<InputT, SingleValueSparseVectorEncoding<std::uint8_t>>;
     using IndexMap                          = typename Components::IndexMapAnnotationData<InputT>::IndexMap;
 
     // ----------------------------------------------------------------------
@@ -47,9 +48,9 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(OneHotEncoderTransformer);
 
-    void save(Archive &ar) const override;
-
     bool operator==(OneHotEncoderTransformer const &other) const;
+
+    void save(Archive &ar) const override;
 
 private:
     // ----------------------------------------------------------------------
@@ -60,21 +61,24 @@ private:
 
     // MSVC has problems when the definition and declaration are separated
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-        typename IndexMap::const_iterator const         lable_iter(Labels.find(input));
-        if(lable_iter == Labels.end()) {
-            if(AllowMissingValues) {
-                callback(OneHotStruct(0, static_cast<std::uint32_t>(Labels.size()) + 1, 1));
-                return;
-            }
-            throw std::invalid_argument("'input' was not found");
-        }
         // when missing values are allowed, the total size is increased by 1 and the 0th element in the vector represent missing values
-        std::uint32_t offset = AllowMissingValues ? 1 : 0;
-        callback(OneHotStruct(static_cast<std::uint32_t>(lable_iter->second + offset),   // category index
-                              static_cast<std::uint32_t>(Labels.size() + offset),        // category total size
-                              static_cast<std::uint32_t>(1)                              // number of appearances and
-                                                                                         // this will just be 1 and 0 in one hot encoder
-        ));
+        std::uint64_t const                 offset(AllowMissingValues ? 1 : 0);
+
+        // Create the encoding value
+        std::uint64_t                       encodingIndex;
+
+        typename IndexMap::const_iterator const         label_iter(Labels.find(input));
+
+        if(label_iter == Labels.end()) {
+            if(AllowMissingValues == false)
+                throw std::invalid_argument("'input' was not found");
+
+            encodingIndex = 0;
+        }
+        else
+            encodingIndex = static_cast<std::uint64_t>(label_iter->second + offset);
+
+        callback(SingleValueSparseVectorEncoding<std::uint8_t>(Labels.size() + offset, 1, encodingIndex));
     }
 };
 
@@ -90,14 +94,14 @@ template <
     typename InputT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class OneHotEncoderEstimatorImpl : public TransformerEstimator<InputT, OneHotStruct> {
+class OneHotEncoderEstimatorImpl : public TransformerEstimator<InputT, SingleValueSparseVectorEncoding<std::uint8_t>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = TransformerEstimator<InputT, OneHotStruct>;
+    using BaseType                          = TransformerEstimator<InputT, SingleValueSparseVectorEncoding<std::uint8_t>>;
     using TransformerType                   = OneHotEncoderTransformer<InputT>;
 
     // ----------------------------------------------------------------------
@@ -142,7 +146,7 @@ private:
 
         IndexMapAnnotationData const &       i_data(IndexMapEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::IndexMapEstimatorName));
 
-        return std::make_unique<OneHotEncoderTransformer<InputT>>(i_data.Value, _allowMissingValues);
+        return typename BaseType::TransformerUniquePtr(new OneHotEncoderTransformer<InputT>(i_data.Value, _allowMissingValues));
     }
 };
 
@@ -208,25 +212,46 @@ public:
 template <typename InputT>
 OneHotEncoderTransformer<InputT>::OneHotEncoderTransformer(IndexMap map, bool allowMissingValues) :
     Labels(
-        std::move([&map](void) ->  IndexMap & {
-            if (map.size() == 0) {
-                throw std::invalid_argument("Index map is empty!");
-            }
-            return map;
-        }()
-        )),
+        std::move(
+            [&map](void) ->  IndexMap & {
+                if (map.size() == 0) {
+                    throw std::invalid_argument("Index map is empty!");
+                }
+                return map;
+            }()
+        )
+    ),
     AllowMissingValues(std::move(allowMissingValues)) {
 }
 
 template <typename InputT>
 OneHotEncoderTransformer<InputT>::OneHotEncoderTransformer(Archive &ar) :
-    // TODO: Labels(Traits<decltype(Labels)>::deserialize(ar)),
-    AllowMissingValues(Traits<decltype(AllowMissingValues)>::deserialize(ar)) {
+    OneHotEncoderTransformer(
+        [&ar](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
+
+            // Data
+            IndexMap                        map(Traits<IndexMap>::deserialize(ar));
+            bool                            allowMissingValues(Traits<bool>::deserialize(ar));
+
+            return OneHotEncoderTransformer(std::move(map), std::move(allowMissingValues));
+        }()
+    ) {
 }
 
 template <typename InputT>
 void OneHotEncoderTransformer<InputT>::save(Archive &ar) const /*override*/ {
-    // TODO: Traits<decltype(Labels)>::serialize(ar, Labels);
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
+
+    // Data
+    Traits<decltype(Labels)>::serialize(ar, Labels);
     Traits<decltype(AllowMissingValues)>::serialize(ar, AllowMissingValues);
 }
 
@@ -290,6 +315,6 @@ template <typename InputT, size_t MaxNumTrainingItemsV>
 void Details::OneHotEncoderEstimatorImpl<InputT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
-}
-}
-}
+} // namespace Featurizers
+} // namespace Featurizers
+} // namespace Microsoft

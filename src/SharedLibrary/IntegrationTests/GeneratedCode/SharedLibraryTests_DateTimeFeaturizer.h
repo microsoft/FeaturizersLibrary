@@ -5,7 +5,11 @@
 #pragma once
 
 #include "SharedLibrary_DateTimeFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
+
+#include "SharedLibrary_Common.hpp"
 
 /* ---------------------------------------------------------------------- */
 /* |  DateTimeFeaturizer */
@@ -30,31 +34,32 @@ void DateTimeFeaturizer_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(DateTimeFeaturizer_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(DateTimeFeaturizer_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(DateTimeFeaturizer_Fit(pEstimatorHandle, CreateDateTimeParameter(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(DateTimeFeaturizer_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -90,10 +95,14 @@ void DateTimeFeaturizer_Test(
     for(auto const & input : inference_input) {
         TimePoint result;
 
-        REQUIRE(DateTimeFeaturizer_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(DateTimeFeaturizer_Transform(pTransformerHandle, CreateDateTimeParameter(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 

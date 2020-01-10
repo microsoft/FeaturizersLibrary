@@ -18,7 +18,7 @@ endif()
 
 include(CppCommon OPTIONAL)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -36,9 +36,11 @@ SET(
     MaxAbsValueEstimator_UnitTest
     MinMaxEstimator_UnitTest
     ModeEstimator_UnitTest
+    NormUpdaters_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
     RobustScalarNormEstimator_UnitTest
-    StatisticsMetricsEstimator_UnitTest
+    StandardDeviationEstimator_UnitTest
+    StatisticalMetricsEstimator_UnitTest
     TrainingOnlyEstimatorImpl_UnitTest
     # TODO: Add tests for:
     #   - TimeSeriesFrequencyEstimator

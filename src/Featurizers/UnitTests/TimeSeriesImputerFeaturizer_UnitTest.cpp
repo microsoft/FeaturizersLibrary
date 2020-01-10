@@ -786,7 +786,7 @@ TEST_CASE("One Row input") {
 
     using transformerType = NS::Featurizers::Components::TimeSeriesImputerEstimator::Transformer;
 
-    auto model = std::make_unique<transformerType>(
+    auto model = new transformerType(
             []()->std::chrono::system_clock::duration {
                 std::chrono::system_clock::duration frequency;
                 std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
@@ -902,4 +902,44 @@ TEST_CASE("Median Test - suppress error") {
         );
 
     CHECK(actual_output == expected_output);
+}
+
+TEST_CASE("Serialization") {
+    // Today, it isn't easy to create a TimeSeriesImputerTransformer in isolation. For now,
+    // create the Estimator and then create the Transformer.
+    NS::AnnotationMapsPtr const                         pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::TimeSeriesImputerEstimator         estimator(pAllColumnAnnotations, {NS::TypeId::Int8}, false, NS::Featurizers::Components::TimeSeriesImputeStrategy::Forward);
+
+    estimator.begin_training();
+
+    std::chrono::system_clock::time_point               now(std::chrono::system_clock::now());
+
+    estimator.fit(std::make_tuple(GetTimePoint(now,0), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{"14.5","18"}));
+    estimator.fit(std::make_tuple(GetTimePoint(now,1), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{"14.5","18"}));
+
+    estimator.complete_training();
+
+    auto const                                          pTransformer(estimator.create_transformer());
+    NS::Archive                                         out;
+
+    pTransformer->save(out);
+
+    NS::Archive                                                             in(out.commit());
+    NS::Featurizers::TimeSeriesImputerEstimator::TransformerType            other(in);
+
+    CHECK(other == static_cast<NS::Featurizers::TimeSeriesImputerEstimator::TransformerType const &>(*pTransformer));
+}
+
+TEST_CASE("Serialization Version Error") {
+    NS::Archive                             out;
+
+    out.serialize(static_cast<std::uint16_t>(2));
+    out.serialize(static_cast<std::uint16_t>(0));
+
+    NS::Archive                             in(out.commit());
+
+    CHECK_THROWS_WITH(
+        NS::Featurizers::TimeSeriesImputerEstimator::TransformerType(in),
+        Catch::Contains("Unsupported archive version")
+    );
 }

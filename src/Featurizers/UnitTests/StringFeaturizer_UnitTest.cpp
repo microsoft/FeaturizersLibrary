@@ -88,3 +88,30 @@ TEST_CASE("Transformer_Maps") {
     std::string map_s{ "{5:35.800000,93:0.147000}" };
     CHECK(NS::Featurizers::StringTransformer<std::map<std::int16_t, std::double_t>>().execute(m) == map_s);
 }
+
+TEST_CASE("Serialization") {
+    NS::Featurizers::StringTransformer<std::string>     original;
+    NS::Archive                                         out;
+
+    original.save(out);
+
+    NS::Archive                             in(out.commit());
+
+    NS::Featurizers::StringTransformer<std::string>     other(in);
+
+    CHECK(other == original);
+}
+
+TEST_CASE("Serialization Version Error") {
+    NS::Archive                             out;
+
+    out.serialize(static_cast<std::uint16_t>(2));
+    out.serialize(static_cast<std::uint16_t>(0));
+
+    NS::Archive                             in(out.commit());
+
+    CHECK_THROWS_WITH(
+        NS::Featurizers::StringTransformer<std::string>(in),
+        Catch::Contains("Unsupported archive version")
+    );
+}

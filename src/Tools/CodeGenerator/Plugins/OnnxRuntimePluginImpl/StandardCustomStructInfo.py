@@ -5,6 +5,7 @@
 """Contains the StandardCustomStructInfo object"""
 
 import os
+import re
 import textwrap
 from collections import OrderedDict
 
@@ -62,6 +63,12 @@ class StandardCustomStructInfo(CustomStructInfo):
     # ----------------------------------------------------------------------
     @Interface.override
     def GetDefOutputStatementsConstraintsAndSuffix(self):
+        # ----------------------------------------------------------------------
+        def ToOrtTypeString(value):
+            return value.replace("std::", "").replace("_t", "")
+
+        # ----------------------------------------------------------------------
+
         output_statements = []
 
         for index, member in enumerate(self._custom_struct.members):
@@ -78,7 +85,7 @@ class StandardCustomStructInfo(CustomStructInfo):
             output_statements,
             OrderedDict(
                 [
-                    (k, ["tensor({})".format(v.replace("std::", ""))])
+                    (k, [ToOrtTypeString(v)])
                     for k,
                     v in six.iteritems(self._template_to_types)
                 ],
@@ -86,12 +93,10 @@ class StandardCustomStructInfo(CustomStructInfo):
             textwrap.dedent(
                 """\
                 .TypeAndShapeInferenceFunction(
-                    [](ONNX_NAMESPACE::InferenceContext &ctx) {{
-                        {statements}
+                    [](ONNX_NAMESPACE::InferenceContext& ctx) {{
+                      const bool has_shape = hasInputShape(ctx, 1);
 
-                        for(int i = 0; i < ctx.getNumOutputs(); ++i) {{
-                            *ctx.getOutputType(i)->mutable_tensor_type()->mutable_shape() = ctx.getInputType(1)->tensor_type().shape();
-                        }}
+                      {statements}
                     }}
                 )
                 """,
@@ -99,40 +104,44 @@ class StandardCustomStructInfo(CustomStructInfo):
                 statements=StringHelpers.LeftJustify(
                     "\n".join(
                         [
-                            "ctx.getOutputType({index})->mutable_tensor_type()->set_elem_type(ONNX_NAMESPACE::TensorProto_DataType_{type});".format(
+                            textwrap.dedent(
+                                """\
+                                propagateElemTypeFromDtypeToOutput(ctx, ONNX_NAMESPACE::TensorProto_DataType_{type}, {index});
+                                if(has_shape) {{
+                                  propagateShapeFromInputToOutput(ctx, 1, {index});
+                                }}
+                                """,
+                            ).format(
                                 index=index,
-                                type=member.type.replace("std::", "").replace(
-                                    "_t",
-                                    "",
-                                ).upper(),
-                            ) for index,
-                            member in enumerate(self._custom_struct.members)
+                                type=ToOrtTypeString(member.type).upper(),
+                            )
+                            for index, member in enumerate(self._custom_struct.members)
                         ],
                     ),
-                    8,
+                    6,
                 ),
             )
         )
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetKernelInitializeAssignAndPreprocessorStatements(self, transformer_name):
+    def GetKernelInitializeAssignAndPreprocessorStatements(self, transformer_name, input_transformation_statement):
         initialize_statements_part1 = []
         initialize_statements_part2 = []
-        assign_statements = ["auto result(transformer.execute(input_data[i]));\n"]
+        assign_statements = ["auto result(transformer.execute({}));\n".format(input_transformation_statement)]
 
         for index, member in enumerate(self._custom_struct.members):
             initialize_statements_part1.append(
-                "Tensor * {name}_tensor(ctr->Output({index}, input_tensor->Shape()));".format(
+                "Tensor* {name}_tensor(ctx->Output({index}, input_tensor->Shape()));".format(
                     name=member.name,
                     index=index,
                 ),
             )
 
             initialize_statements_part2.append(
-                "{type} * {name}_data({name}_tensor->MutableData<{type}>());".format(
+                "{type}* {name}_data({name}_tensor->MutableData<{type}>());".format(
                     name=member.name,
-                    type=member.type.replace("std::", ""),
+                    type=member.type,
                 ),
             )
 
@@ -145,30 +154,4 @@ class StandardCustomStructInfo(CustomStructInfo):
         return (
             initialize_statements_part1 + [""] + initialize_statements_part2,
             assign_statements,
-            [textwrap.dedent(
-                """\
-                ONNX_OPERATOR_KERNEL_EX(
-                    {transformer_name},
-                    kMSAutoMLDomain,
-                    1,
-                    kCpuExecutionProvider,
-                    KernelDefBuilder()
-                        {constraints}
-                );
-                """,
-            ).format(
-                transformer_name=transformer_name,
-                constraints=StringHelpers.LeftJustify(
-                    "\n".join(
-                        [
-                            '.TypeConstraint("{k}", DataTypeImpl::GetTensorType<{v}>())'.format(
-                                k=k,
-                                v=v.replace("std::", ""),
-                            ) for k,
-                            v in six.iteritems(self._template_to_types)
-                        ],
-                    ),
-                    8,
-                ),
-            )]
         )

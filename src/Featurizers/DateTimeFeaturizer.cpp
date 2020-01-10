@@ -296,54 +296,82 @@ bool DoesCountryMatch(std::string const &country, std::string query) {
 } // anonymous namespace
 
 DateTimeTransformer::DateTimeTransformer(Archive &ar) :
-    DateTimeTransformer(Traits<std::string>::deserialize(ar), "") {
+    DateTimeTransformer(ar, "") {
 }
 
 DateTimeTransformer::DateTimeTransformer(Archive &ar, std::string dataRootDir) :
-    DateTimeTransformer(Traits<std::string>::deserialize(ar), std::move(dataRootDir)) {
+    DateTimeTransformer(
+        [&ar, &dataRootDir](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
+
+            return DateTimeTransformer(Traits<std::string>::deserialize(ar), std::move(dataRootDir));
+        }()
+    ) {
 }
 
 DateTimeTransformer::DateTimeTransformer(std::string optionalCountryName, std::string optionalDataRootDir):
-    _countryName(std::move(optionalCountryName)) {
+    _countryName(std::move(optionalCountryName)),
+    _dateHolidayMap(
+        [this, &optionalDataRootDir]() {
+            if(_countryName.empty())
+                return HolidayMap();
 
-    if (!_countryName.empty()) {
-        // Get the corresponding file
-        std::string                         filename;
+            // Get the corresponding file
+            std::string                         filename;
 
-        if(
-            EnumCountries(
-                [this, &filename](std::string country) {
-                    if(DoesCountryMatch(_countryName, country)) {
-                        filename = std::move(country);
+            if(
+                EnumCountries(
+                    [this, &filename](std::string country) {
+                        if(DoesCountryMatch(_countryName, country)) {
+                            filename = std::move(country);
 
-                        // Don't continue processing
-                        return false;
-                    }
+                            // Don't continue processing
+                            return false;
+                        }
 
-                    return true;
-                },
-                optionalDataRootDir
-            )
-        ) {
-            // A true return value means that we have enumerated through all of the country names and didn't find a match
-            throw std::invalid_argument(_countryName);
-        }
+                        return true;
+                    },
+                    optionalDataRootDir
+                )
+            ) {
+                // A true return value means that we have enumerated through all of the country names and didn't find a match
+                throw std::invalid_argument(_countryName);
+            }
 
-        JsonStream holidaysByCountry = GetJsonStream(GetDataDirectory(optionalDataRootDir) + filename);
+            JsonStream holidaysByCountry = GetJsonStream(GetDataDirectory(optionalDataRootDir) + filename);
 
-        //Convert Jsonstream to std::unordered_map
-        //Note that the map keys are generated with "Date" and "Holiday" so no need to check existence
-        std::vector<InputType> dateVector = holidaysByCountry.at("Date").get<std::vector<InputType>>();
-        std::vector<std::string> nameVector = holidaysByCountry.at("Holiday").get<std::vector<std::string>>();
+            //Convert Jsonstream to std::unordered_map
+            //Note that the map keys are generated with "Date" and "Holiday" so no need to check existence
+            std::vector<std::int64_t> dateVector = holidaysByCountry.at("Date").get<std::vector<std::int64_t>>();
+            std::vector<std::string> nameVector = holidaysByCountry.at("Holiday").get<std::vector<std::string>>();
+            HolidayMap                      holidays;
 
-        assert(dateVector.size() == nameVector.size());
-        for (unsigned long iter = 0; iter < dateVector.size(); ++iter) {
-            _dateHolidayMap[dateVector[iter]] = nameVector[iter];
-        }
-    }
+            assert(dateVector.size() == nameVector.size());
+            for (unsigned long iter = 0; iter < dateVector.size(); ++iter) {
+                holidays[dateVector[iter]] = nameVector[iter];
+            }
+
+            return holidays;
+        }()
+    ) {
+
+}
+
+bool DateTimeTransformer::operator==(DateTimeTransformer const &other) const {
+    return _dateHolidayMap == other._dateHolidayMap;
 }
 
 void DateTimeTransformer::save(Archive & ar) const /*override*/ {
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
+
+    // Data
     Traits<std::string>::serialize(ar, _countryName);
 }
 
@@ -351,19 +379,19 @@ void DateTimeTransformer::save(Archive & ar) const /*override*/ {
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 void DateTimeTransformer::execute_impl(InputType const &input, CallbackFunction const &callback) /*override*/ {
-    std::chrono::time_point<std::chrono::system_clock> time(std::chrono::seconds {input} );
-    TimePoint result = TimePoint(time);
+    static constexpr long long const        secondsPerDay(60 * 60 * 24);
+
+    TimePoint                               result(input);
 
     if (!_dateHolidayMap.empty()) {
-        //Normalize dateKey by cast one day range of time into an exact time
-        //86400 is the total number of seconds in a day, and as the holiday time is provided in a manner(00:00:00 in one
-        //day, so we need to consider any time that falls into this day.
-        InputType dateKey = (input - input % 86400);
+        // Values in the holiday map are based on midnight of the corresponding day. When looking up holidays for this time,
+        // remove any seconds since midnight.
+        long long const                     totalSeconds(std::chrono::time_point_cast<std::chrono::seconds>(input).time_since_epoch().count());
+        int64_t const                       holidayKey(static_cast<int64_t>((static_cast<double>(totalSeconds) / secondsPerDay)) * secondsPerDay);
+        HolidayMap::const_iterator const    iter(_dateHolidayMap.find(holidayKey));
 
-        auto x = _dateHolidayMap.find(dateKey);
-        if (x != _dateHolidayMap.end()) {
-            result.holidayName = x->second;
-        }
+        if(iter != _dateHolidayMap.end())
+            result.holidayName = iter->second;
     }
 
     callback(std::move(result));
@@ -437,10 +465,10 @@ void DateTimeEstimator::complete_training_impl(void) /*override*/ {
 }
 
 typename DateTimeEstimator::BaseType::TransformerUniquePtr DateTimeEstimator::create_transformer_impl(void) /*override*/ {
-    return std::make_unique<DateTimeTransformer>(
+    return typename BaseType::TransformerUniquePtr(new DateTimeTransformer(
         Country ? *Country : std::string(),
         DataRootDir ? *DataRootDir : std::string()
-    );
+    ));
 }
 
 } // namespace Featurizers

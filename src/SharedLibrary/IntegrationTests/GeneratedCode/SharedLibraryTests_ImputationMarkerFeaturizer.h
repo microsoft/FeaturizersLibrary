@@ -5,12 +5,16 @@
 #pragma once
 
 #include "SharedLibrary_ImputationMarkerFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
+
+#include "SharedLibrary_Common.hpp"
 
 /* ---------------------------------------------------------------------- */
-/* |  ImputationMarkerFeaturizer <int8_t> */
+/* |  ImputationMarkerFeaturizer <int8> */
 template <typename VectorInputT>
-void ImputationMarkerFeaturizer_int8_t_Test(
+void ImputationMarkerFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<bool> const &)> const &verify_func
@@ -18,9 +22,9 @@ void ImputationMarkerFeaturizer_int8_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    ImputationMarkerFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    ImputationMarkerFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_int8_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -29,35 +33,36 @@ void ImputationMarkerFeaturizer_int8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(ImputationMarkerFeaturizer_int8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_int8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(ImputationMarkerFeaturizer_int8_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(ImputationMarkerFeaturizer_int8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    ImputationMarkerFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    ImputationMarkerFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -65,20 +70,20 @@ void ImputationMarkerFeaturizer_int8_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(ImputationMarkerFeaturizer_int8_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    ImputationMarkerFeaturizer_int8_t_TransformerHandle * pTransformerHandle(nullptr);
+    ImputationMarkerFeaturizer_int8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_int8_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(ImputationMarkerFeaturizer_int8_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -89,10 +94,14 @@ void ImputationMarkerFeaturizer_int8_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_int8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int8_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -101,14 +110,14 @@ void ImputationMarkerFeaturizer_int8_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(ImputationMarkerFeaturizer_int8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  ImputationMarkerFeaturizer <int16_t> */
+/* |  ImputationMarkerFeaturizer <int16> */
 template <typename VectorInputT>
-void ImputationMarkerFeaturizer_int16_t_Test(
+void ImputationMarkerFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<bool> const &)> const &verify_func
@@ -116,9 +125,9 @@ void ImputationMarkerFeaturizer_int16_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    ImputationMarkerFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    ImputationMarkerFeaturizer_int16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_int16_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -127,35 +136,36 @@ void ImputationMarkerFeaturizer_int16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(ImputationMarkerFeaturizer_int16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_int16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(ImputationMarkerFeaturizer_int16_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(ImputationMarkerFeaturizer_int16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    ImputationMarkerFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    ImputationMarkerFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -163,20 +173,20 @@ void ImputationMarkerFeaturizer_int16_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(ImputationMarkerFeaturizer_int16_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    ImputationMarkerFeaturizer_int16_t_TransformerHandle * pTransformerHandle(nullptr);
+    ImputationMarkerFeaturizer_int16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_int16_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(ImputationMarkerFeaturizer_int16_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -187,10 +197,14 @@ void ImputationMarkerFeaturizer_int16_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_int16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int16_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -199,14 +213,14 @@ void ImputationMarkerFeaturizer_int16_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(ImputationMarkerFeaturizer_int16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  ImputationMarkerFeaturizer <int32_t> */
+/* |  ImputationMarkerFeaturizer <int32> */
 template <typename VectorInputT>
-void ImputationMarkerFeaturizer_int32_t_Test(
+void ImputationMarkerFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<bool> const &)> const &verify_func
@@ -214,9 +228,9 @@ void ImputationMarkerFeaturizer_int32_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    ImputationMarkerFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    ImputationMarkerFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_int32_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -225,35 +239,36 @@ void ImputationMarkerFeaturizer_int32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(ImputationMarkerFeaturizer_int32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_int32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(ImputationMarkerFeaturizer_int32_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(ImputationMarkerFeaturizer_int32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    ImputationMarkerFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    ImputationMarkerFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -261,20 +276,20 @@ void ImputationMarkerFeaturizer_int32_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(ImputationMarkerFeaturizer_int32_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    ImputationMarkerFeaturizer_int32_t_TransformerHandle * pTransformerHandle(nullptr);
+    ImputationMarkerFeaturizer_int32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_int32_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(ImputationMarkerFeaturizer_int32_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -285,10 +300,14 @@ void ImputationMarkerFeaturizer_int32_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_int32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int32_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -297,14 +316,14 @@ void ImputationMarkerFeaturizer_int32_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(ImputationMarkerFeaturizer_int32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  ImputationMarkerFeaturizer <int64_t> */
+/* |  ImputationMarkerFeaturizer <int64> */
 template <typename VectorInputT>
-void ImputationMarkerFeaturizer_int64_t_Test(
+void ImputationMarkerFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<bool> const &)> const &verify_func
@@ -312,9 +331,9 @@ void ImputationMarkerFeaturizer_int64_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    ImputationMarkerFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    ImputationMarkerFeaturizer_int64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_int64_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -323,35 +342,36 @@ void ImputationMarkerFeaturizer_int64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(ImputationMarkerFeaturizer_int64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_int64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(ImputationMarkerFeaturizer_int64_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(ImputationMarkerFeaturizer_int64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    ImputationMarkerFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    ImputationMarkerFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -359,20 +379,20 @@ void ImputationMarkerFeaturizer_int64_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(ImputationMarkerFeaturizer_int64_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    ImputationMarkerFeaturizer_int64_t_TransformerHandle * pTransformerHandle(nullptr);
+    ImputationMarkerFeaturizer_int64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_int64_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(ImputationMarkerFeaturizer_int64_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -383,10 +403,14 @@ void ImputationMarkerFeaturizer_int64_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_int64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::int64_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -395,14 +419,14 @@ void ImputationMarkerFeaturizer_int64_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(ImputationMarkerFeaturizer_int64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  ImputationMarkerFeaturizer <uint8_t> */
+/* |  ImputationMarkerFeaturizer <uint8> */
 template <typename VectorInputT>
-void ImputationMarkerFeaturizer_uint8_t_Test(
+void ImputationMarkerFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<bool> const &)> const &verify_func
@@ -410,9 +434,9 @@ void ImputationMarkerFeaturizer_uint8_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    ImputationMarkerFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    ImputationMarkerFeaturizer_uint8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_uint8_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -421,35 +445,36 @@ void ImputationMarkerFeaturizer_uint8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(ImputationMarkerFeaturizer_uint8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_uint8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(ImputationMarkerFeaturizer_uint8_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(ImputationMarkerFeaturizer_uint8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    ImputationMarkerFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    ImputationMarkerFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -457,20 +482,20 @@ void ImputationMarkerFeaturizer_uint8_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(ImputationMarkerFeaturizer_uint8_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    ImputationMarkerFeaturizer_uint8_t_TransformerHandle * pTransformerHandle(nullptr);
+    ImputationMarkerFeaturizer_uint8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_uint8_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(ImputationMarkerFeaturizer_uint8_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -481,10 +506,14 @@ void ImputationMarkerFeaturizer_uint8_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_uint8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -493,14 +522,14 @@ void ImputationMarkerFeaturizer_uint8_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(ImputationMarkerFeaturizer_uint8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  ImputationMarkerFeaturizer <uint16_t> */
+/* |  ImputationMarkerFeaturizer <uint16> */
 template <typename VectorInputT>
-void ImputationMarkerFeaturizer_uint16_t_Test(
+void ImputationMarkerFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<bool> const &)> const &verify_func
@@ -508,9 +537,9 @@ void ImputationMarkerFeaturizer_uint16_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    ImputationMarkerFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    ImputationMarkerFeaturizer_uint16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_uint16_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -519,35 +548,36 @@ void ImputationMarkerFeaturizer_uint16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(ImputationMarkerFeaturizer_uint16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_uint16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(ImputationMarkerFeaturizer_uint16_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(ImputationMarkerFeaturizer_uint16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    ImputationMarkerFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    ImputationMarkerFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -555,20 +585,20 @@ void ImputationMarkerFeaturizer_uint16_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(ImputationMarkerFeaturizer_uint16_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    ImputationMarkerFeaturizer_uint16_t_TransformerHandle * pTransformerHandle(nullptr);
+    ImputationMarkerFeaturizer_uint16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_uint16_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(ImputationMarkerFeaturizer_uint16_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -579,10 +609,14 @@ void ImputationMarkerFeaturizer_uint16_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_uint16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -591,14 +625,14 @@ void ImputationMarkerFeaturizer_uint16_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(ImputationMarkerFeaturizer_uint16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  ImputationMarkerFeaturizer <uint32_t> */
+/* |  ImputationMarkerFeaturizer <uint32> */
 template <typename VectorInputT>
-void ImputationMarkerFeaturizer_uint32_t_Test(
+void ImputationMarkerFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<bool> const &)> const &verify_func
@@ -606,9 +640,9 @@ void ImputationMarkerFeaturizer_uint32_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    ImputationMarkerFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    ImputationMarkerFeaturizer_uint32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_uint32_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -617,35 +651,36 @@ void ImputationMarkerFeaturizer_uint32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(ImputationMarkerFeaturizer_uint32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_uint32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(ImputationMarkerFeaturizer_uint32_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(ImputationMarkerFeaturizer_uint32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    ImputationMarkerFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    ImputationMarkerFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -653,20 +688,20 @@ void ImputationMarkerFeaturizer_uint32_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(ImputationMarkerFeaturizer_uint32_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    ImputationMarkerFeaturizer_uint32_t_TransformerHandle * pTransformerHandle(nullptr);
+    ImputationMarkerFeaturizer_uint32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_uint32_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(ImputationMarkerFeaturizer_uint32_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -677,10 +712,14 @@ void ImputationMarkerFeaturizer_uint32_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_uint32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -689,14 +728,14 @@ void ImputationMarkerFeaturizer_uint32_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(ImputationMarkerFeaturizer_uint32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  ImputationMarkerFeaturizer <uint64_t> */
+/* |  ImputationMarkerFeaturizer <uint64> */
 template <typename VectorInputT>
-void ImputationMarkerFeaturizer_uint64_t_Test(
+void ImputationMarkerFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<bool> const &)> const &verify_func
@@ -704,9 +743,9 @@ void ImputationMarkerFeaturizer_uint64_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    ImputationMarkerFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    ImputationMarkerFeaturizer_uint64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_uint64_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -715,35 +754,36 @@ void ImputationMarkerFeaturizer_uint64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(ImputationMarkerFeaturizer_uint64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_uint64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(ImputationMarkerFeaturizer_uint64_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(ImputationMarkerFeaturizer_uint64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    ImputationMarkerFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    ImputationMarkerFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -751,20 +791,20 @@ void ImputationMarkerFeaturizer_uint64_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(ImputationMarkerFeaturizer_uint64_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    ImputationMarkerFeaturizer_uint64_t_TransformerHandle * pTransformerHandle(nullptr);
+    ImputationMarkerFeaturizer_uint64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_uint64_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(ImputationMarkerFeaturizer_uint64_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -775,10 +815,14 @@ void ImputationMarkerFeaturizer_uint64_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_uint64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -787,14 +831,14 @@ void ImputationMarkerFeaturizer_uint64_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(ImputationMarkerFeaturizer_uint64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  ImputationMarkerFeaturizer <float_t> */
+/* |  ImputationMarkerFeaturizer <float> */
 template <typename VectorInputT>
-void ImputationMarkerFeaturizer_float_t_Test(
+void ImputationMarkerFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<bool> const &)> const &verify_func
@@ -802,9 +846,9 @@ void ImputationMarkerFeaturizer_float_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    ImputationMarkerFeaturizer_float_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    ImputationMarkerFeaturizer_float_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_float_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_float_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -813,35 +857,36 @@ void ImputationMarkerFeaturizer_float_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(ImputationMarkerFeaturizer_float_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_float_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(ImputationMarkerFeaturizer_float_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::float_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::float_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(ImputationMarkerFeaturizer_float_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    ImputationMarkerFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    ImputationMarkerFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -849,20 +894,20 @@ void ImputationMarkerFeaturizer_float_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(ImputationMarkerFeaturizer_float_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_float_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    ImputationMarkerFeaturizer_float_t_TransformerHandle * pTransformerHandle(nullptr);
+    ImputationMarkerFeaturizer_float_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_float_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_float_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(ImputationMarkerFeaturizer_float_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_float_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -873,10 +918,14 @@ void ImputationMarkerFeaturizer_float_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_float_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_float_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::float_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::float_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -885,14 +934,14 @@ void ImputationMarkerFeaturizer_float_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(ImputationMarkerFeaturizer_float_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  ImputationMarkerFeaturizer <double_t> */
+/* |  ImputationMarkerFeaturizer <double> */
 template <typename VectorInputT>
-void ImputationMarkerFeaturizer_double_t_Test(
+void ImputationMarkerFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<bool> const &)> const &verify_func
@@ -900,9 +949,9 @@ void ImputationMarkerFeaturizer_double_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    ImputationMarkerFeaturizer_double_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    ImputationMarkerFeaturizer_double_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_double_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_double_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -911,35 +960,36 @@ void ImputationMarkerFeaturizer_double_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(ImputationMarkerFeaturizer_double_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(ImputationMarkerFeaturizer_double_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(ImputationMarkerFeaturizer_double_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::double_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::double_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(ImputationMarkerFeaturizer_double_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    ImputationMarkerFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    ImputationMarkerFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -947,20 +997,20 @@ void ImputationMarkerFeaturizer_double_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(ImputationMarkerFeaturizer_double_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_double_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    ImputationMarkerFeaturizer_double_t_TransformerHandle * pTransformerHandle(nullptr);
+    ImputationMarkerFeaturizer_double_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(ImputationMarkerFeaturizer_double_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_double_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(ImputationMarkerFeaturizer_double_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_double_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -971,10 +1021,14 @@ void ImputationMarkerFeaturizer_double_t_Test(
     for(auto const & input : inference_input) {
         bool result;
 
-        REQUIRE(ImputationMarkerFeaturizer_double_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_double_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::double_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<std::double_t>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -983,7 +1037,7 @@ void ImputationMarkerFeaturizer_double_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(ImputationMarkerFeaturizer_double_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(ImputationMarkerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
@@ -1009,31 +1063,32 @@ void ImputationMarkerFeaturizer_bool_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(ImputationMarkerFeaturizer_bool_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(ImputationMarkerFeaturizer_bool_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<bool>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<bool>::GetNullableValue(input), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(ImputationMarkerFeaturizer_bool_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1072,7 +1127,11 @@ void ImputationMarkerFeaturizer_bool_Test(
         REQUIRE(ImputationMarkerFeaturizer_bool_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<bool>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<bool>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -1107,31 +1166,32 @@ void ImputationMarkerFeaturizer_string_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(ImputationMarkerFeaturizer_string_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(ImputationMarkerFeaturizer_string_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::string>::IsNull(input) ? nullptr : input->c_str(), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(ImputationMarkerFeaturizer_string_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1170,7 +1230,11 @@ void ImputationMarkerFeaturizer_string_Test(
         REQUIRE(ImputationMarkerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::string>::IsNull(input) ? nullptr : input->c_str(), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 

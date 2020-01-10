@@ -138,7 +138,7 @@ private:
 
         IndexMapAnnotationData const &      data(IndexMapEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::IndexMapEstimatorName));
 
-        return std::make_unique<LabelEncoderTransformer<InputT>>(data.Value, _allowMissingValues);
+        return typename BaseType::TransformerUniquePtr(new LabelEncoderTransformer<InputT>(data.Value, _allowMissingValues));
     }
 };
 
@@ -209,13 +209,32 @@ LabelEncoderTransformer<InputT>::LabelEncoderTransformer(IndexMap map, bool allo
 
 template <typename InputT>
 LabelEncoderTransformer<InputT>::LabelEncoderTransformer(Archive &ar) :
-    // TODO: Labels(Traits<decltype(Labels)>::deserialize(ar)),
-    AllowMissingValues(Traits<decltype(AllowMissingValues)>::deserialize(ar)) {
+    LabelEncoderTransformer(
+        [&ar](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
+
+            // Data
+            IndexMap                        map(Traits<IndexMap>::deserialize(ar));
+            bool                            allowMissingValues(Traits<bool>::deserialize(ar));
+
+            return LabelEncoderTransformer(std::move(map), std::move(allowMissingValues));
+        }()
+    ) {
 }
 
 template <typename InputT>
 void LabelEncoderTransformer<InputT>::save(Archive &ar) const /*override*/ {
-    // TODO: Traits<decltype(Labels)>::serialize(ar, Labels);
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
+
+    // Data
+    Traits<decltype(Labels)>::serialize(ar, Labels);
     Traits<decltype(AllowMissingValues)>::serialize(ar, AllowMissingValues);
 }
 

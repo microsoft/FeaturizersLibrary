@@ -130,15 +130,18 @@ class _StructTypeInfoFactory(TypeInfoFactory):
 @Interface.staticderived
 class TimePointTypeInfoFactory(_StructTypeInfoFactory):
     TypeName                                = Interface.DerivedProperty("TimePoint")
+    CppType                                 = Interface.DerivedProperty("TimePoint")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class OneHotStructTypeInfoFactory(_StructTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("OneHotStruct")
+class HashOneHotEncodingTypeInfoFactory(_StructTypeInfoFactory):
+    TypeName                                = Interface.DerivedProperty("HashOneHotEncoding")
+    CppType                                 = Interface.DerivedProperty("HashOneHotEncoding")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class HashOneHotVectorizerStructTypeInfoFactory(_StructTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("HashOneHotVectorizerStruct")
+class OneHotEncodingTypeInfoFactory(_StructTypeInfoFactory):
+    TypeName                                = Interface.DerivedProperty("OneHotEncoding")
+    CppType                                 = Interface.DerivedProperty("OneHotEncoding")

@@ -5,23 +5,27 @@
 #pragma once
 
 #include "SharedLibrary_HashOneHotVectorizerFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
+
+#include "SharedLibrary_Common.hpp"
 
 /* ---------------------------------------------------------------------- */
-/* |  HashOneHotVectorizerFeaturizer <int8_t> */
+/* |  HashOneHotVectorizerFeaturizer <int8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void HashOneHotVectorizerFeaturizer_int8_t_Test(
+void HashOneHotVectorizerFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    HashOneHotVectorizerFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_int8_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int8_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -30,35 +34,36 @@ void HashOneHotVectorizerFeaturizer_int8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(HashOneHotVectorizerFeaturizer_int8_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(HashOneHotVectorizerFeaturizer_int8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(HashOneHotVectorizerFeaturizer_int8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(HashOneHotVectorizerFeaturizer_int8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    HashOneHotVectorizerFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    HashOneHotVectorizerFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -66,64 +71,68 @@ void HashOneHotVectorizerFeaturizer_int8_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int8_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    HashOneHotVectorizerFeaturizer_int8_t_TransformerHandle * pTransformerHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_int8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_int8_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(HashOneHotVectorizerFeaturizer_int8_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
     for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_int8_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int8_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     // Destroy the transformer
-    REQUIRE(HashOneHotVectorizerFeaturizer_int8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  HashOneHotVectorizerFeaturizer <int16_t> */
+/* |  HashOneHotVectorizerFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void HashOneHotVectorizerFeaturizer_int16_t_Test(
+void HashOneHotVectorizerFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    HashOneHotVectorizerFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_int16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_int16_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int16_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -132,35 +141,36 @@ void HashOneHotVectorizerFeaturizer_int16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(HashOneHotVectorizerFeaturizer_int16_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(HashOneHotVectorizerFeaturizer_int16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(HashOneHotVectorizerFeaturizer_int16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(HashOneHotVectorizerFeaturizer_int16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    HashOneHotVectorizerFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    HashOneHotVectorizerFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -168,64 +178,68 @@ void HashOneHotVectorizerFeaturizer_int16_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int16_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    HashOneHotVectorizerFeaturizer_int16_t_TransformerHandle * pTransformerHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_int16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_int16_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(HashOneHotVectorizerFeaturizer_int16_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
     for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_int16_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int16_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     // Destroy the transformer
-    REQUIRE(HashOneHotVectorizerFeaturizer_int16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  HashOneHotVectorizerFeaturizer <int32_t> */
+/* |  HashOneHotVectorizerFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void HashOneHotVectorizerFeaturizer_int32_t_Test(
+void HashOneHotVectorizerFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    HashOneHotVectorizerFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_int32_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int32_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -234,35 +248,36 @@ void HashOneHotVectorizerFeaturizer_int32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(HashOneHotVectorizerFeaturizer_int32_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(HashOneHotVectorizerFeaturizer_int32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(HashOneHotVectorizerFeaturizer_int32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(HashOneHotVectorizerFeaturizer_int32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    HashOneHotVectorizerFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    HashOneHotVectorizerFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -270,64 +285,68 @@ void HashOneHotVectorizerFeaturizer_int32_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int32_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    HashOneHotVectorizerFeaturizer_int32_t_TransformerHandle * pTransformerHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_int32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_int32_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(HashOneHotVectorizerFeaturizer_int32_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
     for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_int32_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int32_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     // Destroy the transformer
-    REQUIRE(HashOneHotVectorizerFeaturizer_int32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  HashOneHotVectorizerFeaturizer <int64_t> */
+/* |  HashOneHotVectorizerFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void HashOneHotVectorizerFeaturizer_int64_t_Test(
+void HashOneHotVectorizerFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    HashOneHotVectorizerFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_int64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_int64_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int64_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -336,35 +355,36 @@ void HashOneHotVectorizerFeaturizer_int64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(HashOneHotVectorizerFeaturizer_int64_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(HashOneHotVectorizerFeaturizer_int64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(HashOneHotVectorizerFeaturizer_int64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(HashOneHotVectorizerFeaturizer_int64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    HashOneHotVectorizerFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    HashOneHotVectorizerFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -372,64 +392,68 @@ void HashOneHotVectorizerFeaturizer_int64_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int64_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    HashOneHotVectorizerFeaturizer_int64_t_TransformerHandle * pTransformerHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_int64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_int64_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(HashOneHotVectorizerFeaturizer_int64_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
     for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_int64_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int64_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     // Destroy the transformer
-    REQUIRE(HashOneHotVectorizerFeaturizer_int64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  HashOneHotVectorizerFeaturizer <uint8_t> */
+/* |  HashOneHotVectorizerFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void HashOneHotVectorizerFeaturizer_uint8_t_Test(
+void HashOneHotVectorizerFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    HashOneHotVectorizerFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_uint8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint8_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint8_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -438,35 +462,36 @@ void HashOneHotVectorizerFeaturizer_uint8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(HashOneHotVectorizerFeaturizer_uint8_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(HashOneHotVectorizerFeaturizer_uint8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(HashOneHotVectorizerFeaturizer_uint8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(HashOneHotVectorizerFeaturizer_uint8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    HashOneHotVectorizerFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    HashOneHotVectorizerFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -474,64 +499,68 @@ void HashOneHotVectorizerFeaturizer_uint8_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint8_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    HashOneHotVectorizerFeaturizer_uint8_t_TransformerHandle * pTransformerHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_uint8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint8_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint8_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint8_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
     for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint8_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint8_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     // Destroy the transformer
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  HashOneHotVectorizerFeaturizer <uint16_t> */
+/* |  HashOneHotVectorizerFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void HashOneHotVectorizerFeaturizer_uint16_t_Test(
+void HashOneHotVectorizerFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    HashOneHotVectorizerFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_uint16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint16_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint16_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -540,35 +569,36 @@ void HashOneHotVectorizerFeaturizer_uint16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(HashOneHotVectorizerFeaturizer_uint16_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(HashOneHotVectorizerFeaturizer_uint16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(HashOneHotVectorizerFeaturizer_uint16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(HashOneHotVectorizerFeaturizer_uint16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    HashOneHotVectorizerFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    HashOneHotVectorizerFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -576,64 +606,68 @@ void HashOneHotVectorizerFeaturizer_uint16_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint16_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    HashOneHotVectorizerFeaturizer_uint16_t_TransformerHandle * pTransformerHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_uint16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint16_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint16_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint16_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
     for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint16_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint16_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     // Destroy the transformer
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  HashOneHotVectorizerFeaturizer <uint32_t> */
+/* |  HashOneHotVectorizerFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void HashOneHotVectorizerFeaturizer_uint32_t_Test(
+void HashOneHotVectorizerFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    HashOneHotVectorizerFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_uint32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint32_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint32_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -642,35 +676,36 @@ void HashOneHotVectorizerFeaturizer_uint32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(HashOneHotVectorizerFeaturizer_uint32_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(HashOneHotVectorizerFeaturizer_uint32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(HashOneHotVectorizerFeaturizer_uint32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(HashOneHotVectorizerFeaturizer_uint32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    HashOneHotVectorizerFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    HashOneHotVectorizerFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -678,64 +713,68 @@ void HashOneHotVectorizerFeaturizer_uint32_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint32_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    HashOneHotVectorizerFeaturizer_uint32_t_TransformerHandle * pTransformerHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_uint32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint32_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint32_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint32_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
     for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint32_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint32_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     // Destroy the transformer
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  HashOneHotVectorizerFeaturizer <uint64_t> */
+/* |  HashOneHotVectorizerFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void HashOneHotVectorizerFeaturizer_uint64_t_Test(
+void HashOneHotVectorizerFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    HashOneHotVectorizerFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_uint64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint64_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint64_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -744,35 +783,36 @@ void HashOneHotVectorizerFeaturizer_uint64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(HashOneHotVectorizerFeaturizer_uint64_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(HashOneHotVectorizerFeaturizer_uint64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(HashOneHotVectorizerFeaturizer_uint64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(HashOneHotVectorizerFeaturizer_uint64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    HashOneHotVectorizerFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    HashOneHotVectorizerFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -780,64 +820,68 @@ void HashOneHotVectorizerFeaturizer_uint64_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint64_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    HashOneHotVectorizerFeaturizer_uint64_t_TransformerHandle * pTransformerHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_uint64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint64_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint64_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint64_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
     for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint64_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint64_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     // Destroy the transformer
-    REQUIRE(HashOneHotVectorizerFeaturizer_uint64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  HashOneHotVectorizerFeaturizer <float_t> */
+/* |  HashOneHotVectorizerFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void HashOneHotVectorizerFeaturizer_float_t_Test(
+void HashOneHotVectorizerFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    HashOneHotVectorizerFeaturizer_float_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_float_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_float_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_float_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -846,35 +890,36 @@ void HashOneHotVectorizerFeaturizer_float_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(HashOneHotVectorizerFeaturizer_float_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(HashOneHotVectorizerFeaturizer_float_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(HashOneHotVectorizerFeaturizer_float_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(HashOneHotVectorizerFeaturizer_float_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    HashOneHotVectorizerFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    HashOneHotVectorizerFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -882,64 +927,68 @@ void HashOneHotVectorizerFeaturizer_float_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_float_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_float_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    HashOneHotVectorizerFeaturizer_float_t_TransformerHandle * pTransformerHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_float_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_float_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_float_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(HashOneHotVectorizerFeaturizer_float_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_float_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_float_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
     for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_float_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_float_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     // Destroy the transformer
-    REQUIRE(HashOneHotVectorizerFeaturizer_float_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  HashOneHotVectorizerFeaturizer <double_t> */
+/* |  HashOneHotVectorizerFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
-void HashOneHotVectorizerFeaturizer_double_t_Test(
+void HashOneHotVectorizerFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    HashOneHotVectorizerFeaturizer_double_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_double_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_double_t_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_double_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -948,35 +997,36 @@ void HashOneHotVectorizerFeaturizer_double_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(HashOneHotVectorizerFeaturizer_double_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(HashOneHotVectorizerFeaturizer_double_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(HashOneHotVectorizerFeaturizer_double_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(HashOneHotVectorizerFeaturizer_double_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    HashOneHotVectorizerFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    HashOneHotVectorizerFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -984,46 +1034,50 @@ void HashOneHotVectorizerFeaturizer_double_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_double_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_double_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    HashOneHotVectorizerFeaturizer_double_t_TransformerHandle * pTransformerHandle(nullptr);
+    HashOneHotVectorizerFeaturizer_double_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(HashOneHotVectorizerFeaturizer_double_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_double_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(HashOneHotVectorizerFeaturizer_double_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_double_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_double_t_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
     for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_double_t_DestroyTransformedData(&result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_double_DestroyTransformedData(&result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     // Destroy the transformer
-    REQUIRE(HashOneHotVectorizerFeaturizer_double_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(HashOneHotVectorizerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
@@ -1033,7 +1087,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_bool_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -1050,31 +1104,32 @@ void HashOneHotVectorizerFeaturizer_bool_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(HashOneHotVectorizerFeaturizer_bool_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(HashOneHotVectorizerFeaturizer_bool_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(HashOneHotVectorizerFeaturizer_bool_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1103,17 +1158,21 @@ void HashOneHotVectorizerFeaturizer_bool_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_bool_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 
@@ -1135,7 +1194,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_string_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotVectorizerStruct> const &)> const &verify_func,
+    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -1152,31 +1211,32 @@ void HashOneHotVectorizerFeaturizer_string_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(HashOneHotVectorizerFeaturizer_string_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(HashOneHotVectorizerFeaturizer_string_Fit(pEstimatorHandle, input.c_str(), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(HashOneHotVectorizerFeaturizer_string_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1205,17 +1265,21 @@ void HashOneHotVectorizerFeaturizer_string_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotVectorizerStruct> results;
+    std::vector<HashOneHotEncoding> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotVectorizerStruct result;
+        HashOneHotEncoding result;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(result);
+        #else
         results.emplace_back(result);
+        #endif
         // No inline destroy statement
     }
 

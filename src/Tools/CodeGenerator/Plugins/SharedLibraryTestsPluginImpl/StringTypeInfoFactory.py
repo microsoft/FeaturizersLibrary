@@ -25,7 +25,8 @@ class StringTypeInfoFactory(TypeInfoFactory):
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
-    TypeName                                = Interface.DerivedProperty("std::string")
+    TypeName                                = Interface.DerivedProperty("string")
+    CppType                                 = Interface.DerivedProperty("std::string")
 
     # ----------------------------------------------------------------------
     # |
@@ -64,7 +65,17 @@ class StringTypeInfoFactory(TypeInfoFactory):
             "&{result_name}_ptr, &{result_name}_items".format(
                 result_name=result_name,
             ),
-            "results.emplace_back(std::string({}_ptr));".format(result_name),
+            textwrap.dedent(
+                """\
+                #if (defined __apple_build_version__)
+                results.push_back(std::string({result}_ptr));
+                #else
+                results.emplace_back(std::string({result}_ptr));
+                #endif
+                """,
+            ).format(
+                result=result_name,
+            ),
             "{result_name}_ptr, {result_name}_items".format(
                 result_name=result_name,
             ),

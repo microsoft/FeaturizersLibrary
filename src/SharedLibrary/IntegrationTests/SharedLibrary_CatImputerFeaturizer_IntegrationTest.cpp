@@ -9,7 +9,7 @@
 #include "../../3rdParty/optional.h"
 
 TEST_CASE("int8") {
-    CatImputerFeaturizer_int8_t_Test(
+    CatImputerFeaturizer_int8_Test(
         std::vector<nonstd::optional<std::int8_t>>{
             static_cast<std::int8_t>(1),
             static_cast<std::int8_t>(2),
@@ -55,4 +55,3 @@ TEST_CASE("string") {
         }
     );
 }
-

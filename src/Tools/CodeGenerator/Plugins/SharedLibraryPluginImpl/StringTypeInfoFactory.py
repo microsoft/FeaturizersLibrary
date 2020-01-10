@@ -25,7 +25,8 @@ class StringTypeInfoFactory(TypeInfoFactory):
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
-    TypeName                                = Interface.DerivedProperty("std::string")
+    TypeName                                = Interface.DerivedProperty("string")
+    CppType                                 = Interface.DerivedProperty("std::string")
 
     # ----------------------------------------------------------------------
     # |
@@ -69,7 +70,11 @@ class StringTypeInfoFactory(TypeInfoFactory):
                 char const * const * const {name}_end({name}_ptr + {name}_items);
 
                 while({name}_ptr != {name}_end) {{
+                #if (defined __apple_build_version__)
+                    {name}_buffer.push_back(*{name}_ptr ? *{name}_ptr : nonstd::optional<std::string>());
+                #else
                     {name}_buffer.emplace_back(*{name}_ptr ? *{name}_ptr : nonstd::optional<std::string>());
+                #endif
                     ++{name}_ptr;
                 }}
                 """,
@@ -87,7 +92,11 @@ class StringTypeInfoFactory(TypeInfoFactory):
                 char const * const * const {name}_end({name}_ptr + {name}_items);
 
                 while({name}_ptr != {name}_end) {{
+                #if (defined __apple_build_version__)
+                    {name}_buffer.push_back(*{name}_ptr);
+                #else
                     {name}_buffer.emplace_back(*{name}_ptr);
+                #endif
                     ++{name}_ptr;
                 }}
                 """,
@@ -100,7 +109,7 @@ class StringTypeInfoFactory(TypeInfoFactory):
                 "/*in*/ char const * const * {name}_ptr".format(
                     name=arg_name,
                 ),
-                "std::size_t {name}_items".format(
+                "/*in*/ std::size_t {name}_items".format(
                     name=arg_name,
                 ),
             ],
