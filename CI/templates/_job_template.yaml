@@ -34,7 +34,7 @@ jobs:
                 - checkout: self
                   clean: false  # if true, run `execute git clean -ffdx && git reset --hard HEAD` before fetching
                   submodules: recursive
-                ${{ parameters.steps }}
+                - ${{ parameters.steps }}
 
         - ${{ if eq(parameters.operating_system, 'Linux') }}:
             - ${{ if eq(parameters.agent_pool_container, '') }}:
@@ -62,7 +62,7 @@ jobs:
                     - checkout: self
                       clean: false  # if true, run `execute git clean -ffdx && git reset --hard HEAD` before fetching
                       submodules: recursive
-                    ${{ parameters.steps }}
+                    - ${{ parameters.steps }}
                 
 
             - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
@@ -92,7 +92,7 @@ jobs:
                     - checkout: self
                       clean: false  # if true, run `execute git clean -ffdx && git reset --hard HEAD` before fetching
                       submodules: recursive
-                    ${{ parameters.steps }}
+                    - ${{ parameters.steps }}
                    
     - ${{ if not(eq(parameters.agent_pool_is_custom, 'true')) }}:
         - ${{ if eq(parameters.agent_pool_container, '') }}:
@@ -111,7 +111,7 @@ jobs:
                 - checkout: self
                   clean: false  # if true, run `execute git clean -ffdx && git reset --hard HEAD` before fetching
                   submodules: recursive
-                ${{ parameters.steps }}
+                - ${{ parameters.steps }}
 
         - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
             - job: ${{ parameters.job_name }}
