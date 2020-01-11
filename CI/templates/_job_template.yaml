@@ -36,7 +36,7 @@ jobs:
 
               steps:
                 - ${{ if not(eq(parameters.custom_checkout, 'none')) }}:
-                  - ${{ parameters.custom_checkout }}
+                    - ${{ parameters.custom_checkout }}
                 - ${{ parameters.steps }}
 
         - ${{ if eq(parameters.operating_system, 'Linux') }}:
@@ -63,7 +63,7 @@ jobs:
 
                   steps:
                     - ${{ if not(eq(parameters.custom_checkout, 'none')) }}:
-                      - ${{ parameters.custom_checkout }}
+                        - ${{ parameters.custom_checkout }}
                     - ${{ parameters.steps }}
 
             - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
@@ -91,7 +91,7 @@ jobs:
 
                   steps:
                     - ${{ if not(eq(parameters.custom_checkout, 'none')) }}:
-                      - ${{ parameters.custom_checkout }}
+                        - ${{ parameters.custom_checkout }}
                     - ${{ parameters.steps }}
 
     - ${{ if not(eq(parameters.agent_pool_is_custom, 'true')) }}:
@@ -109,7 +109,7 @@ jobs:
 
               steps:
                 - ${{ if not(eq(parameters.custom_checkout, 'none')) }}:
-                  - ${{ parameters.custom_checkout }}
+                    - ${{ parameters.custom_checkout }}
                 - ${{ parameters.steps }}
 
         - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
@@ -128,5 +128,5 @@ jobs:
 
               steps:
                 - ${{ if not(eq(parameters.custom_checkout, 'none')) }}:
-                  - ${{ parameters.custom_checkout }}
+                    - ${{ parameters.custom_checkout }}
                 - ${{ parameters.steps }}
