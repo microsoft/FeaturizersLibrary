@@ -35,7 +35,8 @@ jobs:
                 clean: All
 
               steps:
-                - ${{ parameters.custom_checkout }}
+                - ${{ if not(eq(parameters.custom_checkout, 'none')) }}:
+                  - ${{ parameters.custom_checkout }}
                 - ${{ parameters.steps }}
 
         - ${{ if eq(parameters.operating_system, 'Linux') }}:
@@ -61,7 +62,8 @@ jobs:
                   #   clean: All
 
                   steps:
-                    - ${{ parameters.custom_checkout }}
+                    - ${{ if not(eq(parameters.custom_checkout, 'none')) }}:
+                      - ${{ parameters.custom_checkout }}
                     - ${{ parameters.steps }}
 
             - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
@@ -88,7 +90,8 @@ jobs:
                   #   clean: All
 
                   steps:
-                    - ${{ parameters.custom_checkout }}
+                    - ${{ if not(eq(parameters.custom_checkout, 'none')) }}:
+                      - ${{ parameters.custom_checkout }}
                     - ${{ parameters.steps }}
 
     - ${{ if not(eq(parameters.agent_pool_is_custom, 'true')) }}:
@@ -105,7 +108,8 @@ jobs:
                 clean: All
 
               steps:
-                - ${{ parameters.custom_checkout }}
+                - ${{ if not(eq(parameters.custom_checkout, 'none')) }}:
+                  - ${{ parameters.custom_checkout }}
                 - ${{ parameters.steps }}
 
         - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
@@ -123,5 +127,6 @@ jobs:
                 clean: All
 
               steps:
-                - ${{ parameters.custom_checkout }}
+                - ${{ if not(eq(parameters.custom_checkout, 'none')) }}:
+                  - ${{ parameters.custom_checkout }}
                 - ${{ parameters.steps }}
