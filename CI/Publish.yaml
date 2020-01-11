@@ -22,7 +22,7 @@ stages:
           job_name: AuzreUpload_Job
           job_display_name: "Azure Upload"
           operating_system: Windows
-          custom_checkout: 
+          custom_checkout: none
           steps:
             - template: "Publish.azureupload_steps_template.yaml"
               parameters:
@@ -39,7 +39,7 @@ stages:
           job_name: NuGet_Job
           job_display_name: "NuGet Packages"
           operating_system: Windows
-          custom_checkout: 
+          custom_checkout: none
           steps:
             - template: "Publish.nuget_steps_template.yaml"
               parameters:
@@ -60,7 +60,7 @@ stages:
           job_name: GitTag_Job
           job_display_name: "Tag Git Sources (for release builds)"
           operating_system: Windows
-          custom_checkout: 
+          custom_checkout: none
           steps:
             - template: "Publish.tagsources_steps_template.yaml"
               parameters:
