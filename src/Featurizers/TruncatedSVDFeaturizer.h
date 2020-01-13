@@ -472,17 +472,17 @@ SVDComponentsAnnotationData<TransformedT> ComponentsDetails::SVDTrainingOnlyPoli
 
     Eigen::Index rank = (_matrix.rows() < _matrix.cols()) ? _matrix.rows() : _matrix.cols();
 
-    // Gaussian Random Matrix for A^T
+    // Gaussian Random Matrix for _matrix^T
 	DenseMatrix O(_matrix.rows(), rank);
 	sample_gaussian(O);
 			
-	// Compute Sample Matrix of A^T
-	DenseMatrix Y = _matrix.transpose() * O;
+	// Compute Sample Matrix of _matrix^T
+	DenseMatrix Y = _matrix.transpose() * std::move(O);
 			
 	// Orthonormalize Y
 	gram_schmidt(Y);
 			
-	// Range(B) = Range(A^T)
+	// Range(B) = Range(_matrix^T)
 	DenseMatrix B = _matrix * Y;
 			
 	// Gaussian Random Matrix
@@ -496,14 +496,14 @@ SVDComponentsAnnotationData<TransformedT> ComponentsDetails::SVDTrainingOnlyPoli
 	gram_schmidt(Z);
 			
     // Range(C) = Range(B)
-	DenseMatrix C = Z.transpose() * B; 
+	DenseMatrix C = Z.transpose() * std::move(B); 
 			
-	Eigen::JacobiSVD<DenseMatrix> svdOfC(C, Eigen::ComputeThinU | Eigen::ComputeThinV);
+	Eigen::JacobiSVD<DenseMatrix> svdOfC(C, Eigen::ComputeThinV);
 			
 	// C = USV^T
 	// A = Z * U * S * V^T * Y^T()
 	_singularvalues = svdOfC.singularValues();
-	_singularvectors = Y * svdOfC.matrixV();
+	_singularvectors = std::move(Y) * svdOfC.matrixV();
 
     return SVDComponentsAnnotationData<TransformedT>(std::move(_singularvalues), std::move(_singularvectors));
 }
@@ -565,6 +565,12 @@ void SVDTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ 
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
 void SVDTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
+    if (input.rows() == 0)
+        throw std::invalid_argument("Input matrix rows() invalid");
+    
+    if (input.cols() != _singularvectors.rows()) 
+        throw std::invalid_argument("Input matrix cols() invalid");
+
     callback(std::move(input * _singularvectors));
 }
 
