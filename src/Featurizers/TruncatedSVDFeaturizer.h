@@ -25,8 +25,7 @@
 #   pragma warning(disable: 4127)
 #endif
 
-#include "../3rdParty/eigen/Eigen/Core"
-#include "../3rdParty/eigen/Eigen/Eigen"
+#include "../3rdParty/eigen/Eigen/Dense"
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
@@ -38,13 +37,13 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
-static constexpr char const * const         PCAComponentsEstimatorName("PCAComponentsEstimator");
+static constexpr char const * const         SVDComponentsEstimatorName("SVDComponentsEstimator");
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MatrixDecompositionAnnotationData
-///  \brief         Contains PCA components: Eigenvalues and Eigenvectors
+///  \class         SVDComponentsAnnotationData
+///  \brief         Contains SVD components: Eigenvalues and Eigenvectors
 template <typename T>
-class PCAComponentsAnnotationData {
+class SVDComponentsAnnotationData {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -52,28 +51,131 @@ public:
     // |
     // ----------------------------------------------------------------------
 
-    T const                                          Eigenvalues;
-    T const                                          Eigenvectors;
+    T const                                          SingularValues;
+    T const                                          SingularVectors;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    PCAComponentsAnnotationData(T eigenvalues, T eigenvectors);
-    ~PCAComponentsAnnotationData(void) = default;
+    SVDComponentsAnnotationData(T singularvalues, T singularvectors);
+    ~SVDComponentsAnnotationData(void) = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(PCAComponentsAnnotationData);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SVDComponentsAnnotationData);
 };
 
 namespace ComponentsDetails {
 
+namespace {
+//the following functions in anonymous space are introduced from RedSVD
+//Copyright attached
+/* 
+ * A header-only version of RedSVD
+ * 
+ * Copyright (c) 2014 Nicolas Tessore
+ * 
+ * based on RedSVD
+ * 
+ * Copyright (c) 2010 Daisuke Okanohara
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 
+ * 1. Redistributions of source code must retain the above Copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above Copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the authors nor the names of its contributors
+ *    may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ */
+template<typename Scalar>
+inline void sample_gaussian(Scalar& x, Scalar& y)
+{
+	using std::sqrt;
+	using std::log;
+	using std::cos;
+	using std::sin;
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#endif
+		
+	const Scalar PI(3.1415926535897932384626433832795028841971693993751f);
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+		
+	Scalar v1 = static_cast<Scalar>(std::rand() + static_cast<Scalar>(1)) / (static_cast<Scalar>(RAND_MAX+static_cast<Scalar>(2)));
+	Scalar v2 = static_cast<Scalar>(std::rand() + static_cast<Scalar>(1)) / (static_cast<Scalar>(RAND_MAX+static_cast<Scalar>(2)));
+	Scalar len = sqrt(static_cast<Scalar>(-2) * log(v1));
+	x = len * cos(static_cast<Scalar>(2) * PI * v2);
+	y = len * sin(static_cast<Scalar>(2) * PI * v2);
+}
+	
+template<typename MatrixType>
+inline void sample_gaussian(MatrixType& mat) {
+
+	typedef typename MatrixType::Index Index;
+		
+	for(Index i = 0; i < mat.rows(); ++i)
+	{
+		for(Index j = 0; j+1 < mat.cols(); j += 2)
+			sample_gaussian(mat(i, j), mat(i, j+1));
+		if(mat.cols() % 2)
+			sample_gaussian(mat(i, mat.cols()-1), mat(i, mat.cols()-1));
+	}
+}
+	
+template<typename MatrixType>
+inline void gram_schmidt(MatrixType& mat) {
+	
+    typedef typename MatrixType::Scalar Scalar;
+	typedef typename MatrixType::Index Index;
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#endif
+		
+	static const Scalar EPS(1E-4f);
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+		
+	for(Index i = 0; i < mat.cols(); ++i) {
+		for(Index j = 0; j < i; ++j) {
+			Scalar r = mat.col(i).dot(mat.col(j));
+			mat.col(i) -= r * mat.col(j);
+		}
+			
+		Scalar norm = mat.col(i).norm();
+			
+		if(norm < EPS) {
+			for(Index k = i; k < mat.cols(); ++k)
+				mat.col(k).setZero();
+			return;
+		}
+		mat.col(i) /= norm;
+	}
+}
+
+} //anonymous namespace
+
 /////////////////////////////////////////////////////////////////////////
-///  \class         PCATrainingOnlyPolicy
-///  \brief         `PCAComponentsEstimator` implementation details.
+///  \class         SVDTrainingOnlyPolicy
+///  \brief         `SVDComponentsEstimator` implementation details.
 ///
 template <typename InputT, typename TransformedT>
-class PCATrainingOnlyPolicy {
+class SVDTrainingOnlyPolicy {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -86,7 +188,7 @@ public:
     // |  Public Data
     // |
     // ----------------------------------------------------------------------
-    static constexpr char const * const    NameValue = PCAComponentsEstimatorName;
+    static constexpr char const * const    NameValue = SVDComponentsEstimatorName;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -94,7 +196,7 @@ public:
     // ----------------------------------------------------------------------
 
     void fit(InputType const &input);
-    PCAComponentsAnnotationData<TransformedT> complete_training(void);
+    SVDComponentsAnnotationData<TransformedT> complete_training(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -103,15 +205,15 @@ private:
     // |
     // ----------------------------------------------------------------------
     TransformedT                                     _matrix;
-    TransformedT                                     _eigenvalues;
-    TransformedT                                     _eigenvectors;
+    TransformedT                                     _singularvalues;
+    TransformedT                                     _singularvectors;
 };
 
 } // namespace ComponentsDetails
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         PCAComponentsEstimator
-///  \brief         This class generates PCAComponentsAnnotationData
+///  \class         SVDComponentsEstimator
+///  \brief         This class generates SVDComponentsAnnotationData
 ///                 by processing input matrix using Eigen
 ///
 template <
@@ -119,9 +221,9 @@ template <
     typename TransformedT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class PCAComponentsEstimator :
+class SVDComponentsEstimator :
     public Components::TrainingOnlyEstimatorImpl<
-        ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>,
+        ComponentsDetails::SVDTrainingOnlyPolicy<InputT, TransformedT>,
         MaxNumTrainingItemsV
     > {
 public:
@@ -132,7 +234,7 @@ public:
     // ----------------------------------------------------------------------
     using BaseType =
         Components::TrainingOnlyEstimatorImpl<
-            ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>,
+            ComponentsDetails::SVDTrainingOnlyPolicy<InputT, TransformedT>,
             MaxNumTrainingItemsV
         >;
 
@@ -141,24 +243,24 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    PCAComponentsEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
-    ~PCAComponentsEstimator(void) override = default;
+    SVDComponentsEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~SVDComponentsEstimator(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(PCAComponentsEstimator);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SVDComponentsEstimator);
 };
 
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         PCATransformer
-///  \brief         Contains PCAComponents and use PCAComponents to project
+///  \class         SVDTransformer
+///  \brief         Contains SVDComponents and use SVDComponents to project
 ///                 matrix for dimensionality reduction, also provides 
-///                 PCAComponents retriving
+///                 SVDComponents retriving
 ///
 template <
     typename InputT,
     typename TransformedT
 >
-class PCATransformer : public StandardTransformer<InputT, TransformedT> {
+class SVDTransformer : public StandardTransformer<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -172,14 +274,14 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    PCATransformer(TransformedT eigenvalues, TransformedT eigenvectors);
-    PCATransformer(Archive &ar);
+    SVDTransformer(TransformedT singularvalues, TransformedT singularvectors);
+    SVDTransformer(Archive &ar);
 
-    ~PCATransformer(void) override = default;
+    ~SVDTransformer(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(PCATransformer);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SVDTransformer);
 
-    bool operator==(PCATransformer const &other) const;
+    bool operator==(SVDTransformer const &other) const;
 
     void save(Archive &ar) const override;
 
@@ -189,8 +291,8 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    TransformedT const                               _eigenvalues;
-    TransformedT const                               _eigenvectors;
+    TransformedT const                               _singularvalues;
+    TransformedT const                               _singularvectors;
 
     // ----------------------------------------------------------------------
     // |
@@ -203,9 +305,9 @@ private:
 namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         PCAEstimatorImpl
-///  \brief         Estimator that reads an annotation created by the `PCAComponentsEstimator`
-///                 and creates a `PCATransformer` object.
+///  \class         SVDEstimatorImpl
+///  \brief         Estimator that reads an annotation created by the `SVDComponentsEstimator`
+///                 and creates a `SVDTransformer` object.
 ///
 template <
     typename InputT,
@@ -213,7 +315,7 @@ template <
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 ////InputT and TransformedT are Containers type
-class PCAEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
+class SVDEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -221,17 +323,17 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = TransformerEstimator<InputT, TransformedT>;
-    using TransformerType                   = PCATransformer<InputT, TransformedT>;
+    using TransformerType                   = SVDTransformer<InputT, TransformedT>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    PCAEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
-    ~PCAEstimatorImpl(void) override = default;
+    SVDEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~SVDEstimatorImpl(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(PCAEstimatorImpl);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SVDEstimatorImpl);
 
 private:
     // ----------------------------------------------------------------------
@@ -253,31 +355,31 @@ private:
     // MSVC has problems when the definition is separate from the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
         //----------------------------------------------------------------------
-        using PCAComponentsAnnotationData                = PCAComponentsAnnotationData<TransformedT>;
-        using PCAComponentsEstimator                     = PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>;
+        using SVDComponentsAnnotationData                = SVDComponentsAnnotationData<TransformedT>;
+        using SVDComponentsEstimator                     = SVDComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>;
         // ----------------------------------------------------------------------
 
-        PCAComponentsAnnotationData const &              data(PCAComponentsEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, PCAComponentsEstimatorName));
+        SVDComponentsAnnotationData const &              data(SVDComponentsEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, SVDComponentsEstimatorName));
 
-        return typename BaseType::TransformerUniquePtr(new PCATransformer<InputT, TransformedT>(data.Eigenvalues, data.Eigenvectors));
+        return typename BaseType::TransformerUniquePtr(new SVDTransformer<InputT, TransformedT>(data.SingularValues, data.SingularVectors));
     }
 };
 
 } // namespace Details
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         PCAFeaturizer
-///  \brief         Creates the `PCATransformer` object.
+///  \class         SVDFeaturizer
+///  \brief         Creates the `SVDTransformer` object.
 ///
 template <
     typename InputT,
     typename TransformedT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class PCAEstimator :
+class SVDEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-        PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>,
-        Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
+        SVDComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>,
+        Details::SVDEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -287,8 +389,8 @@ public:
     // ----------------------------------------------------------------------
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
-            PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>,
-            Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
+            SVDComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>,
+            Details::SVDEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
         >;
 
     // ----------------------------------------------------------------------
@@ -296,10 +398,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    PCAEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
-    ~PCAEstimator(void) override = default;
+    SVDEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~SVDEstimator(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(PCAEstimator);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SVDEstimator);
 };
 
 // ----------------------------------------------------------------------
@@ -314,28 +416,28 @@ public:
 
 // ----------------------------------------------------------------------
 // |
-// |  PCAComponentsAnnotationData
+// |  SVDComponentsAnnotationData
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-PCAComponentsAnnotationData<T>::PCAComponentsAnnotationData(T eigenvalues, T eigenvectors) :
-    Eigenvalues(
+SVDComponentsAnnotationData<T>::SVDComponentsAnnotationData(T singularvalues, T singularvectors) :
+    SingularValues(
         std::move(
-            [&eigenvalues](void) -> T & {
-                if(eigenvalues.size() == 0)
-                    throw std::invalid_argument("eigenvalues");
+            [&singularvalues](void) -> T & {
+                if(singularvalues.size() == 0)
+                    throw std::invalid_argument("singularvalues");
 
-                return eigenvalues;
+                return singularvalues;
             }()
         )
     ),
-    Eigenvectors(
+    SingularVectors(
         std::move(
-            [&eigenvectors](void) -> T & {
-                if(eigenvectors.size() == 0)
-                    throw std::invalid_argument("eigenvectors");
+            [&singularvectors](void) -> T & {
+                if(singularvectors.size() == 0)
+                    throw std::invalid_argument("singularvectors");
 
-                return eigenvectors;
+                return singularvectors;
             }()
         )
     ) {
@@ -343,16 +445,16 @@ PCAComponentsAnnotationData<T>::PCAComponentsAnnotationData(T eigenvalues, T eig
 
 // ----------------------------------------------------------------------
 // |
-// |  PCAComponentsEstimator
+// |  SVDComponentsEstimator
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::PCAComponentsEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+SVDComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::SVDComponentsEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
     BaseType(std::move(pAllColumnAnnotations), std::move(colIndex), true) {
 }
 
 template <typename InputT, typename TransformedT>
-void ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::fit(InputType const &input) {
+void ComponentsDetails::SVDTrainingOnlyPolicy<InputT, TransformedT>::fit(InputType const &input) {
 
     //assume same type but remain InputT and TransformedT for flexibility
     if (!std::is_same<InputT,TransformedT>::value)
@@ -362,42 +464,66 @@ void ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::fit(InputTy
 }
 
 template <typename InputT, typename TransformedT>
-PCAComponentsAnnotationData<TransformedT> ComponentsDetails::PCATrainingOnlyPolicy<InputT, TransformedT>::complete_training(void) {
+SVDComponentsAnnotationData<TransformedT> ComponentsDetails::SVDTrainingOnlyPolicy<InputT, TransformedT>::complete_training(void) {
 
-    Eigen::SelfAdjointEigenSolver<TransformedT> eig(
-        [&]() -> TransformedT {
-            //compute for centered training data
-            TransformedT centered = _matrix.rowwise() - _matrix.colwise().mean();
-            //compute for covariance matrix
-            TransformedT cov = centered.adjoint() * centered;
-            //using covariance matrix to compute PCA
-            return cov;
-        }()
-    );
+    //the following code in this function is introduced from RedSVD
+    typedef typename TransformedT::Scalar Scalar;
+    typedef typename Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> DenseMatrix;
 
-    //PCA uses sigma but sklearn PCA uses sqrt(sigma), this implementation follows original principle. 
-    _eigenvalues = eig.eigenvalues();
-    _eigenvectors = eig.eigenvectors();
-    
-    return PCAComponentsAnnotationData<TransformedT>(std::move(_eigenvalues), std::move(_eigenvectors));
+    Eigen::Index rank = (_matrix.rows() < _matrix.cols()) ? _matrix.rows() : _matrix.cols();
+
+    // Gaussian Random Matrix for A^T
+	DenseMatrix O(_matrix.rows(), rank);
+	sample_gaussian(O);
+			
+	// Compute Sample Matrix of A^T
+	DenseMatrix Y = _matrix.transpose() * O;
+			
+	// Orthonormalize Y
+	gram_schmidt(Y);
+			
+	// Range(B) = Range(A^T)
+	DenseMatrix B = _matrix * Y;
+			
+	// Gaussian Random Matrix
+	DenseMatrix P(B.cols(), rank);
+	sample_gaussian(P);
+			
+	// Compute Sample Matrix of B
+	DenseMatrix Z = B * P;
+			
+	// Orthonormalize Z
+	gram_schmidt(Z);
+			
+    // Range(C) = Range(B)
+	DenseMatrix C = Z.transpose() * B; 
+			
+	Eigen::JacobiSVD<DenseMatrix> svdOfC(C, Eigen::ComputeThinU | Eigen::ComputeThinV);
+			
+	// C = USV^T
+	// A = Z * U * S * V^T * Y^T()
+	_singularvalues = svdOfC.singularValues();
+	_singularvectors = Y * svdOfC.matrixV();
+
+    return SVDComponentsAnnotationData<TransformedT>(std::move(_singularvalues), std::move(_singularvectors));
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  PCATransformer
+// |  SVDTransformer
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
-PCATransformer<InputT, TransformedT>::PCATransformer(TransformedT eigenvalues, TransformedT eigenvectors) :
+SVDTransformer<InputT, TransformedT>::SVDTransformer(TransformedT singularvalues, TransformedT singularvectors) :
     //no validation here because same variable has been validated in annotation class
-    _eigenvalues(std::move(eigenvalues)),
-    _eigenvectors(std::move(eigenvectors)) {
+    _singularvalues(std::move(singularvalues)),
+    _singularvectors(std::move(singularvectors)) {
 }
 
 //TODO:
 // template <typename InputT, typename TransformedT>
-// PCATransformer<InputT, TransformedT>::PCATransformer(Archive &ar) :
-//     PCATransformer(
+// SVDTransformer<InputT, TransformedT>::SVDTransformer(Archive &ar) :
+//     SVDTransformer(
 //         [&ar](void) {
 //             // Version
 //             std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
@@ -407,64 +533,64 @@ PCATransformer<InputT, TransformedT>::PCATransformer(TransformedT eigenvalues, T
 //                 throw std::runtime_error("Unsupported archive version");
 
 //             // Data:TODO
-//             TransformedT                   eigenvalues(Traits<TransformedT>::deserialize(ar));
-//             TransformedT                   eigenvectors(Traits<TransformedT>::deserialize(ar));
+//             TransformedT                   singularvalues(Traits<TransformedT>::deserialize(ar));
+//             TransformedT                   singularvectors(Traits<TransformedT>::deserialize(ar));
 
-//             return PCATransformer<InputT, TransformedT>(std::move(eigenvalues), std::move(eigenvectors));
+//             return SVDTransformer<InputT, TransformedT>(std::move(singularvalues), std::move(singularvectors));
 //         }()
 //     ) {
 // }
 
 template <typename InputT, typename TransformedT>
-bool PCATransformer<InputT, TransformedT>::operator==(PCATransformer const &other) const {
-    if ((this->_eigenvalues - other._eigenvalues).norm() > 0.000001f || (this->_eigenvectors - other._eigenvectors).norm() > 0.000001f)
+bool SVDTransformer<InputT, TransformedT>::operator==(SVDTransformer const &other) const {
+    if ((this->_singularvalues - other._singularvectors).norm() > 0.000001f || (this->_singularvalues - other._singularvectors).norm() > 0.000001f)
         return false;
 
     return true;
 }
 
 template <typename InputT, typename TransformedT>
-void PCATransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
+void SVDTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
     // Version
     Traits<std::uint16_t>::serialize(ar, 1); // Major
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data TODO
-    // Traits<decltype(_eigenvalues)>::serialize(ar, _eigenvalues);
-    // Traits<decltype(_eigenvectors)>::serialize(ar, _eigenvectors);
+    // Traits<decltype(_singularvalues)>::serialize(ar, _singularvalues);
+    // Traits<decltype(_singularvectors)>::serialize(ar, _singularvectors);
 }
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
-void PCATransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
-    callback(std::move(input * _eigenvectors.transpose()));
+void SVDTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
+    callback(std::move(input * _singularvectors));
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  PCAEstimator
+// |  SVDEstimator
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-PCAEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::PCAEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+SVDEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::SVDEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
     BaseType(
-        "PCAEstimator",
+        "SVDEstimator",
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, colIndex](void) { return PCAComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
-        [pAllColumnAnnotations, colIndex](void) { return Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
+        [pAllColumnAnnotations, colIndex](void) { return SVDComponentsEstimator<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex](void) { return Details::SVDEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
     ) {
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::PCAEstimatorImpl
+// |  Details::SVDEstimatorImpl
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::PCAEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
-    BaseType("PCAEstimatorImpl", std::move(pAllColumnAnnotations)),
+Details::SVDEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::SVDEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+    BaseType("SVDEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
             [this, &colIndex](void) -> size_t & {
@@ -481,17 +607,17 @@ Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::PCAEstima
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-bool Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+bool Details::SVDEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
     return false;
 }
 
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-FitResult Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
+FitResult Details::SVDEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
     throw std::runtime_error("This will never be called");
 }
 
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-void Details::PCAEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+void Details::SVDEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
 } // namespace Featurizers
