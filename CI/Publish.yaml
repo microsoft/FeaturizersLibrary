@@ -63,7 +63,9 @@ stages:
           job_display_name: "Tag Git Sources (for release builds)"
           operating_system: Windows
           custom_checkout:
-            - checkout: none
+              - checkout: self
+                persistCredentials: true
+                clean: true
           steps:
             - template: "Publish.tagsources_steps_template.yaml"
               parameters:

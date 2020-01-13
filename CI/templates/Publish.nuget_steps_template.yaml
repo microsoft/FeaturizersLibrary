@@ -9,8 +9,6 @@ parameters:
   service_connection: "" # Service connection name setup in Azure DevOps
 
 steps:
-  - checkout: none
-
   - template: Publish.initialize_steps_template.yaml
     parameters:
       azure_dev_ops_build_definition_id: ${{ parameters.azure_dev_ops_build_definition_id }}
