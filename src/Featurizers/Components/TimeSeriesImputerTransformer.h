@@ -71,7 +71,7 @@ public:
     class Transformer : public Microsoft::Featurizer::Transformer<typename BaseType::InputType,typename BaseType::TransformedType> {
     public:
 
-        using StrTraits                     = Traits<std::string>;
+        using StrTraits                     = Traits<nonstd::optional<std::string>>;
         using ThisBaseType                  = Microsoft::Featurizer::Transformer<typename BaseType::InputType,typename BaseType::TransformedType>;
 
         // ----------------------------------------------------------------------

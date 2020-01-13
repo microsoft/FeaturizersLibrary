@@ -6,12 +6,14 @@
 
 #include <limits>
 #include "../../Traits.h"
+
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 namespace Components {
 
 namespace TypeSelector {
+
 // max norm type selector is created for selecting different types for max norm based on input type
 // when input type is integer, uint64 is chosen for performance
 // when input type is numeric, long double is chosen
@@ -29,7 +31,7 @@ struct MaxNormTypeSelector<std::double_t> {
     using type = long double;
 };
 
-}
+} // namespace TypeSelector
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
@@ -63,12 +65,12 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-
     L1NormUpdater(void);
 
     void update(InputType input);
 
     long double commit(void);
+
 private:
     // ----------------------------------------------------------------------
     // |
@@ -82,7 +84,6 @@ private:
     // since it doesn't make sense to create an updater and commit without any update
     bool        _update_flag;
 };
-
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         L2NormUpdater
@@ -108,12 +109,12 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-
     L2NormUpdater(void);
 
     void update(InputType input);
 
     long double commit(void);
+
 private:
     // ----------------------------------------------------------------------
     // |
@@ -137,7 +138,6 @@ private:
 template <typename T>
 class MaxNormUpdater {
 public:
-
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
@@ -159,6 +159,7 @@ public:
     void update(InputType input);
 
     typename TypeSelector::MaxNormTypeSelector<T>::type commit(void);
+
 private:
     // ----------------------------------------------------------------------
     // |
@@ -172,6 +173,7 @@ private:
     // since it doesn't make sense to create an updater and commit without any update
     bool                                                _update_flag;
 };
+
 } // Updaters
 
 // ----------------------------------------------------------------------
@@ -296,7 +298,7 @@ typename TypeSelector::MaxNormTypeSelector<T>::type Updaters::MaxNormUpdater<T>:
 #   pragma clang diagnostic pop
 #endif
 
-}
-}
-}
-}
+} // namespace Components
+} // namespace Featurizers
+} // namespace Featurizer
+} // namespace Microsoft

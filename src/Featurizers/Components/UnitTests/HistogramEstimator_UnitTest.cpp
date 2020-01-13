@@ -35,6 +35,21 @@ TEST_CASE("int") {
     CHECK(toCheck == histogram);
 }
 
+TEST_CASE("optional int") {
+    using Histogram                         = NS::Featurizers::Components::HistogramAnnotationData<nonstd::optional<int>>::Histogram;
+
+    Histogram const                         histogram({{10,4}, {20, 1} , {8, 2}, {30, 2}, {7, 1}, {15, 2}, {11, 1}, {18, 1}, {6,1}, {nonstd::optional<int>(),4}});
+    std::vector<std::vector<nonstd::optional<int>>> const                   list(
+        {
+            {10,20,8,10,30,nonstd::optional<int>()},
+            {7,10,10,nonstd::optional<int>(),nonstd::optional<int>(),15,11},
+            {nonstd::optional<int>(),15,30,18,8,6}
+        }
+    );
+    Histogram const                         toCheck(Test(list));
+
+    CHECK(toCheck == histogram);
+}
 
 TEST_CASE("string") {
     using Histogram                         = NS::Featurizers::Components::HistogramAnnotationData<std::string>::Histogram;
@@ -46,4 +61,3 @@ TEST_CASE("string") {
 
     CHECK(toCheck == histogram);
 }
-
