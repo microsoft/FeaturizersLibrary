@@ -169,8 +169,19 @@ inline bool IsSupportedModeEstimatorValue(T const &, std::true_type) {
 }
 
 template <typename T>
-inline bool IsSupportedModeEstimatorValue(T const &value, std::false_type) {
+inline bool IsSupportedModeEstimatorValueIsNullable(T const &value, std::true_type) {
     return Traits<T>::IsNull(value) == false;
+}
+
+template <typename T>
+inline bool IsSupportedModeEstimatorValueIsNullable(T const &, std::false_type) {
+    // The value is not nullable, so it is supported
+    return true;
+}
+
+template <typename T>
+inline bool IsSupportedModeEstimatorValue(T const &value, std::false_type) {
+    return IsSupportedModeEstimatorValueIsNullable(value, std::integral_constant<bool, Traits<T>::IsNullableType>());
 }
 
 } // anonymous namespace
