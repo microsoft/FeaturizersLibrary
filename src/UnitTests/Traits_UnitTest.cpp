@@ -402,7 +402,7 @@ TEST_CASE("Serialization") {
 
 template <typename T>
 bool TestCreateNullValue(void) {
-    return Traits<T>::IsNull(Traits<T>::CreateNullValue());
+    return Traits<typename Traits<T>::nullable_type>::IsNull(Traits<T>::CreateNullValue());
 }
 
 TEST_CASE("CreateNullValue") {

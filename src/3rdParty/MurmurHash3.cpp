@@ -17,6 +17,13 @@
 #   pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #endif
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wold-style-cast"
+#   pragma clang diagnostic ignored "-Wcast-align"
+#   pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+
 // Microsoft Visual Studio
 
 #if defined(_MSC_VER)
@@ -423,6 +430,9 @@ void MurmurHash3_x64_128 ( const void * key, const int len,
 }
 
 //-----------------------------------------------------------------------------
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #if (defined __GNUC__) && (__GNUC__ >= 7)
 #   pragma GCC diagnostic pop

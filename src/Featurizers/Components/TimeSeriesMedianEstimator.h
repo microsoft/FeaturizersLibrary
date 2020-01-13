@@ -155,10 +155,10 @@ inline FitResult TimeSeriesMedianEstimator::fit_impl(typename BaseType::InputTyp
         }
 
         for(std::size_t i=0; i< colValues.size(); ++i) {
-            if(Traits<std::string>::IsNull(colValues[i]) || DoesColTypeSupportMedian(_colsToImputeDataTypes[i]) == false)
+            if(Traits<nonstd::optional<std::string>>::IsNull(colValues[i]) || DoesColTypeSupportMedian(_colsToImputeDataTypes[i]) == false)
                 continue;
 
-            _aggregateTracker[key][i] += Traits<std::double_t>::FromString(Traits<std::string>::GetNullableValue(colValues[i]));
+            _aggregateTracker[key][i] += Traits<std::double_t>::FromString(Traits<nonstd::optional<std::string>>::GetNullableValue(colValues[i]));
             _countTracker[key][i] += 1;
         }
     }
