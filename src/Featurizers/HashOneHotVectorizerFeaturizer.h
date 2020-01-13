@@ -9,19 +9,6 @@
 #include "Components/InferenceOnlyFeaturizerImpl.h"
 #include "../3rdParty/MurmurHash3.h"
 
-#if (defined __clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wold-style-cast"
-#   pragma clang diagnostic ignored "-Wcast-align"
-#   pragma clang diagnostic ignored "-Wsign-conversion"
-#endif
-
-#include "../3rdParty/MurmurHash3.cpp"
-
-#if (defined __clang__)
-#   pragma clang diagnostic pop
-#endif
-
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
