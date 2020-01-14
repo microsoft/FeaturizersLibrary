@@ -54,6 +54,10 @@ TEST_CASE("Integers") {
     CHECK(Test<int>({5, 3, 1, 2, 100, 4}) == NS::Featurizers::Components::IndexMapAnnotationData<int>::IndexMap{ {1, 0u}, {2, 1u}, {3, 2u}, {4, 3u}, {5, 4u}, {100, 5u} });
 }
 
+TEST_CASE("Optional Integers") {
+    CHECK(Test<nonstd::optional<int>>({5, 3, nonstd::optional<int>(), 1, 2, 100, 4}) == NS::Featurizers::Components::IndexMapAnnotationData<nonstd::optional<int>>::IndexMap{ {nonstd::optional<int>(), 0u}, {1, 1u}, {2, 2u}, {3, 3u}, {4, 4u}, {5, 5u}, {100, 6u} });
+}
+
 TEST_CASE("Strings") {
     CHECK(Test<std::string>({"one", "two", "three", "four"}) == NS::Featurizers::Components::IndexMapAnnotationData<std::string>::IndexMap{ {"four", 0u}, {"one", 1u}, {"three", 2u}, {"two", 3u} });
 }

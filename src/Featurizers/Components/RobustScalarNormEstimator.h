@@ -58,6 +58,9 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
+    static_assert(Traits<InputT>::IsNullableType == false || Traits<InputT>::IsNativeNullableType, "Support for nullable types has not been implemented yet");
+    static_assert(Traits<TransformedT>::IsNullableType == false || Traits<TransformedT>::IsNativeNullableType, "Support for nullable types has not been implemented yet");
+
     using InputType                         = InputT;
     using ScalingParameters                 = std::tuple<float, float>;
     using OptionalScalingParameters         = nonstd::optional<ScalingParameters>;

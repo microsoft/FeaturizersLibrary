@@ -88,6 +88,7 @@ public:
     // ----------------------------------------------------------------------
     using FrequencyMap                      = std::unordered_map<std::string, std::uint32_t>;
     using IndexMap                          = FrequencyMap;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
@@ -121,10 +122,15 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
+
+    // TODO: Rather than using std::string, we should use a type that makes it clear that
+    //       the content is UTF8; this type should also compare using unicode characters
+    //       rather than asci characters.
     using InputType                         = std::string;
     using InputTypeConstIterator            = std::string::const_iterator;
     using StringDecorator                   = std::function<std::string (InputTypeConstIterator begin, InputTypeConstIterator end)>;
     using IndexMap                          = DocumentStatisticsAnnotationData::IndexMap;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
