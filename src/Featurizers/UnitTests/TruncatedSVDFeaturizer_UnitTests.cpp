@@ -211,7 +211,7 @@ TEST_CASE("Serialization/Deserialization") {
     NS::Archive                             in(out.commit());
     TransformerType                         other(in);
 
-    //CHECK(other == original);
+    CHECK(other == original);
 }
 
 TEST_CASE("Serialization Version Error") {
