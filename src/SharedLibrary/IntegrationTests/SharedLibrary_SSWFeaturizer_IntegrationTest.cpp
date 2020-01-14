@@ -10,75 +10,75 @@
 TEST_CASE("int8_t_with_mean_with_std") {
     StandardScaleWrapperFeaturizer_int8_Test(
         std::vector<std::int8_t>{
-            static_cast<std::int8_t>(0),
-            static_cast<std::int8_t>(0),
-            static_cast<std::int8_t>(1),
-            static_cast<std::int8_t>(1)
+            0,
+            0,
+            1,
+            1
         },
         std::vector<std::int8_t>{
-            static_cast<std::int8_t>(2)
+            2
         },
         [](std::vector<std::double_t> const &args) {
-            return args == std::vector<std::double_t>{static_cast<std::double_t>(3)};
+            return args[0] == 3.0;
         },
-        bool(true),
-        bool(true)
+        true,
+        true
     );
 }
 
 TEST_CASE("double_t_without_mean_with_std") {
     StandardScaleWrapperFeaturizer_double_Test(
         std::vector<std::double_t>{
-            static_cast<std::double_t>(0),
-            static_cast<std::double_t>(0),
-            static_cast<std::double_t>(1),
-            static_cast<std::double_t>(1)
+            0.0,
+            0.0,
+            1.0,
+            1.0
         },
         std::vector<std::double_t>{
-            static_cast<std::double_t>(2)
+            2.0
         },
         [](std::vector<std::double_t> const &args) {
-            return args == std::vector<std::double_t>{static_cast<std::double_t>(4)};
+            return args[0] == 4.0;
         },
-        bool(false),
-        bool(true)
+        false,
+        true
     );
 }
 
 TEST_CASE("double_t_with_mean_without_std") {
     StandardScaleWrapperFeaturizer_double_Test(
         std::vector<std::double_t>{
-            static_cast<std::double_t>(0),
-            static_cast<std::double_t>(0),
-            static_cast<std::double_t>(1),
-            static_cast<std::double_t>(1)
+            0.0,
+            0.0,
+            1.0,
+            1.0
         },
         std::vector<std::double_t>{
-            static_cast<std::double_t>(2)
+            2.0
         },
         [](std::vector<std::double_t> const &args) {
-            return args == std::vector<std::double_t>{static_cast<std::double_t>(1.5)};
+            return args[0] == 1.5;
         },
-        bool(true),
-        bool(false)
+        true,
+        false
     );
 }
 
 TEST_CASE("double_t_without_mean_without_std") {
     StandardScaleWrapperFeaturizer_double_Test(
         std::vector<std::double_t>{
-            static_cast<std::double_t>(0),
-            static_cast<std::double_t>(0),
-            static_cast<std::double_t>(1),
-            static_cast<std::double_t>(1)
+            0.0,
+            0.0,
+            1.0,
+            1.0
         },
         std::vector<std::double_t>{
-            static_cast<std::double_t>(2)
+            2.0
         },
         [](std::vector<std::double_t> const &args) {
-            return args == std::vector<std::double_t>{static_cast<std::double_t>(2)};
+            return args[0] == 2.0;
         },
-        bool(false),
-        bool(false)
+        false,
+        false
     );
 }
