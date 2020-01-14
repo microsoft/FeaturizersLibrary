@@ -181,12 +181,50 @@ TEST_CASE("SVD_Transformer") {
 #endif
 }
 
-//TODO
 TEST_CASE("Serialization/Deserialization") {
+    using InputT = Eigen::MatrixX<float>;
+    using TransformedT = Eigen::MatrixX<float>;
+    using TransformerType = NS::Featurizers::SVDTransformer<InputT, TransformedT>;
 
-}
+    TransformedT singularValues(3, 1);
+    singularValues(0, 0) = 3.79535f;
+    singularValues(1, 0) = 2.21387f;
+    singularValues(2, 0) = 0.83309f;
 
-//TODO
-TEST_CASE("Serialization Version Error") {
+    TransformedT singularVectors(3, 3);
+    singularVectors(0, 0) =  0.805059f;
+    singularVectors(0, 1) = -0.315908f;
+    singularVectors(0, 2) = -0.502078f;
+    singularVectors(1, 0) =  0.204052f;
+    singularVectors(1, 1) =  0.942225f;
+    singularVectors(1, 2) = -0.265660f;
+    singularVectors(2, 0) =  0.556994f;
+    singularVectors(2, 1) =  0.111422f;
+    singularVectors(2, 2) =  0.823008f;
     
+    TransformerType                         original(singularValues, singularVectors);
+
+    NS::Archive                             out;
+
+    original.save(out);
+
+    NS::Archive                             in(out.commit());
+    TransformerType                         other(in);
+
+    //CHECK(other == original);
 }
+
+TEST_CASE("Serialization Version Error") {
+    NS::Archive                             out;
+
+    out.serialize(static_cast<std::uint16_t>(2));
+    out.serialize(static_cast<std::uint16_t>(0));
+
+    NS::Archive                             in(out.commit());
+
+    CHECK_THROWS_WITH(
+        (NS::Featurizers::SVDTransformer<Eigen::MatrixX<float>, Eigen::MatrixX<float>>(in)),
+        Catch::Contains("Unsupported archive version")
+    );
+}
+

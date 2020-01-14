@@ -520,30 +520,29 @@ SVDTransformer<InputT, TransformedT>::SVDTransformer(TransformedT singularvalues
     _singularvectors(std::move(singularvectors)) {
 }
 
-//TODO:
-// template <typename InputT, typename TransformedT>
-// SVDTransformer<InputT, TransformedT>::SVDTransformer(Archive &ar) :
-//     SVDTransformer(
-//         [&ar](void) {
-//             // Version
-//             std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
-//             std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+template <typename InputT, typename TransformedT>
+SVDTransformer<InputT, TransformedT>::SVDTransformer(Archive &ar) :
+    SVDTransformer(
+        [&ar](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
 
-//             if(majorVersion != 1 || minorVersion != 0)
-//                 throw std::runtime_error("Unsupported archive version");
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
 
-//             // Data:TODO
-//             TransformedT                   singularvalues(Traits<TransformedT>::deserialize(ar));
-//             TransformedT                   singularvectors(Traits<TransformedT>::deserialize(ar));
+            // Data:TODO
+            TransformedT                   singularvalues(Traits<TransformedT>::deserialize(ar));
+            TransformedT                   singularvectors(Traits<TransformedT>::deserialize(ar));
 
-//             return SVDTransformer<InputT, TransformedT>(std::move(singularvalues), std::move(singularvectors));
-//         }()
-//     ) {
-// }
+            return SVDTransformer<InputT, TransformedT>(std::move(singularvalues), std::move(singularvectors));
+        }()
+    ) {
+}
 
 template <typename InputT, typename TransformedT>
 bool SVDTransformer<InputT, TransformedT>::operator==(SVDTransformer const &other) const {
-    if ((this->_singularvalues - other._singularvectors).norm() > 0.000001f || (this->_singularvalues - other._singularvectors).norm() > 0.000001f)
+    if ((this->_singularvalues - other._singularvalues).norm() > 0.000001f || (this->_singularvectors - other._singularvectors).norm() > 0.000001f)
         return false;
 
     return true;
@@ -555,9 +554,9 @@ void SVDTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ 
     Traits<std::uint16_t>::serialize(ar, 1); // Major
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
-    // Data TODO
-    // Traits<decltype(_singularvalues)>::serialize(ar, _singularvalues);
-    // Traits<decltype(_singularvectors)>::serialize(ar, _singularvectors);
+    // Data 
+    Traits<decltype(_singularvalues)>::serialize(ar, _singularvalues);
+    Traits<decltype(_singularvectors)>::serialize(ar, _singularvectors);
 }
 
 // ----------------------------------------------------------------------
