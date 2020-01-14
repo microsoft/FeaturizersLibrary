@@ -25,7 +25,7 @@
 #   pragma warning(disable: 4127)
 #endif
 
-#include "../3rdParty/eigen/Eigen/Dense"
+#include "Eigen/Dense"
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
