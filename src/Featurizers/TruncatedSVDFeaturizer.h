@@ -39,34 +39,6 @@ namespace Featurizers {
 
 static constexpr char const * const         SVDComponentsEstimatorName("SVDComponentsEstimator");
 
-/////////////////////////////////////////////////////////////////////////
-///  \class         SVDComponentsAnnotationData
-///  \brief         Contains SVD components: Eigenvalues and Eigenvectors
-template <typename T>
-class SVDComponentsAnnotationData {
-public:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Data
-    // |
-    // ----------------------------------------------------------------------
-
-    T const                                          SingularValues;
-    T const                                          SingularVectors;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-    SVDComponentsAnnotationData(T singularvalues, T singularvectors);
-    ~SVDComponentsAnnotationData(void) = default;
-
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SVDComponentsAnnotationData);
-};
-
-namespace ComponentsDetails {
-
 namespace {
 //the following functions in anonymous space are introduced from RedSVD
 //Copyright attached
@@ -97,78 +69,106 @@ namespace {
 template<typename Scalar>
 inline void sample_gaussian(Scalar& x, Scalar& y)
 {
-	using std::sqrt;
-	using std::log;
-	using std::cos;
-	using std::sin;
+    using std::sqrt;
+    using std::log;
+    using std::cos;
+    using std::sin;
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
 		
-	const Scalar PI(3.1415926535897932384626433832795028841971693993751f);
+    const Scalar PI(3.1415926535897932384626433832795028841971693993751f);
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
 		
-	Scalar v1 = static_cast<Scalar>(std::rand() + static_cast<Scalar>(1)) / (static_cast<Scalar>(RAND_MAX+static_cast<Scalar>(2)));
-	Scalar v2 = static_cast<Scalar>(std::rand() + static_cast<Scalar>(1)) / (static_cast<Scalar>(RAND_MAX+static_cast<Scalar>(2)));
-	Scalar len = sqrt(static_cast<Scalar>(-2) * log(v1));
-	x = len * cos(static_cast<Scalar>(2) * PI * v2);
-	y = len * sin(static_cast<Scalar>(2) * PI * v2);
+    Scalar v1 = static_cast<Scalar>(std::rand() + static_cast<Scalar>(1)) / (static_cast<Scalar>(RAND_MAX+static_cast<Scalar>(2)));
+    Scalar v2 = static_cast<Scalar>(std::rand() + static_cast<Scalar>(1)) / (static_cast<Scalar>(RAND_MAX+static_cast<Scalar>(2)));
+    Scalar len = sqrt(static_cast<Scalar>(-2) * log(v1));
+    x = len * cos(static_cast<Scalar>(2) * PI * v2);
+    y = len * sin(static_cast<Scalar>(2) * PI * v2);
 }
 	
 template<typename MatrixType>
 inline void sample_gaussian(MatrixType& mat) {
 
-	typedef typename MatrixType::Index Index;
+    typedef typename MatrixType::Index Index;
 		
-	for(Index i = 0; i < mat.rows(); ++i)
-	{
-		for(Index j = 0; j+1 < mat.cols(); j += 2)
-			sample_gaussian(mat(i, j), mat(i, j+1));
-		if(mat.cols() % 2)
-			sample_gaussian(mat(i, mat.cols()-1), mat(i, mat.cols()-1));
-	}
+    for(Index i = 0; i < mat.rows(); ++i)
+    {
+        for(Index j = 0; j+1 < mat.cols(); j += 2)
+            sample_gaussian(mat(i, j), mat(i, j+1));
+        if(mat.cols() % 2)
+            sample_gaussian(mat(i, mat.cols()-1), mat(i, mat.cols()-1));
+    }
 }
 	
 template<typename MatrixType>
 inline void gram_schmidt(MatrixType& mat) {
 	
     typedef typename MatrixType::Scalar Scalar;
-	typedef typename MatrixType::Index Index;
+    typedef typename MatrixType::Index Index;
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
 		
-	static const Scalar EPS(1E-4f);
+    static const Scalar EPS(1E-4f);
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
 		
-	for(Index i = 0; i < mat.cols(); ++i) {
-		for(Index j = 0; j < i; ++j) {
-			Scalar r = mat.col(i).dot(mat.col(j));
-			mat.col(i) -= r * mat.col(j);
-		}
+    for(Index i = 0; i < mat.cols(); ++i) {
+        for(Index j = 0; j < i; ++j) {
+            Scalar r = mat.col(i).dot(mat.col(j));
+            mat.col(i) -= r * mat.col(j);
+        }
 			
-		Scalar norm = mat.col(i).norm();
+        Scalar norm = mat.col(i).norm();
 			
-		if(norm < EPS) {
-			for(Index k = i; k < mat.cols(); ++k)
-				mat.col(k).setZero();
-			return;
-		}
-		mat.col(i) /= norm;
-	}
+        if(norm < EPS) {
+            for(Index k = i; k < mat.cols(); ++k)
+                mat.col(k).setZero();
+            return;
+        }
+        mat.col(i) /= norm;
+    }
 }
 
 } //anonymous namespace
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         SVDComponentsAnnotationData
+///  \brief         Contains SVD components: Eigenvalues and Eigenvectors
+template <typename T>
+class SVDComponentsAnnotationData {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Data
+    // |
+    // ----------------------------------------------------------------------
+
+    T const                                          SingularValues;
+    T const                                          SingularVectors;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    SVDComponentsAnnotationData(T singularvalues, T singularvectors);
+    ~SVDComponentsAnnotationData(void) = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SVDComponentsAnnotationData);
+};
+
+namespace ComponentsDetails {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         SVDTrainingOnlyPolicy
@@ -473,37 +473,37 @@ SVDComponentsAnnotationData<TransformedT> ComponentsDetails::SVDTrainingOnlyPoli
     Eigen::Index rank = (_matrix.rows() < _matrix.cols()) ? _matrix.rows() : _matrix.cols();
 
     // Gaussian Random Matrix for _matrix^T
-	DenseMatrix O(_matrix.rows(), rank);
-	sample_gaussian(O);
+    DenseMatrix O(_matrix.rows(), rank);
+    sample_gaussian(O);
 			
-	// Compute Sample Matrix of _matrix^T
-	DenseMatrix Y = _matrix.transpose() * std::move(O);
+    // Compute Sample Matrix of _matrix^T
+    DenseMatrix Y = _matrix.transpose() * std::move(O);
 			
-	// Orthonormalize Y
-	gram_schmidt(Y);
+    // Orthonormalize Y
+    gram_schmidt(Y);
 			
-	// Range(B) = Range(_matrix^T)
-	DenseMatrix B = _matrix * Y;
+    // Range(B) = Range(_matrix^T)
+    DenseMatrix B = _matrix * Y;
 			
-	// Gaussian Random Matrix
-	DenseMatrix P(B.cols(), rank);
-	sample_gaussian(P);
+    // Gaussian Random Matrix
+    DenseMatrix P(B.cols(), rank);
+    sample_gaussian(P);
 			
-	// Compute Sample Matrix of B
-	DenseMatrix Z = B * P;
+    // Compute Sample Matrix of B
+    DenseMatrix Z = B * P;
 			
-	// Orthonormalize Z
-	gram_schmidt(Z);
+    // Orthonormalize Z
+    gram_schmidt(Z);
 			
     // Range(C) = Range(B)
-	DenseMatrix C = Z.transpose() * std::move(B); 
+    DenseMatrix C = Z.transpose() * std::move(B); 
 			
-	Eigen::JacobiSVD<DenseMatrix> svdOfC(C, Eigen::ComputeThinV);
+    Eigen::JacobiSVD<DenseMatrix> svdOfC(C, Eigen::ComputeThinV);
 			
-	// C = USV^T
-	// A = Z * U * S * V^T * Y^T()
-	_singularvalues = svdOfC.singularValues();
-	_singularvectors = std::move(Y) * svdOfC.matrixV();
+    // C = USV^T
+    // A = Z * U * S * V^T * Y^T()
+    _singularvalues = svdOfC.singularValues();
+    _singularvectors = std::move(Y) * svdOfC.matrixV();
 
     return SVDComponentsAnnotationData<TransformedT>(std::move(_singularvalues), std::move(_singularvectors));
 }
