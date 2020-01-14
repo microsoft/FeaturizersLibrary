@@ -15,7 +15,7 @@ template<typename InputT, typename TransformedT>
 void EstimatorTest(InputT const &trainingMatrix,
                    TransformedT const &singularValuesLabel,
                    TransformedT const &singularVectorsLabel,
-                   std::float_t eps = 0.00001f) {
+                   std::float_t eps = 0.0001f) {
 
     using SVDComponentsEstimator                       = NS::Featurizers::SVDComponentsEstimator<InputT, TransformedT>;
     using SVDComponentsAnnotationData                  = NS::Featurizers::SVDComponentsAnnotationData<TransformedT>;
@@ -37,8 +37,8 @@ void EstimatorTest(InputT const &trainingMatrix,
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
 
-    CHECK((singularValuesMat - singularValuesLabel).norm() < eps);
-    CHECK((singularVectorsMat - singularVectorsLabel).norm() < eps);
+    CHECK((singularValuesMat.cwiseProduct(singularValuesMat) - singularValuesLabel.cwiseProduct(singularValuesLabel)).norm() < eps);
+    CHECK((singularVectorsMat.cwiseProduct(singularVectorsMat) - singularVectorsLabel.cwiseProduct(singularVectorsLabel)).norm() < eps);
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
@@ -113,7 +113,7 @@ TEST_CASE("Singular_Estimator_Itegration") {
 TEST_CASE("SVD_Transformer") {
     using InputT = Eigen::MatrixX<float>;
     using TransformedT = Eigen::MatrixX<float>;
-    std::float_t eps = 0.00001f;
+    std::float_t eps = 0.0001f;
 
     InputT trainingMatrix(3, 3);
     trainingMatrix(0, 0) = -1;
@@ -174,7 +174,7 @@ TEST_CASE("SVD_Transformer") {
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
 
-    CHECK((output - label).norm() < eps);
+    CHECK((output.cwiseProduct(output) - label.cwiseProduct(label)).norm() < eps);
    
 #if (defined __clang__)
 #   pragma clang diagnostic pop
