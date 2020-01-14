@@ -61,6 +61,12 @@ private:
     // |
     // ----------------------------------------------------------------------
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override;
+
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::true_type);
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::false_type);
+
+    template <typename U>
+    void execute_implex(U const &input, typename BaseType::CallbackFunction const &callback);
 };
 
 namespace Details {
@@ -249,6 +255,11 @@ void MinMaxScalarTransformer<InputT, TransformedT>::save(Archive &ar) const /*ov
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
 void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
+    execute_impl(input, callback, std::integral_constant<bool, Microsoft::Featurizer::Traits<InputT>::IsNullableType>());
+}
+
+template <typename InputT, typename TransformedT>
+void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::true_type) {
     // ----------------------------------------------------------------------
     using InputTraits                       = Traits<InputT>;
     using TransformedTraits                 = Traits<TransformedT>;
@@ -259,6 +270,17 @@ void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseTy
         return;
     }
 
+    execute_implex(InputTraits::GetNullableValue(input), callback);
+}
+
+template <typename InputT, typename TransformedT>
+void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::false_type) {
+    execute_implex(input, callback);
+}
+
+template <typename InputT, typename TransformedT>
+template <typename U>
+void MinMaxScalarTransformer<InputT, TransformedT>::execute_implex(U const &input, typename BaseType::CallbackFunction const &callback) {
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
@@ -275,7 +297,6 @@ void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseTy
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
-
 }
 
 // ----------------------------------------------------------------------

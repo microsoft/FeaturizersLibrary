@@ -801,11 +801,12 @@ template <typename T>
 void _LoadDataString(Microsoft::Featurizer::Archive &ar, OptionalStrings &results) {
     // ----------------------------------------------------------------------
     using TheseTraits               = Microsoft::Featurizer::Traits<T>;
+    using NullableTypeTraits        = Microsoft::Featurizer::Traits<typename TheseTraits::nullable_type>;
     // ----------------------------------------------------------------------
 
     typename TheseTraits::nullable_type     value(Microsoft::Featurizer::Traits<typename TheseTraits::nullable_type>::deserialize(ar));
 
-    results.emplace_back(TheseTraits::IsNull(value) ? nonstd::optional<std::string>() : TheseTraits::ToString(TheseTraits::GetNullableValue(value)));
+    results.emplace_back(NullableTypeTraits::IsNull(value) ? nonstd::optional<std::string>() : TheseTraits::ToString(NullableTypeTraits::GetNullableValue(value)));
 }
 
 OptionalStrings Serializer::_LoadDataStrings(Microsoft::Featurizer::Archive &ar) const {

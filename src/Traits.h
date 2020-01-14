@@ -135,14 +135,17 @@ struct Traits {
     //
     //   // Methods
     //   - static nullable_type CreateNullValue(void);
-    //   - static bool IsNull(nullable_type const &value);
-    //   - static T const & GetNullableValue(nullable_type const &value);
-    //   - static T & GetNullableValue(nullable_type &value);
+    //
     //   - static std::string ToString(T const &value);
     //   - static T FromString(std::string const &value);
+    //
     //   - template <typename ArchiveT> static ArchiveT & serialize(ArchiveT &ar, T const &value);
     //   - template <typename ArchiveT> static T deserialize(ArchiveT &ar);
     //
+    //   // The following methods should be implemented if the type is a nullable type
+    //   - static bool IsNull(nullable_type const &value);
+    //   - static T const & GetNullableValue(nullable_type const &value);
+    //   - static T & GetNullableValue(nullable_type &value);
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -184,29 +187,10 @@ struct TraitsImpl {
     static nullable_type CreateNullValue(void) {
         return nullable_type();
     }
-    static bool IsNull(T const&) {
-        return false;
-    }
-    static bool IsNull(nullable_type const& value) {
-        return !value.has_value();
-    }
 
     struct IsIntOrNumeric {
         static constexpr bool const value = false;
     };
-
-    static T const & GetNullableValue(nullable_type const &value) {
-        if (IsNull(value))
-            throw std::runtime_error("GetNullableValue attempt on a null value.");
-        return *value;
-    }
-
-    static T & GetNullableValue(nullable_type &value) {
-        if(IsNull(value))
-            throw std::runtime_error("GetNullableValue attempt on a null value.");
-
-        return *value;
-    }
 };
 
 #if (defined __clang__)

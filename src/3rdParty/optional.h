@@ -222,6 +222,7 @@ namespace nonstd {
 
 #elif defined(__GNUC__)
 # pragma GCC   diagnostic push
+# pragma GCC   diagnostic ignored "-Wmaybe-uninitialized"
 # pragma GCC   diagnostic ignored "-Wundef"
 #endif
 

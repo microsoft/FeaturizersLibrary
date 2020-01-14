@@ -33,7 +33,7 @@ class _ScalarTypeInfoFactory(TypeInfoFactory):
         input_name="input",
     ):
         if is_input_optional:
-            return "Microsoft::Featurizer::Traits<{cpp_type}>::IsNull({input_name}) ? nullptr : &Microsoft::Featurizer::Traits<{cpp_type}>::GetNullableValue({input_name})".format(
+            return "Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<{cpp_type}>::nullable_type>::IsNull({input_name}) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<{cpp_type}>::nullable_type>::GetNullableValue({input_name})".format(
                 cpp_type=self.CppType,
                 input_name=input_name,
             )

@@ -93,11 +93,20 @@ private:
     Updaters::L2NormUpdater<std::double_t>    _updater;
     std::double_t                             _average;
     std::uint64_t                             _count;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    void fit_impl(InputType const &input, std::true_type /*is_optional*/);
+    void fit_impl(InputType const &input, std::false_type /*is_optional*/);
+
+    template <typename U>
+    void fit_impl(U const &input);
 };
 
 } // namespace Details
-
-
 
 /////////////////////////////////////////////////////////////////////////
 ///  \typedef       StandardDeviationEstimator
@@ -210,15 +219,7 @@ bool Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT
 
 template <typename T, typename StandardDeviationEstimatorT>
 void Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::fit(InputType const &input) {
-    // TODO: Implement different strategies for dealing with null
-    if(Microsoft::Featurizer::Traits<T>::IsNull(input))
-        return;
-    _updater.update(static_cast<std::double_t>(input) - _average);
-    // check if count will be out of bounds
-    if (std::numeric_limits<std::uint64_t>::max() == _count) {
-        throw std::runtime_error("Overflow occured for count during calculating standard deviation! You might input too much data");
-    }
-    ++_count;
+    return fit_impl(input, std::integral_constant<bool, Microsoft::Featurizer::Traits<T>::IsNullableType>());
 }
 
 template <typename T, typename StandardDeviationEstimatorT>
@@ -234,6 +235,37 @@ StandardDeviationAnnotationData Details::StandardDeviationTrainingOnlyPolicy<T, 
     return StandardDeviationAnnotationData(std::move(deviation), std::move(_count));
 }
 
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+template <typename T, typename StandardDeviationEstimatorT>
+void Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::fit_impl(InputType const &input, std::true_type) {
+    // ----------------------------------------------------------------------
+    using TheseTraits                       = Microsoft::Featurizer::Traits<T>;
+    // ----------------------------------------------------------------------
+
+    // TODO: Implement different strategies for dealing with null
+    if(TheseTraits::IsNull(input))
+        return;
+
+    fit_impl(TheseTraits::GetNullableValue(input));
+}
+
+template <typename T, typename StandardDeviationEstimatorT>
+void Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::fit_impl(InputType const &input, std::false_type) {
+    fit_impl(input);
+}
+
+template <typename T, typename StandardDeviationEstimatorT>
+template <typename U>
+void Details::StandardDeviationTrainingOnlyPolicy<T, StandardDeviationEstimatorT>::fit_impl(U const &input) {
+    _updater.update(static_cast<std::double_t>(input) - _average);
+    // check if count will be out of bounds
+    if (std::numeric_limits<std::uint64_t>::max() == _count) {
+        throw std::runtime_error("Overflow occured for count during calculating standard deviation! You might input too much data");
+    }
+    ++_count;
+}
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
