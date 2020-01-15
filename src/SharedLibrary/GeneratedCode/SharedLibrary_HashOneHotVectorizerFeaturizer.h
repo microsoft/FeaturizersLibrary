@@ -7,6 +7,7 @@
 #include "SharedLibrary_Common.h"
 
 extern "C" {
+
 FEATURIZER_LIBRARY_API_PACK_PREFIX
 
 struct HashOneHotEncoding {

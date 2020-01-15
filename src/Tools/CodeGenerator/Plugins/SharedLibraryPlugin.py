@@ -43,7 +43,13 @@ class Plugin(PluginBase):
     # |  Methods
     @staticmethod
     @Interface.override
-    def Generate(global_custom_structs, data, output_dir, status_stream):
+    def Generate(
+        global_custom_structs,
+        global_custom_enums,
+        data,
+        output_dir,
+        status_stream,
+    ):
         result_code = 0
 
         status_stream.write("Preprocessing data...")
@@ -53,7 +59,7 @@ class Plugin(PluginBase):
             c_data = []
 
             for items in data:
-                c_data.append([CData(item, global_custom_structs) for item in items])
+                c_data.append([CData(item, global_custom_structs, global_custom_enums) for item in items])
 
         status_stream.write("Generating Common Files...")
         with status_stream.DoneManager() as this_dm:
@@ -487,7 +493,8 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                 """,
             ),
         )
-        custom_struct_flag = False
+
+        wrote_custom_data = False
 
         for item, c_data in zip(items, c_data_items):
             template = getattr(item, "template", None)
@@ -556,20 +563,56 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
                 )
 
             custom_structs = "\n".join(custom_structs)
-            if not custom_struct_flag:
+
+            # Create the custom enums (if any)
+            custom_enums = []
+
+            for enum_name, enum_info in six.iteritems(c_data.CustomEnums):
+                custom_enums.append(
+                    textwrap.dedent(
+                        """\
+                        enum {name}Value {{
+                            {values}
+                        }};
+
+                        typedef unsigned char {name}Type;
+                        """,
+                    ).format(
+                        name=enum_name,
+                        values=StringHelpers.LeftJustify(
+                            "\n".join(
+                                [
+                                    "{}_{}{}".format(
+                                        enum_name,
+                                        this_enum_value,
+                                        "" if this_enum_index != 0 else "={}".format(enum_info.starting_index),
+                                    )
+                                    for this_enum_index, this_enum_value in enumerate(enum_info.values)
+                                ]
+                            ),
+                            4,
+                        ),
+                    ),
+                )
+
+            custom_enums = "\n".join(custom_enums)
+
+            if not wrote_custom_data:
                 f.write(
                     textwrap.dedent(
                         """\
-                        {custom_structs}
+                        {first_sep}{custom_structs}{sep}{custom_enums}
                         """,
                     ).format(
-                        custom_structs="" if not custom_structs else "{}\n\n".format(
-                            custom_structs.strip(),
-                        ),
+                        first_sep="\n" if custom_structs or custom_enums else "",
+                        custom_structs="" if not custom_structs else "{}\n\n".format(custom_structs.strip()),
+                        sep="\n\n" if custom_structs and custom_enums else "",
+                        custom_enums="" if not custom_enums else "{}\n\n".format(custom_enums.strip()),
                         **d
                     )
                 )
-            custom_struct_flag = True
+                wrote_custom_data = True
+
             f.write(
                 textwrap.dedent(
                     """\
@@ -1171,7 +1214,7 @@ class CData(object):
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
-    def __init__(self, item, global_custom_structs):
+    def __init__(self, item, global_custom_structs, global_custom_enums):
         # Create the custom structs
         custom_structs = OrderedDict()
 
@@ -1186,6 +1229,12 @@ class CData(object):
                 members[member.name] = tif()
 
             custom_structs[custom_struct.name] = members
+
+        # Create the custom enums
+        custom_enums = OrderedDict()
+
+        for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
+            custom_enums[custom_enum.name] = custom_enum
 
         # Create the configuration param factories
         configuration_param_type_info_factories = []
@@ -1210,6 +1259,7 @@ class CData(object):
 
         # Commit the results
         self.CustomStructs                              = custom_structs
+        self.CustomEnums                                = custom_enums
         self.ConfigurationParamTypeInfoFactories        = configuration_param_type_info_factories
         self.InputTypeInfoFactory                       = input_type_info_factory
         self.OutputTypeInfoFactory                      = output_type_info_factory
