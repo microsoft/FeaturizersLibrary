@@ -11,8 +11,7 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
-namespace {
-//the following functions in anonymous space are introduced from RedSVD
+//the following functions are introduced from RedSVD
 //Copyright attached
 /* 
  * A header-only version of RedSVD
@@ -111,8 +110,6 @@ inline void gram_schmidt(MatrixType& mat) {
         mat.col(i) /= norm;
     }
 }
-
-} //anonymous namespace
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         TruncatedSVDTransformer
