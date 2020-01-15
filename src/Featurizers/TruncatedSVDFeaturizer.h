@@ -160,7 +160,16 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override;
+     // MSVC has problems when the declaration and definition are separated
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
+        if (input.size() == 0)
+            throw std::invalid_argument("Input matrix size() invalid");
+    
+        if (input.cols() != _singularvectors.rows()) 
+            throw std::invalid_argument("Input matrix cols() invalid");
+
+        callback(input * _singularvectors);
+    }
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -209,7 +218,12 @@ private:
     // |
     // ----------------------------------------------------------------------
     bool begin_training_impl(void) override;
-    FitResult fit_impl(typename BaseType::InputType const *, size_t) override;
+    // MSVC has problems when the declaration and definition are separated
+    FitResult fit_impl(typename BaseType::InputType const *pBuffer, size_t) override {
+        _matrix = *pBuffer;
+
+        return FitResult::Continue;
+    }
     void complete_training_impl(void) override;
 
     // MSVC has problems when the definition is separate from the declaration
@@ -296,17 +310,6 @@ void TruncatedSVDTransformer<MatrixT>::save(Archive &ar) const /*override*/ {
     Traits<decltype(_singularvectors)>::serialize(ar, _singularvectors);
 }
 
-template <typename MatrixT>
-void TruncatedSVDTransformer<MatrixT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
-    if (input.size() == 0)
-        throw std::invalid_argument("Input matrix size() invalid");
-    
-    if (input.cols() != _singularvectors.rows()) 
-        throw std::invalid_argument("Input matrix cols() invalid");
-
-    callback(input * _singularvectors);
-}
-
 // ----------------------------------------------------------------------
 // |
 // |  TruncatedSVDEstimator
@@ -336,13 +339,6 @@ bool TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::begin_training_impl(v
 }
 
 template <typename MatrixT, size_t MaxNumTrainingItemsV>
-FitResult TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *pBuffer, size_t) /*override*/ {
-    _matrix = *pBuffer;
-
-    return FitResult::Continue;
-}
-
-template <typename MatrixT, size_t MaxNumTrainingItemsV>
 void TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
     //the following code in this function is introduced from RedSVD
     typedef typename MatrixT::Scalar Scalar;
@@ -355,7 +351,7 @@ void TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::complete_training_imp
     sample_gaussian(O);
 			
     // Compute Sample Matrix of _matrix^T
-    DenseMatrix Y = _matrix.transpose() * std::move(O);
+    DenseMatrix Y = _matrix.transpose() * O;
 			
     // Orthonormalize Y
     gram_schmidt(Y);
@@ -374,14 +370,14 @@ void TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::complete_training_imp
     gram_schmidt(Z);
 			
     // Range(C) = Range(B)
-    DenseMatrix C = Z.transpose() * std::move(B); 
+    DenseMatrix C = Z.transpose() * B; 
 			
     Eigen::JacobiSVD<DenseMatrix> svdOfC(C, Eigen::ComputeThinV);
 			
     // C = USV^T
     // A = Z * U * S * V^T * Y^T()
     this->_singularValues = svdOfC.singularValues();
-    this->_singularVectors = std::move(Y) * svdOfC.matrixV();
+    this->_singularVectors = Y * svdOfC.matrixV();
 }
 
 } // namespace Featurizers
