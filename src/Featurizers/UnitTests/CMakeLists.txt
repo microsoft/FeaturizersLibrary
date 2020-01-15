@@ -52,7 +52,6 @@ foreach(_test_name IN ITEMS
 
     target_link_libraries(${_test_name} PRIVATE
         FeaturizersCode
-        eigen
     )
 
     add_test(NAME ${_test_name} COMMAND ${_test_name} --success)
