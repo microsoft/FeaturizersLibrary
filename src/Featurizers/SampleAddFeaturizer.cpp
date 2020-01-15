@@ -22,11 +22,11 @@ public:
 
     // ----------------------------------------------------------------------
     // |  Public Methods
-    SampleAddTransformer(std::uint32_t delta) :
+    explicit SampleAddTransformer(std::uint32_t delta) :
         Delta(delta) {
     }
 
-    SampleAddTransformer(Archive &ar) :
+    explicit SampleAddTransformer(Archive &ar) :
         SampleAddTransformer(
             [&ar](void) {
                 // Version
