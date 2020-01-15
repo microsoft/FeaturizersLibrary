@@ -898,52 +898,49 @@ struct Traits<std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT>> : publi
     }
 };
 
-
-namespace {
-
-template <typename ArchiveT, typename MatrixT>
-ArchiveT & SerializeMatrix(ArchiveT &ar, MatrixT const &value) {
-    ar.serialize(static_cast<typename MatrixT::Index>(value.rows()));
-    ar.serialize(static_cast<typename MatrixT::Index>(value.cols()));
-
-    for (typename MatrixT::Index rowId = 0; rowId < value.rows(); ++rowId) {
-        for (typename MatrixT::Index colId = 0; colId < value.cols(); ++colId) {
-            Traits<typename MatrixT::Scalar>::serialize(ar, value(rowId, colId));
-        }   
-    }
-    
-    return ar;
-}
-
-template <typename MatrixT, typename ArchiveT>
-MatrixT DeserializeMatrix(ArchiveT &ar) {
-    typename MatrixT::Index                 numRows(ar.template deserialize<typename MatrixT::Index>());
-    typename MatrixT::Index                 numCols(ar.template deserialize<typename MatrixT::Index>());
-
-    MatrixT                                 result(numRows, numCols);
-
-    for (typename MatrixT::Index rowId = 0; rowId < numRows; ++rowId) {
-        for (typename MatrixT::Index colId = 0; colId < numCols; ++colId) {
-            typename MatrixT::Scalar        element(Traits<typename MatrixT::Scalar>::deserialize(ar));
-            result(rowId, colId) = element;
-        }   
-    }
-
-    return result;
-}
-
-} // anonymous namespace
-
 template <typename T>
-struct Traits<Eigen::MatrixX<T>> {
+struct Traits<Eigen::MatrixX<T>> : public TraitsImpl<Eigen::MatrixX<T>> {
+
+    static std::string ToString(Eigen::MatrixX<T> const &value) {
+        return ToStringImpl(value.data(), static_cast<size_t>(value.size()));
+    }
+
+    static Eigen::MatrixX<T> FromString(std::string const &value) {
+        std::ignore = value; throw std::logic_error("Not Implemented Yet");
+    }
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, Eigen::MatrixX<T> const &value) {
-        return SerializeMatrix(ar, value);
+        using MatrixT = Eigen::MatrixX<T>;
+
+        ar.serialize(static_cast<typename MatrixT::Index>(value.rows()));
+        ar.serialize(static_cast<typename MatrixT::Index>(value.cols()));
+
+        for (typename MatrixT::Index rowId = 0; rowId < value.rows(); ++rowId) {
+            for (typename MatrixT::Index colId = 0; colId < value.cols(); ++colId) {
+                Traits<typename MatrixT::Scalar>::serialize(ar, value(rowId, colId));
+            }   
+        }
+    
+        return ar;
     }
 
     template <typename ArchiveT>
     static Eigen::MatrixX<T> deserialize(ArchiveT &ar) {
-        return DeserializeMatrix<Eigen::MatrixX<T>>(ar);
+        using MatrixT  = Eigen::MatrixX<T>;
+
+        typename MatrixT::Index                 numRows(ar.template deserialize<typename MatrixT::Index>());
+        typename MatrixT::Index                 numCols(ar.template deserialize<typename MatrixT::Index>());
+
+        MatrixT                                 result(numRows, numCols);
+
+        for (typename MatrixT::Index rowId = 0; rowId < numRows; ++rowId) {
+            for (typename MatrixT::Index colId = 0; colId < numCols; ++colId) {
+                result(rowId, colId) = Traits<typename MatrixT::Scalar>::deserialize(ar);
+            }   
+        }
+
+        return result;
     }
 };
 
