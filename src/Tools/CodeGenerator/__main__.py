@@ -186,6 +186,7 @@ def EntryPoint(
             ),
             suffix=lambda: "\n" if nonlocals.skipped else None,
         ) as this_dm:
+            # Get the global custom structs
             global_custom_struct_names = set()
             global_custom_structs = []
 
@@ -195,6 +196,17 @@ def EntryPoint(
 
                 global_custom_struct_names.add(item.name)
                 global_custom_structs.append(item)
+
+            # Get the global custom enums
+            global_custom_enum_names = set()
+            global_custom_enums = []
+
+            for item in data.custom_enums:
+                if item.name in global_custom_enum_names:
+                    raise Exception("The custom enum '{}' has already been defined".format(item.name))
+
+                global_custom_enum_names.add(item.name)
+                global_custom_enums.append(item)
 
             # If there are templates at play, preprocess the content and expand the values
             new_data = []
@@ -271,6 +283,10 @@ def EntryPoint(
                             for member in custom_struct.members:
                                 member.type = regex.sub(template_type, member.type)
 
+                        for custom_enum in getattr(new_item, "custom_enums", []):
+                            if any(gce for gce in global_custom_enums if gce.name == custom_enum.name):
+                                raise Exception("The custom enum '{}' in '{}' has already been defined as a global custom enum.\n".format(custom_enum.name, item.name))
+
                         for mapping in item.type_mappings:
                             # Since we can have multiple templates this is for when a mapping doesn't use a template or not the current template
                             if (
@@ -311,9 +327,19 @@ def EntryPoint(
                         )
 
                     # ----------------------------------------------------------------------
+                    def IsCustomEnumType(typename):
+                        return any(
+                            custom_enum
+                            for custom_enum in itertools.chain(getattr(item, "custom_enums", []), global_custom_enums)
+                            if custom_enum.name == typename
+                        )
 
-                    if item.input_type not in SUPPORTED_TYPES and not IsCustomStructType(
-                        item.input_type,
+                    # ----------------------------------------------------------------------
+
+                    if (
+                        item.input_type not in SUPPORTED_TYPES
+                        and not IsCustomStructType(item.input_type)
+                        and not IsCustomEnumType(item.input_type)
                     ):
                         raise Exception(
                             "The input type '{}' defined in '{}' is not valid.".format(
@@ -325,6 +351,7 @@ def EntryPoint(
                     if (
                         item.output_type not in SUPPORTED_TYPES
                         and not IsCustomStructType(item.output_type)
+                        and not IsCustomEnumType(item.output_type)
                     ):
                         raise Exception(
                             "The output type '{}' defined in '{}' is not valid.".format(
@@ -337,7 +364,13 @@ def EntryPoint(
         with dm.stream.DoneManager() as this_dm:
             FileSystem.MakeDirs(output_dir)
 
-            this_dm.result = plugin.Generate(global_custom_structs, data, output_dir, this_dm.stream)
+            this_dm.result = plugin.Generate(
+                global_custom_structs,
+                global_custom_enums,
+                data,
+                output_dir,
+                this_dm.stream,
+            )
             if this_dm.result != 0:
                 return this_dm.result
 
