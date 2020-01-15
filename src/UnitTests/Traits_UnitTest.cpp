@@ -409,7 +409,6 @@ TEST_CASE("Serialization") {
     matrix(0, 0) = 1.0f;
     matrix(0, 1) = 0.0f;
     CHECK(SerializationTestImpl(Eigen::MatrixX<float>()));
-    CHECK(SerializationTestImpl(Eigen::MatrixX<float>(1, 2)));
     CHECK(SerializationTestImpl(matrix));
 
     CHECK(SerializationTestImpl(nonstd::optional<int>()));
