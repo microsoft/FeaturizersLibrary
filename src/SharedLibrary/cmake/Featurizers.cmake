@@ -88,6 +88,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PointerTable.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.cpp
 

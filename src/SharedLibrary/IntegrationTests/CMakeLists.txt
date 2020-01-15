@@ -39,6 +39,7 @@ foreach(_test_name IN ITEMS
     SharedLibrary_MDFeaturizer_IntegrationTest
     SharedLibrary_OHEFeaturizer_IntegrationTest
     SharedLibrary_RSFeaturizer_IntegrationTest
+    SharedLibrary_SSWFeaturizer_IntegrationTest
     SharedLibrary_StringFeaturizer_IntegrationTest
     SharedLibrary_TSIFeaturizer_IntegrationTest
 )
