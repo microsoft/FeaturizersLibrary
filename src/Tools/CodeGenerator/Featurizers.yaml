@@ -634,15 +634,51 @@ featurizers:
     estimator_name: StandardScaleWrapperEstimator
     num_output_columns: 1
     description: |-
-      TODO
+      Standardize features by removing the mean and scaling to unit variance based on input flag with_mean and with_std
+      standard score of a sample x is calculated as
+        z = (x - u) / s
+      where u is the mean of the training samples or 0 if with_mean is false, and s is the standard deviation of the training samples or 1 if with_std is false
 
       C++-style pseudo signature:
-        TODO
+        template <typeanem T> double(T const &value);
 
       Examples:
-        TODO
+        Given the training data [0, 0, 1, 1];
+          mean: 0.5
+          std: 0.5
 
-    status: Pending
+        execute(2) = (2 - 0.5) / 0.5 = 3 if with_mean is true and with_std is true
+        execute(2) = (2 - 0.5) / 1 = 1.5 if with_mean is true and with_std is false
+        execute(2) = (2 - 0) / 0.5 = 4 if with_mean is false and with_std is true
+        execute(2) = (2 - 0) / 1 = 2 if with_mean is false and with_std is false
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+
+    type_mappings:
+      - input_type: T
+        output_type: double
+
+    configuration_params:
+      - type: bool
+        name: withMean
+        is_optional: false
+
+      - type: bool
+        name: withStd
+        is_optional: false
+
 
   # ----------------------------------------------------------------------
   - name: StringFeaturizer
