@@ -56,6 +56,8 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
+    static_assert(Traits<T>::IsNullableType == false || Traits<T>::IsNativeNullableType, "Support for nullable types has not been implemented yet");
+
     using InputType                         = T;
 
     // ----------------------------------------------------------------------

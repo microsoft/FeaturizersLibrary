@@ -249,6 +249,18 @@ TEST_CASE("Unordered map") {
     CHECK(map_res == map_s);
 }
 
+TEST_CASE("Transformer_EigenMatrix") {
+    Eigen::MatrixX<int> matrix(1, 3);
+    matrix(0, 0) = 1;
+    matrix(0, 1) = 2;
+    matrix(0, 2) = 3;
+    std::string matrix_res = Traits<Eigen::MatrixX<int>>::ToString(matrix);
+    std::string matrix_s{ "[1,2,3]" };
+    CHECK(matrix_res == matrix_s);
+
+    CHECK_THROWS_WITH((Traits<Eigen::MatrixX<int>>::FromString(matrix_res)), "Not Implemented Yet");
+}
+
 TEST_CASE("Transformer_Tuples") {
     std::tuple<int, std::string, double> tu(42, "hi", -3.14);
     std::string tu_res = Traits<std::tuple<int, std::string, double>>::ToString(tu);
@@ -272,7 +284,7 @@ bool SerializationTestImpl(T const &value) {
     Archive                                 in(out.commit());
     T const                                 other(Traits<T>::deserialize(in));
 
-    return in.AtEnd() && other == value;
+    return in.AtEnd() && (other == value);
 }
 
 TEST_CASE("Transformer_TimePoint") {
@@ -393,6 +405,12 @@ TEST_CASE("Serialization") {
     CHECK(SerializationTestImpl(std::unordered_map<int, std::string>{ {10, "ten"}, {20, "twenty"} }));
     CHECK(SerializationTestImpl(std::unordered_map<std::string, int>{ {"ten", 10}, {"twenty", 20} }));
 
+    CHECK(SerializationTestImpl(Eigen::MatrixX<float>()));
+    Eigen::MatrixX<float> matrix(1, 2);
+    matrix(0, 0) = 1.0f;
+    matrix(0, 1) = 0.0f;
+    CHECK(SerializationTestImpl(matrix));
+
     CHECK(SerializationTestImpl(nonstd::optional<int>()));
     CHECK(SerializationTestImpl(nonstd::optional<int>(23)));
     CHECK(SerializationTestImpl(nonstd::optional<std::string>("foo")));
@@ -402,7 +420,7 @@ TEST_CASE("Serialization") {
 
 template <typename T>
 bool TestCreateNullValue(void) {
-    return Traits<T>::IsNull(Traits<T>::CreateNullValue());
+    return Traits<typename Traits<T>::nullable_type>::IsNull(Traits<T>::CreateNullValue());
 }
 
 TEST_CASE("CreateNullValue") {
@@ -421,5 +439,6 @@ TEST_CASE("CreateNullValue") {
     CHECK(TestCreateNullValue<std::vector<std::string>>());
     CHECK(TestCreateNullValue<std::map<std::string, std::uint32_t>>());
     CHECK(TestCreateNullValue<std::unordered_map<std::string, std::uint32_t>>());
+    CHECK(TestCreateNullValue<Eigen::MatrixX<std::float_t>>());
     CHECK(TestCreateNullValue<nonstd::optional<std::int8_t>>());
 }

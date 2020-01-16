@@ -6,9 +6,6 @@ parameters:
   azure_dev_ops_project_id: "" # 7b4fddf7-fb53-4b12-bfcb-f87ad3774a32 (The project GUID from which to download the pipeline artifacts)
 
 steps:
-  - checkout: self
-    persistCredentials: true
-    clean: true
 
   - template: Publish.initialize_steps_template.yaml
     parameters:

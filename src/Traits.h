@@ -14,6 +14,32 @@
 #include <unordered_map>
 #include <vector>
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wold-style-cast"
+#   pragma clang diagnostic ignored "-Wsign-conversion"
+#   pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#   pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#   pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#   pragma clang diagnostic ignored "-Wmissing-noreturn"
+#   pragma clang diagnostic ignored "-Wdocumentation"
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#   pragma clang diagnostic ignored "-Wcast-align"
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#   pragma clang diagnostic ignored "-Wshadow"
+#elif (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4127)
+#endif
+
+#include "3rdParty/eigen/Eigen/Dense"
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#elif (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
+
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
@@ -135,14 +161,17 @@ struct Traits {
     //
     //   // Methods
     //   - static nullable_type CreateNullValue(void);
-    //   - static bool IsNull(nullable_type const &value);
-    //   - static T const & GetNullableValue(nullable_type const &value);
-    //   - static T & GetNullableValue(nullable_type &value);
+    //
     //   - static std::string ToString(T const &value);
     //   - static T FromString(std::string const &value);
+    //
     //   - template <typename ArchiveT> static ArchiveT & serialize(ArchiveT &ar, T const &value);
     //   - template <typename ArchiveT> static T deserialize(ArchiveT &ar);
     //
+    //   // The following methods should be implemented if the type is a nullable type
+    //   - static bool IsNull(nullable_type const &value);
+    //   - static T const & GetNullableValue(nullable_type const &value);
+    //   - static T & GetNullableValue(nullable_type &value);
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -184,29 +213,10 @@ struct TraitsImpl {
     static nullable_type CreateNullValue(void) {
         return nullable_type();
     }
-    static bool IsNull(T const&) {
-        return false;
-    }
-    static bool IsNull(nullable_type const& value) {
-        return !value.has_value();
-    }
 
     struct IsIntOrNumeric {
         static constexpr bool const value = false;
     };
-
-    static T const & GetNullableValue(nullable_type const &value) {
-        if (IsNull(value))
-            throw std::runtime_error("GetNullableValue attempt on a null value.");
-        return *value;
-    }
-
-    static T & GetNullableValue(nullable_type &value) {
-        if(IsNull(value))
-            throw std::runtime_error("GetNullableValue attempt on a null value.");
-
-        return *value;
-    }
 };
 
 #if (defined __clang__)
@@ -885,6 +895,52 @@ struct Traits<std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT>> : publi
     template <typename ArchiveT>
     static std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT> deserialize(ArchiveT &ar) {
         return DeserializeMap<std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT>>(ar);
+    }
+};
+
+template <typename T>
+struct Traits<Eigen::MatrixX<T>> : public TraitsImpl<Eigen::MatrixX<T>> {
+
+    static std::string ToString(Eigen::MatrixX<T> const &value) {
+        return ToStringImpl(value.data(), static_cast<size_t>(value.size()));
+    }
+
+    static Eigen::MatrixX<T> FromString(std::string const &value) {
+        std::ignore = value; throw std::logic_error("Not Implemented Yet");
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, Eigen::MatrixX<T> const &value) {
+        using MatrixT = Eigen::MatrixX<T>;
+
+        ar.serialize(static_cast<typename MatrixT::Index>(value.rows()));
+        ar.serialize(static_cast<typename MatrixT::Index>(value.cols()));
+
+        for (typename MatrixT::Index rowId = 0; rowId < value.rows(); ++rowId) {
+            for (typename MatrixT::Index colId = 0; colId < value.cols(); ++colId) {
+                Traits<typename MatrixT::Scalar>::serialize(ar, value(rowId, colId));
+            }   
+        }
+    
+        return ar;
+    }
+
+    template <typename ArchiveT>
+    static Eigen::MatrixX<T> deserialize(ArchiveT &ar) {
+        using MatrixT  = Eigen::MatrixX<T>;
+
+        typename MatrixT::Index                 numRows(ar.template deserialize<typename MatrixT::Index>());
+        typename MatrixT::Index                 numCols(ar.template deserialize<typename MatrixT::Index>());
+
+        MatrixT                                 result(numRows, numCols);
+
+        for (typename MatrixT::Index rowId = 0; rowId < numRows; ++rowId) {
+            for (typename MatrixT::Index colId = 0; colId < numCols; ++colId) {
+                result(rowId, colId) = Traits<typename MatrixT::Scalar>::deserialize(ar);
+            }   
+        }
+
+        return result;
     }
 };
 
