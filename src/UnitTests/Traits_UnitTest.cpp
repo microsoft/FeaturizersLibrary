@@ -284,7 +284,7 @@ bool SerializationTestImpl(T const &value) {
     Archive                                 in(out.commit());
     T const                                 other(Traits<T>::deserialize(in));
 
-    return in.AtEnd() && other == value;
+    return in.AtEnd() && (other == value);
 }
 
 TEST_CASE("Transformer_TimePoint") {
@@ -405,10 +405,10 @@ TEST_CASE("Serialization") {
     CHECK(SerializationTestImpl(std::unordered_map<int, std::string>{ {10, "ten"}, {20, "twenty"} }));
     CHECK(SerializationTestImpl(std::unordered_map<std::string, int>{ {"ten", 10}, {"twenty", 20} }));
 
+    CHECK(SerializationTestImpl(Eigen::MatrixX<float>()));
     Eigen::MatrixX<float> matrix(1, 2);
     matrix(0, 0) = 1.0f;
     matrix(0, 1) = 0.0f;
-    CHECK(SerializationTestImpl(Eigen::MatrixX<float>()));
     CHECK(SerializationTestImpl(matrix));
 
     CHECK(SerializationTestImpl(nonstd::optional<int>()));
