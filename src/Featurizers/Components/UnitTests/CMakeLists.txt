@@ -42,6 +42,7 @@ SET(
     StandardDeviationEstimator_UnitTest
     StatisticalMetricsEstimator_UnitTest
     TrainingOnlyEstimatorImpl_UnitTest
+    VectorNormsEstimator_UnitTest
     # TODO: Add tests for:
     #   - TimeSeriesFrequencyEstimator
     #   - TimeSeriesMedianEstimator

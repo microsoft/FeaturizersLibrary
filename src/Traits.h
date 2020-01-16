@@ -207,7 +207,7 @@ template <typename T>
 struct TraitsImpl {
     static constexpr bool const             IsNullableType = false;
     static constexpr bool const             IsNativeNullableType = false;
-
+    static constexpr bool const             IsVectorType = false;
     using nullable_type = nonstd::optional<T>;
 
     static nullable_type CreateNullValue(void) {
@@ -763,6 +763,8 @@ struct Traits<std::array<T, ArrayV>> : public TraitsImpl<std::array<T, ArrayV>> 
 
 template <typename T, typename AllocatorT>
 struct Traits<std::vector<T, AllocatorT>> : public TraitsImpl<std::vector<T, AllocatorT>> {
+    static constexpr bool const             IsVectorType = true;
+
     static std::string ToString(std::vector<T, AllocatorT> const& value) {
         return ToStringImpl(value.data(), value.size());
     }
@@ -919,9 +921,9 @@ struct Traits<Eigen::MatrixX<T>> : public TraitsImpl<Eigen::MatrixX<T>> {
         for (typename MatrixT::Index rowId = 0; rowId < value.rows(); ++rowId) {
             for (typename MatrixT::Index colId = 0; colId < value.cols(); ++colId) {
                 Traits<typename MatrixT::Scalar>::serialize(ar, value(rowId, colId));
-            }   
+            }
         }
-    
+
         return ar;
     }
 
@@ -937,7 +939,7 @@ struct Traits<Eigen::MatrixX<T>> : public TraitsImpl<Eigen::MatrixX<T>> {
         for (typename MatrixT::Index rowId = 0; rowId < numRows; ++rowId) {
             for (typename MatrixT::Index colId = 0; colId < numCols; ++colId) {
                 result(rowId, colId) = Traits<typename MatrixT::Scalar>::deserialize(ar);
-            }   
+            }
         }
 
         return result;

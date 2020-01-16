@@ -67,6 +67,8 @@ public:
     // ----------------------------------------------------------------------
     L1NormUpdater(void);
 
+    void reset(void);
+
     void update(InputType input);
 
     long double commit(void);
@@ -110,6 +112,8 @@ public:
     // |
     // ----------------------------------------------------------------------
     L2NormUpdater(void);
+
+    void reset(void);
 
     void update(InputType input);
 
@@ -156,6 +160,8 @@ public:
 
     MaxNormUpdater(void);
 
+    void reset(void);
+
     void update(InputType input);
 
     typename TypeSelector::MaxNormTypeSelector<T>::type commit(void);
@@ -198,6 +204,11 @@ Updaters::L1NormUpdater<T>::L1NormUpdater() :
 }
 
 template <typename T>
+void Updaters::L1NormUpdater<T>::reset() {
+    _l1_norm = 0;
+    _update_flag = false;
+}
+template <typename T>
 void Updaters::L1NormUpdater<T>::update(T input) {
     if (!_update_flag) {
         _update_flag = true;
@@ -237,6 +248,11 @@ Updaters::L2NormUpdater<T>::L2NormUpdater() :
 }
 
 template <typename T>
+void Updaters::L2NormUpdater<T>::reset() {
+    _l2_norm = 0;
+    _update_flag = false;
+}
+template <typename T>
 void Updaters::L2NormUpdater<T>::update(T input) {
     if (!_update_flag) {
         _update_flag = true;
@@ -274,6 +290,11 @@ Updaters::MaxNormUpdater<T>::MaxNormUpdater() :
     _update_flag(false) {
 }
 
+template <typename T>
+void Updaters::MaxNormUpdater<T>::reset() {
+    _max_norm = 0;
+    _update_flag = false;
+}
 template <typename T>
 void Updaters::MaxNormUpdater<T>::update(T input) {
     if (!_update_flag) {
