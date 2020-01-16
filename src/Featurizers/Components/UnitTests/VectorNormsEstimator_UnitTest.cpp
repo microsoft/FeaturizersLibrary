@@ -28,7 +28,7 @@ TEST_CASE("all zeros - l1 norm") {
 
     NS::Featurizers::Components::VectorNormsAnnotationData const &       annotation(estimator.get_annotation_data());
 
-    std::vector<long double> norms({0, 0, 0, 0});
+    std::vector<std::double_t> norms({0, 0, 0, 0});
     CHECK(annotation.Norms   == norms);
     CHECK(annotation.Type    == NS::Featurizers::NormType::L1);
 }
@@ -46,7 +46,7 @@ TEST_CASE("1D matrix - l2 norm") {
 
     NS::Featurizers::Components::VectorNormsAnnotationData const &       annotation(estimator.get_annotation_data());
 
-    std::vector<long double> norms({13});
+    std::vector<std::double_t> norms({13});
     CHECK(annotation.Norms   == norms);
     CHECK(annotation.Type    == NS::Featurizers::NormType::L2);
 }
@@ -67,7 +67,7 @@ TEST_CASE("int16_t - l2 norm") {
 
     NS::Featurizers::Components::VectorNormsAnnotationData const &       annotation(estimator.get_annotation_data());
 
-    std::vector<long double> norms({0, 5, 3, 6});
+    std::vector<std::double_t> norms({0, 5, 3, 6});
     CHECK(annotation.Norms   == norms);
     CHECK(annotation.Type    == NS::Featurizers::NormType::L2);
 }
@@ -89,10 +89,10 @@ TEST_CASE("double - max norm") {
 
     NS::Featurizers::Components::VectorNormsAnnotationData const &       annotation(estimator.get_annotation_data());
 
-    std::vector<long double> norms({static_cast<long double>(20.0),
-                                    static_cast<long double>(45.0),
-                                    static_cast<long double>(78.3),
-                                    static_cast<long double>(87.9)});
+    std::vector<std::double_t> norms({static_cast<long double>(20.0),
+                                      static_cast<long double>(45.0),
+                                      static_cast<long double>(78.3),
+                                      static_cast<long double>(87.9)});
     CHECK(annotation.Norms   == norms);
     CHECK(annotation.Type    == NS::Featurizers::NormType::MAX);
 }
