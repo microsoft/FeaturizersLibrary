@@ -71,7 +71,7 @@ Used to push binaries to Azure resources during publish.
     Connection Name:                                    AI Infra Build (<guid>)
     Scope level:                                        Subscription
     Subscription:                                       AI Infra Build (<guid>)
-    Resource Group:                                     FeaturizersBuild
+    Resource Group:                                     FeaturizersLibraryBuild
 
 ESRP CodeSigning Connection
 ---------------------------
@@ -91,15 +91,15 @@ Used to push NuGet packages.
     Feed URL:                                           https://api.nuget.org/v3/index.json
     ApiKey:                                             Created on NuGet.org and then copied to the Azure DevOps connection dialog window for one-tiem usage
 
-featurizersbuild
-----------------
+featurizerslibrarybuild
+-----------------------
 Used to pull the universal_linux Docker image for universal_linux builds.
 
     Type:                                               Dockerregistry
     Registry Type:                                      Azure Container Registry
-    Connection name:                                    featurizersbuild
+    Connection name:                                    featurizerslibrarybuild
     Azure subscription:                                 AI Infra Build
-    Azure container registry:                           featurizersbuild
+    Azure container registry:                           featurizerslibrarybuild
 
 Azure DevOps Settings
 =====================

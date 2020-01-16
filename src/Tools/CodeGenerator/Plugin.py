@@ -51,9 +51,10 @@ class Plugin(Interface.Interface):
     # ----------------------------------------------------------------------
     @staticmethod
     @Interface.abstractmethod
-    def Generate(data, output_dir, status_stream):
+    def Generate(global_custom_structs, global_custom_enums, data, output_dir, status_stream):
         """Generates content based on the provided data. Returns a result code."""
         raise Exception("Abstract method")
+
 
 # ----------------------------------------------------------------------
 class TypeVisitor(Interface.Interface):
@@ -75,33 +76,31 @@ class TypeVisitor(Interface.Interface):
         **kwargs
     ):
         simple_type_map = {
-            "int8_t": cls.OnInt8,
-            "int16_t": cls.OnInt16,
-            "int32_t": cls.OnInt32,
-            "int64_t": cls.OnInt64,
-            "uint8_t": cls.OnUInt8,
-            "uint16_t": cls.OnUInt16,
-            "uint32_t": cls.OnUInt32,
-            "uint64_t": cls.OnUInt64,
-            "float32_t": cls.OnFloat32,
-            "float_t": cls.OnFloat32,
-            "double_t": cls.OnFloat64,
+            "int8": cls.OnInt8,
+            "int16": cls.OnInt16,
+            "int32": cls.OnInt32,
+            "int64": cls.OnInt64,
+            "uint8": cls.OnUInt8,
+            "uint16": cls.OnUInt16,
+            "uint32": cls.OnUInt32,
+            "uint64": cls.OnUInt64,
+            "float32": cls.OnFloat32,
+            "float": cls.OnFloat32,
+            "double": cls.OnFloat64,
             "bool": cls.OnBool,
             "string": cls.OnString,
         }
 
-        search_string = type_string.replace("std::", "")
-
-        func = simple_type_map.get(search_string, None)
+        func = simple_type_map.get(type_string, None)
         if func is not None:
             return func(type_string, *args, **kwargs)
 
         if cls._Accept_Regex is None:
             cls._Accept_Regex = re.compile(r"^(?P<type>\S+)<(?P<template>.+)>$")
 
-        match = cls._Accept_Regex.match(search_string)
+        match = cls._Accept_Regex.match(type_string)
         if not match:
-            if supported_custom_types and search_string in supported_custom_types:
+            if supported_custom_types and type_string in supported_custom_types:
                 return cls.OnCustomType(type_string, *args, **kwargs)
 
             raise Exception("'{}' is not a supported type".format(type_string))
@@ -123,7 +122,12 @@ class TypeVisitor(Interface.Interface):
 
         template_args = cls._GetTemplateArgs(match.group("template"))
         if len(template_args) != expected_num_template_args:
-            raise Exception("'{}' was expected to have {} template arg(s)".format(type_string, expected_num_template_args))
+            raise Exception(
+                "'{}' was expected to have {} template arg(s)".format(
+                    type_string,
+                    expected_num_template_args,
+                ),
+            )
 
         return func(template_args, *args, **kwargs)
 
@@ -270,7 +274,7 @@ class TypeVisitor(Interface.Interface):
                 if bracket_count or brace_count or paren_count or template_count:
                     continue
 
-                template_args.append(template[prev_index : index].strip())
+                template_args.append(template[prev_index:index].strip())
                 prev_index = index + 1
 
         if prev_index < len(template):

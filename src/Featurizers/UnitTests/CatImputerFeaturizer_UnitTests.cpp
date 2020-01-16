@@ -136,26 +136,23 @@ TEST_CASE("CatImputer- All values Null") {
 }
 
 TEST_CASE("Serialization/Deserialization- Numeric") {
-    using type                              = nonstd::optional<std::int64_t>;
     using transformedType                   = std::int64_t;
-    using transformerType                   = NS::Featurizers::CatImputerTransformer<type,transformedType>;
+    using transformerType                   = NS::Featurizers::CatImputerTransformer<transformedType>;
 
     auto model = std::make_shared<transformerType>(10);
 
     NS::Archive archive;
     model->save(archive);
     std::vector<unsigned char> vec = archive.commit();
-    CHECK(vec.size() == 8);
-
+    
     NS::Archive loader(vec);
     transformerType modelLoaded(loader);
     CHECK(modelLoaded.Value == model->Value);
 }
 
 TEST_CASE("Serialization/Deserialization- string") {
-    using type                              = nonstd::optional<std::string>;
     using transformedType                   = std::string;
-    using transformerType                   = NS::Featurizers::CatImputerTransformer<type,transformedType>;
+    using transformerType                   = NS::Featurizers::CatImputerTransformer<transformedType>;
 
     auto model = std::make_shared<transformerType>("one");
 
@@ -167,4 +164,18 @@ TEST_CASE("Serialization/Deserialization- string") {
     transformerType modelLoaded(loader);
     CHECK(modelLoaded.Value == model->Value);
 
+}
+
+TEST_CASE("Serialization Version Error") {
+    NS::Archive                             out;
+
+    out.serialize(static_cast<std::uint16_t>(2));
+    out.serialize(static_cast<std::uint16_t>(0));
+
+    NS::Archive                             in(out.commit());
+
+    CHECK_THROWS_WITH(
+        NS::Featurizers::CatImputerTransformer<std::string>(in),
+        Catch::Contains("Unsupported archive version")
+    );
 }

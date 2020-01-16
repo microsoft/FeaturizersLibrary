@@ -5,12 +5,16 @@
 #pragma once
 
 #include "SharedLibrary_StringFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
+
+#include "SharedLibrary_Common.hpp"
 
 /* ---------------------------------------------------------------------- */
-/* |  StringFeaturizer <int8_t> */
+/* |  StringFeaturizer <int8> */
 template <typename VectorInputT>
-void StringFeaturizer_int8_t_Test(
+void StringFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::string> const &)> const &verify_func
@@ -18,9 +22,9 @@ void StringFeaturizer_int8_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    StringFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    StringFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_int8_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -29,35 +33,36 @@ void StringFeaturizer_int8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(StringFeaturizer_int8_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(StringFeaturizer_int8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(StringFeaturizer_int8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_int8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    StringFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    StringFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -65,20 +70,20 @@ void StringFeaturizer_int8_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(StringFeaturizer_int8_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    StringFeaturizer_int8_t_TransformerHandle * pTransformerHandle(nullptr);
+    StringFeaturizer_int8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_int8_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(StringFeaturizer_int8_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -90,14 +95,17 @@ void StringFeaturizer_int8_t_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
-        REQUIRE(StringFeaturizer_int8_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int8_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_int8_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -106,14 +114,14 @@ void StringFeaturizer_int8_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(StringFeaturizer_int8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  StringFeaturizer <int16_t> */
+/* |  StringFeaturizer <int16> */
 template <typename VectorInputT>
-void StringFeaturizer_int16_t_Test(
+void StringFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::string> const &)> const &verify_func
@@ -121,9 +129,9 @@ void StringFeaturizer_int16_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    StringFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    StringFeaturizer_int16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_int16_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -132,35 +140,36 @@ void StringFeaturizer_int16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(StringFeaturizer_int16_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(StringFeaturizer_int16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(StringFeaturizer_int16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_int16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    StringFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    StringFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -168,20 +177,20 @@ void StringFeaturizer_int16_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(StringFeaturizer_int16_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    StringFeaturizer_int16_t_TransformerHandle * pTransformerHandle(nullptr);
+    StringFeaturizer_int16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_int16_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(StringFeaturizer_int16_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -193,14 +202,17 @@ void StringFeaturizer_int16_t_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
-        REQUIRE(StringFeaturizer_int16_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int16_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_int16_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -209,14 +221,14 @@ void StringFeaturizer_int16_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(StringFeaturizer_int16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  StringFeaturizer <int32_t> */
+/* |  StringFeaturizer <int32> */
 template <typename VectorInputT>
-void StringFeaturizer_int32_t_Test(
+void StringFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::string> const &)> const &verify_func
@@ -224,9 +236,9 @@ void StringFeaturizer_int32_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    StringFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    StringFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_int32_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -235,35 +247,36 @@ void StringFeaturizer_int32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(StringFeaturizer_int32_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(StringFeaturizer_int32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(StringFeaturizer_int32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_int32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    StringFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    StringFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -271,20 +284,20 @@ void StringFeaturizer_int32_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(StringFeaturizer_int32_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    StringFeaturizer_int32_t_TransformerHandle * pTransformerHandle(nullptr);
+    StringFeaturizer_int32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_int32_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(StringFeaturizer_int32_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -296,14 +309,17 @@ void StringFeaturizer_int32_t_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
-        REQUIRE(StringFeaturizer_int32_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int32_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_int32_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -312,14 +328,14 @@ void StringFeaturizer_int32_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(StringFeaturizer_int32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  StringFeaturizer <int64_t> */
+/* |  StringFeaturizer <int64> */
 template <typename VectorInputT>
-void StringFeaturizer_int64_t_Test(
+void StringFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::string> const &)> const &verify_func
@@ -327,9 +343,9 @@ void StringFeaturizer_int64_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    StringFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    StringFeaturizer_int64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_int64_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -338,35 +354,36 @@ void StringFeaturizer_int64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(StringFeaturizer_int64_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(StringFeaturizer_int64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(StringFeaturizer_int64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_int64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    StringFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    StringFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -374,20 +391,20 @@ void StringFeaturizer_int64_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(StringFeaturizer_int64_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    StringFeaturizer_int64_t_TransformerHandle * pTransformerHandle(nullptr);
+    StringFeaturizer_int64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_int64_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(StringFeaturizer_int64_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -399,14 +416,17 @@ void StringFeaturizer_int64_t_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
-        REQUIRE(StringFeaturizer_int64_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int64_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_int64_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -415,14 +435,14 @@ void StringFeaturizer_int64_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(StringFeaturizer_int64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  StringFeaturizer <uint8_t> */
+/* |  StringFeaturizer <uint8> */
 template <typename VectorInputT>
-void StringFeaturizer_uint8_t_Test(
+void StringFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::string> const &)> const &verify_func
@@ -430,9 +450,9 @@ void StringFeaturizer_uint8_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    StringFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    StringFeaturizer_uint8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_uint8_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -441,35 +461,36 @@ void StringFeaturizer_uint8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(StringFeaturizer_uint8_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(StringFeaturizer_uint8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(StringFeaturizer_uint8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_uint8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    StringFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    StringFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -477,20 +498,20 @@ void StringFeaturizer_uint8_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(StringFeaturizer_uint8_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    StringFeaturizer_uint8_t_TransformerHandle * pTransformerHandle(nullptr);
+    StringFeaturizer_uint8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_uint8_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(StringFeaturizer_uint8_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -502,14 +523,17 @@ void StringFeaturizer_uint8_t_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
-        REQUIRE(StringFeaturizer_uint8_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint8_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_uint8_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -518,14 +542,14 @@ void StringFeaturizer_uint8_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(StringFeaturizer_uint8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  StringFeaturizer <uint16_t> */
+/* |  StringFeaturizer <uint16> */
 template <typename VectorInputT>
-void StringFeaturizer_uint16_t_Test(
+void StringFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::string> const &)> const &verify_func
@@ -533,9 +557,9 @@ void StringFeaturizer_uint16_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    StringFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    StringFeaturizer_uint16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_uint16_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -544,35 +568,36 @@ void StringFeaturizer_uint16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(StringFeaturizer_uint16_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(StringFeaturizer_uint16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(StringFeaturizer_uint16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_uint16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    StringFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    StringFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -580,20 +605,20 @@ void StringFeaturizer_uint16_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(StringFeaturizer_uint16_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    StringFeaturizer_uint16_t_TransformerHandle * pTransformerHandle(nullptr);
+    StringFeaturizer_uint16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_uint16_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(StringFeaturizer_uint16_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -605,14 +630,17 @@ void StringFeaturizer_uint16_t_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
-        REQUIRE(StringFeaturizer_uint16_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint16_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_uint16_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -621,14 +649,14 @@ void StringFeaturizer_uint16_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(StringFeaturizer_uint16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  StringFeaturizer <uint32_t> */
+/* |  StringFeaturizer <uint32> */
 template <typename VectorInputT>
-void StringFeaturizer_uint32_t_Test(
+void StringFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::string> const &)> const &verify_func
@@ -636,9 +664,9 @@ void StringFeaturizer_uint32_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    StringFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    StringFeaturizer_uint32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_uint32_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -647,35 +675,36 @@ void StringFeaturizer_uint32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(StringFeaturizer_uint32_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(StringFeaturizer_uint32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(StringFeaturizer_uint32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_uint32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    StringFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    StringFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -683,20 +712,20 @@ void StringFeaturizer_uint32_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(StringFeaturizer_uint32_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    StringFeaturizer_uint32_t_TransformerHandle * pTransformerHandle(nullptr);
+    StringFeaturizer_uint32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_uint32_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(StringFeaturizer_uint32_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -708,14 +737,17 @@ void StringFeaturizer_uint32_t_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
-        REQUIRE(StringFeaturizer_uint32_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint32_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_uint32_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -724,14 +756,14 @@ void StringFeaturizer_uint32_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(StringFeaturizer_uint32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  StringFeaturizer <uint64_t> */
+/* |  StringFeaturizer <uint64> */
 template <typename VectorInputT>
-void StringFeaturizer_uint64_t_Test(
+void StringFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::string> const &)> const &verify_func
@@ -739,9 +771,9 @@ void StringFeaturizer_uint64_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    StringFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    StringFeaturizer_uint64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_uint64_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -750,35 +782,36 @@ void StringFeaturizer_uint64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(StringFeaturizer_uint64_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(StringFeaturizer_uint64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(StringFeaturizer_uint64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_uint64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    StringFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    StringFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -786,20 +819,20 @@ void StringFeaturizer_uint64_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(StringFeaturizer_uint64_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    StringFeaturizer_uint64_t_TransformerHandle * pTransformerHandle(nullptr);
+    StringFeaturizer_uint64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_uint64_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(StringFeaturizer_uint64_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -811,14 +844,17 @@ void StringFeaturizer_uint64_t_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
-        REQUIRE(StringFeaturizer_uint64_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint64_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_uint64_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -827,14 +863,14 @@ void StringFeaturizer_uint64_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(StringFeaturizer_uint64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  StringFeaturizer <float_t> */
+/* |  StringFeaturizer <float> */
 template <typename VectorInputT>
-void StringFeaturizer_float_t_Test(
+void StringFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::string> const &)> const &verify_func
@@ -842,9 +878,9 @@ void StringFeaturizer_float_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    StringFeaturizer_float_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    StringFeaturizer_float_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_float_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_float_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -853,35 +889,36 @@ void StringFeaturizer_float_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(StringFeaturizer_float_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(StringFeaturizer_float_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(StringFeaturizer_float_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_float_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    StringFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    StringFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -889,20 +926,20 @@ void StringFeaturizer_float_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(StringFeaturizer_float_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(StringFeaturizer_float_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    StringFeaturizer_float_t_TransformerHandle * pTransformerHandle(nullptr);
+    StringFeaturizer_float_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_float_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_float_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(StringFeaturizer_float_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_float_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -914,14 +951,17 @@ void StringFeaturizer_float_t_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
-        REQUIRE(StringFeaturizer_float_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_float_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_float_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_float_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -930,14 +970,14 @@ void StringFeaturizer_float_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(StringFeaturizer_float_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  StringFeaturizer <double_t> */
+/* |  StringFeaturizer <double> */
 template <typename VectorInputT>
-void StringFeaturizer_double_t_Test(
+void StringFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::string> const &)> const &verify_func
@@ -945,9 +985,9 @@ void StringFeaturizer_double_t_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    StringFeaturizer_double_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    StringFeaturizer_double_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_double_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_double_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -956,35 +996,36 @@ void StringFeaturizer_double_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(StringFeaturizer_double_t_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(StringFeaturizer_double_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(StringFeaturizer_double_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_double_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    StringFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    StringFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -992,20 +1033,20 @@ void StringFeaturizer_double_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(StringFeaturizer_double_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(StringFeaturizer_double_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    StringFeaturizer_double_t_TransformerHandle * pTransformerHandle(nullptr);
+    StringFeaturizer_double_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_double_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_double_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(StringFeaturizer_double_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_double_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -1017,14 +1058,17 @@ void StringFeaturizer_double_t_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
-        REQUIRE(StringFeaturizer_double_t_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_double_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_double_t_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_double_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1033,7 +1077,7 @@ void StringFeaturizer_double_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(StringFeaturizer_double_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
@@ -1059,31 +1103,32 @@ void StringFeaturizer_bool_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_bool_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_bool_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_bool_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1120,11 +1165,14 @@ void StringFeaturizer_bool_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_bool_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_bool_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
@@ -1162,31 +1210,32 @@ void StringFeaturizer_string_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
+            TrainingState trainingState(0);
+
+            REQUIRE(StringFeaturizer_string_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
+
+            if(trainingState != Training)
+                break;
+
+            FitResult result(0);
             auto const & input(*iter);
 
             REQUIRE(StringFeaturizer_string_Fit(pEstimatorHandle, input.c_str(), &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
-
-            if(result == Complete)
-                break;
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(StringFeaturizer_string_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1223,11 +1272,14 @@ void StringFeaturizer_string_Test(
         char const * result_ptr(nullptr);
         std::size_t result_items(0);
 
-
         REQUIRE(StringFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::string(result_ptr));
+        #else
         results.emplace_back(std::string(result_ptr));
+        #endif
         
         // Destroy the contents
         REQUIRE(StringFeaturizer_string_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));

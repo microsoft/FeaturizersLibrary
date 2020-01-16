@@ -7,6 +7,7 @@
 #include "SharedLibrary_Common.h"
 
 extern "C" {
+
 FEATURIZER_LIBRARY_API_PACK_PREFIX
 
 struct TimePoint {
@@ -49,9 +50,11 @@ struct DateTimeFeaturizer_TransformerHandle {};
 FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateEstimator(/*in*/ char const *optionalCountryName, /*in*/ char const *optionalDataRootDir,/*out*/ DateTimeFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyEstimator(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_GetState(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_IsTrainingComplete(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Fit(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*in*/ int64_t input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_FitBuffer(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Fit(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*in*/ DateTimeParameter input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_FitBuffer(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*in*/ DateTimeParameter const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_OnDataCompleted(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CompleteTraining(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* Inference Methods */
@@ -61,7 +64,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyTransformer(/*in*/ DateTim
 
 FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerSaveData(/*in*/ DateTimeFeaturizer_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturizer_TransformerHandle *pHandle, /*in*/ int64_t input, /*out via struct*/ TimePoint * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturizer_TransformerHandle *pHandle, /*in*/ DateTimeParameter input, /*out via struct*/ TimePoint * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyTransformedData(/*in*/ TimePoint * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 } // extern "C"

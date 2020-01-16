@@ -7,55 +7,121 @@ parameters:
   agent_pool_is_custom: False # Set this value to True if the agent is part of a custom pool
   job_name: ""
   job_display_name: ""
+  operating_system: "" # Windows|Linux|MacOS
   steps: []
+  custom_checkout: 
+    - checkout: self
+      clean: false  # if true, run `execute git clean -ffdx && git reset --hard HEAD` before fetching
+      submodules: recursive
   timeout_in_minutes: 240
 
 # This template is necessary because we can't create a job with an empty container string. Therefore,
 # the container attribute is only present when there is a container provided.
 
 jobs:
-  - ${{ if eq(parameters.agent_pool_container, '') }}:
-      - ${{ if eq(parameters.agent_pool_is_custom, 'true') }}:
-          - job: ${{ parameters.job_name }}
-            displayName: ${{ parameters.job_display_name }}
+    - ${{ if eq(parameters.agent_pool_is_custom, 'true') }}:
+        - ${{ if eq(parameters.operating_system, 'Windows') }}:
+            - job: ${{ parameters.job_name }}
+              displayName: ${{ parameters.job_display_name }}
 
-            timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
+              timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
 
-            pool: "${{ parameters.agent_pool }}"
+              pool:
+                name: "${{ parameters.agent_pool }}"
+                demands:
+                    - Agent.OS -equals Windows_NT
 
-            workspace:
-              clean: All
+              workspace:
+                clean: All
 
-            steps:
-              ${{ parameters.steps }}
+              steps:
+                - ${{ parameters.custom_checkout }}
+                - ${{ parameters.steps }}
 
-      - ${{ if not(eq(parameters.agent_pool_is_custom, 'true')) }}:
-          - job: ${{ parameters.job_name }}
-            displayName: ${{ parameters.job_display_name }}
+        - ${{ if eq(parameters.operating_system, 'Linux') }}:
+            - ${{ if eq(parameters.agent_pool_container, '') }}:
+                - job: ${{ parameters.job_name }}
+                  displayName: ${{ parameters.job_display_name }}
 
-            timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
+                  timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
 
-            pool:
-              vmImage: "${{ parameters.agent_pool }}"
+                  pool:
+                    name: "${{ parameters.agent_pool }}"
+                    demands:
+                        - Agent.OS -equals Linux
 
-            workspace:
-              clean: All
+                  # Initial activation is run as root, but subsequent build steps are run as a normal user.
+                  # Cleaning is also run as a normal user, where is is unable to clean those directories
+                  # that were created by the steps run as root. Skip the clean to work around these issues.
+                  #
+                  # TODO: It seems strange that some steps are run as root while others aren't. Disabling the
+                  #       clean is a temporary workaround and not a proper long term solution.
 
-            steps:
-              ${{ parameters.steps }}
+                  # workspace:
+                  #   clean: All
 
-  - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
-      - job: ${{ parameters.job_name }}
-        displayName: ${{ parameters.job_display_name }}
+                  steps:
+                    - ${{ parameters.custom_checkout }}
+                    - ${{ parameters.steps }}
 
-        timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
+            - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
+                - job: ${{ parameters.job_name }}
+                  displayName: ${{ parameters.job_display_name }}
 
-        pool:
-          vmImage: "${{ parameters.agent_pool }}"
-        container: "${{ parameters.agent_pool_container }}"
+                  timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
 
-        workspace:
-          clean: All
+                  pool:
+                    name: "${{ parameters.agent_pool }}"
+                    demands:
+                        - Agent.OS -equals Linux
 
-        steps:
-          ${{ parameters.steps }}
+                  container: "${{ parameters.agent_pool_container }}"
+
+                  # Initial activation is run as root, but subsequent build steps are run as a normal user.
+                  # Cleaning is also run as a normal user, where is is unable to clean those directories
+                  # that were created by the steps run as root. Skip the clean to work around these issues.
+                  #
+                  # TODO: It seems strange that some steps are run as root while others aren't. Disabling the
+                  #       clean is a temporary workaround and not a proper long term solution.
+
+                  # workspace:
+                  #   clean: All
+
+                  steps:
+                    - ${{ parameters.custom_checkout }}
+                    - ${{ parameters.steps }}
+
+    - ${{ if not(eq(parameters.agent_pool_is_custom, 'true')) }}:
+        - ${{ if eq(parameters.agent_pool_container, '') }}:
+            - job: ${{ parameters.job_name }}
+              displayName: ${{ parameters.job_display_name }}
+
+              timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
+
+              pool:
+                vmImage: "${{ parameters.agent_pool }}"
+
+              workspace:
+                clean: All
+
+              steps:
+                - ${{ parameters.custom_checkout }}
+                - ${{ parameters.steps }}
+
+        - ${{ if not(eq(parameters.agent_pool_container, '')) }}:
+            - job: ${{ parameters.job_name }}
+              displayName: ${{ parameters.job_display_name }}
+
+              timeoutInMinutes: ${{ parameters.timeout_in_minutes }}
+
+              pool:
+                vmImage: "${{ parameters.agent_pool }}"
+
+              container: "${{ parameters.agent_pool_container }}"
+
+              workspace:
+                clean: All
+
+              steps:
+                - ${{ parameters.custom_checkout }}
+                - ${{ parameters.steps }}

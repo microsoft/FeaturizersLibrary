@@ -55,7 +55,17 @@ class _StructTypeInfoFactory(TypeInfoFactory):
             self.TypeName,
             "{} {};".format(self.TypeName, result_name),
             "&{}".format(result_name),
-            "results.emplace_back({});".format(result_name),
+            textwrap.dedent(
+                """\
+                #if (defined __apple_build_version__)
+                results.push_back({result});
+                #else
+                results.emplace_back({result});
+                #endif
+                """,
+            ).format(
+                result=result_name,
+            ),
             "&{}".format(result_name),
             destroy_inline=False,
         )
@@ -67,15 +77,18 @@ class _StructTypeInfoFactory(TypeInfoFactory):
 @Interface.staticderived
 class TimePointTypeInfoFactory(_StructTypeInfoFactory):
     TypeName                                = Interface.DerivedProperty("TimePoint")
+    CppType                                 = Interface.DerivedProperty("TimePoint")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class OneHotStructTypeInfoFactory(_StructTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("OneHotStruct")
+class HashOneHotEncodingTypeInfoFactory(_StructTypeInfoFactory):
+    TypeName                                = Interface.DerivedProperty("HashOneHotEncoding")
+    CppType                                 = Interface.DerivedProperty("HashOneHotEncoding")
 
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class HashOneHotVectorizerStructTypeInfoFactory(_StructTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("HashOneHotVectorizerStruct")
+class OneHotEncodingTypeInfoFactory(_StructTypeInfoFactory):
+    TypeName                                = Interface.DerivedProperty("OneHotEncoding")
+    CppType                                 = Interface.DerivedProperty("OneHotEncoding")

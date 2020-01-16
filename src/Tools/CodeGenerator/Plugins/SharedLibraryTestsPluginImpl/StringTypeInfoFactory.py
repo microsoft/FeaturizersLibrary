@@ -25,7 +25,8 @@ class StringTypeInfoFactory(TypeInfoFactory):
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
-    TypeName                                = Interface.DerivedProperty("std::string")
+    TypeName                                = Interface.DerivedProperty("string")
+    CppType                                 = Interface.DerivedProperty("std::string")
 
     # ----------------------------------------------------------------------
     # |
@@ -39,7 +40,7 @@ class StringTypeInfoFactory(TypeInfoFactory):
         input_name="input",
     ):
         if is_input_optional:
-            return "Microsoft::Featurizer::Traits<std::string>::IsNull({input_name}) ? nullptr : {input_name}->c_str()".format(
+            return "Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull({input_name}) ? nullptr : {input_name}->c_str()".format(
                 input_name=input_name,
             )
 
@@ -64,7 +65,17 @@ class StringTypeInfoFactory(TypeInfoFactory):
             "&{result_name}_ptr, &{result_name}_items".format(
                 result_name=result_name,
             ),
-            "results.emplace_back(std::string({}_ptr));".format(result_name),
+            textwrap.dedent(
+                """\
+                #if (defined __apple_build_version__)
+                results.push_back(std::string({result}_ptr));
+                #else
+                results.emplace_back(std::string({result}_ptr));
+                #endif
+                """,
+            ).format(
+                result=result_name,
+            ),
             "{result_name}_ptr, {result_name}_items".format(
                 result_name=result_name,
             ),

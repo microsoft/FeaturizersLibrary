@@ -10,7 +10,7 @@ parameters:
   # defined here and not in variables.
   artifacts:
     - Globals
-    - "Windows - x64"
+    - "Windows-x64-Clang 8"
     - Packages
     - Documentation
 
@@ -31,45 +31,45 @@ steps:
         # the intention here is to compare if var == '$(var)', but as the right side of == will be a string of
         # "$(var)" if var is empty, or the exact value which is equal to var if var is assigned the value.
         # Therefore, a non-standard comparison is necessary in this case
-        if triggered_build_id == "{}(Build.TriggeredBy.BuildNumber)".format("$") and build_id == "{}(build_id)".format("$"):
+        if triggered_build_id == ("%s(Build.TriggeredBy.BuildNumber)" % "$") and build_id == ("%s(build_id)" % "$"):
             raise Exception("Please specify a value for the variable 'build_id' when triggering this build manually")
 
   # Download from a specific id
   - ${{ each artifact in parameters.artifacts }}:
-      - ${{ if or(not(eq(parameters.minimal_download, 'true')), eq(artifact, 'Globals'), eq(artifact, 'Windows - x64')) }}:
-        - task: DownloadPipelineArtifact@2
-          displayName: "Download Pipeline Artifacts (Manually Triggered Build [${{ artifact }}])"
+      - ? ${{ if or(not(eq(parameters.minimal_download, 'true')), eq(artifact, 'Globals'), eq(artifact, 'Windows-x64-Clang 8')) }}
+        : - task: DownloadPipelineArtifact@2
+            displayName: "Download Pipeline Artifacts (Manually Triggered Build [${{ artifact }}])"
 
-          timeoutInMinutes: 180
-          condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'))
+            timeoutInMinutes: 180
+            condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'))
 
-          inputs:
-            buildType: specific
-            project: "${{ parameters.azure_dev_ops_project_id }}"
-            definition: "${{ parameters.azure_dev_ops_build_definition_id }}"
-            specificBuildWithTriggering: false
-            buildVersionToDownload: specific
-            pipelineId: "$(build_id)"
-            artifactName: "${{ artifact }}"
-            targetPath: "$(Pipeline.Workspace)/${{ artifact }}"
+            inputs:
+              buildType: specific
+              project: "${{ parameters.azure_dev_ops_project_id }}"
+              definition: "${{ parameters.azure_dev_ops_build_definition_id }}"
+              specificBuildWithTriggering: false
+              buildVersionToDownload: specific
+              pipelineId: "$(build_id)"
+              artifactName: "${{ artifact }}"
+              targetPath: "$(Pipeline.Workspace)/${{ artifact }}"
 
   # Download from a triggered build
   - ${{ each artifact in parameters.artifacts }}:
-      - ${{ if or(not(eq(parameters.minimal_download, 'true')), eq(artifact, 'Globals'), eq(artifact, 'Windows - x64')) }}:
-        - task: DownloadPipelineArtifact@2
-          displayName: "Download Pipeline Artifacts (Pipeline Build [${{ artifact }}])"
+      - ? ${{ if or(not(eq(parameters.minimal_download, 'true')), eq(artifact, 'Globals'), eq(artifact, 'Windows-x64-Clang 8')) }}
+        : - task: DownloadPipelineArtifact@2
+            displayName: "Download Pipeline Artifacts (Pipeline Build [${{ artifact }}])"
 
-          timeoutInMinutes: 180
-          condition: and(succeeded(), eq(variables['Build.Reason'], 'BuildCompletion'))
+            timeoutInMinutes: 180
+            condition: and(succeeded(), eq(variables['Build.Reason'], 'BuildCompletion'))
 
-          inputs:
-            buildType: specific
-            project: "${{ parameters.azure_dev_ops_project_id }}"
-            definition: "${{ parameters.azure_dev_ops_build_definition_id }}"
-            specificBuildWithTriggering: true
-            buildVersionToDownload: latestFromBranch
-            artifactName: "${{ artifact }}"
-            targetPath: "$(Pipeline.Workspace)/${{ artifact }}"
+            inputs:
+              buildType: specific
+              project: "${{ parameters.azure_dev_ops_project_id }}"
+              definition: "${{ parameters.azure_dev_ops_build_definition_id }}"
+              specificBuildWithTriggering: true
+              buildVersionToDownload: latestFromBranch
+              artifactName: "${{ artifact }}"
+              targetPath: "$(Pipeline.Workspace)/${{ artifact }}"
 
   - task: PythonScript@0
     displayName: "[IMPL] Populate Stage Variables"
@@ -88,7 +88,7 @@ steps:
 
         for info_filename in [
             os.path.join(r"$(Pipeline.Workspace)", "Globals", "globals.json"),
-            os.path.join(r"$(Pipeline.Workspace)", "Windows - x64", "Builder", "product_version_info.json"),
+            os.path.join(r"$(Pipeline.Workspace)", "Windows-x64-Clang 8", "Builder", "product_version_info.json"),
         ]:
             assert os.path.isdir(os.path.dirname(info_filename)), info_filename
             assert os.path.isfile(info_filename), info_filename
@@ -97,7 +97,7 @@ steps:
                 content = json.load(f)
 
             for k, v in content.items():
-                k = "pipeline_{}".format(k)
+                k = "pipeline_%s" % k
                 assert k not in values, (k, info_filename, values[k])
 
                 if isinstance(v, bool):
@@ -108,5 +108,5 @@ steps:
                 values[k] = v
 
         for k, v in values.items():
-            print("{} = {}".format(k, v))
-            print("##vso[task.setvariable variable={}]{}".format(k, v))
+            print("%s = %s" % (k, v))
+            print("##vso[task.setvariable variable=%s]%s" % (k, v))

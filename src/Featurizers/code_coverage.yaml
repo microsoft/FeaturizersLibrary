@@ -1,0 +1,4 @@
+filter:
+  continue_processing: false
+  includes:
+    - Microsoft::Featurizer::Featurizers::*

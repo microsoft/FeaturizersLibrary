@@ -18,7 +18,7 @@ endif()
 
 include(CppCommon OPTIONAL)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -41,6 +41,7 @@ foreach(_test_name IN ITEMS
     OneHotEncoderFeaturizer_UnitTests
     RobustScalarFeaturizer_UnitTests
     SampleAddFeaturizer_UnitTest
+    StandardScaleWrapperFeaturizer_UnitTest
     StringFeaturizer_UnitTest
     Structs_UnitTest
     TfidfVectorizerFeaturizer_UnitTests

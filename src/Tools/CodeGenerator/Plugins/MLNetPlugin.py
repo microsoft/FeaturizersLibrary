@@ -42,7 +42,7 @@ class Plugin(PluginBase):
     # |  Methods
     @staticmethod
     @Interface.override
-    def Generate(data, output_dir, status_stream):
+    def Generate(global_custom_structs, global_custom_enums, data, output_dir, status_stream):
         result_code = 0
 
         status_stream.write("Preprocessing data for ML.NET...")
@@ -880,13 +880,14 @@ class CSharpData(object):
     @classmethod
     def _GetTypeInfoClass(cls, the_type):
         if cls._type_info_factory_classes is None:
+            from Plugins.MLNetPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
             from Plugins.MLNetPluginImpl import ScalarTypeInfoFactories
             from Plugins.MLNetPluginImpl.StringTypeInfoFactory import (
                 StringTypeInfoFactory,
             )
             from Plugins.MLNetPluginImpl import StructTypeInfoFactories
 
-            type_info_factory_classes = [StringTypeInfoFactory]
+            type_info_factory_classes = [DatetimeTypeInfoFactory, StringTypeInfoFactory]
 
             for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
                 for obj_name in dir(compound_module):
@@ -902,8 +903,6 @@ class CSharpData(object):
             # Associate the type info factories with the class rather than the instance
             # so that we only need to perform this initialization once.
             cls._type_info_factory_classes = type_info_factory_classes
-
-        the_type = the_type.replace("std::", "").replace("_t", "")
 
         for type_info_factory_class in cls._type_info_factory_classes:
             if type_info_factory_class.TypeName == the_type:

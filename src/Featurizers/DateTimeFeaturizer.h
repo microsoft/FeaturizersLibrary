@@ -107,15 +107,14 @@ private:
 ///  \brief         A Transformer that takes a chrono::system_clock::time_point and
 ///                 returns a struct with all the data split out.
 ///
-//std::chrono::system_clock::time_point
-class DateTimeTransformer : public Components::InferenceOnlyTransformerImpl<std::int64_t, TimePoint> {
+class DateTimeTransformer : public Components::InferenceOnlyTransformerImpl<std::chrono::system_clock::time_point, TimePoint> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = Components::InferenceOnlyTransformerImpl<std::int64_t, TimePoint>;
+    using BaseType                          = Components::InferenceOnlyTransformerImpl<std::chrono::system_clock::time_point, TimePoint>;
 
     // ----------------------------------------------------------------------
     // |
@@ -133,6 +132,8 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DateTimeTransformer);
 
+    bool operator==(DateTimeTransformer const &other) const;
+
     void save(Archive & ar) const override;
 
 private:
@@ -142,16 +143,15 @@ private:
     // |
     // ----------------------------------------------------------------------
     using JsonStream                        = nlohmann::json;
-    using HolidayMap                        = std::unordered_map<InputType, std::string>;
+    using HolidayMap                        = std::unordered_map<std::int64_t, std::string>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    std::string const                         _countryName;
-
-    HolidayMap                                _dateHolidayMap;
+    std::string const                       _countryName;
+    HolidayMap const                        _dateHolidayMap;
 
     // ----------------------------------------------------------------------
     // |

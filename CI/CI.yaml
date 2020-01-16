@@ -13,7 +13,11 @@ resources:
   containers:
     - container: universal_linux
       image: universal_linux
-      endpoint: featurizersbuild
+      endpoint: featurizerslibrarybuild
+
+    - container: centos7
+      image: centos7
+      endpoint: featurizerslibrarybuild
 
 # Note that any variable set in this file will always override a value set within the editor.
 # Therefore, do not set default values here but instead do it in an initialization script.
@@ -38,85 +42,122 @@ stages:
       # Official Builds
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           configuration: x64
           esrp_connected_service_name: "ESRP CodeSigning Connection"
+          job_display_name: "Windows-x64-Clang 8"
           operating_system: Windows
           tester_code_coverage: True
 
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           configuration: x86
           esrp_connected_service_name: "ESRP CodeSigning Connection"
+          job_display_name: "Windows-x86-Clang 8"
           operating_system: Windows
 
-      # Note that the universal_linux build is generating code that produces runtime errors. Therefore, this
-      # build has been disabled in favor of an ubuntu-16.04-based build.
-      #
-      # - template: 'templates/BuildAndTest.job_template.yaml'
-      #   parameters:
-      #     agent_pool: ubuntu-16.04
-      #     agent_pool_container: universal_linux
-      #     configuration: universal_linux
-      #     esrp_connected_service_name: 'ESRP CodeSigning Connection'
-      #     operating_system: Linux
-
-      # Work-around for issues with the ubuntu-16.04-based build.
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          agent_pool: ubuntu-16.04
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           configuration: system_compiler
           esrp_connected_service_name: "ESRP CodeSigning Connection"
+          job_display_name: "Ubuntu 16.04-x64-GCC"
           operating_system: Linux
 
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
           agent_pool: macOS-10.14
           configuration: system_compiler
-          esrp_connected_service_name: "ESRP CodeSigning Connection"
+          job_display_name: "MacOS 10.14-x64-Clang"
+          job_name_unique_id: "1014"
           operating_system: MacOS
 
       # ----------------------------------------------------------------------
       # Sanity Builds
 
       # When code coverage is enabled, we only test debug builds. Execute release tests to ensure that everything is working.
-      - template: 'templates/BuildAndTest.job_template.yaml'
+      - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           configuration: x64
+          job_display_name: "[Test Only] Windows-x64-Clang 8"
           operating_system: Windows
           test_only: true
-          test_only_suffix: ' (test only)'
           tester_release_only: true
 
-      - template: 'templates/BuildAndTest.job_template.yaml'
+      - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
-          configuration: x64_MSVC
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x64_MSVC_2019
+          job_display_name: "Windows-x64-MSVC 2019"
           operating_system: Windows
 
-      - template: 'templates/BuildAndTest.job_template.yaml'
+      - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
-          configuration: x86_MSVC
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x86_MSVC_2019
+          job_display_name: "Windows-x86-MSVC 2019"
           operating_system: Windows
 
-      - template: 'templates/BuildAndTest.job_template.yaml'
+      - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          agent_pool: ubuntu-16.04
-          configuration: x64
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x64_MSVC_2017
+          job_display_name: "Windows-x64-MSVC 2017"
+          operating_system: Windows
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x86_MSVC_2017
+          job_display_name: "Windows-x86-MSVC 2017"
+          operating_system: Windows
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x64_Clang_8
+          job_display_name: "Ubuntu 16.04-x64-Clang 8"
           operating_system: Linux
+
+      # TODO: Disabled for now - template: "templates/BuildAndTest.job_template.yaml"
+      # TODO: Disabled for now   parameters:
+      # TODO: Disabled for now     agent_pool: FeaturizersLibrary
+      # TODO: Disabled for now     agent_pool_is_custom: true
+      # TODO: Disabled for now     agent_pool_container: centos7
+      # TODO: Disabled for now     configuration: system_compiler
+      # TODO: Disabled for now     job_display_name: "CentOS 7-x64-GCC"
+      # TODO: Disabled for now     operating_system: Linux
+
+      # Note that the universal_linux build is generating code that produces runtime errors. This build remains to ensure
+      # that the code compiles on older platforms.
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          agent_pool_container: universal_linux
+          configuration: universal_linux
+          operating_system: Linux
+          job_display_name: "[Build Only] Holy Build Box-x64-GCC"
+          tester_build_only: true
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: macOS-10.13
+          configuration: system_compiler
+          job_display_name: "MacOS 10.13-x64-Clang"
+          job_name_unique_id: "1013"
+          operating_system: MacOS
 
   - stage: PostBuild_Stage
     displayName: "Post Build:"
@@ -125,11 +166,11 @@ stages:
     jobs:
       - template: "templates/_job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           job_name: Package_Job
           job_display_name: "Package"
+          operating_system: Windows
           steps:
             - template: "BuildAndTest.package_steps_template.yaml"
               parameters:
@@ -139,11 +180,11 @@ stages:
 
       - template: "templates/_job_template.yaml"
         parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
           job_name: Documentation_Job
           job_display_name: "Generate Documentation"
+          operating_system: Windows
           steps:
             - template: "BuildAndTest.documentation_steps_template.yaml"
               parameters:

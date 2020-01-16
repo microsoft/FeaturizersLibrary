@@ -21,7 +21,7 @@ namespace Featurizers {
 ///  \brief         This class retrieves a MaxAbsValueAnnotation and computes
 ///                 using the scale.
 ///
-template <typename InputT,typename TransformedT>
+template <typename InputT, typename TransformedT>
 class MaxAbsScalarTransformer : public StandardTransformer<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
@@ -47,6 +47,10 @@ public:
     MaxAbsScalarTransformer(Archive & ar);
 
     ~MaxAbsScalarTransformer(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MaxAbsScalarTransformer);
+
+    bool operator==(MaxAbsScalarTransformer const &other) const;
 
     void save(Archive & ar) const override;
 
@@ -119,7 +123,7 @@ private:
 
         MaxAbsValueAnnotationData const &     data(MaxAbsValueEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::MaxAbsValueEstimatorName));
 
-        return std::make_unique<MaxAbsScalarTransformer<InputT, TransformedT>>(data.Value);
+        return typename BaseType::TransformerUniquePtr(new MaxAbsScalarTransformer<InputT, TransformedT>(data.Value));
     }
 };
 
@@ -185,11 +189,42 @@ MaxAbsScalarTransformer<InputT, TransformedT>::MaxAbsScalarTransformer(typename 
 
 template <typename InputT, typename TransformedT>
 MaxAbsScalarTransformer<InputT, TransformedT>::MaxAbsScalarTransformer(Archive &ar) :
-    Scale(Traits<decltype(Scale)>::deserialize(ar)) {
+    MaxAbsScalarTransformer(
+        [&ar](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
+
+            // Data
+            return MaxAbsScalarTransformer(Traits<decltype(Scale)>::deserialize(ar));
+        }()
+    ) {
+}
+
+template <typename InputT, typename TransformedT>
+bool MaxAbsScalarTransformer<InputT, TransformedT>::operator==(MaxAbsScalarTransformer const &other) const {
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
+
+    return Scale == other.Scale;
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 }
 
 template <typename InputT, typename TransformedT>
 void MaxAbsScalarTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
+
+    // Data
     Traits<decltype(Scale)>::serialize(ar, Scale);
 }
 

@@ -40,7 +40,13 @@ class Plugin(PluginBase):
     # |  Methods
     @staticmethod
     @Interface.override
-    def Generate(data, output_dir, status_stream):
+    def Generate(
+        global_custom_structs,
+        global_custom_enums,
+        data,
+        output_dir,
+        status_stream,
+    ):
         result_code = 0
 
         status_stream.write("Preprocessing data...")
@@ -99,7 +105,11 @@ def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
                 #pragma once
 
                 #include "SharedLibrary_{name}.h"
+
                 #include "Traits.h"
+                #include "Featurizers/Structs.h"
+
+                #include "SharedLibrary_Common.hpp"
 
                 """,
             ).format(
@@ -110,11 +120,11 @@ def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
         for item, type_info_data in zip(items, all_type_info_data):
             template = getattr(item, "template", None)
             if template:
-                template_desc = template.replace("std::", "")
-
-                suffix = "_{}_".format(template_desc)
-                type_desc = " <{}>".format(template_desc)
-                cpp_template_suffix = "<{}>".format(template)
+                suffix = "_{}_".format(template)
+                type_desc = " <{}>".format(template)
+                cpp_template_suffix = "<{}>".format(
+                    type_info_data.InputTypeInfoFactory.CppType,
+                )
             else:
                 suffix = "_"
                 type_desc = ""
@@ -191,31 +201,32 @@ def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
                             typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
                             while(true) {{
-                                FitResult result(Continue);
+                                TrainingState trainingState(0);
+
+                                REQUIRE({name}{suffix}GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+                                REQUIRE(pErrorInfo == nullptr);
+
+                                if(trainingState != Training)
+                                    break;
+
+                                FitResult result(0);
                                 auto const & input(*iter);
 
                                 REQUIRE({name}{suffix}Fit(pEstimatorHandle, {fit_input_args}, &result, &pErrorInfo));
                                 REQUIRE(pErrorInfo == nullptr);
-
-                                if(result == Complete)
-                                    break;
 
                                 if(result == ResetAndContinue) {{
                                     iter = training_input.begin();
                                     continue;
                                 }}
 
-                                if(result == Continue) {{
-                                    ++iter;
+                                ++iter;
+                                if(iter == training_input.end()) {{
+                                    REQUIRE({name}{suffix}OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                                    REQUIRE(pErrorInfo == nullptr);
 
-                                    if(iter != training_input.end())
-                                        continue;
-
-                                    break;
+                                    iter = training_input.begin();
                                 }}
-
-                                INFO("Value is " << result)
-                                REQUIRE(false);
                             }}
                         }}
 
@@ -278,13 +289,13 @@ def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
                     constructor_args=constructor_args,
                     fit_input_args=transform_input_args,
                     transform_vars=StringHelpers.LeftJustify(
-                        output_statement_info.TransformVars,
+                        output_statement_info.TransformVars.rstrip(),
                         8,
                     ),
                     transform_input_args=transform_input_args,
                     transform_output_args=output_statement_info.TransformOutputVars,
                     transform_statement=StringHelpers.LeftJustify(
-                        output_statement_info.AppendResultStatement,
+                        output_statement_info.AppendResultStatement.rstrip(),
                         8,
                     ),
                     inline_destroy_statement=StringHelpers.LeftJustify(
@@ -365,13 +376,17 @@ class TypeInfoData(object):
     @classmethod
     def _GetTypeInfoClass(cls, the_type):
         if cls._type_info_factory_classes is None:
+            from Plugins.SharedLibraryTestsPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl import ScalarTypeInfoFactories
-            from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfoFactory import (
-                StringTypeInfoFactory,
-            )
+            from Plugins.SharedLibraryTestsPluginImpl.SparseVectorEncodingTypeInfoFactory import SparseVectorEncodingTypeInfoFactory
+            from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl import StructTypeInfoFactories
 
-            type_info_factory_classes = [StringTypeInfoFactory]
+            type_info_factory_classes = [
+                DatetimeTypeInfoFactory,
+                SparseVectorEncodingTypeInfoFactory,
+                StringTypeInfoFactory,
+            ]
 
             for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
                 for obj_name in dir(compound_module):

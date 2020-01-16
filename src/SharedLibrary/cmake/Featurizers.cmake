@@ -23,7 +23,7 @@ function(Impl)
     project(${_project_name} LANGUAGES CXX)
     set(PROJECT_VERSION ${_version})
 
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -88,6 +88,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PointerTable.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.cpp
 

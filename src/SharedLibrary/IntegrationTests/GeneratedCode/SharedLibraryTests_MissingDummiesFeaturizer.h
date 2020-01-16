@@ -5,22 +5,26 @@
 #pragma once
 
 #include "SharedLibrary_MissingDummiesFeaturizer.h"
+
 #include "Traits.h"
+#include "Featurizers/Structs.h"
+
+#include "SharedLibrary_Common.hpp"
 
 /* ---------------------------------------------------------------------- */
-/* |  MissingDummiesFeaturizer <int8_t> */
+/* |  MissingDummiesFeaturizer <int8> */
 template <typename VectorInputT>
-void MissingDummiesFeaturizer_int8_t_Test(
+void MissingDummiesFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MissingDummiesFeaturizer_int8_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    MissingDummiesFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_int8_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -29,35 +33,36 @@ void MissingDummiesFeaturizer_int8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(MissingDummiesFeaturizer_int8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_int8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(MissingDummiesFeaturizer_int8_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(MissingDummiesFeaturizer_int8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    MissingDummiesFeaturizer_int8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MissingDummiesFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -65,34 +70,38 @@ void MissingDummiesFeaturizer_int8_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MissingDummiesFeaturizer_int8_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_int8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MissingDummiesFeaturizer_int8_t_TransformerHandle * pTransformerHandle(nullptr);
+    MissingDummiesFeaturizer_int8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_int8_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MissingDummiesFeaturizer_int8_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_int8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int8_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_int8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -101,24 +110,24 @@ void MissingDummiesFeaturizer_int8_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MissingDummiesFeaturizer_int8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MissingDummiesFeaturizer <int16_t> */
+/* |  MissingDummiesFeaturizer <int16> */
 template <typename VectorInputT>
-void MissingDummiesFeaturizer_int16_t_Test(
+void MissingDummiesFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MissingDummiesFeaturizer_int16_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    MissingDummiesFeaturizer_int16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_int16_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -127,35 +136,36 @@ void MissingDummiesFeaturizer_int16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(MissingDummiesFeaturizer_int16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_int16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(MissingDummiesFeaturizer_int16_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(MissingDummiesFeaturizer_int16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    MissingDummiesFeaturizer_int16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MissingDummiesFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -163,34 +173,38 @@ void MissingDummiesFeaturizer_int16_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MissingDummiesFeaturizer_int16_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_int16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MissingDummiesFeaturizer_int16_t_TransformerHandle * pTransformerHandle(nullptr);
+    MissingDummiesFeaturizer_int16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_int16_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MissingDummiesFeaturizer_int16_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_int16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int16_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_int16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -199,24 +213,24 @@ void MissingDummiesFeaturizer_int16_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MissingDummiesFeaturizer_int16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MissingDummiesFeaturizer <int32_t> */
+/* |  MissingDummiesFeaturizer <int32> */
 template <typename VectorInputT>
-void MissingDummiesFeaturizer_int32_t_Test(
+void MissingDummiesFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MissingDummiesFeaturizer_int32_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    MissingDummiesFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_int32_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -225,35 +239,36 @@ void MissingDummiesFeaturizer_int32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(MissingDummiesFeaturizer_int32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_int32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(MissingDummiesFeaturizer_int32_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(MissingDummiesFeaturizer_int32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    MissingDummiesFeaturizer_int32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MissingDummiesFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -261,34 +276,38 @@ void MissingDummiesFeaturizer_int32_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MissingDummiesFeaturizer_int32_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_int32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MissingDummiesFeaturizer_int32_t_TransformerHandle * pTransformerHandle(nullptr);
+    MissingDummiesFeaturizer_int32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_int32_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MissingDummiesFeaturizer_int32_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_int32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int32_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_int32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -297,24 +316,24 @@ void MissingDummiesFeaturizer_int32_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MissingDummiesFeaturizer_int32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MissingDummiesFeaturizer <int64_t> */
+/* |  MissingDummiesFeaturizer <int64> */
 template <typename VectorInputT>
-void MissingDummiesFeaturizer_int64_t_Test(
+void MissingDummiesFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MissingDummiesFeaturizer_int64_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    MissingDummiesFeaturizer_int64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_int64_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -323,35 +342,36 @@ void MissingDummiesFeaturizer_int64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(MissingDummiesFeaturizer_int64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_int64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(MissingDummiesFeaturizer_int64_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(MissingDummiesFeaturizer_int64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    MissingDummiesFeaturizer_int64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MissingDummiesFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -359,34 +379,38 @@ void MissingDummiesFeaturizer_int64_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MissingDummiesFeaturizer_int64_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_int64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MissingDummiesFeaturizer_int64_t_TransformerHandle * pTransformerHandle(nullptr);
+    MissingDummiesFeaturizer_int64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_int64_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MissingDummiesFeaturizer_int64_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_int64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<int64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<int64_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_int64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -395,24 +419,24 @@ void MissingDummiesFeaturizer_int64_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MissingDummiesFeaturizer_int64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MissingDummiesFeaturizer <uint8_t> */
+/* |  MissingDummiesFeaturizer <uint8> */
 template <typename VectorInputT>
-void MissingDummiesFeaturizer_uint8_t_Test(
+void MissingDummiesFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MissingDummiesFeaturizer_uint8_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    MissingDummiesFeaturizer_uint8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_uint8_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -421,35 +445,36 @@ void MissingDummiesFeaturizer_uint8_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(MissingDummiesFeaturizer_uint8_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_uint8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(MissingDummiesFeaturizer_uint8_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(MissingDummiesFeaturizer_uint8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    MissingDummiesFeaturizer_uint8_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MissingDummiesFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -457,34 +482,38 @@ void MissingDummiesFeaturizer_uint8_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MissingDummiesFeaturizer_uint8_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_uint8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MissingDummiesFeaturizer_uint8_t_TransformerHandle * pTransformerHandle(nullptr);
+    MissingDummiesFeaturizer_uint8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_uint8_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MissingDummiesFeaturizer_uint8_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_uint8_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint8_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint8_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_uint8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -493,24 +522,24 @@ void MissingDummiesFeaturizer_uint8_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MissingDummiesFeaturizer_uint8_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MissingDummiesFeaturizer <uint16_t> */
+/* |  MissingDummiesFeaturizer <uint16> */
 template <typename VectorInputT>
-void MissingDummiesFeaturizer_uint16_t_Test(
+void MissingDummiesFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MissingDummiesFeaturizer_uint16_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    MissingDummiesFeaturizer_uint16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_uint16_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -519,35 +548,36 @@ void MissingDummiesFeaturizer_uint16_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(MissingDummiesFeaturizer_uint16_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_uint16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(MissingDummiesFeaturizer_uint16_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(MissingDummiesFeaturizer_uint16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    MissingDummiesFeaturizer_uint16_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MissingDummiesFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -555,34 +585,38 @@ void MissingDummiesFeaturizer_uint16_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MissingDummiesFeaturizer_uint16_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_uint16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MissingDummiesFeaturizer_uint16_t_TransformerHandle * pTransformerHandle(nullptr);
+    MissingDummiesFeaturizer_uint16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_uint16_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MissingDummiesFeaturizer_uint16_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_uint16_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint16_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint16_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_uint16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -591,24 +625,24 @@ void MissingDummiesFeaturizer_uint16_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MissingDummiesFeaturizer_uint16_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MissingDummiesFeaturizer <uint32_t> */
+/* |  MissingDummiesFeaturizer <uint32> */
 template <typename VectorInputT>
-void MissingDummiesFeaturizer_uint32_t_Test(
+void MissingDummiesFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MissingDummiesFeaturizer_uint32_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    MissingDummiesFeaturizer_uint32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_uint32_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -617,35 +651,36 @@ void MissingDummiesFeaturizer_uint32_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(MissingDummiesFeaturizer_uint32_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_uint32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(MissingDummiesFeaturizer_uint32_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(MissingDummiesFeaturizer_uint32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    MissingDummiesFeaturizer_uint32_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MissingDummiesFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -653,34 +688,38 @@ void MissingDummiesFeaturizer_uint32_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MissingDummiesFeaturizer_uint32_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_uint32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MissingDummiesFeaturizer_uint32_t_TransformerHandle * pTransformerHandle(nullptr);
+    MissingDummiesFeaturizer_uint32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_uint32_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MissingDummiesFeaturizer_uint32_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_uint32_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint32_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint32_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_uint32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -689,24 +728,24 @@ void MissingDummiesFeaturizer_uint32_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MissingDummiesFeaturizer_uint32_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MissingDummiesFeaturizer <uint64_t> */
+/* |  MissingDummiesFeaturizer <uint64> */
 template <typename VectorInputT>
-void MissingDummiesFeaturizer_uint64_t_Test(
+void MissingDummiesFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MissingDummiesFeaturizer_uint64_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    MissingDummiesFeaturizer_uint64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_uint64_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -715,35 +754,36 @@ void MissingDummiesFeaturizer_uint64_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(MissingDummiesFeaturizer_uint64_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_uint64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(MissingDummiesFeaturizer_uint64_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(MissingDummiesFeaturizer_uint64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    MissingDummiesFeaturizer_uint64_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MissingDummiesFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -751,34 +791,38 @@ void MissingDummiesFeaturizer_uint64_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MissingDummiesFeaturizer_uint64_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_uint64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MissingDummiesFeaturizer_uint64_t_TransformerHandle * pTransformerHandle(nullptr);
+    MissingDummiesFeaturizer_uint64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_uint64_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MissingDummiesFeaturizer_uint64_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_uint64_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<uint64_t>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<uint64_t>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_uint64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -787,24 +831,24 @@ void MissingDummiesFeaturizer_uint64_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MissingDummiesFeaturizer_uint64_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MissingDummiesFeaturizer <float_t> */
+/* |  MissingDummiesFeaturizer <float> */
 template <typename VectorInputT>
-void MissingDummiesFeaturizer_float_t_Test(
+void MissingDummiesFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MissingDummiesFeaturizer_float_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    MissingDummiesFeaturizer_float_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_float_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_float_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -813,35 +857,36 @@ void MissingDummiesFeaturizer_float_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(MissingDummiesFeaturizer_float_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_float_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(MissingDummiesFeaturizer_float_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(MissingDummiesFeaturizer_float_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    MissingDummiesFeaturizer_float_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MissingDummiesFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -849,34 +894,38 @@ void MissingDummiesFeaturizer_float_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MissingDummiesFeaturizer_float_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_float_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MissingDummiesFeaturizer_float_t_TransformerHandle * pTransformerHandle(nullptr);
+    MissingDummiesFeaturizer_float_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_float_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_float_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MissingDummiesFeaturizer_float_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_float_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_float_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<float>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<float>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_float_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -885,24 +934,24 @@ void MissingDummiesFeaturizer_float_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MissingDummiesFeaturizer_float_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MissingDummiesFeaturizer <double_t> */
+/* |  MissingDummiesFeaturizer <double> */
 template <typename VectorInputT>
-void MissingDummiesFeaturizer_double_t_Test(
+void MissingDummiesFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MissingDummiesFeaturizer_double_t_EstimatorHandle *pEstimatorHandle(nullptr);
+    MissingDummiesFeaturizer_double_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_double_t_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_double_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -911,35 +960,36 @@ void MissingDummiesFeaturizer_double_t_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(MissingDummiesFeaturizer_double_t_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_double_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(MissingDummiesFeaturizer_double_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(MissingDummiesFeaturizer_double_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
-    MissingDummiesFeaturizer_double_t_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MissingDummiesFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -947,34 +997,38 @@ void MissingDummiesFeaturizer_double_t_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MissingDummiesFeaturizer_double_t_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_double_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MissingDummiesFeaturizer_double_t_TransformerHandle * pTransformerHandle(nullptr);
+    MissingDummiesFeaturizer_double_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MissingDummiesFeaturizer_double_t_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_double_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MissingDummiesFeaturizer_double_t_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_double_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_double_t_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<double>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<double>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_double_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -983,7 +1037,7 @@ void MissingDummiesFeaturizer_double_t_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MissingDummiesFeaturizer_double_t_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MissingDummiesFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
@@ -993,7 +1047,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_bool_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -1009,31 +1063,32 @@ void MissingDummiesFeaturizer_bool_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(MissingDummiesFeaturizer_bool_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<bool>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<bool>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_bool_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(MissingDummiesFeaturizer_bool_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(MissingDummiesFeaturizer_bool_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1062,17 +1117,21 @@ void MissingDummiesFeaturizer_bool_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_bool_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<bool>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<bool>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_bool_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 
@@ -1091,7 +1150,7 @@ template <typename VectorInputT>
 void MissingDummiesFeaturizer_string_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -1107,31 +1166,32 @@ void MissingDummiesFeaturizer_string_Test(
         typename std::vector<VectorInputT>::const_iterator iter(training_input.begin());
 
         while(true) {
-            FitResult result(Continue);
-            auto const & input(*iter);
+            TrainingState trainingState(0);
 
-            REQUIRE(MissingDummiesFeaturizer_string_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<std::string>::IsNull(input) ? nullptr : input->c_str(), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_string_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
-            if(result == Complete)
+            if(trainingState != Training)
                 break;
+
+            FitResult result(0);
+            auto const & input(*iter);
+
+            REQUIRE(MissingDummiesFeaturizer_string_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &result, &pErrorInfo));
+            REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
                 iter = training_input.begin();
                 continue;
             }
 
-            if(result == Continue) {
-                ++iter;
+            ++iter;
+            if(iter == training_input.end()) {
+                REQUIRE(MissingDummiesFeaturizer_string_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(pErrorInfo == nullptr);
 
-                if(iter != training_input.end())
-                    continue;
-
-                break;
+                iter = training_input.begin();
             }
-
-            INFO("Value is " << result)
-            REQUIRE(false);
         }
     }
 
@@ -1160,17 +1220,21 @@ void MissingDummiesFeaturizer_string_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<int8_t> results;
+    std::vector<std::int8_t> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        int8_t result;
+        std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<std::string>::IsNull(input) ? nullptr : input->c_str(), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
+        #if (defined __apple_build_version__)
+        results.push_back(std::move(result));
+        #else
         results.emplace_back(std::move(result));
+        #endif
         // No inline destroy statement
     }
 

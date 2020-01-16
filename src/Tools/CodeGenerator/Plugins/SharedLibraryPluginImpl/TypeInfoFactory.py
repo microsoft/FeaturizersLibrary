@@ -46,6 +46,11 @@ class TypeInfoFactory(Interface.Interface):
         """Name of the type"""
         raise Exception("Abstract property")
 
+    @Interface.abstractproperty
+    def CppType(self):
+        """C++ type"""
+        raise Exception("Abstract property")
+
     # ----------------------------------------------------------------------
     # |
     # |  Public Methods

@@ -14,11 +14,32 @@
 #include <unordered_map>
 #include <vector>
 
-#if (!defined ISLITTLEENDIAN)
-# define ISLITTLEENDIAN 1
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wold-style-cast"
+#   pragma clang diagnostic ignored "-Wsign-conversion"
+#   pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#   pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#   pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#   pragma clang diagnostic ignored "-Wmissing-noreturn"
+#   pragma clang diagnostic ignored "-Wdocumentation"
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#   pragma clang diagnostic ignored "-Wcast-align"
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#   pragma clang diagnostic ignored "-Wshadow"
+#elif (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4127)
 #endif
 
-static bool constexpr is_little_endian = bool(ISLITTLEENDIAN);
+#include "3rdParty/eigen/Eigen/Dense"
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#elif (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
+
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
@@ -140,14 +161,17 @@ struct Traits {
     //
     //   // Methods
     //   - static nullable_type CreateNullValue(void);
-    //   - static bool IsNull(nullable_type const &value);
-    //   - static T const & GetNullableValue(nullable_type const &value);
-    //   - static T & GetNullableValue(nullable_type &value);
+    //
     //   - static std::string ToString(T const &value);
     //   - static T FromString(std::string const &value);
+    //
     //   - template <typename ArchiveT> static ArchiveT & serialize(ArchiveT &ar, T const &value);
     //   - template <typename ArchiveT> static T deserialize(ArchiveT &ar);
     //
+    //   // The following methods should be implemented if the type is a nullable type
+    //   - static bool IsNull(nullable_type const &value);
+    //   - static T const & GetNullableValue(nullable_type const &value);
+    //   - static T & GetNullableValue(nullable_type &value);
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -189,66 +213,15 @@ struct TraitsImpl {
     static nullable_type CreateNullValue(void) {
         return nullable_type();
     }
-    static bool IsNull(T const&) {
-        return false;
-    }
-    static bool IsNull(nullable_type const& value) {
-        return !value.has_value();
-    }
-    struct IsUnsignedInt {
+
+    struct IsIntOrNumeric {
         static constexpr bool const value = false;
     };
-
-    static T const & GetNullableValue(nullable_type const &value) {
-        if (IsNull(value))
-            throw std::runtime_error("GetNullableValue attempt on a null value.");
-        return *value;
-    }
-
-    static T & GetNullableValue(nullable_type &value) {
-        if(IsNull(value))
-            throw std::runtime_error("GetNullableValue attempt on a null value.");
-
-        return *value;
-    }
 };
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
-
-namespace {
-template <typename T>
-static T swap_endian(T u)
-{
-    unsigned char* source(reinterpret_cast<unsigned char*>(&u));
-    unsigned char dest[sizeof(T)];
-
-    for (size_t k = 0; k < sizeof(T); k++)
-        dest[k] = *(source+sizeof(T) - k - 1);
-
-    return *reinterpret_cast<T*>(dest);
-}
-
-
-template <typename ArchiveT, typename TypeT>
-static ArchiveT & serialize_impl(ArchiveT &ar, TypeT const &value, std::true_type) {
-    return ar.serialize(value);
-}
-template <typename ArchiveT, typename TypeT>
-static ArchiveT & serialize_impl(ArchiveT &ar, TypeT const &value, std::false_type) {
-    return ar.serialize(swap_endian<TypeT>(value));
-}
-template <typename ArchiveT, typename TypeT>
-static TypeT deserialize_impl(ArchiveT &ar, std::true_type) {
-    return ar.template deserialize<TypeT>();
-}
-template <typename ArchiveT, typename TypeT>
-static TypeT deserialize_impl(ArchiveT &ar, std::false_type) {
-    return swap_endian<TypeT>(ar.template deserialize<TypeT>());
-}
-
-} //anonymous namespace
 
 
 template <>
@@ -300,6 +273,10 @@ struct Traits<std::int8_t> : public TraitsImpl<std::int8_t> {
         return static_cast<std::int8_t>(v);
     }
 
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int8_t const &value) {
         return ar.serialize(value);
@@ -326,14 +303,18 @@ struct Traits<std::int16_t> : public TraitsImpl<std::int16_t> {
         return static_cast<std::int16_t>(v);
     }
 
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int16_t const &value) {
-        return serialize_impl<ArchiveT, std::int16_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.serialize(value);
     }
 
     template <typename ArchiveT>
     static std::int16_t deserialize(ArchiveT &ar) {
-        return deserialize_impl<ArchiveT, std::int16_t>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.template deserialize<std::int16_t>();
     }
 };
 
@@ -348,14 +329,18 @@ struct Traits<std::int32_t> : public TraitsImpl<std::int32_t> {
         return std::stoi(value.c_str());
     }
 
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int32_t const &value) {
-        return serialize_impl<ArchiveT, std::int32_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.serialize(value);
     }
 
     template <typename ArchiveT>
     static std::int32_t deserialize(ArchiveT &ar) {
-        return deserialize_impl<ArchiveT, std::int32_t>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.template deserialize<std::int32_t>();
     }
 };
 
@@ -392,14 +377,18 @@ struct Traits<std::int64_t> : public TraitsImpl<std::int64_t> {
         return static_cast<std::int64_t>(v);
     }
 
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
+    };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::int64_t const &value) {
-        return serialize_impl<ArchiveT, std::int64_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.serialize(value);
     }
 
     template <typename ArchiveT>
     static std::int64_t deserialize(ArchiveT &ar) {
-        return deserialize_impl<ArchiveT, std::int64_t>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.template deserialize<std::int64_t>();
     }
 };
 
@@ -418,9 +407,10 @@ struct Traits<std::uint8_t> : public TraitsImpl<std::uint8_t> {
         return static_cast<std::uint8_t>(v);
     }
 
-    struct IsUnsignedInt {
+    struct IsIntOrNumeric {
         static constexpr bool const value = true;
     };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint8_t const &value) {
         return ar.serialize(value);
@@ -447,17 +437,18 @@ struct Traits<std::uint16_t> : public TraitsImpl<std::uint16_t> {
         return static_cast<std::uint16_t>(v);
     }
 
-    struct IsUnsignedInt {
+    struct IsIntOrNumeric {
         static constexpr bool const value = true;
     };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint16_t const &value) {
-        return serialize_impl<ArchiveT, std::uint16_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.serialize(value);
     }
 
     template <typename ArchiveT>
     static std::uint16_t deserialize(ArchiveT &ar) {
-        return deserialize_impl<ArchiveT, std::uint16_t>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.template deserialize<std::uint16_t>();
     }
 };
 
@@ -494,17 +485,18 @@ struct Traits<std::uint32_t> : public TraitsImpl<std::uint32_t> {
         return static_cast<std::uint32_t>(v);
     }
 
-    struct IsUnsignedInt {
+    struct IsIntOrNumeric {
         static constexpr bool const value = true;
     };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint32_t const &value) {
-        return serialize_impl<ArchiveT, std::uint32_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.serialize(value);
     }
 
     template <typename ArchiveT>
     static std::uint32_t deserialize(ArchiveT &ar) {
-        return deserialize_impl<ArchiveT, std::uint32_t>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.template deserialize<std::uint32_t>();
     }
 };
 
@@ -541,17 +533,18 @@ struct Traits<std::uint64_t> : public TraitsImpl<std::uint64_t> {
         return static_cast<std::uint64_t>(v);
     }
 
-    struct IsUnsignedInt {
-        static constexpr bool const value = false;
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
     };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::uint64_t const &value) {
-        return serialize_impl<ArchiveT, std::uint64_t>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.serialize(value);
     }
 
     template <typename ArchiveT>
     static std::uint64_t deserialize(ArchiveT &ar) {
-        return deserialize_impl<ArchiveT, std::uint64_t>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.template deserialize<std::uint64_t>();
     }
 };
 
@@ -600,17 +593,18 @@ struct Traits<std::float_t> {
         return std::stof(value.c_str());
     }
 
-    struct IsUnsignedInt {
-        static constexpr bool const value = false;
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
     };
+
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, nullable_type const &value) {
-        return serialize_impl<ArchiveT, nullable_type>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.serialize(value);
     }
 
     template <typename ArchiveT>
     static nullable_type deserialize(ArchiveT &ar) {
-        return deserialize_impl<ArchiveT, nullable_type>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.template deserialize<nullable_type>();
     }
 };
 
@@ -658,18 +652,19 @@ struct Traits<std::double_t>  {
 
         return std::stod(value.c_str());
     }
-    struct IsUnsignedInt {
-        static constexpr bool const value = false;
+
+    struct IsIntOrNumeric {
+        static constexpr bool const value = true;
     };
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, nullable_type const &value) {
-        return serialize_impl<ArchiveT, nullable_type>(ar, value, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.serialize(value);
     }
 
     template <typename ArchiveT>
     static nullable_type deserialize(ArchiveT &ar) {
-        return deserialize_impl<ArchiveT, nullable_type>(ar, std::integral_constant<bool,ISLITTLEENDIAN>());
+        return ar.template deserialize<nullable_type>();
     }
 };
 
@@ -805,58 +800,144 @@ struct Traits<std::vector<T, AllocatorT>> : public TraitsImpl<std::vector<T, All
     }
 };
 
+namespace {
+
+template <typename MapT>
+std::string ToMapString(MapT const &value) {
+    std::ostringstream                      out;
+
+    out << "{";
+
+    for(auto it = value.cbegin(); it != value.end(); ++it) {
+        out << Traits<typename MapT::key_type>::ToString(it->first) << ":" << Traits<typename MapT::mapped_type>::ToString(it->second);
+        if(std::next(it) != value.end())
+            out << ",";
+    }
+
+    out << "}";
+
+    return out.str();
+}
+
+template <typename MapT>
+MapT FromMapString(std::string const &value) {
+    std::ignore = value;
+    throw std::logic_error("Not Implemented Yet");
+}
+
+template <typename ArchiveT, typename MapT>
+ArchiveT & SerializeMap(ArchiveT &ar, MapT const &value) {
+    ar.serialize(static_cast<std::uint32_t>(value.size()));
+
+    for(auto const &kvp : value) {
+        Traits<typename MapT::key_type>::serialize(ar, kvp.first);
+        Traits<typename MapT::mapped_type>::serialize(ar, kvp.second);
+    }
+
+    return ar;
+}
+
+template <typename MapT, typename ArchiveT>
+MapT DeserializeMap(ArchiveT &ar) {
+    MapT                                    result;
+    std::uint32_t                           size(ar.template deserialize<std::uint32_t>());
+
+    while(size) {
+        typename MapT::key_type             key(Traits<typename MapT::key_type>::deserialize(ar));
+        typename MapT::mapped_type          value(Traits<typename MapT::mapped_type>::deserialize(ar));
+
+        result.emplace(std::make_pair(std::move(key), std::move(value)));
+
+        --size;
+    }
+
+    return result;
+}
+
+} // anonymous namespace
+
 template <typename KeyT, typename T, typename CompareT, typename AllocatorT>
 struct Traits<std::map<KeyT, T, CompareT, AllocatorT>> : public TraitsImpl<std::map<KeyT, T, CompareT, AllocatorT>> {
     static std::string ToString(std::map<KeyT, T, CompareT, AllocatorT> const& value) {
-        std::ostringstream streamObj;
-        streamObj << "{";
-
-        for (auto it = value.cbegin(); it != value.cend(); ++it)
-        {
-            streamObj << Traits<KeyT>::ToString(it->first) << ":" <<  Traits<T>::ToString(it->second);
-            if (std::next(it) != value.cend())
-            {
-                streamObj << ",";
-            }
-        }
-        streamObj << "}";
-        return streamObj.str();
+        return ToMapString(value);
     }
 
     static std::map<KeyT, T, CompareT, AllocatorT> FromString(std::string const &value) {
-        std::ignore = value; throw std::logic_error("Not Implemented Yet");
+        return FromMapString<std::map<KeyT, T, CompareT, AllocatorT>>(value);
     }
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::map<KeyT, T, CompareT, AllocatorT> const &value) {
-        ar.serialize(static_cast<std::uint32_t>(value.size()));
-
-        for(auto const &kvp : value) {
-            Traits<KeyT>::serialize(ar, kvp.first);
-            Traits<T>::serialize(ar, kvp.second);
-        }
-
-        return ar;
+        return SerializeMap(ar, value);
     }
 
     template <typename ArchiveT>
     static std::map<KeyT, T, CompareT, AllocatorT> deserialize(ArchiveT &ar) {
-        using MapType                       = std::map<KeyT, T, CompareT, AllocatorT>;
+        return DeserializeMap<std::map<KeyT, T, CompareT, AllocatorT>>(ar);
+    }
+};
 
-        MapType                             result;
-        std::uint32_t                       size(ar.template deserialize<std::uint32_t>());
+template <typename KeyT, typename T, typename HashT, typename KeyEqualT, typename AllocatorT>
+struct Traits<std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT>> : public TraitsImpl<std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT>> {
+    static std::string ToString(std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT> const &value) {
+        return ToMapString(value);
+    }
 
-        while(size) {
-            result.emplace(
-                [&ar](void) -> std::pair<KeyT, T> {
-                    KeyT                    key(Traits<KeyT>::deserialize(ar));
-                    T                       value(Traits<T>::deserialize(ar));
+    static std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT> FromString(std::string const &value) {
+        return FromMapString<std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT>>(value);
+    }
 
-                    return std::make_pair(std::move(key), std::move(value));
-                }()
-            );
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT> const &value) {
+        return SerializeMap(ar, value);
+    }
 
-            --size;
+    template <typename ArchiveT>
+    static std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT> deserialize(ArchiveT &ar) {
+        return DeserializeMap<std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT>>(ar);
+    }
+};
+
+template <typename T>
+struct Traits<Eigen::MatrixX<T>> : public TraitsImpl<Eigen::MatrixX<T>> {
+
+    static std::string ToString(Eigen::MatrixX<T> const &value) {
+        return ToStringImpl(value.data(), static_cast<size_t>(value.size()));
+    }
+
+    static Eigen::MatrixX<T> FromString(std::string const &value) {
+        std::ignore = value; throw std::logic_error("Not Implemented Yet");
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, Eigen::MatrixX<T> const &value) {
+        using MatrixT = Eigen::MatrixX<T>;
+
+        ar.serialize(static_cast<typename MatrixT::Index>(value.rows()));
+        ar.serialize(static_cast<typename MatrixT::Index>(value.cols()));
+
+        for (typename MatrixT::Index rowId = 0; rowId < value.rows(); ++rowId) {
+            for (typename MatrixT::Index colId = 0; colId < value.cols(); ++colId) {
+                Traits<typename MatrixT::Scalar>::serialize(ar, value(rowId, colId));
+            }   
+        }
+    
+        return ar;
+    }
+
+    template <typename ArchiveT>
+    static Eigen::MatrixX<T> deserialize(ArchiveT &ar) {
+        using MatrixT  = Eigen::MatrixX<T>;
+
+        typename MatrixT::Index                 numRows(ar.template deserialize<typename MatrixT::Index>());
+        typename MatrixT::Index                 numCols(ar.template deserialize<typename MatrixT::Index>());
+
+        MatrixT                                 result(numRows, numCols);
+
+        for (typename MatrixT::Index rowId = 0; rowId < numRows; ++rowId) {
+            for (typename MatrixT::Index colId = 0; colId < numCols; ++colId) {
+                result(rowId, colId) = Traits<typename MatrixT::Scalar>::deserialize(ar);
+            }   
         }
 
         return result;
@@ -892,40 +973,40 @@ struct Traits<std::tuple<Types...>> : public TraitsImpl<std::tuple<Types...>> {
     }
 
 private:
-    template<std::size_t N> static inline std::enable_if_t<N < sizeof...(Types) - 1> ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj) {
+    template<std::size_t N> static inline typename std::enable_if<N < sizeof...(Types) - 1>::type ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         streamObj << Traits<type>::ToString(std::get<N>(value)) << ",";
         ToStringHelper<N + 1>(value, streamObj);
     }
 
-    template<std::size_t N> static inline std::enable_if_t<N == (sizeof...(Types) - 1)> ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj) {
+    template<std::size_t N> static inline typename std::enable_if<N == (sizeof...(Types) - 1)>::type ToStringHelper(std::tuple<Types...> const& value, std::ostringstream& streamObj) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         streamObj << Traits<type>::ToString(std::get<N>(value));
     }
 
-    template <std::size_t N, typename ArchiveT> static inline std::enable_if_t<N < sizeof...(Types) - 1> SerializeHelper(ArchiveT &ar, std::tuple<Types...> const &value) {
+    template <std::size_t N, typename ArchiveT> static inline typename std::enable_if<N < sizeof...(Types) - 1>::type SerializeHelper(ArchiveT &ar, std::tuple<Types...> const &value) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         Traits<type>::serialize(ar, std::get<N>(value));
         SerializeHelper<N + 1>(ar, value);
     }
 
-    template <std::size_t N, typename ArchiveT> static inline std::enable_if_t<N == sizeof...(Types) - 1> SerializeHelper(ArchiveT &ar, std::tuple<Types...> const &value) {
+    template <std::size_t N, typename ArchiveT> static inline typename std::enable_if<N == sizeof...(Types) - 1>::type SerializeHelper(ArchiveT &ar, std::tuple<Types...> const &value) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         Traits<type>::serialize(ar, std::get<N>(value));
     }
 
-    template <std::size_t N, typename ArchiveT> static inline std::enable_if_t<N < sizeof...(Types) - 1> DeserializeHelper(ArchiveT &ar, std::tuple<Types...> &value) {
+    template <std::size_t N, typename ArchiveT> static inline typename std::enable_if<N < sizeof...(Types) - 1>::type DeserializeHelper(ArchiveT &ar, std::tuple<Types...> &value) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         std::get<N>(value) = Traits<type>::deserialize(ar);
         DeserializeHelper<N + 1>(ar, value);
     }
 
-    template <std::size_t N, typename ArchiveT> static inline std::enable_if_t<N == sizeof...(Types) - 1> DeserializeHelper(ArchiveT &ar, std::tuple<Types...> &value) {
+    template <std::size_t N, typename ArchiveT> static inline typename std::enable_if<N == sizeof...(Types) - 1>::type DeserializeHelper(ArchiveT &ar, std::tuple<Types...> &value) {
         using type = typename std::tuple_element<N, std::tuple<Types...>>::type;
 
         std::get<N>(value) = Traits<type>::deserialize(ar);
@@ -1007,16 +1088,55 @@ struct Traits<std::chrono::system_clock::duration> : public Impl::CommonDuration
 template <typename ClockT, typename DurationT>
 struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<std::chrono::time_point<ClockT, DurationT>> {
     static std::string ToString(std::chrono::time_point<ClockT, DurationT> const &tp) {
-        std::ostringstream                  out;
-
-        date::operator <<(out, tp);
-        out.flush();
-
-        return out.str();
+        return date::format("%FT%TZ", date::floor<std::chrono::seconds>(tp));
     }
 
     static std::chrono::time_point<ClockT, DurationT> FromString(std::string const &value) {
-        std::ignore = value; throw std::logic_error("Not Implemented Yet");
+        // valid iso8601 format can be YYYY-MM-DDTHH:mm:ssZ
+        // dashes, T, colons and time zone offset can be optional
+        // so we search for these tokens and create a template to be used in parse
+        std::string dash_template_component = "";
+        std::string colon_template_component = "";
+        std::string T_template_component = " ";
+        std::string Z_template_component = "Z";
+
+        // use a pointer to make a copy only when necessary
+        std::string const * ptr(&value);
+        std::string modified;
+
+        if ((value.find_first_of("Z") == std::string::npos)) {
+            // there is no Z in the string
+            if (value.find_last_of(":") == value.size() - 3) {
+                // there is a colon in the time zone
+                // remove it
+                modified = *ptr;
+                modified.erase(modified.size() - 3, 1);
+                ptr = &modified;
+            }
+            Z_template_component = "%z";
+        }
+        if (!(value.find_first_of("-") == std::string::npos)) {
+            // there is - in the string
+            dash_template_component = "-";
+        }
+        if (!(value.find_first_of(":") == std::string::npos)) {
+            // there is : in the string
+            colon_template_component = ":";
+        }
+        if (!(value.find_first_of("T") == std::string::npos)) {
+            // there is T in the string
+            T_template_component = "T";
+        }
+        std::istringstream ss(*ptr);
+        std::ostringstream date_template;
+        date_template << "%Y" << dash_template_component << "%m" << dash_template_component << "%d" << T_template_component << "%H" << colon_template_component <<"%M" << colon_template_component << "%S" << Z_template_component;
+        date::sys_time<std::chrono::system_clock::duration> tp;
+        date::from_stream(ss, date_template.str().c_str(), tp);
+
+        if (ss.fail() ) {
+            throw std::invalid_argument("Date time string is not in valid ISO 8601 form!");
+        }
+        return tp;
     }
 
     template <typename ArchiveT>
@@ -1071,9 +1191,6 @@ struct Traits<nonstd::optional<T>>  {
 
         return Traits<T>::FromString(value);
     }
-    struct IsUnsignedInt {
-        static constexpr bool const value = false;
-    };
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, nonstd::optional<T> const &value) {
@@ -1098,6 +1215,20 @@ struct Traits<nonstd::optional<T>>  {
 
 // TODO: ONNX (Sparse) Tensor
 // TODO: Apache Arrow
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         MakeNullableType
+///  \brief         We have many several situations where the transformer operates on nullable types,
+///                 but we don't want to instantiate the class as Transformer<optional<type>>.
+///                 This struct allows us to instantiate the class as Transformer<type>, but still be able to
+///                 operate on optional<type> and to make sure that optional<type> is not initially passed in.
+///
+template <typename T>
+struct MakeNullableType {
+    static_assert(Traits<T>::IsNullableType == false || Traits<T>::IsNativeNullableType, "'T' must not be a nullable type");
+
+    using type = typename Traits<T>::nullable_type;
+};
 
 } // namespace Featurizer
 } // namespace Microsoft

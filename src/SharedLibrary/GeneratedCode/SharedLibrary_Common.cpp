@@ -9,6 +9,7 @@
 
 #include "SharedLibrary_Common.h"
 #include "SharedLibrary_PointerTable.h"
+#include "Traits.h"
 
 // Forward declaration for DestroyTransformerSaveData
 ErrorInfoHandle* CreateErrorInfo(std::exception const &ex);
@@ -80,9 +81,18 @@ FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char cons
 
 // These methods are used internally but not exported
 ErrorInfoHandle * CreateErrorInfo(std::exception const &ex) {
-    std::unique_ptr<std::string> result(std::make_unique<std::string>(ex.what()));
+    std::unique_ptr<std::string> result(new std::string(ex.what()));
 
     size_t index = g_pointerTable.Add(result.release());
     return reinterpret_cast<ErrorInfoHandle *>(index);
 }
 
+std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &param) {
+    if(param.dataType == DateTimeParameter::DateTimeTypeValue::DateTimeInt64)
+        return std::chrono::system_clock::from_time_t(param.data.posix);
+
+    if(param.dataType == DateTimeParameter::DateTimeTypeValue::DateTimeString)
+        return Microsoft::Featurizer::Traits<std::chrono::system_clock::time_point>::FromString(param.data.isoStr.pBuffer);
+
+    throw std::runtime_error("'type' is invalid");
+}

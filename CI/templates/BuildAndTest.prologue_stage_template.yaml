@@ -10,17 +10,18 @@ stages:
   - stage: Prologue_Stage
     displayName: "Prologue:"
 
-    jobs:
-      - template: '_job_template.yaml'
-        parameters:
-          # agent_pool: AI-Pytorch-Win-CPU
-          # agent_pool_is_custom: true
-          agent_pool: windows-2019
-          job_name: 'Globals_Job'
-          job_display_name: "Global Variables"
-          steps:
-            - checkout: none
+    variables:
+      runCodesignValidationInjection: False
 
+    jobs:
+      - template: "_job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          job_name: "Globals_Job"
+          job_display_name: "Global Variables"
+          operating_system: Windows
+          steps:
             - task: PythonScript@0
               displayName: "[IMPL] Create JSON"
 
@@ -31,6 +32,7 @@ stages:
                 script: |-
                   import datetime
                   import json
+                  import subprocess
                   import sys
 
                   from collections import OrderedDict
@@ -39,10 +41,44 @@ stages:
 
                   values["is_release_build"] = "${{ parameters.release_build }}".lower() in ["true", "yes"]
 
+                  # Get the current git branch. This is a bit more complicated that normal, as the agent will
+                  # be in a detacted head state.
+                  git_output = subprocess.check_output(
+                      "git show -s --pretty=%d HEAD",
+                      shell=True,
+                  ).decode("utf-8").strip()
+
+                  # The output will be something like "(HEAD, origin/master)"
+                  branch_names = git_output.split(",")
+
+                  assert branch_names[0] == "(HEAD", branch_names
+                  branch_names.pop(0)
+
+                  if len(branch_names) == 1:
+                      git_output = branch_names[0]
+                  else:
+                      this_git_output = None
+
+                      for branch_name in branch_names:
+                          if "master" in branch_name:
+                              this_git_output = branch_name
+                              break
+
+                      if this_git_output is None:
+                          this_git_output = branch_names[0]
+
+                      git_output = this_git_output
+
+                  if git_output.endswith(")"):
+                      git_output = git_output[:-1]
+
+                  # Only take the last component of the branch name
+                  git_branch = git_output.split("/")[-1]
+
                   # the intention here is to compare if var == '$(var)', but as the right side of == will be a string of
                   # "$(var)" if var is empty, or the exact value which is equal to var if var is assigned the value.
                   # Therefore, a non-standard comparison is necessary in this case
-                  if "${{ parameters.prerelease_build_name }}" and "${{ parameters.prerelease_build_name }}" != "{}(prerelease_build_name)".format("$"):
+                  if "${{ parameters.prerelease_build_name }}" and "${{ parameters.prerelease_build_name }}" != "%s(prerelease_build_name)" % "$":
                       is_prerelease_build = True
                       build_name = "${{ parameters.prerelease_build_name }}"
                   else:
@@ -57,21 +93,37 @@ stages:
                           #
                           #     "manual" < "pipe" < "preview"
                           #
-                          build_name = "pipe.{build_id}.{year}.{month}.{day}.{hour}.{minute}.{second}".format(
-                              build_id=1 if "${{ parameters.is_ci_build }}".lower() in ["true", "yes"] else 0,
-                              year=now.year,
-                              month=now.month,
-                              day=now.day,
-                              hour=now.hour,
-                              minute=now.minute,
-                              second=now.second,
+
+                          # Not using format to remain compatible with python2
+                          build_name = "pipe.%s.%s.%s.%s.%s.%s.%s" % (
+                              1 if "${{ parameters.is_ci_build }}".lower() in ["true", "yes"] else 0,
+                              now.year,
+                              now.month,
+                              now.day,
+                              now.hour,
+                              now.minute,
+                              now.second,
                           )
 
+                  if build_name and git_branch != "master":
+                      # Update the branch name to only include semantic version-supported chars
+                      sem_ver_chars = []
+
+                      for c in git_branch:
+                          if not c.isalnum() and c != '.':
+                              c = '.'
+
+                          sem_ver_chars.append(c)
+
+                      build_name = "%s.%s" % (''.join(sem_ver_chars), build_name)
+
+                  values["git_branch"] = git_branch
                   values["is_prerelease_build"] = is_prerelease_build
                   values["build_name"] = build_name
 
                   for k, v in values.items():
-                      print("{} = {}".format(k, v))
+                      # Not using format to remain compatible with python2
+                      print("%s = %s" % (k, v))
 
                   with open("globals.json", "w") as f:
                       json.dump(values, f)

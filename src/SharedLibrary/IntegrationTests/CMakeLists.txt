@@ -18,7 +18,7 @@ endif()
 
 include(CppCommon OPTIONAL)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -39,6 +39,7 @@ foreach(_test_name IN ITEMS
     SharedLibrary_MDFeaturizer_IntegrationTest
     SharedLibrary_OHEFeaturizer_IntegrationTest
     SharedLibrary_RSFeaturizer_IntegrationTest
+    SharedLibrary_SSWFeaturizer_IntegrationTest
     SharedLibrary_StringFeaturizer_IntegrationTest
     SharedLibrary_TSIFeaturizer_IntegrationTest
 )

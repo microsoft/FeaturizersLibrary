@@ -30,42 +30,47 @@ static_assert(std::is_same<Traits<std::uint64_t>::nullable_type, nonstd::optiona
 static_assert(std::is_same<Traits<std::string>::nullable_type, nonstd::optional<std::string>>::value, "Incorrect nullable type for std::string");
 static_assert(std::is_same<Traits<std::array<char, 4>>::nullable_type, nonstd::optional<std::array<char, 4>>>::value, "Incorrect nullable type for std::array");
 static_assert(std::is_same<Traits<bool>::nullable_type, nonstd::optional<bool>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<std::map<int,int>>::nullable_type, nonstd::optional<std::map<int,int>>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<std::vector<int>>::nullable_type, nonstd::optional<std::vector<int>>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<nonstd::optional<int>>::nullable_type, nonstd::optional<int>>::value, "Incorrect nullable type for std::string");
-static_assert(std::is_same<Traits<std::tuple<int>>::nullable_type, nonstd::optional<std::tuple<int>>>::value, "Incorrect nullable type for std::string");
+static_assert(std::is_same<Traits<std::map<int,int>>::nullable_type, nonstd::optional<std::map<int,int>>>::value, "Incorrect nullable type for std::map");
+static_assert(std::is_same<Traits<std::unordered_map<int,int>>::nullable_type, nonstd::optional<std::unordered_map<int,int>>>::value, "Incorrect nullable type for std::unordered_map");
+static_assert(std::is_same<Traits<std::vector<int>>::nullable_type, nonstd::optional<std::vector<int>>>::value, "Incorrect nullable type for std::vector");
+static_assert(std::is_same<Traits<nonstd::optional<int>>::nullable_type, nonstd::optional<int>>::value, "Incorrect nullable type for nonstd::optional");
+static_assert(std::is_same<Traits<std::tuple<int>>::nullable_type, nonstd::optional<std::tuple<int>>>::value, "Incorrect nullable type for std::tuple");
 
 TEST_CASE("Transformer_Nullable") {
     nonstd::optional<std::int8_t> arg_null;
-	std::float_t arg_f_ini = std::numeric_limits<std::float_t>::quiet_NaN();
-	std::double_t arg_d_ini = std::numeric_limits<std::double_t>::quiet_NaN();
+    std::float_t arg_f_ini = std::numeric_limits<std::float_t>::quiet_NaN();
+    std::double_t arg_d_ini = std::numeric_limits<std::double_t>::quiet_NaN();
 
-	nonstd::optional<std::int64_t> arg_64(-7799);
+    nonstd::optional<std::int64_t> arg_64(-7799);
     std::float_t arg_f = 123;
     std::double_t arg_d = 123.45;
 
     CHECK(Traits<nonstd::optional<std::int8_t>>::ToString(arg_null) == "NULL");
-	CHECK(Traits<std::float_t>::ToString(Traits<std::float_t>::GetNullableValue(arg_f)) == "123.000000");
-	CHECK(Traits<nonstd::optional<std::int64_t>>::GetNullableValue(arg_64) == -7799);
-	CHECK(Traits<std::double_t>::ToString(Traits<std::double_t>::GetNullableValue(arg_d)) == "123.450000");
+    CHECK(Traits<std::float_t>::ToString(Traits<std::float_t>::GetNullableValue(arg_f)) == "123.000000");
+    CHECK(Traits<nonstd::optional<std::int64_t>>::GetNullableValue(arg_64) == -7799);
+    CHECK(Traits<std::double_t>::ToString(Traits<std::double_t>::GetNullableValue(arg_d)) == "123.450000");
 
-	CHECK_THROWS_WITH(Traits<nonstd::optional<std::int8_t>>::GetNullableValue(arg_null)
-				, Catch::Contains("GetNullableValue attempt on a null optional type."));
-	CHECK_THROWS_WITH(Traits<float_t>::GetNullableValue(arg_f_ini)
-				, Catch::Contains("GetNullableValue attempt on a float_t NaN."));
-	CHECK_THROWS_WITH(Traits<double_t>::GetNullableValue(arg_d_ini)
-				, Catch::Contains("GetNullableValue attempt on a double_t NaN."));
+    CHECK_THROWS_WITH(Traits<nonstd::optional<std::int8_t>>::GetNullableValue(arg_null)
+                , Catch::Contains("GetNullableValue attempt on a null optional type."));
+    CHECK_THROWS_WITH(Traits<float_t>::GetNullableValue(arg_f_ini)
+                , Catch::Contains("GetNullableValue attempt on a float_t NaN."));
+    CHECK_THROWS_WITH(Traits<double_t>::GetNullableValue(arg_d_ini)
+                , Catch::Contains("GetNullableValue attempt on a double_t NaN."));
 }
 
 TEST_CASE("Transformer_Binary") {
     bool arg_false = false;
     bool arg_true = true;
+    CHECK(!Traits<bool>::IsIntOrNumeric::value);
     CHECK(Traits<bool>::ToString(arg_false) == "False");
     CHECK(Traits<bool>::ToString(arg_true) == "True");
 }
 
 TEST_CASE("Transformer_Strings") {
     std::string arg_s = "isstring";
+
+    CHECK(!Traits<std::string>::IsIntOrNumeric::value);
+
     CHECK(Traits<std::string>::ToString(arg_s) == "isstring");
 }
 
@@ -79,6 +84,16 @@ TEST_CASE("Transformer_Integers") {
     std::uint16_t arg_u16 = 250;
     std::uint32_t arg_u32 = 480;
     std::uint64_t arg_u64 = 7799;
+
+    CHECK(Traits<std::int8_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::int16_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::int32_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::int64_t>::IsIntOrNumeric::value);
+
+    CHECK(Traits<std::uint8_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::uint16_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::uint32_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::uint64_t>::IsIntOrNumeric::value);
 
     CHECK(Traits<std::int8_t>::ToString(arg_8) == "20");
     CHECK(Traits<std::int16_t>::ToString(arg_16) == "-250");
@@ -126,11 +141,14 @@ TEST_CASE("Transformer_Integers") {
 }
 
 TEST_CASE("Transformer_Numbers") {
-	std::float_t arg_f_ini = std::numeric_limits<std::float_t>::quiet_NaN();
-	std::double_t arg_d_ini = std::numeric_limits<std::double_t>::quiet_NaN();
+    std::float_t arg_f_ini = std::numeric_limits<std::float_t>::quiet_NaN();
+    std::double_t arg_d_ini = std::numeric_limits<std::double_t>::quiet_NaN();
     std::float_t arg_f = 123;
     std::double_t arg_d1 = 123.45;
     std::double_t arg_d2 = 135453984983490.5473;
+
+    CHECK(Traits<std::float_t>::IsIntOrNumeric::value);
+    CHECK(Traits<std::double_t>::IsIntOrNumeric::value);
 
     CHECK(Traits<std::float_t>::ToString(arg_f_ini) == "NaN");
     CHECK(Traits<std::double_t>::ToString(arg_d_ini) == "NaN");
@@ -164,9 +182,9 @@ TEST_CASE("Transformer_Arrays") {
 
     //array<optional>
     nonstd::optional<std::double_t> arg_null;
-	std::array<nonstd::optional<std::double_t>, 3> arr_hasnull{1.5,arg_null,-47.1};
-	std::string arr_hasnull_s{"[1.500000,NULL,-47.100000]"};
-	CHECK(Traits<std::array<nonstd::optional<std::double_t>, 3>>::ToString(arr_hasnull) == arr_hasnull_s);
+    std::array<nonstd::optional<std::double_t>, 3> arr_hasnull{1.5,arg_null,-47.1};
+    std::string arr_hasnull_s{"[1.500000,NULL,-47.100000]"};
+    CHECK(Traits<std::array<nonstd::optional<std::double_t>, 3>>::ToString(arr_hasnull) == arr_hasnull_s);
 
     //vectors in arrays
     std::vector<std::double_t> vect{ 1.03, -20.1, 305.8 };
@@ -181,16 +199,16 @@ TEST_CASE("Transformer_Arrays") {
 TEST_CASE("Transformer_Vectors") {
     std::vector<std::double_t> vect{ 1.03, -20.1, 305.8 };
     std::string vect_s{ "[1.030000,-20.100000,305.800000]" };
-	CHECK(Traits<std::vector<std::double_t>>::ToString(vect) == vect_s);
+    CHECK(Traits<std::vector<std::double_t>>::ToString(vect) == vect_s);
 
-	//vector<optional>
-	nonstd::optional<std::int8_t> arg_null;
-	std::vector<nonstd::optional<std::int8_t>> vect_hasnull{static_cast<std::int8_t>(1), static_cast<std::int8_t>(2), arg_null, static_cast<std::int8_t>(4)};
-	std::string vect_hasnull_s{"[1,2,NULL,4]"};
-	CHECK(Traits<std::vector<nonstd::optional<std::int8_t>>>::ToString(vect_hasnull) == vect_hasnull_s);
+    //vector<optional>
+    nonstd::optional<std::int8_t> arg_null;
+    std::vector<nonstd::optional<std::int8_t>> vect_hasnull{static_cast<std::int8_t>(1), static_cast<std::int8_t>(2), arg_null, static_cast<std::int8_t>(4)};
+    std::string vect_hasnull_s{"[1,2,NULL,4]"};
+    CHECK(Traits<std::vector<nonstd::optional<std::int8_t>>>::ToString(vect_hasnull) == vect_hasnull_s);
 
-	//vectors in vectors
-	std::vector<std::int16_t> Bvect{2, 3, 7, -9};
+    //vectors in vectors
+    std::vector<std::int16_t> Bvect{2, 3, 7, -9};
     std::vector<std::vector<std::int16_t>> Rvect(2, Bvect);
     std::vector<std::vector<std::vector<std::int16_t>>> R2vect(2, Rvect);
     std::string Rvect_res = Traits<std::vector<std::vector<std::int16_t>>>::ToString(Rvect);
@@ -217,9 +235,30 @@ TEST_CASE("Transformer_Maps") {
     m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(93), 0.147));
     std::string map_res = Traits<std::map<std::int16_t, std::double_t>>::ToString(m);
     std::string map_s{ "{5:35.800000,93:0.147000}" };
-	CHECK(map_res == map_s);
+    CHECK(map_res == map_s);
 
     CHECK_THROWS_WITH((Traits<std::map<std::int16_t, std::double_t>>::FromString(map_res)), "Not Implemented Yet");
+}
+
+TEST_CASE("Unordered map") {
+    std::unordered_map<std::int16_t, std::double_t> m;
+    m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(5), 35.8));
+    m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(93), 0.147));
+    std::string map_res = Traits<std::unordered_map<std::int16_t, std::double_t>>::ToString(m);
+    std::string map_s{ "{93:0.147000,5:35.800000}" };
+    CHECK(map_res == map_s);
+}
+
+TEST_CASE("Transformer_EigenMatrix") {
+    Eigen::MatrixX<int> matrix(1, 3);
+    matrix(0, 0) = 1;
+    matrix(0, 1) = 2;
+    matrix(0, 2) = 3;
+    std::string matrix_res = Traits<Eigen::MatrixX<int>>::ToString(matrix);
+    std::string matrix_s{ "[1,2,3]" };
+    CHECK(matrix_res == matrix_s);
+
+    CHECK_THROWS_WITH((Traits<Eigen::MatrixX<int>>::FromString(matrix_res)), "Not Implemented Yet");
 }
 
 TEST_CASE("Transformer_Tuples") {
@@ -245,38 +284,95 @@ bool SerializationTestImpl(T const &value) {
     Archive                                 in(out.commit());
     T const                                 other(Traits<T>::deserialize(in));
 
-    return in.AtEnd() && other == value;
+    return in.AtEnd() && (other == value);
 }
 
-template <typename T>
-bool SerializeOnly(T const &value) {
-    Archive                                 out;
+TEST_CASE("Transformer_TimePoint") {
+    // without time offset
+    std::string tp_str = "1975-02-28T12:02:15Z";
+    std::chrono::system_clock::time_point tp = Traits<std::chrono::system_clock::time_point>::FromString(tp_str);
+    std::string tp_res = Traits<std::chrono::system_clock::time_point>::ToString(tp);
+    CHECK(tp_res == tp_str);
 
-    Traits<T>::serialize(out,value);
+    date::sys_days dp = date::floor<date::days>(tp);
+    date::year_month_day ymd = date::year_month_day{dp};
+    date::time_of_day<std::chrono::seconds> time = date::make_time(std::chrono::duration_cast<std::chrono::seconds>(tp-dp));
 
-    Archive                                 in(out.commit());
+    CHECK(ymd.year() == date::year(1975));
+    CHECK(ymd.month() == date::month(2));
+    CHECK(ymd.day() == date::day(28));
+    CHECK(time.hours().count() == 12);
+    CHECK(time.minutes().count() == 2);
+    CHECK(time.seconds().count() == 15);
 
-    T const                                 other(in.template deserialize<T>());
-    return value == other;
+    // with time offset
+    tp_str = "1975-02-28T12:02:15-03:00";
+    tp = Traits<std::chrono::system_clock::time_point>::FromString(tp_str);
+
+    dp = date::floor<date::days>(tp);
+    ymd = date::year_month_day{dp};
+    time = date::make_time(std::chrono::duration_cast<std::chrono::seconds>(tp-dp));
+
+    CHECK(ymd.year() == date::year(1975));
+    CHECK(ymd.month() == date::month(2));
+    CHECK(ymd.day() == date::day(28));
+    CHECK(time.hours().count() == 15);
+    CHECK(time.minutes().count() == 2);
+    CHECK(time.seconds().count() == 15);
+
+    // with add ins
+    tp_str = "1975-12-31T20:50:15-07:45";
+    tp = Traits<std::chrono::system_clock::time_point>::FromString(tp_str);
+
+    dp = date::floor<date::days>(tp);
+    ymd = date::year_month_day{dp};
+    time = date::make_time(std::chrono::duration_cast<std::chrono::seconds>(tp-dp));
+
+    CHECK(ymd.year() == date::year(1976));
+    CHECK(ymd.month() == date::month(1));
+    CHECK(ymd.day() == date::day(1));
+    CHECK(time.hours().count() == 4);
+    CHECK(time.minutes().count() == 35);
+    CHECK(time.seconds().count() == 15);
+
+
+    // invalid 02/29 year
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-02-29T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid month
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-13-29T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid 31 day
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-31T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid hour
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-30T27:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid minute
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-30T12:61:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid second
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-30T12:02:79Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid dash
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-0428T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid colon
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T1202:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid T
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28S12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
+
+    // invalid Z
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T12:02:15")), "Date time string is not in valid ISO 8601 form!");
+    CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T12:02:15-0700Z")), "Date time string is not in valid ISO 8601 form!");
+
+
 }
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
-
-
-/*
-There are three categories of tests about serialization:
-1. Round trip test
-2. Run time endianess check
-3. Big endianess serialization test
-*/
-
-bool TestLittleEndianess() {
-    uint32_t u = 0x01020304;
-    return (*(reinterpret_cast<uint8_t*>(&u))) == 4;
-}
-
 
 TEST_CASE("Serialization") {
     CHECK(SerializationTestImpl(true));
@@ -305,6 +401,16 @@ TEST_CASE("Serialization") {
     CHECK(SerializationTestImpl(std::map<int, std::string>{ {10, "ten"}, {20, "twenty"} }));
     CHECK(SerializationTestImpl(std::map<std::string, int>{ {"ten", 10}, {"twenty", 20} }));
 
+    CHECK(SerializationTestImpl(std::unordered_map<int, std::string>()));
+    CHECK(SerializationTestImpl(std::unordered_map<int, std::string>{ {10, "ten"}, {20, "twenty"} }));
+    CHECK(SerializationTestImpl(std::unordered_map<std::string, int>{ {"ten", 10}, {"twenty", 20} }));
+
+    CHECK(SerializationTestImpl(Eigen::MatrixX<float>()));
+    Eigen::MatrixX<float> matrix(1, 2);
+    matrix(0, 0) = 1.0f;
+    matrix(0, 1) = 0.0f;
+    CHECK(SerializationTestImpl(matrix));
+
     CHECK(SerializationTestImpl(nonstd::optional<int>()));
     CHECK(SerializationTestImpl(nonstd::optional<int>(23)));
     CHECK(SerializationTestImpl(nonstd::optional<std::string>("foo")));
@@ -312,29 +418,9 @@ TEST_CASE("Serialization") {
     CHECK(SerializationTestImpl(std::tuple<std::string, int, bool>("one", 2, true)));
 }
 
-TEST_CASE("Run_Time_Check") {
-    CHECK(TestLittleEndianess() == is_little_endian); // ISLITTLEENDIAN in Traits.h is set incorrectly!
-}
-
-TEST_CASE("Serialization_Based_On_Endianess") {
-    // checks if serialized output == original
-    // expected result would be true for little endian and false for big endian
-    bool expected_result(TestLittleEndianess()?true:false);
-    CHECK(SerializeOnly(static_cast<std::int16_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::int32_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::int64_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::uint16_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::uint32_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::uint64_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::double_t>(-23)) == expected_result);
-    CHECK(SerializeOnly(static_cast<std::float_t>(-23)) == expected_result);
-}
-
-
-
 template <typename T>
 bool TestCreateNullValue(void) {
-    return Traits<T>::IsNull(Traits<T>::CreateNullValue());
+    return Traits<typename Traits<T>::nullable_type>::IsNull(Traits<T>::CreateNullValue());
 }
 
 TEST_CASE("CreateNullValue") {
@@ -352,5 +438,7 @@ TEST_CASE("CreateNullValue") {
     CHECK(TestCreateNullValue<std::string>());
     CHECK(TestCreateNullValue<std::vector<std::string>>());
     CHECK(TestCreateNullValue<std::map<std::string, std::uint32_t>>());
+    CHECK(TestCreateNullValue<std::unordered_map<std::string, std::uint32_t>>());
+    CHECK(TestCreateNullValue<Eigen::MatrixX<std::float_t>>());
     CHECK(TestCreateNullValue<nonstd::optional<std::int8_t>>());
 }

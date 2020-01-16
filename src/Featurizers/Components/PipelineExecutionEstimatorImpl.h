@@ -49,6 +49,8 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(PipelineExecutionTransformer);
 
+    bool operator==(PipelineExecutionTransformer const &other) const;
+
     void save(Archive &ar) const override;
 
     using BaseType::execute;
@@ -224,7 +226,7 @@ private:
 
     // MSVC has problems when attempting to separate the definition from the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        return std::make_unique<TransformerType>(_estimatorChain);
+        return typename BaseType::TransformerUniquePtr(new TransformerType(_estimatorChain));
     }
 };
 
@@ -251,6 +253,11 @@ PipelineExecutionTransformer<EstimatorTs...>::PipelineExecutionTransformer(typen
 template <typename... EstimatorTs>
 PipelineExecutionTransformer<EstimatorTs...>::PipelineExecutionTransformer(Archive &ar) :
     _transformerChain(ar) {
+}
+
+template <typename... EstimatorTs>
+bool PipelineExecutionTransformer<EstimatorTs...>::operator==(PipelineExecutionTransformer const &other) const {
+    return _transformerChain == other._transformerChain;
 }
 
 template <typename... EstimatorTs>

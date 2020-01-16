@@ -8,7 +8,7 @@
 #include "GeneratedCode/SharedLibraryTests_MinMaxScalarFeaturizer.h"
 
 TEST_CASE("double_t") {
-    MinMaxScalarFeaturizer_double_t_Test(
+    MinMaxScalarFeaturizer_double_Test(
         std::vector<std::double_t>{
             static_cast<std::double_t>(-1),
             static_cast<std::double_t>(-0.5),

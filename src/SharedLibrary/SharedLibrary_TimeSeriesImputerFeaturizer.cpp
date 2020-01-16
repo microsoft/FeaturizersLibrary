@@ -164,7 +164,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateEsti
 
         Serializer::TypeIds                 colTypeIds(createTypeIds(pDataColTypes, numDataColTypes));
         std::unique_ptr<EstimatorMemory>    pMemory(
-            std::make_unique<EstimatorMemory>(
+            new EstimatorMemory(
                 Serializer(createTypeIds(pKeyColTypes, numKeyColTypes), colTypeIds),
                 Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator(
                     // We want to have an annotation map for each output column. Given our output type,
@@ -345,7 +345,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTran
 
         EstimatorMemory &                   estimatorMemory(*g_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pEstimatorHandle)));
         std::unique_ptr<TransformerMemory>  pTransformerMemory(
-            std::make_unique<TransformerMemory>(
+            new TransformerMemory(
                 std::move(estimatorMemory.EstimatorSerializer),
                 estimatorMemory.Estimator.create_transformer()
             )
@@ -378,7 +378,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTran
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
         Microsoft::Featurizer::Archive      archive(pBuffer, cBufferSize);
-        std::unique_ptr<TransformerMemory>  pTransformerMemory(std::make_unique<TransformerMemory>(archive));
+        std::unique_ptr<TransformerMemory>  pTransformerMemory(new TransformerMemory(archive));
         size_t                              index(g_pointerTable.Add(pTransformerMemory.get()));
 
         *ppTransformerHandle = reinterpret_cast<TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle *>(index);
@@ -801,11 +801,12 @@ template <typename T>
 void _LoadDataString(Microsoft::Featurizer::Archive &ar, OptionalStrings &results) {
     // ----------------------------------------------------------------------
     using TheseTraits               = Microsoft::Featurizer::Traits<T>;
+    using NullableTypeTraits        = Microsoft::Featurizer::Traits<typename TheseTraits::nullable_type>;
     // ----------------------------------------------------------------------
 
     typename TheseTraits::nullable_type     value(Microsoft::Featurizer::Traits<typename TheseTraits::nullable_type>::deserialize(ar));
 
-    results.emplace_back(TheseTraits::IsNull(value) ? nonstd::optional<std::string>() : TheseTraits::ToString(TheseTraits::GetNullableValue(value)));
+    results.emplace_back(NullableTypeTraits::IsNull(value) ? nonstd::optional<std::string>() : TheseTraits::ToString(NullableTypeTraits::GetNullableValue(value)));
 }
 
 OptionalStrings Serializer::_LoadDataStrings(Microsoft::Featurizer::Archive &ar) const {
@@ -1024,7 +1025,7 @@ TransformerMemory::TransformerMemory(SerializerType serializer, TransformerUniqu
 
 TransformerMemory::TransformerMemory(Microsoft::Featurizer::Archive &ar) :
     TransformerSerializer(ar),
-    Transformer(std::make_unique<Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator::TransformerType>(ar)) {
+    Transformer(new Microsoft::Featurizer::Featurizers::TimeSeriesImputerEstimator::TransformerType(ar)) {
 }
 
 Microsoft::Featurizer::Archive & TransformerMemory::save(Microsoft::Featurizer::Archive &ar) {

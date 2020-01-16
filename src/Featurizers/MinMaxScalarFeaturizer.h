@@ -15,7 +15,10 @@ namespace Featurizers {
 ///  \class         MinMaxScalarTransformer
 ///  \brief         Scales values based on learned min and max values.
 ///
-template <typename InputT, typename TransformedT>
+template <
+    typename InputT,
+    typename TransformedT=std::double_t
+>
 class MinMaxScalarTransformer : public StandardTransformer<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
@@ -58,6 +61,12 @@ private:
     // |
     // ----------------------------------------------------------------------
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override;
+
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::true_type);
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::false_type);
+
+    template <typename U>
+    void execute_implex(U const &input, typename BaseType::CallbackFunction const &callback);
 };
 
 namespace Details {
@@ -69,7 +78,7 @@ namespace Details {
 ///
 template <
     typename InputT,
-    typename TransformedT,
+    typename TransformedT=std::double_t,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class MinMaxScalarEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
@@ -118,7 +127,7 @@ private:
 
         MinMaxAnnotationData const &        data(MinMaxEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::MinMaxEstimatorName));
 
-        return std::make_unique<MinMaxScalarTransformer<InputT, TransformedT>>(data.Min, data.Max);
+        return typename BaseType::TransformerUniquePtr(new MinMaxScalarTransformer<InputT, TransformedT>(data.Min, data.Max));
     }
 };
 
@@ -193,6 +202,14 @@ template <typename InputT, typename TransformedT>
 MinMaxScalarTransformer<InputT, TransformedT>::MinMaxScalarTransformer(Archive &ar) :
     MinMaxScalarTransformer(
         [&ar](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
+
+            // Data
             typename BaseType::InputType    min(Traits<typename BaseType::InputType>::deserialize(ar));
             typename BaseType::InputType    max(Traits<typename BaseType::InputType>::deserialize(ar));
 
@@ -220,6 +237,11 @@ bool MinMaxScalarTransformer<InputT, TransformedT>::operator==(MinMaxScalarTrans
 
 template <typename InputT, typename TransformedT>
 void MinMaxScalarTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
+
+    // Data
     Traits<decltype(_min)>::serialize(ar, _min);
 
     // Note that we are serializing the max value rather than just the span so
@@ -233,6 +255,11 @@ void MinMaxScalarTransformer<InputT, TransformedT>::save(Archive &ar) const /*ov
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
 void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
+    execute_impl(input, callback, std::integral_constant<bool, Microsoft::Featurizer::Traits<InputT>::IsNullableType>());
+}
+
+template <typename InputT, typename TransformedT>
+void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::true_type) {
     // ----------------------------------------------------------------------
     using InputTraits                       = Traits<InputT>;
     using TransformedTraits                 = Traits<TransformedT>;
@@ -243,6 +270,17 @@ void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseTy
         return;
     }
 
+    execute_implex(InputTraits::GetNullableValue(input), callback);
+}
+
+template <typename InputT, typename TransformedT>
+void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::false_type) {
+    execute_implex(input, callback);
+}
+
+template <typename InputT, typename TransformedT>
+template <typename U>
+void MinMaxScalarTransformer<InputT, TransformedT>::execute_implex(U const &input, typename BaseType::CallbackFunction const &callback) {
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
@@ -259,7 +297,6 @@ void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseTy
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
-
 }
 
 // ----------------------------------------------------------------------

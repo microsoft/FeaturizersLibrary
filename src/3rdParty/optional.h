@@ -205,9 +205,24 @@ namespace nonstd {
 
 #if defined(__clang__)
 # pragma clang diagnostic push
+
+# if (defined __apple_build_version__)
+
+    // This 2nd push should not be necessary. However, we have seen warnings when
+    // building on MacOS associated with the pop at the end of this file not corresponding to
+    // any push (which is unexpected, because there is a push immediately above this
+    // one). Adding another push here suppresses that warning.
+    //
+    // All of this is very fishy. There may be something more interesting going on,
+    // but a manual inspection of this file did not provide any additional information.
+#   pragma clang diagnostic push
+# endif
+
 # pragma clang diagnostic ignored "-Wundef"
+
 #elif defined(__GNUC__)
 # pragma GCC   diagnostic push
+# pragma GCC   diagnostic ignored "-Wmaybe-uninitialized"
 # pragma GCC   diagnostic ignored "-Wundef"
 #endif
 

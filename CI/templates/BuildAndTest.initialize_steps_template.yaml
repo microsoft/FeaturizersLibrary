@@ -63,7 +63,9 @@ steps:
             content = json.load(f)
 
         for k, v in content.items():
-            k = "pipeline_{}".format(k)
+            # Note that we aren't using format here, as we want this script to work with
+            # both python2 and python3
+            k = "pipeline_%s" % k
             assert k not in values, (k, values[k])
 
             if isinstance(v, bool):
@@ -74,5 +76,7 @@ steps:
             values[k] = v
 
         for k, v in values.items():
-            print("{} = {}".format(k, v))
-            print("##vso[task.setvariable variable={}]{}".format(k, v))
+            # Note that we aren't using format here, as we want this script to work with
+            # both python2 and python3
+            print("%s = %s" % (k, v))
+            print("##vso[task.setvariable variable=%s]%s" % (k, v))
