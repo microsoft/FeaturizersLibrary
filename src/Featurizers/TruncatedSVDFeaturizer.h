@@ -13,26 +13,26 @@ namespace Featurizers {
 
 //the following functions are introduced from RedSVD
 //Copyright attached
-/* 
+/*
  * A header-only version of RedSVD
- * 
+ *
  * Copyright (c) 2014 Nicolas Tessore
- * 
+ *
  * based on RedSVD
- * 
+ *
  * Copyright (c) 2010 Daisuke Okanohara
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above Copyright
  *    notice, this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above Copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the authors nor the names of its contributors
  *    may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
@@ -49,25 +49,25 @@ inline void sample_gaussian(Scalar& x, Scalar& y)
     #   pragma clang diagnostic push
     #   pragma clang diagnostic ignored "-Wdouble-promotion"
     #endif
-		
+
     const Scalar PI(3.1415926535897932384626433832795028841971693993751f);
 
     #if (defined __clang__)
     #   pragma clang diagnostic pop
     #endif
-		
+
     Scalar v1 = static_cast<Scalar>(std::rand() + static_cast<Scalar>(1)) / (static_cast<Scalar>(RAND_MAX+static_cast<Scalar>(2)));
     Scalar v2 = static_cast<Scalar>(std::rand() + static_cast<Scalar>(1)) / (static_cast<Scalar>(RAND_MAX+static_cast<Scalar>(2)));
     Scalar len = sqrt(static_cast<Scalar>(-2) * log(v1));
     x = len * cos(static_cast<Scalar>(2) * PI * v2);
     y = len * sin(static_cast<Scalar>(2) * PI * v2);
 }
-	
+
 template<typename MatrixType>
 inline void sample_gaussian(MatrixType& mat) {
 
     typedef typename MatrixType::Index Index;
-		
+
     for(Index i = 0; i < mat.rows(); ++i)
     {
         for(Index j = 0; j+1 < mat.cols(); j += 2)
@@ -76,10 +76,10 @@ inline void sample_gaussian(MatrixType& mat) {
             sample_gaussian(mat(i, mat.cols()-1), mat(i, mat.cols()-1));
     }
 }
-	
+
 template<typename MatrixType>
 inline void gram_schmidt(MatrixType& mat) {
-	
+
     typedef typename MatrixType::Scalar Scalar;
     typedef typename MatrixType::Index Index;
 
@@ -87,21 +87,21 @@ inline void gram_schmidt(MatrixType& mat) {
     #   pragma clang diagnostic push
     #   pragma clang diagnostic ignored "-Wdouble-promotion"
     #endif
-		
+
     static const Scalar EPS(1E-4f);
 
     #if (defined __clang__)
     #   pragma clang diagnostic pop
     #endif
-		
+
     for(Index i = 0; i < mat.cols(); ++i) {
         for(Index j = 0; j < i; ++j) {
             Scalar r = mat.col(i).dot(mat.col(j));
             mat.col(i) -= r * mat.col(j);
         }
-			
+
         Scalar norm = mat.col(i).norm();
-			
+
         if(norm < EPS) {
             for(Index k = i; k < mat.cols(); ++k)
                 mat.col(k).setZero();
@@ -114,7 +114,7 @@ inline void gram_schmidt(MatrixType& mat) {
 /////////////////////////////////////////////////////////////////////////
 ///  \class         TruncatedSVDTransformer
 ///  \brief         Contains SVDComponents and use SVDComponents to project
-///                 matrix for dimensionality reduction, also provides 
+///                 matrix for dimensionality reduction, also provides
 ///                 SVDComponents retriving
 ///
 template <typename MatrixT>
@@ -161,8 +161,8 @@ private:
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
         if (input.size() == 0)
             throw std::invalid_argument("Input matrix size() invalid");
-    
-        if (input.cols() != _singularvectors.rows()) 
+
+        if (input.cols() != _singularvectors.rows())
             throw std::invalid_argument("Input matrix cols() invalid");
 
         callback(input * _singularvectors);
@@ -302,7 +302,7 @@ void TruncatedSVDTransformer<MatrixT>::save(Archive &ar) const /*override*/ {
     Traits<std::uint16_t>::serialize(ar, 1); // Major
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
-    // Data 
+    // Data
     Traits<decltype(_singularvalues)>::serialize(ar, _singularvalues);
     Traits<decltype(_singularvectors)>::serialize(ar, _singularvectors);
 }
@@ -346,31 +346,31 @@ void TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::complete_training_imp
     // Gaussian Random Matrix for _matrix^T
     DenseMatrix O(_matrix.rows(), rank);
     sample_gaussian(O);
-			
+
     // Compute Sample Matrix of _matrix^T
     DenseMatrix Y = _matrix.transpose() * O;
-			
+
     // Orthonormalize Y
     gram_schmidt(Y);
-			
+
     // Range(B) = Range(_matrix^T)
     DenseMatrix B = _matrix * Y;
-			
+
     // Gaussian Random Matrix
     DenseMatrix P(B.cols(), rank);
     sample_gaussian(P);
-			
+
     // Compute Sample Matrix of B
     DenseMatrix Z = B * P;
-			
+
     // Orthonormalize Z
     gram_schmidt(Z);
-			
+
     // Range(C) = Range(B)
-    DenseMatrix C = Z.transpose() * B; 
-			
+    DenseMatrix C = Z.transpose() * B;
+
     Eigen::JacobiSVD<DenseMatrix> svdOfC(C, Eigen::ComputeThinV);
-			
+
     // C = USV^T
     // A = Z * U * S * V^T * Y^T()
     this->_singularValues = svdOfC.singularValues();
