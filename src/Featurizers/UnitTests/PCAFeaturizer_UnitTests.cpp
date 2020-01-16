@@ -72,7 +72,7 @@ void PCATransformerTest() {
 #endif
 
     CHECK((output.cwiseProduct(output) - label.cwiseProduct(label)).norm() < eps);
-   
+
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
@@ -112,7 +112,7 @@ TEST_CASE("Serialization/Deserialization") {
     eigenVectors(2, 0) =  0.556994f;
     eigenVectors(2, 1) =  0.111422f;
     eigenVectors(2, 2) =  0.823008f;
-    
+
     TransformerType                         original(eigenValues, eigenVectors);
 
     NS::Archive                             out;

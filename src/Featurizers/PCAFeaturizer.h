@@ -108,6 +108,7 @@ private:
     MatrixT                                 _eigenvalues;
     MatrixT                                 _eigenvectors;
 
+    bool                                    _hasCalledFit;
     // ----------------------------------------------------------------------
     // |
     // |  Private Methods
@@ -116,7 +117,11 @@ private:
     bool begin_training_impl(void) override;
     // MSVC has problems when the declaration and definition are separated
     FitResult fit_impl(typename BaseType::InputType const *pBuffer, size_t) override {
+        if (_hasCalledFit)
+            throw std::runtime_error("Fit_impl() should not be called move than once in PCAFeaturizer");
+
         _matrix = *pBuffer;
+        _hasCalledFit = true;
 
         return FitResult::Continue;
     }
@@ -124,7 +129,7 @@ private:
 
     // MSVC has problems when the definition is separate from the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        return typename BaseType::TransformerUniquePtr(new PCATransformer<MatrixT>(_eigenvalues, _eigenvectors));
+        return typename BaseType::TransformerUniquePtr(new PCATransformer<MatrixT>(std::move(_eigenvalues), std::move(_eigenvectors)));
     }
 };
 
@@ -224,6 +229,7 @@ PCAEstimator<MatrixT, MaxNumTrainingItemsV>::PCAEstimator(AnnotationMapsPtr pAll
             }()
         )
     ) {
+        _hasCalledFit = false;
 }
 
 // ----------------------------------------------------------------------
@@ -247,6 +253,9 @@ void PCAEstimator<MatrixT, MaxNumTrainingItemsV>::complete_training_impl(void) /
             return cov;
         }()
     );
+
+    // free _matrix
+    _matrix.resize(0, 0);
 
     //PCA uses sigma but sklearn PCA uses sqrt(sigma), this implementation follows original principle.
     this->_eigenvalues = eig.eigenvalues();
