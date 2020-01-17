@@ -55,7 +55,7 @@ private:
     void execute_impl (typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
         typename IndexMap::const_iterator const         iter(labels_.find (input));
         nonstd::optional<std::uint32_t> result;
-        if(iter != Labels.end()) {
+        if(iter != labels_.end()) {
             result = iter->second;
         }
         callback(result);
@@ -75,14 +75,14 @@ template <
     typename InputT,
     size_t MaxNumTrainingItemsV = std::numeric_limits<size_t>::max()
 >
-class NumericalizeEstimatorImpl : public TransformerEstimator<InputT, std::uint32_t> {
+class NumericalizeEstimatorImpl : public TransformerEstimator<InputT, nonstd::optional<std::uint32_t>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType = TransformerEstimator<InputT, std::uint32_t>;
+    using BaseType = TransformerEstimator<InputT, nonstd::optional<std::uint32_t>>;
     using TransformerType = NumericalizeTransformer<InputT>;
 
     // ----------------------------------------------------------------------
@@ -212,8 +212,18 @@ inline NumericalizeTransformer<InputT>::NumericalizeTransformer(Archive & ar) :
     ) {
 }
 
+template<typename InputT>
+inline void NumericalizeTransformer<InputT>::save(Archive& ar) const {
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
+
+    // Data
+    Traits<decltype(labels_)>::serialize(ar, labels_);
+}
+
 template <typename InputT>
-bool NumericalizeTransformer<InputT>::operator==(NumericalizeTransformer const &other) const {
+inline bool NumericalizeTransformer<InputT>::operator==(NumericalizeTransformer const &other) const {
     return labels_ == other.labels_;
 }
 
@@ -233,17 +243,26 @@ NumericalizeEstimator<InputT, MaxNumTrainingItemsV>::NumericalizeEstimator(Annot
     BaseType(
         "NumericalizeEstimator",
         pAllColumnAnnotations,
-        [&, colIndex]() mutable { return Components::HistogramEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), colIndex); },
-        [&, colIndex]() mutable { return Components::IndexMapEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), colIndex, std::move(existingValues)); },
-        [&, colIndex]() mutable { return Details::NumericalizeEstimatorImpl<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), colIndex); }
+        [pAllColumnAnnotations, colIndex]() { return Components::HistogramEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), colIndex); },
+        [pAllColumnAnnotations, colIndex, &existingValues]() { return Components::IndexMapEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), colIndex, std::move(existingValues)); },
+        [pAllColumnAnnotations, colIndex]() { return Details::NumericalizeEstimatorImpl<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), colIndex); }
     ) {
 }
+
 
 // ----------------------------------------------------------------------
 // |
 // |  Details::NumericalizeEstimatorImpl
 // |
 // ----------------------------------------------------------------------
+template<typename InputT, size_t MaxNumTrainingItemsV>
+inline Details::NumericalizeEstimatorImpl<InputT, MaxNumTrainingItemsV>::NumericalizeEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+    BaseType("NumericalizeEstimatorImpl", std::move(pAllColumnAnnotations)),
+    _colIndex(colIndex) {
+    if(_colIndex >= this->get_column_annotations().size())
+        throw std::invalid_argument("colIndex");
+}
+
 template<typename InputT, size_t MaxNumTrainingItemsV>
 inline bool Details::NumericalizeEstimatorImpl<InputT, MaxNumTrainingItemsV>::begin_training_impl(void) {
     return false;
