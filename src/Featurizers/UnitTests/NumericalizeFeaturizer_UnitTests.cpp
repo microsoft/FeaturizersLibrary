@@ -96,7 +96,6 @@ TEST_CASE("not found value") {
 
 TEST_CASE("Serialization/Deserialization- Numeric") {
     using InputType       = std::uint32_t;
-    using TransformedType = nonstd::optional<std::uint32_t>;
     using TransformerType = NS::Featurizers::NumericalizeTransformer<InputType>;
 
     IndexMap<InputType, std::uint32_t>    indexmap(
@@ -126,7 +125,6 @@ TEST_CASE("Serialization/Deserialization- Numeric") {
 
 TEST_CASE("Serialization/Deserialization- string") {
     using InputType       = std::string;
-    using TransformedType = nonstd::optional<std::uint32_t>;
     using TransformerType = NS::Featurizers::NumericalizeTransformer<InputType>;
 
     IndexMap<InputType, std::uint32_t>    indexmap(
