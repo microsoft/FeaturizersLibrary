@@ -13,6 +13,8 @@ namespace Featurizer {
 namespace Featurizers {
 namespace Components {
 
+// TODO: This should be removed in favor of the StatisticalMetricsEstimator
+
 static constexpr char const * const         MinMaxEstimatorName("MinMaxEstimator");
 
 /////////////////////////////////////////////////////////////////////////

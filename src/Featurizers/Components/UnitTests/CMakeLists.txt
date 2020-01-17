@@ -34,11 +34,11 @@ SET(
     IndexMapEstimator_UnitTest
     InferenceOnlyFeaturizerImpl_UnitTest
     MaxAbsValueEstimator_UnitTest
+    MedianEstimator_UnitTest
     MinMaxEstimator_UnitTest
     ModeEstimator_UnitTest
     NormUpdaters_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
-    RobustScalarNormEstimator_UnitTest
     StandardDeviationEstimator_UnitTest
     StatisticalMetricsEstimator_UnitTest
     TrainingOnlyEstimatorImpl_UnitTest
