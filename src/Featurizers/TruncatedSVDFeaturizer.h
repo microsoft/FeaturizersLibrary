@@ -4,8 +4,8 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include "../Featurizer.h"
-#include "../Archive.h"
+#include "Featurizer.h"
+#include "Archive.h"
 
 namespace Microsoft {
 namespace Featurizer {
@@ -32,8 +32,8 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    TruncatedSVDTransformer(MatrixT singularvectors);
-    TruncatedSVDTransformer(Archive &ar);
+    explicit TruncatedSVDTransformer(MatrixT singularvectors);
+    explicit TruncatedSVDTransformer(Archive &ar);
 
     ~TruncatedSVDTransformer(void) override = default;
 
@@ -67,6 +67,106 @@ private:
         callback(input * _singularvectors);
     }
 };
+
+//the following functions are introduced from RedSVD
+//Copyright attached
+/*
+ * A header-only version of RedSVD
+ *
+ * Copyright (c) 2014 Nicolas Tessore
+ *
+ * based on RedSVD
+ *
+ * Copyright (c) 2010 Daisuke Okanohara
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above Copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above Copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the authors nor the names of its contributors
+ *    may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ */
+template<typename Scalar>
+inline void sample_gaussian(Scalar& x, Scalar& y)
+{
+    using std::sqrt;
+    using std::log;
+    using std::cos;
+    using std::sin;
+
+    #if (defined __clang__)
+    #   pragma clang diagnostic push
+    #   pragma clang diagnostic ignored "-Wdouble-promotion"
+    #endif
+
+    const Scalar PI(3.1415926535897932384626433832795028841971693993751f);
+
+    #if (defined __clang__)
+    #   pragma clang diagnostic pop
+    #endif
+
+    Scalar v1 = static_cast<Scalar>(std::rand() + static_cast<Scalar>(1)) / (static_cast<Scalar>(RAND_MAX+static_cast<Scalar>(2)));
+    Scalar v2 = static_cast<Scalar>(std::rand() + static_cast<Scalar>(1)) / (static_cast<Scalar>(RAND_MAX+static_cast<Scalar>(2)));
+    Scalar len = sqrt(static_cast<Scalar>(-2) * log(v1));
+    x = len * cos(static_cast<Scalar>(2) * PI * v2);
+    y = len * sin(static_cast<Scalar>(2) * PI * v2);
+}
+
+template<typename MatrixType>
+inline void sample_gaussian(MatrixType& mat) {
+
+    typedef typename MatrixType::Index Index;
+
+    for(Index i = 0; i < mat.rows(); ++i)
+    {
+        for(Index j = 0; j+1 < mat.cols(); j += 2)
+            sample_gaussian(mat(i, j), mat(i, j+1));
+        if(mat.cols() % 2)
+            sample_gaussian(mat(i, mat.cols()-1), mat(i, mat.cols()-1));
+    }
+}
+
+template<typename MatrixType>
+inline void gram_schmidt(MatrixType& mat) {
+
+    typedef typename MatrixType::Scalar Scalar;
+    typedef typename MatrixType::Index Index;
+
+    #if (defined __clang__)
+    #   pragma clang diagnostic push
+    #   pragma clang diagnostic ignored "-Wdouble-promotion"
+    #endif
+
+    static const Scalar EPS(1E-4f);
+
+    #if (defined __clang__)
+    #   pragma clang diagnostic pop
+    #endif
+
+    for(Index i = 0; i < mat.cols(); ++i) {
+        for(Index j = 0; j < i; ++j) {
+            Scalar r = mat.col(i).dot(mat.col(j));
+            mat.col(i) -= r * mat.col(j);
+        }
+
+        Scalar norm = mat.col(i).norm();
+
+        if(norm < EPS) {
+            for(Index k = i; k < mat.cols(); ++k)
+                mat.col(k).setZero();
+            return;
+        }
+        mat.col(i) /= norm;
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         TruncatedSVDEstimator
@@ -186,16 +286,9 @@ private:
 // ----------------------------------------------------------------------
 template <typename MatrixT>
 TruncatedSVDTransformer<MatrixT>::TruncatedSVDTransformer(MatrixT singularvectors) :
-    _singularvectors(
-        std::move(
-            [&singularvectors](void) -> MatrixT & {
-                if(singularvectors.size() == 0)
-                    throw std::invalid_argument("singularvectors");
-
-                return singularvectors;
-            }()
-        )
-    ) {
+    _singularvectors(std::move(singularvectors)) {
+    if(_singularvectors.size() == 0)
+        throw std::invalid_argument("singularvectors");
 }
 
 template <typename MatrixT>
@@ -233,106 +326,6 @@ void TruncatedSVDTransformer<MatrixT>::save(Archive &ar) const /*override*/ {
 
     // Data
     Traits<decltype(_singularvectors)>::serialize(ar, _singularvectors);
-}
-
-//the following functions are introduced from RedSVD
-//Copyright attached
-/*
- * A header-only version of RedSVD
- *
- * Copyright (c) 2014 Nicolas Tessore
- *
- * based on RedSVD
- *
- * Copyright (c) 2010 Daisuke Okanohara
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above Copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above Copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the authors nor the names of its contributors
- *    may be used to endorse or promote products derived from this
- *    software without specific prior written permission.
- */
-template<typename Scalar>
-inline void sample_gaussian(Scalar& x, Scalar& y)
-{
-    using std::sqrt;
-    using std::log;
-    using std::cos;
-    using std::sin;
-
-    #if (defined __clang__)
-    #   pragma clang diagnostic push
-    #   pragma clang diagnostic ignored "-Wdouble-promotion"
-    #endif
-
-    const Scalar PI(3.1415926535897932384626433832795028841971693993751f);
-
-    #if (defined __clang__)
-    #   pragma clang diagnostic pop
-    #endif
-
-    Scalar v1 = static_cast<Scalar>(std::rand() + static_cast<Scalar>(1)) / (static_cast<Scalar>(RAND_MAX+static_cast<Scalar>(2)));
-    Scalar v2 = static_cast<Scalar>(std::rand() + static_cast<Scalar>(1)) / (static_cast<Scalar>(RAND_MAX+static_cast<Scalar>(2)));
-    Scalar len = sqrt(static_cast<Scalar>(-2) * log(v1));
-    x = len * cos(static_cast<Scalar>(2) * PI * v2);
-    y = len * sin(static_cast<Scalar>(2) * PI * v2);
-}
-
-template<typename MatrixType>
-inline void sample_gaussian(MatrixType& mat) {
-
-    typedef typename MatrixType::Index Index;
-
-    for(Index i = 0; i < mat.rows(); ++i)
-    {
-        for(Index j = 0; j+1 < mat.cols(); j += 2)
-            sample_gaussian(mat(i, j), mat(i, j+1));
-        if(mat.cols() % 2)
-            sample_gaussian(mat(i, mat.cols()-1), mat(i, mat.cols()-1));
-    }
-}
-
-template<typename MatrixType>
-inline void gram_schmidt(MatrixType& mat) {
-
-    typedef typename MatrixType::Scalar Scalar;
-    typedef typename MatrixType::Index Index;
-
-    #if (defined __clang__)
-    #   pragma clang diagnostic push
-    #   pragma clang diagnostic ignored "-Wdouble-promotion"
-    #endif
-
-    static const Scalar EPS(1E-4f);
-
-    #if (defined __clang__)
-    #   pragma clang diagnostic pop
-    #endif
-
-    for(Index i = 0; i < mat.cols(); ++i) {
-        for(Index j = 0; j < i; ++j) {
-            Scalar r = mat.col(i).dot(mat.col(j));
-            mat.col(i) -= r * mat.col(j);
-        }
-
-        Scalar norm = mat.col(i).norm();
-
-        if(norm < EPS) {
-            for(Index k = i; k < mat.cols(); ++k)
-                mat.col(k).setZero();
-            return;
-        }
-        mat.col(i) /= norm;
-    }
 }
 
 // ----------------------------------------------------------------------
