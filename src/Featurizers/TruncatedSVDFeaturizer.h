@@ -32,7 +32,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    TruncatedSVDTransformer(MatrixT singularvalues, MatrixT singularvectors);
+    TruncatedSVDTransformer(MatrixT singularvectors);
     TruncatedSVDTransformer(Archive &ar);
 
     ~TruncatedSVDTransformer(void) override = default;
@@ -49,7 +49,6 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    MatrixT const                                    _singularvalues;
     MatrixT const                                    _singularvectors;
 
     // ----------------------------------------------------------------------
@@ -106,8 +105,6 @@ private:
     // ----------------------------------------------------------------------
     size_t const                            _colIndex;
     MatrixT                                 _matrix;
-    MatrixT                                 _singularValues;
-    MatrixT                                 _singularVectors;
 
     bool                                    _hasCalledFit;
     // ----------------------------------------------------------------------
@@ -120,7 +117,7 @@ private:
     FitResult fit_impl(typename BaseType::InputType const *pBuffer, size_t) override {
 
         if (_hasCalledFit)
-            throw std::runtime_error("Fit_impl() should not be called move than once in TruncatedSVDFeaturizer");
+            throw std::runtime_error("fit_impl() should not be called move than once in TruncatedSVDFeaturizer");
 
         _matrix = *pBuffer;
         _hasCalledFit = true;
@@ -131,7 +128,44 @@ private:
 
     // MSVC has problems when the definition is separate from the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        return typename BaseType::TransformerUniquePtr(new TruncatedSVDTransformer<MatrixT>(std::move(_singularValues), std::move(_singularVectors)));
+        //the following code in this function is introduced from RedSVD
+        typedef typename MatrixT::Scalar Scalar;
+        typedef typename Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> DenseMatrix;
+
+        Eigen::Index rank = (_matrix.rows() < _matrix.cols()) ? _matrix.rows() : _matrix.cols();
+
+        // Gaussian Random Matrix for _matrix^T
+        DenseMatrix O(_matrix.rows(), rank);
+        sample_gaussian(O);
+
+        // Compute Sample Matrix of _matrix^T
+        DenseMatrix Y = _matrix.transpose() * O;
+
+        // Orthonormalize Y
+        gram_schmidt(Y);
+
+        // Range(B) = Range(_matrix^T)
+        DenseMatrix B = _matrix * Y;
+
+        // free _matrix
+        _matrix.resize(0, 0);
+
+        // Gaussian Random Matrix
+        DenseMatrix P(B.cols(), rank);
+        sample_gaussian(P);
+
+        // Compute Sample Matrix of B
+        DenseMatrix Z = B * P;
+
+        // Orthonormalize Z
+        gram_schmidt(Z);
+
+        // Range(C) = Range(B)
+        DenseMatrix C = Z.transpose() * B;
+
+        Eigen::JacobiSVD<DenseMatrix> svdOfC(C, Eigen::ComputeThinV);
+
+        return typename BaseType::TransformerUniquePtr(new TruncatedSVDTransformer<MatrixT>(Y * svdOfC.matrixV()));
     }
 };
 
@@ -151,17 +185,7 @@ private:
 // |
 // ----------------------------------------------------------------------
 template <typename MatrixT>
-TruncatedSVDTransformer<MatrixT>::TruncatedSVDTransformer(MatrixT singularvalues, MatrixT singularvectors) :
-    _singularvalues(
-        std::move(
-            [&singularvalues](void) -> MatrixT & {
-                if(singularvalues.size() == 0)
-                    throw std::invalid_argument("singularvalues");
-
-                return singularvalues;
-            }()
-        )
-    ),
+TruncatedSVDTransformer<MatrixT>::TruncatedSVDTransformer(MatrixT singularvectors) :
     _singularvectors(
         std::move(
             [&singularvectors](void) -> MatrixT & {
@@ -186,17 +210,16 @@ TruncatedSVDTransformer<MatrixT>::TruncatedSVDTransformer(Archive &ar) :
                 throw std::runtime_error("Unsupported archive version");
 
             // Data
-            MatrixT                        singularvalues(Traits<MatrixT>::deserialize(ar));
             MatrixT                        singularvectors(Traits<MatrixT>::deserialize(ar));
 
-            return TruncatedSVDTransformer<MatrixT>(std::move(singularvalues), std::move(singularvectors));
+            return TruncatedSVDTransformer<MatrixT>(std::move(singularvectors));
         }()
     ) {
 }
 
 template <typename MatrixT>
 bool TruncatedSVDTransformer<MatrixT>::operator==(TruncatedSVDTransformer const &other) const {
-    if ((this->_singularvalues - other._singularvalues).norm() > 0.000001f || (this->_singularvectors - other._singularvectors).norm() > 0.000001f)
+    if ((this->_singularvectors - other._singularvectors).norm() > 0.000001f)
         return false;
 
     return true;
@@ -209,7 +232,6 @@ void TruncatedSVDTransformer<MatrixT>::save(Archive &ar) const /*override*/ {
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
-    Traits<decltype(_singularvalues)>::serialize(ar, _singularvalues);
     Traits<decltype(_singularvectors)>::serialize(ar, _singularvectors);
 }
 
@@ -330,8 +352,8 @@ TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::TruncatedSVDEstimator(Anno
                 return colIndex;
             }()
         )
-    ) {
-        _hasCalledFit = false;
+    ),
+    _hasCalledFit(false) {
 }
 
 // ----------------------------------------------------------------------
@@ -344,47 +366,6 @@ bool TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::begin_training_impl(v
 
 template <typename MatrixT, size_t MaxNumTrainingItemsV>
 void TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
-    //the following code in this function is introduced from RedSVD
-    typedef typename MatrixT::Scalar Scalar;
-    typedef typename Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> DenseMatrix;
-
-    Eigen::Index rank = (_matrix.rows() < _matrix.cols()) ? _matrix.rows() : _matrix.cols();
-
-    // Gaussian Random Matrix for _matrix^T
-    DenseMatrix O(_matrix.rows(), rank);
-    sample_gaussian(O);
-
-    // Compute Sample Matrix of _matrix^T
-    DenseMatrix Y = _matrix.transpose() * O;
-
-    // Orthonormalize Y
-    gram_schmidt(Y);
-
-    // Range(B) = Range(_matrix^T)
-    DenseMatrix B = _matrix * Y;
-
-    // free _matrix
-    _matrix.resize(0, 0);
-
-    // Gaussian Random Matrix
-    DenseMatrix P(B.cols(), rank);
-    sample_gaussian(P);
-
-    // Compute Sample Matrix of B
-    DenseMatrix Z = B * P;
-
-    // Orthonormalize Z
-    gram_schmidt(Z);
-
-    // Range(C) = Range(B)
-    DenseMatrix C = Z.transpose() * B;
-
-    Eigen::JacobiSVD<DenseMatrix> svdOfC(C, Eigen::ComputeThinV);
-
-    // C = USV^T
-    // A = Z * U * S * V^T * Y^T()
-    this->_singularValues = svdOfC.singularValues();
-    this->_singularVectors = Y * svdOfC.matrixV();
 }
 
 } // namespace Featurizers

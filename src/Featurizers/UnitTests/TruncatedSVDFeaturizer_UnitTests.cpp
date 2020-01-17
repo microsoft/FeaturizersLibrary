@@ -66,7 +66,7 @@ void TruncatedSVDTransformerTest() {
 #endif
 
     CHECK((output.cwiseProduct(output) - label.cwiseProduct(label)).norm() < eps);
-   
+
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
@@ -74,12 +74,9 @@ void TruncatedSVDTransformerTest() {
 
 TEST_CASE("Invalid_Annotation") {
     using MatrixT = Eigen::MatrixX<float>;
-    MatrixT invalidSingularValues;
     MatrixT invalidSingularVectors;
-    MatrixT validSingularValues(2, 2);
     MatrixT validSingularVectors(2, 2);
-    CHECK_THROWS_WITH(NS::Featurizers::TruncatedSVDTransformer<MatrixT>(invalidSingularValues, validSingularVectors), "singularvalues");
-    CHECK_THROWS_WITH(NS::Featurizers::TruncatedSVDTransformer<MatrixT>(validSingularValues, invalidSingularVectors), "singularvectors");
+    CHECK_THROWS_WITH(NS::Featurizers::TruncatedSVDTransformer<MatrixT>(invalidSingularVectors), "singularvectors");
 }
 
 TEST_CASE("TruncatedSVDTransformerTest") {
@@ -106,8 +103,8 @@ TEST_CASE("Serialization/Deserialization") {
     singularVectors(2, 0) =  0.556994f;
     singularVectors(2, 1) =  0.111422f;
     singularVectors(2, 2) =  0.823008f;
-    
-    TransformerType                         original(singularValues, singularVectors);
+
+    TransformerType                         original(singularVectors);
 
     NS::Archive                             out;
 
