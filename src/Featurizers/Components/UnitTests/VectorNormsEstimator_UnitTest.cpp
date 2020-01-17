@@ -22,15 +22,14 @@ TEST_CASE("all zeros - l1 norm") {
                                                      {0, 0, 0, 0}}});
 
     NS::AnnotationMapsPtr                                                                       pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::VectorNormsEstimator<InputType, NS::Featurizers::NormType::L1> estimator(pAllColumnAnnotations, 0);
+    NS::Featurizers::Components::VectorNormsEstimator<InputType, NS::Featurizers::Components::NormType::L1> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, list);
 
-    NS::Featurizers::Components::VectorNormsAnnotationData const &       annotation(estimator.get_annotation_data());
+    NS::Featurizers::Components::VectorNormsAnnotationData<NS::Featurizers::Components::NormType::L1> const &       annotation(estimator.get_annotation_data());
 
     std::vector<std::double_t> norms({0, 0, 0, 0});
     CHECK(annotation.Norms   == norms);
-    CHECK(annotation.Type    == NS::Featurizers::NormType::L1);
 }
 
 TEST_CASE("1D matrix - l2 norm") {
@@ -40,15 +39,14 @@ TEST_CASE("1D matrix - l2 norm") {
     std::vector<std::vector<InputType>> const list({{{0, 5, 12, 0}}});
 
     NS::AnnotationMapsPtr                                                                       pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::VectorNormsEstimator<InputType, NS::Featurizers::NormType::L2> estimator(pAllColumnAnnotations, 0);
+    NS::Featurizers::Components::VectorNormsEstimator<InputType, NS::Featurizers::Components::NormType::L2> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, list);
 
-    NS::Featurizers::Components::VectorNormsAnnotationData const &       annotation(estimator.get_annotation_data());
+    NS::Featurizers::Components::VectorNormsAnnotationData<NS::Featurizers::Components::NormType::L2> const &       annotation(estimator.get_annotation_data());
 
     std::vector<std::double_t> norms({13});
     CHECK(annotation.Norms   == norms);
-    CHECK(annotation.Type    == NS::Featurizers::NormType::L2);
 }
 
 TEST_CASE("int16_t - l2 norm") {
@@ -61,15 +59,14 @@ TEST_CASE("int16_t - l2 norm") {
                                                      {0, 6, 0, 0}}});
 
     NS::AnnotationMapsPtr                                                                       pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::VectorNormsEstimator<InputType, NS::Featurizers::NormType::L2> estimator(pAllColumnAnnotations, 0);
+    NS::Featurizers::Components::VectorNormsEstimator<InputType, NS::Featurizers::Components::NormType::L2> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, list);
 
-    NS::Featurizers::Components::VectorNormsAnnotationData const &       annotation(estimator.get_annotation_data());
+    NS::Featurizers::Components::VectorNormsAnnotationData<NS::Featurizers::Components::NormType::L2> const &       annotation(estimator.get_annotation_data());
 
     std::vector<std::double_t> norms({0, 5, 3, 6});
     CHECK(annotation.Norms   == norms);
-    CHECK(annotation.Type    == NS::Featurizers::NormType::L2);
 }
 
 
@@ -83,16 +80,15 @@ TEST_CASE("double - max norm") {
                                                      {   0,    0,    0,  0,    0, 87.9}}});
 
     NS::AnnotationMapsPtr                                                                        pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::VectorNormsEstimator<InputType, NS::Featurizers::NormType::MAX> estimator(pAllColumnAnnotations, 0);
+    NS::Featurizers::Components::VectorNormsEstimator<InputType, NS::Featurizers::Components::NormType::MAX> estimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(estimator, list);
 
-    NS::Featurizers::Components::VectorNormsAnnotationData const &       annotation(estimator.get_annotation_data());
+    NS::Featurizers::Components::VectorNormsAnnotationData<NS::Featurizers::Components::NormType::MAX> const &       annotation(estimator.get_annotation_data());
 
     std::vector<std::double_t> norms({static_cast<long double>(20.0),
                                       static_cast<long double>(45.0),
                                       static_cast<long double>(78.3),
                                       static_cast<long double>(87.9)});
     CHECK(annotation.Norms   == norms);
-    CHECK(annotation.Type    == NS::Featurizers::NormType::MAX);
 }

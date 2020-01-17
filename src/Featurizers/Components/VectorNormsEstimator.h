@@ -81,8 +81,8 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    static_assert(Traits<T>::IsVectorType, "Input type has to be vector!");
 
+    // using ValueType = typename std::iterator_traits<std::tuple_element<0, T>::type>::value_type;
     using ValueType = typename T::value_type;
     using InputType = T;
 
@@ -111,6 +111,14 @@ private:
     // ----------------------------------------------------------------------
     std::vector<std::double_t> _norms;
     typename TypeSelector::UpdaterTypeSelector<ValueType, NormT>::type _updater;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    void fit_impl(InputType const &input, std::true_type /*is_optional*/);
+    void fit_impl(InputType const &input, std::false_type /*is_optional*/);
 };
 
 } // namespace Details
@@ -142,7 +150,7 @@ using VectorNormsEstimator                       = TrainingOnlyEstimatorImpl<Det
 // |
 // ----------------------------------------------------------------------
 template <NormType NormT>
-VectorNormsAnnotationData::VectorNormsAnnotationData(std::vector<std::double_t> norms) :
+VectorNormsAnnotationData<NormT>::VectorNormsAnnotationData(std::vector<std::double_t> norms) :
     Norms(std::move(norms)) {
         for (auto const & norm : Norms) {
             if (norm < 0) {
@@ -162,16 +170,39 @@ Details::VectorNormsTrainingOnlyPolicy<T, NormT>::VectorNormsTrainingOnlyPolicy(
 
 template <typename T, NormType NormT>
 void Details::VectorNormsTrainingOnlyPolicy<T, NormT>::fit(InputType const &input) {
-    for (auto const & i : input) {
-        _updater.update(i);
-    }
-    _norms.push_back(static_cast<std::double_t>(_updater.commit()));
-    _updater.reset();
+    // T is a pair of iterators
+    fit_impl(input, std::integral_constant<bool, Microsoft::Featurizer::Traits<ValueType>::IsNullableType>());
 }
 
 template <typename T, NormType NormT>
 VectorNormsAnnotationData<NormT> Details::VectorNormsTrainingOnlyPolicy<T, NormT>::complete_training(void) {
-    return VectorNormsAnnotationData<NormT>(std::move(_norms), std::move(NormT));
+    return VectorNormsAnnotationData<NormT>(std::move(_norms));
+}
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+template <typename T, NormType NormT>
+void Details::VectorNormsTrainingOnlyPolicy<T, NormT>::fit_impl(InputType const &input, std::true_type) {
+    // ----------------------------------------------------------------------
+    using TheseTraits                       = Microsoft::Featurizer::Traits<ValueType>;
+    // ----------------------------------------------------------------------
+
+    for (auto const & value : input) {
+        if(!TheseTraits::IsNull(value))
+            _updater.update(TheseTraits::GetNullableValue(value));
+    }
+    _norms.emplace_back(static_cast<std::double_t>(_updater.commit()));
+    _updater.reset();
+}
+
+template <typename T, NormType NormT>
+void Details::VectorNormsTrainingOnlyPolicy<T, NormT>::fit_impl(InputType const &input, std::false_type) {
+    for (auto const & value : input) {
+        _updater.update(value);
+    }
+    _norms.emplace_back(static_cast<std::double_t>(_updater.commit()));
+    _updater.reset();
 }
 
 } // namespace Components
