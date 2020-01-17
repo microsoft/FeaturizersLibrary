@@ -28,6 +28,7 @@ add_library(FeaturizersCode STATIC
 
     ${_this_path}/../Components/Components.h
     ${_this_path}/../Components/InferenceOnlyFeaturizerImpl.h
+    ${_this_path}/../Components/MedianEstimator.h
     ${_this_path}/../Components/PipelineExecutionEstimatorImpl.h
     ${_this_path}/../Components/TimeSeriesFrequencyEstimator.h
     ${_this_path}/../Components/TimeSeriesImputerTransformer.h
