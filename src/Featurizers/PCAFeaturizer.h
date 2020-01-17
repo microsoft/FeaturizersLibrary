@@ -32,7 +32,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    PCATransformer(MatrixT eigenvalues, MatrixT eigenvectors);
+    PCATransformer(MatrixT eigenvectors);
     PCATransformer(Archive &ar);
 
     ~PCATransformer(void) override = default;
@@ -49,7 +49,6 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    MatrixT const                                    _eigenvalues;
     MatrixT const                                    _eigenvectors;
 
     // ----------------------------------------------------------------------
@@ -62,6 +61,7 @@ private:
         if (input.size() == 0)
             throw std::invalid_argument("Input matrix size() invalid");
 
+        //this is simplified(mathematically) from input.col() == _eigenvectors.transpose().rows()
         if (input.cols() != _eigenvectors.cols())
             throw std::invalid_argument("Input matrix cols() invalid");
 
@@ -105,8 +105,6 @@ private:
     // ----------------------------------------------------------------------
     size_t const                            _colIndex;
     MatrixT                                 _matrix;
-    MatrixT                                 _eigenvalues;
-    MatrixT                                 _eigenvectors;
 
     bool                                    _hasCalledFit;
     // ----------------------------------------------------------------------
@@ -118,7 +116,7 @@ private:
     // MSVC has problems when the declaration and definition are separated
     FitResult fit_impl(typename BaseType::InputType const *pBuffer, size_t) override {
         if (_hasCalledFit)
-            throw std::runtime_error("Fit_impl() should not be called move than once in PCAFeaturizer");
+            throw std::runtime_error("fit_impl() should not be called move than once in PCAFeaturizer");
 
         _matrix = *pBuffer;
         _hasCalledFit = true;
@@ -129,7 +127,22 @@ private:
 
     // MSVC has problems when the definition is separate from the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        return typename BaseType::TransformerUniquePtr(new PCATransformer<MatrixT>(std::move(_eigenvalues), std::move(_eigenvectors)));
+
+        Eigen::SelfAdjointEigenSolver<MatrixT> eig(
+            [this]() -> MatrixT {
+                //compute for centered training data
+                MatrixT centered = _matrix.rowwise() - _matrix.colwise().mean();
+                //compute for covariance matrix
+                MatrixT cov = centered.adjoint() * centered;
+                //using covariance matrix to compute PCA
+                return cov;
+            }()
+        );
+
+        // free _matrix
+        _matrix.resize(0, 0);
+
+        return typename BaseType::TransformerUniquePtr(new PCATransformer<MatrixT>(eig.eigenvectors()));
     }
 };
 
@@ -149,17 +162,7 @@ private:
 // |
 // ----------------------------------------------------------------------
 template <typename MatrixT>
-PCATransformer<MatrixT>::PCATransformer(MatrixT eigenvalues, MatrixT eigenvectors) :
-    _eigenvalues(
-        std::move(
-            [&eigenvalues](void) -> MatrixT & {
-                if(eigenvalues.size() == 0)
-                    throw std::invalid_argument("eigenvalues");
-
-                return eigenvalues;
-            }()
-        )
-    ),
+PCATransformer<MatrixT>::PCATransformer(MatrixT eigenvectors) :
     _eigenvectors(
         std::move(
             [&eigenvectors](void) -> MatrixT & {
@@ -184,17 +187,16 @@ PCATransformer<MatrixT>::PCATransformer(Archive &ar) :
                 throw std::runtime_error("Unsupported archive version");
 
             // Data
-            MatrixT                        eigenvalues(Traits<MatrixT>::deserialize(ar));
             MatrixT                        eigenvectors(Traits<MatrixT>::deserialize(ar));
 
-            return PCATransformer<MatrixT>(std::move(eigenvalues), std::move(eigenvectors));
+            return PCATransformer<MatrixT>(std::move(eigenvectors));
         }()
     ) {
 }
 
 template <typename MatrixT>
 bool PCATransformer<MatrixT>::operator==(PCATransformer const &other) const {
-    if ((this->_eigenvalues - other._eigenvalues).norm() > 0.000001f || (this->_eigenvectors - other._eigenvectors).norm() > 0.000001f)
+    if ((this->_eigenvectors - other._eigenvectors).norm() > 0.000001f)
         return false;
 
     return true;
@@ -207,7 +209,6 @@ void PCATransformer<MatrixT>::save(Archive &ar) const /*override*/ {
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
-    Traits<decltype(_eigenvalues)>::serialize(ar, _eigenvalues);
     Traits<decltype(_eigenvectors)>::serialize(ar, _eigenvectors);
 }
 
@@ -228,8 +229,8 @@ PCAEstimator<MatrixT, MaxNumTrainingItemsV>::PCAEstimator(AnnotationMapsPtr pAll
                 return colIndex;
             }()
         )
-    ) {
-        _hasCalledFit = false;
+    ),
+    _hasCalledFit(false) {
 }
 
 // ----------------------------------------------------------------------
@@ -242,24 +243,6 @@ bool PCAEstimator<MatrixT, MaxNumTrainingItemsV>::begin_training_impl(void) /*ov
 
 template <typename MatrixT, size_t MaxNumTrainingItemsV>
 void PCAEstimator<MatrixT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
-
-    Eigen::SelfAdjointEigenSolver<MatrixT> eig(
-        [&]() -> MatrixT {
-            //compute for centered training data
-            MatrixT centered = _matrix.rowwise() - _matrix.colwise().mean();
-            //compute for covariance matrix
-            MatrixT cov = centered.adjoint() * centered;
-            //using covariance matrix to compute PCA
-            return cov;
-        }()
-    );
-
-    // free _matrix
-    _matrix.resize(0, 0);
-
-    //PCA uses sigma but sklearn PCA uses sqrt(sigma), this implementation follows original principle.
-    this->_eigenvalues = eig.eigenvalues();
-    this->_eigenvectors = eig.eigenvectors();
 }
 
 } // namespace Featurizers

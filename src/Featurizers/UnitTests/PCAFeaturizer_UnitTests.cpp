@@ -80,12 +80,9 @@ void PCATransformerTest() {
 
 TEST_CASE("Invalid_Annotation") {
     using MatrixT = Eigen::MatrixX<float>;
-    MatrixT invalidEigenValues;
     MatrixT invalidEigenVectors;
-    MatrixT validEigenValues(2, 2);
     MatrixT validEigenVectors(2, 2);
-    CHECK_THROWS_WITH(NS::Featurizers::PCATransformer<MatrixT>(invalidEigenValues, validEigenVectors), "eigenvalues");
-    CHECK_THROWS_WITH(NS::Featurizers::PCATransformer<MatrixT>(validEigenValues, invalidEigenVectors), "eigenvectors");
+    CHECK_THROWS_WITH(NS::Featurizers::PCATransformer<MatrixT>(invalidEigenVectors), "eigenvectors");
 }
 
 TEST_CASE("PCATransformerTest") {
@@ -113,7 +110,7 @@ TEST_CASE("Serialization/Deserialization") {
     eigenVectors(2, 1) =  0.111422f;
     eigenVectors(2, 2) =  0.823008f;
 
-    TransformerType                         original(eigenValues, eigenVectors);
+    TransformerType                         original(eigenVectors);
 
     NS::Archive                             out;
 
