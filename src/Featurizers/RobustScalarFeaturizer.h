@@ -4,14 +4,13 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include "Components/RobustScalarNormEstimator.h"
+#include "Components/MedianEstimator.h"
 #include "Components/PipelineExecutionEstimatorImpl.h"
+#include "Components/StatisticalMetricsEstimator.h"
 
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
-
-
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         RobustScalarTransformer
@@ -88,7 +87,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    RobustScalarEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    RobustScalarEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool withCentering, float qRangeMin, float qRangeMax);
     ~RobustScalarEstimatorImpl(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RobustScalarEstimatorImpl);
@@ -100,6 +99,9 @@ private:
     // |
     // ----------------------------------------------------------------------
     size_t const                            _colIndex;
+    bool const                              _withCentering;
+    float const                             _qRangeMin;
+    float const                             _qRangeMax;
 
     // ----------------------------------------------------------------------
     // |
@@ -113,14 +115,43 @@ private:
     // MSVC runs into problems when separating the definition for this method
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
         // ----------------------------------------------------------------------
-        using RobustScalarNormAnnotationData            = Components::RobustScalarNormAnnotationData<TransformedT>;
-        using RobustScalarNormEstimator                 = Components::RobustScalarNormEstimator<InputT, TransformedT, MaxNumTrainingItemsV>;
+        using MedianEstimator                           = Components::MedianEstimator<InputT, TransformedT, true, MaxNumTrainingItemsV>;
+        using MedianAnnotationData                      = Components::MedianAnnotationData<TransformedT>;
 
+        using StatisticalMetricsEstimator               = Components::StatisticalMetricsEstimator<InputT, MaxNumTrainingItemsV>;
+        using StatisticalMetricsAnnoationData           = typename StatisticalMetricsEstimator::AnnotationData;
         // ----------------------------------------------------------------------
 
-        RobustScalarNormAnnotationData const &          data(RobustScalarNormEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::RobustScalarNormEstimatorName));
+        TransformedT                        median(static_cast<TransformedT>(0.0));
 
-        return typename BaseType::TransformerUniquePtr(new RobustScalarTransformer<InputT, TransformedT>(data.Median, data.Scale));
+        if(_withCentering) {
+            MedianAnnotationData const &                medianData(MedianEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::MedianEstimatorName));
+
+            median = medianData.Median;
+        }
+
+        TransformedT                        scale(static_cast<TransformedT>(1.0));
+
+        if(Traits<float>::IsNull(_qRangeMin) == false) {
+            float const                     qRangeRatio((_qRangeMax - _qRangeMin) / 100.0f);
+
+            assert(qRangeRatio >= 0.0f && qRangeRatio <= 1.0f);
+
+            StatisticalMetricsAnnoationData const &     statisticsData(StatisticalMetricsEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::StatisticalMetricsEstimatorName));
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#endif
+
+            scale = static_cast<TransformedT>((statisticsData.Max - statisticsData.Min) * qRangeRatio);
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+        }
+
+        return typename BaseType::TransformerUniquePtr(new RobustScalarTransformer<InputT, TransformedT>(std::move(median), std::move(scale)));
     }
 };
 
@@ -138,7 +169,8 @@ template <
 >
 class RobustScalarEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-        Components::RobustScalarNormEstimator<InputT, TransformedT, MaxNumTrainingItemsV>,
+        Components::MedianEstimator<InputT, TransformedT, true, MaxNumTrainingItemsV>,
+        Components::StatisticalMetricsEstimator<InputT, MaxNumTrainingItemsV>,
         Details::RobustScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
     > {
 public:
@@ -148,17 +180,17 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType = Components::PipelineExecutionEstimatorImpl<
-        Components::RobustScalarNormEstimator<InputT, TransformedT, MaxNumTrainingItemsV>,
+        Components::MedianEstimator<InputT, TransformedT, true, MaxNumTrainingItemsV>,
+        Components::StatisticalMetricsEstimator<InputT, MaxNumTrainingItemsV>,
         Details::RobustScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
     >;
-
-    using OptionalScalingParameters = typename Components::RobustScalarNormEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::OptionalScalingParameters;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
+    static RobustScalarEstimator<InputT, TransformedT, MaxNumTrainingItemsV> CreateWithDefaultScaling(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_centering);
 
     // Note that the signature with distinct values for qRangeMin and qRangeMax is required
     // for compatibility with the generated C interfaces (which doesn't yet support tuples).
@@ -173,8 +205,6 @@ public:
     ~RobustScalarEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RobustScalarEstimator);
-
-    static RobustScalarEstimator<InputT, TransformedT, MaxNumTrainingItemsV> CreateWithDefaultScaling(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool with_centering);
 };
 
 // ----------------------------------------------------------------------
@@ -271,8 +301,14 @@ void RobustScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseTy
 // |  Details::RobustScalarEstimatorImpl
 // |
 // ----------------------------------------------------------------------
+namespace {
+
+    using FloatTraits                       = Traits<std::float_t>;
+
+} // anonymous namespace
+
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-Details::RobustScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::RobustScalarEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+Details::RobustScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::RobustScalarEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool withCentering, float qRangeMin, float qRangeMax) :
     BaseType("RobustScalarEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
@@ -283,7 +319,47 @@ Details::RobustScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::
                 return colIndex;
             }()
         )
+    ),
+    _withCentering(std::move(withCentering)),
+    _qRangeMin(
+        std::move(
+            [&qRangeMin](void) -> float & {
+                if(
+                    FloatTraits::IsNull(qRangeMin) == false
+                    && (
+                        qRangeMin < 0.0f
+                        || qRangeMin > 100.0f
+                    )
+                )
+                    throw std::invalid_argument("qRangeMin");
+
+                return qRangeMin;
+            }()
+        )
+    ),
+    _qRangeMax(
+        std::move(
+            [&qRangeMax](void) -> float & {
+                if(
+                    FloatTraits::IsNull(qRangeMax) == false
+                    && (
+                        qRangeMax < 0.0f
+                        || qRangeMax > 100.f
+                    )
+                )
+                    throw std::invalid_argument("qRangeMax");
+
+                return qRangeMax;
+            }()
+        )
     ) {
+        if(FloatTraits::IsNull(_qRangeMin) == false || FloatTraits::IsNull(_qRangeMax) == false) {
+            if(FloatTraits::IsNull(_qRangeMin) || FloatTraits::IsNull(_qRangeMax))
+                throw std::invalid_argument("qRangeMin and qRangeMax must be atomically set");
+
+            if(_qRangeMax < _qRangeMin)
+                throw std::invalid_argument("qRangeMax");
+        }
 }
 
 // ----------------------------------------------------------------------
@@ -303,7 +379,6 @@ template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
 void Details::RobustScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
-
 // ----------------------------------------------------------------------
 // |
 // |  RobustScalarEstimator
@@ -314,48 +389,15 @@ RobustScalarEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::RobustScalarE
     BaseType(
         "RobustScalarEstimator",
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, colIndex, &withCentering, &qRangeMin, &qRangeMax](void) {
-            OptionalScalingParameters       optionalScalingParameters(
-                [&qRangeMin, &qRangeMax](void) -> OptionalScalingParameters {
-                    if(Traits<std::float_t>::IsNull(qRangeMin) == false || Traits<std::float_t>::IsNull(qRangeMax) == false) {
-                        if(Traits<std::float_t>::IsNull(qRangeMin) || Traits<std::float_t>::IsNull(qRangeMax))
-                            throw std::invalid_argument("Both 'qRangeMin' and 'qRangeMax' should be specified");
-
-                        return std::make_tuple(qRangeMin, qRangeMax);
-                    }
-
-                    return OptionalScalingParameters();
-                }()
-            );
-
-            return Components::RobustScalarNormEstimator<InputT, TransformedT, MaxNumTrainingItemsV> (
-                std::move(pAllColumnAnnotations),
-                std::move(colIndex),
-                std::move(withCentering),
-                std::move(optionalScalingParameters)
-            );
-        },
-        [pAllColumnAnnotations, colIndex](void) {
-            return Details::RobustScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(
-                std::move(pAllColumnAnnotations),
-                std::move(colIndex)
-            );
-        }
+        [pAllColumnAnnotations, colIndex](void) { return Components::MedianEstimator<InputT, TransformedT, true, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex](void) { return Components::StatisticalMetricsEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex, &withCentering, &qRangeMin, &qRangeMax](void) { return Details::RobustScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex), std::move(withCentering), std::move(qRangeMin), std::move(qRangeMax)); }
     ) {
 }
 
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
 RobustScalarEstimator<InputT, TransformedT, MaxNumTrainingItemsV> RobustScalarEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::CreateWithDefaultScaling(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool withCentering) {
     return RobustScalarEstimator(std::move(pAllColumnAnnotations), std::move(colIndex), withCentering, 25.0f, 75.0f);
-
-    // TODO: Restore this code path once `OptionalScalingParameters` support is restored.
-    //
-    // OptionalScalingParameters optionalScalingParameters = nonstd::optional<std::tuple<float, float>>(std::tuple<float, float>(25.0f, 75.0f));
-    //
-    // if (withCentering) {
-    //     return RobustScalarEstimator(pAllColumnAnnotations, colIndex, true, optionalScalingParameters);
-    // }
-    // return RobustScalarEstimator(pAllColumnAnnotations, colIndex, false, optionalScalingParameters);
 }
 
 } // namespace Featurizers
