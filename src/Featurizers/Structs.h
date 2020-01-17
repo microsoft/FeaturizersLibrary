@@ -55,6 +55,8 @@ public:
     // ----------------------------------------------------------------------
     SparseVectorEncoding(std::uint64_t numElements, std::vector<ValueEncoding> values);
 
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SparseVectorEncoding);
+
     bool operator==(SparseVectorEncoding const &other) const;
     bool operator!=(SparseVectorEncoding const &other) const;
 };
@@ -91,67 +93,10 @@ public:
     // ----------------------------------------------------------------------
     SingleValueSparseVectorEncoding(std::uint64_t numElements, value_type value, std::uint64_t index);
 
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SingleValueSparseVectorEncoding);
+
     bool operator==(SingleValueSparseVectorEncoding const &other) const;
     bool operator!=(SingleValueSparseVectorEncoding const &other) const;
-};
-
-
-/////////////////////////////////////////////////////////////////////////
-
-///  \class        CSREncoding
-///  \brief         Struct that contains information that can be used to
-///                 create a sparse matrix without creating the matrix
-///                 itself. We are using Compressed Sparse Row form
-///                 in this case.
-///
-///                 CSREncoding contains three vectors to express a
-///                 sparse matrix:
-///                 V contains all non-zero element values,
-///                 ColIndex contains column indices of non-zero values,
-///                 RowIndex has one element per row in the matrix and encodes
-///                 the index in V where the given row starts
-///
-
-template <typename T>
-class CSREncoding {
-public:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    using value_type                        = T;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Data
-    // |
-    // ----------------------------------------------------------------------
-
-    std::vector<value_type>          Values;
-    std::vector<std::uint64_t>       ColIndex;
-    std::vector<std::uint64_t>       RowIndex;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-    CSREncoding();
-    CSREncoding(std::vector<value_type> values, std::vector<std::uint64_t> col, std::vector<std::uint64_t> row);
-
-    bool operator==(CSREncoding const &other) const;
-    bool operator!=(CSREncoding const &other) const;
-};
-
-/////////////////////////////////////////////////////////////////////////
-///  \enum          NormType
-///  \brief         Training state associated with an `Estimator`.
-///
-enum class NormType : unsigned char {
-    L1 = 1,                            ///> l1 norm
-    L2,                               ///> l2 norm
-    MAX                               ///> max norm
 };
 
 // ----------------------------------------------------------------------
@@ -296,56 +241,6 @@ bool SingleValueSparseVectorEncoding<T>::operator==(SingleValueSparseVectorEncod
 
 template <typename T>
 bool SingleValueSparseVectorEncoding<T>::operator!=(SingleValueSparseVectorEncoding const &other) const {
-    return (*this == other) == false;
-}
-
-
-// ----------------------------------------------------------------------
-// |
-// |  CSREncoding
-// |
-// ----------------------------------------------------------------------
-template <typename T>
-CSREncoding<T>::CSREncoding() {
-    RowIndex.push_back(0);
-}
-
-template <typename T>
-CSREncoding<T>::CSREncoding(std::vector<value_type> values, std::vector<std::uint64_t> col, std::vector<std::uint64_t> row) :
-    Values(std::move(values)),
-    ColIndex(std::move(col)),
-    RowIndex(std::move(row)) {
-        if(RowIndex[0] != 0) {
-            throw std::invalid_argument("Row index array should start with 0!");
-        }
-
-        if(Values.size() != ColIndex.size()) {
-            throw std::invalid_argument("Non-zero values array and column index array should have same size!");
-        }
-
-        if(RowIndex.back() > ColIndex.size()) {
-            throw std::invalid_argument("Last value of row index should be less than the size of column index array");
-        }
-}
-
-#if (defined __clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wfloat-equal"
-#endif
-
-template <typename T>
-bool CSREncoding<T>::operator==(CSREncoding const &other) const {
-    return Values == other.Values
-        && ColIndex == other.ColIndex
-        && RowIndex == other.RowIndex;
-}
-
-#if (defined __clang__)
-#   pragma clang diagnostic pop
-#endif
-
-template <typename T>
-bool CSREncoding<T>::operator!=(CSREncoding const &other) const {
     return (*this == other) == false;
 }
 

@@ -12,6 +12,16 @@ namespace Featurizer {
 namespace Featurizers {
 namespace Components {
 
+/////////////////////////////////////////////////////////////////////////
+///  \enum          NormType
+///  \brief         Training state associated with an `Estimator`.
+///
+enum class NormType : unsigned char {
+    L1 = 1,                            ///> l1 norm
+    L2,                               ///> l2 norm
+    MAX                               ///> max norm
+};
+
 namespace TypeSelector {
 
 // max norm type selector is created for selecting different types for max norm based on input type
@@ -198,9 +208,8 @@ private:
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-Updaters::L1NormUpdater<T>::L1NormUpdater() :
-    _l1_norm(0),
-    _update_flag(false) {
+Updaters::L1NormUpdater<T>::L1NormUpdater() {
+    reset();
 }
 
 template <typename T>
@@ -242,9 +251,8 @@ long double Updaters::L1NormUpdater<T>::commit(void) {
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-Updaters::L2NormUpdater<T>::L2NormUpdater() :
-    _l2_norm(0),
-    _update_flag(false) {
+Updaters::L2NormUpdater<T>::L2NormUpdater() {
+    reset();
 }
 
 template <typename T>
@@ -285,9 +293,8 @@ long double Updaters::L2NormUpdater<T>::commit(void) {
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-Updaters::MaxNormUpdater<T>::MaxNormUpdater() :
-    _max_norm(0),
-    _update_flag(false) {
+Updaters::MaxNormUpdater<T>::MaxNormUpdater() {
+    reset();
 }
 
 template <typename T>

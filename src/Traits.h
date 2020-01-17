@@ -207,7 +207,6 @@ template <typename T>
 struct TraitsImpl {
     static constexpr bool const             IsNullableType = false;
     static constexpr bool const             IsNativeNullableType = false;
-    static constexpr bool const             IsVectorType = false;
     using nullable_type = nonstd::optional<T>;
 
     static nullable_type CreateNullValue(void) {
@@ -763,7 +762,6 @@ struct Traits<std::array<T, ArrayV>> : public TraitsImpl<std::array<T, ArrayV>> 
 
 template <typename T, typename AllocatorT>
 struct Traits<std::vector<T, AllocatorT>> : public TraitsImpl<std::vector<T, AllocatorT>> {
-    static constexpr bool const             IsVectorType = true;
 
     static std::string ToString(std::vector<T, AllocatorT> const& value) {
         return ToStringImpl(value.data(), value.size());

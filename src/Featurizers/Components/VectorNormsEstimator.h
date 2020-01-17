@@ -9,7 +9,6 @@
 #include "TrainingOnlyEstimatorImpl.h"
 #include "../../Traits.h"
 #include "NormUpdaters.h"
-#include "../Structs.h"
 
 namespace Microsoft {
 namespace Featurizer {
@@ -47,6 +46,7 @@ struct UpdaterTypeSelector<T, NormType::MAX> {
 ///  \class         VectorNormsAnnotationData
 ///  \brief         An annotation class which contains the norms of a matrix
 ///
+template <NormType NormT>
 class VectorNormsAnnotationData {
 public:
     // ----------------------------------------------------------------------
@@ -55,14 +55,13 @@ public:
     // |
     // ----------------------------------------------------------------------
     std::vector<std::double_t> const Norms;
-    NormType                 const Type;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    VectorNormsAnnotationData(std::vector<std::double_t> norms, NormType type);
+    VectorNormsAnnotationData(std::vector<std::double_t> norms);
     ~VectorNormsAnnotationData(void) = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(VectorNormsAnnotationData);
@@ -102,7 +101,7 @@ public:
     VectorNormsTrainingOnlyPolicy(void);
 
     void fit(InputType const &input);
-    VectorNormsAnnotationData complete_training(void);
+    VectorNormsAnnotationData<NormT> complete_training(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -142,11 +141,11 @@ using VectorNormsEstimator                       = TrainingOnlyEstimatorImpl<Det
 // |  VectorNormsAnnotationData
 // |
 // ----------------------------------------------------------------------
-VectorNormsAnnotationData::VectorNormsAnnotationData(std::vector<std::double_t> norms, NormType type) :
-    Norms(std::move(norms)),
-    Type(std::move(type)) {
-        for (auto it = norms.begin(); it != norms.end(); ++it) {
-            if (*it < 0) {
+template <NormType NormT>
+VectorNormsAnnotationData::VectorNormsAnnotationData(std::vector<std::double_t> norms) :
+    Norms(std::move(norms)) {
+        for (auto const & norm : Norms) {
+            if (norm < 0) {
                 throw std::invalid_argument("Norms shouldn't be less than 0!");
             }
         }
@@ -163,16 +162,16 @@ Details::VectorNormsTrainingOnlyPolicy<T, NormT>::VectorNormsTrainingOnlyPolicy(
 
 template <typename T, NormType NormT>
 void Details::VectorNormsTrainingOnlyPolicy<T, NormT>::fit(InputType const &input) {
-    for (auto it = input.begin(); it != input.end(); ++it) {
-        _updater.update(*it);
+    for (auto const & i : input) {
+        _updater.update(i);
     }
     _norms.push_back(static_cast<std::double_t>(_updater.commit()));
     _updater.reset();
 }
 
 template <typename T, NormType NormT>
-VectorNormsAnnotationData Details::VectorNormsTrainingOnlyPolicy<T, NormT>::complete_training(void) {
-    return VectorNormsAnnotationData(std::move(_norms), std::move(NormT));
+VectorNormsAnnotationData<NormT> Details::VectorNormsTrainingOnlyPolicy<T, NormT>::complete_training(void) {
+    return VectorNormsAnnotationData<NormT>(std::move(_norms), std::move(NormT));
 }
 
 } // namespace Components

@@ -32,6 +32,9 @@ TEST_CASE("l1 updater normal cases") {
     updater.update(3);
     long double const r2(updater.commit());
     CHECK(r2 == 6);
+
+    updater.reset();
+    CHECK_THROWS_WITH(updater.commit(), "update is not called before l1 is committed!");
 }
 TEST_CASE("l1 updater overflow") {
     using inputType = std::double_t;
@@ -54,6 +57,9 @@ TEST_CASE("l2 updater normal cases") {
     updater.update(4);
     long double const r2(updater.commit());
     CHECK(r2 == 5);
+
+    updater.reset();
+    CHECK_THROWS_WITH(updater.commit(), "update is not called before l2 is committed!");
 }
 TEST_CASE("l2 updater overflow") {
     using inputType = std::double_t;
@@ -77,6 +83,8 @@ TEST_CASE("max updater") {
     std::uint64_t const r2(updater.commit());
     CHECK(r2 == 100);
 
+    updater.reset();
+    CHECK_THROWS_WITH(updater.commit(), "update is not called before max is committed!");
 }
 
 #if (defined __clang__)

@@ -110,34 +110,3 @@ TEST_CASE("SingleValueSparseVectorEncoding - float") {
     CHECK(o1 != NS::Featurizers::SingleValueSparseVectorEncoding<float>(10, 2.0f, 2));
     CHECK(o1 != NS::Featurizers::SingleValueSparseVectorEncoding<float>(10, 1.0f, 3));
 }
-
-
-TEST_CASE("CSREncoding") {
-    std::vector<std::int16_t>  values({1, 2, 3, 4, 5});
-    std::vector<std::uint64_t> col({0, 1, 1, 3, 2});
-    std::vector<std::uint64_t> row({0, 2, 3, 3, 5});
-    NS::Featurizers::CSREncoding<std::int16_t>                  csr(values, col, row);
-
-    CHECK(csr.Values   == values);
-    CHECK(csr.ColIndex == col);
-    CHECK(csr.RowIndex == row);
-
-    CHECK(csr == NS::Featurizers::CSREncoding<std::int16_t>({1, 2, 3, 4, 5}, {0, 1, 1, 3, 2}, {0, 2, 3, 3, 5}));
-    CHECK(csr != NS::Featurizers::CSREncoding<std::int16_t>({1, 2, 3, 4, 7}, {0, 1, 1, 3, 2}, {0, 2, 3, 3, 5}));
-    CHECK(csr != NS::Featurizers::CSREncoding<std::int16_t>({1, 2, 3, 4, 5}, {0, 1, 2, 3, 2}, {0, 2, 3, 3, 5}));
-    CHECK(csr != NS::Featurizers::CSREncoding<std::int16_t>({1, 2, 3, 4, 5}, {0, 1, 1, 3, 2}, {0, 3, 3, 3, 5}));
-}
-
-TEST_CASE("CSREncoding - invalid construction") {
-    std::vector<std::int16_t>  values({1, 2, 3, 4, 5});
-    std::vector<std::uint64_t> col({0, 1, 1, 3, 2});
-    std::vector<std::uint64_t> errorRow1({1, 2, 3, 3, 5});
-    CHECK_THROWS_WITH(NS::Featurizers::CSREncoding<std::int16_t>(values, col, errorRow1), "Row index array should start with 0!");
-
-    std::vector<std::uint64_t> row({0, 2, 3, 3, 5});
-    std::vector<std::uint64_t> errorCol({0, 1, 1, 3});
-    CHECK_THROWS_WITH(NS::Featurizers::CSREncoding<std::int16_t>(values, errorCol, row), "Non-zero values array and column index array should have same size!");
-
-    std::vector<std::uint64_t> errorRow2({0, 1, 1, 3, 6});
-    CHECK_THROWS_WITH(NS::Featurizers::CSREncoding<std::int16_t>(values, col, errorRow2), "Last value of row index should be less than the size of column index array");
-}
