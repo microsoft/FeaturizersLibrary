@@ -37,6 +37,7 @@ foreach(_test_name IN ITEMS
     MaxAbsScalarFeaturizer_UnitTests
     MinMaxScalarFeaturizer_UnitTests
     MissingDummiesFeaturizer_UnitTests
+    NumericalizeFeaturizer_UnitTests
     OneHotEncoderFeaturizer_UnitTests
     RobustScalarFeaturizer_UnitTests
     SampleAddFeaturizer_UnitTest

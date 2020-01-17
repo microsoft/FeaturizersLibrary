@@ -9,10 +9,22 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../CatImputerFeaturizer.h
     ${_this_path}/../DateTimeFeaturizer.h
     ${_this_path}/../DateTimeFeaturizer.cpp
+    ${_this_path}/../HashOneHotVectorizerFeaturizer.h
+    ${_this_path}/../ImputationMarkerFeaturizer.h
+    ${_this_path}/../LabelEncoderFeaturizer.h
+    ${_this_path}/../MaxAbsScalarFeaturizer.h
+    ${_this_path}/../MinMaxScalarFeaturizer.h
+    ${_this_path}/../MissingDummiesFeaturizer.h
+
+    ${_this_path}/../NumericalizeFeaturizer.h
+
+    ${_this_path}/../OneHotEncoderFeaturizer.h
+    ${_this_path}/../RobustScalarFeaturizer.h
     ${_this_path}/../SampleAddFeaturizer.h
     ${_this_path}/../SampleAddFeaturizer.cpp
+    ${_this_path}/../StandardScaleWrapperFeaturizer.h
     ${_this_path}/../StringFeaturizer.h
-    ${_this_path}/../TimeSeriesImputerFeaturizer
+    ${_this_path}/../TimeSeriesImputerFeaturizer.h
 
     ${_this_path}/../Components/Components.h
     ${_this_path}/../Components/InferenceOnlyFeaturizerImpl.h
