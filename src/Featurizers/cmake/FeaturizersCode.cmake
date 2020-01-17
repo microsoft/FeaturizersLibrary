@@ -25,9 +25,6 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../Components/Details/PipelineExecutionEstimatorImpl_details.h
 )
 
-add_library(Framework INTERFACE)
-target_include_directories(Framework INTERFACE ${_this_path}/../../../src)
-
 file(GLOB JSON_DATA "${_this_path}/../DateTimeFeaturizerData/GeneratedCode/*.json")
 
 foreach(df ${JSON_DATA})

@@ -4,8 +4,8 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include "Featurizer.h"
-#include "Archive.h"
+#include "../Featurizer.h"
+#include "../Archive.h"
 
 namespace Microsoft {
 namespace Featurizer {
