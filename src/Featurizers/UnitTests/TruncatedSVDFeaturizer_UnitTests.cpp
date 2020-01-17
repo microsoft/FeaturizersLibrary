@@ -79,6 +79,31 @@ TEST_CASE("Invalid_Annotation") {
     CHECK_THROWS_WITH(NS::Featurizers::TruncatedSVDTransformer<MatrixT>(invalidSingularVectors), "singularvectors");
 }
 
+TEST_CASE("Invalid_fit") {
+    using MatrixT = Eigen::MatrixX<float>;
+
+    MatrixT trainingMatrix(3, 3);
+    trainingMatrix(0, 0) = -1;
+    trainingMatrix(0, 1) = -1;
+    trainingMatrix(0, 2) =  0;
+    trainingMatrix(1, 0) =  0;
+    trainingMatrix(1, 1) = -2;
+    trainingMatrix(1, 2) = -1;
+    trainingMatrix(2, 0) = -3;
+    trainingMatrix(2, 1) =  0;
+    trainingMatrix(2, 2) = -2;
+
+    using SVDEstimator                                 = NS::Featurizers::TruncatedSVDEstimator<MatrixT>;
+    NS::AnnotationMapsPtr const                        pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+
+    SVDEstimator                                       estimator(pAllColumnAnnotations, 0);
+
+    estimator.begin_training();
+    estimator.fit(trainingMatrix);
+
+    CHECK_THROWS_WITH(estimator.fit(trainingMatrix), "fit_impl() should not be called move than once in TruncatedSVDFeaturizer");
+}
+
 TEST_CASE("TruncatedSVDTransformerTest") {
     TruncatedSVDTransformerTest<Eigen::MatrixX<float>>();
     TruncatedSVDTransformerTest<Eigen::MatrixX<double>>();
