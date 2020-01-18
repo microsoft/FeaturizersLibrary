@@ -55,7 +55,6 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    static_assert(Traits<InputT>::IsNullableType == false || Traits<InputT>::IsNativeNullableType, "'InputT' should not be a nullable type");
     static_assert(Traits<TransformedT>::IsNullableType == false || Traits<TransformedT>::IsNativeNullableType, "'TransformedT' should not be a nullable type");
 
     using InputType                         = InputT;
@@ -85,8 +84,8 @@ private:
     // ensures that sorting only happens when a value is retrieved while sorting would
     // need to happen during insertion for other types. For this algorithm, it means
     // that sorting only happens when we need to rebalance the queues.
-    using MaxHeapType                       = std::priority_queue<InputT>;
-    using MinHeapType                       = std::priority_queue<InputT, std::vector<InputT>, std::greater<InputT>>;
+    using MaxHeapType                       = std::priority_queue<TransformedT>;
+    using MinHeapType                       = std::priority_queue<TransformedT, std::vector<TransformedT>, std::greater<TransformedT>>;
 
     // ----------------------------------------------------------------------
     // |
@@ -101,6 +100,12 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
+    void fit_impl(InputType const &input, std::true_type /*is_nullable*/);
+    void fit_impl(InputType const &input, std::false_type /*is_nullable*/);
+
+    template <typename U>
+    void fit_impl(U const &input);
+
     TransformedT _get_interpolated_value(std::true_type /*supports Interpolated values*/);
     TransformedT _get_interpolated_value(std::false_type /*supports Interpolated values*/);
 };
@@ -147,20 +152,7 @@ MedianAnnotationData<T>::MedianAnnotationData(T median) :
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, bool InterpolateValuesV>
 void Details::MedianTrainingOnlyPolicy<InputT, TransformedT, InterpolateValuesV>::fit(InputType const &input) {
-    if(_smaller.empty() || input <= _smaller.top())
-        _smaller.emplace(input);
-    else
-        _larger.emplace(input);
-
-    // Rebalance if necessary
-    if(_smaller.size() >= _larger.size() + 2) {
-        _larger.emplace(_smaller.top());
-        _smaller.pop();
-    }
-    else if(_larger.size() > _smaller.size()) {
-        _smaller.emplace(_larger.top());
-        _larger.pop();
-    }
+    fit_impl(input, std::integral_constant<bool, Traits<InputT>::IsNullableType>());
 }
 
 template <typename InputT, typename TransformedT, bool InterpolateValuesV>
@@ -181,7 +173,7 @@ MedianAnnotationData<TransformedT> Details::MedianTrainingOnlyPolicy<InputT, Tra
         assert(_smaller.empty() == false);
         assert(InterpolateValuesV == false || _smaller.size() == _larger.size() + 1);
 
-        median = static_cast<TransformedT>(_smaller.top());
+        median = _smaller.top();
     }
     else
         median = this->_get_interpolated_value(std::integral_constant<bool, InterpolateValuesV>());
@@ -201,10 +193,42 @@ MedianAnnotationData<TransformedT> Details::MedianTrainingOnlyPolicy<InputT, Tra
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, bool InterpolateValuesV>
+void Details::MedianTrainingOnlyPolicy<InputT, TransformedT, InterpolateValuesV>::fit_impl(InputType const &input, std::true_type /*is_nullable*/) {
+    if(Traits<InputT>::IsNull(input))
+        return;
+
+    fit_impl(Traits<InputT>::GetNullableValue(input));
+}
+
+template <typename InputT, typename TransformedT, bool InterpolateValuesV>
+void Details::MedianTrainingOnlyPolicy<InputT, TransformedT, InterpolateValuesV>::fit_impl(InputType const &input, std::false_type /*is_nullable*/) {
+    fit_impl(input);
+}
+
+template <typename InputT, typename TransformedT, bool InterpolateValuesV>
+template <typename U>
+void Details::MedianTrainingOnlyPolicy<InputT, TransformedT, InterpolateValuesV>::fit_impl(U const &input) {
+    if(_smaller.empty() || static_cast<TransformedT>(input) <= _smaller.top())
+        _smaller.emplace(static_cast<TransformedT>(input));
+    else
+        _larger.emplace(static_cast<TransformedT>(input));
+
+    // Rebalance if necessary
+    if(_smaller.size() >= _larger.size() + 2) {
+        _larger.emplace(_smaller.top());
+        _smaller.pop();
+    }
+    else if(_larger.size() > _smaller.size()) {
+        _smaller.emplace(_larger.top());
+        _larger.pop();
+    }
+}
+
+template <typename InputT, typename TransformedT, bool InterpolateValuesV>
 TransformedT Details::MedianTrainingOnlyPolicy<InputT, TransformedT, InterpolateValuesV>::_get_interpolated_value(std::true_type /*supports Interpolated values*/) {
     assert(_smaller.empty() == false);
 
-    InputT const                            greater(_larger.empty() ? 0 : _larger.top());
+    TransformedT const                      greater(_larger.empty() ? 0 : _larger.top());
 
 #if (defined __clang__)
 #   pragma clang diagnostic push

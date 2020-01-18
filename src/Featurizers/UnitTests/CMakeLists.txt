@@ -35,6 +35,7 @@ foreach(_test_name IN ITEMS
     ImputationMarkerFeaturizer_UnitTests
     LabelEncoderFeaturizer_UnitTests
     MaxAbsScalarFeaturizer_UnitTests
+    MedianImputerFeaturizer_UnitTest
     MinMaxImputerFeaturizer_UnitTest
     MinMaxScalarFeaturizer_UnitTests
     MissingDummiesFeaturizer_UnitTests

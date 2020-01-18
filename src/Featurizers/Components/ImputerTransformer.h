@@ -140,7 +140,7 @@ void ImputerTransformer<InputT, TransformedT>::execute_impl(InputType const &inp
     if(TheseTraits::IsNull(input))
         callback(Value);
     else
-        callback(TheseTraits::GetNullableValue(input));
+        callback(static_cast<TransformedT>(TheseTraits::GetNullableValue(input)));
 }
 
 } // namespace Components

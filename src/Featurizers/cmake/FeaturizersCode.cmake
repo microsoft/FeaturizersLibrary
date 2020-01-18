@@ -14,6 +14,7 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../ImputationMarkerFeaturizer.h
     ${_this_path}/../LabelEncoderFeaturizer.h
     ${_this_path}/../MaxAbsScalarFeaturizer.h
+    ${_this_path}/../MedianImputerFeaturizer.h
     ${_this_path}/../MinMaxImputerFeaturizer.h
     ${_this_path}/../MinMaxScalarFeaturizer.h
     ${_this_path}/../MissingDummiesFeaturizer.h
