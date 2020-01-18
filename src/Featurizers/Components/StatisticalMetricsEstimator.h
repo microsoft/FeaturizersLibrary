@@ -476,7 +476,6 @@ typename Updaters::StandardStatsUpdater<T>::StandardResult Updaters::StandardSta
     } else {
         return StandardStatisticalAnnotationData<T>(0,0,0,0,0);
     }
-
 }
 
 // ----------------------------------------------------------------------
