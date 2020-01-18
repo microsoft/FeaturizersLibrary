@@ -11,8 +11,6 @@
 
 namespace NS = Microsoft::Featurizer;
 
-// BugBug: Interpolate tests
-
 TEST_CASE("int") {
     // Odd number of items (no interpolation required)
     CHECK(
