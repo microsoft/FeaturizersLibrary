@@ -19,11 +19,11 @@ namespace Featurizers {
 namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MinMaxImputerEstimatorImpl
-///  \brief         Implementation details for the `MinMaxImputerEstimator`
+///  \class         MeanImputerEstimatorImpl
+///  \brief         Implementation details for `MeanImputerEstimator`
 ///
 template <typename T, size_t MaxNumTrainingItemsV>
-class MinMaxImputerEstimatorImpl : public TransformerEstimator<typename Traits<T>::nullable_type, T> {
+class MeanImputerEstimatorImpl : public TransformerEstimator<typename Traits<T>::nullable_type, double> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -33,28 +33,27 @@ public:
     static_assert(Traits<T>::IsNullableType == false || Traits<T>::IsNativeNullableType, "'T' must not be a nullable type");
 
     using InputType                         = typename Traits<T>::nullable_type;
-    using BaseType                          = TransformerEstimator<InputType, T>;
+    using BaseType                          = TransformerEstimator<InputType, double>;
 
-    using TransformerType                   = Components::ImputerTransformer<InputType, T>;
+    using TransformerType                   = Components::ImputerTransformer<InputType, double>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MinMaxImputerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool useMin);
-    ~MinMaxImputerEstimatorImpl(void) override = default;
+    MeanImputerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~MeanImputerEstimatorImpl(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxImputerEstimatorImpl);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MeanImputerEstimatorImpl);
 
 private:
     // ----------------------------------------------------------------------
     // |
-    // |  Private Data
+    // |  Private Methods
     // |
     // ----------------------------------------------------------------------
     size_t const                            _colIndex;
-    bool const                              _useMin;
 
     // ----------------------------------------------------------------------
     // |
@@ -75,39 +74,41 @@ private:
         // ----------------------------------------------------------------------
 
         AnnotationData const &              data(StatisticalMetricsEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::StatisticalMetricsEstimatorName));
-        InputType const &                   value(_useMin ? data.Min : data.Max);
 
+        // Use the Min value to determine if any values were encountered during training
 #if (defined _MSC_VER)
 #   pragma warning(push)
 #   pragma warning(disable: 4127) // conditional expression is constant
 #endif
 
-        if(std::is_same<InputType, T>::value == false && InputTypeTraits::IsNull(value))
-            throw std::runtime_error("The imputed value may not be null");
+        if(std::is_same<InputType, T>::value == false && InputTypeTraits::IsNull(data.Min)) {
+            assert(InputTypeTraits::IsNull(data.Max));
+            throw std::runtime_error("Mean values can't be calculated without input");
+        }
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)
 #endif
 
-        return typename BaseType::TransformerUniquePtr(new TransformerType(InputTypeTraits::GetNullableValue(value)));
+        return typename BaseType::TransformerUniquePtr(new TransformerType(data.Average));
     }
 };
 
 } // namespace Details
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MinMaxImputerEstimator
+///  \class         MeanImputerEstimator
 ///  \brief         Creates a `Transformer` that populates null values with
-///                 the min- or max-value encountered during training.
+///                 the mean (average) of values encountered during training.
 ///
 template <
-    typename TransformedT,
+    typename T,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class MinMaxImputerEstimator :
+class MeanImputerEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-        Components::StatisticalMetricsEstimator<typename Traits<TransformedT>::nullable_type, MaxNumTrainingItemsV>,
-        Details::MinMaxImputerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>
+        Components::StatisticalMetricsEstimator<typename Traits<T>::nullable_type, MaxNumTrainingItemsV>,
+        Details::MeanImputerEstimatorImpl<T, MaxNumTrainingItemsV>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -115,10 +116,12 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
+    static_assert(Traits<T>::IsNullableType == false || Traits<T>::IsNativeNullableType, "'T' must not be a nullable type");
+
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
-            Components::StatisticalMetricsEstimator<typename Traits<TransformedT>::nullable_type, MaxNumTrainingItemsV>,
-            Details::MinMaxImputerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>
+            Components::StatisticalMetricsEstimator<typename Traits<T>::nullable_type, MaxNumTrainingItemsV>,
+            Details::MeanImputerEstimatorImpl<T, MaxNumTrainingItemsV>
         >;
 
     // ----------------------------------------------------------------------
@@ -126,10 +129,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MinMaxImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool useMin);
-    ~MinMaxImputerEstimator(void) override = default;
+    MeanImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~MeanImputerEstimator(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxImputerEstimator);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MeanImputerEstimator);
 };
 
 // ----------------------------------------------------------------------
@@ -144,12 +147,12 @@ public:
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::MinMaxImputerEstimatorImpl
+// |  Details::MeanImputerEstimatorImpl
 // |
 // ----------------------------------------------------------------------
 template <typename T, size_t MaxNumTrainingItemsV>
-Details::MinMaxImputerEstimatorImpl<T, MaxNumTrainingItemsV>::MinMaxImputerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool useMin) :
-    BaseType("MinMaxImputerEstimatorImpl", std::move(pAllColumnAnnotations)),
+Details::MeanImputerEstimatorImpl<T, MaxNumTrainingItemsV>::MeanImputerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+    BaseType("MeanImputerEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
             [this, &colIndex](void) -> size_t & {
@@ -159,40 +162,39 @@ Details::MinMaxImputerEstimatorImpl<T, MaxNumTrainingItemsV>::MinMaxImputerEstim
                 return colIndex;
             }()
         )
-    ),
-    _useMin(std::move(useMin)) {
+    ) {
 }
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename T, size_t MaxNumTrainingItemsV>
-bool Details::MinMaxImputerEstimatorImpl<T, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+bool Details::MeanImputerEstimatorImpl<T, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
     // No training is necessary
     return false;
 }
 
 template <typename T, size_t MaxNumTrainingItemsV>
-FitResult Details::MinMaxImputerEstimatorImpl<T, MaxNumTrainingItemsV>::fit_impl(InputType const *, size_t) /*override*/ {
+FitResult Details::MeanImputerEstimatorImpl<T, MaxNumTrainingItemsV>::fit_impl(InputType const *, size_t) /*override*/ {
     throw std::runtime_error("This should not be called");
 }
 
 template <typename T, size_t MaxNumTrainingItemsV>
-void Details::MinMaxImputerEstimatorImpl<T, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+void Details::MeanImputerEstimatorImpl<T, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  MinMaxImputerEstimator
+// |  MeanImputerEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename TransformedT, size_t MaxNumTrainingItemsV>
-MinMaxImputerEstimator<TransformedT, MaxNumTrainingItemsV>::MinMaxImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool useMin) :
+template <typename T, size_t MaxNumTrainingItemsV>
+MeanImputerEstimator<T, MaxNumTrainingItemsV>::MeanImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
     BaseType(
-        "MinMaxImputerEstimator",
+        "MeanImputerEstimator",
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, colIndex](void) { return Components::StatisticalMetricsEstimator<typename Traits<TransformedT>::nullable_type, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
-        [pAllColumnAnnotations, colIndex, &useMin](void) { return Details::MinMaxImputerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex), std::move(useMin)); }
+        [pAllColumnAnnotations, colIndex](void) { return Components::StatisticalMetricsEstimator<typename Traits<T>::nullable_type, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex](void) { return Details::MeanImputerEstimatorImpl<T, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
     ) {
 }
 

@@ -147,7 +147,7 @@ TEST_CASE("No inputs - int") {
     NS::Featurizers::MinMaxImputerEstimator<int>        estimator(NS::CreateTestAnnotationMapsPtr(1), 0, true);
 
     estimator.begin_training();
-    CHECK_THROWS_WITH(estimator.complete_training(), "The imputed value may not be null");
+    CHECK_THROWS_WITH(estimator.complete_training(), "No values were provided");
 }
 
 TEST_CASE("No inputs - nullable type") {
@@ -155,7 +155,7 @@ TEST_CASE("No inputs - nullable type") {
     NS::Featurizers::MinMaxImputerEstimator<float>      estimator(NS::CreateTestAnnotationMapsPtr(1), 0, true);
 
     estimator.begin_training();
-    estimator.complete_training();
+    CHECK_THROWS_WITH(estimator.complete_training(), "No values were provided");
 }
 
 TEST_CASE("Exceptions") {

@@ -16,6 +16,7 @@ namespace NS = Microsoft::Featurizer;
 #   pragma clang diagnostic ignored "-Wfloat-equal"
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
+
 // test for valid argument for constructors
 TEST_CASE("valid argument for AnnotationData constructors") {
     NS::Featurizers::Components::BasicStatisticalAnnotationData<int> basics(10,              // min
@@ -38,6 +39,7 @@ TEST_CASE("valid argument for AnnotationData constructors") {
     CHECK(standard.Max  == 90);
     CHECK(standard.Count == 4);
 }
+
 // test for invalid argument for constructors
 TEST_CASE("invalid argument for AnnotationData constructors") {
     CHECK_THROWS_WITH(NS::Featurizers::Components::BasicStatisticalAnnotationData<int>(10,              // min
@@ -59,6 +61,7 @@ TEST_CASE("invalid argument for AnnotationData constructors") {
                                                                                            3            // count
                                                                                          ), "average is not in the correct range");
 }
+
 // test for updaters class specifically
 TEST_CASE("updaters for integer types") {
     using inputType = int;
@@ -133,7 +136,6 @@ TEST_CASE("overflow for numerical types") {
     CHECK_THROWS_WITH(standard_updater.update(1), "Input is so small comparing to sum that sum is the same after long double addition!");
 }
 
-
 // test for overall estimator
 TEST_CASE("int") {
     using inputType = int;
@@ -147,6 +149,24 @@ TEST_CASE("int") {
                                                                             40,
                                                                             50}}));
     NS::Featurizers::Components::StandardStatisticalAnnotationData<inputType> const& stats(estimator.get_annotation_data());
+
+    CHECK(stats.Min     == 10);
+    CHECK(stats.Max     == 50);
+    CHECK(stats.Count   == 5);
+    CHECK(stats.Sum     == 150);
+    CHECK(stats.Average == 30);
+}
+
+TEST_CASE("optional int") {
+    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::Components::StatisticalMetricsEstimator<nonstd::optional<int>> estimator(pAllColumnAnnotations,0);
+
+    NS::TestHelpers::Train(estimator, std::vector<std::vector<nonstd::optional<int>>>({{10,
+                                                                                        20,
+                                                                                        30,
+                                                                                        40,
+                                                                                        50}}));
+    NS::Featurizers::Components::StandardStatisticalAnnotationData<int> const& stats(estimator.get_annotation_data());
 
     CHECK(stats.Min     == 10);
     CHECK(stats.Max     == 50);
@@ -229,14 +249,10 @@ TEST_CASE("null input for numerical types") {
     NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations, 0);
 
-    NS::TestHelpers::Train(estimator, list);
-    NS::Featurizers::Components::StandardStatisticalAnnotationData<inputType> const& stats(estimator.get_annotation_data());
-
-    CHECK(stats.Min == 0);
-    CHECK(stats.Max == 0);
-    CHECK(stats.Count == 0);
-    CHECK(stats.Sum == 0);
-    CHECK(stats.Average == 0);
+    CHECK_THROWS_WITH(
+        (NS::TestHelpers::Train(estimator, list)),
+        "No values were provided"
+    );
 }
 
 TEST_CASE("null input for string") {
@@ -253,11 +269,12 @@ TEST_CASE("null input for string") {
     NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::StatisticalMetricsEstimator<inputType> estimator(pAllColumnAnnotations, 0);
 
-    NS::TestHelpers::Train(estimator, list);
-    NS::Featurizers::Components::BasicStatisticalAnnotationData<inputType> const& stats(estimator.get_annotation_data());
-
-    CHECK(stats.Count == 0);
+    CHECK_THROWS_WITH(
+        (NS::TestHelpers::Train(estimator, list)),
+        "No values were provided"
+    );
 }
+
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
