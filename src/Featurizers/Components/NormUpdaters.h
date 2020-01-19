@@ -55,8 +55,6 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using InputType                         = T;
-
     // input type can only be integer or numeric
     static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to norm updater has to be integer or numerical types!");
 
@@ -67,7 +65,7 @@ public:
     // ----------------------------------------------------------------------
     L1NormUpdater(void);
 
-    void update(InputType input);
+    void update(T input);
 
     long double commit(void);
 
@@ -99,8 +97,6 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using InputType                         = T;
-
     // input type can only be integer or numeric
     static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to norm updater has to be integer or numerical types!");
 
@@ -111,7 +107,7 @@ public:
     // ----------------------------------------------------------------------
     L2NormUpdater(void);
 
-    void update(InputType input);
+    void update(T input);
 
     long double commit(void);
 
@@ -143,8 +139,6 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using InputType                         = T;
-
     // input type can only be integer or numeric
     static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to norm updater has to be integer or numerical types!");
 
@@ -156,7 +150,7 @@ public:
 
     MaxNormUpdater(void);
 
-    void update(InputType input);
+    void update(T input);
 
     typename TypeSelector::MaxNormTypeSelector<T>::type commit(void);
 
