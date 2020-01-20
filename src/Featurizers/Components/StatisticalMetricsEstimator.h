@@ -8,6 +8,7 @@
 
 #include "TrainingOnlyEstimatorImpl.h"
 #include "../../Traits.h"
+
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
@@ -51,38 +52,31 @@ template <typename T>
 class BasicStatsUpdater {
 public:
     /////////////////////////////////////////////////////////////////////////
-    ///  \class         BasicResult
+    ///  \class         Result
     ///  \brief         A structure which contains the min, max and count
     ///                 for an input column. Template T can be all types
     ///
-    struct BasicResult {
+    struct Result {
     public:
         // ----------------------------------------------------------------------
         // |
         // |  Public Data
         // |
         // ----------------------------------------------------------------------
-        T             const                           Min;
-        T             const                           Max;
-        std::uint64_t const                           Count;
+        T             const                 Min;
+        T             const                 Max;
+        std::uint64_t const                 Count;
 
         // ----------------------------------------------------------------------
         // |
         // |  Public Methods
         // |
         // ----------------------------------------------------------------------
-        BasicResult(T min, T max, std::uint64_t count);
-        ~BasicResult(void) = default;
+        Result(T min, T max, std::uint64_t count);
+        ~Result(void) = default;
 
-        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(BasicResult);
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Result);
     };
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    using InputType                         = T;
 
     // ----------------------------------------------------------------------
     // |
@@ -93,9 +87,9 @@ public:
     // min, max and count are set based on first valid input element
     BasicStatsUpdater(void);
 
-    void update(InputType input);
+    void update(T input);
     // commit returns the result of min, max and count
-    BasicResult commit(void);
+    Result commit(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -103,10 +97,10 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    InputType                                 _min;
-    InputType                                 _max;
-    std::uint64_t                             _count;
-    bool                                      _first_element_flag;
+    T                                       _min;
+    T                                       _max;
+    std::uint64_t                           _count;
+    bool                                    _first_element_flag;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -117,37 +111,45 @@ private:
 template <typename T>
 class StandardStatsUpdater : public BasicStatsUpdater<T> {
 public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = BasicStatsUpdater<T>;
+
     /////////////////////////////////////////////////////////////////////////
-    ///  \class         StandardResult
+    ///  \class         Result
     ///  \brief         A struct which contains the sum and average
     ///                 for an input column. Template T can only be integer and numerical types
     ///
-    struct StandardResult : public BasicStatsUpdater<T>::BasicResult {
+    struct Result : public BasicStatsUpdater<T>::Result {
     public:
+        // ----------------------------------------------------------------------
+        // |
+        // |  Public Types
+        // |
+        // ----------------------------------------------------------------------
+        using BaseType                      = typename BasicStatsUpdater<T>::Result;
+
         // ----------------------------------------------------------------------
         // |
         // |  Public Data
         // |
         // ----------------------------------------------------------------------
-        typename TypeSelector::SumTypeSelector<T>::type   const                            Sum;
-        std::double_t                                     const                            Average;
+        typename TypeSelector::SumTypeSelector<T>::type const               Sum;
+        std::double_t                                   const               Average;
 
         // ----------------------------------------------------------------------
         // |
         // |  Public Methods
         // |
         // ----------------------------------------------------------------------
-        StandardResult(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count);
-        ~StandardResult(void) = default;
+        Result(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count);
+        ~Result(void) = default;
 
-        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(StandardResult);
+        FEATURIZER_MOVE_CONSTRUCTOR_ONLY(Result);
     };
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    using InputType                         = T;
 
     // ----------------------------------------------------------------------
     // |
@@ -156,9 +158,9 @@ public:
     // ----------------------------------------------------------------------
     StandardStatsUpdater(void);
 
-    void update(InputType input);
+    void update(T input);
     // commit returns the result of min, max, count, sum and average
-    StandardResult commit(void);
+    Result commit(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -166,7 +168,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    typename TypeSelector::SumTypeSelector<T>::type                               _sum;
+    typename TypeSelector::SumTypeSelector<T>::type     _sum;
 };
 
 } // namespace Updaters
@@ -174,19 +176,18 @@ private:
 namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         BasicStatsTrainingOnlyPolicy
-///  \brief         BasicStatsTrainingOnlyPolicy deals with basic stats include
-///                 min, max and count
+///  \class         StatisticalMetricsTrainingOnlyPolicy
+///  \brief         Applies statistical calculations on non-null inputs.
 ///
-template <typename T>
-class BasicStatsTrainingOnlyPolicy {
+template <typename InputT, typename UpdaterT>
+class StatisticalMetricsTrainingOnlyPolicy {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using InputType                         = T;
+    using InputType                         = InputT;
 
     // ----------------------------------------------------------------------
     // |
@@ -200,10 +201,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    BasicStatsTrainingOnlyPolicy(void);
+    StatisticalMetricsTrainingOnlyPolicy(void);
 
     void fit(InputType const &input);
-    typename Updaters::BasicStatsUpdater<T>::BasicResult complete_training(void);
+    typename UpdaterT::Result complete_training(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -211,120 +212,84 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    Updaters::BasicStatsUpdater<T>                         _updater;
+    UpdaterT                                _updater;
 
     // ----------------------------------------------------------------------
     // |
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    void fit_impl(InputType const &input, std::true_type /*is_optional*/);
-    void fit_impl(InputType const &input, std::false_type /*is_optional*/);
-};
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         StandardStatsTrainingOnlyPolicy
-///  \brief         StandardStatsTrainingOnlyPolicy deals with advanced stats include
-///                 sum and average
-///
-template <typename T>
-class StandardStatsTrainingOnlyPolicy : public BasicStatsTrainingOnlyPolicy<T> {
-public:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    using InputType                         = T;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Data
-    // |
-    // ----------------------------------------------------------------------
-    static constexpr char const * const     NameValue = StatisticalMetricsEstimatorName;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-    StandardStatsTrainingOnlyPolicy(void);
-
-    void fit(InputType const &input);
-    typename Updaters::StandardStatsUpdater<T>::StandardResult complete_training(void);
-
-private:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Data
-    // |
-    // ----------------------------------------------------------------------
-    Updaters::StandardStatsUpdater<T>                      _updater;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Methods
-    // |
-    // ----------------------------------------------------------------------
-    void fit_impl(InputType const &input, std::true_type /*is_optional*/);
-    void fit_impl(InputType const &input, std::false_type /*is_optional*/);
+    void fit_impl(InputType const &input, std::true_type /*is_nullable*/);
+    void fit_impl(InputType const &input, std::false_type /*is_nullable*/);
 };
 
 template <typename T>
-struct StatsPolicySelector {
-    using type = BasicStatsTrainingOnlyPolicy<T>;
+struct StatsUpdaterSelector {
+    using type = Updaters::BasicStatsUpdater<T>;
 };
 
 template <>
-struct StatsPolicySelector<std::int8_t> {
-    using type = StandardStatsTrainingOnlyPolicy<std::int8_t>;
+struct StatsUpdaterSelector<std::int8_t> {
+    using type = Updaters::StandardStatsUpdater<std::int8_t>;
 };
 
 template <>
-struct StatsPolicySelector<std::uint8_t> {
-    using type = StandardStatsTrainingOnlyPolicy<std::uint8_t>;
+struct StatsUpdaterSelector<std::uint8_t> {
+    using type = Updaters::StandardStatsUpdater<std::uint8_t>;
 };
 
 template <>
-struct StatsPolicySelector<std::int16_t> {
-    using type = StandardStatsTrainingOnlyPolicy<std::int16_t>;
+struct StatsUpdaterSelector<std::int16_t> {
+    using type = Updaters::StandardStatsUpdater<std::int16_t>;
 };
 
 template <>
-struct StatsPolicySelector<std::uint16_t> {
-    using type = StandardStatsTrainingOnlyPolicy<std::uint16_t>;
+struct StatsUpdaterSelector<std::uint16_t> {
+    using type = Updaters::StandardStatsUpdater<std::uint16_t>;
 };
 
 template <>
-struct StatsPolicySelector<std::int32_t> {
-    using type = StandardStatsTrainingOnlyPolicy<std::int32_t>;
+struct StatsUpdaterSelector<std::int32_t> {
+    using type = Updaters::StandardStatsUpdater<std::int32_t>;
 };
 
 template <>
-struct StatsPolicySelector<std::uint32_t> {
-    using type = StandardStatsTrainingOnlyPolicy<std::uint32_t>;
+struct StatsUpdaterSelector<std::uint32_t> {
+    using type = Updaters::StandardStatsUpdater<std::uint32_t>;
 };
 
 template <>
-struct StatsPolicySelector<std::int64_t> {
-    using type = StandardStatsTrainingOnlyPolicy<std::int64_t>;
+struct StatsUpdaterSelector<std::int64_t> {
+    using type = Updaters::StandardStatsUpdater<std::int64_t>;
 };
 
 template <>
-struct StatsPolicySelector<std::uint64_t> {
-    using type = StandardStatsTrainingOnlyPolicy<std::uint64_t>;
+struct StatsUpdaterSelector<std::uint64_t> {
+    using type = Updaters::StandardStatsUpdater<std::uint64_t>;
 };
 
 template <>
-struct StatsPolicySelector<std::float_t> {
-    using type = StandardStatsTrainingOnlyPolicy<std::float_t>;
+struct StatsUpdaterSelector<std::float_t> {
+    using type = Updaters::StandardStatsUpdater<std::float_t>;
 };
 
 template <>
-struct StatsPolicySelector<std::double_t> {
-    using type = StandardStatsTrainingOnlyPolicy<std::double_t>;
+struct StatsUpdaterSelector<std::double_t> {
+    using type = Updaters::StandardStatsUpdater<std::double_t>;
 };
+
+template <typename T, bool IsNullableTypeV>
+struct NonNullableTypeExtractorImpl {
+    using type                              = typename std::remove_cv<typename std::remove_reference<decltype(Traits<T>::GetNullableValue(std::declval<T>()))>::type>::type;
+};
+
+template <typename T>
+struct NonNullableTypeExtractorImpl<T, false> {
+    using type                              = T;
+};
+
+template <typename T>
+struct NonNullableTypeExtractor : public NonNullableTypeExtractorImpl<T, Traits<T>::IsNullableType> {};
 
 } // namespace Details
 
@@ -332,11 +297,10 @@ struct StatsPolicySelector<std::double_t> {
 // to avoid confusion for user who would expect annotation data from
 // the estimator, we put using statement here
 template <typename T>
-using BasicStatisticalAnnotationData = typename Updaters::BasicStatsUpdater<T>::BasicResult;
+using BasicStatisticalAnnotationData = typename Updaters::BasicStatsUpdater<T>::Result;
 
 template <typename T>
-using StandardStatisticalAnnotationData = typename Updaters::StandardStatsUpdater<T>::StandardResult;
-
+using StandardStatisticalAnnotationData = typename Updaters::StandardStatsUpdater<T>::Result;
 
 /////////////////////////////////////////////////////////////////////////
 ///  \typedef       StatisticalMetricsEstimator
@@ -346,7 +310,16 @@ template <
     typename InputT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-using StatisticalMetricsEstimator                       = TrainingOnlyEstimatorImpl<typename Details::StatsPolicySelector<InputT>::type, MaxNumTrainingItemsV>;
+using StatisticalMetricsEstimator =
+    TrainingOnlyEstimatorImpl<
+        Details::StatisticalMetricsTrainingOnlyPolicy<
+            InputT,
+            typename Details::StatsUpdaterSelector<
+                typename Details::NonNullableTypeExtractor<InputT>::type
+            >::type
+        >,
+        MaxNumTrainingItemsV
+    >;
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -375,7 +348,7 @@ Updaters::BasicStatsUpdater<T>::BasicStatsUpdater(void) :
 }
 
 template <typename T>
-Updaters::BasicStatsUpdater<T>::BasicResult::BasicResult(T min, T max, std::uint64_t count) :
+Updaters::BasicStatsUpdater<T>::Result::Result(T min, T max, std::uint64_t count) :
     Min(std::move(min)),
     Max(std::move(max)),
     Count(std::move(count)) {
@@ -400,17 +373,18 @@ void Updaters::BasicStatsUpdater<T>::update(T input) {
     }
     // check if count will be out of bounds
     if (std::numeric_limits<std::uint64_t>::max() == _count) {
-        throw std::runtime_error("Overflow occured for count during calculating statistic metrics! Check your data!");
+        throw std::runtime_error("Overflow occurred for count during calculating statistic metrics! Check your data!");
     }
     ++_count;
 }
 
 template <typename T>
-typename Updaters::BasicStatsUpdater<T>::BasicResult Updaters::BasicStatsUpdater<T>::commit(void) {
-    if(_count != 0) {
-        assert(_min <= _max);
-    }
-    return BasicStatisticalAnnotationData<T>(std::move(_min), std::move(_max), std::move(_count));
+typename Updaters::BasicStatsUpdater<T>::Result Updaters::BasicStatsUpdater<T>::commit(void) {
+    if(_count == 0)
+        throw std::runtime_error("No values were provided");
+
+    assert(_min <= _max);
+    return Result(std::move(_min), std::move(_max), std::move(_count));
 }
 
 // ----------------------------------------------------------------------
@@ -424,12 +398,12 @@ Updaters::StandardStatsUpdater<T>::StandardStatsUpdater(void) :
 }
 
 template <typename T>
-Updaters::StandardStatsUpdater<T>::StandardResult::StandardResult(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count) :
-    Updaters::BasicStatsUpdater<T>::BasicResult(std::move(min), std::move(max), std::move(count)),
+Updaters::StandardStatsUpdater<T>::Result::Result(typename TypeSelector::SumTypeSelector<T>::type sum, std::double_t average, T min, T max, std::uint64_t count) :
+    BaseType(std::move(min), std::move(max), std::move(count)),
     Sum(std::move(sum)),
     Average(std::move(average))
     {
-        if(Average > BasicStatisticalAnnotationData<T>::Max || Average < BasicStatisticalAnnotationData<T>::Min)
+        if(Average > BaseType::Max || Average < BaseType::Min)
             throw std::invalid_argument("average is not in the correct range");
 }
 
@@ -459,8 +433,9 @@ void Updaters::StandardStatsUpdater<T>::update(T input) {
 }
 
 template <typename T>
-typename Updaters::StandardStatsUpdater<T>::StandardResult Updaters::StandardStatsUpdater<T>::commit(void) {
-    BasicStatisticalAnnotationData<T> basics = BasicStatsUpdater<T>::commit();
+typename Updaters::StandardStatsUpdater<T>::Result Updaters::StandardStatsUpdater<T>::commit(void) {
+    typename Result::BaseType               basics(BaseType::commit());
+
     if (basics.Count != 0) {
         if (TypeSelector::SumTypeSelector<T>::IsNumeric) {
             // double and long double have the same size in some systems but in others, long doubles are of greater size
@@ -476,36 +451,34 @@ typename Updaters::StandardStatsUpdater<T>::StandardResult Updaters::StandardSta
     } else {
         return StandardStatisticalAnnotationData<T>(0,0,0,0,0);
     }
-
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::BasicStatsTrainingOnlyPolicy
+// |  Details::StatisticalMetricsTrainingOnlyPolicy
 // |
 // ----------------------------------------------------------------------
-template <typename T>
-Details::BasicStatsTrainingOnlyPolicy<T>::BasicStatsTrainingOnlyPolicy(void) :
-    _updater(Updaters::BasicStatsUpdater<T>()) {
+template <typename InputT, typename UpdaterT>
+Details::StatisticalMetricsTrainingOnlyPolicy<InputT, UpdaterT>::StatisticalMetricsTrainingOnlyPolicy(void) {
 }
 
-template <typename T>
-void Details::BasicStatsTrainingOnlyPolicy<T>::fit(InputType const &input) {
-    fit_impl(input, std::integral_constant<bool, Microsoft::Featurizer::Traits<T>::IsNullableType>());
+template <typename InputT, typename UpdaterT>
+void Details::StatisticalMetricsTrainingOnlyPolicy<InputT, UpdaterT>::fit(InputType const &input) {
+    fit_impl(input, std::integral_constant<bool, Microsoft::Featurizer::Traits<InputT>::IsNullableType>());
 }
 
-template <typename T>
-BasicStatisticalAnnotationData<T> Details::BasicStatsTrainingOnlyPolicy<T>::complete_training(void) {
+template <typename InputT, typename UpdaterT>
+typename UpdaterT::Result Details::StatisticalMetricsTrainingOnlyPolicy<InputT, UpdaterT>::complete_training(void) {
     return _updater.commit();
 }
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-template <typename T>
-void Details::BasicStatsTrainingOnlyPolicy<T>::fit_impl(InputType const &input, std::true_type) {
+template <typename InputT, typename UpdaterT>
+void Details::StatisticalMetricsTrainingOnlyPolicy<InputT, UpdaterT>::fit_impl(InputType const &input, std::true_type /*is_nullable*/) {
     // ----------------------------------------------------------------------
-    using TheseTraits                       = Microsoft::Featurizer::Traits<T>;
+    using TheseTraits                       = Microsoft::Featurizer::Traits<InputT>;
     // ----------------------------------------------------------------------
 
     if(TheseTraits::IsNull(input))
@@ -514,48 +487,8 @@ void Details::BasicStatsTrainingOnlyPolicy<T>::fit_impl(InputType const &input, 
     _updater.update(TheseTraits::GetNullableValue(input));
 }
 
-template <typename T>
-void Details::BasicStatsTrainingOnlyPolicy<T>::fit_impl(InputType const &input, std::false_type) {
-    _updater.update(input);
-}
-
-// ----------------------------------------------------------------------
-// |
-// |  Details::StandardStatsTrainingOnlyPolicy
-// |
-// ----------------------------------------------------------------------
-template <typename T>
-Details::StandardStatsTrainingOnlyPolicy<T>::StandardStatsTrainingOnlyPolicy(void) :
-    _updater(Updaters::StandardStatsUpdater<T>()) {
-}
-
-template <typename T>
-void Details::StandardStatsTrainingOnlyPolicy<T>::fit(InputType const &input) {
-    fit_impl(input, std::integral_constant<bool, Microsoft::Featurizer::Traits<T>::IsNullableType>());
-}
-
-template <typename T>
-StandardStatisticalAnnotationData<T> Details::StandardStatsTrainingOnlyPolicy<T>::complete_training(void) {
-    return _updater.commit();
-}
-
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-template <typename T>
-void Details::StandardStatsTrainingOnlyPolicy<T>::fit_impl(InputType const &input, std::true_type) {
-    // ----------------------------------------------------------------------
-    using TheseTraits                       = Microsoft::Featurizer::Traits<T>;
-    // ----------------------------------------------------------------------
-
-    if(TheseTraits::IsNull(input))
-        return;
-
-    _updater.update(TheseTraits::GetNullableValue(input));
-}
-
-template <typename T>
-void Details::StandardStatsTrainingOnlyPolicy<T>::fit_impl(InputType const &input, std::false_type) {
+template <typename InputT, typename UpdaterT>
+void Details::StatisticalMetricsTrainingOnlyPolicy<InputT, UpdaterT>::fit_impl(InputType const &input, std::false_type /*is_nullable*/) {
     _updater.update(input);
 }
 

@@ -97,7 +97,20 @@ std::vector<typename EstimatorT::TransformedType> TransformerEstimatorTest(
     std::vector<typename EstimatorT::InputType> const &data
 ) {
     Train<EstimatorT>(estimator, inputBatches);
-    return Predict(estimator, data);   
+    return Predict(estimator, data);
+}
+
+template <typename EstimatorT>
+std::vector<typename EstimatorT::TransformedType> TransformerEstimatorTest(
+    EstimatorT estimator,
+    std::vector<typename EstimatorT::InputType> const &inputBatch,
+    std::vector<typename EstimatorT::InputType> const &data
+) {
+    return TransformerEstimatorTest(
+        std::move(estimator),
+        make_vector<std::vector<typename EstimatorT::InputType>>(inputBatch),
+        data
+    );
 }
 
 template <typename EstimatorT>
@@ -108,7 +121,7 @@ std::vector<typename EstimatorT::TransformedType> TransformerTest(
     estimator.begin_training();
     estimator.complete_training();
 
-    return Predict(estimator, data);  
+    return Predict(estimator, data);
 }
 
 // Fuzzy check is used to check if two vectors<double/float> are same considering precision loss

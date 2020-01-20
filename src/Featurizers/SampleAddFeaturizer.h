@@ -30,7 +30,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    SampleAddEstimator(AnnotationMapsPtr pAllColumnAnnotations);
+    explicit SampleAddEstimator(AnnotationMapsPtr pAllColumnAnnotations);
     ~SampleAddEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SampleAddEstimator);

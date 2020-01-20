@@ -29,16 +29,18 @@ enable_testing()
 SET(
     _test_names
     DocumentStatisticsEstimator_UnitTest
-    GrainEstimatorImpl_UnitTest
+    # This test is optionally included below:
+    #     GrainEstimatorImpl_UnitTest
     HistogramEstimator_UnitTest
+    ImputerTransformer_UnitTest
     IndexMapEstimator_UnitTest
     InferenceOnlyFeaturizerImpl_UnitTest
     MaxAbsValueEstimator_UnitTest
+    MedianEstimator_UnitTest
     MinMaxEstimator_UnitTest
     ModeEstimator_UnitTest
     NormUpdaters_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
-    RobustScalarNormEstimator_UnitTest
     StandardDeviationEstimator_UnitTest
     StatisticalMetricsEstimator_UnitTest
     TrainingOnlyEstimatorImpl_UnitTest
