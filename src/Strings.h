@@ -208,7 +208,18 @@ template <typename IteratorT>
 inline std::string ToLower(IteratorT begin,
                            IteratorT end) {
     std::string result(begin, end);
-    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+
+#if (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4244) // conversion from 'unsigned int' to 'unsigned char', possible loss of data
+#endif
+
+    std::transform(result.begin(), result.end(), result.begin(), [](char c) { return std::tolower(c); });
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
+
     return result;
 }
 
@@ -216,7 +227,18 @@ template <typename IteratorT>
 inline std::string ToUpper(IteratorT begin,
                            IteratorT end) {
     std::string result(begin, end);
-    std::transform(result.begin(), result.end(), result.begin(), ::toupper);
+
+#if (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4244) // conversion from 'unsigned int' to 'unsigned char', possible loss of data
+#endif
+
+    std::transform(result.begin(), result.end(), result.begin(), [](char c) { return std::toupper(c); });
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
+
     return result;
 }
 
