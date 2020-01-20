@@ -83,11 +83,11 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    void update_impl(InputType const &input, std::true_type /*is_nullable*/);
-    void update_impl(InputType const &input, std::false_type /*is_nullable*/);
+    void update_impl(T input, std::true_type /*is_nullable*/);
+    void update_impl(T input, std::false_type /*is_nullable*/);
 
     template <typename U>
-    void update_impl(U const &input);
+    void update_impl(U input);
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -131,11 +131,11 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    void update_impl(InputType const &input, std::true_type /*is_nullable*/);
-    void update_impl(InputType const &input, std::false_type /*is_nullable*/);
+    void update_impl(T input, std::true_type /*is_nullable*/);
+    void update_impl(T input, std::false_type /*is_nullable*/);
 
     template <typename U>
-    void update_impl(U const &input);
+    void update_impl(U input);
 };
 
 
@@ -181,11 +181,11 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    void update_impl(InputType const &input, std::true_type /*is_nullable*/);
-    void update_impl(InputType const &input, std::false_type /*is_nullable*/);
+    void update_impl(T input, std::true_type /*is_nullable*/);
+    void update_impl(T input, std::false_type /*is_nullable*/);
 
     template <typename U>
-    void update_impl(U const &input);
+    void update_impl(U input);
 };
 
 } // Updaters
@@ -216,12 +216,12 @@ void Updaters::L1NormUpdater<T>::reset() {
 }
 
 template <typename T>
-void Updaters::L1NormUpdater<T>::update(T const& input) {
+void Updaters::L1NormUpdater<T>::update(T input) {
     update_impl(input, std::integral_constant<bool, Traits<T>::IsNullableType>());
 }
 
 template <typename T>
-void Updaters::L1NormUpdater<T>::update_impl(T const &input, std::true_type /*is_nullable*/) {
+void Updaters::L1NormUpdater<T>::update_impl(T input, std::true_type /*is_nullable*/) {
     if (Traits<T>::IsNull(input)) {
         return;
     }
@@ -231,13 +231,13 @@ void Updaters::L1NormUpdater<T>::update_impl(T const &input, std::true_type /*is
 
 
 template <typename T>
-void Updaters::L1NormUpdater<T>::update_impl(T const &input, std::false_type /*is_nullable*/) {
+void Updaters::L1NormUpdater<T>::update_impl(T input, std::false_type /*is_nullable*/) {
     update_impl(input);
 }
 
 template <typename T>
 template <typename U>
-void Updaters::L1NormUpdater<T>::update_impl(U const &input) {
+void Updaters::L1NormUpdater<T>::update_impl(U input) {
     
     long double diff = std::abs(static_cast<long double>(input));
 
@@ -274,12 +274,12 @@ void Updaters::L2NormUpdater<T>::reset() {
     _l2_norm = 0;
 }
 template <typename T>
-void Updaters::L2NormUpdater<T>::update(T const& input) {
+void Updaters::L2NormUpdater<T>::update(T input) {
     update_impl(input, std::integral_constant<bool, Traits<T>::IsNullableType>());
 }
 
 template <typename T>
-void Updaters::L2NormUpdater<T>::update_impl(T const &input, std::true_type /*is_nullable*/) {
+void Updaters::L2NormUpdater<T>::update_impl(T input, std::true_type /*is_nullable*/) {
     if (Traits<T>::IsNull(input)) {
         return;
     }
@@ -289,13 +289,13 @@ void Updaters::L2NormUpdater<T>::update_impl(T const &input, std::true_type /*is
 
 
 template <typename T>
-void Updaters::L2NormUpdater<T>::update_impl(T const &input, std::false_type /*is_nullable*/) {
+void Updaters::L2NormUpdater<T>::update_impl(T input, std::false_type /*is_nullable*/) {
     update_impl(input);
 }
 
 template <typename T>
 template <typename U>
-void Updaters::L2NormUpdater<T>::update_impl(U const &input) {
+void Updaters::L2NormUpdater<T>::update_impl(U input) {
     
     long double diff_square = std::pow(std::abs(static_cast<long double>(input)), 2);
 
@@ -331,12 +331,12 @@ void Updaters::MaxNormUpdater<T>::reset() {
     _max_norm = 0;
 }
 template <typename T>
-void Updaters::MaxNormUpdater<T>::update(T const& input) {
+void Updaters::MaxNormUpdater<T>::update(T input) {
     update_impl(input, std::integral_constant<bool, Traits<T>::IsNullableType>());
 }
 
 template <typename T>
-void Updaters::MaxNormUpdater<T>::update_impl(T const &input, std::true_type /*is_nullable*/) {
+void Updaters::MaxNormUpdater<T>::update_impl(T input, std::true_type /*is_nullable*/) {
     if (Traits<T>::IsNull(input)) {
         return;
     }
@@ -346,13 +346,13 @@ void Updaters::MaxNormUpdater<T>::update_impl(T const &input, std::true_type /*i
 
 
 template <typename T>
-void Updaters::MaxNormUpdater<T>::update_impl(T const &input, std::false_type /*is_nullable*/) {
+void Updaters::MaxNormUpdater<T>::update_impl(T input, std::false_type /*is_nullable*/) {
     update_impl(input);
 }
 
 template <typename T>
 template <typename U>
-void Updaters::MaxNormUpdater<T>::update_impl(U const &input) {
+void Updaters::MaxNormUpdater<T>::update_impl(U input) {
     _max_norm = std::max(static_cast<typename TypeSelector::MaxNormTypeSelector<T>::type>(std::abs(input)), _max_norm);
 }
 
