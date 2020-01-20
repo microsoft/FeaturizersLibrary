@@ -126,7 +126,7 @@ TEST_CASE("Trim") {
 TEST_CASE("TrimAndReplace") {
     std::string input(" ! is  this the   * first#document  ?   ");
     std::string label(" is this the first document ");
-    std::string output(TrimAndReplace(input.begin(), input.end()));
+    std::string output(Details::TrimAndReplace(input.begin(), input.end()));
     CHECK(output == label);
 }
 
