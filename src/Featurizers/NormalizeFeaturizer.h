@@ -53,14 +53,14 @@ private:
     // |
     // ----------------------------------------------------------------------
     std::vector<std::double_t> const                   _norms;
-    std::uint64_t                                      _row;
+    size_t                                             _row;
 
     // ----------------------------------------------------------------------
     // |
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override;
+    void execute_impl(InputT const &input, typename BaseType::CallbackFunction const &callback) override;
 
     void execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::true_type);
     void execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::false_type);
@@ -114,7 +114,7 @@ private:
     // |
     // ----------------------------------------------------------------------
     bool begin_training_impl(void) override;
-    FitResult fit_impl(typename BaseType::InputType const *, size_t) override;
+    FitResult fit_impl(InputT const *, size_t) override;
     void complete_training_impl(void) override;
 
     // MSVC has problems when the definition is separate from the declaration
@@ -250,7 +250,7 @@ bool NormalizeTransformer<InputT>::operator==(NormalizeTransformer const &other)
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename InputT>
-void NormalizeTransformer<InputT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
+void NormalizeTransformer<InputT>::execute_impl(InputT const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
     execute_impl(const_cast<IteratorType&>(std::get<0>(input)), std::get<1>(input), callback, std::integral_constant<bool, Microsoft::Featurizer::Traits<ValueType>::IsNullableType>());
 }
 
@@ -276,7 +276,7 @@ void NormalizeTransformer<InputT>::execute_impl(IteratorType &begin, IteratorTyp
             ++begin;
             continue;
         }
-        res.emplace_back(static_cast<std::double_t>(InputTraits::GetNullableValue(*begin)) / static_cast<std::double_t>(_norms[_row]));
+        res.emplace_back(static_cast<std::double_t>(static_cast<long double>(InputTraits::GetNullableValue(*begin)) / static_cast<long double>(_norms[_row])));
         ++begin;
     }
     ++_row;
@@ -297,7 +297,7 @@ void NormalizeTransformer<InputT>::execute_impl(IteratorType &begin, IteratorTyp
     std::vector<std::double_t> res;
     res.reserve(static_cast<size_t>(std::distance(begin, end)));
     while (begin != end) {
-        res.emplace_back(static_cast<std::double_t>(*begin) / static_cast<std::double_t>(_norms[_row]));
+        res.emplace_back(static_cast<std::double_t>(static_cast<long double>(*begin) / static_cast<long double>(_norms[_row])));
         ++begin;
     }
     ++_row;
@@ -349,7 +349,7 @@ bool Details::NormalizeEstimatorImpl<InputT, UpdaterType, MaxNumTrainingItemsV>:
 }
 
 template <typename InputT, typename UpdaterType, size_t MaxNumTrainingItemsV>
-FitResult Details::NormalizeEstimatorImpl<InputT, UpdaterType, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
+FitResult Details::NormalizeEstimatorImpl<InputT, UpdaterType, MaxNumTrainingItemsV>::fit_impl(InputT const *, size_t) /*override*/ {
     throw std::runtime_error("This will never be called");
 }
 

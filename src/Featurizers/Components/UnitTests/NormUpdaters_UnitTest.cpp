@@ -118,7 +118,7 @@ TEST_CASE("l2 updater overflow") {
 TEST_CASE("max updater") {
     using inputType = int;
     NS::Featurizers::Components::Updaters::MaxNormUpdater<inputType> updater;
-    long double const r0(updater.commit());
+    std::uint64_t const r0(updater.commit());
     CHECK(r0 == 0);
 
     updater.update(-10);
@@ -132,13 +132,13 @@ TEST_CASE("max updater") {
     CHECK(r2 == 100);
 
     updater.reset();
-    long double const r3(updater.commit());
+    std::uint64_t const r3(updater.commit());
     CHECK(r3 == 0);
 }
 TEST_CASE("max updater null values") {
     using inputType = nonstd::optional<int>;
     NS::Featurizers::Components::Updaters::MaxNormUpdater<inputType> updater;
-    long double const r0(updater.commit());
+    std::uint64_t const r0(updater.commit());
     CHECK(r0 == 0);
 
     updater.update(-10);
@@ -153,7 +153,7 @@ TEST_CASE("max updater null values") {
     CHECK(r2 == 100);
 
     updater.reset();
-    long double const r3(updater.commit());
+    std::uint64_t const r3(updater.commit());
     CHECK(r3 == 0);
 }
 
