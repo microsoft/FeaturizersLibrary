@@ -8,6 +8,19 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Details {
 
+template<typename IteratorT>
+inline std::vector<IteratorT> IteratorVectorGenerator(IteratorT const & begin,
+                                                     IteratorT const & end) {
+    std::vector<IteratorT> wordIterVector;
+    wordIterVector.reserve(static_cast<unsigned long long>(std::distance(begin, end)));
+
+    for (IteratorT strIter = begin; strIter != end; ++strIter)
+        wordIterVector.emplace_back(std::move(strIter));
+    wordIterVector.emplace_back(std::move(end));
+
+    return wordIterVector;
+}
+
 template <
     typename IteratorT,
     typename IsDelimiterT
@@ -59,6 +72,23 @@ inline void ParseRegex(IteratorT const &begin,
     }
 }
 
+template <typename IteratorT>
+inline void ParseNgramCharHelper(IteratorT const &begin,
+                                 IteratorT const &end,
+                                 size_t const &ngramRangeMin,
+                                 size_t const &ngramRangeMax,
+                                 std::function<void (IteratorT&, IteratorT&)> const &callback) {
+
+    std::vector<IteratorT> wordIterVector(IteratorVectorGenerator(begin, end));
+
+    for (size_t strIterOffset = 0; strIterOffset < wordIterVector.size(); ++strIterOffset)  {
+        for (size_t ngramRangeVal = ngramRangeMin; ngramRangeVal <= ngramRangeMax; ++ngramRangeVal) {
+            if (strIterOffset + ngramRangeVal < wordIterVector.size())
+                callback(wordIterVector[strIterOffset], wordIterVector[strIterOffset + ngramRangeVal]);
+        }
+    }
+}
+
 template <
     typename IteratorT,
     typename IsDelimiterT
@@ -106,30 +136,59 @@ inline void ParseNgramChar(std::string &input,
     if (ngramRangeMin < 1 || ngramRangeMin > ngramRangeMax || ngramRangeMax > trimedString.size())
         throw std::invalid_argument("ngramRangeMin and ngramRangeMax not valid");
 
-    std::vector<IteratorT> wordIterVector;
-    for (IteratorT strIter = trimedString.begin(); strIter != trimedString.end(); ++strIter)
-        wordIterVector.emplace_back(strIter);
-    wordIterVector.emplace_back(trimedString.end());
+    ParseNgramCharHelper<IteratorT>(trimedString.begin(), trimedString.end(), ngramRangeMin, ngramRangeMax, callback);
+}
 
-    for (size_t strIterOffset = 0; strIterOffset < wordIterVector.size(); ++strIterOffset)  {
-        for (size_t ngramRangeVal = ngramRangeMin; ngramRangeVal <= ngramRangeMax; ++ngramRangeVal) {
-            if (strIterOffset + ngramRangeVal < wordIterVector.size())
-                callback(wordIterVector[strIterOffset], wordIterVector[strIterOffset + ngramRangeVal]);
+template <
+    typename IteratorT,
+    typename IsDelimiterT
+>
+inline void ParseNgramCharwb(std::string &input,
+                             IsDelimiterT const &isDelimiter,
+                             size_t const &ngramRangeMin,
+                             size_t const &ngramRangeMax,
+                             std::function<void (IteratorT&, IteratorT&)> const &callback) {
+
+    std::string trimedString(TrimAndReplace(input.begin(), input.end()));
+
+    //wordIterPairVector is used to store the begin and end iterator of words in input
+    std::vector<std::pair<IteratorT, IteratorT>> wordIterPairVector;
+    Details::Parse<IteratorT, IsDelimiterT>(
+        trimedString.begin(),
+        trimedString.end(),
+        isDelimiter,
+        [&wordIterPairVector] (IteratorT &iterBegin, IteratorT &iterEnd) {
+            wordIterPairVector.emplace_back(std::make_pair(iterBegin, iterEnd));
         }
+    );
+
+    if (wordIterPairVector.size() == 0)
+        throw std::invalid_argument("wordIterPairVector.size() == 0");
+
+    if (ngramRangeMin < 1 || ngramRangeMin > ngramRangeMax )
+        throw std::invalid_argument("ngramRangeMin and ngramRangeMax not valid");
+
+    for (size_t pairIdx = 0; pairIdx < wordIterPairVector.size(); ++pairIdx) {
+        //copy
+        std::string const paddedWord = " " + std::string(wordIterPairVector[pairIdx].first, wordIterPairVector[pairIdx].second) + " ";
+
+        ParseNgramCharHelper<IteratorT>(paddedWord.begin(), paddedWord.end(), ngramRangeMin, ngramRangeMax, callback);
     }
 }
 
 }
 
 template <typename IteratorT>
-inline std::string ToLower(IteratorT begin, IteratorT end) {
+inline std::string ToLower(IteratorT begin,
+                           IteratorT end) {
     std::string result(begin, end);
     std::transform(result.begin(), result.end(), result.begin(), ::tolower);
     return result;
 }
 
 template <typename IteratorT>
-inline std::string ToUpper(IteratorT begin, IteratorT end) {
+inline std::string ToUpper(IteratorT begin,
+                           IteratorT end) {
     std::string result(begin, end);
     std::transform(result.begin(), result.end(), result.begin(), ::toupper);
     return result;
@@ -139,7 +198,9 @@ template <
     typename IteratorT,
     typename PredicateT
 >
-inline std::string TrimLeft(IteratorT begin, IteratorT end, PredicateT isPredicate) {
+inline std::string TrimLeft(IteratorT begin,
+                            IteratorT end,
+                            PredicateT isPredicate) {
     while (begin != end) {
         if (*begin == isPredicate)
             ++begin;
@@ -153,7 +214,9 @@ template <
     typename IteratorT,
     typename PredicateT
 >
-inline std::string TrimRight(IteratorT begin, IteratorT end, PredicateT isPredicate) {
+inline std::string TrimRight(IteratorT begin,
+                             IteratorT end,
+                             PredicateT isPredicate) {
     IteratorT offset = begin;
     IteratorT iter = begin;
     while (iter != end) {
@@ -168,13 +231,16 @@ template <
     typename IteratorT,
     typename PredicateT
 >
-inline std::string Trim(IteratorT begin, IteratorT end, PredicateT isPredicate) {
+inline std::string Trim(IteratorT begin,
+                        IteratorT end,
+                        PredicateT isPredicate) {
     std::string stringAfterTrimedLeft(TrimLeft(begin, end, isPredicate));
     return TrimRight(stringAfterTrimedLeft.begin(), stringAfterTrimedLeft.end(), isPredicate);
 }
 
 template <typename IteratorT>
-inline std::string TrimAndReplace(IteratorT begin, IteratorT end) {
+inline std::string TrimAndReplace(IteratorT begin,
+                                  IteratorT end) {
     //replace all punctuations with spaces
     std::transform(begin, end, begin, [](char c) {
         if (std::ispunct(c) )
@@ -268,6 +334,33 @@ inline void ParseNgramCharCopy(std::string const &input,
     Details::ParseNgramChar(inputCopy, ngramRangeMin, ngramRangeMax, callback);
 }
 
+template <
+    typename IteratorT,
+    typename IsDelimiterT
+>
+inline void ParseNgramCharwb(std::string &input,
+                             IsDelimiterT const &isDelimiter,
+                             size_t const &ngramRangeMin,
+                             size_t const &ngramRangeMax,
+                             std::function<void (IteratorT&, IteratorT&)> const &callback) {
+
+    Details::ParseNgramCharwb(input, isDelimiter, ngramRangeMin, ngramRangeMax, callback);
+}
+
+template <
+    typename IteratorT,
+    typename IsDelimiterT
+>
+inline void ParseNgramCharwbCopy(std::string const &input,
+                                 IsDelimiterT const &isDelimiter,
+                                 size_t const &ngramRangeMin,
+                                 size_t const &ngramRangeMax,
+                                 std::function<void (IteratorT&, IteratorT&)> const &callback) {
+
+    //copy string to trim
+    std::string inputCopy(input);
+    Details::ParseNgramCharwb(inputCopy, isDelimiter, ngramRangeMin, ngramRangeMax, callback);
+}
 
 // inline void ParseNgramCharwb()
 
@@ -275,19 +368,6 @@ inline void ParseNgramCharCopy(std::string const &input,
 } // namespace Microsoft
 
 
-// inline std::vector<std::string> NgramParsingChar(std::string const &input, std::uint8_t ngram_range_min, std::uint8_t ngram_range_max) {
-//     if (ngram_range_min < 1 || ngram_range_max < ngram_range_min)
-//         throw std::invalid_argument("invalid ngram range");
-//     std::vector<std::string> ngramDocument;
-//     for (auto ngramVal = ngram_range_min; ngramVal <= ngram_range_max; ++ngramVal) {
-//         for (size_t segIdx = 0; segIdx < input.size() - ngramVal + 1; ++segIdx) {
-//             ngramDocument.emplace_back(input.substr(segIdx, ngramVal));
-//         }
-//     }
-//     if (ngramDocument.size() == 0)
-//         std::runtime_error("empty vocabulary");
-//     return ngramDocument;
-// }
 // inline std::vector<std::string> NgramParsingCharwb(std::vector<std::string> const &input, std::uint8_t ngram_range_min, std::uint8_t ngram_range_max) {
 //     if (ngram_range_min < 1 || ngram_range_max < ngram_range_min)
 //         throw std::invalid_argument("invalid ngram range");
