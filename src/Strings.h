@@ -73,6 +73,32 @@ inline void ParseRegex(IteratorT const &begin,
 }
 
 template <typename IteratorT>
+inline std::string TrimAndReplace(IteratorT begin,
+                                  IteratorT end) {
+    //replace all punctuations with spaces
+    std::transform(begin, end, begin, [](char c) {
+        if (std::ispunct(c) )
+            return ' ';
+        return c;
+    });
+
+    std::string result(begin, end);
+    //remove duplicate space
+    result.erase(
+        std::unique(
+            result.begin(),
+            result.end(),
+            [=](char lhs, char rhs){
+                return (lhs == rhs) && (lhs == ' ');
+            }
+        ),
+        result.end()
+    );
+
+    return result;
+}
+
+template <typename IteratorT>
 inline void ParseNgramCharHelper(IteratorT const &begin,
                                  IteratorT const &end,
                                  size_t const &ngramRangeMin,
@@ -238,32 +264,6 @@ inline std::string Trim(IteratorT begin,
     return TrimRight(stringAfterTrimedLeft.begin(), stringAfterTrimedLeft.end(), isPredicate);
 }
 
-template <typename IteratorT>
-inline std::string TrimAndReplace(IteratorT begin,
-                                  IteratorT end) {
-    //replace all punctuations with spaces
-    std::transform(begin, end, begin, [](char c) {
-        if (std::ispunct(c) )
-            return ' ';
-        return c;
-    });
-
-    std::string result(begin, end);
-    //remove duplicate space
-    result.erase(
-        std::unique(
-            result.begin(),
-            result.end(),
-            [=](char lhs, char rhs){
-                return (lhs == rhs) && (lhs == ' ');
-            }
-        ),
-        result.end()
-    );
-
-    return result;
-}
-
 template <
     typename IteratorT,
     typename IsDelimiterT
@@ -362,31 +362,5 @@ inline void ParseNgramCharwbCopy(std::string const &input,
     Details::ParseNgramCharwb(inputCopy, isDelimiter, ngramRangeMin, ngramRangeMax, callback);
 }
 
-// inline void ParseNgramCharwb()
-
 } // namespace Featurizer
 } // namespace Microsoft
-
-
-// inline std::vector<std::string> NgramParsingCharwb(std::vector<std::string> const &input, std::uint8_t ngram_range_min, std::uint8_t ngram_range_max) {
-//     if (ngram_range_min < 1 || ngram_range_max < ngram_range_min)
-//         throw std::invalid_argument("invalid ngram range");
-//     std::vector<std::string> ngramDocument;
-//     for (std::string word : input) {
-//         std::string paddingWord = " " + word + " ";
-//         size_t paddingWordSize = paddingWord.size();
-//         for (auto ngramVal = ngram_range_min; ngramVal <= ngram_range_max; ++ngramVal) {
-//             if (ngramVal >= paddingWordSize) {
-//                 ngramDocument.emplace_back(paddingWord);
-//                 break;
-//             }
-//             for (size_t segIdx = 0; segIdx < paddingWordSize - ngramVal + 1; ++segIdx) {
-//                 ngramDocument.emplace_back(paddingWord.substr(segIdx, ngramVal));
-//             }
-
-//         }
-//     }
-//     if (ngramDocument.size() == 0)
-//         std::runtime_error("empty vocabulary");
-//     return ngramDocument;
-// }
