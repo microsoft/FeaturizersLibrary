@@ -5,6 +5,7 @@
 #pragma once
 
 #include "HistogramEstimator.h"
+#include "OrderEstimator.h"
 
 namespace Microsoft {
 namespace Featurizer {
@@ -191,31 +192,49 @@ ModeAnnotationData<T> Details::ModeTrainingOnlyPolicy<T, AllowNullModeV, ModeEst
     // ----------------------------------------------------------------------
     using HistogramAnnotationData           = HistogramAnnotationData<T>;
     using HistogramEstimator                = HistogramEstimator<T, ModeEstimatorT::MaxNumTrainingItems>;
+
+    using OrderAnnotationData               = OrderAnnotationData<T>;
+    using OrderEstimator                    = OrderEstimator<T, ModeEstimatorT::MaxNumTrainingItems>;
     // ----------------------------------------------------------------------
 
     ModeEstimatorT const &                  estimator(static_cast<ModeEstimatorT const &>(*this));
-    HistogramAnnotationData const &         data(HistogramEstimator::get_annotation_data(estimator.get_column_annotations(), estimator.get_column_index(), HistogramEstimatorName));
+    HistogramAnnotationData const &         histogramData(HistogramEstimator::get_annotation_data(estimator.get_column_annotations(), estimator.get_column_index(), HistogramEstimatorName));
+    OrderAnnotationData const &             orderData(OrderEstimator::get_annotation_data(estimator.get_column_annotations(), estimator.get_column_index(), OrderEstimatorName));
 
     // Find the most common value
-    if(data.Value.empty())
+    if(histogramData.Value.empty() || orderData.Value.empty())
         throw std::runtime_error("The histogram is empty");
 
-    typename HistogramAnnotationData::Histogram::const_iterator             iterMode(data.Value.end());
+    typename HistogramAnnotationData::Histogram::const_iterator             iterMode(histogramData.Value.end());
+    std::uint32_t                                                           modeIndex(0);
 
     for(
-        typename HistogramAnnotationData::Histogram::const_iterator iter=data.Value.begin();
-        iter != data.Value.end();
+        typename HistogramAnnotationData::Histogram::const_iterator iter=histogramData.Value.begin();
+        iter != histogramData.Value.end();
         ++iter
     ) {
-        if(iterMode == data.Value.end() || iter->second > iterMode->second) {
+        if(iterMode == histogramData.Value.end() || iter->second >= iterMode->second) {
             if(IsSupportedModeEstimatorValue(iter->first, std::integral_constant<bool, AllowNullModeV>()) == false)
                 continue;
 
+            // If the values are equal, only take this value if it was seen before the current best
+            typename OrderAnnotationData::OrderMap::const_iterator const    iterModeIndex(orderData.Value.find(iter->first));
+
+            assert(iterModeIndex != orderData.Value.end());
+
+            if(
+                iterMode != histogramData.Value.end()
+                && iter->second == iterMode->second
+                && iterModeIndex->second > modeIndex
+            )
+                continue;
+
             iterMode = iter;
+            modeIndex = iterModeIndex->second;
         }
     }
 
-    if(iterMode == data.Value.end())
+    if(iterMode == histogramData.Value.end())
         throw std::runtime_error("The histogram does not contain any supported values");
 
     return ModeAnnotationData<T>(iterMode->first);

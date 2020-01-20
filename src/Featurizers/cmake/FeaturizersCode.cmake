@@ -19,6 +19,7 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../MinMaxImputerFeaturizer.h
     ${_this_path}/../MinMaxScalarFeaturizer.h
     ${_this_path}/../MissingDummiesFeaturizer.h
+    ${_this_path}/../ModeImputerFeaturizer.h
     ${_this_path}/../NumericalizeFeaturizer.h
     ${_this_path}/../OneHotEncoderFeaturizer.h
     ${_this_path}/../PCAFeaturizer.h
@@ -43,6 +44,7 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../Components/MinMaxEstimator.h
     ${_this_path}/../Components/ModeEstimator.h
     ${_this_path}/../Components/NormUpdaters.h
+    ${_this_path}/../Components/OrderEstimator.h
     ${_this_path}/../Components/PipelineExecutionEstimatorImpl.h
     ${_this_path}/../Components/StandardDeviationEstimator.h
     ${_this_path}/../Components/StatisticalMetricsEstimator.h
