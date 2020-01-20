@@ -125,6 +125,45 @@ bool FuzzyCheck(std::vector<T> const & vec1, std::vector<T> const & vec2, std::d
     }
     return true;
 }
+template<>
+bool FuzzyCheck<std::float_t>(std::vector<std::float_t> const & vec1, std::vector<std::float_t> const & vec2, std::double_t epsilon) {
+    if (vec1.size() != vec2.size())
+        return false;
+
+    size_t vec_size = vec1.size();
+    for (size_t idx = 0; idx < vec_size; ++idx) {
+        if (std::isnan(vec1[idx]) && std::isnan(vec2[idx])) {
+            continue;
+        }
+        else if (std::isnan(vec1[idx]) || std::isnan(vec2[idx])) {
+            return false;
+        }
+        if (abs(vec1[idx] - vec2[idx]) > static_cast<std::float_t>(epsilon)) {
+            return false;
+        }
+    }
+    return true;
+}
+template <>
+bool FuzzyCheck<std::double_t>(std::vector<std::double_t> const & vec1, std::vector<std::double_t> const & vec2, std::double_t epsilon) {
+    if (vec1.size() != vec2.size())
+        return false;
+
+    size_t vec_size = vec1.size();
+    for (size_t idx = 0; idx < vec_size; ++idx) {
+        if (std::isnan(vec1[idx]) && std::isnan(vec2[idx])) {
+            continue;
+        }
+        else if (std::isnan(vec1[idx]) || std::isnan(vec2[idx])) {
+            return false;
+        }
+        if (abs(vec1[idx] - vec2[idx]) > static_cast<std::double_t>(epsilon)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 
 } // namespace TestHelpers
 } // namespace Featurizer

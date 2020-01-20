@@ -17,18 +17,18 @@ namespace Featurizers {
 ///  \brief         Normalize based on l1, l2 or max norm
 ///
 template <typename InputT>
-class NormalizeTransformer : public StandardTransformer<InputT, std::vector<long double>> {
+class NormalizeTransformer : public StandardTransformer<InputT, std::vector<std::double_t>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    static_assert(Traits<InputT>::IsVectorType, "Input type has to be vector!");
-    static_assert(Traits<typename InputT::value_type>::IsIntOrNumeric::value, "Vector elements has to be ints or numeric types!");
 
-    using ValueType                         = typename InputT::value_type;
-    using BaseType                          = StandardTransformer<InputT, std::vector<long double>>;
+    
+    using IteratorType = typename std::tuple_element<0, InputT>::type;
+    using ValueType    = typename std::iterator_traits<IteratorType>::value_type;
+    using BaseType     = StandardTransformer<InputT, std::vector<std::double_t>>;
 
     // ----------------------------------------------------------------------
     // |
@@ -52,7 +52,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    std::vector<std::double_t> const                     _norms;
+    std::vector<std::double_t> const                   _norms;
     std::uint64_t                                      _row;
 
     // ----------------------------------------------------------------------
@@ -62,8 +62,8 @@ private:
     // ----------------------------------------------------------------------
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override;
 
-    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::true_type);
-    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::false_type);
+    void execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::true_type);
+    void execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::false_type);
 
 };
 
@@ -76,17 +76,17 @@ namespace Details {
 ///
 template <
     typename InputT,
-    NormType NormT,
+    typename UpdaterType,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class NormalizeEstimatorImpl : public TransformerEstimator<InputT, std::vector<long double>> {
+class NormalizeEstimatorImpl : public TransformerEstimator<InputT, std::vector<std::double_t>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using TransformedType                   = std::vector<long double>;
+    using TransformedType                   = std::vector<std::double_t>;
     using BaseType                          = TransformerEstimator<InputT, TransformedType>;
     using TransformerType                   = NormalizeTransformer<InputT>;
 
@@ -120,13 +120,12 @@ private:
     // MSVC has problems when the definition is separate from the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
         // ----------------------------------------------------------------------
-        using VectorNormsAnnotationData = Components::VectorNormsAnnotationData;
-        using VectorNormsEstimator       = Components::VectorNormsEstimator<InputT, NormT, MaxNumTrainingItemsV>;
+        using VectorNormsAnnotationData = Components::VectorNormsAnnotationData<UpdaterType>;
+        using VectorNormsEstimator       = Components::VectorNormsEstimator<InputT, UpdaterType, MaxNumTrainingItemsV>;
         // ----------------------------------------------------------------------
 
         VectorNormsAnnotationData const & data(VectorNormsEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::VectorNormsEstimatorName));
 
-        assert(data.Type == NormT);
         return typename BaseType::TransformerUniquePtr(new NormalizeTransformer<InputT>(data.Norms));
     }
 };
@@ -140,13 +139,13 @@ private:
 ///
 template <
     typename InputT,
-    NormType NormT,
+    typename UpdaterType,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class NormalizeEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-        Components::VectorNormsEstimator<InputT, NormT, MaxNumTrainingItemsV>,
-        Details::NormalizeEstimatorImpl<InputT, NormT, MaxNumTrainingItemsV>
+        Components::VectorNormsEstimator<InputT, UpdaterType, MaxNumTrainingItemsV>,
+        Details::NormalizeEstimatorImpl<InputT, UpdaterType, MaxNumTrainingItemsV>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -156,8 +155,8 @@ public:
     // ----------------------------------------------------------------------
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
-            Components::VectorNormsEstimator<InputT, NormT, MaxNumTrainingItemsV>,
-            Details::NormalizeEstimatorImpl<InputT, NormT, MaxNumTrainingItemsV>
+            Components::VectorNormsEstimator<InputT, UpdaterType, MaxNumTrainingItemsV>,
+            Details::NormalizeEstimatorImpl<InputT, UpdaterType, MaxNumTrainingItemsV>
         >;
 
     // ----------------------------------------------------------------------
@@ -191,8 +190,11 @@ template <typename InputT>
 NormalizeTransformer<InputT>::NormalizeTransformer(std::vector<std::double_t> norms) :
     _norms(std::move(norms)),
     _row(0) {
-        for (auto it = norms.begin(); it != norms.end(); ++it) {
-            if (*it < 0) {
+        if (_norms.empty()) {
+            throw std::invalid_argument("Norms input to NormalizeTransformer is empty!");
+        }
+        for (auto norm : _norms) {
+            if (norm < 0) {
                 throw std::invalid_argument("Norms shouldn't be less than 0!");
             }
         }
@@ -202,6 +204,14 @@ template <typename InputT>
 NormalizeTransformer<InputT>::NormalizeTransformer(Archive &ar) :
     NormalizeTransformer(
         [&ar](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
+
+            // Data
             std::vector<std::double_t> norms(Traits<std::vector<std::double_t>>::deserialize(ar));
 
             return NormalizeTransformer<InputT>(std::move(norms));
@@ -211,6 +221,11 @@ NormalizeTransformer<InputT>::NormalizeTransformer(Archive &ar) :
 
 template <typename InputT>
 void NormalizeTransformer<InputT>::save(Archive &ar) const /*override*/ {
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
+
+    // Data
     Traits<std::vector<std::double_t>>::serialize(ar, _norms);
 }
 
@@ -236,32 +251,54 @@ bool NormalizeTransformer<InputT>::operator==(NormalizeTransformer const &other)
 // ----------------------------------------------------------------------
 template <typename InputT>
 void NormalizeTransformer<InputT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
-    execute_impl(input, callback, std::integral_constant<bool, Microsoft::Featurizer::Traits<ValueType>::IsNullableType>());
+    execute_impl(const_cast<IteratorType&>(std::get<0>(input)), std::get<1>(input), callback, std::integral_constant<bool, Microsoft::Featurizer::Traits<ValueType>::IsNullableType>());
 }
 
 template <typename InputT>
-void NormalizeTransformer<InputT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::true_type) {
+void NormalizeTransformer<InputT>::execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::true_type) {
     // ----------------------------------------------------------------------
     using InputTraits                       = Traits<ValueType>;
-    using TransformedTraits                 = Traits<long double>;
+    using TransformedTraits                 = Traits<std::double_t>;
     // ----------------------------------------------------------------------
-    std::vector<long double> res;
-    for (auto it = input.begin(); it != input.end(); ++it) {
-        if(InputTraits::IsNull(*it)) {
-            res.push_back(TransformedTraits::CreateNullValue());
+    if (std::distance(begin, end) < 0) {
+        throw std::runtime_error("Input iterators to VectorNormsEstimator are invalid!");
+    }
+    if (_row >= _norms.size()) {
+        throw std::runtime_error("Number of norms is not aligned with number of rows!");
+    }
+
+
+    std::vector<std::double_t> res;
+    res.reserve(static_cast<size_t>(std::distance(begin, end)));
+    while (begin != end) {
+        if(InputTraits::IsNull(*begin)) {
+            res.emplace_back(TransformedTraits::CreateNullValue());
+            ++begin;
             continue;
         }
-        res.push_back(static_cast<long double>(InputTraits::GetNullableValue(*it)) / static_cast<long double>(_norms[_row]));
+        res.emplace_back(static_cast<std::double_t>(InputTraits::GetNullableValue(*begin)) / static_cast<std::double_t>(_norms[_row]));
+        ++begin;
     }
     ++_row;
     callback(res);
 }
 
 template <typename InputT>
-void NormalizeTransformer<InputT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::false_type) {
-    std::vector<long double> res;
-    for (auto it = input.begin(); it != input.end(); ++it) {
-        res.push_back(static_cast<long double>(*it) / static_cast<long double>(_norms[_row]));
+void NormalizeTransformer<InputT>::execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::false_type) {
+    if (std::distance(begin, end) < 0) {
+        throw std::runtime_error("Input iterators to VectorNormsEstimator are invalid!");
+    }
+
+    if (_row >= _norms.size()) {
+        throw std::runtime_error("Number of norms is not aligned with number of rows!");
+    }
+
+
+    std::vector<std::double_t> res;
+    res.reserve(static_cast<size_t>(std::distance(begin, end)));
+    while (begin != end) {
+        res.emplace_back(static_cast<std::double_t>(*begin) / static_cast<std::double_t>(_norms[_row]));
+        ++begin;
     }
     ++_row;
     callback(res);
@@ -273,13 +310,13 @@ void NormalizeTransformer<InputT>::execute_impl(typename BaseType::InputType con
 // |  NormalizeEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename InputT, NormType NormT, size_t MaxNumTrainingItemsV>
-NormalizeEstimator<InputT, NormT, MaxNumTrainingItemsV>::NormalizeEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+template <typename InputT, typename UpdaterType, size_t MaxNumTrainingItemsV>
+NormalizeEstimator<InputT, UpdaterType, MaxNumTrainingItemsV>::NormalizeEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
     BaseType(
         "NormalizeEstimator",
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, colIndex](void) { return Components::VectorNormsEstimator<InputT, NormT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
-        [pAllColumnAnnotations, colIndex](void) { return Details::NormalizeEstimatorImpl<InputT, NormT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
+        [pAllColumnAnnotations, colIndex](void) { return Components::VectorNormsEstimator<InputT, UpdaterType, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex](void) { return Details::NormalizeEstimatorImpl<InputT, UpdaterType, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
     ) {
 }
 
@@ -288,8 +325,8 @@ NormalizeEstimator<InputT, NormT, MaxNumTrainingItemsV>::NormalizeEstimator(Anno
 // |  Details::NormalizeEstimatorImpl
 // |
 // ----------------------------------------------------------------------
-template <typename InputT, NormType NormT, size_t MaxNumTrainingItemsV>
-Details::NormalizeEstimatorImpl<InputT, NormT, MaxNumTrainingItemsV>::NormalizeEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+template <typename InputT, typename UpdaterType, size_t MaxNumTrainingItemsV>
+Details::NormalizeEstimatorImpl<InputT, UpdaterType, MaxNumTrainingItemsV>::NormalizeEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
     BaseType("NormalizeEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
@@ -306,18 +343,18 @@ Details::NormalizeEstimatorImpl<InputT, NormT, MaxNumTrainingItemsV>::NormalizeE
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-template <typename InputT, NormType NormT, size_t MaxNumTrainingItemsV>
-bool Details::NormalizeEstimatorImpl<InputT, NormT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+template <typename InputT, typename UpdaterType, size_t MaxNumTrainingItemsV>
+bool Details::NormalizeEstimatorImpl<InputT, UpdaterType, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
     return false;
 }
 
-template <typename InputT, NormType NormT, size_t MaxNumTrainingItemsV>
-FitResult Details::NormalizeEstimatorImpl<InputT, NormT, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
+template <typename InputT, typename UpdaterType, size_t MaxNumTrainingItemsV>
+FitResult Details::NormalizeEstimatorImpl<InputT, UpdaterType, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
     throw std::runtime_error("This will never be called");
 }
 
-template <typename InputT, NormType NormT, size_t MaxNumTrainingItemsV>
-void Details::NormalizeEstimatorImpl<InputT, NormT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+template <typename InputT, typename UpdaterType, size_t MaxNumTrainingItemsV>
+void Details::NormalizeEstimatorImpl<InputT, UpdaterType, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
 } // namespace Featurizers

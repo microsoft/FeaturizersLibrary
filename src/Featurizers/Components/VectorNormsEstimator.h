@@ -9,7 +9,7 @@
 #include "TrainingOnlyEstimatorImpl.h"
 #include "../../Traits.h"
 #include "NormUpdaters.h"
-
+#include "../Structs.h"
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
@@ -17,36 +17,11 @@ namespace Components {
 
 static constexpr char const * const         VectorNormsEstimatorName("VectorNormsEstimator");
 
-namespace TypeSelector {
-
-// updater type selector is created to select different updater based on input parameter
-template <typename T, NormType NormT>
-struct UpdaterTypeSelector {
-};
-template <typename T>
-struct UpdaterTypeSelector<T, NormType::L1> {
-    using type = Updaters::L1NormUpdater<T>;
-};
-
-template <typename T>
-struct UpdaterTypeSelector<T, NormType::L2> {
-    using type = Updaters::L2NormUpdater<T>;
-};
-
-template <typename T>
-struct UpdaterTypeSelector<T, NormType::MAX> {
-    using type = Updaters::MaxNormUpdater<T>;
-};
-
-} // namespace TypeSelector
-
-
-
 /////////////////////////////////////////////////////////////////////////
 ///  \class         VectorNormsAnnotationData
 ///  \brief         An annotation class which contains the norms of a matrix
 ///
-template <NormType NormT>
+template <typename UpdaterType>
 class VectorNormsAnnotationData {
 public:
     // ----------------------------------------------------------------------
@@ -73,7 +48,7 @@ namespace Details {
 ///  \class         VectorNormsTrainingOnlyPolicy
 ///  \brief         `VectorNormsEstimator` implementation details.
 ///
-template <typename T, NormType NormT>
+template <typename T, typename UpdaterType>
 class VectorNormsTrainingOnlyPolicy {
 public:
     // ----------------------------------------------------------------------
@@ -82,8 +57,9 @@ public:
     // |
     // ----------------------------------------------------------------------
 
-    // using ValueType = typename std::iterator_traits<std::tuple_element<0, T>::type>::value_type;
-    using ValueType = typename T::value_type;
+    using IteratorType = typename std::tuple_element<0, T>::type;
+    using ValueType    = typename std::iterator_traits<IteratorType>::value_type;
+
     using InputType = T;
 
     // ----------------------------------------------------------------------
@@ -101,7 +77,7 @@ public:
     VectorNormsTrainingOnlyPolicy(void);
 
     void fit(InputType const &input);
-    VectorNormsAnnotationData<NormT> complete_training(void);
+    VectorNormsAnnotationData<UpdaterType> complete_training(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -110,15 +86,7 @@ private:
     // |
     // ----------------------------------------------------------------------
     std::vector<std::double_t> _norms;
-    typename TypeSelector::UpdaterTypeSelector<ValueType, NormT>::type _updater;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Methods
-    // |
-    // ----------------------------------------------------------------------
-    void fit_impl(InputType const &input, std::true_type /*is_optional*/);
-    void fit_impl(InputType const &input, std::false_type /*is_optional*/);
+    UpdaterType _updater;
 };
 
 } // namespace Details
@@ -129,10 +97,10 @@ private:
 ///
 template <
     typename InputT,
-    NormType NormT,
+    typename UpdaterType,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-using VectorNormsEstimator                       = TrainingOnlyEstimatorImpl<Details::VectorNormsTrainingOnlyPolicy<InputT, NormT>, MaxNumTrainingItemsV>;
+using VectorNormsEstimator                       = TrainingOnlyEstimatorImpl<Details::VectorNormsTrainingOnlyPolicy<InputT, UpdaterType>, MaxNumTrainingItemsV>;
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -149,8 +117,8 @@ using VectorNormsEstimator                       = TrainingOnlyEstimatorImpl<Det
 // |  VectorNormsAnnotationData
 // |
 // ----------------------------------------------------------------------
-template <NormType NormT>
-VectorNormsAnnotationData<NormT>::VectorNormsAnnotationData(std::vector<std::double_t> norms) :
+template <typename UpdaterType>
+VectorNormsAnnotationData<UpdaterType>::VectorNormsAnnotationData(std::vector<std::double_t> norms) :
     Norms(std::move(norms)) {
         for (auto const & norm : Norms) {
             if (norm < 0) {
@@ -164,46 +132,34 @@ VectorNormsAnnotationData<NormT>::VectorNormsAnnotationData(std::vector<std::dou
 // |  Details::VectorNormsTrainingOnlyPolicy
 // |
 // ----------------------------------------------------------------------
-template <typename T, NormType NormT>
-Details::VectorNormsTrainingOnlyPolicy<T, NormT>::VectorNormsTrainingOnlyPolicy(void) {
+template <typename T, typename UpdaterType>
+Details::VectorNormsTrainingOnlyPolicy<T, UpdaterType>::VectorNormsTrainingOnlyPolicy(void) {
 }
 
-template <typename T, NormType NormT>
-void Details::VectorNormsTrainingOnlyPolicy<T, NormT>::fit(InputType const &input) {
+template <typename T, typename UpdaterType>
+void Details::VectorNormsTrainingOnlyPolicy<T, UpdaterType>::fit(InputType const &input) {
     // T is a pair of iterators
-    fit_impl(input, std::integral_constant<bool, Microsoft::Featurizer::Traits<ValueType>::IsNullableType>());
-}
+    // unpack input to two iterators
+    IteratorType & begin = const_cast<IteratorType&>(std::get<0>(input));
+    IteratorType const & end = std::get<1>(input);
 
-template <typename T, NormType NormT>
-VectorNormsAnnotationData<NormT> Details::VectorNormsTrainingOnlyPolicy<T, NormT>::complete_training(void) {
-    return VectorNormsAnnotationData<NormT>(std::move(_norms));
-}
-
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-template <typename T, NormType NormT>
-void Details::VectorNormsTrainingOnlyPolicy<T, NormT>::fit_impl(InputType const &input, std::true_type) {
-    // ----------------------------------------------------------------------
-    using TheseTraits                       = Microsoft::Featurizer::Traits<ValueType>;
-    // ----------------------------------------------------------------------
-
-    for (auto const & value : input) {
-        if(!TheseTraits::IsNull(value))
-            _updater.update(TheseTraits::GetNullableValue(value));
+    if (std::distance(begin, end) < 0) {
+        throw std::runtime_error("Input iterators to VectorNormsEstimator are invalid!");
+    }
+    // null values are handled inside NormUpdater
+    while (begin != end) {
+        _updater.update(*begin);
+        ++begin;
     }
     _norms.emplace_back(static_cast<std::double_t>(_updater.commit()));
     _updater.reset();
 }
 
-template <typename T, NormType NormT>
-void Details::VectorNormsTrainingOnlyPolicy<T, NormT>::fit_impl(InputType const &input, std::false_type) {
-    for (auto const & value : input) {
-        _updater.update(value);
-    }
-    _norms.emplace_back(static_cast<std::double_t>(_updater.commit()));
-    _updater.reset();
+template <typename T, typename UpdaterType>
+VectorNormsAnnotationData<UpdaterType> Details::VectorNormsTrainingOnlyPolicy<T, UpdaterType>::complete_training(void) {
+    return VectorNormsAnnotationData<UpdaterType>(std::move(_norms));
 }
+
 
 } // namespace Components
 } // namespace Featurizers
