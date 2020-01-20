@@ -66,7 +66,7 @@ public:
 
     void reset(void);
 
-    void update(InputType const& input);
+    void update(T input);
 
     long double commit(void);
 
@@ -115,7 +115,7 @@ public:
 
     void reset(void);
 
-    void update(InputType const& input);
+    void update(T input);
 
     long double commit(void);
 
@@ -165,7 +165,7 @@ public:
 
     void reset(void);
 
-    void update(InputType const& input);
+    void update(T input);
 
     typename TypeSelector::MaxNormTypeSelector<T>::type commit(void);
 
