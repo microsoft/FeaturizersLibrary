@@ -10,32 +10,51 @@
 using namespace Microsoft::Featurizer;
 
 void ParseTest(std::string const & input, std::vector<std::string> const & label) {
-    std::vector<std::string> output;
+    std::vector<std::string> output1;
     Details::Parse<std::string::const_iterator, char>(
         input.begin(),
         input.end(),
         ' ',
-        [&output] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
-            output.emplace_back(std::string(iterBegin, iterEnd));
+        [&output1] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
+            output1.emplace_back(std::string(iterBegin, iterEnd));
         }
     );
-    CHECK(output == label);
+    CHECK(output1 == label);
+    std::vector<std::string> output2;
+    Parse<std::string::const_iterator, char>(
+        input,
+        ' ',
+        [&output2] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
+            output2.emplace_back(std::string(iterBegin, iterEnd));
+        }
+    );
+    CHECK(output2 == label);
 }
 
 void ParseRegexTest(std::string const & input,
                     std::vector<std::string> const & label,
                     std::string const & token = "[^\\s]+") {
-    std::vector<std::string> output;
     std::regex rgx(token);
+
+    std::vector<std::string> output1;
     Details::ParseRegex<std::string::const_iterator, std::regex>(
         input.begin(),
         input.end(),
         rgx,
-        [&output] (std::string::const_iterator &iterBegin, std::string::const_iterator &iterEnd) {
-            output.emplace_back(std::string(iterBegin, iterEnd));
+        [&output1] (std::string::const_iterator &iterBegin, std::string::const_iterator &iterEnd) {
+            output1.emplace_back(std::string(iterBegin, iterEnd));
         }
     );
-    CHECK(output == label);
+    CHECK(output1 == label);
+    std::vector<std::string> output2;
+    ParseRegex<std::string::const_iterator, std::regex>(
+        input,
+        rgx,
+        [&output2] (std::string::const_iterator &iterBegin, std::string::const_iterator &iterEnd) {
+            output2.emplace_back(std::string(iterBegin, iterEnd));
+        }
+    );
+    CHECK(output2 == label);
 }
 
 void ParseNgramWordTest(std::string & input,
@@ -43,17 +62,28 @@ void ParseNgramWordTest(std::string & input,
                         char const & ch,
                         size_t ngramRangeMin,
                         size_t ngramRangeMax) {
-    std::vector<std::string> output;
+    std::vector<std::string> output1;
     Details::ParseNgramWord<std::string::const_iterator, char>(
         input,
         ch,
         ngramRangeMin,
         ngramRangeMax,
-        [&output] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
-            output.emplace_back(std::string(iterBegin, iterEnd));
+        [&output1] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
+            output1.emplace_back(std::string(iterBegin, iterEnd));
         }
     );
-    CHECK(output == label);
+    CHECK(output1 == label);
+    std::vector<std::string> output2;
+    ParseNgramWord<std::string::const_iterator, char>(
+        input,
+        ch,
+        ngramRangeMin,
+        ngramRangeMax,
+        [&output2] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
+            output2.emplace_back(std::string(iterBegin, iterEnd));
+        }
+    );
+    CHECK(output2 == label);
 }
 
 void ParseNgramWordCopyTest(std::string const & input,
@@ -78,16 +108,26 @@ void ParseNgramCharTest(std::string & input,
                         std::vector<std::string> const & label,
                         size_t ngramRangeMin,
                         size_t ngramRangeMax) {
-    std::vector<std::string> output;
+    std::vector<std::string> output1;
     Details::ParseNgramChar<std::string::const_iterator>(
         input,
         ngramRangeMin,
         ngramRangeMax,
-        [&output] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
-            output.emplace_back(std::string(iterBegin, iterEnd));
+        [&output1] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
+            output1.emplace_back(std::string(iterBegin, iterEnd));
         }
     );
-    CHECK(output == label);
+    CHECK(output1 == label);
+    std::vector<std::string> output2;
+    ParseNgramChar<std::string::const_iterator>(
+        input,
+        ngramRangeMin,
+        ngramRangeMax,
+        [&output2] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
+            output2.emplace_back(std::string(iterBegin, iterEnd));
+        }
+    );
+    CHECK(output2 == label);
 }
 
 void ParseNgramCharCopyTest(std::string const & input,
@@ -111,17 +151,28 @@ void ParseNgramCharwbTest(std::string & input,
                           char const & ch,
                           size_t ngramRangeMin,
                           size_t ngramRangeMax) {
-    std::vector<std::string> output;
+    std::vector<std::string> output1;
     Details::ParseNgramCharwb<std::string::const_iterator, char>(
         input,
         ch,
         ngramRangeMin,
         ngramRangeMax,
-        [&output] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
-            output.emplace_back(std::string(iterBegin, iterEnd));
+        [&output1] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
+            output1.emplace_back(std::string(iterBegin, iterEnd));
         }
     );
-    CHECK(output == label);
+    CHECK(output1 == label);
+    std::vector<std::string> output2;
+    ParseNgramCharwb<std::string::const_iterator, char>(
+        input,
+        ch,
+        ngramRangeMin,
+        ngramRangeMax,
+        [&output2] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
+            output2.emplace_back(std::string(iterBegin, iterEnd));
+        }
+    );
+    CHECK(output2 == label);
 }
 
 void ParseNgramCharwbCopyTest(std::string const & input,
