@@ -71,11 +71,8 @@ private:
     // ----------------------------------------------------------------------
     void execute_impl(IteratorRangeT const &input, typename BaseType::CallbackFunction const &callback) override;
 
-    bool is_null(IteratorType const &input, std::true_type);
-    bool is_null(IteratorType const &input, std::false_type);
-
-    auto access(IteratorType const &input, std::true_type);
-    auto access(IteratorType const &input, std::false_type);
+    void execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::true_type);
+    void execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::false_type);
 };
 
 namespace Details {
@@ -266,6 +263,39 @@ void NormalizeTransformer<IteratorRangeT>::execute_impl(IteratorRangeT const &in
     IteratorType begin = std::get<0>(input);
     IteratorType const & end = std::get<1>(input);
 
+    execute_impl(begin, end, callback, std::integral_constant<bool, Microsoft::Featurizer::Traits<ValueType>::IsNullableType>());
+}
+
+template <typename IteratorRangeT>
+void NormalizeTransformer<IteratorRangeT>::execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::true_type) {
+    // ----------------------------------------------------------------------
+    using InputTraits                       = Traits<ValueType>;
+    using TransformedTraits                 = Traits<std::double_t>;
+    // ----------------------------------------------------------------------
+    if (std::distance(begin, end) < 0) {
+        throw std::runtime_error("Input iterators to VectorNormsEstimator are invalid!");
+    }
+    if (_row >= _norms.size()) {
+        throw std::runtime_error("Number of norms is not aligned with number of rows!");
+    }
+
+
+    std::vector<std::double_t> res;
+    res.reserve(static_cast<size_t>(std::distance(begin, end)));
+    while (begin != end) {
+        if(InputTraits::IsNull(*begin)) {
+            res.emplace_back(TransformedTraits::CreateNullValue());
+        }
+        else {
+            res.emplace_back(static_cast<std::double_t>(static_cast<long double>(InputTraits::GetNullableValue(*begin)) / static_cast<long double>(_norms[_row])));
+        }
+        ++begin;
+    }
+    ++_row;
+    callback(res);
+}
+template <typename IteratorRangeT>
+void NormalizeTransformer<IteratorRangeT>::execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::false_type) {
     if (std::distance(begin, end) < 0) {
         throw std::runtime_error("Input iterators to VectorNormsEstimator are invalid!");
     }
@@ -276,37 +306,11 @@ void NormalizeTransformer<IteratorRangeT>::execute_impl(IteratorRangeT const &in
     std::vector<std::double_t> res;
     res.reserve(static_cast<size_t>(std::distance(begin, end)));
     while (begin != end) {
-        if(is_null(begin, std::integral_constant<bool, Microsoft::Featurizer::Traits<ValueType>::IsNullableType>())) {
-            res.emplace_back(Traits<std::double_t>::CreateNullValue());
-        }
-        else {
-            res.emplace_back(static_cast<std::double_t>(static_cast<long double>(access(begin, std::integral_constant<bool, Microsoft::Featurizer::Traits<ValueType>::IsNullableType>())) / static_cast<long double>(_norms[_row])));
-        }
+        res.emplace_back(static_cast<std::double_t>(static_cast<long double>(*begin) / static_cast<long double>(_norms[_row])));
         ++begin;
     }
     ++_row;
     callback(res);
-}
-
-template <typename IteratorRangeT>
-bool NormalizeTransformer<IteratorRangeT>::is_null(IteratorType const &input, std::true_type) {
-    return Traits<ValueType>::IsNull(*input);
-}
-
-template <typename IteratorRangeT>
-bool NormalizeTransformer<IteratorRangeT>::is_null(IteratorType const &input, std::false_type) {
-    return false;
-}
-
-
-template <typename IteratorRangeT>
-auto NormalizeTransformer<IteratorRangeT>::access(IteratorType const &input, std::true_type) {
-    return Traits<ValueType>::GetNullableValue(*input);
-}
-
-template <typename IteratorRangeT>
-auto NormalizeTransformer<IteratorRangeT>::access(IteratorType const &input, std::false_type) {
-    return *input;
 }
 // ----------------------------------------------------------------------
 // |
