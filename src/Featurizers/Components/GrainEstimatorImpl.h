@@ -210,7 +210,7 @@ protected:
     // |  Protected Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorMap                      = typename GrainEStimatorAnnotation<GrainT>::AnnotationMap;
+    using EstimatorMap                      = typename GrainEstimatorAnnotation<GrainT>::AnnotationMap;
 
     // ----------------------------------------------------------------------
     // |
