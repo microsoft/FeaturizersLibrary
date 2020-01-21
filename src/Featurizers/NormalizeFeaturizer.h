@@ -263,6 +263,13 @@ void NormalizeTransformer<IteratorRangeT>::execute_impl(IteratorRangeT const &in
     IteratorType begin = std::get<0>(input);
     IteratorType const & end = std::get<1>(input);
 
+    if (std::distance(begin, end) < 0) {
+        throw std::runtime_error("Input iterators to VectorNormsEstimator are invalid!");
+    }
+    if (_row >= _norms.size()) {
+        throw std::runtime_error("Number of norms is not aligned with number of rows!");
+    }
+
     execute_impl(begin, end, callback, std::integral_constant<bool, Microsoft::Featurizer::Traits<ValueType>::IsNullableType>());
 }
 
@@ -272,13 +279,6 @@ void NormalizeTransformer<IteratorRangeT>::execute_impl(IteratorType &begin, Ite
     using InputTraits                       = Traits<ValueType>;
     using TransformedTraits                 = Traits<std::double_t>;
     // ----------------------------------------------------------------------
-    if (std::distance(begin, end) < 0) {
-        throw std::runtime_error("Input iterators to VectorNormsEstimator are invalid!");
-    }
-    if (_row >= _norms.size()) {
-        throw std::runtime_error("Number of norms is not aligned with number of rows!");
-    }
-
 
     std::vector<std::double_t> res;
     res.reserve(static_cast<size_t>(std::distance(begin, end)));
@@ -296,13 +296,6 @@ void NormalizeTransformer<IteratorRangeT>::execute_impl(IteratorType &begin, Ite
 }
 template <typename IteratorRangeT>
 void NormalizeTransformer<IteratorRangeT>::execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::false_type) {
-    if (std::distance(begin, end) < 0) {
-        throw std::runtime_error("Input iterators to VectorNormsEstimator are invalid!");
-    }
-    if (_row >= _norms.size()) {
-        throw std::runtime_error("Number of norms is not aligned with number of rows!");
-    }
-
     std::vector<std::double_t> res;
     res.reserve(static_cast<size_t>(std::distance(begin, end)));
     while (begin != end) {
