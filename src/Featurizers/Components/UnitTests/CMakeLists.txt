@@ -40,6 +40,7 @@ SET(
     MinMaxEstimator_UnitTest
     ModeEstimator_UnitTest
     NormUpdaters_UnitTest
+    OrderEstimator_UnitTest
     PipelineExecutionEstimatorImpl_UnitTest
     StandardDeviationEstimator_UnitTest
     StatisticalMetricsEstimator_UnitTest

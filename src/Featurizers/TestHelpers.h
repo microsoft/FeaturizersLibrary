@@ -68,6 +68,11 @@ void Train(EstimatorT &estimator, std::vector<std::vector<InputT>> const &inputB
     estimator.complete_training();
 }
 
+template <typename EstimatorT, typename InputT>
+void Train(EstimatorT &estimator, std::vector<InputT> const &inputBatch) {
+    Train(estimator, std::vector<std::vector<InputT>>{inputBatch});
+}
+
 template <typename EstimatorT>
 std::vector<typename EstimatorT::TransformedType> Predict(EstimatorT &estimator, std::vector<typename EstimatorT::InputType> const &data) {
 
