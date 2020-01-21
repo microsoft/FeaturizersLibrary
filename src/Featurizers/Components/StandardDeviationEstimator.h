@@ -169,7 +169,7 @@ public:
 // |
 // ----------------------------------------------------------------------
 
-StandardDeviationAnnotationData::StandardDeviationAnnotationData(long double standard_deviation, std::uint64_t count) :
+inline StandardDeviationAnnotationData::StandardDeviationAnnotationData(long double standard_deviation, std::uint64_t count) :
     StandardDeviation(std::move(standard_deviation)),
     Count(std::move(count)) {
         if (StandardDeviation < 0) {
