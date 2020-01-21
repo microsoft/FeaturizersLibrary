@@ -4,6 +4,8 @@
 // ----------------------------------------------------------------------
 #pragma once
 
+#include <unordered_map>
+
 #include "HistogramEstimator.h"
 
 namespace Microsoft {
@@ -25,7 +27,13 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using IndexMap                          = std::unordered_map<T, std::uint32_t>;
+    using IndexMap =
+        std::unordered_map<
+            T,
+            std::uint32_t,
+            std::hash<T>,
+            typename Traits<T>::key_equal
+        >;
 
     // ----------------------------------------------------------------------
     // |

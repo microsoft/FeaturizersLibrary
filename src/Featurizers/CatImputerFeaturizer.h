@@ -11,6 +11,7 @@
 #include "Components/PipelineExecutionEstimatorImpl.h"
 #include "Components/HistogramEstimator.h"
 #include "Components/ModeEstimator.h"
+#include "Components/OrderEstimator.h"
 
 namespace Microsoft {
 namespace Featurizer {
@@ -141,6 +142,7 @@ template <
 class CatImputerEstimator :
     public Components::PipelineExecutionEstimatorImpl<
         Components::HistogramEstimator<typename MakeNullableType<TransformedT>::type, MaxNumTrainingItemsV>,
+        Components::OrderEstimator<typename MakeNullableType<TransformedT>::type, MaxNumTrainingItemsV>,
         Components::ModeEstimator<typename MakeNullableType<TransformedT>::type, false, MaxNumTrainingItemsV>,
         Details::CatImputerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>
     > {
@@ -153,6 +155,7 @@ public:
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
             Components::HistogramEstimator<typename MakeNullableType<TransformedT>::type, MaxNumTrainingItemsV>,
+            Components::OrderEstimator<typename MakeNullableType<TransformedT>::type, MaxNumTrainingItemsV>,
             Components::ModeEstimator<typename MakeNullableType<TransformedT>::type, false, MaxNumTrainingItemsV>,
             Details::CatImputerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>
         >;
@@ -241,6 +244,7 @@ CatImputerEstimator<TransformedT, MaxNumTrainingItemsV>::CatImputerEstimator(Ann
         "CatImputerEstimator",
         pAllColumnAnnotations,
         [pAllColumnAnnotations, colIndex](void) { return Components::HistogramEstimator<typename MakeNullableType<TransformedT>::type, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex](void) { return Components::OrderEstimator<typename MakeNullableType<TransformedT>::type, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
         [pAllColumnAnnotations, colIndex](void) { return Components::ModeEstimator<typename MakeNullableType<TransformedT>::type, false, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
         [pAllColumnAnnotations, colIndex](void) { return Details::CatImputerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
     ) {
