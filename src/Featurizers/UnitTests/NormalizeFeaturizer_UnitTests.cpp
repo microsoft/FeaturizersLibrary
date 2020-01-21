@@ -36,7 +36,7 @@ TEST_CASE("invalid input iterators") {
 
     CHECK_THROWS_WITH(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::NormalizeEstimator<InputType, NS::Featurizers::Components::Updaters::L2NormUpdater<ValueType>>(pAllColumnAnnotations, 0),
+            NS::Featurizers::L2NormalizeEstimator<InputType>(pAllColumnAnnotations, 0),
             trainingBatches,
             inferencingInput
         ), "Input iterators to VectorNormsEstimator are invalid!"
@@ -77,7 +77,7 @@ TEST_CASE("double_t - max norm") {
 
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::NormalizeEstimator<InputType, NS::Featurizers::Components::Updaters::MaxNormUpdater<ValueType>>(pAllColumnAnnotations, 0),
+            NS::Featurizers::MaxNormalizeEstimator<InputType>(pAllColumnAnnotations, 0),
             trainingBatches,
             inferencingInput
         ) == inferencingOutput
@@ -113,7 +113,7 @@ TEST_CASE("int16_t - l2 norm") {
 
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::NormalizeEstimator<InputType, NS::Featurizers::Components::Updaters::L2NormUpdater<ValueType>>(pAllColumnAnnotations, 0),
+            NS::Featurizers::L2NormalizeEstimator<InputType>(pAllColumnAnnotations, 0),
             trainingBatches,
             inferencingInput
         ) == inferencingOutput
@@ -146,7 +146,7 @@ TEST_CASE("nonstd::optional<int> - l1 norm") {
 
     CHECK(NS::TestHelpers::FuzzyCheck(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::NormalizeEstimator<InputType, NS::Featurizers::Components::Updaters::L1NormUpdater<ValueType>>(pAllColumnAnnotations, 0),
+            NS::Featurizers::L1NormalizeEstimator<InputType>(pAllColumnAnnotations, 0),
             trainingBatches,
             inferencingInput
         )[0], inferencingOutput[0]
@@ -163,7 +163,7 @@ TEST_CASE("Serialization/Deserialization") {
     NS::Archive archive;
     model->save(archive);
     std::vector<unsigned char> vec = archive.commit();
-    
+
     NS::Archive loader(vec);
     TransformerType modelLoaded(loader);
     CHECK(modelLoaded == *model);

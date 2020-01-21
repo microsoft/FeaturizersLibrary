@@ -6,11 +6,22 @@
 
 #include "Components/VectorNormsEstimator.h"
 #include "Components/PipelineExecutionEstimatorImpl.h"
+#include "Components/NormUpdaters.h"
 #include "../Archive.h"
 #include "Structs.h"
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
+
+template <typename T>
+struct GetNullableType {
+    using type = T;
+};
+
+template <typename U>
+struct GetNullableType<nonstd::optional<U>> {
+    using type = U;
+};
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         NormalizeTransformer
@@ -73,6 +84,12 @@ private:
 
     void execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::true_type);
     void execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::false_type);
+
+    bool is_null(IteratorType const &input, std::true_type);
+    bool is_null(IteratorType const &input, std::false_type);
+
+    typename GetNullableType<ValueType>::type get_value(IteratorType const &input, std::true_type);
+    ValueType get_value(IteratorType const &input, std::false_type);
 };
 
 namespace Details {
@@ -178,6 +195,44 @@ public:
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(NormalizeEstimator);
 };
 
+/////////////////////////////////////////////////////////////////////////
+///  \typedef       L1NormalizeEstimator
+///  \brief         Used to differentiate different NormalizeEstimator depends on norms
+///
+template <
+    typename IteratorRangeT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
+using L1NormalizeEstimator = NormalizeEstimator<
+                                    IteratorRangeT,
+                                    Components::Updaters::L1NormUpdater<typename std::iterator_traits<typename std::tuple_element<0, IteratorRangeT>::type>::value_type>,
+                                    MaxNumTrainingItemsV>;
+
+/////////////////////////////////////////////////////////////////////////
+///  \typedef       L2NormalizeEstimator
+///  \brief         Used to differentiate different NormalizeEstimator depends on norms
+///
+template <
+    typename IteratorRangeT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
+using L2NormalizeEstimator = NormalizeEstimator<
+                                    IteratorRangeT,
+                                    Components::Updaters::L2NormUpdater<typename std::iterator_traits<typename std::tuple_element<0, IteratorRangeT>::type>::value_type>,
+                                    MaxNumTrainingItemsV>;
+
+/////////////////////////////////////////////////////////////////////////
+///  \typedef       MaxNormalizeEstimator
+///  \brief         Used to differentiate different NormalizeEstimator depends on norms
+///
+template <
+    typename IteratorRangeT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
+using MaxNormalizeEstimator = NormalizeEstimator<
+                                    IteratorRangeT,
+                                    Components::Updaters::MaxNormUpdater<typename std::iterator_traits<typename std::tuple_element<0, IteratorRangeT>::type>::value_type>,
+                                    MaxNumTrainingItemsV>;
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -270,41 +325,41 @@ void NormalizeTransformer<IteratorRangeT>::execute_impl(IteratorRangeT const &in
         throw std::runtime_error("Number of norms is not aligned with number of rows!");
     }
 
-    execute_impl(begin, end, callback, std::integral_constant<bool, Microsoft::Featurizer::Traits<ValueType>::IsNullableType>());
-}
-
-template <typename IteratorRangeT>
-void NormalizeTransformer<IteratorRangeT>::execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::true_type) {
-    // ----------------------------------------------------------------------
-    using InputTraits                       = Traits<ValueType>;
-    using TransformedTraits                 = Traits<std::double_t>;
-    // ----------------------------------------------------------------------
-
     std::vector<std::double_t> res;
     res.reserve(static_cast<size_t>(std::distance(begin, end)));
     while (begin != end) {
-        if(InputTraits::IsNull(*begin)) {
-            res.emplace_back(TransformedTraits::CreateNullValue());
+        if(is_null(begin, std::integral_constant<bool, Microsoft::Featurizer::Traits<ValueType>::IsNullableType>())) {
+            res.emplace_back(Traits<std::double_t>::CreateNullValue());
         }
         else {
-            res.emplace_back(static_cast<std::double_t>(static_cast<long double>(InputTraits::GetNullableValue(*begin)) / static_cast<long double>(_norms[_row])));
+            res.emplace_back(static_cast<std::double_t>(static_cast<long double>(get_value(begin, std::integral_constant<bool, Microsoft::Featurizer::Traits<ValueType>::IsNullableType>())) / static_cast<long double>(_norms[_row])));
         }
         ++begin;
     }
     ++_row;
     callback(res);
 }
+
 template <typename IteratorRangeT>
-void NormalizeTransformer<IteratorRangeT>::execute_impl(IteratorType &begin, IteratorType const &end, typename BaseType::CallbackFunction const &callback, std::false_type) {
-    std::vector<std::double_t> res;
-    res.reserve(static_cast<size_t>(std::distance(begin, end)));
-    while (begin != end) {
-        res.emplace_back(static_cast<std::double_t>(static_cast<long double>(*begin) / static_cast<long double>(_norms[_row])));
-        ++begin;
-    }
-    ++_row;
-    callback(res);
+bool NormalizeTransformer<IteratorRangeT>::is_null(IteratorType const &input, std::true_type) {
+    return Traits<ValueType>::IsNull(*input);
 }
+template <typename IteratorRangeT>
+bool NormalizeTransformer<IteratorRangeT>::is_null(IteratorType const &input, std::false_type) {
+    return false;
+}
+
+
+template <typename IteratorRangeT>
+typename GetNullableType<typename std::iterator_traits<typename std::tuple_element<0, IteratorRangeT>::type>::value_type>::type NormalizeTransformer<IteratorRangeT>::get_value(IteratorType const &input, std::true_type) {
+    return Traits<ValueType>::GetNullableValue(*input);
+}
+template <typename IteratorRangeT>
+typename std::iterator_traits<typename std::tuple_element<0, IteratorRangeT>::type>::value_type NormalizeTransformer<IteratorRangeT>::get_value(IteratorType const &input, std::false_type) {
+    return *input;
+}
+
+
 // ----------------------------------------------------------------------
 // |
 // |  NormalizeEstimator
