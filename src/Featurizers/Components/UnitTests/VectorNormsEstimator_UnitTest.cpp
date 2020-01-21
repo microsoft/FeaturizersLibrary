@@ -15,6 +15,21 @@ namespace NS = Microsoft::Featurizer;
 template <typename T>
 using Range = std::pair<typename std::vector<T>::iterator, typename std::vector<T>::iterator>;
 
+TEST_CASE("invalid input types") {
+    CHECK(NS::Featurizers::Components::IsIteratorPair<Range<int>>::value);
+    CHECK(NS::Featurizers::Components::IsIteratorPair<std::pair<int, int>>::value);
+    CHECK(NS::Featurizers::Components::IsIteratorPair<std::tuple<int, int>>::value);
+    CHECK(!NS::Featurizers::Components::IsIteratorPair<std::tuple<int, int, int>>::value);
+    CHECK(!NS::Featurizers::Components::IsIteratorPair<std::pair<int, std::double_t>>::value);
+    CHECK(!NS::Featurizers::Components::IsIteratorPair<std::tuple<int, std::double_t>>::value);
+}
+
+TEST_CASE("invalid annotation") {
+    CHECK_THROWS_WITH(NS::Featurizers::Components::VectorNormsAnnotationData<NS::Featurizers::Components::Updaters::L1NormUpdater<int>>({}), "No norm is passed in to VectorNormsAnnotationData!");
+
+    CHECK_THROWS_WITH(NS::Featurizers::Components::VectorNormsAnnotationData<NS::Featurizers::Components::Updaters::L1NormUpdater<int>>({1, -1, 3}), "Norms shouldn't be less than 0!");
+}
+
 TEST_CASE("all zeros - l1 norm") {
     using ValueType = std::uint16_t;
     using InputType = Range<ValueType>;

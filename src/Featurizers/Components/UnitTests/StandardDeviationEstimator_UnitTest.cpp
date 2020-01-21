@@ -49,7 +49,7 @@ TEST_CASE("0 valid double data") {
 
     NS::Featurizers::Components::StandardDeviationEstimator<inputType> estimator(pAllColumnAnnotations, 0);
 
-    CHECK_THROWS_WITH(NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{null}})), "Count is 0 when calculating standard deviation!");
+    CHECK_THROWS_WITH(NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{null}})), "No valid input is passed in before commit is called!");
 }
 
 TEST_CASE("one int input data") {

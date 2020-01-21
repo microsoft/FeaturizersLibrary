@@ -49,14 +49,6 @@ namespace Updaters{
 template <typename T>
 class L1NormUpdater {
 public:
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    using InputType                         = T;
-
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -78,6 +70,10 @@ private:
     // ----------------------------------------------------------------------
     long double _l1_norm;
 
+    // flags to check if update function is called
+    // an error will be thrown if no valid input is input before commit
+    bool        _has_valid_input;
+
     // ----------------------------------------------------------------------
     // |
     // |  Private Methods
@@ -98,13 +94,6 @@ private:
 template <typename T>
 class L2NormUpdater {
 public:
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    using InputType                         = T;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -125,6 +114,10 @@ private:
     // |
     // ----------------------------------------------------------------------
     long double _l2_norm;
+
+    // flags to check if update function is called
+    // an error will be thrown if no valid input is input before commit
+    bool        _has_valid_input;
 
     // ----------------------------------------------------------------------
     // |
@@ -149,13 +142,6 @@ class MaxNormUpdater {
 public:
     // ----------------------------------------------------------------------
     // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    using InputType                         = T;
-
-    // ----------------------------------------------------------------------
-    // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
@@ -175,6 +161,10 @@ private:
     // |
     // ----------------------------------------------------------------------
     typename TypeSelector::MaxNormTypeSelector<T>::type _max_norm;
+
+    // flags to check if update function is called
+    // an error will be thrown if no valid input is input before commit
+    bool        _has_valid_input;
 
     // ----------------------------------------------------------------------
     // |
@@ -213,6 +203,7 @@ Updaters::L1NormUpdater<T>::L1NormUpdater() {
 template <typename T>
 void Updaters::L1NormUpdater<T>::reset() {
     _l1_norm = 0;
+    _has_valid_input = false;
 }
 
 template <typename T>
@@ -238,7 +229,9 @@ void Updaters::L1NormUpdater<T>::update_impl(T input, std::false_type /*is_nulla
 template <typename T>
 template <typename U>
 void Updaters::L1NormUpdater<T>::update_impl(U input) {
-    
+    if (!_has_valid_input)
+        _has_valid_input = true;
+
     long double diff = std::abs(static_cast<long double>(input));
 
     // check if diff is too small comparing to l1_norm
@@ -257,6 +250,9 @@ void Updaters::L1NormUpdater<T>::update_impl(U input) {
 template <typename T>
 long double Updaters::L1NormUpdater<T>::commit(void) {
     assert(_l1_norm >= 0);
+    if (!_has_valid_input) {
+        throw std::runtime_error("No valid input is passed in before commit is called!");
+    }
     return _l1_norm;
 }
 // ----------------------------------------------------------------------
@@ -272,6 +268,7 @@ Updaters::L2NormUpdater<T>::L2NormUpdater() {
 template <typename T>
 void Updaters::L2NormUpdater<T>::reset() {
     _l2_norm = 0;
+    _has_valid_input = false;
 }
 template <typename T>
 void Updaters::L2NormUpdater<T>::update(T input) {
@@ -296,7 +293,9 @@ void Updaters::L2NormUpdater<T>::update_impl(T input, std::false_type /*is_nulla
 template <typename T>
 template <typename U>
 void Updaters::L2NormUpdater<T>::update_impl(U input) {
-    
+    if (!_has_valid_input)
+        _has_valid_input = true;
+
     long double diff_square = std::pow(std::abs(static_cast<long double>(input)), 2);
 
     if ((_l2_norm + diff_square == _l2_norm) && (diff_square != 0)) {
@@ -314,6 +313,9 @@ void Updaters::L2NormUpdater<T>::update_impl(U input) {
 template <typename T>
 long double Updaters::L2NormUpdater<T>::commit(void) {
     assert(_l2_norm >= 0);
+    if (!_has_valid_input) {
+        throw std::runtime_error("No valid input is passed in before commit is called!");
+    }
     return std::sqrt(_l2_norm);
 }
 // ----------------------------------------------------------------------
@@ -329,6 +331,7 @@ Updaters::MaxNormUpdater<T>::MaxNormUpdater() {
 template <typename T>
 void Updaters::MaxNormUpdater<T>::reset() {
     _max_norm = 0;
+    _has_valid_input = false;
 }
 template <typename T>
 void Updaters::MaxNormUpdater<T>::update(T input) {
@@ -353,6 +356,8 @@ void Updaters::MaxNormUpdater<T>::update_impl(T input, std::false_type /*is_null
 template <typename T>
 template <typename U>
 void Updaters::MaxNormUpdater<T>::update_impl(U input) {
+    if (!_has_valid_input)
+        _has_valid_input = true;
     _max_norm = std::max(static_cast<typename TypeSelector::MaxNormTypeSelector<T>::type>(std::abs(input)), _max_norm);
 }
 
@@ -360,6 +365,9 @@ void Updaters::MaxNormUpdater<T>::update_impl(U input) {
 template <typename T>
 typename TypeSelector::MaxNormTypeSelector<T>::type Updaters::MaxNormUpdater<T>::commit(void) {
     assert(_max_norm >= 0);
+    if (!_has_valid_input) {
+        throw std::runtime_error("No valid input is passed in before commit is called!");
+    }
     return _max_norm;
 }
 
