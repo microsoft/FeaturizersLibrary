@@ -38,7 +38,7 @@ TEST_CASE("no valid input, with mean, with std") {
             NS::Featurizers::StandardScaleWrapperEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, true, true),
             trainingBatches,
             inferencingInput
-        ), "update is not called before l2 is committed!"
+        ), "No values were provided"
     );
 }
 // test for int
@@ -174,7 +174,7 @@ TEST_CASE("no valid input, with mean, without std") {
             NS::Featurizers::StandardScaleWrapperEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, true, false),
             trainingBatches,
             inferencingInput
-        ), "update is not called before l2 is committed!"
+        ), "No values were provided"
     );
 }
 // test for int
@@ -313,7 +313,7 @@ TEST_CASE("no valid input, without mean, with std") {
             NS::Featurizers::StandardScaleWrapperEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, false, true),
             trainingBatches,
             inferencingInput
-        ), "update is not called before l2 is committed!"
+        ), "No values were provided"
     );
 }
 // test for int
@@ -450,7 +450,7 @@ TEST_CASE("no valid input, without mean, without std") {
             NS::Featurizers::StandardScaleWrapperEstimator<InputType, TransformedType>(pAllColumnAnnotations, 0, false, false),
             trainingBatches,
             inferencingInput
-        ), "update is not called before l2 is committed!"
+        ), "No values were provided"
     );
 }
 // test for int
