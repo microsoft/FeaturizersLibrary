@@ -312,6 +312,48 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_FitBuffer(
     }
 }
 
+FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_GetState(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+        if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        EstimatorMemory &                   memory(*g_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(memory.Estimator.get_state());
+
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_OnDataCompleted(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo){
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        EstimatorMemory &                   memory(*g_pointerTable.Get<EstimatorMemory>(reinterpret_cast<size_t>(pHandle)));
+
+        memory.Estimator.on_data_completed();
+
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CompleteTraining(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
