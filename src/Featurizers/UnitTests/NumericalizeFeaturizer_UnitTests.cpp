@@ -97,9 +97,7 @@ TEST_CASE("not found value") {
         const bool r_nan = std::isnan(results[i]);
         const bool e_nan = std::isnan(expectedOutput[i]);
         if(r_nan || e_nan) {
-            if((r_nan && !e_nan) || (!r_nan && e_nan)) {
-                CHECK(!"Fails Naness compare");
-            }
+            CHECK(r_nan == e_nan);
         } else {
             CHECK(std::abs(results[i] - expectedOutput[i]) < LDBL_EPSILON);
         }
