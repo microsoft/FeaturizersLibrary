@@ -35,15 +35,21 @@ foreach(_test_name IN ITEMS
     ImputationMarkerFeaturizer_UnitTests
     LabelEncoderFeaturizer_UnitTests
     MaxAbsScalarFeaturizer_UnitTests
+    MeanImputerFeaturizer_UnitTest
+    MedianImputerFeaturizer_UnitTest
+    MinMaxImputerFeaturizer_UnitTest
     MinMaxScalarFeaturizer_UnitTests
     MissingDummiesFeaturizer_UnitTests
+    NumericalizeFeaturizer_UnitTests
     OneHotEncoderFeaturizer_UnitTests
+    PCAFeaturizer_UnitTests
     RobustScalarFeaturizer_UnitTests
     SampleAddFeaturizer_UnitTest
     StandardScaleWrapperFeaturizer_UnitTest
     StringFeaturizer_UnitTest
     Structs_UnitTest
     TimeSeriesImputerFeaturizer_UnitTest
+    TruncatedSVDFeaturizer_UnitTests
 )
     add_executable(${_test_name} ${_test_name}.cpp)
 

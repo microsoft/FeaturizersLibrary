@@ -480,13 +480,36 @@ featurizers:
       This is the LabelEncoder, but returns a null value for categories not encountered during training.
 
       C++-style pseudo signature:
-        template <typename T> float execute(T const &value);
+        template <typename T> std::optional<uint32_t> execute(T const &value);
 
       Examples:
-        execute("encountered") -> <unique id>
-        execute("not encountered") -> NaN
+        Assuming the training data of ["Oh", "Huh", "Heh"]...
+        execute("Oh") -> std::optional<uint32_t>(1)
+        execute("Huh") -> std::optional<uint32_t>(2)
+        execute("Heh") -> std::optional<uint32_t>(3)
+        # This value was not seeing at training time
+        execute("Oops") -> std::optional<uint32_t>()
 
-    status: Pending
+    templates:
+      - name: T
+        types:
+          - int8
+          - uint8
+          - int16
+          - uint16          
+          - int32
+          - uint32
+          - int64
+          - uint64
+          - float
+          - double
+          - bool
+          - string
+          
+    type_mappings:
+      - input_type: T
+        is_input_optional: true
+        output_type: uint32
 
   # ----------------------------------------------------------------------
   - name: OneHotEncoderFeaturizer

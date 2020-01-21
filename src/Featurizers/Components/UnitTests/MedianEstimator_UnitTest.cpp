@@ -43,15 +43,33 @@ TEST_CASE("ints") {
     Test<false, int>({1, 2, 3, 4}, 2);
 }
 
+TEST_CASE("nullable ints") {
+    Test<true, nonstd::optional<int>>({1, 2, nonstd::optional<int>(), 3, 4, 5, nonstd::optional<int>()}, 3);
+    Test<true, nonstd::optional<int>>({1, 2, nonstd::optional<int>(), 3, nonstd::optional<int>(), 4}, 2.5);
+    Test<false, nonstd::optional<int>>({1, 2, nonstd::optional<int>(), nonstd::optional<int>(), nonstd::optional<int>(), 3, nonstd::optional<int>(), 4}, 2);
+}
+
 TEST_CASE("strings") {
     Test<false, std::string, std::string>({"1", "2", "3", "4", "5"}, "3");
     Test<false, std::string, std::string>({"1", "2", "3", "4"}, "2");
 }
 
-TEST_CASE("error conditions") {
+TEST_CASE("nullable strings") {
+    Test<false, nonstd::optional<std::string>, std::string>({nonstd::optional<std::string>(), nonstd::optional<std::string>(), "1", "2", nonstd::optional<std::string>(), "3", "4", "5"}, "3");
+    Test<false, nonstd::optional<std::string>, std::string>({"1", nonstd::optional<std::string>(), "2", "3", nonstd::optional<std::string>(), "4"}, "2");
+}
+
+TEST_CASE("No elements during training") {
     NS::AnnotationMapsPtr const                         pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::MedianEstimator<int>   estimator(pAllColumnAnnotations, 0);
 
     estimator.begin_training();
     CHECK_THROWS_WITH(estimator.complete_training(), "No elements were provided during training");
+}
+
+TEST_CASE("No valid elements during training") {
+    CHECK_THROWS_WITH(
+        (Test<true, nonstd::optional<int>>({nonstd::optional<int>(), nonstd::optional<int>()}, 0)),
+        "No elements were provided during training"
+    );
 }
