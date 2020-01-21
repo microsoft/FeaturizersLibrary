@@ -11,8 +11,9 @@ using namespace Microsoft::Featurizer;
 
 void ParseTest(std::string const & input, std::vector<std::string> const & label) {
     std::vector<std::string> output;
-    Parse<std::string::const_iterator, char>(
-        input,
+    Details::Parse<std::string::const_iterator, char>(
+        input.begin(),
+        input.end(),
         ' ',
         [&output] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
             output.emplace_back(std::string(iterBegin, iterEnd));
@@ -26,8 +27,9 @@ void ParseRegexTest(std::string const & input,
                     std::string const & token = "[^\\s]+") {
     std::vector<std::string> output;
     std::regex rgx(token);
-    ParseRegex<std::string::const_iterator, std::regex>(
-        input,
+    Details::ParseRegex<std::string::const_iterator, std::regex>(
+        input.begin(),
+        input.end(),
         rgx,
         [&output] (std::string::const_iterator &iterBegin, std::string::const_iterator &iterEnd) {
             output.emplace_back(std::string(iterBegin, iterEnd));
@@ -42,7 +44,7 @@ void ParseNgramWordTest(std::string & input,
                         size_t ngramRangeMin,
                         size_t ngramRangeMax) {
     std::vector<std::string> output;
-    ParseNgramWord<std::string::const_iterator, char>(
+    Details::ParseNgramWord<std::string::const_iterator, char>(
         input,
         ch,
         ngramRangeMin,
@@ -77,7 +79,7 @@ void ParseNgramCharTest(std::string & input,
                         size_t ngramRangeMin,
                         size_t ngramRangeMax) {
     std::vector<std::string> output;
-    ParseNgramChar<std::string::const_iterator>(
+    Details::ParseNgramChar<std::string::const_iterator>(
         input,
         ngramRangeMin,
         ngramRangeMax,
@@ -110,7 +112,7 @@ void ParseNgramCharwbTest(std::string & input,
                           size_t ngramRangeMin,
                           size_t ngramRangeMax) {
     std::vector<std::string> output;
-    ParseNgramCharwb<std::string::const_iterator, char>(
+    Details::ParseNgramCharwb<std::string::const_iterator, char>(
         input,
         ch,
         ngramRangeMin,

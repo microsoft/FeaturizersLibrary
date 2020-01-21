@@ -12,7 +12,7 @@ template<typename IteratorT>
 inline std::vector<IteratorT> IteratorVectorGenerator(IteratorT const & begin,
                                                      IteratorT const & end) {
     std::vector<IteratorT> wordIterVector;
-    wordIterVector.reserve(static_cast<unsigned int>(std::distance(begin, end)));
+    wordIterVector.reserve(static_cast<unsigned int>(std::distance(begin, end) + 1));
 
     for (IteratorT strIter = begin; strIter != end; ++strIter)
         wordIterVector.emplace_back(std::move(strIter));
