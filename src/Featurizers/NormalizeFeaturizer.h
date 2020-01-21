@@ -345,7 +345,7 @@ bool NormalizeTransformer<IteratorRangeT>::is_null(IteratorType const &input, st
     return Traits<ValueType>::IsNull(*input);
 }
 template <typename IteratorRangeT>
-bool NormalizeTransformer<IteratorRangeT>::is_null(IteratorType const &input, std::false_type) {
+bool NormalizeTransformer<IteratorRangeT>::is_null(IteratorType const &, std::false_type) {
     return false;
 }
 
