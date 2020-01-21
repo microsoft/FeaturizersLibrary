@@ -229,8 +229,7 @@ void Updaters::L1NormUpdater<T>::update_impl(T input, std::false_type /*is_nulla
 template <typename T>
 template <typename U>
 void Updaters::L1NormUpdater<T>::update_impl(U input) {
-    if (!_has_valid_input)
-        _has_valid_input = true;
+    _has_valid_input = true;
 
     long double diff = std::abs(static_cast<long double>(input));
 
@@ -249,10 +248,10 @@ void Updaters::L1NormUpdater<T>::update_impl(U input) {
 
 template <typename T>
 long double Updaters::L1NormUpdater<T>::commit(void) {
-    assert(_l1_norm >= 0);
     if (!_has_valid_input) {
         throw std::runtime_error("No valid input is passed in before commit is called!");
     }
+    assert(_l1_norm >= 0);
     return _l1_norm;
 }
 // ----------------------------------------------------------------------
@@ -293,8 +292,7 @@ void Updaters::L2NormUpdater<T>::update_impl(T input, std::false_type /*is_nulla
 template <typename T>
 template <typename U>
 void Updaters::L2NormUpdater<T>::update_impl(U input) {
-    if (!_has_valid_input)
-        _has_valid_input = true;
+    _has_valid_input = true;
 
     long double diff_square = std::pow(std::abs(static_cast<long double>(input)), 2);
 
@@ -312,10 +310,10 @@ void Updaters::L2NormUpdater<T>::update_impl(U input) {
 
 template <typename T>
 long double Updaters::L2NormUpdater<T>::commit(void) {
-    assert(_l2_norm >= 0);
     if (!_has_valid_input) {
         throw std::runtime_error("No valid input is passed in before commit is called!");
     }
+    assert(_l2_norm >= 0);
     return std::sqrt(_l2_norm);
 }
 // ----------------------------------------------------------------------
@@ -356,18 +354,17 @@ void Updaters::MaxNormUpdater<T>::update_impl(T input, std::false_type /*is_null
 template <typename T>
 template <typename U>
 void Updaters::MaxNormUpdater<T>::update_impl(U input) {
-    if (!_has_valid_input)
-        _has_valid_input = true;
+    _has_valid_input = true;
     _max_norm = std::max(static_cast<typename TypeSelector::MaxNormTypeSelector<T>::type>(std::abs(input)), _max_norm);
 }
 
 
 template <typename T>
 typename TypeSelector::MaxNormTypeSelector<T>::type Updaters::MaxNormUpdater<T>::commit(void) {
-    assert(_max_norm >= 0);
     if (!_has_valid_input) {
         throw std::runtime_error("No valid input is passed in before commit is called!");
     }
+    assert(_max_norm >= 0);
     return _max_norm;
 }
 
