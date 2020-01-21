@@ -9,6 +9,28 @@
 
 using namespace Microsoft::Featurizer;
 
+void IteratorVectorGeneratorTest(std::string const & input) {
+    std::vector<std::string::const_iterator> iterVec(Details::IteratorVectorGenerator(input.begin(), input.end()));
+    CHECK(input == std::string(iterVec[0], iterVec[iterVec.size() - 1]));
+}
+
+void ParseNgramCharHelperTest(std::string const & input,
+                              std::vector<std::string> const & label,
+                              size_t ngramRangeMin,
+                              size_t ngramRangeMax) {
+    std::vector<std::string> output;
+    Details::ParseNgramCharHelper<std::string::const_iterator>(
+        input.begin(),
+        input.end(),
+        ngramRangeMin,
+        ngramRangeMax,
+        [&output] (std::string::const_iterator & iterBegin, std::string::const_iterator & iterEnd) {
+            output.emplace_back(std::string(iterBegin, iterEnd));
+        }
+    );
+    CHECK(output == label);
+}
+
 void ParseTest(std::string const & input, std::vector<std::string> const & label) {
     std::vector<std::string> output1;
     Details::Parse<std::string::const_iterator, char>(
@@ -193,6 +215,10 @@ void ParseNgramCharwbCopyTest(std::string const & input,
     CHECK(output == label);
 }
 
+TEST_CASE("IteratorVectorGenerator") {
+    IteratorVectorGeneratorTest("this is a document");
+}
+
 TEST_CASE("ToLower") {
     std::string input("THIS IS THE FIRST DOCUMENT.");
     std::string label("this is the first document.");
@@ -275,6 +301,10 @@ TEST_CASE("ParseNgramWord") {
     std::string input(" bi-grams    are cool! ");
     ParseNgramWordTest(input, {"bi", "grams", "are", "cool", "bi grams", "grams are", "are cool"}, ' ', 1, 2);
     ParseNgramWordTest(input, {"bi grams", "grams are", "are cool", "bi grams are", "grams are cool"}, ' ', 2, 3);
+}
+
+TEST_CASE("ParseNgramCharHelper") {
+    ParseNgramCharHelperTest(" jumpy ", {" jump", "jumpy", "umpy "}, 5, 5);
 }
 
 TEST_CASE("ParseNgramChar") {
