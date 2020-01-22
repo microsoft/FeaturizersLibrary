@@ -7,7 +7,7 @@
 
 #include "../Strings.h"
 
-using namespace Microsoft::Featurizer;
+using namespace Microsoft::Featurizer::Strings;
 
 bool isWhiteSpace(char c) {
     if (c == ' ')
@@ -90,7 +90,7 @@ void ParseNgramWordTest(std::string & input,
                         size_t ngramRangeMin,
                         size_t ngramRangeMax) {
     std::vector<std::string> output1;
-    Details::ParseNgramWord<std::string::const_iterator>(
+    ParseNgramWord<std::string::const_iterator>(
         input,
         isWhiteSpace,
         ngramRangeMin,
@@ -135,7 +135,7 @@ void ParseNgramCharTest(std::string & input,
                         size_t ngramRangeMin,
                         size_t ngramRangeMax) {
     std::vector<std::string> output1;
-    Details::ParseNgramChar<std::string::const_iterator>(
+    ParseNgramChar<std::string::const_iterator>(
         input,
         ngramRangeMin,
         ngramRangeMax,
@@ -177,7 +177,7 @@ void ParseNgramCharwbTest(std::string & input,
                           size_t ngramRangeMin,
                           size_t ngramRangeMax) {
     std::vector<std::string> output1;
-    Details::ParseNgramCharwb<std::string::const_iterator>(
+    ParseNgramCharwb<std::string::const_iterator>(
         input,
         isWhiteSpace,
         ngramRangeMin,
@@ -348,5 +348,3 @@ TEST_CASE("ParseNgramCharwb") {
     CHECK_THROWS_WITH(ParseNgramCharwbTest(input, {}, 0, 8), "ngramRangeMin and ngramRangeMax not valid");
     ParseNgramCharwbTest(input, {}, 8, 8);
 }
-
-
