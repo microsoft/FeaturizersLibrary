@@ -6,6 +6,8 @@
 #include "catch.hpp"
 
 #include "../ModeEstimator.h"
+#include "../OrderEstimator.h"
+
 #include "../../TestHelpers.h"
 #include "../../../3rdParty/optional.h"
 
@@ -23,9 +25,11 @@ T Test(std::vector<T> const &input) {
 
     // Standard tests
     NS::Featurizers::Components::HistogramEstimator<T>  histoEstimator(pAllColumnAnnotations, 0);
+    NS::Featurizers::Components::OrderEstimator<T>      orderEstimator(pAllColumnAnnotations, 0);
     NS::Featurizers::Components::ModeEstimator<T>       modeEstimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(histoEstimator, batchedInput);
+    NS::TestHelpers::Train(orderEstimator, batchedInput);
     NS::TestHelpers::Train(modeEstimator, batchedInput);
 
     return modeEstimator.get_annotation_data().Value;
@@ -46,9 +50,11 @@ OptionalString TestNullModeValues(void) {
     std::vector<std::vector<OptionalString>> const                                      batchedInput(NS::TestHelpers::make_vector<std::vector<OptionalString>>(NS::TestHelpers::make_vector<OptionalString>("one", "two", OptionalString(), OptionalString(), "two", OptionalString())));
     NS::AnnotationMapsPtr                                                               pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::HistogramEstimator<OptionalString>                     histoEstimator(pAllColumnAnnotations, 0);
+    NS::Featurizers::Components::OrderEstimator<OptionalString>                         orderEstimator(pAllColumnAnnotations, 0);
     NS::Featurizers::Components::ModeEstimator<OptionalString, AllowNullModeValueV>     modeEstimator(pAllColumnAnnotations, 0);
 
     NS::TestHelpers::Train(histoEstimator, batchedInput);
+    NS::TestHelpers::Train(orderEstimator, batchedInput);
     NS::TestHelpers::Train(modeEstimator, batchedInput);
 
     return modeEstimator.get_annotation_data().Value;

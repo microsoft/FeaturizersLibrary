@@ -514,7 +514,8 @@ TEST_CASE("ColumnImputation (Median): 1 grain (EmptyRow, EmptyRow)") {
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
     std::vector<std::tuple<bool,std::chrono::system_clock::time_point, std::vector<std::string>, std::vector<nonstd::optional<std::string>>>> output = {
                     std::make_tuple(false,GetTimePoint(now,0), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{"15.500000","50.000000"}),
-                    std::make_tuple(false,GetTimePoint(now,1), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{"15.500000","50.000000"})
+                    std::make_tuple(true,GetTimePoint(now,1), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{"15.500000","50.000000"}),
+                    std::make_tuple(false,GetTimePoint(now,2), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{"15.500000","50.000000"})
                 };
     CHECK(Test({
                     {
@@ -525,7 +526,7 @@ TEST_CASE("ColumnImputation (Median): 1 grain (EmptyRow, EmptyRow)") {
                 },
                 {
                     std::make_tuple(GetTimePoint(now,0), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{nonstd::optional<std::string>{},nonstd::optional<std::string>{}}),
-                    std::make_tuple(GetTimePoint(now,1), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{nonstd::optional<std::string>{},nonstd::optional<std::string>{}})
+                    std::make_tuple(GetTimePoint(now,2), std::vector<std::string>{"a"}, std::vector<nonstd::optional<std::string>>{nonstd::optional<std::string>{},nonstd::optional<std::string>{}})
                 },{NS::TypeId::Float64,NS::TypeId::Float64}, false, NS::Featurizers::Components::TimeSeriesImputeStrategy::Median) == output);
     }
 

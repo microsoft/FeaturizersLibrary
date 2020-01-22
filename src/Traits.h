@@ -7,6 +7,7 @@
 #include <array>
 #include <chrono>
 #include <cmath>
+#include <functional>
 #include <limits>
 #include <map>
 #include <sstream>
@@ -154,6 +155,7 @@ struct Traits {
     //
     //   // Types
     //   - nullable_type
+    //   - key_equal
     //
     //   // "Data"
     //   static constexpr bool const        IsNullableType;
@@ -209,6 +211,7 @@ struct TraitsImpl {
     static constexpr bool const             IsNativeNullableType = false;
 
     using nullable_type = nonstd::optional<T>;
+    using key_equal = std::equal_to<T>;
 
     static nullable_type CreateNullValue(void) {
         return nullable_type();
@@ -555,6 +558,24 @@ struct Traits<std::float_t> {
     static constexpr bool const             IsNullableType = true;
     static constexpr bool const             IsNativeNullableType = true;
 
+    struct key_equal {
+        bool operator()(std::float_t const &a, std::float_t const &b) const {
+            if(std::isnan(a) && std::isnan(b))
+                return true;
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
+
+            return a == b;
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+        }
+    };
+
     static nullable_type CreateNullValue(void) {
         return std::numeric_limits<std::float_t>::quiet_NaN();
     }
@@ -614,6 +635,24 @@ struct Traits<std::double_t>  {
 
     static constexpr bool const             IsNullableType = true;
     static constexpr bool const             IsNativeNullableType = true;
+
+    struct key_equal {
+        bool operator()(std::double_t const &a, std::double_t const &b) const {
+            if(std::isnan(a) && std::isnan(b))
+                return true;
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
+
+            return a == b;
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+        }
+    };
 
     static nullable_type CreateNullValue(void) {
         return std::numeric_limits<std::double_t>::quiet_NaN();
@@ -919,9 +958,9 @@ struct Traits<Eigen::MatrixX<T>> : public TraitsImpl<Eigen::MatrixX<T>> {
         for (typename MatrixT::Index rowId = 0; rowId < value.rows(); ++rowId) {
             for (typename MatrixT::Index colId = 0; colId < value.cols(); ++colId) {
                 Traits<typename MatrixT::Scalar>::serialize(ar, value(rowId, colId));
-            }   
+            }
         }
-    
+
         return ar;
     }
 
@@ -937,7 +976,7 @@ struct Traits<Eigen::MatrixX<T>> : public TraitsImpl<Eigen::MatrixX<T>> {
         for (typename MatrixT::Index rowId = 0; rowId < numRows; ++rowId) {
             for (typename MatrixT::Index colId = 0; colId < numCols; ++colId) {
                 result(rowId, colId) = Traits<typename MatrixT::Scalar>::deserialize(ar);
-            }   
+            }
         }
 
         return result;
@@ -1153,6 +1192,7 @@ struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<st
 template <typename T>
 struct Traits<nonstd::optional<T>>  {
     using nullable_type                     = nonstd::optional<T>;
+    using key_equal                         = std::equal_to<nonstd::optional<T>>;
 
     static constexpr bool const             IsNullableType = true;
     static constexpr bool const             IsNativeNullableType = false;
