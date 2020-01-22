@@ -15,7 +15,7 @@ TEST_CASE("int") {
     // Odd number of items (no interpolation required)
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::MedianImputerEstimator<nonstd::optional<int>, float>(NS::CreateTestAnnotationMapsPtr(1), 0),
+            NS::Featurizers::MedianImputerEstimator<int, float>(NS::CreateTestAnnotationMapsPtr(1), 0),
             std::vector<nonstd::optional<int>>{
                 10,
                 20,
@@ -36,7 +36,7 @@ TEST_CASE("int") {
     // Even number of items (interpolated)
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::MedianImputerEstimator<nonstd::optional<int>, float>(NS::CreateTestAnnotationMapsPtr(1), 0),
+            NS::Featurizers::MedianImputerEstimator<int, float>(NS::CreateTestAnnotationMapsPtr(1), 0),
             std::vector<nonstd::optional<int>>{
                 10,
                 40,
@@ -58,7 +58,7 @@ TEST_CASE("int") {
     // Even number of items (interpolation disabled)
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::MedianImputerEstimator<nonstd::optional<int>, float, false>(NS::CreateTestAnnotationMapsPtr(1), 0),
+            NS::Featurizers::MedianImputerEstimator<int, float, false>(NS::CreateTestAnnotationMapsPtr(1), 0),
             std::vector<nonstd::optional<int>>{
                 10,
                 40,
@@ -149,7 +149,7 @@ TEST_CASE("string") {
     // Odd number of items
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::MedianImputerEstimator<nonstd::optional<std::string>, std::string, false>(NS::CreateTestAnnotationMapsPtr(1), 0),
+            NS::Featurizers::MedianImputerEstimator<std::string, std::string>(NS::CreateTestAnnotationMapsPtr(1), 0),
             std::vector<nonstd::optional<std::string>>{
                 "10",
                 "20",
@@ -170,7 +170,7 @@ TEST_CASE("string") {
     // Even number of items (no interpolation)
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::MedianImputerEstimator<nonstd::optional<std::string>, std::string, false>(NS::CreateTestAnnotationMapsPtr(1), 0),
+            NS::Featurizers::MedianImputerEstimator<std::string, std::string>(NS::CreateTestAnnotationMapsPtr(1), 0),
             std::vector<nonstd::optional<std::string>>{
                 "10",
                 "20",
@@ -193,7 +193,7 @@ TEST_CASE("string") {
 TEST_CASE("Null inputs - int") {
     CHECK_THROWS_WITH(
         (NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::MedianImputerEstimator<nonstd::optional<int>, int, false>(NS::CreateTestAnnotationMapsPtr(1), 0),
+            NS::Featurizers::MedianImputerEstimator<int, int>(NS::CreateTestAnnotationMapsPtr(1), 0),
             std::vector<nonstd::optional<int>>{
                 nonstd::optional<int>(),
                 nonstd::optional<int>()
@@ -231,7 +231,7 @@ TEST_CASE("Null inputs - float") {
 }
 
 TEST_CASE("No inputs - int") {
-    NS::Featurizers::MedianImputerEstimator<nonstd::optional<int>, int>     estimator(NS::CreateTestAnnotationMapsPtr(1), 0);
+    NS::Featurizers::MedianImputerEstimator<int, int>     estimator(NS::CreateTestAnnotationMapsPtr(1), 0);
 
     estimator.begin_training();
     CHECK_THROWS_WITH(estimator.complete_training(), "No elements were provided during training");
