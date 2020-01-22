@@ -17,9 +17,10 @@ namespace Components {
 
 static constexpr char const * const         VectorNormsEstimatorName("VectorNormsEstimator");
 
-// vectors as input to VectorNormEstimator and NormalizeFeaturizer
-// are represented as a pair or a tuple of iterators std::pair<begin, end>
-// this struct is created for asserting a type to be a pair or a tuple of iterators
+/////////////////////////////////////////////////////////////////////////
+///  \class         IsIteratorPair
+///  \brief         Determines whether a type is a pair or tuple of iterators
+///
 template <typename T>
 struct IsIteratorPair {
     static constexpr bool const value = false;
