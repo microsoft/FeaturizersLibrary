@@ -99,7 +99,7 @@ TEST_CASE("not found value") {
         if(r_nan || e_nan) {
             CHECK(r_nan == e_nan);
         } else {
-            CHECK(std::abs(results[i] - expectedOutput[i]) < LDBL_EPSILON);
+            CHECK(std::abs(results[i] - expectedOutput[i]) < std::double_t(DBL_EPSILON));
         }
     }
 }
