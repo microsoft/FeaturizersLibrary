@@ -55,6 +55,8 @@ public:
     // ----------------------------------------------------------------------
     SparseVectorEncoding(std::uint64_t numElements, std::vector<ValueEncoding> values);
 
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SparseVectorEncoding);
+
     bool operator==(SparseVectorEncoding const &other) const;
     bool operator!=(SparseVectorEncoding const &other) const;
 };
@@ -90,6 +92,8 @@ public:
     // |
     // ----------------------------------------------------------------------
     SingleValueSparseVectorEncoding(std::uint64_t numElements, value_type value, std::uint64_t index);
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SingleValueSparseVectorEncoding);
 
     bool operator==(SingleValueSparseVectorEncoding const &other) const;
     bool operator!=(SingleValueSparseVectorEncoding const &other) const;

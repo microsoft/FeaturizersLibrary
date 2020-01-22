@@ -132,17 +132,22 @@ std::vector<typename EstimatorT::TransformedType> TransformerTest(
 // Fuzzy check is used to check if two vectors<double/float> are same considering precision loss
 template <typename T>
 bool FuzzyCheck(std::vector<T> const & vec1, std::vector<T> const & vec2, std::double_t epsilon = 0.000001) {
+    static_assert(std::is_floating_point<T>::value, "FuzzyCheck checks vector of double or float!");
     if (vec1.size() != vec2.size())
         return false;
 
     size_t vec_size = vec1.size();
     for (size_t idx = 0; idx < vec_size; ++idx) {
+        if (std::isnan(vec1[idx]) && std::isnan(vec2[idx])) {
+            continue;
+        }
         if (abs(vec1[idx] - vec2[idx]) > static_cast<T>(epsilon)) {
             return false;
         }
     }
     return true;
 }
+
 
 } // namespace TestHelpers
 } // namespace Featurizer
