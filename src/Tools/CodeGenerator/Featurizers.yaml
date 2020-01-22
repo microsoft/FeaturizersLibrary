@@ -1,14 +1,5 @@
 featurizers:
   # ----------------------------------------------------------------------
-  - name: CategoryBinarizerFeaturizer
-    estimator_name: CategoryBinarizerEstimator
-    num_output_columns: 1
-    description: |-
-      See OneHotEncoderFeaturizer.
-
-    status: Pending
-
-  # ----------------------------------------------------------------------
   - name: CatImputerFeaturizer
     estimator_name: CatImputerEstimator
     num_output_columns: 1
@@ -722,8 +713,6 @@ featurizers:
             name: Value
           - type: uint64
             name: Index
-
-    # ----------------------------------------------------------------------
 
   # ----------------------------------------------------------------------
   - name: PCAFeaturizer
