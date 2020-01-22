@@ -23,17 +23,17 @@ namespace Details {
 ///  \brief         Implementation details for the `MedianImputerEstimatorImpl`
 ///
 template <typename InputT, typename TransformedT, bool InterpolateValuesV, size_t MaxNumTrainingItemsV>
-class MedianImputerEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
+class MedianImputerEstimatorImpl : public TransformerEstimator<typename Traits<InputT>::nullable_type, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    static_assert(Traits<InputT>::IsNullableType, "'InputT' must be a nullable type");
+    static_assert(Traits<InputT>::IsNullableType == false || Traits<InputT>::IsNativeNullableType, "'InputT' must not be a nullable type");
     static_assert(Traits<TransformedT>::IsNullableType == false || Traits<TransformedT>::IsNativeNullableType, "'TransformedT' must not be a nullable type");
 
-    using InputType                         = InputT;
+    using InputType                         = typename Traits<InputT>::nullable_type;
     using BaseType                          = TransformerEstimator<InputType, TransformedT>;
 
     using TransformerType                   = Components::ImputerTransformer<InputType, TransformedT>;
@@ -68,7 +68,7 @@ private:
     // MSVC has problems when the declaration and definition are separated
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
         // ----------------------------------------------------------------------
-        using MedianEstimator               = Components::MedianEstimator<InputT, TransformedT, InterpolateValuesV, MaxNumTrainingItemsV>;
+        using MedianEstimator               = Components::MedianEstimator<typename Traits<InputT>::nullable_type, TransformedT, InterpolateValuesV, MaxNumTrainingItemsV>;
         using AnnotationData                = typename MedianEstimator::AnnotationData;
         // ----------------------------------------------------------------------
 
@@ -76,6 +76,16 @@ private:
 
         return typename BaseType::TransformerUniquePtr(new TransformerType(data.Median));
     }
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ShouldInterpolateValues
+///  \brief         Contains a value of true if interpolation should be used
+///                 when calculating the median value.
+///
+template <typename T>
+struct ShouldInterpolateValues {
+    static constexpr bool const             value = std::is_integral<T>::value || std::is_floating_point<T>::value;
 };
 
 } // namespace Details
@@ -88,12 +98,12 @@ private:
 template <
     typename InputT,
     typename TransformedT,
-    bool InterpolateValuesV=true,
+    bool InterpolateValuesV=Details::ShouldInterpolateValues<InputT>::value,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class MedianImputerEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-        Components::MedianEstimator<InputT, TransformedT, InterpolateValuesV, MaxNumTrainingItemsV>,
+        Components::MedianEstimator<typename Traits<InputT>::nullable_type, TransformedT, InterpolateValuesV, MaxNumTrainingItemsV>,
         Details::MedianImputerEstimatorImpl<InputT, TransformedT, InterpolateValuesV, MaxNumTrainingItemsV>
     > {
 public:
@@ -102,12 +112,12 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    static_assert(Traits<InputT>::IsNullableType, "'InputT' must be a nullable type");
+    static_assert(Traits<InputT>::IsNullableType == false || Traits<InputT>::IsNativeNullableType, "'InputT' must not be a nullable type");
     static_assert(Traits<TransformedT>::IsNullableType == false || Traits<TransformedT>::IsNativeNullableType, "'TransformedT' must not be a nullable type");
 
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
-            Components::MedianEstimator<InputT, TransformedT, InterpolateValuesV, MaxNumTrainingItemsV>,
+            Components::MedianEstimator<typename Traits<InputT>::nullable_type, TransformedT, InterpolateValuesV, MaxNumTrainingItemsV>,
             Details::MedianImputerEstimatorImpl<InputT, TransformedT, InterpolateValuesV, MaxNumTrainingItemsV>
         >;
 
@@ -180,7 +190,7 @@ MedianImputerEstimator<InputT, TransformedT, InterpolateValuesV, MaxNumTrainingI
     BaseType(
         "MedianImputerEstimator",
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, colIndex](void) { return Components::MedianEstimator<InputT, TransformedT, InterpolateValuesV, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
+        [pAllColumnAnnotations, colIndex](void) { return Components::MedianEstimator<typename Traits<InputT>::nullable_type, TransformedT, InterpolateValuesV, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
         [pAllColumnAnnotations, colIndex](void) { return Details::MedianImputerEstimatorImpl<InputT, TransformedT, InterpolateValuesV, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
     ) {
 }
