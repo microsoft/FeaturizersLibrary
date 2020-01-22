@@ -66,7 +66,7 @@ featurizers:
       vocabulary established during training.
 
       C++-style pseudo signature:
-        TODO
+        CountVector execute(std::string const &value);
 
       Examples:
         Assuming the training data is...
@@ -901,7 +901,7 @@ featurizers:
       Convert a collection of raw documents to a matrix of TF-IDF features
 
       C++-style pseudo signature:
-        TODO
+        TfidfVector execute(std::string const &value);
 
       Examples:
         Assuming the training data is...
@@ -913,8 +913,6 @@ featurizers:
         [TFIDFStruct(3,0.281089f), TFIDFStruct(6,0.281089f), TFIDFStruct(8,0.281089f), TFIDFStruct(5,0.538648f), TFIDFStruct(1,0.687624f)],
         [TFIDFStruct(3,0.267104f), TFIDFStruct(0,0.511849f), TFIDFStruct(4,0.511849f), TFIDFStruct(6,0.267104f), TFIDFStruct(8,0.267104f), TFIDFStruct(7,0.511849f)],
         [TFIDFStruct(3,0.384085f), TFIDFStruct(6,0.384085f), TFIDFStruct(8,0.384085f), TFIDFStruct(2,0.580286f), TFIDFStruct(1,0.469791f)]]
-        Explaination...
-          TODO
 
     status: Pending
 
