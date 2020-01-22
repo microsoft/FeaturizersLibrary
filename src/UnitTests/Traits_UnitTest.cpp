@@ -442,3 +442,26 @@ TEST_CASE("CreateNullValue") {
     CHECK(TestCreateNullValue<Eigen::MatrixX<std::float_t>>());
     CHECK(TestCreateNullValue<nonstd::optional<std::int8_t>>());
 }
+
+TEST_CASE("key_equal") {
+    // Standard impl
+    CHECK(Traits<int>::key_equal()(10, 10));
+    CHECK(Traits<int>::key_equal()(10, 20) == false);
+
+    CHECK(Traits<std::string>::key_equal()("10", "10"));
+    CHECK(Traits<std::string>::key_equal()("10", "20") == false);
+
+    // float
+    CHECK(Traits<float>::key_equal()(10.0f, 10.0f));
+    CHECK(Traits<float>::key_equal()(10.0f, 20.0f) == false);
+    CHECK(Traits<float>::key_equal()(Traits<float>::CreateNullValue(), 10.0f) == false);
+    CHECK(Traits<float>::key_equal()(10.0f, Traits<float>::CreateNullValue()) == false);
+    CHECK(Traits<float>::key_equal()(Traits<float>::CreateNullValue(), Traits<float>::CreateNullValue()));
+
+    // dobule
+    CHECK(Traits<double>::key_equal()(10.0, 10.0));
+    CHECK(Traits<double>::key_equal()(10.0, 20.0) == false);
+    CHECK(Traits<double>::key_equal()(Traits<double>::CreateNullValue(), 10.0) == false);
+    CHECK(Traits<double>::key_equal()(10.0, Traits<double>::CreateNullValue()) == false);
+    CHECK(Traits<double>::key_equal()(Traits<double>::CreateNullValue(), Traits<double>::CreateNullValue()));
+}

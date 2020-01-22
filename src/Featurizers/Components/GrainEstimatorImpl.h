@@ -4,6 +4,8 @@
 // ----------------------------------------------------------------------
 #pragma once
 
+#include <unordered_map>
+
 #include "../../Featurizer.h"
 #include "Details/EstimatorTraits.h"
 
@@ -24,7 +26,13 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using AnnotationMap                     = std::unordered_map<GrainT, AnnotationPtr>;
+    using AnnotationMap =
+        std::unordered_map<
+            GrainT,
+            AnnotationPtr,
+            std::hash<GrainT>,
+            Traits<GrainT>::key_equal
+        >;
 
     // ----------------------------------------------------------------------
     // |
@@ -202,7 +210,7 @@ protected:
     // |  Protected Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorMap                      = std::unordered_map<GrainT, EstimatorT>;
+    using EstimatorMap                      = typename GrainEstimatorAnnotation<GrainT>::AnnotationMap;
 
     // ----------------------------------------------------------------------
     // |
