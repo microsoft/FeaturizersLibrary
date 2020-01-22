@@ -25,14 +25,14 @@ struct GetNullableType<nonstd::optional<U>> {
 
 namespace {
     // tag dispatching functions for potential nullable values within iterators
-    
+
     template <typename IteratorT>
     bool is_null(IteratorT const &input, std::true_type) {
         return Traits<typename std::iterator_traits<IteratorT>::value_type>::IsNull(*input);
     }
 
     template <typename IteratorT>
-    bool is_null(IteratorT const &input, std::false_type) {
+    bool is_null(IteratorT const &, std::false_type) {
         return false;
     }
 
