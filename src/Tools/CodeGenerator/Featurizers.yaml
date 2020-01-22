@@ -13,6 +13,14 @@ featurizers:
     estimator_name: CatImputerEstimator
     num_output_columns: 1
     description: |-
+      *****
+      *****
+
+      This featurizer has been DEPRECATED in favor of the ModeImputerFeaturizer.
+
+      *****
+      *****
+
       Imputes (populates) values with the mode (most common value) encountered during
       training. This featurizer supports float and double for most (if not all) frameworks
       due to the existance of NaN in those types. Other types require 'optional' support
@@ -272,41 +280,6 @@ featurizers:
         output_type: bool
 
   # ----------------------------------------------------------------------
-  - name: ImputerFeaturizer
-    estimator_name: ImputerEstimator
-    num_output_columns: 1
-    description: |-
-      Imputes missing values based on a strategy employed during training time. Strategies
-      are:
-
-        - mean: average of training data (valid for integer and number types)
-        - median: middle point of all values encountered during training (valid for integer and number types)
-        - mode: Most common value encountered during training (valid for all types)
-
-      C++-style pseudo signature:
-        float execute(float const &value);                      // Valid for mean, median, mode
-        double execute(double const &value);                    // Valid for mean, median, mode
-        string execute(std::optional<string> const &value);     // Valid for mode
-
-      Examples:
-        Mean, with training data [1, 2, 3, 4]: mean of 2.5
-
-          execute(3.0) -> 3.0
-          execute(NaN) -> 2.5
-
-        Median, with training data [1, 2, 3, 4, 5]: median of 3
-
-          execute(2.0) -> 2.0
-          execute(NaN) -> 3.0
-
-        Mode, with training data ["one", "two", "three", "two"]: mode of "two"
-
-          execute("foo") -> "foo"
-          execute(std::optional<string>()) -> "two"
-
-    status: Pending
-
-  # ----------------------------------------------------------------------
   - name: LabelEncoderFeaturizer
     estimator_name: LabelEncoderEstimator
     num_output_columns: 1
@@ -394,6 +367,137 @@ featurizers:
         output_type: double
 
   # ----------------------------------------------------------------------
+  - name: MeanImputerFeaturizer
+    estimator_name: MeanImputerEstimator
+    num_output_columns: 1
+    description: |-
+      Imputes (populates) values with the mean (average) value encountered during
+      training.
+
+      C++-style pseudo signature:
+        float execute(float const &value);
+        double execute(double const &value);
+        template <typename T> T execute(std::optional<T> const &value);
+
+      Examples (where 123.4 is the mean value):
+        execute(1.0) -> 1.0
+        execute(NaN) -> 123.4
+        execute(2.0) -> 2.0
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+
+    type_mappings:
+      - input_type: T
+        is_input_optional: true
+        output_type: double
+
+  # ----------------------------------------------------------------------
+  - name: MedianImputerFeaturizer
+    estimator_name: MedianImputerEstimator
+    num_output_columns: 1
+    is_output_a_template: true
+    description: |-
+      Imputes (populates) values with the median value encountered during
+      training.
+
+      C++-style pseudo signature:
+        float execute(float const &value);
+        double execute(double const &value);
+        template <typename T> T execute(std::optional<T> const &value);
+
+      Examples (where 123.4 is the median value):
+        execute(1.0) -> 1.0
+        execute(NaN) -> 123.4
+        execute(2.0) -> 2.0
+
+    templates:
+      - name: TIntegerOrNumeric
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+
+      - name: TInputNoInterpolation
+        types:
+          - bool
+          - string
+
+    type_mappings:
+      - input_type: TIntegerOrNumeric
+        is_input_optional: true
+        output_type: double
+
+      - input_type: TInputNoInterpolation
+        is_input_optional: true
+        output_type: TInputNoInterpolation
+
+  # ----------------------------------------------------------------------
+  - name: MinMaxImputerFeaturizer
+    estimator_name: MinMaxImputerEstimator
+    num_output_columns: 1
+    description: |-
+      Imputes (populates) values with the minimum or maximum value encountered during
+      training.
+
+      C++-style pseudo signature:
+        float execute(float const &value);
+        double execute(double const &value);
+        template <typename T> T execute(std::optional<T> const &value);
+
+      Examples (where 123 is the minimum or maximum value (depending on configuration
+      parameters set when creating the estimator):
+        execute(1.0) -> 1.0
+        execute(NaN) -> 123.4
+        execute(2.0) -> 2.0
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+          - string
+
+    type_mappings:
+      - input_type: T
+        is_input_optional: true
+        output_type: T
+
+    configuration_params:
+      - type: bool
+        name: useMin
+        description: |-
+          Impute using the minimum value encountered during training; if 'false', the maximum
+          value will be used for imputation.
+
+  # ----------------------------------------------------------------------
   - name: MinMaxScalarFeaturizer
     estimator_name: MinMaxScalarEstimator
     num_output_columns: 1
@@ -473,6 +577,46 @@ featurizers:
         output_type: int8
 
   # ----------------------------------------------------------------------
+  - name: ModeImputerFeaturizer
+    estimator_name: ModeImputerEstimator
+    num_output_columns: 1
+    description: |-
+      Imputes (populates) values with the mode (most frequent) value encountered during
+      training. The first value encountered with be used in the event that mutliple values
+      we found the most number of times.
+
+      C++-style pseudo signature:
+        float execute(float const &value);
+        double execute(double const &value);
+        template <typename T> T execute(std::optional<T> const &value);
+
+      Examples (where 123.4 is the mode value):
+        execute(1.0) -> 1.0
+        execute(NaN) -> 123.4
+        execute(2.0) -> 2.0
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+          - string
+
+    type_mappings:
+      - input_type: T
+        is_input_optional: true
+        output_type: T
+
+  # ----------------------------------------------------------------------
   - name: NumericalizeFeaturizer
     estimator_name: NumericalizeEstimator
     num_output_columns: 1
@@ -496,7 +640,7 @@ featurizers:
           - int8
           - uint8
           - int16
-          - uint16          
+          - uint16
           - int32
           - uint32
           - int64
@@ -505,7 +649,7 @@ featurizers:
           - double
           - bool
           - string
-          
+
     type_mappings:
       - input_type: T
         output_type: double
@@ -571,6 +715,8 @@ featurizers:
             name: Index
 
     # ----------------------------------------------------------------------
+
+  # ----------------------------------------------------------------------
   - name: PCAFeaturizer
     estimator_name: PCAEstimator
     num_output_columns: 1
@@ -700,7 +846,6 @@ featurizers:
       - type: bool
         name: withStd
         is_optional: false
-
 
   # ----------------------------------------------------------------------
   - name: StringFeaturizer

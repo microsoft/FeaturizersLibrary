@@ -36,7 +36,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_CreateEstimator(/*out*/ 
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
 
         pEstimator->begin_training();
 
@@ -63,7 +63,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_DestroyEstimator(/*in*/ 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>>(index);
         g_pointerTable.Remove(index);
 
         delete pEstimator;
@@ -86,7 +86,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_GetState(/*in*/ MaxAbsSc
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pState == nullptr) throw std::invalid_argument("'pState' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pState = static_cast<TrainingState>(estimator.get_state());
     
@@ -108,7 +108,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_IsTrainingComplete(/*in*
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -133,7 +133,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_Fit(/*in*/ MaxAbsScalarF
 
         // No validation
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
@@ -161,7 +161,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_FitBuffer(/*in*/ MaxAbsS
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -182,7 +182,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_OnDataCompleted(/*in*/ M
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.on_data_completed();
     
@@ -203,7 +203,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_CompleteTraining(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.complete_training();
     
@@ -227,9 +227,9 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_CreateTransformerFromEst
 
 
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>::TransformerType*>(estimator.create_transformer().release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType*>(estimator.create_transformer().release());
 
 
         size_t index = g_pointerTable.Add(pTransformer);
@@ -256,7 +256,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_CreateTransformerFromSav
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>::TransformerType(archive));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_int8_TransformerHandle*>(index);
@@ -279,7 +279,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_DestroyTransformer(/*in*
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>::TransformerType>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
 
@@ -304,7 +304,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_CreateTransformerSaveDat
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -339,7 +339,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int8_Transform(/*in*/ MaxAbsS
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, float>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int8_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -368,7 +368,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_CreateEstimator(/*out*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
 
         pEstimator->begin_training();
 
@@ -395,7 +395,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_DestroyEstimator(/*in*/
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>>(index);
         g_pointerTable.Remove(index);
 
         delete pEstimator;
@@ -418,7 +418,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_GetState(/*in*/ MaxAbsS
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pState == nullptr) throw std::invalid_argument("'pState' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pState = static_cast<TrainingState>(estimator.get_state());
     
@@ -440,7 +440,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_IsTrainingComplete(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -465,7 +465,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_Fit(/*in*/ MaxAbsScalar
 
         // No validation
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
@@ -493,7 +493,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_FitBuffer(/*in*/ MaxAbs
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -514,7 +514,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_OnDataCompleted(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.on_data_completed();
     
@@ -535,7 +535,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_CompleteTraining(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.complete_training();
     
@@ -559,9 +559,9 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_CreateTransformerFromEs
 
 
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>::TransformerType*>(estimator.create_transformer().release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType*>(estimator.create_transformer().release());
 
 
         size_t index = g_pointerTable.Add(pTransformer);
@@ -588,7 +588,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_CreateTransformerFromSa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>::TransformerType(archive));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_int16_TransformerHandle*>(index);
@@ -611,7 +611,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_DestroyTransformer(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>::TransformerType>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
 
@@ -636,7 +636,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_CreateTransformerSaveDa
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -671,7 +671,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int16_Transform(/*in*/ MaxAbs
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, float>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int16_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -700,7 +700,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_CreateEstimator(/*out*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
 
         pEstimator->begin_training();
 
@@ -727,7 +727,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_DestroyEstimator(/*in*/
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>>(index);
         g_pointerTable.Remove(index);
 
         delete pEstimator;
@@ -750,7 +750,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_GetState(/*in*/ MaxAbsS
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pState == nullptr) throw std::invalid_argument("'pState' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pState = static_cast<TrainingState>(estimator.get_state());
     
@@ -772,7 +772,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_IsTrainingComplete(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -797,7 +797,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_Fit(/*in*/ MaxAbsScalar
 
         // No validation
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
@@ -825,7 +825,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_FitBuffer(/*in*/ MaxAbs
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -846,7 +846,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_OnDataCompleted(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.on_data_completed();
     
@@ -867,7 +867,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_CompleteTraining(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.complete_training();
     
@@ -891,9 +891,9 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_CreateTransformerFromEs
 
 
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>::TransformerType*>(estimator.create_transformer().release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType*>(estimator.create_transformer().release());
 
 
         size_t index = g_pointerTable.Add(pTransformer);
@@ -920,7 +920,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_CreateTransformerFromSa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>::TransformerType(archive));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_uint8_TransformerHandle*>(index);
@@ -943,7 +943,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_DestroyTransformer(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>::TransformerType>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
 
@@ -968,7 +968,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_CreateTransformerSaveDa
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -1003,7 +1003,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint8_Transform(/*in*/ MaxAbs
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, float>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint8_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -1032,7 +1032,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_CreateEstimator(/*out*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
 
         pEstimator->begin_training();
 
@@ -1059,7 +1059,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_DestroyEstimator(/*in*
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>>(index);
         g_pointerTable.Remove(index);
 
         delete pEstimator;
@@ -1082,7 +1082,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_GetState(/*in*/ MaxAbs
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pState == nullptr) throw std::invalid_argument("'pState' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pState = static_cast<TrainingState>(estimator.get_state());
     
@@ -1104,7 +1104,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_IsTrainingComplete(/*i
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -1129,7 +1129,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_Fit(/*in*/ MaxAbsScala
 
         // No validation
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
@@ -1157,7 +1157,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_FitBuffer(/*in*/ MaxAb
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -1178,7 +1178,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_OnDataCompleted(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.on_data_completed();
     
@@ -1199,7 +1199,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_CompleteTraining(/*in*
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.complete_training();
     
@@ -1223,9 +1223,9 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_CreateTransformerFromE
 
 
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>::TransformerType*>(estimator.create_transformer().release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType*>(estimator.create_transformer().release());
 
 
         size_t index = g_pointerTable.Add(pTransformer);
@@ -1252,7 +1252,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_CreateTransformerFromS
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>::TransformerType(archive));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_uint16_TransformerHandle*>(index);
@@ -1275,7 +1275,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_DestroyTransformer(/*i
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>::TransformerType>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
 
@@ -1300,7 +1300,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_CreateTransformerSaveD
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -1335,7 +1335,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint16_Transform(/*in*/ MaxAb
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, float>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint16_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -1364,7 +1364,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_CreateEstimator(/*out*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
 
         pEstimator->begin_training();
 
@@ -1391,7 +1391,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_DestroyEstimator(/*in*/
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>>(index);
         g_pointerTable.Remove(index);
 
         delete pEstimator;
@@ -1414,7 +1414,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_GetState(/*in*/ MaxAbsS
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pState == nullptr) throw std::invalid_argument("'pState' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pState = static_cast<TrainingState>(estimator.get_state());
     
@@ -1436,7 +1436,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_IsTrainingComplete(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -1461,7 +1461,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_Fit(/*in*/ MaxAbsScalar
 
         // No validation
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
@@ -1489,7 +1489,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_FitBuffer(/*in*/ MaxAbs
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -1510,7 +1510,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_OnDataCompleted(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.on_data_completed();
     
@@ -1531,7 +1531,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_CompleteTraining(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.complete_training();
     
@@ -1555,9 +1555,9 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_CreateTransformerFromEs
 
 
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>::TransformerType*>(estimator.create_transformer().release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType*>(estimator.create_transformer().release());
 
 
         size_t index = g_pointerTable.Add(pTransformer);
@@ -1584,7 +1584,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_CreateTransformerFromSa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>::TransformerType(archive));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_float_TransformerHandle*>(index);
@@ -1607,7 +1607,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_DestroyTransformer(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>::TransformerType>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
 
@@ -1632,7 +1632,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_CreateTransformerSaveDa
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -1667,7 +1667,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_float_Transform(/*in*/ MaxAbs
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, float>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::float_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -1696,7 +1696,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_CreateEstimator(/*out*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
 
         pEstimator->begin_training();
 
@@ -1723,7 +1723,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_DestroyEstimator(/*in*/
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>>(index);
         g_pointerTable.Remove(index);
 
         delete pEstimator;
@@ -1746,7 +1746,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_GetState(/*in*/ MaxAbsS
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pState == nullptr) throw std::invalid_argument("'pState' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pState = static_cast<TrainingState>(estimator.get_state());
     
@@ -1768,7 +1768,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_IsTrainingComplete(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -1793,7 +1793,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_Fit(/*in*/ MaxAbsScalar
 
         // No validation
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
@@ -1821,7 +1821,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_FitBuffer(/*in*/ MaxAbs
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -1842,7 +1842,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_OnDataCompleted(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.on_data_completed();
     
@@ -1863,7 +1863,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_CompleteTraining(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.complete_training();
     
@@ -1887,9 +1887,9 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_CreateTransformerFromEs
 
 
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>::TransformerType*>(estimator.create_transformer().release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
 
 
         size_t index = g_pointerTable.Add(pTransformer);
@@ -1916,7 +1916,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_CreateTransformerFromSa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>::TransformerType(archive));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_int32_TransformerHandle*>(index);
@@ -1939,7 +1939,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_DestroyTransformer(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>::TransformerType>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
 
@@ -1964,7 +1964,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_CreateTransformerSaveDa
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -1999,7 +1999,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int32_Transform(/*in*/ MaxAbs
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, double>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int32_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -2028,7 +2028,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_CreateEstimator(/*out*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
 
         pEstimator->begin_training();
 
@@ -2055,7 +2055,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_DestroyEstimator(/*in*/
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>>(index);
         g_pointerTable.Remove(index);
 
         delete pEstimator;
@@ -2078,7 +2078,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_GetState(/*in*/ MaxAbsS
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pState == nullptr) throw std::invalid_argument("'pState' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pState = static_cast<TrainingState>(estimator.get_state());
     
@@ -2100,7 +2100,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_IsTrainingComplete(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -2125,7 +2125,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_Fit(/*in*/ MaxAbsScalar
 
         // No validation
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
@@ -2153,7 +2153,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_FitBuffer(/*in*/ MaxAbs
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -2174,7 +2174,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_OnDataCompleted(/*in*/ 
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.on_data_completed();
     
@@ -2195,7 +2195,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_CompleteTraining(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.complete_training();
     
@@ -2219,9 +2219,9 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_CreateTransformerFromEs
 
 
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>::TransformerType*>(estimator.create_transformer().release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
 
 
         size_t index = g_pointerTable.Add(pTransformer);
@@ -2248,7 +2248,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_CreateTransformerFromSa
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>::TransformerType(archive));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_int64_TransformerHandle*>(index);
@@ -2271,7 +2271,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_DestroyTransformer(/*in
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>::TransformerType>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
 
@@ -2296,7 +2296,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_CreateTransformerSaveDa
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -2331,7 +2331,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_int64_Transform(/*in*/ MaxAbs
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, double>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::int64_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -2360,7 +2360,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_CreateEstimator(/*out*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
 
         pEstimator->begin_training();
 
@@ -2387,7 +2387,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_DestroyEstimator(/*in*
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>>(index);
         g_pointerTable.Remove(index);
 
         delete pEstimator;
@@ -2410,7 +2410,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_GetState(/*in*/ MaxAbs
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pState == nullptr) throw std::invalid_argument("'pState' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pState = static_cast<TrainingState>(estimator.get_state());
     
@@ -2432,7 +2432,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_IsTrainingComplete(/*i
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -2457,7 +2457,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_Fit(/*in*/ MaxAbsScala
 
         // No validation
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
@@ -2485,7 +2485,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_FitBuffer(/*in*/ MaxAb
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -2506,7 +2506,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_OnDataCompleted(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.on_data_completed();
     
@@ -2527,7 +2527,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_CompleteTraining(/*in*
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.complete_training();
     
@@ -2551,9 +2551,9 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_CreateTransformerFromE
 
 
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>::TransformerType*>(estimator.create_transformer().release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
 
 
         size_t index = g_pointerTable.Add(pTransformer);
@@ -2580,7 +2580,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_CreateTransformerFromS
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>::TransformerType(archive));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_uint32_TransformerHandle*>(index);
@@ -2603,7 +2603,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_DestroyTransformer(/*i
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>::TransformerType>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
 
@@ -2628,7 +2628,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_CreateTransformerSaveD
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -2663,7 +2663,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint32_Transform(/*in*/ MaxAb
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, double>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint32_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -2692,7 +2692,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_CreateEstimator(/*out*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
 
         pEstimator->begin_training();
 
@@ -2719,7 +2719,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_DestroyEstimator(/*in*
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>>(index);
         g_pointerTable.Remove(index);
 
         delete pEstimator;
@@ -2742,7 +2742,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_GetState(/*in*/ MaxAbs
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pState == nullptr) throw std::invalid_argument("'pState' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pState = static_cast<TrainingState>(estimator.get_state());
     
@@ -2764,7 +2764,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_IsTrainingComplete(/*i
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -2789,7 +2789,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_Fit(/*in*/ MaxAbsScala
 
         // No validation
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
@@ -2817,7 +2817,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_FitBuffer(/*in*/ MaxAb
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -2838,7 +2838,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_OnDataCompleted(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.on_data_completed();
     
@@ -2859,7 +2859,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_CompleteTraining(/*in*
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.complete_training();
     
@@ -2883,9 +2883,9 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_CreateTransformerFromE
 
 
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>::TransformerType*>(estimator.create_transformer().release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
 
 
         size_t index = g_pointerTable.Add(pTransformer);
@@ -2912,7 +2912,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_CreateTransformerFromS
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>::TransformerType(archive));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_uint64_TransformerHandle*>(index);
@@ -2935,7 +2935,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_DestroyTransformer(/*i
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>::TransformerType>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
 
@@ -2960,7 +2960,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_CreateTransformerSaveD
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -2995,7 +2995,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_uint64_Transform(/*in*/ MaxAb
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, double>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::uint64_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
@@ -3024,7 +3024,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_CreateEstimator(/*out*
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
 
         pEstimator->begin_training();
 
@@ -3051,7 +3051,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_DestroyEstimator(/*in*
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>>(index);
         g_pointerTable.Remove(index);
 
         delete pEstimator;
@@ -3074,7 +3074,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_GetState(/*in*/ MaxAbs
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pState == nullptr) throw std::invalid_argument("'pState' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pState = static_cast<TrainingState>(estimator.get_state());
     
@@ -3096,7 +3096,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_IsTrainingComplete(/*i
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -3121,7 +3121,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_Fit(/*in*/ MaxAbsScala
 
         // No validation
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
@@ -3149,7 +3149,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_FitBuffer(/*in*/ MaxAb
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
@@ -3170,7 +3170,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_OnDataCompleted(/*in*/
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.on_data_completed();
     
@@ -3191,7 +3191,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_CompleteTraining(/*in*
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.complete_training();
     
@@ -3215,9 +3215,9 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_CreateTransformerFromE
 
 
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>::TransformerType*>(estimator.create_transformer().release());
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
 
 
         size_t index = g_pointerTable.Add(pTransformer);
@@ -3244,7 +3244,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_CreateTransformerFromS
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>::TransformerType(archive));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MaxAbsScalarFeaturizer_double_TransformerHandle*>(index);
@@ -3267,7 +3267,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_DestroyTransformer(/*i
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>::TransformerType>(index);
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
 
@@ -3292,7 +3292,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_CreateTransformerSaveD
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -3327,7 +3327,7 @@ FEATURIZER_LIBRARY_API bool MaxAbsScalarFeaturizer_double_Transform(/*in*/ MaxAb
         // No input validation
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
-        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, double>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MaxAbsScalarEstimator<std::double_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
         // Input
         auto result(transformer.execute(input));
