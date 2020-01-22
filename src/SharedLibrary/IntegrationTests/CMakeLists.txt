@@ -35,8 +35,13 @@ foreach(_test_name IN ITEMS
     SharedLibrary_IMFeaturizer_IntegrationTest
     SharedLibrary_LEFeaturizer_IntegrationTest
     SharedLibrary_MASFeaturizer_IntegrationTest
-    SharedLibrary_MMSFeaturizer_IntegrationTest
     SharedLibrary_MDFeaturizer_IntegrationTest
+    SharedLibrary_MeanIFeaturizer_IntegrationTest
+    SharedLibrary_MedianIFeaturizer_IntegrationTest
+    SharedLibrary_MMIFeaturizer_IntegrationTest
+    SharedLibrary_MMSFeaturizer_IntegrationTest
+    SharedLibrary_ModeIFeaturizer_IntegrationTest
+    SharedLibrary_NumericalizeFeaturizer_IntegrationTest
     SharedLibrary_OHEFeaturizer_IntegrationTest
     SharedLibrary_RSFeaturizer_IntegrationTest
     SharedLibrary_SSWFeaturizer_IntegrationTest

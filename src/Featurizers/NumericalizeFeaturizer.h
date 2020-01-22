@@ -18,14 +18,14 @@ namespace Featurizers {
 ///                 Returns no value
 ///
 template <typename InputT>
-class NumericalizeTransformer : public StandardTransformer<InputT, nonstd::optional<std::uint32_t>> {
+class NumericalizeTransformer : public StandardTransformer<InputT, std::double_t> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType = StandardTransformer<InputT, nonstd::optional<std::uint32_t>>;
+    using BaseType = StandardTransformer<InputT, std::double_t>;
     using IndexMap = typename Components::IndexMapAnnotationData<InputT>::IndexMap;
 
     // ----------------------------------------------------------------------
@@ -52,11 +52,13 @@ private:
     // ----------------------------------------------------------------------
 
     // MSVC has problems when the definition and declaration are separated
-    void execute_impl (typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-        typename IndexMap::const_iterator const         iter(labels_.find (input));
-        nonstd::optional<std::uint32_t> result;
+    void execute_impl(typename BaseType::InputType const& input, typename BaseType::CallbackFunction const& callback) override {
+        typename IndexMap::const_iterator const         iter(labels_.find(input));
+        double result = 0.;
         if(iter != labels_.end()) {
             result = iter->second;
+        } else {
+            result = std::numeric_limits<double>::quiet_NaN();
         }
         callback(result);
     }
@@ -75,14 +77,14 @@ template <
     typename InputT,
     size_t MaxNumTrainingItemsV = std::numeric_limits<size_t>::max()
 >
-class NumericalizeEstimatorImpl : public TransformerEstimator<InputT, nonstd::optional<std::uint32_t>> {
+class NumericalizeEstimatorImpl : public TransformerEstimator<InputT, std::double_t> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType = TransformerEstimator<InputT, nonstd::optional<std::uint32_t>>;
+    using BaseType = TransformerEstimator<InputT, std::double_t>;
     using TransformerType = NumericalizeTransformer<InputT>;
 
     // ----------------------------------------------------------------------
@@ -124,10 +126,10 @@ private:
         using IndexMapEstimator = Components::IndexMapEstimator<InputT, MaxNumTrainingItemsV>;
         // ----------------------------------------------------------------------
 
-        IndexMapAnnotationData const &      data(IndexMapEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::IndexMapEstimatorName));
+        IndexMapAnnotationData const& data(IndexMapEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::IndexMapEstimatorName));
 
         return typename BaseType::TransformerUniquePtr(new NumericalizeTransformer<InputT>(data.Value));
-        }
+    }
 };
 } // namespace Details
 
@@ -141,9 +143,9 @@ template <
 >
 class NumericalizeEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-    Components::HistogramEstimator<InputT, MaxNumTrainingItemsV>,
-    Components::IndexMapEstimator<InputT, MaxNumTrainingItemsV>,
-    Details::NumericalizeEstimatorImpl<InputT, MaxNumTrainingItemsV>
+        Components::HistogramEstimator<InputT, MaxNumTrainingItemsV>,
+        Components::IndexMapEstimator<InputT, MaxNumTrainingItemsV>,
+        Details::NumericalizeEstimatorImpl<InputT, MaxNumTrainingItemsV>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -153,9 +155,9 @@ public:
     // ----------------------------------------------------------------------
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
-        Components::HistogramEstimator<InputT, MaxNumTrainingItemsV>,
-        Components::IndexMapEstimator<InputT, MaxNumTrainingItemsV>,
-        Details::NumericalizeEstimatorImpl<InputT, MaxNumTrainingItemsV>
+            Components::HistogramEstimator<InputT, MaxNumTrainingItemsV>,
+            Components::IndexMapEstimator<InputT, MaxNumTrainingItemsV>,
+            Details::NumericalizeEstimatorImpl<InputT, MaxNumTrainingItemsV>
         >;
 
     using IndexMap = typename Components::IndexMapAnnotationData<InputT>::IndexMap;

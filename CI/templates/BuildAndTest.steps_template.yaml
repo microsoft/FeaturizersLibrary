@@ -87,7 +87,7 @@ steps:
         if tester_code_coverage and (tester_release_only or tester_build_only):
             raise Exception("'tester_code_coverage' and 'tester_release_only'/'tester_build_only' are mutually exclusive variables and cannot both be set")
 
-        values["pipeline_tester_code_coverage_arg"] = "/code_coverage /code_coverage_validator_flag=min_code_coverage_percentage:80.0" if tester_code_coverage else ""
+        values["pipeline_tester_code_coverage_arg"] = "/code_coverage /code_coverage_validator_flag=min_code_coverage_percentage:75.0" if tester_code_coverage else ""
         values["pipeline_tester_release_only_arg"] = "/release_only" if tester_release_only else ""
         values["pipeline_tester_build_only_arg"] = "/build_only" if tester_build_only else ""
 
