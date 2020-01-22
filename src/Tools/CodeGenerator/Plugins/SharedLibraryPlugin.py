@@ -114,7 +114,7 @@ def _CreateInterfaceSubstitutionDict(item, c_data):
         type_desc = " <{}>".format(template)
         if item.is_output_a_template:
             cpp_template_suffix = "<{}>".format(
-                c_data.InputTypeInfoFactory.CppType + ", " + item.output_type,
+                c_data.InputTypeInfoFactory.CppType + ", " + c_data.OutputTypeInfoFactory.CppType,
             )
         else:
             cpp_template_suffix = "<{}>".format(c_data.InputTypeInfoFactory.CppType)
@@ -1263,6 +1263,10 @@ class CData(object):
         self.ConfigurationParamTypeInfoFactories        = configuration_param_type_info_factories
         self.InputTypeInfoFactory                       = input_type_info_factory
         self.OutputTypeInfoFactory                      = output_type_info_factory
+
+    # ----------------------------------------------------------------------
+    def __repr__(self):
+        return CommonEnvironment.ObjectReprImpl(self)
 
     # ----------------------------------------------------------------------
     # |

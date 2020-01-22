@@ -66,32 +66,43 @@ function(Impl)
 
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_CatImputerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_CatImputerFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_Common.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_Common.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_Common.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_Common.hpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_HashOneHotVectorizerFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_HashOneHotVectorizerFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ImputationMarkerFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_HashOneHotVectorizerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ImputationMarkerFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ImputationMarkerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalarFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalarFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxScalarFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalarFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MeanImputerFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MeanImputerFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MedianImputerFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MedianImputerFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxImputerFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxImputerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxScalarFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MissingDummiesFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxScalarFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MissingDummiesFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_OneHotEncoderFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MissingDummiesFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ModeImputerFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ModeImputerFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_NumericalizeFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_NumericalizeFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_OneHotEncoderFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PointerTable.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_OneHotEncoderFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PointerTable.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PointerTable.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.h
 
         ${_featurizers_file_attribute_sources}
     )
