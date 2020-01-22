@@ -119,9 +119,10 @@ inline void ParseNgramCharHelper(IteratorT const &begin,
 
     for (size_t strIterOffset = 0; strIterOffset < wordIterVector.size(); ++strIterOffset)  {
         for (size_t ngramRangeVal = ngramRangeMin; ngramRangeVal <= ngramRangeMax; ++ngramRangeVal) {
-            if (strIterOffset + ngramRangeVal < wordIterVector.size())
+            if (strIterOffset + ngramRangeVal < wordIterVector.size()) {
                 callback(wordIterVector[strIterOffset], wordIterVector[strIterOffset + ngramRangeVal]);
                 break;
+            }
         }
     }
 }
@@ -276,8 +277,7 @@ template <typename PredicateT>
 inline std::string TrimRight(std::string input,
                              PredicateT isPredicate) {
     input.erase(std::find_if(input.rbegin(), input.rend(), [&isPredicate](char c) {
-        return !isPredicate(c);
-    }).base(), input.end());
+        return !isPredicate(c);}).base(), input.end());
     return input;
 }
 
