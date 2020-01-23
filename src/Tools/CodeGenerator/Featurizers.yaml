@@ -811,9 +811,15 @@ featurizers:
         By applying PCA we get the eigenvector P
         the projecting matrix of an input matrix X is X*P^T
 
+    templates:
+    - name: T
+        types:
+          - float
+          - double
+
     type_mappings:
-      - input_type: MatrixT
-        output_type: MatrixT
+      - input_type: matrix<T>
+        output_type: matrix<T>
 
     status: Pending
 
@@ -1269,8 +1275,14 @@ featurizers:
         By applying TruncatedSVD we get the right singular vector P
         the projecting matrix of an input matrix X is X*P
 
+    templates:
+    - name: T
+        types:
+          - float
+          - double
+
     type_mappings:
-      - input_type: MatrixT
-        output_type: MatrixT
+      - input_type: matrix<T>
+        output_type: matrix<T>
 
     status: Pending
