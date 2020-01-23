@@ -49,21 +49,14 @@ namespace Updaters{
 template <typename T>
 class L1NormUpdater {
 public:
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    // input type can only be integer or numeric
-    static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to norm updater has to be integer or numerical types!");
-
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
     L1NormUpdater(void);
+
+    void reset(void);
 
     void update(T input);
 
@@ -78,9 +71,19 @@ private:
     long double _l1_norm;
 
     // flags to check if update function is called
-    // an error will be thrown if no update(input) is called before commit
-    // since it doesn't make sense to create an updater and commit without any update
-    bool        _update_flag;
+    // an error will be thrown if no valid input is input before commit
+    bool        _has_valid_input;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    void update_impl(T input, std::true_type /*is_nullable*/);
+    void update_impl(T input, std::false_type /*is_nullable*/);
+
+    template <typename U>
+    void update_impl(U input);
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -91,21 +94,14 @@ private:
 template <typename T>
 class L2NormUpdater {
 public:
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    // input type can only be integer or numeric
-    static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to norm updater has to be integer or numerical types!");
-
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
     L2NormUpdater(void);
+
+    void reset(void);
 
     void update(T input);
 
@@ -119,10 +115,20 @@ private:
     // ----------------------------------------------------------------------
     long double _l2_norm;
 
-    // flags to check if update functions are called
-    // an error will be thrown if no update(input) is called before commit
-    // since it doesn't make sense to create an updater and commit without any update
-    bool        _update_flag;
+    // flags to check if update function is called
+    // an error will be thrown if no valid input is input before commit
+    bool        _has_valid_input;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    void update_impl(T input, std::true_type /*is_nullable*/);
+    void update_impl(T input, std::false_type /*is_nullable*/);
+
+    template <typename U>
+    void update_impl(U input);
 };
 
 
@@ -136,19 +142,13 @@ class MaxNormUpdater {
 public:
     // ----------------------------------------------------------------------
     // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    // input type can only be integer or numeric
-    static_assert(Traits<T>::IsIntOrNumeric::value, "Input type to norm updater has to be integer or numerical types!");
-
-    // ----------------------------------------------------------------------
-    // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
 
     MaxNormUpdater(void);
+
+    void reset(void);
 
     void update(T input);
 
@@ -162,10 +162,20 @@ private:
     // ----------------------------------------------------------------------
     typename TypeSelector::MaxNormTypeSelector<T>::type _max_norm;
 
-    // flags to check if update functions are called
-    // an error will be thrown if no update(input) is called before commit
-    // since it doesn't make sense to create an updater and commit without any update
-    bool                                                _update_flag;
+    // flags to check if update function is called
+    // an error will be thrown if no valid input is input before commit
+    bool        _has_valid_input;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    void update_impl(T input, std::true_type /*is_nullable*/);
+    void update_impl(T input, std::false_type /*is_nullable*/);
+
+    template <typename U>
+    void update_impl(U input);
 };
 
 } // Updaters
@@ -186,16 +196,41 @@ private:
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-Updaters::L1NormUpdater<T>::L1NormUpdater() :
-    _l1_norm(0),
-    _update_flag(false) {
+Updaters::L1NormUpdater<T>::L1NormUpdater() {
+    reset();
+}
+
+template <typename T>
+void Updaters::L1NormUpdater<T>::reset() {
+    _l1_norm = 0;
+    _has_valid_input = false;
 }
 
 template <typename T>
 void Updaters::L1NormUpdater<T>::update(T input) {
-    if (!_update_flag) {
-        _update_flag = true;
+    update_impl(input, std::integral_constant<bool, Traits<T>::IsNullableType>());
+}
+
+template <typename T>
+void Updaters::L1NormUpdater<T>::update_impl(T input, std::true_type /*is_nullable*/) {
+    if (Traits<T>::IsNull(input)) {
+        return;
     }
+
+    update_impl(Traits<T>::GetNullableValue(input));
+}
+
+
+template <typename T>
+void Updaters::L1NormUpdater<T>::update_impl(T input, std::false_type /*is_nullable*/) {
+    update_impl(input);
+}
+
+template <typename T>
+template <typename U>
+void Updaters::L1NormUpdater<T>::update_impl(U input) {
+    _has_valid_input = true;
+
     long double diff = std::abs(static_cast<long double>(input));
 
     // check if diff is too small comparing to l1_norm
@@ -213,10 +248,10 @@ void Updaters::L1NormUpdater<T>::update(T input) {
 
 template <typename T>
 long double Updaters::L1NormUpdater<T>::commit(void) {
-    assert(_l1_norm >= 0);
-    if (!_update_flag) {
-        throw std::runtime_error("update is not called before l1 is committed!");
+    if (!_has_valid_input) {
+        throw std::runtime_error("No valid input is passed in before commit is called!");
     }
+    assert(_l1_norm >= 0);
     return _l1_norm;
 }
 // ----------------------------------------------------------------------
@@ -225,16 +260,40 @@ long double Updaters::L1NormUpdater<T>::commit(void) {
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-Updaters::L2NormUpdater<T>::L2NormUpdater() :
-    _l2_norm(0),
-    _update_flag(false) {
+Updaters::L2NormUpdater<T>::L2NormUpdater() {
+    reset();
 }
 
 template <typename T>
+void Updaters::L2NormUpdater<T>::reset() {
+    _l2_norm = 0;
+    _has_valid_input = false;
+}
+template <typename T>
 void Updaters::L2NormUpdater<T>::update(T input) {
-    if (!_update_flag) {
-        _update_flag = true;
+    update_impl(input, std::integral_constant<bool, Traits<T>::IsNullableType>());
+}
+
+template <typename T>
+void Updaters::L2NormUpdater<T>::update_impl(T input, std::true_type /*is_nullable*/) {
+    if (Traits<T>::IsNull(input)) {
+        return;
     }
+
+    update_impl(Traits<T>::GetNullableValue(input));
+}
+
+
+template <typename T>
+void Updaters::L2NormUpdater<T>::update_impl(T input, std::false_type /*is_nullable*/) {
+    update_impl(input);
+}
+
+template <typename T>
+template <typename U>
+void Updaters::L2NormUpdater<T>::update_impl(U input) {
+    _has_valid_input = true;
+
     long double diff_square = std::pow(std::abs(static_cast<long double>(input)), 2);
 
     if ((_l2_norm + diff_square == _l2_norm) && (diff_square != 0)) {
@@ -251,10 +310,10 @@ void Updaters::L2NormUpdater<T>::update(T input) {
 
 template <typename T>
 long double Updaters::L2NormUpdater<T>::commit(void) {
-    assert(_l2_norm >= 0);
-    if (!_update_flag) {
-        throw std::runtime_error("update is not called before l2 is committed!");
+    if (!_has_valid_input) {
+        throw std::runtime_error("No valid input is passed in before commit is called!");
     }
+    assert(_l2_norm >= 0);
     return std::sqrt(_l2_norm);
 }
 // ----------------------------------------------------------------------
@@ -263,28 +322,49 @@ long double Updaters::L2NormUpdater<T>::commit(void) {
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-Updaters::MaxNormUpdater<T>::MaxNormUpdater() :
-    _max_norm(0),
-    _update_flag(false) {
+Updaters::MaxNormUpdater<T>::MaxNormUpdater() {
+    reset();
 }
 
 template <typename T>
+void Updaters::MaxNormUpdater<T>::reset() {
+    _max_norm = 0;
+    _has_valid_input = false;
+}
+template <typename T>
 void Updaters::MaxNormUpdater<T>::update(T input) {
-    if (!_update_flag) {
-        _max_norm = static_cast<typename TypeSelector::MaxNormTypeSelector<T>::type>(std::abs(input));
-        _update_flag = true;
-    } else {
-        _max_norm = std::max(static_cast<typename TypeSelector::MaxNormTypeSelector<T>::type>(std::abs(input)), _max_norm);
+    update_impl(input, std::integral_constant<bool, Traits<T>::IsNullableType>());
+}
+
+template <typename T>
+void Updaters::MaxNormUpdater<T>::update_impl(T input, std::true_type /*is_nullable*/) {
+    if (Traits<T>::IsNull(input)) {
+        return;
     }
+
+    update_impl(Traits<T>::GetNullableValue(input));
+}
+
+
+template <typename T>
+void Updaters::MaxNormUpdater<T>::update_impl(T input, std::false_type /*is_nullable*/) {
+    update_impl(input);
+}
+
+template <typename T>
+template <typename U>
+void Updaters::MaxNormUpdater<T>::update_impl(U input) {
+    _has_valid_input = true;
+    _max_norm = std::max(static_cast<typename TypeSelector::MaxNormTypeSelector<T>::type>(std::abs(input)), _max_norm);
 }
 
 
 template <typename T>
 typename TypeSelector::MaxNormTypeSelector<T>::type Updaters::MaxNormUpdater<T>::commit(void) {
-    assert(_max_norm >= 0);
-    if (!_update_flag) {
-        throw std::runtime_error("update is not called before max is committed!");
+    if (!_has_valid_input) {
+        throw std::runtime_error("No valid input is passed in before commit is called!");
     }
+    assert(_max_norm >= 0);
     return _max_norm;
 }
 
