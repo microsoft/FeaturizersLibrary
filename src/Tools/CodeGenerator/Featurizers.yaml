@@ -64,19 +64,19 @@ featurizers:
         ["orange apple orange grape", "grape carrot carrot apple", "peach banana orange banana"]
 
         The input data is...
-        ["banana grape grape apple apple apple orange"]
+        "banana grape grape apple apple apple orange"
 
         The result will be computed by...
           categorize and compute each word's number of apperance in input data, we have "apple -> 3", "banana -> 1", "grape -> 2", "orange -> 1"
           construct a dictionary and assign id for each unique word using training data, we have "apple -> 0", "banana -> 1", "grape -> 3", "orange -> 4"
           generate TFStruct by combining <word's id, word's number of apperance>
 
-        The result is... in the format of <idx, value>
-        <0, 3>, <3, 2>, <1, 1>, <4, 1>
+        The result is...
+        [3, 1, 0, 2, 1]
 
     type_mappings:
       - input_type: std::string
-        output_type: CountVectorEncoding
+        output_type: sparse_vector<int>
 
     configuration_params:
       - type: bool
@@ -114,20 +114,6 @@ featurizers:
       - type: bool
         name: binary
         is_optional: false
-
-
-    custom_structs:
-      - name: CountVectorEncoding
-        description: |-
-          Sparse vector of a matrix of token counts
-
-        members:
-          - type: uint32
-            name: NumElements
-          - type: uint32
-            name: Value
-          - type: uint32
-            name: Index
 
     status: Pending
 
@@ -826,8 +812,8 @@ featurizers:
         the projecting matrix of an input matrix X is X*P^T
 
     type_mappings:
-      - input_type: Matrix<T>
-        output_type: Matrix<T>
+      - input_type: MatrixT
+        output_type: MatrixT
 
     status: Pending
 
@@ -1112,28 +1098,28 @@ featurizers:
 
         Assuming the input data is...
         "this is the first document"
-        The default result will be... in the format of <idx, value>
-        <3,0.384085f>, <6,0.384085f>, <8,0.384085f>, <2,0.580286f>, <2,0.580286f>,
+        The default result will be...
+        [0. , 0.469791f, 0.580286f, 0.384085f, 0. , 0. , 0.384085f, 0. , 0.384085f]
 
         Assuming the input data is...
         "this document is the second document"
-        The default result will be... in the format of <idx, value>
-        <3,0.281089f>, <6,0.281089f>, <8,0.281089f>, <5,0.538648f>, <1,0.687624f>
+        The default result will be...
+        [0. , 0.687624f, 0. , 0.281089f, 0. , 0.538648f, 0.281089f, 0. , 0.281089f]
 
         Assuming the input data is...
         "and this is the third one"
-        The default result will be... in the format of <idx, value>
-        <3,0.267104f>, <0,0.511849f>, <4,0.511849f>, <6,0.267104f>, <8,0.267104f>, <7,0.511849f>
+        The default result will be...
+        [0.511849f, 0. , 0. , 0.267104f, 0.511849f, 0. , 0.267104f, 0.511849f, 0.267104f]
 
         Assuming the input data is...
         "is this the first document"
-        The default result will be... in the format of <idx, value>
-        <3,0.384085f>, <6,0.384085f>, <8,0.384085f>, <2,0.580286f>, <1,0.469791f>
+        The default result will be...
+        [0. , 0.469791f, ,0.580286f, 0.384085f, 0. , 0. , 0.384085f, 0. , 0.384085f]
 
 
     type_mappings:
       - input_type: std::string
-        output_type: TfidfVectorEncoding
+        output_type: sparse_vector<float>
 
     configuration_params:
       - type: bool
@@ -1187,18 +1173,6 @@ featurizers:
       - type: bool
         name: sublinearTf
         is_optional: false
-
-
-    custom_structs:
-      - name: TfidfVectorEncoding
-        description: |-
-          Sparse matrix of TF-IDF features
-
-        members:
-          - type: uint32
-            name: DictId
-          - type: float
-            name: Value
 
     status: Pending
 
@@ -1296,7 +1270,7 @@ featurizers:
         the projecting matrix of an input matrix X is X*P
 
     type_mappings:
-      - input_type: Matrix<T>
-        output_type: Matrix<T>
+      - input_type: MatrixT
+        output_type: MatrixT
 
     status: Pending
