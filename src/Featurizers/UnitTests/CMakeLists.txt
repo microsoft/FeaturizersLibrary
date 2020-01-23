@@ -40,6 +40,7 @@ foreach(_test_name IN ITEMS
     MinMaxImputerFeaturizer_UnitTest
     MinMaxScalarFeaturizer_UnitTests
     MissingDummiesFeaturizer_UnitTests
+    NormalizeFeaturizer_UnitTests
     ModeImputerFeaturizer_UnitTest
     NumericalizeFeaturizer_UnitTests
     OneHotEncoderFeaturizer_UnitTests
