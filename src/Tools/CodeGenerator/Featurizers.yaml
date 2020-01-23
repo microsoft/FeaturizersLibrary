@@ -80,6 +80,75 @@ featurizers:
         The result is...
         [TFStruct(0, 3), TFStruct(3, 2), TFStruct(1, 1), TFStruct(4, 1)]
 
+    type_mappings:
+      - input_type: std::string
+        output_type: CountVectorEncoding
+
+    configuration_params:
+      - type: bool
+        name: lowercase
+        is_optional: false
+
+      - type: int
+        name: analyzer
+        is_optional: false
+
+      - type: string
+        name: regexToken
+        is_optional: false
+
+      - type: IndexMap
+        name: existingVocabulary
+        is_optional: true
+
+      - type: uint32
+        name: topKTerms
+        is_optional: true
+
+      - type: float
+        name: minDf
+        is_optional: false
+
+      - type: float
+        name: maxDf
+        is_optional: false
+
+      - type: uint32
+        name: ngramRangeMin
+        is_optional: false
+
+      - type: uint32
+        name: ngramRangeMax
+        is_optional: false
+
+      - type: bool
+        name: binary
+        is_optional: false
+
+
+    custom_structs:
+      - name: CountVectorEncoding
+        description: |-
+          Sparse vector of a matrix of token counts
+
+        members:
+          - type: uint32
+            name: NumElements
+          - type: uint32
+            name: Value
+          - type: uint32
+            name: Index
+
+      - name: IndexMap
+        description: |-
+          map<string, uint32>
+
+        members:
+          - type: string
+            name: Key
+          - type: uint32
+            name: Value
+
     status: Pending
 
   # ----------------------------------------------------------------------
@@ -913,6 +982,89 @@ featurizers:
         [TFIDFStruct(3,0.281089f), TFIDFStruct(6,0.281089f), TFIDFStruct(8,0.281089f), TFIDFStruct(5,0.538648f), TFIDFStruct(1,0.687624f)],
         [TFIDFStruct(3,0.267104f), TFIDFStruct(0,0.511849f), TFIDFStruct(4,0.511849f), TFIDFStruct(6,0.267104f), TFIDFStruct(8,0.267104f), TFIDFStruct(7,0.511849f)],
         [TFIDFStruct(3,0.384085f), TFIDFStruct(6,0.384085f), TFIDFStruct(8,0.384085f), TFIDFStruct(2,0.580286f), TFIDFStruct(1,0.469791f)]]
+
+    type_mappings:
+      - input_type: std::string
+        output_type: TfidfVectorEncoding
+
+    configuration_params:
+      - type: bool
+        name: lowercase
+        is_optional: false
+
+      - type: int
+        name: analyzer
+        is_optional: false
+
+      - type: string
+        name: regexToken
+        is_optional: false
+
+      - type: IndexMap
+        name: existingVocabulary
+        is_optional: true
+
+      - type: uint32
+        name: topKTerms
+        is_optional: true
+
+      - type: float
+        name: minDf
+        is_optional: false
+
+      - type: float
+        name: maxDf
+        is_optional: false
+
+      - type: uint32
+        name: ngramRangeMin
+        is_optional: false
+
+      - type: uint32
+        name: ngramRangeMax
+        is_optional: false
+
+      - type: bool
+        name: binary
+        is_optional: false
+
+      - type: int
+        name: normPolicy
+        is_optional: false
+
+      - type: bool
+        name: useIdf
+        is_optional: false
+
+      - type: bool
+        name: smoothIdf
+        is_optional: false
+
+      - type: bool
+        name: sublinearTf
+        is_optional: false
+
+
+    custom_structs:
+      - name: TfidfVectorEncoding
+        description: |-
+          Sparse matrix of TF-IDF features
+
+        members:
+          - type: uint32
+            name: DictId
+          - type: float
+            name: Value
+
+      - name: IndexMap
+        description: |-
+          map<string, uint32>
+
+        members:
+          - type: string
+            name: Key
+          - type: uint32
+            name: Value
 
     status: Pending
 
