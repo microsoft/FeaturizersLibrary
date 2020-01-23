@@ -493,7 +493,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTran
 }
 
 // For ONNX we don't need to serialize the TransformerMemory. This method just serializes the transformer state directly
-FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTransformerSaveData(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateONNXSaveData(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
