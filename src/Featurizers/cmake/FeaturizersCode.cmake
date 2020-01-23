@@ -13,14 +13,16 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../FromStringFeaturizer.h
     ${_this_path}/../HashOneHotVectorizerFeaturizer.h
     ${_this_path}/../ImputationMarkerFeaturizer.h
+    ${_this_path}/../L1NormalizeFeaturizer.h
+    ${_this_path}/../L2NormalizeFeaturizer.h    
     ${_this_path}/../LabelEncoderFeaturizer.h
     ${_this_path}/../MaxAbsScalarFeaturizer.h
+    ${_this_path}/../MaxNormalizeFeaturizer.h
     ${_this_path}/../MeanImputerFeaturizer.h
     ${_this_path}/../MedianImputerFeaturizer.h
     ${_this_path}/../MinMaxImputerFeaturizer.h
     ${_this_path}/../MinMaxScalarFeaturizer.h
     ${_this_path}/../MissingDummiesFeaturizer.h
-    ${_this_path}/../NormalizeFeaturizer.h
     ${_this_path}/../ModeImputerFeaturizer.h
     ${_this_path}/../NumericalizeFeaturizer.h
     ${_this_path}/../OneHotEncoderFeaturizer.h
@@ -58,6 +60,8 @@ add_library(FeaturizersCode STATIC
 
     ${_this_path}/../Components/Details/EstimatorTraits.h
     ${_this_path}/../Components/Details/PipelineExecutionEstimatorImpl_details.h
+
+    ${_this_path}/../NormalizeFeaturizerBase/NormalizeFeaturizer.h
 )
 
 file(GLOB JSON_DATA "${_this_path}/../DateTimeFeaturizerData/GeneratedCode/*.json")

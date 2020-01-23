@@ -6,7 +6,9 @@
 #include "catch.hpp"
 
 #include "../../3rdParty/optional.h"
-#include "../../Featurizers/NormalizeFeaturizer.h"
+#include "../../Featurizers/L1NormalizeFeaturizer.h"
+#include "../../Featurizers/L2NormalizeFeaturizer.h"
+#include "../../Featurizers/MaxNormalizeFeaturizer.h"
 #include "../TestHelpers.h"
 #include "../../Traits.h"
 #include "../Structs.h"
