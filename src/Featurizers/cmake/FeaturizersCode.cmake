@@ -61,7 +61,7 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../Components/Details/EstimatorTraits.h
     ${_this_path}/../Components/Details/PipelineExecutionEstimatorImpl_details.h
 
-    ${_this_path}/../NormalizeFeaturizerBase/NormalizeFeaturizer.h
+    ${_this_path}/../Base/NormalizeFeaturizer.h
 )
 
 file(GLOB JSON_DATA "${_this_path}/../DateTimeFeaturizerData/GeneratedCode/*.json")
