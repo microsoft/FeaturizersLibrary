@@ -18,7 +18,7 @@ template <
     typename IteratorRangeT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-using L2NormalizeEstimator = NormalizeEstimatorBase<
+using L2NormalizeEstimator = Base::NormalizeEstimatorBase<
                                     IteratorRangeT,
                                     Components::Updaters::L2NormUpdater<typename std::iterator_traits<typename std::tuple_element<0, IteratorRangeT>::type>::value_type>,
                                     MaxNumTrainingItemsV>;
