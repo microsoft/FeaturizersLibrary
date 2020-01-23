@@ -4,7 +4,7 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include "NormalizeFeaturizerBase/NormalizeFeaturizer.h"
+#include "Base/NormalizeFeaturizer.h"
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
@@ -17,7 +17,7 @@ template <
     typename IteratorRangeT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-using MaxNormalizeEstimator = NormalizeEstimatorBase<
+using MaxNormalizeEstimator = Base::NormalizeEstimatorBase<
                                     IteratorRangeT,
                                     Components::Updaters::MaxNormUpdater<typename std::iterator_traits<typename std::tuple_element<0, IteratorRangeT>::type>::value_type>,
                                     MaxNumTrainingItemsV>;

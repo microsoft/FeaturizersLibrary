@@ -12,6 +12,7 @@
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
+namespace Base {
 
 template <typename T>
 struct GetNullableType {
@@ -373,6 +374,7 @@ template <typename IteratorRangeT, typename UpdaterT, size_t MaxNumTrainingItems
 void Details::NormalizeEstimatorImpl<IteratorRangeT, UpdaterT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
+} // namespace Base
 } // namespace Featurizers
 } // namespace Featurizer
 } // namespace Microsoft
