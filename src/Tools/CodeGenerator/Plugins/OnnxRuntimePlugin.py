@@ -733,7 +733,8 @@ def _GenerateKernel(
     template_suffix = []
 
     if len(input_type_mappings) == 1:
-        assert len(output_type_mappings) == 1, output_type_mappings
+        if len(output_type_mappings) != 1:
+            raise NotImplementedError("Multiple output types is not supported yet")
 
         input_type = _GetCppTypeMapping(next(six.iterkeys(input_type_mappings)))
         input_types = []

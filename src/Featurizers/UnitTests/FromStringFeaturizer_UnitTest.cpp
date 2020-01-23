@@ -19,7 +19,7 @@ TEST_CASE("bool") {
 TEST_CASE("int") {
     CHECK(NS::Featurizers::FromStringTransformer<int>().execute("10") == 10);
     CHECK(NS::Featurizers::FromStringTransformer<int>().execute("-20") == -20);
-    CHECK_THROWS_WITH(NS::Featurizers::FromStringTransformer<int>().execute("invalid"), Catch::Contains("invalid"));
+    CHECK_THROWS(NS::Featurizers::FromStringTransformer<int>().execute("invalid"));
 }
 
 TEST_CASE("Transformer serialization") {
