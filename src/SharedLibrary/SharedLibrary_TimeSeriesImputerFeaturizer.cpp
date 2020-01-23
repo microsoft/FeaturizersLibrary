@@ -492,6 +492,40 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTran
     }
 }
 
+// For ONNX we don't need to serialize the TransformerMemory. This method just serializes the transformer state directly
+FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTransformerSaveData(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
+        if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
+
+        TransformerMemory &                 memory(*g_pointerTable.Get<TransformerMemory>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Archive      archive;
+
+        memory.Transformer->save(archive);
+
+        Microsoft::Featurizer::Archive::ByteArray const buffer(archive.commit());
+
+        unsigned char *                     new_buffer(new unsigned char[buffer.size()]);
+
+        std::copy(buffer.begin(), buffer.end(), new_buffer);
+
+        *ppBuffer = new_buffer;
+        *pBufferSize = buffer.size();
+
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
