@@ -799,8 +799,8 @@ featurizers:
         the projecting matrix of an input matrix X is X*P^T
 
     type_mappings:
-      - input_type: MatrixT
-        output_type: MatrixT
+      - input_type: Matrix<T>
+        output_type: Matrix<T>
 
     status: Pending
 
@@ -1106,10 +1106,6 @@ featurizers:
         name: regexToken
         is_optional: false
 
-      - type: IndexMap
-        name: existingVocabulary
-        is_optional: true
-
       - type: uint32
         name: topKTerms
         is_optional: true
@@ -1160,16 +1156,6 @@ featurizers:
           - type: uint32
             name: DictId
           - type: float
-            name: Value
-
-      - name: IndexMap
-        description: |-
-          map<string, uint32>
-
-        members:
-          - type: string
-            name: Key
-          - type: uint32
             name: Value
 
     status: Pending
@@ -1268,7 +1254,7 @@ featurizers:
         the projecting matrix of an input matrix X is X*P
 
     type_mappings:
-      - input_type: MatrixT
-        output_type: MatrixT
+      - input_type: Matrix<T>
+        output_type: Matrix<T>
 
     status: Pending
