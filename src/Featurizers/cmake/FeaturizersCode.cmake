@@ -10,6 +10,7 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../CatImputerFeaturizer.h
     ${_this_path}/../DateTimeFeaturizer.h
     ${_this_path}/../DateTimeFeaturizer.cpp
+    ${_this_path}/../FromStringFeaturizer.h
     ${_this_path}/../HashOneHotVectorizerFeaturizer.h
     ${_this_path}/../ImputationMarkerFeaturizer.h
     ${_this_path}/../LabelEncoderFeaturizer.h
@@ -19,6 +20,7 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../MinMaxImputerFeaturizer.h
     ${_this_path}/../MinMaxScalarFeaturizer.h
     ${_this_path}/../MissingDummiesFeaturizer.h
+    ${_this_path}/../NormalizeFeaturizer.h
     ${_this_path}/../ModeImputerFeaturizer.h
     ${_this_path}/../NumericalizeFeaturizer.h
     ${_this_path}/../OneHotEncoderFeaturizer.h
@@ -52,6 +54,7 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../Components/TimeSeriesImputerTransformer.h
     ${_this_path}/../Components/TimeSeriesMedianEstimator.h
     ${_this_path}/../Components/TrainingOnlyEstimatorImpl.h
+    ${_this_path}/../Components/VectorNormsEstimator.h
 
     ${_this_path}/../Components/Details/EstimatorTraits.h
     ${_this_path}/../Components/Details/PipelineExecutionEstimatorImpl_details.h

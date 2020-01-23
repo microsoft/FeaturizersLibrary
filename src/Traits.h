@@ -209,7 +209,6 @@ template <typename T>
 struct TraitsImpl {
     static constexpr bool const             IsNullableType = false;
     static constexpr bool const             IsNativeNullableType = false;
-
     using nullable_type = nonstd::optional<T>;
     using key_equal = std::equal_to<T>;
 
@@ -802,6 +801,7 @@ struct Traits<std::array<T, ArrayV>> : public TraitsImpl<std::array<T, ArrayV>> 
 
 template <typename T, typename AllocatorT>
 struct Traits<std::vector<T, AllocatorT>> : public TraitsImpl<std::vector<T, AllocatorT>> {
+
     static std::string ToString(std::vector<T, AllocatorT> const& value) {
         return ToStringImpl(value.data(), value.size());
     }

@@ -21,7 +21,7 @@ namespace NS = Microsoft::Featurizer;
 TEST_CASE("l1 updater normal cases") {
     using inputType = int;
     NS::Featurizers::Components::Updaters::L1NormUpdater<inputType> updater;
-    CHECK_THROWS_WITH(updater.commit(), "update is not called before l1 is committed!");
+    CHECK_THROWS_WITH(updater.commit(), "No valid input is passed in before commit is called!");
 
     updater.update(0);
     long double const r1(updater.commit());
@@ -32,7 +32,35 @@ TEST_CASE("l1 updater normal cases") {
     updater.update(3);
     long double const r2(updater.commit());
     CHECK(r2 == 6);
+
+    updater.reset();
+    CHECK_THROWS_WITH(updater.commit(), "No valid input is passed in before commit is called!");
 }
+
+TEST_CASE("l1 updater null values") {
+    using inputType = nonstd::optional<int>;
+    NS::Featurizers::Components::Updaters::L1NormUpdater<inputType> updater;
+    CHECK_THROWS_WITH(updater.commit(), "No valid input is passed in before commit is called!");
+
+    updater.update(0);
+    long double const r1(updater.commit());
+    CHECK(r1 == 0);
+
+    updater.update(1);
+    updater.update(nonstd::optional<int>());
+    updater.update(2);
+    updater.update(3);
+    long double const r2(updater.commit());
+    CHECK(r2 == 6);
+
+    // input values are all nulls
+    updater.reset();
+    updater.update(inputType());
+    updater.update(inputType());
+    CHECK_THROWS_WITH(updater.commit(), "No valid input is passed in before commit is called!");
+}
+
+
 TEST_CASE("l1 updater overflow") {
     using inputType = std::double_t;
     NS::Featurizers::Components::Updaters::L1NormUpdater<inputType> updater;
@@ -43,7 +71,7 @@ TEST_CASE("l1 updater overflow") {
 TEST_CASE("l2 updater normal cases") {
     using inputType = int;
     NS::Featurizers::Components::Updaters::L2NormUpdater<inputType> updater;
-    CHECK_THROWS_WITH(updater.commit(), "update is not called before l2 is committed!");
+    CHECK_THROWS_WITH(updater.commit(), "No valid input is passed in before commit is called!");
 
     updater.update(2);
     long double const r1(updater.commit());
@@ -54,7 +82,34 @@ TEST_CASE("l2 updater normal cases") {
     updater.update(4);
     long double const r2(updater.commit());
     CHECK(r2 == 5);
+
+    updater.reset();
+    CHECK_THROWS_WITH(updater.commit(), "No valid input is passed in before commit is called!");
 }
+
+TEST_CASE("l2 updater null values") {
+    using inputType = nonstd::optional<int>;
+    NS::Featurizers::Components::Updaters::L2NormUpdater<inputType> updater;
+    CHECK_THROWS_WITH(updater.commit(), "No valid input is passed in before commit is called!");
+
+    updater.update(2);
+    long double const r1(updater.commit());
+    CHECK(r1 == 2);
+
+    updater.update(1);
+    updater.update(2);
+    updater.update(nonstd::optional<int>());
+    updater.update(4);
+    long double const r2(updater.commit());
+    CHECK(r2 == 5);
+
+    // input values are all nulls
+    updater.reset();
+    updater.update(inputType());
+    updater.update(inputType());
+    CHECK_THROWS_WITH(updater.commit(), "No valid input is passed in before commit is called!");
+}
+
 TEST_CASE("l2 updater overflow") {
     using inputType = std::double_t;
     NS::Featurizers::Components::Updaters::L2NormUpdater<inputType> updater;
@@ -62,10 +117,10 @@ TEST_CASE("l2 updater overflow") {
     CHECK_THROWS_WITH(updater.update(1), "In l2 norm calculation, square of input is so small comparing to l2_norm that l2_norm is the same after long double addition!");
 }
 
-TEST_CASE("max updater") {
+TEST_CASE("max updater normal cases") {
     using inputType = int;
     NS::Featurizers::Components::Updaters::MaxNormUpdater<inputType> updater;
-    CHECK_THROWS_WITH(updater.commit(), "update is not called before max is committed!");
+    CHECK_THROWS_WITH(updater.commit(), "No valid input is passed in before commit is called!");
 
     updater.update(-10);
     std::uint64_t const r1(updater.commit());
@@ -77,6 +132,30 @@ TEST_CASE("max updater") {
     std::uint64_t const r2(updater.commit());
     CHECK(r2 == 100);
 
+    updater.reset();
+    CHECK_THROWS_WITH(updater.commit(), "No valid input is passed in before commit is called!");
+}
+TEST_CASE("max updater null values") {
+    using inputType = nonstd::optional<int>;
+    NS::Featurizers::Components::Updaters::MaxNormUpdater<inputType> updater;
+    CHECK_THROWS_WITH(updater.commit(), "No valid input is passed in before commit is called!");
+
+    updater.update(-10);
+    std::uint64_t const r1(updater.commit());
+    CHECK(r1 == 10);
+
+    updater.update(-10);
+    updater.update(1);
+    updater.update(nonstd::optional<int>());
+    updater.update(100);
+    std::uint64_t const r2(updater.commit());
+    CHECK(r2 == 100);
+
+    // input values are all nulls
+    updater.reset();
+    updater.update(inputType());
+    updater.update(inputType());
+    CHECK_THROWS_WITH(updater.commit(), "No valid input is passed in before commit is called!");
 }
 
 #if (defined __clang__)

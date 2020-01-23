@@ -27,6 +27,7 @@ enable_testing()
 foreach(_test_name IN ITEMS
     Archive_UnitTest
     Featurizer_UnitTest
+    Strings_UnitTest
     Traits_UnitTest
 )
     add_executable(${_test_name} ${_test_name}.cpp)
