@@ -226,6 +226,44 @@ featurizers:
             name: isPaidTimeOff
 
   # ----------------------------------------------------------------------
+  - name: FromStringFeaturizer
+    estimator_name: FromStringEstimator
+    num_output_columns: 1
+    creates_annotations: false
+    description: |-
+      Converts from a string to a scalar type.
+
+      C++-style pseudo signature:
+        int32 execute(std::string const &value);
+        bool execute(std::string const &value);
+
+      Examples:
+        execute("True") -> true [bool]
+        execute("10") -> 10 [int32]
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+
+    is_input_a_template: false
+    is_output_a_template: true
+
+    type_mappings:
+      - input_type: string
+        output_type: T
+
+  # ----------------------------------------------------------------------
   - name: HashOneHotVectorizerFeaturizer
     estimator_name: HashOneHotVectorizerEstimator
     num_output_columns: 1
@@ -864,25 +902,25 @@ featurizers:
         execute([4,1,2,2]) = [4/9, 1/9, 2/9, 2/9]
         execute([1,3,9,3]) = [1/16, 3/16, 9/16, 3/16]
 
-      templates:
-        - name: T
-          types:
-            - int8
-            - int16
-            - int32
-            - int64
-            - uint8
-            - uint16
-            - uint32
-            - uint64
-            - float
-            - double
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
 
-      type_mappings:
-        - input_type: vector<T>
-          output_type: vector<double>
+    type_mappings:
+      - input_type: vector<T>
+        output_type: vector<double>
 
-      status: Pending
+    status: Pending
 
   # ----------------------------------------------------------------------
   - name: L2NormalizerFeaturizer
@@ -907,25 +945,25 @@ featurizers:
         execute([4,1,2,2]) = [4/5, 1/5, 2/5, 2/5]
         execute([1,3,9,3]) = [1/10, 3/10, 9/10, 3/10]
 
-      templates:
-        - name: T
-          types:
-            - int8
-            - int16
-            - int32
-            - int64
-            - uint8
-            - uint16
-            - uint32
-            - uint64
-            - float
-            - double
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
 
-      type_mappings:
-        - input_type: vector<T>
-          output_type: vector<double>
+    type_mappings:
+      - input_type: vector<T>
+        output_type: vector<double>
 
-      status: Pending
+    status: Pending
 
   # ----------------------------------------------------------------------
   - name: MaxNormalizerFeaturizer
@@ -950,25 +988,26 @@ featurizers:
         execute([4,1,2,2]) = [4/4, 1/4, 2/4, 2/4]
         execute([1,3,9,3]) = [1/9, 3/9, 9/9, 3/9]
 
-      templates:
-        - name: T
-          types:
-            - int8
-            - int16
-            - int32
-            - int64
-            - uint8
-            - uint16
-            - uint32
-            - uint64
-            - float
-            - double
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
 
-      type_mappings:
-        - input_type: vector<T>
-          output_type: vector<double>
+    type_mappings:
+      - input_type: vector<T>
+        output_type: vector<double>
 
-      status: Pending
+    status: Pending
+
   # ----------------------------------------------------------------------
   - name: StandardScaleWrapperFeaturizer
     estimator_name: StandardScaleWrapperEstimator
