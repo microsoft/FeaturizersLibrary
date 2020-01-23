@@ -62,14 +62,17 @@ featurizers:
       Examples:
         Assuming the training data is...
         ["orange apple orange grape", "grape carrot carrot apple", "peach banana orange banana"]
+
         The input data is...
         ["banana grape grape apple apple apple orange"]
+
         The result will be computed by...
           categorize and compute each word's number of apperance in input data, we have "apple -> 3", "banana -> 1", "grape -> 2", "orange -> 1"
           construct a dictionary and assign id for each unique word using training data, we have "apple -> 0", "banana -> 1", "grape -> 3", "orange -> 4"
           generate TFStruct by combining <word's id, word's number of apperance>
-        The result is...
-        [TFStruct(0, 3), TFStruct(3, 2), TFStruct(1, 1), TFStruct(4, 1)]
+
+        The result is... in the format of <idx, value>
+        <0, 3>, <3, 2>, <1, 1>, <4, 1>
 
     type_mappings:
       - input_type: std::string
@@ -1107,12 +1110,26 @@ featurizers:
         Assuming the training data is...
         ["this is the first document", "this document is the second document", "and this is the third one", "is this the first document"]
 
-        Assuming the input data is the same as training data...
-        The default result will be...(for each input string)
-        TFIDFStruct(3,0.384085f), TFIDFStruct(6,0.384085f), TFIDFStruct(8,0.384085f), TFIDFStruct(2,0.580286f), TFIDFStruct(2,0.580286f),
-        TFIDFStruct(3,0.281089f), TFIDFStruct(6,0.281089f), TFIDFStruct(8,0.281089f), TFIDFStruct(5,0.538648f), TFIDFStruct(1,0.687624f),
-        TFIDFStruct(3,0.267104f), TFIDFStruct(0,0.511849f), TFIDFStruct(4,0.511849f), TFIDFStruct(6,0.267104f), TFIDFStruct(8,0.267104f), TFIDFStruct(7,0.511849f),
-        TFIDFStruct(3,0.384085f), TFIDFStruct(6,0.384085f), TFIDFStruct(8,0.384085f), TFIDFStruct(2,0.580286f), TFIDFStruct(1,0.469791f)
+        Assuming the input data is...
+        "this is the first document"
+        The default result will be... in the format of <idx, value>
+        <3,0.384085f>, <6,0.384085f>, <8,0.384085f>, <2,0.580286f>, <2,0.580286f>,
+
+        Assuming the input data is...
+        "this document is the second document"
+        The default result will be... in the format of <idx, value>
+        <3,0.281089f>, <6,0.281089f>, <8,0.281089f>, <5,0.538648f>, <1,0.687624f>
+
+        Assuming the input data is...
+        "and this is the third one"
+        The default result will be... in the format of <idx, value>
+        <3,0.267104f>, <0,0.511849f>, <4,0.511849f>, <6,0.267104f>, <8,0.267104f>, <7,0.511849f>
+
+        Assuming the input data is...
+        "is this the first document"
+        The default result will be... in the format of <idx, value>
+        <3,0.384085f>, <6,0.384085f>, <8,0.384085f>, <2,0.580286f>, <1,0.469791f>
+
 
     type_mappings:
       - input_type: std::string
