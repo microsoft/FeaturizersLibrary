@@ -71,6 +71,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_Common.hpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_FromStringFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_FromStringFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_HashOneHotVectorizerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_HashOneHotVectorizerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ImputationMarkerFeaturizer.cpp
