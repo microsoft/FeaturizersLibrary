@@ -798,6 +798,10 @@ featurizers:
         By applying PCA we get the eigenvector P
         the projecting matrix of an input matrix X is X*P^T
 
+    type_mappings:
+      - input_type: MatrixT
+        output_type: MatrixT
+
     status: Pending
 
   # ----------------------------------------------------------------------
@@ -1149,5 +1153,9 @@ featurizers:
         Assuming the training matrix A
         By applying TruncatedSVD we get the right singular vector P
         the projecting matrix of an input matrix X is X*P
+
+    type_mappings:
+      - input_type: MatrixT
+        output_type: MatrixT
 
     status: Pending
