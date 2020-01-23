@@ -129,7 +129,7 @@ private:
         IndexMapAnnotationData const& data(IndexMapEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::IndexMapEstimatorName));
 
         return typename BaseType::TransformerUniquePtr(new NumericalizeTransformer<InputT>(data.Value));
-        }
+    }
 };
 } // namespace Details
 
@@ -143,9 +143,9 @@ template <
 >
 class NumericalizeEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-    Components::HistogramEstimator<InputT, MaxNumTrainingItemsV>,
-    Components::IndexMapEstimator<InputT, MaxNumTrainingItemsV>,
-    Details::NumericalizeEstimatorImpl<InputT, MaxNumTrainingItemsV>
+        Components::HistogramEstimator<InputT, MaxNumTrainingItemsV>,
+        Components::IndexMapEstimator<InputT, MaxNumTrainingItemsV>,
+        Details::NumericalizeEstimatorImpl<InputT, MaxNumTrainingItemsV>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -155,9 +155,9 @@ public:
     // ----------------------------------------------------------------------
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
-        Components::HistogramEstimator<InputT, MaxNumTrainingItemsV>,
-        Components::IndexMapEstimator<InputT, MaxNumTrainingItemsV>,
-        Details::NumericalizeEstimatorImpl<InputT, MaxNumTrainingItemsV>
+            Components::HistogramEstimator<InputT, MaxNumTrainingItemsV>,
+            Components::IndexMapEstimator<InputT, MaxNumTrainingItemsV>,
+            Details::NumericalizeEstimatorImpl<InputT, MaxNumTrainingItemsV>
         >;
 
     using IndexMap = typename Components::IndexMapAnnotationData<InputT>::IndexMap;
