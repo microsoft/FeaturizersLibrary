@@ -88,10 +88,6 @@ featurizers:
         name: regexToken
         is_optional: false
 
-      - type: IndexMap
-        name: existingVocabulary
-        is_optional: true
-
       - type: uint32
         name: topKTerms
         is_optional: true
@@ -129,16 +125,6 @@ featurizers:
             name: Value
           - type: uint32
             name: Index
-
-      - name: IndexMap
-        description: |-
-          map<string, uint32>
-
-        members:
-          - type: string
-            name: Key
-          - type: uint32
-            name: Value
 
     status: Pending
 
@@ -1083,11 +1069,11 @@ featurizers:
         ["this is the first document", "this document is the second document", "and this is the third one", "is this the first document"]
 
         Assuming the input data is the same as training data...
-        The default result will be...
-        [[TFIDFStruct(3,0.384085f), TFIDFStruct(6,0.384085f), TFIDFStruct(8,0.384085f), TFIDFStruct(2,0.580286f), TFIDFStruct(2,0.580286f)],
-        [TFIDFStruct(3,0.281089f), TFIDFStruct(6,0.281089f), TFIDFStruct(8,0.281089f), TFIDFStruct(5,0.538648f), TFIDFStruct(1,0.687624f)],
-        [TFIDFStruct(3,0.267104f), TFIDFStruct(0,0.511849f), TFIDFStruct(4,0.511849f), TFIDFStruct(6,0.267104f), TFIDFStruct(8,0.267104f), TFIDFStruct(7,0.511849f)],
-        [TFIDFStruct(3,0.384085f), TFIDFStruct(6,0.384085f), TFIDFStruct(8,0.384085f), TFIDFStruct(2,0.580286f), TFIDFStruct(1,0.469791f)]]
+        The default result will be...(for each input string)
+        TFIDFStruct(3,0.384085f), TFIDFStruct(6,0.384085f), TFIDFStruct(8,0.384085f), TFIDFStruct(2,0.580286f), TFIDFStruct(2,0.580286f),
+        TFIDFStruct(3,0.281089f), TFIDFStruct(6,0.281089f), TFIDFStruct(8,0.281089f), TFIDFStruct(5,0.538648f), TFIDFStruct(1,0.687624f),
+        TFIDFStruct(3,0.267104f), TFIDFStruct(0,0.511849f), TFIDFStruct(4,0.511849f), TFIDFStruct(6,0.267104f), TFIDFStruct(8,0.267104f), TFIDFStruct(7,0.511849f),
+        TFIDFStruct(3,0.384085f), TFIDFStruct(6,0.384085f), TFIDFStruct(8,0.384085f), TFIDFStruct(2,0.580286f), TFIDFStruct(1,0.469791f)
 
     type_mappings:
       - input_type: std::string
