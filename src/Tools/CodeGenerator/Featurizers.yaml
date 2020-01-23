@@ -810,7 +810,7 @@ featurizers:
         is_optional: true
 
   # ----------------------------------------------------------------------
-  - name: L1NormalizerFeaturizer
+  - name: L1NormalizeFeaturizer
     estimator_name: L1NormalizeEstimator
     num_output_columns: 1
     description: |-
@@ -853,7 +853,7 @@ featurizers:
     status: Pending
 
   # ----------------------------------------------------------------------
-  - name: L2NormalizerFeaturizer
+  - name: L2NormalizeFeaturizer
     estimator_name: L2NormalizeEstimator
     num_output_columns: 1
     description: |-
@@ -896,7 +896,7 @@ featurizers:
     status: Pending
 
   # ----------------------------------------------------------------------
-  - name: MaxNormalizerFeaturizer
+  - name: MaxNormalizeFeaturizer
     estimator_name: MaxNormalizeEstimator
     num_output_columns: 1
     description: |-
