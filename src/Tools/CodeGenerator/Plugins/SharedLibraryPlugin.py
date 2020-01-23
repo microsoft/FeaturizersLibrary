@@ -110,14 +110,22 @@ def _CreateInterfaceSubstitutionDict(item, c_data):
         type_desc = ""
         cpp_template_suffix = ""
     else:
+        templates = []
+
         suffix = "_{}_".format(template)
         type_desc = " <{}>".format(template)
+
+        cpp_templates = []
+
+        if item.is_input_a_template:
+            cpp_templates.append(c_data.InputTypeInfoFactory.CppType)
         if item.is_output_a_template:
-            cpp_template_suffix = "<{}>".format(
-                c_data.InputTypeInfoFactory.CppType + ", " + c_data.OutputTypeInfoFactory.CppType,
-            )
-        else:
-            cpp_template_suffix = "<{}>".format(c_data.InputTypeInfoFactory.CppType)
+            cpp_templates.append(c_data.OutputTypeInfoFactory.CppType)
+
+        assert cpp_templates
+        cpp_templates = ", ".join(cpp_templates)
+
+        cpp_template_suffix = "<{}>".format(cpp_templates)
 
     # ----------------------------------------------------------------------
     def ToParamsString(params, arg_desc):
