@@ -14,7 +14,8 @@
 
 namespace NS = Microsoft::Featurizer;
 
-using IndexMapType = typename NS::Featurizers::CountVectorizerTransformer::IndexMapType;
+using IndexMapType = std::unordered_map<std::string, std::uint32_t>;
+using AnalyzerMethod                       = NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
 
 //todo: more tests will be added
 
@@ -32,17 +33,19 @@ TEST_CASE("string_nobinary") {
 
     std::vector<TransformedType::ValueEncoding> values;
     values.emplace_back(TransformedType::ValueEncoding(3,0));
-    values.emplace_back(TransformedType::ValueEncoding(2,1));
-    values.emplace_back(TransformedType::ValueEncoding(1,2));
-    values.emplace_back(TransformedType::ValueEncoding(1,3));
+    values.emplace_back(TransformedType::ValueEncoding(1,1));
+    values.emplace_back(TransformedType::ValueEncoding(2,3));
+    values.emplace_back(TransformedType::ValueEncoding(1,4));
     auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
                                                                            TransformedType(6          /// is this 6 or 4??? training dictionary size or inference dictionary size
                                                                            , std::move(values))
                                                                           );
 
+
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, 1.0, 0.0, 1, IndexMapType(), false),
+            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, Microsoft::Featurizer::Strings::ToLower, AnalyzerMethod::Word, "",
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, false),
             trainingBatches,
             inferencingInput
         )== inferencingOutput
