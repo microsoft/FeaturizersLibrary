@@ -43,6 +43,9 @@ public:
 
     void save(Archive &ar) const override;
 
+    size_t getEigenVectorRowsNumber() const;
+    size_t getEigenVectorColsNumber() const;
+
 private:
     // ----------------------------------------------------------------------
     // |
@@ -203,6 +206,16 @@ void PCATransformer<MatrixT>::save(Archive &ar) const /*override*/ {
 
     // Data
     Traits<decltype(_eigenvectors)>::serialize(ar, _eigenvectors);
+}
+
+template <typename MatrixT>
+size_t PCATransformer<MatrixT>::getEigenVectorRowsNumber() const {
+    return static_cast<size_t>(_eigenvectors.rows());
+}
+
+template <typename MatrixT>
+size_t PCATransformer<MatrixT>::getEigenVectorColsNumber() const {
+    return static_cast<size_t>(_eigenvectors.cols());
 }
 
 // ----------------------------------------------------------------------
