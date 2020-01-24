@@ -6,7 +6,9 @@
 #include "catch.hpp"
 
 #include "../../3rdParty/optional.h"
-#include "../../Featurizers/NormalizeFeaturizer.h"
+#include "../../Featurizers/L1NormalizeFeaturizer.h"
+#include "../../Featurizers/L2NormalizeFeaturizer.h"
+#include "../../Featurizers/MaxNormalizeFeaturizer.h"
 #include "../TestHelpers.h"
 #include "../../Traits.h"
 #include "../Structs.h"
@@ -46,7 +48,7 @@ TEST_CASE("invalid input iterators") {
 TEST_CASE("invalid input norms") {
     using ValueType       = std::int16_t;
     using InputType       = Range<ValueType>;
-    using TransformerType = NS::Featurizers::NormalizeTransformer<InputType>;
+    using TransformerType = NS::Featurizers::Base::NormalizeTransformer<InputType>;
 
     std::vector<std::double_t> norms;
     CHECK_THROWS_WITH(std::make_shared<TransformerType>(norms), "Norms input to NormalizeTransformer is empty!");
@@ -155,7 +157,7 @@ TEST_CASE("nonstd::optional<int> - l1 norm") {
 TEST_CASE("Serialization/Deserialization") {
     using ValueType       = std::int16_t;
     using InputType       = Range<ValueType>;
-    using TransformerType = NS::Featurizers::NormalizeTransformer<InputType>;
+    using TransformerType = NS::Featurizers::Base::NormalizeTransformer<InputType>;
 
     std::vector<std::double_t> norms({1,2,3});
     auto model = std::make_shared<TransformerType>(norms);
@@ -181,7 +183,7 @@ TEST_CASE("Serialization Version Error") {
     NS::Archive                             in(out.commit());
 
     CHECK_THROWS_WITH(
-        (NS::Featurizers::NormalizeTransformer<InputType>(in)),
+        (NS::Featurizers::Base::NormalizeTransformer<InputType>(in)),
         Catch::Contains("Unsupported archive version")
     );
 }
