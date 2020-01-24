@@ -44,7 +44,7 @@ foreach(_test_name IN ITEMS
     StandardScaleWrapperFeaturizer_UnitTest
     StringFeaturizer_UnitTest
     Structs_UnitTest
-    TfidfVectorizerFeaturizer_UnitTests
+    # TfidfVectorizerFeaturizer_UnitTests
     TimeSeriesImputerFeaturizer_UnitTest
 )
     add_executable(${_test_name} ${_test_name}.cpp)

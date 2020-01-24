@@ -24,7 +24,7 @@ struct OneHotStruct {
     OneHotStruct(std::uint32_t index, std::uint32_t size, std::uint32_t appearances);
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(OneHotStruct);
     bool operator==(OneHotStruct const &other) const;
-}
+};
 
 template <typename T>
 class SparseVectorEncoding {
@@ -45,7 +45,9 @@ public:
         // ----------------------------------------------------------------------
         // |  Public Methods
         ValueEncoding(value_type value, std::uint64_t index);
+        ValueEncoding(ValueEncoding && other);
 
+        ValueEncoding & operator =(ValueEncoding && other);
         bool operator==(ValueEncoding const &other) const;
         bool operator!=(ValueEncoding const &other) const;
     };
@@ -64,7 +66,9 @@ public:
     // |
     // ----------------------------------------------------------------------
     SparseVectorEncoding(std::uint64_t numElements, std::vector<ValueEncoding> values);
+    SparseVectorEncoding(SparseVectorEncoding && other);
 
+    SparseVectorEncoding & operator =(SparseVectorEncoding && other);
     bool operator==(SparseVectorEncoding const &other) const;
     bool operator!=(SparseVectorEncoding const &other) const;
 };
@@ -105,34 +109,6 @@ public:
     bool operator!=(SingleValueSparseVectorEncoding const &other) const;
 };
 
-/////////////////////////////////////////////////////////////////////////
-///  \struct        TFStruct
-///  \brief         Struct to hold return value of count vectorizer,
-///                 consist of <dictid, # of appearances>
-///
-struct TFStruct {
-    std::uint32_t const DictionaryId;                              // dict id
-    std::uint32_t const Appearances;                               // number of appearances
-
-    TFStruct(std::uint32_t dictionaryid, std::uint32_t appearances);
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TFStruct);
-    bool operator==(TFStruct const &other) const;
-};
-
-/////////////////////////////////////////////////////////////////////////
-///  \struct        TFIDFStruct
-///  \brief         Struct to hold return value of tfidf vectorizer,
-///                 consist of <dictid, tfidf value>
-///
-struct TFIDFStruct {
-    std::uint32_t const DictionaryId;                              // dict id
-    std::float_t const Tfidf;                                      // freq
-
-    TFIDFStruct(std::uint32_t dictionaryid, std::float_t tfidf);
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(TFIDFStruct);
-    bool operator==(TFIDFStruct const &other) const;
-};
-
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -152,6 +128,20 @@ template <typename T>
 SparseVectorEncoding<T>::ValueEncoding::ValueEncoding(value_type value, std::uint64_t index) :
     Value(std::move(value)),
     Index(std::move(index)) {
+}
+
+template <typename T>
+SparseVectorEncoding<T>::ValueEncoding::ValueEncoding(ValueEncoding && other) :
+    Value(std::move(const_cast<value_type &>(other.Value))),
+    Index(std::move(const_cast<std::uint64_t &>(other.Index))) {
+}
+
+template <typename T>
+typename SparseVectorEncoding<T>::ValueEncoding & SparseVectorEncoding<T>::ValueEncoding::operator =(ValueEncoding && other) {
+    const_cast<value_type &>(this->Value) = std::move(const_cast<value_type &>(other.Value));
+    const_cast<std::uint64_t &>(this->Index) = std::move(const_cast<std::uint64_t &>(other.Index));
+
+    return *this;
 }
 
 #if (defined __clang__)
@@ -176,10 +166,10 @@ bool SparseVectorEncoding<T>::ValueEncoding::operator!=(ValueEncoding const &oth
 
 // ----------------------------------------------------------------------
 // |
-// |  SparseVectorEncoding
+// |  OneHotStruct
 // |
 // ----------------------------------------------------------------------
-  
+
 OneHotStruct::OneHotStruct(std::uint32_t index, std::uint32_t size, std::uint32_t appearances) :
     Index(std::move(index)),
     Size(std::move(size)),
@@ -193,37 +183,11 @@ bool OneHotStruct::operator==(OneHotStruct const &other) const {
     return (Appearances == other.Appearances) && (Index == other.Index) && (Size == other.Size);
 }
 
-
 // ----------------------------------------------------------------------
 // |
-// |  TFStruct
+// |  SparseVectorEncoding
 // |
 // ----------------------------------------------------------------------
-TFStruct::TFStruct(std::uint32_t dictionaryid, std::uint32_t appearances) :
-    DictionaryId(std::move(dictionaryid)),
-    Appearances(std::move(appearances)) {
-}
-
-bool TFStruct::operator==(TFStruct const &other) const {
-    return (Appearances == other.Appearances) && (DictionaryId == other.DictionaryId);
-}
-
-
-// ----------------------------------------------------------------------
-// |
-// |  TFIDFStruct
-// |
-// ----------------------------------------------------------------------
-TFIDFStruct::TFIDFStruct(std::uint32_t dictionaryid, std::float_t tfidf) :
-    DictionaryId(std::move(dictionaryid)),
-    Tfidf(std::move(tfidf)) {
-}
-
-bool TFIDFStruct::operator==(TFIDFStruct const &other) const {
-    return (DictionaryId == other.DictionaryId) && (abs(Tfidf - other.Tfidf) < 0.000001f);
-}
-
-
 
 template <typename T>
 SparseVectorEncoding<T>::SparseVectorEncoding(std::uint64_t numElements, std::vector<ValueEncoding> values) :
@@ -260,6 +224,22 @@ SparseVectorEncoding<T>::SparseVectorEncoding(std::uint64_t numElements, std::ve
             }()
         )
     ) {
+}
+
+
+template <typename T>
+SparseVectorEncoding<T>::SparseVectorEncoding(SparseVectorEncoding && other) :
+    NumElements(std::move(const_cast<std::uint64_t &>(other.NumElements))),
+    Values(std::move(const_cast<std::vector<ValueEncoding> &>(other.Values))) {
+
+}
+
+template <typename T>
+SparseVectorEncoding<T> & SparseVectorEncoding<T>::operator =(SparseVectorEncoding && other) {
+    const_cast<std::uint64_t &>(this->NumElements) = std::move(const_cast<std::uint64_t &>(other.NumElements));
+    const_cast<std::vector<ValueEncoding> &>(this->Values) = std::move(const_cast<std::vector<ValueEncoding> &>(other.Values));
+
+    return *this;
 }
 
 template <typename T>
