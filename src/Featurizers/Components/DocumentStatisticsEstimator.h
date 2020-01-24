@@ -386,7 +386,7 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreq
                 termFrequency.begin(),
                 termFrequency.end(),
                 std::back_inserter(frequencyVector),
-                [](auto const & kv) {
+                [](std::pair<std::string, std::uint32_t> const & kv) {
                     return kv.second;
                 }
             );
