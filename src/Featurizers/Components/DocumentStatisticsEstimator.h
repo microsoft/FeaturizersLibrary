@@ -31,15 +31,7 @@ struct FrequencyAndIndex {
     std::uint32_t const TermFrequency;                            // Words and the number of documents that it appears in
     std::uint32_t const Index;
 
-    //When generating the DocumentStatisticsAnnotationData, it will call FrequencyAndIndex copy constructor
-    //FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FrequencyAndIndex);
-
-    // FrequencyAndIndex(FrequencyAndIndex const &other) :
-    //     TermFrequency(other.TermFrequency),
-    //     Index(other.Index) {
-    //         int BugBug = 10;
-    //         ++BugBug;
-    // }
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FrequencyAndIndex);
 
     FrequencyAndIndex(std::uint32_t termFrequency, std::uint32_t index);
     bool operator==(FrequencyAndIndex const &other) const;
@@ -72,10 +64,13 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
+    DocumentStatisticsAnnotationData(DocumentStatisticsAnnotationData &&other) :
+        TermFrequencyAndIndex(std::move(const_cast<FrequencyAndIndexMap &>(other.TermFrequencyAndIndex))),
+        TotalNumDocuments(std::move(other.TotalNumDocuments)) {
+    }
+
     DocumentStatisticsAnnotationData(FrequencyAndIndexMap termFrequencyAndIndex, std::uint32_t totalNumDocuments);
     ~DocumentStatisticsAnnotationData(void) = default;
-
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DocumentStatisticsAnnotationData);
 };
 
 namespace Details {
@@ -593,8 +588,12 @@ inline DocumentStatisticsAnnotationData Details::DocumentStatisticsTrainingOnlyP
     //ignore the additional keys in termIndex
     FrequencyAndIndexMap                    termFrequencyAndIndex(MergeTwoMapsWithSameKeys(prunedTermFreq, termIndex));
 
+
+   // BaseType::add_annotation(std::make_shared<AnnotationImpl>(EstimatorPolicyT::complete_training()), _colIndex);
+
     return DocumentStatisticsAnnotationData(std::move(termFrequencyAndIndex), std::move(_totalNumDocuments));
 }
+
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------

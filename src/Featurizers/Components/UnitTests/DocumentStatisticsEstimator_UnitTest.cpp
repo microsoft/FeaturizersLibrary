@@ -21,16 +21,18 @@ using AnalyzerMethod                       = NS::Featurizers::Components::Detail
 
 
 
-NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyAndIndexMap TrainTermFrequencyAndIndex(std::vector<std::vector<std::string>> const &inputBatches,
-                                                                                                               StringDecorator decorator,
-                                                                                                               AnalyzerMethod analyzer,
-                                                                                                               std::string regexToken,
-                                                                                                               nonstd::optional<IndexMap> existingVocabulary,
-                                                                                                               nonstd::optional<std::uint32_t> maxFeatures,
-                                                                                                               std::float_t minDf,
-                                                                                                               std::float_t maxDf,
-                                                                                                               std::uint32_t ngramRangeMin,
-                                                                                                               std::uint32_t ngramRangeMax) {
+void DSRTestWrapper(std::vector<std::vector<std::string>> const &inputBatches,
+                                FrequencyAndIndexMap const &label,
+                                std::uint32_t docuNumsLabel,
+                                StringDecorator decorator,
+                                AnalyzerMethod analyzer,
+                                std::string regexToken,
+                                nonstd::optional<IndexMap> existingVocabulary,
+                                nonstd::optional<std::uint32_t> maxFeatures,
+                                std::float_t minDf,
+                                std::float_t maxDf,
+                                std::uint32_t ngramRangeMin,
+                                std::uint32_t ngramRangeMax) {
     NS::AnnotationMapsPtr                                                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::DocumentStatisticsEstimator<std::numeric_limits<size_t>::max()>
                                                                             estimator(pAllColumnAnnotations,
@@ -49,46 +51,17 @@ NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyAndIndex
 
     NS::Featurizers::Components::DocumentStatisticsAnnotationData const &
                                                                             annotation(estimator.get_annotation_data());
-    return annotation.TermFrequencyAndIndex;
+    CHECK(annotation.TermFrequencyAndIndex == label);
+    CHECK(annotation.TotalNumDocuments == docuNumsLabel);
 }
 
-std::uint32_t TrainDocuNum(std::vector<std::vector<std::string>> const &inputBatches,
-                           StringDecorator decorator,
-                           AnalyzerMethod analyzer,
-                           std::string regexToken,
-                           nonstd::optional<IndexMap> existingVocabulary,
-                           nonstd::optional<std::uint32_t> maxFeatures,
-                           std::float_t minDf,
-                           std::float_t maxDf,
-                           std::uint32_t ngramRangeMin,
-                           std::uint32_t ngramRangeMax) {
-    NS::AnnotationMapsPtr                                                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::Components::DocumentStatisticsEstimator<std::numeric_limits<size_t>::max()>
-                                                                            estimator(pAllColumnAnnotations,
-                                                                                      0,
-                                                                                      decorator,
-                                                                                      analyzer,
-                                                                                      regexToken,
-                                                                                      existingVocabulary,
-                                                                                      maxFeatures,
-                                                                                      minDf,
-                                                                                      maxDf,
-                                                                                      ngramRangeMin,
-                                                                                      ngramRangeMax);
+TEST_CASE("invalid_annotation") {
+    FrequencyAndIndexMap termFreqAndIndex;
+    termFreqAndIndex.emplace("key", FrequencyAndIndex(1, 1));
 
-    NS::TestHelpers::Train(estimator, inputBatches);
-
-    NS::Featurizers::Components::DocumentStatisticsAnnotationData const &
-                                                                            annotation(estimator.get_annotation_data());
-    return annotation.TotalNumDocuments;
+    CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(std::move(termFreqAndIndex), 0), "totalNumDocuments");
+    CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(FrequencyAndIndexMap(), 1), "termFrequencyAndIndex");
 }
-
-// TEST_CASE("invalid_annotation") {
-//     FrequencyAndIndexMap termFreqAndIndex(FrequencyAndIndexMap{{"key", FrequencyAndIndex(1, 1)}});
-
-//     CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(termFreqAndIndex, 0), "totalNumDocuments");
-//     CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(FrequencyAndIndexMap(), 1), "termFrequencyAndIndex");
-// }
 
 TEST_CASE("invalid_trainingpolicy") {
     //invalid paramaters
@@ -133,11 +106,18 @@ TEST_CASE("string_idf") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 1;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_custom_decorator") {
@@ -161,11 +141,18 @@ TEST_CASE("string_idf_custom_decorator") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 1;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_custom_regex") {
@@ -189,11 +176,18 @@ TEST_CASE("string_idf_custom_regex") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 1;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 // //problematic test(dangling iterators)
@@ -246,11 +240,18 @@ TEST_CASE("string_idf_ngramword") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 2;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_ngramchar") {
@@ -274,11 +275,18 @@ TEST_CASE("string_idf_ngramchar") {
     std::uint32_t ngramRangeMin = 7;
     std::uint32_t ngramRangeMax = 7;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_ngramcharwb") {
@@ -302,11 +310,18 @@ TEST_CASE("string_idf_ngramcharwb") {
     std::uint32_t ngramRangeMin = 5;
     std::uint32_t ngramRangeMax = 5;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_single_appearance") {
@@ -331,11 +346,18 @@ TEST_CASE("string_idf_single_appearance") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 1;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_full_appearance") {
@@ -360,11 +382,18 @@ TEST_CASE("string_idf_full_appearance") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 1;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_df[0.4, 0.8]") {
@@ -388,11 +417,18 @@ TEST_CASE("string_idf_df[0.4, 0.8]") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 1;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_df[0.0, 0.7]") {
@@ -416,11 +452,18 @@ TEST_CASE("string_idf_df[0.0, 0.7]") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 1;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_max1features") {
@@ -449,11 +492,18 @@ TEST_CASE("string_idf_max1features") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 1;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_max4features") {
@@ -482,11 +532,18 @@ TEST_CASE("string_idf_max4features") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 1;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_custom_full_existingVocabulary") {
@@ -510,11 +567,18 @@ TEST_CASE("string_idf_custom_full_existingVocabulary") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 1;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_custom_insufficient_existingVocabulary") {
@@ -538,11 +602,18 @@ TEST_CASE("string_idf_custom_insufficient_existingVocabulary") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 1;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
 
 TEST_CASE("string_idf_custom_over_existingVocabulary") {
@@ -566,9 +637,16 @@ TEST_CASE("string_idf_custom_over_existingVocabulary") {
     std::uint32_t ngramRangeMin = 1;
     std::uint32_t ngramRangeMax = 1;
 
-    FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-    std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-    CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-    CHECK(docuNumsAnnotation == docuNumsLabel);
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
 }
