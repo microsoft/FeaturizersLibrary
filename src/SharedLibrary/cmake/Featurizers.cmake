@@ -77,10 +77,16 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_HashOneHotVectorizerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ImputationMarkerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ImputationMarkerFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_L1NormalizeFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_L1NormalizeFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_L2NormalizeFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_L2NormalizeFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalarFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalarFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxNormalizeFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxNormalizeFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MeanImputerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MeanImputerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MedianImputerFeaturizer.cpp

@@ -31,6 +31,9 @@ class _StructTypeInfoFactory(TypeInfoFactory):
     def __init__(
         self,
         custom_structs=None,
+        custom_enums=None,
+        member_type=None,
+        create_type_info_factory_func=None,
     ):
         if custom_structs:
             assert self.TypeName in custom_structs, custom_structs
