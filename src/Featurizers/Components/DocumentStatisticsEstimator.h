@@ -19,53 +19,30 @@ namespace Featurizer {
 namespace Featurizers {
 namespace Components {
 
-namespace {
-
-struct IterRangeComp {
-    bool operator()(const std::tuple<std::string::const_iterator, std::string::const_iterator>& a,
-                    const std::tuple<std::string::const_iterator, std::string::const_iterator>& b) const {
-
-        std::string::const_iterator s1 = std::get<0>(a);
-        std::string::const_iterator e1 = std::get<1>(a);
-        std::string::const_iterator s2 = std::get<0>(b);
-        std::string::const_iterator e2 = std::get<1>(b);
-
-        if(std::distance(s1, e1) < std::distance(s2, e2)) {
-            return true;
-        } else if (std::distance(s2, e2) < std::distance(s1, e1)) {
-            return false;
-        }
-
-        while (s1 != e1) {
-            if (s2 == e2 || *s2 < *s1) {
-                return false;
-            } else if (*s1 < *s2) {
-                return true;
-            }
-            ++s1;
-            ++s2;
-        }
-        return (s2 != e2);
-    }
-};
-
-}
 
 static constexpr char const * const         DocumentStatisticsEstimatorName("DocumentStatisticsEstimator");
 
 /////////////////////////////////////////////////////////////////////////
-///  \struct        FrequencyAndIndexStruct
+///  \struct        FrequencyAndIndex
 ///  \brief         This struct is a combination of values of FrequencyMap and
 ///                 IndexMap for the purpose of keys equivelence of two maps
 ///
-struct FrequencyAndIndexStruct {
+struct FrequencyAndIndex {
     std::uint32_t const TermFrequency;                            // Words and the number of documents that it appears in
     std::uint32_t const Index;
 
-    //When generating the DocumentStatisticsAnnotationData, it will call FrequencyAndIndexStruct copy constructor
-    //FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FrequencyAndIndexStruct);
-    FrequencyAndIndexStruct(std::uint32_t termFrequency, std::uint32_t index);
-    bool operator==(FrequencyAndIndexStruct const &other) const;
+    //When generating the DocumentStatisticsAnnotationData, it will call FrequencyAndIndex copy constructor
+    //FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FrequencyAndIndex);
+
+    // FrequencyAndIndex(FrequencyAndIndex const &other) :
+    //     TermFrequency(other.TermFrequency),
+    //     Index(other.Index) {
+    //         int BugBug = 10;
+    //         ++BugBug;
+    // }
+
+    FrequencyAndIndex(std::uint32_t termFrequency, std::uint32_t index);
+    bool operator==(FrequencyAndIndex const &other) const;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -80,7 +57,8 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using FrequencyAndIndexMap              = std::unordered_map<std::string, FrequencyAndIndexStruct>;
+    using FrequencyAndIndexMap              = std::unordered_map<std::string, FrequencyAndIndex>;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
@@ -122,7 +100,6 @@ public:
     using StringDecorator                   = std::function<std::string (std::string)>;
     using IndexMap                          = std::unordered_map<std::string, std::uint32_t>;
     using FrequencyMap                      = IndexMap;
-    using RegexT                            = std::regex;
 
     // ----------------------------------------------------------------------
     // |
@@ -131,10 +108,10 @@ public:
     // ----------------------------------------------------------------------
     static constexpr char const * const     NameValue = DocumentStatisticsEstimatorName;
 
-    enum AnalyzerMethod {
-        WORD = 0,
-        CHAR = 1,
-        CHARWB = 2
+    enum class AnalyzerMethod : unsigned char {
+        Word = 1,
+        Char = 2,
+        Charwb = 3
     };
 
     // ----------------------------------------------------------------------
@@ -164,6 +141,7 @@ private:
     // |
     // ----------------------------------------------------------------------
     using FrequencyAndIndexMap              = DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
+    using RegexT                            = std::regex;
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
@@ -221,7 +199,6 @@ public:
     using StringDecorator                   = Details::DocumentStatisticsTrainingOnlyPolicy::StringDecorator;
     using IndexMap                          = Details::DocumentStatisticsTrainingOnlyPolicy::IndexMap;
     using AnalyzerMethod                    = Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
-    using RegexT                            = Details::DocumentStatisticsTrainingOnlyPolicy::RegexT;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -259,13 +236,21 @@ public:
 // |  FrequencyAndIndexStruct
 // |
 // ----------------------------------------------------------------------
-FrequencyAndIndexStruct::FrequencyAndIndexStruct(std::uint32_t termFrequency, std::uint32_t index) :
-    //validate not necessary in this assignment
-    TermFrequency(std::move(termFrequency)),
+FrequencyAndIndex::FrequencyAndIndex(std::uint32_t termFrequency, std::uint32_t index) :
+    TermFrequency(
+        std::move(
+            [&termFrequency](void) -> std::uint32_t & {
+                if(termFrequency == 0)
+                    throw std::invalid_argument("termFrequency");
+
+                return termFrequency;
+            }()
+        )
+    ),
     Index(std::move(index)) {
 }
 
-bool FrequencyAndIndexStruct::operator==(FrequencyAndIndexStruct const &other) const {
+bool FrequencyAndIndex::operator==(FrequencyAndIndex const &other) const {
     return (TermFrequency == other.TermFrequency) && (Index == other.Index);
 }
 
@@ -339,6 +324,35 @@ DocumentStatisticsEstimator<MaxNumTrainingItemsV>::DocumentStatisticsEstimator(
 // |
 // ----------------------------------------------------------------------
 namespace {
+
+struct IterRangeComp {
+    bool operator()(const std::tuple<std::string::const_iterator, std::string::const_iterator>& a,
+                    const std::tuple<std::string::const_iterator, std::string::const_iterator>& b) const {
+
+        std::string::const_iterator s1 = std::get<0>(a);
+        std::string::const_iterator e1 = std::get<1>(a);
+        std::string::const_iterator s2 = std::get<0>(b);
+        std::string::const_iterator e2 = std::get<1>(b);
+
+        if(std::distance(s1, e1) < std::distance(s2, e2)) {
+            return true;
+        } else if (std::distance(s2, e2) < std::distance(s1, e1)) {
+            return false;
+        }
+
+        while (s1 != e1) {
+            assert(s2 != e2);
+            if (*s2 < *s1) {
+                return false;
+            } else if (*s1 < *s2) {
+                return true;
+            }
+            ++s1;
+            ++s2;
+        }
+        return false;
+    }
+};
 
 inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreqMap(Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap termFrequency,
                                                                                     std::float_t minDf,
@@ -445,7 +459,8 @@ inline DocumentStatisticsAnnotationData::FrequencyAndIndexMap MergeTwoMapsWithSa
     return termFrequencyAndIndex;
 }
 
-}
+} // anonymous namespace
+
 // ----------------------------------------------------------------------
 // |
 // |  Details::DocumentStatisticsTrainingOnlyPolicy
@@ -553,7 +568,7 @@ inline void Details::DocumentStatisticsTrainingOnlyPolicy::fit(InputType const &
 
         fit_impl<InputTypeConstIteratorRangeSet>(
             input,
-            [](InputTypeConstIterator & begin, InputTypeConstIterator & end) {
+            [](InputTypeConstIterator begin, InputTypeConstIterator end) {
                 return std::make_pair(begin, end);
             },
             [](InputTypeConstIteratorRange const &range) -> std::string {
@@ -576,9 +591,9 @@ inline DocumentStatisticsAnnotationData Details::DocumentStatisticsTrainingOnlyP
 
     //here the termIndex includes(strictly) termFrequency, which means termIndex has all the keys that appear in termFrequency, but may has some keys not in termFrequency
     //ignore the additional keys in termIndex
-    FrequencyAndIndexMap                    termFrequencyAndIndex(MergeTwoMapsWithSameKeys(std::move(prunedTermFreq), std::move(termIndex)));
+    FrequencyAndIndexMap                    termFrequencyAndIndex(MergeTwoMapsWithSameKeys(prunedTermFreq, termIndex));
 
-    return DocumentStatisticsAnnotationData(termFrequencyAndIndex, std::move(_totalNumDocuments));
+    return DocumentStatisticsAnnotationData(std::move(termFrequencyAndIndex), std::move(_totalNumDocuments));
 }
 
 // ----------------------------------------------------------------------
@@ -588,7 +603,7 @@ template <typename SetT, typename CreateKeyFuncT, typename KeyToStringFuncT>
 void Details::DocumentStatisticsTrainingOnlyPolicy::fit_impl(InputType const &input, CreateKeyFuncT const &createKeyFunc, KeyToStringFuncT const &keyToStringFunc) {
     SetT                                    documents;
 
-    if (_analyzer == AnalyzerMethod::WORD) {
+    if (_analyzer == AnalyzerMethod::Word) {
         if (!_regexToken.empty()) {
             Microsoft::Featurizer::Strings::ParseRegex<InputTypeConstIterator>(
                 input,
@@ -616,7 +631,7 @@ void Details::DocumentStatisticsTrainingOnlyPolicy::fit_impl(InputType const &in
                 }
             );
         }
-    } else if (_analyzer == AnalyzerMethod::CHAR) {
+    } else if (_analyzer == AnalyzerMethod::Char) {
         Microsoft::Featurizer::Strings::ParseNgramCharCopy<InputTypeConstIterator>(
             input,
             _ngramRangeMin,
@@ -626,7 +641,7 @@ void Details::DocumentStatisticsTrainingOnlyPolicy::fit_impl(InputType const &in
             }
         );
     } else {
-        assert(_analyzer == AnalyzerMethod::CHARWB);
+        assert(_analyzer == AnalyzerMethod::Charwb);
 
         Microsoft::Featurizer::Strings::ParseNgramCharwbCopy<InputTypeConstIterator>(
             input,

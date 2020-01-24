@@ -16,7 +16,7 @@ using IndexMap                             = NS::Featurizers::Components::Detail
 using FrequencyMap                         = IndexMap;
 using FrequencyAndIndexMap                 = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
 using StringDecorator                      = NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy::StringDecorator;
-using FrequencyAndIndexStruct              = NS::Featurizers::Components::FrequencyAndIndexStruct;
+using FrequencyAndIndex                    = NS::Featurizers::Components::FrequencyAndIndex;
 using AnalyzerMethod                       = NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
 
 
@@ -83,12 +83,12 @@ std::uint32_t TrainDocuNum(std::vector<std::vector<std::string>> const &inputBat
     return annotation.TotalNumDocuments;
 }
 
-TEST_CASE("invalid_annotation") {
-    FrequencyAndIndexMap termFreqAndIndex(FrequencyAndIndexMap{{"key", FrequencyAndIndexStruct(1, 1)}});
+// TEST_CASE("invalid_annotation") {
+//     FrequencyAndIndexMap termFreqAndIndex(FrequencyAndIndexMap{{"key", FrequencyAndIndex(1, 1)}});
 
-    CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(termFreqAndIndex, 0), "totalNumDocuments");
-    CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(FrequencyAndIndexMap(), 1), "termFrequencyAndIndex");
-}
+//     CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(termFreqAndIndex, 0), "totalNumDocuments");
+//     CHECK_THROWS_WITH(NS::Featurizers::Components::DocumentStatisticsAnnotationData(FrequencyAndIndexMap(), 1), "termFrequencyAndIndex");
+// }
 
 TEST_CASE("invalid_trainingpolicy") {
     //invalid paramaters
@@ -97,7 +97,7 @@ TEST_CASE("invalid_trainingpolicy") {
 
     //valid paramaters
     StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>(IndexMap({{"key", 1}}));
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>(static_cast<std::uint32_t>(1));
@@ -124,7 +124,7 @@ TEST_CASE("string_idf") {
                                                             {"orange orange peach   peach orange "}});
     //parameter initialization
     StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -152,7 +152,7 @@ TEST_CASE("string_idf_custom_decorator") {
                                                             {"orange ORANGE peach   peach orange "}});
     //parameter initialization
     StringDecorator decorator = Microsoft::Featurizer::Strings::ToLower;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -180,7 +180,7 @@ TEST_CASE("string_idf_custom_regex") {
                                                             {"orange ORANGE peach   peach orange "}});
     //parameter initialization
     StringDecorator decorator = Microsoft::Featurizer::Strings::ToLower;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "[^\\s]+";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -196,8 +196,8 @@ TEST_CASE("string_idf_custom_regex") {
     CHECK(docuNumsAnnotation == docuNumsLabel);
 }
 
-//problematic test(dangling iterators)
-// TEST_CASE("string_idf_ngramword") {
+// //problematic test(dangling iterators)
+// TEST_CASE("string_idf_ngramword_no_decorator") {
 //     FrequencyMap const                         termFreqLabel({{"jumpy", 1}, {"fox", 1}, {"jumpy fox", 1}});
 //     IndexMap const                             termIndexLabel({{"fox", 0}, {"jumpy fox", 2}, {"jumpy", 1}});
 //     FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
@@ -207,9 +207,9 @@ TEST_CASE("string_idf_custom_regex") {
 //                                                inputBatches({{"jumpy fox"}});
 
 //     //parameter initialization
-//     StringDecorator decorator = Microsoft::Featurizer::Strings::ToLower;
-//     //StringDecorator decorator;
-//     AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+//     //StringDecorator decorator = Microsoft::Featurizer::Strings::ToLower;
+//     StringDecorator decorator;
+//     AnalyzerMethod analyzer = AnalyzerMethod::Word;
 //     std::string regexToken = "";
 //     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
 //     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -237,7 +237,7 @@ TEST_CASE("string_idf_ngramword") {
     //parameter initialization
     StringDecorator decorator = Microsoft::Featurizer::Strings::ToLower;
     //StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -265,7 +265,7 @@ TEST_CASE("string_idf_ngramchar") {
     //parameter initialization
     StringDecorator decorator = Microsoft::Featurizer::Strings::ToLower;
     //StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::CHAR;
+    AnalyzerMethod analyzer = AnalyzerMethod::Char;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -293,7 +293,7 @@ TEST_CASE("string_idf_ngramcharwb") {
     //parameter initialization
     StringDecorator decorator = Microsoft::Featurizer::Strings::ToLower;
     //StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::CHARWB;
+    AnalyzerMethod analyzer = AnalyzerMethod::Charwb;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -322,7 +322,7 @@ TEST_CASE("string_idf_single_appearance") {
 
     //parameter initialization
     StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -351,7 +351,7 @@ TEST_CASE("string_idf_full_appearance") {
 
     //parameter initialization
     StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -379,7 +379,7 @@ TEST_CASE("string_idf_df[0.4, 0.8]") {
                                                             {"orange orange peach   peach orange "}});
     //parameter initialization
     StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -407,7 +407,7 @@ TEST_CASE("string_idf_df[0.0, 0.7]") {
                                                             {"orange orange peach   peach orange "}});
     //parameter initialization
     StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -440,7 +440,7 @@ TEST_CASE("string_idf_max1features") {
                                                             {"orange orange peach   peach orange "}});
     //parameter initialization
     StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>(static_cast<std::uint32_t>(1));
@@ -473,7 +473,7 @@ TEST_CASE("string_idf_max4features") {
                                                             {"orange orange peach   peach orange "}});
     //parameter initialization
     StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>(static_cast<std::uint32_t>(4));
@@ -501,7 +501,7 @@ TEST_CASE("string_idf_custom_full_existingVocabulary") {
                                                             {"orange orange peach   peach orange "}});
     //parameter initialization
     StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>(IndexMap({{"apple", 222}, {"banana", 333}, {"grape", 666}, {"orange",999}, {"peach", 777}}));
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -529,7 +529,7 @@ TEST_CASE("string_idf_custom_insufficient_existingVocabulary") {
                                                             {"orange orange peach   peach orange "}});
     //parameter initialization
     StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>(IndexMap({{"apple", 222}, {"banana", 333}, {"grape", 666}}));
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -557,7 +557,7 @@ TEST_CASE("string_idf_custom_over_existingVocabulary") {
                                                             {"orange orange peach   peach orange "}});
     //parameter initialization
     StringDecorator decorator;
-    AnalyzerMethod analyzer = AnalyzerMethod::WORD;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
     std::string regexToken = "";
     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>(IndexMap({{"apple", 222}, {"banana", 333}, {"grape", 666}, {"orange",999}, {"peach", 777}, {"fruit", 444}}));
     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
@@ -572,8 +572,3 @@ TEST_CASE("string_idf_custom_over_existingVocabulary") {
     CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
     CHECK(docuNumsAnnotation == docuNumsLabel);
 }
-
-
-
-
-
