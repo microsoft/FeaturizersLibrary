@@ -58,6 +58,7 @@ FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTran
 FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_DestroyTransformer(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateTransformerSaveData(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_CreateONNXSaveData(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool TimeSeriesImputerFeaturizer_BinaryArchive_Transform(/*in*/ TimeSeriesImputerFeaturizer_BinaryArchive_TransformerHandle *pHandle, /*in*/ BinaryArchiveData data, /*out*/ BinaryArchiveData **ppData, /*out*/ std::size_t *pNumDataElements, /*out*/ ErrorInfoHandle **ppErrorInfo);
