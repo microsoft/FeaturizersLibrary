@@ -42,6 +42,7 @@ class Plugin(PluginBase):
     @staticmethod
     @Interface.override
     def Generate(
+        open_file_func,
         global_custom_structs,
         global_custom_enums,
         data,
@@ -74,6 +75,7 @@ class Plugin(PluginBase):
                     )
                     with dm.stream.DoneManager() as this_dm:
                         this_dm.result = func(
+                            open_file_func,
                             output_dir,
                             items,
                             items_type_info_data,
@@ -91,8 +93,8 @@ class Plugin(PluginBase):
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
-def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
-    with open(
+def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, output_stream):
+    with open_file_func(
         os.path.join(output_dir, "SharedLibraryTests_{}.h".format(items[0].name)),
         "w",
     ) as f:
