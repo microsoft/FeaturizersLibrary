@@ -43,6 +43,9 @@ public:
 
     void save(Archive &ar) const override;
 
+    std::ptrdiff_t getSingularVectorRowsNumber() const;
+    std::ptrdiff_t getSingularVectorColsNumber() const;
+
 private:
     // ----------------------------------------------------------------------
     // |
@@ -326,6 +329,16 @@ void TruncatedSVDTransformer<MatrixT>::save(Archive &ar) const /*override*/ {
 
     // Data
     Traits<decltype(_singularvectors)>::serialize(ar, _singularvectors);
+}
+
+template <typename MatrixT>
+std::ptrdiff_t TruncatedSVDTransformer<MatrixT>::getSingularVectorRowsNumber() const {
+    return _singularvectors.rows();
+}
+
+template <typename MatrixT>
+std::ptrdiff_t TruncatedSVDTransformer<MatrixT>::getSingularVectorColsNumber() const {
+    return _singularvectors.cols();
 }
 
 // ----------------------------------------------------------------------

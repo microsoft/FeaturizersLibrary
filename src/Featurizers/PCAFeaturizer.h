@@ -43,6 +43,9 @@ public:
 
     void save(Archive &ar) const override;
 
+    std::ptrdiff_t getEigenVectorRowsNumber() const;
+    std::ptrdiff_t getEigenVectorColsNumber() const;
+
 private:
     // ----------------------------------------------------------------------
     // |
@@ -203,6 +206,16 @@ void PCATransformer<MatrixT>::save(Archive &ar) const /*override*/ {
 
     // Data
     Traits<decltype(_eigenvectors)>::serialize(ar, _eigenvectors);
+}
+
+template <typename MatrixT>
+std::ptrdiff_t PCATransformer<MatrixT>::getEigenVectorRowsNumber() const {
+    return _eigenvectors.rows();
+}
+
+template <typename MatrixT>
+std::ptrdiff_t PCATransformer<MatrixT>::getEigenVectorColsNumber() const {
+    return _eigenvectors.cols();
 }
 
 // ----------------------------------------------------------------------
