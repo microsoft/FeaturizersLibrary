@@ -35,7 +35,9 @@ public:
         // ----------------------------------------------------------------------
         // |  Public Methods
         ValueEncoding(value_type value, std::uint64_t index);
+        ValueEncoding(ValueEncoding && other);
 
+        ValueEncoding & operator =(ValueEncoding && other);
         bool operator==(ValueEncoding const &other) const;
         bool operator!=(ValueEncoding const &other) const;
     };
@@ -54,9 +56,9 @@ public:
     // |
     // ----------------------------------------------------------------------
     SparseVectorEncoding(std::uint64_t numElements, std::vector<ValueEncoding> values);
+    SparseVectorEncoding(SparseVectorEncoding && other);
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SparseVectorEncoding);
-
+    SparseVectorEncoding & operator =(SparseVectorEncoding && other);
     bool operator==(SparseVectorEncoding const &other) const;
     bool operator!=(SparseVectorEncoding const &other) const;
 };
@@ -120,6 +122,20 @@ SparseVectorEncoding<T>::ValueEncoding::ValueEncoding(value_type value, std::uin
     Index(std::move(index)) {
 }
 
+template <typename T>
+SparseVectorEncoding<T>::ValueEncoding::ValueEncoding(ValueEncoding && other) :
+    Value(std::move(const_cast<value_type &>(other.Value))),
+    Index(std::move(const_cast<std::uint64_t &>(other.Index))) {
+}
+
+template <typename T>
+typename SparseVectorEncoding<T>::ValueEncoding & SparseVectorEncoding<T>::ValueEncoding::operator =(ValueEncoding && other) {
+    const_cast<value_type &>(this->Value) = std::move(const_cast<value_type &>(other.Value));
+    const_cast<std::uint64_t &>(this->Index) = std::move(const_cast<std::uint64_t &>(other.Index));
+
+    return *this;
+}
+
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wfloat-equal"
@@ -180,6 +196,21 @@ SparseVectorEncoding<T>::SparseVectorEncoding(std::uint64_t numElements, std::ve
             }()
         )
     ) {
+}
+
+template <typename T>
+SparseVectorEncoding<T>::SparseVectorEncoding(SparseVectorEncoding && other) :
+    NumElements(std::move(const_cast<std::uint64_t &>(other.NumElements))),
+    Values(std::move(const_cast<std::vector<ValueEncoding> &>(other.Values))) {
+
+}
+
+template <typename T>
+SparseVectorEncoding<T> & SparseVectorEncoding<T>::operator =(SparseVectorEncoding && other) {
+    const_cast<std::uint64_t &>(this->NumElements) = std::move(const_cast<std::uint64_t &>(other.NumElements));
+    const_cast<std::vector<ValueEncoding> &>(this->Values) = std::move(const_cast<std::vector<ValueEncoding> &>(other.Values));
+
+    return *this;
 }
 
 template <typename T>
