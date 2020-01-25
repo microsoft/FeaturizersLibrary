@@ -65,10 +65,10 @@ private:
             throw std::invalid_argument("Input matrix size() invalid");
 
         //this is simplified(mathematically) from input.col() == _eigenvectors.transpose().rows()
-        if (input.cols() != _eigenvectors.cols())
+        if (input.cols() != _eigenvectors.rows())
             throw std::invalid_argument("Input matrix cols() invalid");
 
-        callback(input * _eigenvectors.transpose());
+        callback(input * _eigenvectors);
     }
 };
 
@@ -169,6 +169,8 @@ PCATransformer<MatrixT>::PCATransformer(MatrixT eigenvectors) :
     _eigenvectors(std::move(eigenvectors)) {
     if(_eigenvectors.size() == 0)
         throw std::invalid_argument("eigenvectors");
+
+    eigenvectors.transpose();
 }
 
 template <typename MatrixT>
