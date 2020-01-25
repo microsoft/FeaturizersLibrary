@@ -64,13 +64,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    DocumentStatisticsAnnotationData(DocumentStatisticsAnnotationData &&other) :
-        TermFrequencyAndIndex(std::move(const_cast<FrequencyAndIndexMap &>(other.TermFrequencyAndIndex))),
-        TotalNumDocuments(std::move(other.TotalNumDocuments)) {
-    }
-
     DocumentStatisticsAnnotationData(FrequencyAndIndexMap termFrequencyAndIndex, std::uint32_t totalNumDocuments);
     ~DocumentStatisticsAnnotationData(void) = default;
+
+    DocumentStatisticsAnnotationData(DocumentStatisticsAnnotationData &&other);
 };
 
 namespace Details {
@@ -136,7 +133,15 @@ private:
     // |
     // ----------------------------------------------------------------------
     using FrequencyAndIndexMap              = DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
-    using RegexT                            = std::regex;
+
+    template <typename PredicateT, typename IteratorT>
+    using ParseFunctionType                 = std::function<void (std::string const &,
+                                                                  PredicateT const &,
+                                                                  std::regex const &,
+                                                                  size_t const,
+                                                                  size_t const,
+                                                                  std::function<void (IteratorT, IteratorT)> const &)>;
+
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
@@ -155,6 +160,11 @@ private:
 
     FrequencyMap                            _termFrequency;
     std::uint32_t                           _totalNumDocuments;
+
+    ParseFunctionType<
+        std::function<bool (char)>,
+        std::string::const_iterator
+    >                                       _parseFunc;
 
     // ----------------------------------------------------------------------
     // |
@@ -277,6 +287,11 @@ inline DocumentStatisticsAnnotationData::DocumentStatisticsAnnotationData(Freque
     ) {
 }
 
+inline DocumentStatisticsAnnotationData::DocumentStatisticsAnnotationData(DocumentStatisticsAnnotationData &&other) :
+    TermFrequencyAndIndex(std::move(const_cast<FrequencyAndIndexMap &>(other.TermFrequencyAndIndex))),
+    TotalNumDocuments(std::move(other.TotalNumDocuments)) {
+}
+
 // ----------------------------------------------------------------------
 // |
 // |  DocumentStatisticsEstimator
@@ -377,11 +392,17 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreq
 
     std::uint32_t const & topKTermsValue(*topKTerms);
 
+    //modify termFrequency by selecting top "topKTermsValue" terms
+    //targetPack contains targetValue(apperance number) and remainingTargetValue
+    //Assuming an vector [2,3,3,7,7,6,5,4,4,4,4,4] and the aim is to find top k values(if k = 6)
+    //after partial sorting we know the 6th largest value is 4(the targetValue)
+    //and there are one 4 ahead of it(remainingTargetValue)
     std::tuple<std::uint32_t, long long> targetPack(
         [&termFrequency, &topKTermsValue]() -> std::tuple<std::uint32_t, long long> {
             std::vector<std::uint32_t> frequencyVector;
             frequencyVector.reserve(termFrequency.size());
 
+            //put all apperance number into a vector
             std::transform(
                 termFrequency.begin(),
                 termFrequency.end(),
@@ -391,7 +412,7 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreq
                 }
             );
 
-            //partial sort, ave O(n)
+            //partial sort the vector, ave O(n)
             std::nth_element(
                 frequencyVector.begin(),
                 frequencyVector.begin() + static_cast<int>(topKTermsValue) - 1,
@@ -399,6 +420,7 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreq
                 std::greater<std::uint32_t>()
             );
 
+            //find the target value and calculate the remaining values
             std::uint32_t targetValue = frequencyVector[topKTermsValue - 1];
             long long remainingTargetValue = std::count(
                 frequencyVector.begin(),
@@ -416,6 +438,8 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreq
     std::uint32_t targetValue = std::get<0>(targetPack);
     long long remainingTargetValue = std::get<1>(targetPack);
 
+    //using target value and remaining value to modify termFrequency
+    //didn't find a way to use loop, just remain the original
     FrequencyMap::iterator termFrequencyIter = termFrequency.begin();
     while (termFrequencyIter != termFrequency.end()) {
         if (termFrequencyIter->second < targetValue) {
@@ -424,6 +448,7 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreq
         } else if (termFrequencyIter->second == targetValue) {
             if (remainingTargetValue == 0) {
                termFrequencyIter = termFrequency.erase(termFrequencyIter);
+               continue;
             } else {
                 ++termFrequencyIter;
                 --remainingTargetValue;
@@ -439,9 +464,9 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreq
 inline DocumentStatisticsAnnotationData::FrequencyAndIndexMap MergeTwoMapsWithSameKeys(Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap termFrequency,
                                                                                        Details::DocumentStatisticsTrainingOnlyPolicy::IndexMap termIndex) {
     DocumentStatisticsAnnotationData::FrequencyAndIndexMap termFrequencyAndIndex;
-    for (auto const & termFrequencyIter : termFrequency) {
+    for (std::pair<std::string, std::uint32_t> const termFrequencyIter : termFrequency) {
         //assert that termFrequencyIter.first is in termIndex
-        auto termIndexIter = termIndex.find(termFrequencyIter.first);
+        Details::DocumentStatisticsTrainingOnlyPolicy::IndexMap::iterator termIndexIter = termIndex.find(termFrequencyIter.first);
         if (termIndexIter == termIndex.end())
             throw std::invalid_argument("the keys in termFrequency and termIndex do not match");
 
@@ -472,8 +497,11 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTraining
     std::uint32_t ngramRangeMin,
     std::uint32_t ngramRangeMax
 ) :
+    //decorator is an optional parameter
     _stringDecoratorFunc(std::move(decorator)),
+    //analyzer is an optional parameter
     _analyzer(std::move(analyzer)),
+    //regexToken is an optional parameter
     _regexToken(std::move(regexToken)),
     _existingVocabulary(
         std::move(
@@ -541,6 +569,22 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTraining
 
         if (_ngramRangeMin > _ngramRangeMax)
             throw std::invalid_argument("_ngramRangeMin > _ngramRangeMax");
+
+        //initialize parse function
+        if (_analyzer == AnalyzerMethod::Word) {
+            if (!_regexToken.empty()) {
+                _parseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseRegex<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+            } else if (_ngramRangeMin == 1 && _ngramRangeMax == 1) {
+                _parseFunc = Microsoft::Featurizer::Strings::Wrapper::UParse<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+            } else {
+                _parseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseNgramWordCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+            }
+        } else if (_analyzer == AnalyzerMethod::Char) {
+            _parseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseNgramCharCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+        } else {
+            assert(_analyzer == AnalyzerMethod::Charwb);
+            _parseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseNgramCharwbCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+        }
 }
 
 inline void Details::DocumentStatisticsTrainingOnlyPolicy::fit(InputType const &input) {
@@ -588,9 +632,6 @@ inline DocumentStatisticsAnnotationData Details::DocumentStatisticsTrainingOnlyP
     //ignore the additional keys in termIndex
     FrequencyAndIndexMap                    termFrequencyAndIndex(MergeTwoMapsWithSameKeys(prunedTermFreq, termIndex));
 
-
-   // BaseType::add_annotation(std::make_shared<AnnotationImpl>(EstimatorPolicyT::complete_training()), _colIndex);
-
     return DocumentStatisticsAnnotationData(std::move(termFrequencyAndIndex), std::move(_totalNumDocuments));
 }
 
@@ -602,56 +643,16 @@ template <typename SetT, typename CreateKeyFuncT, typename KeyToStringFuncT>
 void Details::DocumentStatisticsTrainingOnlyPolicy::fit_impl(InputType const &input, CreateKeyFuncT const &createKeyFunc, KeyToStringFuncT const &keyToStringFunc) {
     SetT                                    documents;
 
-    if (_analyzer == AnalyzerMethod::Word) {
-        if (!_regexToken.empty()) {
-            Microsoft::Featurizer::Strings::ParseRegex<InputTypeConstIterator>(
-                input,
-                RegexT(_regexToken),
-                [&createKeyFunc, &documents] (InputTypeConstIterator begin, InputTypeConstIterator end) {
-                    documents.insert(createKeyFunc(begin, end));
-                }
-            );
-        } else if (_ngramRangeMin == 1 && _ngramRangeMax == 1) {
-            Microsoft::Featurizer::Strings::Parse<InputTypeConstIterator>(
-                input,
-                [](char c) {return std::isspace(c);},
-                [&createKeyFunc, &documents] (InputTypeConstIterator begin, InputTypeConstIterator end) {
-                    documents.insert(createKeyFunc(begin, end));
-                }
-            );
-        } else {
-            Microsoft::Featurizer::Strings::ParseNgramWordCopy<InputTypeConstIterator>(
-                input,
-                [](char c) {return std::isspace(c);},
-                _ngramRangeMin,
-                _ngramRangeMax,
-                [&createKeyFunc, &documents] (InputTypeConstIterator begin, InputTypeConstIterator end) {
-                    documents.insert(createKeyFunc(begin, end));
-                }
-            );
+    _parseFunc(
+        input,
+        [](char c) {return std::isspace(c);},
+        std::regex(_regexToken),
+        _ngramRangeMin,
+        _ngramRangeMax,
+        [&createKeyFunc, &documents] (InputTypeConstIterator begin, InputTypeConstIterator end) {
+            documents.insert(createKeyFunc(begin, end));
         }
-    } else if (_analyzer == AnalyzerMethod::Char) {
-        Microsoft::Featurizer::Strings::ParseNgramCharCopy<InputTypeConstIterator>(
-            input,
-            _ngramRangeMin,
-            _ngramRangeMax,
-            [&createKeyFunc, &documents] (InputTypeConstIterator begin, InputTypeConstIterator end) {
-                documents.insert(createKeyFunc(begin, end));
-            }
-        );
-    } else {
-        assert(_analyzer == AnalyzerMethod::Charwb);
-
-        Microsoft::Featurizer::Strings::ParseNgramCharwbCopy<InputTypeConstIterator>(
-            input,
-            [](char c) {return std::isspace(c);},
-            _ngramRangeMin,
-            _ngramRangeMax,
-            [&createKeyFunc, &documents] (InputTypeConstIterator begin, InputTypeConstIterator end) {
-                documents.insert(createKeyFunc(begin, end));
-            }
-        );
-    }
+    );
 
     auto const                              getCountFunc(
         [this, &keyToStringFunc](typename SetT::value_type const &key) -> typename FrequencyMap::mapped_type & {

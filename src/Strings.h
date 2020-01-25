@@ -482,6 +482,85 @@ void ParseNgramCharwbCopy(std::string const &input,
     ParseNgramCharwb(inputCopy, predicate, ngramRangeMin, ngramRangeMax, callback);
 }
 
+//to ensure all parse functions have same number of signature
+namespace Wrapper {
+
+template <
+    typename IteratorT,
+    typename UnaryPredicateT,
+    typename RegexT
+>
+void UParse(std::string const &input,
+           UnaryPredicateT const &predicate,
+           RegexT const &,
+           size_t const,
+           size_t const,
+           std::function<void (IteratorT, IteratorT)> const &callback) {
+
+    Parse(input, predicate, callback);
+}
+
+template <
+    typename IteratorT,
+    typename UnaryPredicateT,
+    typename RegexT
+>
+void UParseRegex(std::string const &input,
+                UnaryPredicateT const &,
+                RegexT const &regexToken,
+                size_t const,
+                size_t const,
+                std::function<void (IteratorT, IteratorT)> const &callback) {
+
+    ParseRegex(input, regexToken, callback);
+}
+
+template <
+    typename IteratorT,
+    typename UnaryPredicateT,
+    typename RegexT
+>
+void UParseNgramWordCopy(std::string const &input,
+                        UnaryPredicateT const &predicate,
+                        RegexT const &,
+                        size_t const ngramRangeMin,
+                        size_t const ngramRangeMax,
+                        std::function<void (IteratorT, IteratorT)> const &callback) {
+
+    ParseNgramWordCopy(input, predicate, ngramRangeMin, ngramRangeMax, callback);
+}
+
+template <
+    typename IteratorT,
+    typename UnaryPredicateT,
+    typename RegexT
+>
+void UParseNgramCharCopy(std::string const &input,
+                        UnaryPredicateT const &,
+                        RegexT const &,
+                        size_t const ngramRangeMin,
+                        size_t const ngramRangeMax,
+                        std::function<void (IteratorT, IteratorT)> const &callback) {
+
+    ParseNgramCharCopy(input, ngramRangeMin, ngramRangeMax, callback);
+}
+
+template <
+    typename IteratorT,
+    typename UnaryPredicateT,
+    typename RegexT
+>
+void UParseNgramCharwbCopy(std::string const &input,
+                          UnaryPredicateT const &predicate,
+                          RegexT const &,
+                          size_t const ngramRangeMin,
+                          size_t const ngramRangeMax,
+                          std::function<void (IteratorT, IteratorT)> const &callback) {
+
+    ParseNgramCharwbCopy(input, predicate, ngramRangeMin, ngramRangeMax, callback);
+}
+
+} // namespace Wrapper
 } // namespace Strings
 } // namespace Featurizer
 } // namespace Microsoft
