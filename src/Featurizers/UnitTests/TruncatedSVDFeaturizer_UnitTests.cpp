@@ -155,3 +155,25 @@ TEST_CASE("Serialization Version Error") {
     );
 }
 
+TEST_CASE("access to shape information") {
+    using MatrixT = Eigen::MatrixX<float>;
+    MatrixT singularVector(6, 2);
+    singularVector(0, 0) = -1;
+    singularVector(0, 1) = -1;
+    singularVector(1, 0) = -2;
+    singularVector(1, 1) = -1;
+    singularVector(2, 0) = -3;
+    singularVector(2, 1) = -2;
+    singularVector(3, 0) = 1;
+    singularVector(3, 1) = 1;
+    singularVector(4, 0) = 2;
+    singularVector(4, 1) = 1;
+    singularVector(5, 0) = 3;
+    singularVector(5, 1) = 2;
+
+    Microsoft::Featurizer::Featurizers::TruncatedSVDTransformer<MatrixT>    svdTransformer(singularVector);
+
+    CHECK(svdTransformer.getSingularVectorRowsNumber() == 6);
+    CHECK(svdTransformer.getSingularVectorColsNumber() == 2);
+}
+

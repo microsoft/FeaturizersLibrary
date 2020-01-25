@@ -95,6 +95,7 @@ SUPPORTED_TYPES                             = set(
         "string",
         "bool",
         "datetime",
+        re.compile(r"vector\<\S+\>"),
     ],
 )
 
@@ -288,11 +289,8 @@ def EntryPoint(
                                 raise Exception("The custom enum '{}' in '{}' has already been defined as a global custom enum.\n".format(custom_enum.name, item.name))
 
                         for mapping in item.type_mappings:
-                            # Since we can have multiple templates this is for when a mapping doesn't use a template or not the current template
-                            if (
-                                mapping.input_type != template.name
-                                and mapping.output_type != template.name
-                            ):
+                            # TODO: sub all types (for example: map<K, V>
+                            if not regex.search(mapping.input_type) and not regex.search(mapping.output_type):
                                 continue
 
                             new_item.input_type = regex.sub(
@@ -319,6 +317,18 @@ def EntryPoint(
             for items in data:
                 for item in items:
                     # ----------------------------------------------------------------------
+                    def IsSupportedType(typename):
+                        for potential_type in SUPPORTED_TYPES:
+                            if hasattr(potential_type, "match"):
+                                if potential_type.match(typename):
+                                    return True
+
+                            elif typename == potential_type:
+                                return True
+
+                        return False
+
+                    # ----------------------------------------------------------------------
                     def IsCustomStructType(typename):
                         return any(
                             custom_struct
@@ -337,7 +347,7 @@ def EntryPoint(
                     # ----------------------------------------------------------------------
 
                     if (
-                        item.input_type not in SUPPORTED_TYPES
+                        not IsSupportedType(item.input_type)
                         and not IsCustomStructType(item.input_type)
                         and not IsCustomEnumType(item.input_type)
                     ):
@@ -349,7 +359,7 @@ def EntryPoint(
                         ) from None
 
                     if (
-                        item.output_type not in SUPPORTED_TYPES
+                        not IsSupportedType(item.output_type)
                         and not IsCustomStructType(item.output_type)
                         and not IsCustomEnumType(item.output_type)
                     ):

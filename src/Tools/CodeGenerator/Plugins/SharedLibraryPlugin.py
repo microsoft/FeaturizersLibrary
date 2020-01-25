@@ -1234,7 +1234,10 @@ class CData(object):
                 assert tif, member.type
 
                 assert member.name not in members, member.name
-                members[member.name] = tif()
+                members[member.name] = tif(
+                    member_type=member.type,
+                    create_type_info_factory_func=self._GetTypeInfoClass,
+                )
 
             custom_structs[custom_struct.name] = members
 
@@ -1251,19 +1254,36 @@ class CData(object):
             tif = self._GetTypeInfoClass(configuration_param.type)
             assert tif, configuration_param.type
 
-            configuration_param_type_info_factories.append(tif(custom_structs))
+            configuration_param_type_info_factories.append(
+                tif(
+                    custom_structs=custom_structs,
+                    custom_enums=custom_enums,
+                    member_type=configuration_param.type,
+                    create_type_info_factory_func=self._GetTypeInfoClass,
+                ),
+            )
 
         # Create the input factory
         tif = self._GetTypeInfoClass(item.input_type)
         assert tif, item.input_type
 
-        input_type_info_factory = tif(custom_structs)
+        input_type_info_factory = tif(
+            custom_structs=custom_structs,
+            custom_enums=custom_enums,
+            member_type=item.input_type,
+            create_type_info_factory_func=self._GetTypeInfoClass,
+        )
 
         # Create the output factory
         tif = self._GetTypeInfoClass(item.output_type)
         assert tif, item.output_type
 
-        output_type_info_factory = tif(custom_structs)
+        output_type_info_factory = tif(
+            custom_structs=custom_structs,
+            custom_enums=custom_enums,
+            member_type=item.output_type,
+            create_type_info_factory_func=self._GetTypeInfoClass,
+        )
 
         # Commit the results
         self.CustomStructs                              = custom_structs
@@ -1296,11 +1316,13 @@ class CData(object):
             from Plugins.SharedLibraryPluginImpl.SparseVectorEncodingTypeInfoFactory import SparseVectorEncodingTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl import StructTypeInfoFactories
+            from Plugins.SharedLibraryPluginImpl.VectorTypeInfoFactory import VectorTypeInfoFactory
 
             type_info_factory_classes = [
                 DateTimeTypeInfoFactory,
                 SparseVectorEncodingTypeInfoFactory,
                 StringTypeInfoFactory,
+                VectorTypeInfoFactory,
             ]
 
             for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:

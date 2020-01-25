@@ -734,7 +734,11 @@ def _GenerateKernel(
 
     if len(input_type_mappings) == 1:
         if len(output_type_mappings) != 1:
-            raise NotImplementedError("Multiple output types is not supported yet")
+            # TODO: Implement this!
+            status_stream.write("Multiple output types is not supported yet ({}) - restricting output to the first type (this is not a good long term solution and should be addressed as soon as possible)\n".format(item.name))
+
+            key = next(six.iterkeys(output_type_mappings))
+            output_type_mappings = {key : output_type_mappings[key]}
 
         input_type = _GetCppTypeMapping(next(six.iterkeys(input_type_mappings)))
         input_types = []

@@ -4,6 +4,7 @@
 # ----------------------------------------------------------------------
 """Contains the Plugin object"""
 
+import itertools
 import os
 import sys
 import textwrap
@@ -53,7 +54,7 @@ class Plugin(PluginBase):
             unsupported_types = set()
             for items in data:
                 csharp_data.append(
-                    [_FillList(item, status_stream, unsupported_types) for item in items],
+                    [_FillList(item, status_stream, unsupported_types, global_custom_structs, global_custom_enums) for item in items],
                 )
 
         for desc, func in [("Generating C# files...", _GenerateCSharpFile)]:
@@ -88,9 +89,9 @@ class Plugin(PluginBase):
 
 
 # ----------------------------------------------------------------------
-def _FillList(item, status_stream, unsupported_types):
+def _FillList(item, status_stream, unsupported_types, global_custom_structs, global_custom_enums):
     try:
-        return CSharpData(item)
+        return CSharpData(item, global_custom_structs, global_custom_enums)
     except Exception as e:
         if "is not a supported type" in e.args[0]:
             if item.custom_structs[0].name not in unsupported_types:
@@ -822,19 +823,30 @@ class CSharpData(object):
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
-    def __init__(self, item):
+    def __init__(self, item, global_custom_structs, global_custom_enums):
+        # Create the custom structs
         custom_structs = OrderedDict()
 
-        for custom_struct in getattr(item, "custom_structs", []):
+        for custom_struct in itertools.chain(global_custom_structs, getattr(item, "custom_structs", [])):
             members = OrderedDict()
 
             for member in custom_struct.members:
                 tif = self._GetTypeInfoClass(member.type)
                 assert tif, member.type
 
-                members[member.name] = tif()
+                assert member.name not in members, member.name
+                members[member.name] = tif(
+                    member_type=member.type,
+                    create_type_info_factory_func=self._GetTypeInfoClass,
+                )
 
             custom_structs[custom_struct.name] = members
+
+        # Create the custom enums
+        custom_enums = OrderedDict()
+
+        for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
+            custom_enums[custom_enum.name] = custom_enum
 
         # Create the configuration param factories
         configuration_param_type_info_factories = []
@@ -843,20 +855,37 @@ class CSharpData(object):
             tif = self._GetTypeInfoClass(configuration_param.type)
             assert tif, configuration_param.type
 
-            configuration_param_type_info_factories.append(tif(custom_structs))
+            configuration_param_type_info_factories.append(
+                tif(
+                    custom_structs=custom_structs,
+                    custom_enums=custom_enums,
+                    member_type=configuration_param.type,
+                    create_type_info_factory_func=self._GetTypeInfoClass,
+                ),
+            )
 
         # Create the input factory
         tif = self._GetTypeInfoClass(item.input_type)
         assert tif, item.input_type
 
-        input_type_info_factory = tif(custom_structs)
+        input_type_info_factory = tif(
+            custom_structs=custom_structs,
+            custom_enums=custom_enums,
+            member_type=item.input_type,
+            create_type_info_factory_func=self._GetTypeInfoClass,
+        )
 
         # Create the output factory
         tif = self._GetTypeInfoClass(item.output_type)
         if tif is None:
             raise Exception("'{}' is not a supported type".format(item.output_type))
 
-        output_type_info_factory = tif(custom_structs)
+        output_type_info_factory = tif(
+            custom_structs=custom_structs,
+            custom_enums=custom_enums,
+            member_type=item.output_type,
+            create_type_info_factory_func=self._GetTypeInfoClass,
+        )
 
         # Commit the results
         self.CustomStructs                              = custom_structs
@@ -882,12 +911,15 @@ class CSharpData(object):
         if cls._type_info_factory_classes is None:
             from Plugins.MLNetPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
             from Plugins.MLNetPluginImpl import ScalarTypeInfoFactories
-            from Plugins.MLNetPluginImpl.StringTypeInfoFactory import (
-                StringTypeInfoFactory,
-            )
+            from Plugins.MLNetPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.MLNetPluginImpl import StructTypeInfoFactories
+            from Plugins.MLNetPluginImpl.VectorTypeInfoFactory import VectorTypeInfoFactory
 
-            type_info_factory_classes = [DatetimeTypeInfoFactory, StringTypeInfoFactory]
+            type_info_factory_classes = [
+                DatetimeTypeInfoFactory,
+                StringTypeInfoFactory,
+                VectorTypeInfoFactory,
+            ]
 
             for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
                 for obj_name in dir(compound_module):
@@ -905,7 +937,12 @@ class CSharpData(object):
             cls._type_info_factory_classes = type_info_factory_classes
 
         for type_info_factory_class in cls._type_info_factory_classes:
-            if type_info_factory_class.TypeName == the_type:
-                return type_info_factory_class
+            if isinstance(type_info_factory_class.TypeName, six.string_types):
+                if type_info_factory_class.TypeName == the_type:
+                    return type_info_factory_class
+
+            elif hasattr(type_info_factory_class.TypeName, "match"):
+                if type_info_factory_class.TypeName.match(the_type):
+                    return type_info_factory_class
 
         return None

@@ -161,3 +161,25 @@ TEST_CASE("Serialization Version Error") {
     );
 }
 
+TEST_CASE("access to shape information") {
+    using MatrixT = Eigen::MatrixX<float>;
+    MatrixT eigenVector(6, 2);
+    eigenVector(0, 0) = -1;
+    eigenVector(0, 1) = -1;
+    eigenVector(1, 0) = -2;
+    eigenVector(1, 1) = -1;
+    eigenVector(2, 0) = -3;
+    eigenVector(2, 1) = -2;
+    eigenVector(3, 0) = 1;
+    eigenVector(3, 1) = 1;
+    eigenVector(4, 0) = 2;
+    eigenVector(4, 1) = 1;
+    eigenVector(5, 0) = 3;
+    eigenVector(5, 1) = 2;
+
+    Microsoft::Featurizer::Featurizers::PCATransformer<MatrixT>    pcaTransformer(eigenVector);
+
+    CHECK(pcaTransformer.getEigenVectorRowsNumber() == 6);
+    CHECK(pcaTransformer.getEigenVectorColsNumber() == 2);
+}
+
