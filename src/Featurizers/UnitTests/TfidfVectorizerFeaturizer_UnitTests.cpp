@@ -17,7 +17,18 @@ namespace NS = Microsoft::Featurizer;
 using IndexMap = typename NS::Featurizers::TfidfVectorizerTransformer::IndexMap;
 using AnalyzerMethod = NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
 
-//todo: more tests will be added
+template<typename T>
+void SparseVectorNumericCheck(NS::Featurizers::SparseVectorEncoding<T> const &a,
+                              NS::Featurizers::SparseVectorEncoding<T> const &b) {
+    CHECK(a.NumElements == b.NumElements);
+    assert(a.Values.size() == b.Values.size());
+    std::vector<NS::Featurizers::SparseVectorEncoding<std::float_t>::ValueEncoding> const & aValues(a.Values);
+    std::vector<NS::Featurizers::SparseVectorEncoding<std::float_t>::ValueEncoding> const & bValues(b.Values);
+    for (size_t idx = 0; idx < a.Values.size(); ++idx) {
+        CHECK(aValues[idx].Index == bValues[idx].Index);
+        CHECK(Approx(aValues[idx].Value) == bValues[idx].Value);
+    }
+}
 
 TEST_CASE("string_standard_1") {
     using InputType       = std::string;
@@ -39,25 +50,23 @@ TEST_CASE("string_standard_1") {
     values.emplace_back(TransformedType::ValueEncoding(0.384085f, 6));
     values.emplace_back(TransformedType::ValueEncoding(0.384085f, 8));
 
-    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
+    auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
+    auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
+                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                    NS::CreateTestAnnotationMapsPtr(1),
+                                    0,
+                                    Microsoft::Featurizer::Strings::ToLower,
+                                    AnalyzerMethod::Word,
+                                    ""
+                                ),
+                                trainingBatches,
+                                inferencingInput
+                            );
+
+    SparseVectorNumericCheck<std::float_t>(std::move(inferencingOutput[0]), std::move(inferencingLabel[0]));
 
     // for (auto const & item : result[0].Values)
     //     std::cout << item.Value << ", "<< item.Index << std::endl;
-
-
-    CHECK(
-        NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
-                NS::CreateTestAnnotationMapsPtr(1),
-                0,
-                Microsoft::Featurizer::Strings::ToLower,
-                AnalyzerMethod::Word,
-                ""
-            ),
-            trainingBatches,
-            inferencingInput
-        )== inferencingOutput
-    );
 }
 
 // TEST_CASE("string_standard_2") {

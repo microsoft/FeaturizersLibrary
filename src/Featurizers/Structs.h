@@ -3,7 +3,6 @@
 // Licensed under the MIT License
 // ----------------------------------------------------------------------
 #pragma once
-#define EPS 0.000001
 
 #include "../Featurizer.h"
 
@@ -144,7 +143,7 @@ typename SparseVectorEncoding<T>::ValueEncoding & SparseVectorEncoding<T>::Value
 
 template <typename T>
 bool SparseVectorEncoding<T>::ValueEncoding::operator==(ValueEncoding const &other) const {
-    return static_cast<T>(abs(Value - other.Value)) < static_cast<T>(EPS)
+    return (Value == other.Value)
         && Index == other.Index;
 }
 
