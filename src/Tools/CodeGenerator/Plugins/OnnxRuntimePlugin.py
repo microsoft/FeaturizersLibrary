@@ -43,7 +43,7 @@ class Plugin(PluginBase):
     # |  Methods
     @staticmethod
     @Interface.override
-    def Generate(global_custom_structs, global_custom_enums, data, output_dir, status_stream):
+    def Generate(open_file_func, global_custom_structs, global_custom_enums, data, output_dir, status_stream):
         result_code = 0
 
         status_stream.write("Preprocessing data...")
@@ -127,6 +127,7 @@ class Plugin(PluginBase):
                 this_dm.stream.write(desc)
                 with this_dm.stream.DoneManager() as dm:
                     dm.result = func(
+                        open_file_func,
                         output_dir,
                         data,
                         type_mappings,
@@ -158,6 +159,7 @@ class Plugin(PluginBase):
                         input_type_mapping, output_type_mapping = type_mapping
 
                         this_dm.result = func(
+                            open_file_func,
                             output_dir,
                             items,
                             input_type_mapping,
@@ -222,6 +224,7 @@ def _GetCppTypeMapping(
 
 # ----------------------------------------------------------------------
 def _GenerateGlobalKernels(
+    open_file_func,
     output_dir,
     all_items,
     all_type_mappings,
@@ -231,7 +234,7 @@ def _GenerateGlobalKernels(
     output_dir = os.path.join(output_dir, "featurizers_ops")
     FileSystem.MakeDirs(output_dir)
 
-    with open(os.path.join(output_dir, "cpu_featurizers_kernels.h"), "w") as f:
+    with open_file_func(os.path.join(output_dir, "cpu_featurizers_kernels.h"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -269,7 +272,7 @@ def _GenerateGlobalKernels(
         )
         continue
 
-    with open(os.path.join(output_dir, "cpu_featurizers_kernels.cc"), "w") as f:
+    with open_file_func(os.path.join(output_dir, "cpu_featurizers_kernels.cc"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -318,6 +321,7 @@ def _GenerateGlobalKernels(
 
 # ----------------------------------------------------------------------
 def _GenerateGlobalDefs(
+    open_file_func,
     output_dir,
     all_items,
     all_type_mappings,
@@ -327,7 +331,7 @@ def _GenerateGlobalDefs(
     output_dir = os.path.join(output_dir, "core", "graph", "featurizers_ops")
     FileSystem.MakeDirs(output_dir)
 
-    with open(os.path.join(output_dir, "featurizers_defs.h"), "w") as f:
+    with open_file_func(os.path.join(output_dir, "featurizers_defs.h"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -634,7 +638,7 @@ def _GenerateGlobalDefs(
             ),
         )
 
-    with open(os.path.join(output_dir, "featurizers_defs.cc"), "w") as f:
+    with open_file_func(os.path.join(output_dir, "featurizers_defs.cc"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -711,6 +715,7 @@ def _GenerateGlobalDefs(
 
 # ----------------------------------------------------------------------
 def _GenerateKernel(
+    open_file_func,
     output_dir,
     items,
     input_type_mappings,
@@ -941,7 +946,7 @@ def _GenerateKernel(
         ),
     )
 
-    with open(
+    with open_file_func(
         os.path.join(
             output_dir,
             "{}.cc".format(

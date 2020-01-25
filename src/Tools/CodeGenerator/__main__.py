@@ -4,11 +4,14 @@
 # ----------------------------------------------------------------------
 """Tool that generates code using in the Featurizer ecosystem."""
 
+import contextlib
 import copy
+import hashlib
 import importlib
 import itertools
 import os
 import re
+import shutil
 import sys
 import textwrap
 
@@ -21,6 +24,7 @@ import CommonEnvironment
 from CommonEnvironment.CallOnExit import CallOnExit
 from CommonEnvironment import CommandLine
 from CommonEnvironment import FileSystem
+from CommonEnvironment.Shell.All import CurrentShell
 from CommonEnvironment.StreamDecorator import StreamDecorator
 from CommonEnvironment import StringHelpers
 
@@ -374,7 +378,43 @@ def EntryPoint(
         with dm.stream.DoneManager() as this_dm:
             FileSystem.MakeDirs(output_dir)
 
+            # ----------------------------------------------------------------------
+            def CalcHash(filename):
+                hash = hashlib.sha256()
+
+                with open(filename, "rb") as f:
+                    while True:
+                        block = f.read(4096)
+                        if not block:
+                            break
+
+                        hash.update(block)
+
+                return hash.digest()
+
+            # ----------------------------------------------------------------------
+            @contextlib.contextmanager
+            def FileWriter(filename, mode):
+                """\
+                Method that writes to a temporary location and only copies to the intended
+                destination if there are changes. This prevents full rebuilds (which are
+                triggered based on timestamps) on files that haven't changed.
+                """
+
+                temp_filename = CurrentShell.CreateTempFilename()
+                with open(temp_filename, mode) as f:
+                    yield f
+
+                if not os.path.isfile(filename) or CalcHash(temp_filename) != CalcHash(filename):
+                    FileSystem.RemoveFile(filename)
+                    shutil.move(temp_filename, filename)
+                else:
+                    FileSystem.RemoveFile(temp_filename)
+
+            # ----------------------------------------------------------------------
+
             this_dm.result = plugin.Generate(
+                FileWriter,
                 global_custom_structs,
                 global_custom_enums,
                 data,
