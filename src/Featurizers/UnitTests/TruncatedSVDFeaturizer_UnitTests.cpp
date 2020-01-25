@@ -12,41 +12,9 @@
 namespace NS = Microsoft::Featurizer;
 
 template <typename MatrixT>
-void TruncatedSVDTransformerTest() {
+void TruncatedSVDTransformerTestImpl(MatrixT const &trainingMatrix, MatrixT const &label) {
     std::float_t eps = 0.0001f;
-
-    MatrixT trainingMatrix(3, 3);
-    trainingMatrix(0, 0) = -1;
-    trainingMatrix(0, 1) = -1;
-    trainingMatrix(0, 2) =  0;
-    trainingMatrix(1, 0) =  0;
-    trainingMatrix(1, 1) = -2;
-    trainingMatrix(1, 2) = -1;
-    trainingMatrix(2, 0) = -3;
-    trainingMatrix(2, 1) =  0;
-    trainingMatrix(2, 2) = -2;
-
     MatrixT input = trainingMatrix;
-
-    #if (defined __clang__)
-    #   pragma clang diagnostic push
-    #   pragma clang diagnostic ignored "-Wdouble-promotion"
-    #endif
-
-    MatrixT label(3, 3);
-    label(0, 0) = -1.009107f;
-    label(0, 1) =  0.626315f;
-    label(0, 2) = -0.767745f;
-    label(1, 0) = -0.965105f;
-    label(1, 1) =  1.995869f;
-    label(1, 2) =  0.291682f;
-    label(2, 0) = -3.529165f;
-    label(2, 1) = -0.724887f;
-    label(2, 2) =  0.139759f;
-
-    #if (defined __clang__)
-    #   pragma clang diagnostic pop
-    #endif
 
     using SVDEstimator                                 = NS::Featurizers::TruncatedSVDEstimator<MatrixT>;
     NS::AnnotationMapsPtr const                        pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
@@ -56,9 +24,11 @@ void TruncatedSVDTransformerTest() {
     );
 
     std::vector<MatrixT> inputContainers = NS::TestHelpers::make_vector<MatrixT>(input);
-    std::vector<MatrixT> outputContainer = NS::TestHelpers::TransformerEstimatorTest(SVDEstimator(pAllColumnAnnotations, 0), trainingBatches, inputContainers);
+    std::vector<Eigen::MatrixX<typename MatrixT::Scalar>> outputContainer = NS::TestHelpers::TransformerEstimatorTest(SVDEstimator(pAllColumnAnnotations, 0), trainingBatches, inputContainers);
 
-    MatrixT output = outputContainer[0];
+    REQUIRE(outputContainer.size() == 1);
+
+    Eigen::MatrixX<typename MatrixT::Scalar> const &    output(outputContainer[0]);
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
@@ -70,6 +40,93 @@ void TruncatedSVDTransformerTest() {
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
+}
+
+template <typename T>
+void TruncatedSVDTransformerTestStandard(void) {
+    // ----------------------------------------------------------------------
+    using Matrix                            = Eigen::MatrixX<T>;
+    // ----------------------------------------------------------------------
+
+    Matrix                                  trainingMatrix(3, 3);
+
+    trainingMatrix(0, 0) = -1;
+    trainingMatrix(0, 1) = -1;
+    trainingMatrix(0, 2) =  0;
+    trainingMatrix(1, 0) =  0;
+    trainingMatrix(1, 1) = -2;
+    trainingMatrix(1, 2) = -1;
+    trainingMatrix(2, 0) = -3;
+    trainingMatrix(2, 1) =  0;
+    trainingMatrix(2, 2) = -2;
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#endif
+
+    Matrix                                  label(3, 3);
+
+    label(0, 0) = -1.009107f;
+    label(0, 1) =  0.626315f;
+    label(0, 2) = -0.767745f;
+    label(1, 0) = -0.965105f;
+    label(1, 1) =  1.995869f;
+    label(1, 2) =  0.291682f;
+    label(2, 0) = -3.529165f;
+    label(2, 1) = -0.724887f;
+    label(2, 2) =  0.139759f;
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+
+    TruncatedSVDTransformerTestImpl(trainingMatrix, label);
+}
+
+template <typename T>
+void TruncatedSVDTransformerTestMap(void) {
+    // ----------------------------------------------------------------------
+    using Matrix                            = Eigen::Map<Eigen::MatrixX<T>>;
+    // ----------------------------------------------------------------------
+
+    // Column major order
+    T                                       data[]{
+        -1, 0, -3,
+        -1, -2, 0,
+        0, -1, -2
+
+    };
+
+    #if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#endif
+
+    T                                       labelData[]{
+        -1.009107f, -0.965105f, -3.529165f,
+        0.626315f, 1.995869f, -0.724887f,
+        -0.767745f, 0.291682f, 0.139759f
+    };
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+
+    Matrix                                  matrix(data, 3, 3);
+    Matrix                                  labelMatrix(labelData, 3, 3);
+
+    TruncatedSVDTransformerTestImpl(matrix, labelMatrix);
+}
+
+TEST_CASE("Standard ") {
+    TruncatedSVDTransformerTestStandard<float>();
+    TruncatedSVDTransformerTestStandard<double>();
+}
+
+TEST_CASE("Map") {
+    TruncatedSVDTransformerTestMap<float>();
+    TruncatedSVDTransformerTestMap<double>();
 }
 
 TEST_CASE("Invalid_Annotation") {
@@ -101,12 +158,7 @@ TEST_CASE("Invalid_fit") {
     estimator.begin_training();
     estimator.fit(trainingMatrix);
 
-    CHECK_THROWS_WITH(estimator.fit(trainingMatrix), "fit_impl() should not be called move than once in TruncatedSVDFeaturizer");
-}
-
-TEST_CASE("TruncatedSVDTransformerTest") {
-    TruncatedSVDTransformerTest<Eigen::MatrixX<float>>();
-    TruncatedSVDTransformerTest<Eigen::MatrixX<double>>();
+    CHECK_THROWS_WITH(estimator.fit(trainingMatrix), "`fit` should not be invoked on an estimator that is not training or is already finished/complete");
 }
 
 TEST_CASE("Serialization/Deserialization") {
@@ -154,26 +206,3 @@ TEST_CASE("Serialization Version Error") {
         Catch::Contains("Unsupported archive version")
     );
 }
-
-TEST_CASE("access to shape information") {
-    using MatrixT = Eigen::MatrixX<float>;
-    MatrixT singularVector(6, 2);
-    singularVector(0, 0) = -1;
-    singularVector(0, 1) = -1;
-    singularVector(1, 0) = -2;
-    singularVector(1, 1) = -1;
-    singularVector(2, 0) = -3;
-    singularVector(2, 1) = -2;
-    singularVector(3, 0) = 1;
-    singularVector(3, 1) = 1;
-    singularVector(4, 0) = 2;
-    singularVector(4, 1) = 1;
-    singularVector(5, 0) = 3;
-    singularVector(5, 1) = 2;
-
-    Microsoft::Featurizer::Featurizers::TruncatedSVDTransformer<MatrixT>    svdTransformer(singularVector);
-
-    CHECK(svdTransformer.getSingularVectorRowsNumber() == 6);
-    CHECK(svdTransformer.getSingularVectorColsNumber() == 2);
-}
-
