@@ -43,7 +43,7 @@ class Plugin(PluginBase):
     # |  Methods
     @staticmethod
     @Interface.override
-    def Generate(global_custom_structs, global_custom_enums, data, output_dir, status_stream):
+    def Generate(open_file_func, global_custom_structs, global_custom_enums, data, output_dir, status_stream):
         result_code = 0
 
         status_stream.write("Preprocessing data for ML.NET...")
@@ -74,6 +74,7 @@ class Plugin(PluginBase):
                     )
                     with dm.stream.DoneManager() as this_dm:
                         this_dm.result = func(
+                            open_file_func,
                             output_dir,
                             items,
                             items_csharp_data,
@@ -107,13 +108,13 @@ def _FillList(item, status_stream, unsupported_types, global_custom_structs, glo
             raise e
 
 
-def _GenerateCSharpFile(output_dir, items, csharp_data_items, output_stream):
+def _GenerateCSharpFile(open_file_func, output_dir, items, csharp_data_items, output_stream):
     baseName = items[0].name.replace("Featurizer", "")
     transformerName = baseName + "Transformer"
     estimatorName = baseName + "Estimator"
     entrypointName = baseName + "Entrypoint"
 
-    with open(os.path.join(output_dir, "{}.cs".format(items[0].name)), "w") as f:
+    with open_file_func(os.path.join(output_dir, "{}.cs".format(items[0].name)), "w") as f:
         f.write(
             textwrap.dedent(
                 """\

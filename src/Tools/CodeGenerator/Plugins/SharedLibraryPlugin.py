@@ -44,6 +44,7 @@ class Plugin(PluginBase):
     @staticmethod
     @Interface.override
     def Generate(
+        open_file_func,
         global_custom_structs,
         global_custom_enums,
         data,
@@ -63,7 +64,7 @@ class Plugin(PluginBase):
 
         status_stream.write("Generating Common Files...")
         with status_stream.DoneManager() as this_dm:
-            this_dm.result = _GenerateCommonFiles(output_dir, this_dm.stream)
+            this_dm.result = _GenerateCommonFiles(open_file_func, output_dir, this_dm.stream)
             if this_dm.result != 0:
                 return this_dm.result
 
@@ -86,6 +87,7 @@ class Plugin(PluginBase):
                     )
                     with dm.stream.DoneManager() as this_dm:
                         this_dm.result = func(
+                            open_file_func,
                             output_dir,
                             items,
                             items_c_data,
@@ -145,8 +147,8 @@ def _CreateInterfaceSubstitutionDict(item, c_data):
 
 
 # ----------------------------------------------------------------------
-def _GenerateCommonFiles(output_dir, output_stream):
-    with open(os.path.join(output_dir, "SharedLibrary_Common.h"), "w") as f:
+def _GenerateCommonFiles(open_file_func, output_dir, output_stream):
+    with open_file_func(os.path.join(output_dir, "SharedLibrary_Common.h"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -290,7 +292,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
             ),
         )
 
-    with open(os.path.join(output_dir, "SharedLibrary_Common.cpp"), "w") as f:
+    with open_file_func(os.path.join(output_dir, "SharedLibrary_Common.cpp"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -396,7 +398,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
             ),
         )
 
-    with open(os.path.join(output_dir, "SharedLibrary_Common.hpp"), "w") as f:
+    with open_file_func(os.path.join(output_dir, "SharedLibrary_Common.hpp"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -436,7 +438,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
             ),
         )
 
-    with open(os.path.join(output_dir, "SharedLibrary_PointerTable.h"), "w") as f:
+    with open_file_func(os.path.join(output_dir, "SharedLibrary_PointerTable.h"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -453,7 +455,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
             ),
         )
 
-    with open(os.path.join(output_dir, "SharedLibrary_PointerTable.cpp"), "w") as f:
+    with open_file_func(os.path.join(output_dir, "SharedLibrary_PointerTable.cpp"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -481,8 +483,8 @@ def _GenerateCommonFiles(output_dir, output_stream):
 
 
 # ----------------------------------------------------------------------
-def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
-    with open(
+def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_stream):
+    with open_file_func(
         os.path.join(output_dir, "SharedLibrary_{}.h".format(items[0].name)),
         "w",
     ) as f:
@@ -686,8 +688,8 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
 
 
 # ----------------------------------------------------------------------
-def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
-    with open(
+def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_stream):
+    with open_file_func(
         os.path.join(output_dir, "SharedLibrary_{}.cpp".format(items[0].name)),
         "w",
     ) as f:
