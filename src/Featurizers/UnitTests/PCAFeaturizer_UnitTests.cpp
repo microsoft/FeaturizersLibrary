@@ -115,6 +115,78 @@ TEST_CASE("PCATransformerTest") {
     PCATransformerTest<Eigen::MatrixX<double>>();
 }
 
+
+TEST_CASE("Different training and inferencing data") {
+    using MatrixType = Eigen::MatrixX<std::double_t>;
+
+    MatrixType trainingMatrix(3, 3);
+    trainingMatrix(0, 0) = -1;
+    trainingMatrix(0, 1) = -1;
+    trainingMatrix(0, 2) =  0;
+    trainingMatrix(1, 0) =  0;
+    trainingMatrix(1, 1) = -2;
+    trainingMatrix(1, 2) = -1;
+    trainingMatrix(2, 0) = -3;
+    trainingMatrix(2, 1) =  0;
+    trainingMatrix(2, 2) = -2;
+
+    MatrixType inferenceMatrix(3, 3);
+    inferenceMatrix(0, 0) = 1;
+    inferenceMatrix(0, 1) = 0;
+    inferenceMatrix(0, 2) = 0;
+    inferenceMatrix(1, 0) = 0;
+    inferenceMatrix(1, 1) = 1;
+    inferenceMatrix(1, 2) = 0;
+    inferenceMatrix(2, 0) = 0;
+    inferenceMatrix(2, 1) = 0;
+    inferenceMatrix(2, 2) = 1;
+
+
+
+    using PCAEstimator                                 = NS::Featurizers::PCAEstimator<MatrixType>;
+    NS::AnnotationMapsPtr const                        pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+
+    std::vector<std::vector<MatrixType>> trainingBatches  = NS::TestHelpers::make_vector<std::vector<MatrixType>>(
+        NS::TestHelpers::make_vector<MatrixType>(trainingMatrix)
+    );
+
+    std::vector<MatrixType> inputContainers = NS::TestHelpers::make_vector<MatrixType>(inferenceMatrix);
+    std::vector<MatrixType> outputContainer = NS::TestHelpers::TransformerEstimatorTest(PCAEstimator(pAllColumnAnnotations, 0), trainingBatches, inputContainers);
+
+
+    MatrixType inferenceOutput(3, 3);
+    inferenceOutput(0, 0) =  0.588348;
+    inferenceOutput(0, 1) =  0.784465;
+    inferenceOutput(0, 2) = -0.196116;
+    inferenceOutput(1, 0) =  0.196583;
+    inferenceOutput(1, 1) = -0.374023;
+    inferenceOutput(1, 2) = -0.906345;
+    inferenceOutput(2, 0) =  0.784348;
+    inferenceOutput(2, 1) = -0.494694;
+    inferenceOutput(2, 2) =  0.374268;
+
+
+    // we used a randomized algorithm for the decomposition of matrices
+    // so for all compilers, the absolute values of matrix element are the same
+    // but signedness can be different for an entire column
+    std::double_t eps = 0.00001;
+    for (MatrixType::Index col=0; col < outputContainer[0].cols(); ++col) {
+        bool negative = std::abs(inferenceOutput(0,col) - outputContainer[0](0,col)) > eps;
+        for (MatrixType::Index row=0; row < outputContainer[0].rows(); ++row) {
+            if (negative) {
+                CHECK(std::abs(inferenceOutput(row, col) + outputContainer[0](row,col)) <= eps);
+            }
+            else {
+                CHECK(std::abs(inferenceOutput(row, col) - outputContainer[0](row,col)) <= eps);
+            }
+        }
+    }
+}
+
+
+
+
+
 TEST_CASE("Serialization/Deserialization") {
     using MatrixT = Eigen::MatrixX<float>;
     using TransformerType = NS::Featurizers::PCATransformer<MatrixT>;
