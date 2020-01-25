@@ -43,8 +43,8 @@ public:
 
     void save(Archive &ar) const override;
 
-    size_t getEigenVectorRowsNumber() const;
-    size_t getEigenVectorColsNumber() const;
+    std::ptrdiff_t getEigenVectorRowsNumber() const;
+    std::ptrdiff_t getEigenVectorColsNumber() const;
 
 private:
     // ----------------------------------------------------------------------
@@ -209,13 +209,13 @@ void PCATransformer<MatrixT>::save(Archive &ar) const /*override*/ {
 }
 
 template <typename MatrixT>
-size_t PCATransformer<MatrixT>::getEigenVectorRowsNumber() const {
-    return static_cast<size_t>(_eigenvectors.rows());
+std::ptrdiff_t PCATransformer<MatrixT>::getEigenVectorRowsNumber() const {
+    return _eigenvectors.rows();
 }
 
 template <typename MatrixT>
-size_t PCATransformer<MatrixT>::getEigenVectorColsNumber() const {
-    return static_cast<size_t>(_eigenvectors.cols());
+std::ptrdiff_t PCATransformer<MatrixT>::getEigenVectorColsNumber() const {
+    return _eigenvectors.cols();
 }
 
 // ----------------------------------------------------------------------

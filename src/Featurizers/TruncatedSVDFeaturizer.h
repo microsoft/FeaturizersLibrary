@@ -43,8 +43,8 @@ public:
 
     void save(Archive &ar) const override;
 
-    size_t getSingularVectorRowsNumber() const;
-    size_t getSingularVectorColsNumber() const;
+    std::ptrdiff_t getSingularVectorRowsNumber() const;
+    std::ptrdiff_t getSingularVectorColsNumber() const;
 
 private:
     // ----------------------------------------------------------------------
@@ -332,13 +332,13 @@ void TruncatedSVDTransformer<MatrixT>::save(Archive &ar) const /*override*/ {
 }
 
 template <typename MatrixT>
-size_t TruncatedSVDTransformer<MatrixT>::getSingularVectorRowsNumber() const {
-    return static_cast<size_t>(_singularvectors.rows());
+std::ptrdiff_t TruncatedSVDTransformer<MatrixT>::getSingularVectorRowsNumber() const {
+    return _singularvectors.rows();
 }
 
 template <typename MatrixT>
-size_t TruncatedSVDTransformer<MatrixT>::getSingularVectorColsNumber() const {
-    return static_cast<size_t>(_singularvectors.cols());
+std::ptrdiff_t TruncatedSVDTransformer<MatrixT>::getSingularVectorColsNumber() const {
+    return _singularvectors.cols();
 }
 
 // ----------------------------------------------------------------------
