@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the VectorTypeInfoFactory object"""
+"""Contains the MatrixTypeInfoFactory object"""
 
 import os
 import re
@@ -20,13 +20,13 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class VectorTypeInfoFactory(TypeInfoFactory):
+class MatrixTypeInfoFactory(TypeInfoFactory):
     # ----------------------------------------------------------------------
     # |
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
-    TypeName                                = Interface.DerivedProperty(re.compile(r"vector\<(?P<type>\S+)\>"))
+    TypeName                                = Interface.DerivedProperty(re.compile(r"matrix\<(?P<type>\S+)\>"))
     CppType                                 = Interface.DerivedProperty(None)
 
     # ----------------------------------------------------------------------
@@ -56,105 +56,91 @@ class VectorTypeInfoFactory(TypeInfoFactory):
             self._type_info                 = type_info
 
             # Override the CppType property with this type info
-            self.CppType = "std::tuple<{type} *, {type} *>".format(
-                type=self._type_info.CppType,
-            )
+            self._matrix_type               = "Eigen::MatrixX<{}>".format(self._type_info.CType);
+            self._map_type                  = "Eigen::Map<{}>".format(self._matrix_type)
+
+            self.CppType = self._map_type
 
     # ----------------------------------------------------------------------
     @Interface.override
     def GetInputInfo(self, arg_name, is_optional, invocation_template):
         if is_optional:
-            validation_statements = textwrap.dedent(
-                """\
-                if({name}_ptr == nullptr && {name}_elements != 0) throw std::invalid_argument("'{name}_elements' is not 0");
-                if({name}_ptr != nullptr && {name}_elements == 0) throw std::invalid_argument("'{name}_elements' is 0");
-                """,
-            ).format(
-                name=arg_name,
-            )
-
-            invocation_statements = invocation_template.format(
-                "{name}_ptr ? std::make_tuple(const_cast<{type} *>({name}_ptr), const_cast<{type} *>({name}_ptr) + {name}_elements) : nonstd::optional<std::tuple<{type} const *, {type} const *>>()".format(
-                    type=self._type_info.CType,
-                    name=arg_name,
-                ),
-            )
-        else:
-            validation_statements = textwrap.dedent(
-                """\
-                if({name}_ptr == nullptr) throw std::invalid_argument("'{name}_ptr' is null");
-                if({name}_elements == 0) throw std::invalid_argument("'{name}_elements' is 0");
-                """,
-            ).format(
-                name=arg_name,
-            )
-
-            invocation_statements = invocation_template.format(
-                "std::make_tuple(const_cast<{type} *>({name}_ptr), const_cast<{type} *>({name}_ptr) + {name}_elements)".format(
-                    type=self._type_info.CType,
-                    name=arg_name,
-                ),
-            )
+            raise Exception("Optional matrix values are not supported")
 
         return self.Result(
             [
-                "/*in*/ {type} const *{name}_ptr".format(
+                "/*in*/ size_t {}_cols".format(arg_name),
+                "/*in*/ size_t {}_rows".format(arg_name),
+                "/*in*/ {type} const * {name}_ptr".format(
                     type=self._type_info.CType,
                     name=arg_name,
                 ),
-                "/*in*/ size_t {}_elements".format(arg_name),
             ],
-            validation_statements,
-            invocation_statements,
+            textwrap.dedent(
+                """\
+                if({name}_cols == 0) throw std::invalid_argument("'{name}_cols' is 0");
+                if({name}_rows == 0) throw std::invalid_argument("'{name}_rows' is 0");
+                if({name}_ptr == nullptr) throw std::invalid_argument("'{name}_ptr' is null");
+                """,
+            ).format(
+                name=arg_name,
+            ),
+            invocation_template.format(
+                "{map_type}(const_cast<{type} *>({name}_ptr), static_cast<Eigen::Index>({name}_rows), static_cast<Eigen::Index>({name}_cols))".format(
+                    name=arg_name,
+                    type=self._type_info.CType,
+                    map_type=self._map_type,
+                ),
+            ),
         )
 
     # ----------------------------------------------------------------------
     @Interface.override
     def GetInputBufferInfo(self, arg_name, is_optional, invocation_template):
         if is_optional:
-            raise Exception("Optional vector values are not supported for input buffers")
+            raise Exception("Optional matrix values are not supported")
 
         return self.Result(
             [
+                "/*in*/ size_t {}_cols".format(arg_name),
+                "/*in*/ size_t {}_rows".format(arg_name),
                 "/*in*/ {type} const **{name}_values_ptr".format(
                     type=self._type_info.CType,
                     name=arg_name,
                 ),
-                "/*in*/ size_t const *{}_sizes_ptr".format(arg_name),
                 "/*in*/ size_t {}_elements".format(arg_name),
             ],
             textwrap.dedent(
                 """\
+                if({name}_cols == 0) throw std::invalid_argument("'{name}_cols' is 0");
+                if({name}_rows == 0) throw std::invalid_argument("'{name}_rows' is 0");
                 if({name}_values_ptr == nullptr) throw std::invalid_argument("'{name}_values_ptr' is null");
-                if({name}_sizes_ptr == nullptr) throw std::invalid_argument("'{name}_sizes_ptr' is null");
                 if({name}_elements == 0) throw std::invalid_argument("'{name}_elements' is 0");
-                """,
-            ).format(
-                name=arg_name,
-            ),
-            textwrap.dedent(
-                """\
-                std::vector<std::tuple<{type} *, {type} *>> {name}_buffer;
+
+                std::vector<{map_type}> {name}_buffer;
 
                 {name}_buffer.reserve({name}_elements);
 
-                {type} const * const * const {name}_values_end_ptr({name}_values_ptr + {name}_elements);
+                {type} const * const * const {name}_values_end({name}_values_ptr + {name}_elements);
 
-                while({name}_values_ptr != {name}_values_end_ptr) {{
-                    {name}_buffer.emplace_back(const_cast<{type} *>(*{name}_values_ptr), const_cast<{type} *>(*{name}_values_ptr) + *{name}_sizes_ptr);
+                while({name}_values_ptr != {name}_values_end) {{
+                #if (defined __apple_build_verion__)
+                    {name}_buffer.push_back({map_type}(const_cast<{type} *>(*{name}_values_ptr), static_cast<Eigen::Index>({name}_rows), static_cast<Eigen::Index>({name}_cols)));
+                #else
+                    {name}_buffer.emplace_back({map_type}(const_cast<{type} *>(*{name}_values_ptr), static_cast<Eigen::Index>({name}_rows), static_cast<Eigen::Index>({name}_cols)));
+                #endif
                     ++{name}_values_ptr;
-                    ++{name}_sizes_ptr;
                 }}
-
-                {statement}
                 """,
             ).format(
-                type=self._type_info.CType,
                 name=arg_name,
-                statement=invocation_template.format(
-                    "{name}_buffer.data(), {name}_buffer.size()".format(
-                        name=arg_name,
-                    ),
+                map_type=self._map_type,
+                matrix_type=self._matrix_type,
+                type=self._type_info.CType,
+            ),
+            invocation_template.format(
+                "{name}_buffer.data(), {name}_buffer.size()".format(
+                    name=arg_name,
                 ),
             ),
         )
@@ -169,49 +155,41 @@ class VectorTypeInfoFactory(TypeInfoFactory):
     ):
         return self.Result(
             [
+                "/*out*/ size_t *{}_cols".format(arg_name),
+                "/*out*/ size_t *{}_rows".format(arg_name),
                 "/*out*/ {type} **{name}_ptr".format(
                     type=self._type_info.CType,
                     name=arg_name,
                 ),
-                "/*out*/ size_t *{}_elements".format(arg_name),
             ],
             textwrap.dedent(
                 """\
+                if({name}_cols == nullptr) throw std::invalid_argument("'{name}_cols' is null");
+                if({name}_rows == nullptr) throw std::invalid_argument("'{name}_rows' is null");
                 if({name}_ptr == nullptr) throw std::invalid_argument("'{name}_ptr' is null");
-                if({name}_elements == nullptr) throw std::invalid_argument("'{name}_elements' is null");
                 """,
             ).format(
                 name=arg_name,
             ),
-            # TODO: This code is assuming a result type of std::vector which
-            #       will likely change in the future. This code will have to be
-            #       updated when that change is made.
             textwrap.dedent(
                 """\
-                if({result_name}.empty()) {{
-                    {pointer}{name}_ptr = nullptr;
-                    {pointer}{name}_elements = 0;
-                }}
-                else {{
-                    struct {name}Internal {{
-                        static void Deleter({type} *pData) {{
-                            delete [] pData;
-                        }}
-                    }};
+                struct {name}Internal {{
+                    static void Deleter({type} *pData) {{
+                        delete [] pData;
+                    }}
+                }};
 
-                    std::unique_ptr<{type}, void (*)({type} *)> pBuffer(new {type}[{result_name}.size()], {name}Internal::Deleter);
-                    {type} * ptr(pBuffer.get());
+                std::unique_ptr<{type}, void (*)({type} *)> {name}_buffer(new {type}[static_cast<size_t>({result_name}.size())], {name}Internal::Deleter);
 
-                    for(auto &value : {result_name})
-                        *ptr++ = std::move(value);
+                memcpy({name}_buffer.get(), {result_name}.data(), static_cast<size_t>({result_name}.size()) * sizeof({type}));
 
-                    {pointer}{name}_ptr = pBuffer.release();
-                    {pointer}{name}_elements = {result_name}.size();
-                }}
+                {pointer}{name}_ptr = {name}_buffer.release();
+                {pointer}{name}_cols = static_cast<size_t>({result_name}.cols());
+                {pointer}{name}_rows = static_cast<size_t>({result_name}.rows());
                 """,
             ).format(
-                type=self._type_info.CType,
                 name=arg_name,
+                type=self._type_info.CType,
                 result_name=result_name,
                 pointer="" if is_struct_member else "*",
             ),
@@ -225,16 +203,17 @@ class VectorTypeInfoFactory(TypeInfoFactory):
     ):
         return self.Result(
             [
+                "/*in*/ size_t {}_cols".format(arg_name),
+                "/*in*/ size_t {}_rows".format(arg_name),
                 "/*in*/ {type} *{name}_ptr".format(
                     type=self._type_info.CType,
                     name=arg_name,
                 ),
-                "/*in*/ size_t {}_elements".format(arg_name),
             ],
             textwrap.dedent(
                 """\
-                if({name}_ptr == nullptr && {name}_elements != 0) throw std::invalid_argument("Invalid buffer");
-                if({name}_ptr != nullptr && {name}_elements == 0) throw std::invalid_argument("Invalid buffer");
+                if({name}_ptr == nullptr && ({name}_cols != 0 || {name}_rows != 0)) throw std::invalid_argument("Invalid buffer");
+                if({name}_ptr != nullptr && ({name}_cols == 0 || {name}_rows == 0)) throw std::invalid_argument("Invalid buffer");
                 """,
             ).format(
                 name=arg_name,

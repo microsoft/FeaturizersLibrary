@@ -103,6 +103,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_NumericalizeFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_OneHotEncoderFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_OneHotEncoderFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PCAFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PCAFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PointerTable.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PointerTable.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.cpp
@@ -111,6 +113,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_TruncatedSVDFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_TruncatedSVDFeaturizer.h
 
         ${_featurizers_file_attribute_sources}
     )
