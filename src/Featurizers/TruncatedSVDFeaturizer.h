@@ -11,6 +11,27 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
+template<typename MatrixType>
+inline MatrixType& svd_flip(MatrixType& mat) {
+    using Scalar = typename std::decay<decltype(mat(0,0))>::type;
+
+    typedef typename MatrixType::Index Index;
+
+    for(Index col = 0; col < mat.cols(); ++col)
+    {
+        Scalar largest = mat(0,col);
+        for(Index row = 1; row < mat.rows(); ++row) {
+            largest = std::abs(mat(row, col)) > std::abs(largest) ? mat(row, col) : largest;
+        }
+        if (largest < 0) {
+            for(Index row = 0; row < mat.rows(); ++row) {
+                mat(row, col) = -mat(row, col);
+            }
+        }
+    }
+    return mat;
+}
+
 /////////////////////////////////////////////////////////////////////////
 ///  \class         TruncatedSVDTransformer
 ///  \brief         Contains SVDComponents and use SVDComponents to project
@@ -67,10 +88,13 @@ private:
 
         if (input.cols() != _singularvectors.rows())
             throw std::invalid_argument("Input matrix cols() invalid");
-
-        callback(input * _singularvectors);
+        
+        EigenMatrix result = input * _singularvectors;
+        
+        callback(svd_flip(result));
     }
 };
+
 
 //the following functions are introduced from RedSVD
 //Copyright attached
