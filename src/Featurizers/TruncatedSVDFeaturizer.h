@@ -11,9 +11,12 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
+// SVD results can have different sign for result in different environment
+// so we create this function so that the largest number within a column is always positive
+// in order to always get a deterministic result across envrionment between UNIX and Windows
 template<typename MatrixType>
 inline MatrixType& svd_flip(MatrixType& mat) {
-    using Scalar = typename std::decay<decltype(mat(0,0))>::type;
+    using Scalar = typename MatrixType::Scalar;
 
     typedef typename MatrixType::Index Index;
 
