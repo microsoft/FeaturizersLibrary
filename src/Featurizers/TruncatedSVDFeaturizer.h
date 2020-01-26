@@ -11,6 +11,27 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
+template<typename MatrixType>
+inline MatrixType& svd_flip(MatrixType& mat) {
+    using Scalar = typename std::decay<decltype(mat(0,0))>::type;
+
+    typedef typename MatrixType::Index Index;
+
+    for(Index col = 0; col < mat.cols(); ++col)
+    {
+        Scalar largest = std::abs(mat(0,col));
+        for(Index row = 1; row < mat.rows(); ++row) {
+            largest = std::abs(mat(row, col)) > largest ? std::abs(mat(row, col)) : largest;
+        }
+        if (largest < 0) {
+            for(Index row = 0; row < mat.rows(); ++row) {
+                mat(row, col) = -mat(row, col);
+            }
+        }
+    }
+    return mat;
+}
+
 /////////////////////////////////////////////////////////////////////////
 ///  \class         TruncatedSVDTransformer
 ///  \brief         Contains SVDComponents and use SVDComponents to project
@@ -67,30 +88,13 @@ private:
 
         if (input.cols() != _singularvectors.rows())
             throw std::invalid_argument("Input matrix cols() invalid");
-
-        callback(input * _singularvectors);
+        
+        EigenMatrix result = input * _singularvectors;
+        svd_flip(result);
+        callback(result);
     }
 };
 
-template<typename MatrixType>
-inline void svd_flip(MatrixType& mat) {
-    using Scalar = typename std::decay<decltype(mat(0,0))>::type;
-
-    typedef typename MatrixType::Index Index;
-
-    for(Index col = 0; col < mat.cols(); ++col)
-    {
-        Scalar largest = std::abs(mat(0,col));
-        for(Index row = 1; row < mat.rows(); ++row) {
-            largest = std::abs(mat(row, col)) > largest ? std::abs(mat(row, col)) : largest;
-        }
-        if (largest < 0) {
-            for(Index row = 0; row < mat.rows(); ++row) {
-                mat(row, col) = -mat(row, col);
-            }
-        }
-    }
-}
 
 //the following functions are introduced from RedSVD
 //Copyright attached
@@ -284,9 +288,6 @@ private:
         Eigen::JacobiSVD<EigenMatrix>       svdOfC(C, Eigen::ComputeThinV);
 
         _state = Y * svdOfC.matrixV();
-        
-        svd_flip(_state);
-        
 
         return FitResult::Complete;
     }
