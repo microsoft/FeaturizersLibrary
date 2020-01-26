@@ -1314,6 +1314,7 @@ class CData(object):
     def _GetTypeInfoClass(cls, the_type):
         if cls._type_info_factory_classes is None:
             from Plugins.SharedLibraryPluginImpl.DatetimeTypeInfoFactory import DateTimeTypeInfoFactory
+            from Plugins.SharedLibraryPluginImpl.MatrixTypeInfoFactory import MatrixTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl import ScalarTypeInfoFactories
             from Plugins.SharedLibraryPluginImpl.SparseVectorEncodingTypeInfoFactory import SparseVectorEncodingTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
@@ -1322,6 +1323,7 @@ class CData(object):
 
             type_info_factory_classes = [
                 DateTimeTypeInfoFactory,
+                MatrixTypeInfoFactory,
                 SparseVectorEncodingTypeInfoFactory,
                 StringTypeInfoFactory,
                 VectorTypeInfoFactory,

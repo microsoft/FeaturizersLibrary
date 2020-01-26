@@ -911,6 +911,7 @@ class CSharpData(object):
     def _GetTypeInfoClass(cls, the_type):
         if cls._type_info_factory_classes is None:
             from Plugins.MLNetPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
+            from Plugins.MLNetPluginImpl.MatrixTypeInfoFactory import MatrixTypeInfoFactory
             from Plugins.MLNetPluginImpl import ScalarTypeInfoFactories
             from Plugins.MLNetPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.MLNetPluginImpl import StructTypeInfoFactories
@@ -918,6 +919,7 @@ class CSharpData(object):
 
             type_info_factory_classes = [
                 DatetimeTypeInfoFactory,
+                MatrixTypeInfoFactory,
                 StringTypeInfoFactory,
                 VectorTypeInfoFactory,
             ]
