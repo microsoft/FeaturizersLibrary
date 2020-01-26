@@ -99,6 +99,7 @@ SUPPORTED_TYPES                             = set(
         "string",
         "bool",
         "datetime",
+        re.compile(r"matrix\<\S+\>"),
         re.compile(r"vector\<\S+\>"),
     ],
 )

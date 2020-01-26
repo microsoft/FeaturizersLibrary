@@ -945,8 +945,6 @@ featurizers:
       - input_type: matrix<T>
         output_type: matrix<T>
 
-    status: Pending
-
   # ----------------------------------------------------------------------
   - name: RobustScalarFeaturizer
     estimator_name: RobustScalarEstimator
@@ -1256,8 +1254,8 @@ featurizers:
     status: External
 
   # ----------------------------------------------------------------------
-  - name: TruncatedSVDWrapperFeaturizer
-    estimator_name: TruncatedSVDWrapperEstimator
+  - name: TruncatedSVDFeaturizer
+    estimator_name: TruncatedSVDEstimator
     num_output_columns: 1
     description: |-
       Dimensionality reduction using truncated SVD algorithm
@@ -1279,5 +1277,3 @@ featurizers:
     type_mappings:
       - input_type: matrix<T>
         output_type: matrix<T>
-
-    status: Pending
