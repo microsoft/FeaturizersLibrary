@@ -12,7 +12,7 @@ namespace Featurizer {
 namespace Featurizers {
 
 template<typename MatrixType>
-inline void svd_flip(MatrixType& mat) {
+inline MatrixType& svd_flip(MatrixType& mat) {
     using Scalar = typename std::decay<decltype(mat(0,0))>::type;
 
     typedef typename MatrixType::Index Index;
@@ -29,6 +29,7 @@ inline void svd_flip(MatrixType& mat) {
             }
         }
     }
+    return mat;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -88,11 +89,9 @@ private:
         if (input.cols() != _singularvectors.rows())
             throw std::invalid_argument("Input matrix cols() invalid");
         
-
         EigenMatrix result = input * _singularvectors;
-        svd_flip(result);
         
-        callback(result);
+        callback(svd_flip(result));
     }
 };
 

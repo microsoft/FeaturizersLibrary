@@ -119,6 +119,15 @@ void TruncatedSVDTransformerTestMap(void) {
     TruncatedSVDTransformerTestImpl(matrix, labelMatrix);
 }
 
+TEST_CASE("Standard ") {
+    TruncatedSVDTransformerTestStandard<float>();
+    TruncatedSVDTransformerTestStandard<double>();
+}
+
+TEST_CASE("Map") {
+    TruncatedSVDTransformerTestMap<float>();
+    TruncatedSVDTransformerTestMap<double>();
+}
 
 TEST_CASE("Invalid_Annotation") {
     using MatrixT = Eigen::MatrixX<float>;
@@ -206,15 +215,6 @@ TEST_CASE("Different training and inferencing data") {
     }
 }
 
-TEST_CASE("Standard ") {
-    TruncatedSVDTransformerTestStandard<float>();
-    TruncatedSVDTransformerTestStandard<double>();
-}
-
-TEST_CASE("Map") {
-    TruncatedSVDTransformerTestMap<float>();
-    TruncatedSVDTransformerTestMap<double>();
-}
 
 TEST_CASE("Serialization/Deserialization") {
     using MatrixT = Eigen::MatrixX<float>;
