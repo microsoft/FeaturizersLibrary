@@ -229,22 +229,20 @@ TEST_CASE("Different training and inferencing data") {
     inferenceOutput(2, 1) = -0.494694;
     inferenceOutput(2, 2) =  0.374268;
 
-    std::cout<<outputContainer[0]<<std::endl;
-    std::cout<<inferenceOutput<<std::endl;
 
     // we used a randomized algorithm for the decomposition of matrices
     // so for all compilers, the absolute values of matrix element are the same
     // but signedness can be different for an entire column
     std::double_t eps = 0.00001;
     for (MatrixType::Index col=0; col < outputContainer[0].cols(); ++col) {
-        // bool negative = std::abs(inferenceOutput(0,col) - outputContainer[0](0,col)) > eps;
+        bool negative = std::abs(inferenceOutput(0,col) - outputContainer[0](0,col)) > eps;
         for (MatrixType::Index row=0; row < outputContainer[0].rows(); ++row) {
-            // if (negative) {
-            //     CHECK(std::abs(inferenceOutput(row, col) + outputContainer[0](row,col)) <= eps);
-            // }
-            // else {
+            if (negative) {
+                CHECK(std::abs(inferenceOutput(row, col) + outputContainer[0](row,col)) <= eps);
+            }
+            else {
                 CHECK(std::abs(inferenceOutput(row, col) - outputContainer[0](row,col)) <= eps);
-            // }
+            }
         }
     }
 }
