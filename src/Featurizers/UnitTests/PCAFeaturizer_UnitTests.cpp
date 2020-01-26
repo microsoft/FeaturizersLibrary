@@ -229,10 +229,9 @@ TEST_CASE("Different training and inferencing data") {
     inferenceOutput(2, 1) = -0.494694;
     inferenceOutput(2, 2) =  0.374268;
 
-    std::double_t eps = 0.00001;
     for (MatrixType::Index col=0; col < outputContainer[0].cols(); ++col) {
         for (MatrixType::Index row=0; row < outputContainer[0].rows(); ++row) {
-            CHECK(std::abs(inferenceOutput(row, col) - outputContainer[0](row,col)) <= eps);
+            CHECK(Approx(inferenceOutput(row, col)) == outputContainer[0](row, col));
         }
     }
 }
