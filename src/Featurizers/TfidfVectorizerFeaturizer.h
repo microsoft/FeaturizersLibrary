@@ -17,6 +17,23 @@ namespace Featurizer {
 namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
+///  \fn            TfidfPolicy
+///  \brief         Contains 4 Tfidf parameters for using bit flags
+///
+enum class TfidfPolicy : unsigned int {
+        //Binary: If True, all non zero counts are set to 1.
+        //This is useful for discrete probabilistic models that model binary events rather than integer counts.
+        Binary = 1 << 0,
+        UseIdf = 1 << 1,
+        SmoothIdf = 1 << 2,
+        SublinearTf = 1 << 3
+};
+
+constexpr TfidfPolicy operator|(TfidfPolicy const & a, TfidfPolicy const & b);
+constexpr TfidfPolicy operator&(TfidfPolicy const & a, TfidfPolicy const & b);
+
+
+/////////////////////////////////////////////////////////////////////////
 ///  \class         TfidfVectorizerTransformer
 ///  \brief         Returns a unique TFIDFStruct for each input.
 ///
@@ -35,35 +52,38 @@ public:
 
     // ----------------------------------------------------------------------
     // |
+    // |  Public Class
+    // |
+    // ----------------------------------------------------------------------
+    enum class NormMethod : unsigned char {
+        L1 = 1,
+        L2 = 2
+    };
+
+    // ----------------------------------------------------------------------
+    // |
     // |  Public Data
     // |
     // ----------------------------------------------------------------------
     IndexMap const                           Labels;
     FrequencyMap const                       DocumentFreq;
     std::uint32_t const                      TotalNumsDocuments;
-    //Binary: If True, all non zero counts are set to 1. This is useful for discrete probabilistic models that model binary events rather than integer counts.
-    bool const                               Binary;
-    std::string const                        Norm;
-    bool const                               UseIdf;
-    bool const                               SmoothIdf;
-    bool const                               SublinearTf;
+    NormMethod const                         Norm;
+    TfidfPolicy const                        TfidfParameters;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    TfidfVectorizerTransformer(
+    explicit TfidfVectorizerTransformer(
         IndexMap labels,
-        FrequencyMap docufreq,
-        std::uint32_t totalnumdocus,
-        bool binary,
-        std::string norm,
-        bool use_idf,
-        bool smooth_idf,
-        bool sublinear_tf
+        FrequencyMap docuFreq,
+        std::uint32_t totalNumDocus,
+        NormMethod norm,
+        TfidfPolicy tfidfParameters
     );
-    TfidfVectorizerTransformer(Archive &ar);
+    explicit TfidfVectorizerTransformer(Archive &ar);
 
     ~TfidfVectorizerTransformer(void) override = default;
 
@@ -99,8 +119,8 @@ private:
 
         std::float_t normVal = 0.0f;
         std::vector<std::tuple<std::uint32_t, std::float_t>> results;
-        for (auto const & pair : documentTermFrequency) {
-            std::string const word(std::string(std::get<0>(pair.first), std::get<1>(pair.first)));
+        for (auto const & wordIteratorPair : documentTermFrequency) {
+            std::string const word(std::string(std::get<0>(wordIteratorPair.first), std::get<1>(wordIteratorPair.first)));
 
             IndexMap::const_iterator const      labelIter(Labels.find(word));
 
@@ -109,31 +129,41 @@ private:
                 std::float_t tf;
                 std::float_t idf;
 
-                //calculate tf
-                if (Binary) {
+                //calculate tf(term frequency) which measures how frequently a term occurs in a document.
+                //Since every document is different in length, it is possible that a term would appear much more times
+                //in long documents than shorter ones. Thus, the term frequency is often divided by the document length
+                //(aka. the total number of terms in the document) as a way of normalization:
+                //TF(t) = (Number of times term t appears in a document) / (Total number of terms in the document)
+                //source:http://www.tfidf.com/
+                if ((TfidfParameters & TfidfPolicy::Binary) == TfidfPolicy::Binary) {
                     tf = 1.0f;
-                } else if (!SublinearTf) {
-                    tf = static_cast<std::float_t>(pair.second);
+                } else if (!((TfidfParameters & TfidfPolicy::SublinearTf) == TfidfPolicy::SublinearTf)) {
+                    tf = wordIteratorPair.second;
                 } else {
-                    tf = 1.0f + static_cast<std::float_t>(log(pair.second));
+                    tf = 1.0f + std::log(static_cast<std::float_t>(wordIteratorPair.second));
                 }
 
-                //calculate idf;
-                if (!UseIdf) {
+                //calculate idf(inverse document frequency) which measures how important a term is. While computing TF,
+                //all terms are considered equally important. However it is known that certain terms, such as "is", "of",
+                //and "that", may appear a lot of times but have little importance. Thus we need to weigh down the frequent
+                //terms while scale up the rare ones, by computing the following:
+                //IDF(t) = log_e(Total number of documents / Number of documents with term t in it).
+                //source:http://www.tfidf.com/
+                if (!((TfidfParameters & TfidfPolicy::UseIdf) == TfidfPolicy::UseIdf)) {
                     idf = 1.0f;
-                } else if (SmoothIdf) {
-                    idf = 1.0f + log((1 + TotalNumsDocuments) / (1.0f + static_cast<std::float_t>(DocumentFreq.at(word))));
+                } else if ((TfidfParameters & TfidfPolicy::SmoothIdf) == TfidfPolicy::SmoothIdf) {
+                    idf = 1.0f + std::log((1 + TotalNumsDocuments) / (1.0f + static_cast<std::float_t>(DocumentFreq.at(word))));
                 } else {
-                    idf = 1.0f + log((1 + TotalNumsDocuments) / (static_cast<std::float_t>(DocumentFreq.at(word))));
+                    idf = 1.0f + std::log((1 + TotalNumsDocuments) / static_cast<std::float_t>(DocumentFreq.at(word)));
                 }
 
-                //calculate tfidf
+                //calculate tfidf (tfidf = tf * idf)
                 std::float_t tfidf = tf * idf;
 
                 //calculate normVal
-                if(Norm == "l1") {
+                if(Norm == NormMethod::L1) {
                     normVal += abs(tfidf);
-                } else if (Norm == "l2") {
+                } else if (Norm == NormMethod::L2) {
                     normVal += tfidf * tfidf;
                 }
 
@@ -142,11 +172,10 @@ private:
             }
         }
         //normVal will never be 0 as long as results is not empty
-        if (normVal == 0.0f)
-            throw std::runtime_error("This happens when the input document is empty");
+        assert(normVal != 0.0f);
 
         // l2-norm calibration
-        if (Norm == "l2")
+        if (Norm == NormMethod::L2)
             normVal = sqrt(normVal);
 
         std::vector<SparseVectorEncoding<std::float_t>::ValueEncoding> sparseVector;
@@ -186,6 +215,7 @@ public:
     using TransformerType                   = TfidfVectorizerTransformer;
     using IndexMap                          = TfidfVectorizerTransformer::IndexMap;
     using FrequencyMap                      = TfidfVectorizerTransformer::FrequencyMap;
+    using NormMethod                        = TfidfVectorizerTransformer::NormMethod;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -194,11 +224,8 @@ public:
     TfidfVectorizerEstimatorImpl(
         AnnotationMapsPtr pAllColumnAnnotations,
         size_t colIndex,
-        bool binary,
-        std::string norm,
-        bool use_idf,
-        bool smooth_idf,
-        bool sublinear_tf
+        NormMethod norm,
+        TfidfPolicy tfidfParameters
     );
     ~TfidfVectorizerEstimatorImpl(void) override = default;
 
@@ -211,11 +238,8 @@ private:
     // |
     // ----------------------------------------------------------------------
     size_t const                             _colIndex;
-    bool const                               _binary;
-    std::string const                        _norm;
-    bool const                               _use_idf;
-    bool const                               _smooth_idf;
-    bool const                               _sublinear_tf;
+    NormMethod const                         _norm;
+    TfidfPolicy const                        _tfidfParameters;
 
     // ----------------------------------------------------------------------
     // |
@@ -247,23 +271,23 @@ private:
                                                         termFrequencyAndIndex(data.TermFrequencyAndIndex);
         std::uint32_t const                             totalNumDocus(data.TotalNumDocuments);
 
-        FrequencyMap termFrequency;
-        IndexMap termIndex;
+        FrequencyMap termFrequencys;
+        IndexMap termIndexes;
         for (auto const & termFrequencyAndIndexPair : termFrequencyAndIndex) {
             //termFrequency and termIndex share the exactly same keys
-            termFrequency.insert(std::make_pair(termFrequencyAndIndexPair.first, termFrequencyAndIndexPair.second.TermFrequency));
-            termIndex.insert(std::make_pair(termFrequencyAndIndexPair.first, termFrequencyAndIndexPair.second.Index));
+            termFrequencys.insert(std::make_pair(termFrequencyAndIndexPair.first, termFrequencyAndIndexPair.second.TermFrequency));
+            termIndexes.insert(std::make_pair(termFrequencyAndIndexPair.first, termFrequencyAndIndexPair.second.Index));
         }
 
-        return std::make_unique<TfidfVectorizerTransformer>(std::move(termIndex),
-                                                            std::move(termFrequency),
+        return typename BaseType::TransformerUniquePtr(new TfidfVectorizerTransformer(
+                                                            std::move(termIndexes),
+                                                            std::move(termFrequencys),
                                                             std::move(totalNumDocus),
-                                                            std::move(_binary),
                                                             std::move(_norm),
-                                                            std::move(_use_idf),
-                                                            std::move(_smooth_idf),
-                                                            std::move(_sublinear_tf)
-                                                            );
+                                                            std::move(_tfidfParameters)
+                                                            )
+                                                      );
+
     }
 };
 
@@ -294,6 +318,7 @@ public:
     using IndexMap                      = TfidfVectorizerTransformer::IndexMap;
     using StringDecorator               = Components::Details::DocumentStatisticsTrainingOnlyPolicy::StringDecorator;
     using AnalyzerMethod                = Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
+    using NormMethod                    = TfidfVectorizerTransformer::NormMethod;
 
     // ----------------------------------------------------------------------
     // |
@@ -312,11 +337,8 @@ public:
         nonstd::optional<IndexMap> vocabulary = nonstd::optional<IndexMap>(),
         std::uint32_t ngramRangeMin = 1,
         std::uint32_t ngramRangeMax = 1,
-        bool binary = false,
-        std::string norm = "l2",
-        bool useIdf = true,
-        bool smoothIdf = true,
-        bool sublinearTf = false
+        NormMethod norm = NormMethod::L2,
+        TfidfPolicy tfidfParameters = TfidfPolicy::UseIdf|TfidfPolicy::SmoothIdf
     );
     ~TfidfVectorizerEstimator(void) override = default;
 
@@ -335,17 +357,33 @@ public:
 
 // ----------------------------------------------------------------------
 // |
+// |  TfidfPolicy
+// |
+// ----------------------------------------------------------------------
+constexpr TfidfPolicy operator|(TfidfPolicy const & a, TfidfPolicy const & b) {
+    return static_cast<TfidfPolicy>(
+        static_cast<unsigned int>(a)
+        | static_cast<unsigned int>(b)
+    );
+}
+
+constexpr TfidfPolicy operator&(TfidfPolicy const & a, TfidfPolicy const & b) {
+    return static_cast<TfidfPolicy>(
+        static_cast<unsigned int>(a)
+        & static_cast<unsigned int>(b)
+    );
+}
+
+// ----------------------------------------------------------------------
+// |
 // |  TfidfVectorizerTransformer
 // |
 // ----------------------------------------------------------------------
 TfidfVectorizerTransformer::TfidfVectorizerTransformer(IndexMap labels,
-                                                       IndexMap docufreq,
-                                                       std::uint32_t totalnumdocus,
-                                                       bool binary,
-                                                       std::string norm,
-                                                       bool useIdf,
-                                                       bool smoothIdf,
-                                                       bool sublinearTf) :
+                                                       IndexMap docuFreq,
+                                                       std::uint32_t totalNumDocus,
+                                                       NormMethod norm,
+                                                       TfidfPolicy tfidfParameters) :
     Labels(
         std::move(
             [&labels](void) ->  IndexMap & {
@@ -358,53 +396,48 @@ TfidfVectorizerTransformer::TfidfVectorizerTransformer(IndexMap labels,
     ),
     DocumentFreq(
         std::move(
-            [&docufreq](void) ->  IndexMap & {
-                if (docufreq.size() == 0) {
+            [&docuFreq](void) ->  IndexMap & {
+                if (docuFreq.size() == 0) {
                     throw std::invalid_argument("DocumentFrequency map is empty!");
                 }
-                return docufreq;
+                return docuFreq;
             }()
         )
     ),
-    TotalNumsDocuments(std::move(totalnumdocus)),
-    Binary(std::move(binary)),
+    TotalNumsDocuments(std::move(totalNumDocus)),
     Norm(std::move(norm)),
-    UseIdf(std::move(useIdf)),
-    SmoothIdf(std::move(smoothIdf)),
-    SublinearTf(std::move(sublinearTf)) {
+    TfidfParameters(std::move(tfidfParameters)) {
 }
 
 TfidfVectorizerTransformer::TfidfVectorizerTransformer(Archive &ar) :
     Labels(Traits<decltype(Labels)>::deserialize(ar)),
     DocumentFreq(Traits<decltype(DocumentFreq)>::deserialize(ar)),
     TotalNumsDocuments(Traits<decltype(TotalNumsDocuments)>::deserialize(ar)),
-    Binary(Traits<decltype(Binary)>::deserialize(ar)),
-    Norm(Traits<decltype(Norm)>::deserialize(ar)),
-    UseIdf(Traits<decltype(UseIdf)>::deserialize(ar)),
-    SmoothIdf(Traits<decltype(SmoothIdf)>::deserialize(ar)),
-    SublinearTf(Traits<decltype(SublinearTf)>::deserialize(ar)) {
+    //todo: unsigned char ?
+    //Norm(Traits<decltype(Norm)>::deserialize(ar)),
+    Norm(),
+    //todo: uint32 ?
+    TfidfParameters() {
 }
 
 void TfidfVectorizerTransformer::save(Archive &ar) const /*override*/ {
+    //call ctor
     Traits<decltype(Labels)>::serialize(ar, Labels);
     Traits<decltype(DocumentFreq)>::serialize(ar, DocumentFreq);
     Traits<decltype(TotalNumsDocuments)>::serialize(ar, TotalNumsDocuments);
-    Traits<decltype(Binary)>::serialize(ar, Binary);
-    Traits<decltype(Norm)>::serialize(ar, Norm);
-    Traits<decltype(UseIdf)>::serialize(ar, UseIdf);
-    Traits<decltype(SmoothIdf)>::serialize(ar, SmoothIdf);
-    Traits<decltype(SublinearTf)>::serialize(ar, SublinearTf);
+    //todo
+    //Traits<decltype(Norm)>::serialize(ar, Norm);
+
+    //todo
+    //Traits<decltype(TfidfPolicy)>::serialize(ar, TfidfPolicy);
 }
 
 bool TfidfVectorizerTransformer::operator==(TfidfVectorizerTransformer const &other) const {
     return Labels == other.Labels
         && DocumentFreq == other.DocumentFreq
         && TotalNumsDocuments == other.TotalNumsDocuments
-        && Binary == other.Binary
         && Norm == other.Norm
-        && UseIdf == other.UseIdf
-        && SmoothIdf == other.SmoothIdf
-        && SublinearTf == other.SublinearTf;
+        && TfidfParameters == other.TfidfParameters;
 }
 
 // ----------------------------------------------------------------------
@@ -426,11 +459,8 @@ TfidfVectorizerEstimator<MaxNumTrainingItemsV>::TfidfVectorizerEstimator(
     nonstd::optional<IndexMap> vocabulary,
     std::uint32_t ngramRangeMin,
     std::uint32_t ngramRangeMax,
-    bool binary,
-    std::string norm,
-    bool useIdf,
-    bool smoothIdf,
-    bool sublinearTf
+    NormMethod norm,
+    TfidfPolicy tfidfParameters
 ) :
     BaseType(
         "TfidfVectorizerEstimator",
@@ -450,15 +480,12 @@ TfidfVectorizerEstimator<MaxNumTrainingItemsV>::TfidfVectorizerEstimator(
                 std::move(ngramRangeMax)
             );
         },
-        [pAllColumnAnnotations, colIndex, &binary, &norm, &useIdf, &smoothIdf, &sublinearTf](void) {
+        [pAllColumnAnnotations, colIndex, &norm, &tfidfParameters](void) {
             return Details::TfidfVectorizerEstimatorImpl<MaxNumTrainingItemsV>(
                 std::move(pAllColumnAnnotations),
                 std::move(colIndex),
-                std::move(binary),
                 std::move(norm),
-                std::move(useIdf),
-                std::move(smoothIdf),
-                std::move(sublinearTf)
+                std::move(tfidfParameters)
             );
         }
     ) {
@@ -473,11 +500,8 @@ template <size_t MaxNumTrainingItemsV>
 Details::TfidfVectorizerEstimatorImpl<MaxNumTrainingItemsV>::TfidfVectorizerEstimatorImpl(
     AnnotationMapsPtr pAllColumnAnnotations,
     size_t colIndex,
-    bool binary,
-    std::string norm,
-    bool useIdf,
-    bool smoothIdf,
-    bool sublinearTf
+    NormMethod norm,
+    TfidfPolicy tfidfParameters
 ) :
     BaseType("TfidfVectorizerEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
@@ -490,20 +514,8 @@ Details::TfidfVectorizerEstimatorImpl<MaxNumTrainingItemsV>::TfidfVectorizerEsti
             }()
         )
     ),
-    _binary(std::move(binary)),
-    _norm(
-        std::move(
-            [&norm](void) -> std::string & {
-                if(norm != "l1" && norm != "l2")
-                    throw std::invalid_argument("norm");
-
-                return norm;
-            }()
-        )
-    ),
-    _use_idf(std::move(useIdf)),
-    _smooth_idf(std::move(smoothIdf)),
-    _sublinear_tf(std::move(sublinearTf)) {
+    _norm(std::move(norm)),
+    _tfidfParameters(std::move(tfidfParameters)) {
 }
 
 // ----------------------------------------------------------------------
