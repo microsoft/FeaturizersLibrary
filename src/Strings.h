@@ -143,12 +143,16 @@ void ParseNgramCharwb(std::string const &input,
 namespace Details {
 
 template <typename UnaryPredicateT>
-std::string StringPadding(std::string input, UnaryPredicateT isPredicate) {
-    if (!isPredicate(input.at(0)) && !isPredicate(input.at(input.length() - 1))) {
+std::string StringPadding(std::string input, UnaryPredicateT predicate) {
+
+    bool isFirstPredicate = predicate(input.at(0));
+    bool isLastPredicate = predicate(input.at(input.length() - 1));
+
+    if (!isFirstPredicate && !isLastPredicate) {
         return " " + input + " ";
-    } else if (!isPredicate(input.at(0))) {
+    } else if (!isFirstPredicate) {
         return " " + input;
-    } else if (!isPredicate(input.at(input.length() - 1))){
+    } else if (!isLastPredicate){
         return input + " ";
     } else {
         return input;
@@ -393,6 +397,8 @@ void ParseNgramCharwb(std::string const &input,
                       size_t const ngramRangeMax,
                       std::function<void (IteratorT, IteratorT)> const &callback) {
 
+    //the pair represents a char(predicate returns true) followed by beginning position of a word,
+    //the size of this vector will be 1 + number of words
     std::vector<std::pair<IteratorT, IteratorT>> wordIterPairVector;
 
     IteratorT itr = input.begin();
@@ -412,6 +418,7 @@ void ParseNgramCharwb(std::string const &input,
         throw std::invalid_argument("ngramRangeMin and ngramRangeMax not valid");
 
     for (size_t pairIdx = 0; pairIdx < wordIterPairVector.size() - 1; ++pairIdx) {
+        //using wordIterPairVector[pairIdx + 1] because that represents the pairIdx's words ending position(considering predicate returning true char)
         Details::ParseNgramCharHelper<IteratorT>(wordIterPairVector[pairIdx].first, wordIterPairVector[pairIdx + 1].second, ngramRangeMin, ngramRangeMax, callback);
     }
 }
