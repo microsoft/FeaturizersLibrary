@@ -132,16 +132,10 @@ private:
     // |  Private Types
     // |
     // ----------------------------------------------------------------------
+    using StringIterator                    = std::string::const_iterator;
     using FrequencyAndIndexMap              = DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
-
-    template <typename PredicateT, typename IteratorT>
     using ParseFunctionType                 = std::function<void (std::string const &,
-                                                                  std::vector<std::string> &,
-                                                                  PredicateT const &,
-                                                                  std::regex const &,
-                                                                  size_t const,
-                                                                  size_t const,
-                                                                  std::function<void (IteratorT, IteratorT)> const &)>;
+                                                            std::function<void (StringIterator, StringIterator)> const &)>;
 
     // ----------------------------------------------------------------------
     // |
@@ -159,13 +153,12 @@ private:
     std::uint32_t const                     _ngramRangeMin;
     std::uint32_t const                     _ngramRangeMax;
 
+    ParseFunctionType const                 _parseFunc;
+
     FrequencyMap                            _termFrequency;
     std::uint32_t                           _totalNumDocuments;
 
-    ParseFunctionType<
-        std::function<bool (char)>,
-        std::string::const_iterator
-    >                                       _parseFunc;
+
 
     // ----------------------------------------------------------------------
     // |
@@ -564,6 +557,69 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTraining
             }()
         )
     ),
+    _parseFunc(
+
+        [this](void) -> ParseFunctionType {
+            //initialize parse function
+            ParseFunctionType parseFunc;
+            if (_analyzer == AnalyzerMethod::Word) {
+                if (!_regexToken.empty()) {
+                    parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                        Microsoft::Featurizer::Strings::ParseRegex<std::string::const_iterator, std::regex>(
+                            input,
+                            std::regex(_regexToken),
+                            callback
+                        );
+                    };
+                } else if (_ngramRangeMin == 1 && _ngramRangeMax == 1) {
+                    parseFunc = [] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                        Microsoft::Featurizer::Strings::Parse<std::string::const_iterator, std::function<bool (char)>>(
+                            input,
+                            [] (char c) {return std::isspace(c);},
+                            callback
+                        );
+                    };
+                } else {
+                    parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                        std::string const processedInput(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
+                        Microsoft::Featurizer::Strings::ParseNgramWord<std::string::const_iterator, std::function<bool (char)>>(
+                            processedInput,
+                            [] (char c) {return std::isspace(c);},
+                            _ngramRangeMin,
+                            _ngramRangeMax,
+                            callback
+                        );
+                    };
+                }
+            } else if (_analyzer == AnalyzerMethod::Char) {
+                parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                    std::string const processedInput(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
+                    Microsoft::Featurizer::Strings::ParseNgramChar<std::string::const_iterator>(
+                        processedInput,
+                        _ngramRangeMin,
+                        _ngramRangeMax,
+                        callback
+                    );
+                };
+            } else {
+                assert(_analyzer == AnalyzerMethod::Charwb);
+
+                parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                    auto predicate = [] (char c) {return std::isspace(c);};
+                    std::string processedInput(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
+                    std::string const paddingInput(Microsoft::Featurizer::Strings::Details::StringPadding<std::function<bool (char)>>(processedInput, predicate));
+                    Microsoft::Featurizer::Strings::ParseNgramCharwb<std::string::const_iterator, std::function<bool (char)>>(
+                        paddingInput,
+                        predicate,
+                        _ngramRangeMin,
+                        _ngramRangeMax,
+                        callback
+                    );
+                };
+            }
+            return parseFunc;
+        }()
+    ),
     _totalNumDocuments(0) {
         if (_minDf > _maxDf)
             throw std::invalid_argument("_minDf > _maxDf");
@@ -571,21 +627,6 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTraining
         if (_ngramRangeMin > _ngramRangeMax)
             throw std::invalid_argument("_ngramRangeMin > _ngramRangeMax");
 
-        //initialize parse function
-        if (_analyzer == AnalyzerMethod::Word) {
-            if (!_regexToken.empty()) {
-                _parseFunc = Microsoft::Featurizer::Strings::UParseRegex<std::string::const_iterator, std::function<bool (char)>, std::regex>;
-            } else if (_ngramRangeMin == 1 && _ngramRangeMax == 1) {
-                _parseFunc = Microsoft::Featurizer::Strings::UParse<std::string::const_iterator, std::function<bool (char)>, std::regex>;
-            } else {
-                _parseFunc = Microsoft::Featurizer::Strings::UParseNgramWordCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
-            }
-        } else if (_analyzer == AnalyzerMethod::Char) {
-            _parseFunc = Microsoft::Featurizer::Strings::UParseNgramCharCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
-        } else {
-            assert(_analyzer == AnalyzerMethod::Charwb);
-            _parseFunc = Microsoft::Featurizer::Strings::UParseNgramCharwbCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
-        }
 }
 
 inline void Details::DocumentStatisticsTrainingOnlyPolicy::fit(InputType const &input) {
@@ -644,15 +685,8 @@ template <typename SetT, typename CreateKeyFuncT, typename KeyToStringFuncT>
 void Details::DocumentStatisticsTrainingOnlyPolicy::fit_impl(InputType const &input, CreateKeyFuncT const &createKeyFunc, KeyToStringFuncT const &keyToStringFunc) {
     SetT                                    documents;
 
-    std::vector<std::string> intermediateValues;
-
     _parseFunc(
         input,
-        intermediateValues,
-        [](char c) {return std::isspace(c);},
-        std::regex(_regexToken),
-        _ngramRangeMin,
-        _ngramRangeMax,
         [&createKeyFunc, &documents] (InputTypeConstIterator begin, InputTypeConstIterator end) {
             documents.insert(createKeyFunc(begin, end));
         }
