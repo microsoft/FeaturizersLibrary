@@ -70,7 +70,6 @@ template <
     typename RegexT
 >
 void ParseRegex(std::string const &input,
-                std::vector<std::string> &intermediateValues,
                 RegexT const &regexToken,
                 std::function<void (IteratorT, IteratorT)> const &callback);
 
@@ -88,27 +87,11 @@ template <
     typename IteratorT,
     typename UnaryPredicateT
 >
-void ParseNgramWord(std::string &input,
-                    std::vector<std::string> &intermediateValues,
+void ParseNgramWord(std::string const &input,
                     UnaryPredicateT const &predicate,
                     size_t const ngramRangeMin,
                     size_t const ngramRangeMax,
                     std::function<void (IteratorT, IteratorT)> const &callback);
-
-/////////////////////////////////////////////////////////////////////////
-///  \fn            ParseNgramWordCopy
-///  \brief         See ParseNgramWord
-///
-template <
-    typename IteratorT,
-    typename UnaryPredicateT
->
-void ParseNgramWordCopy(std::string const &input,
-                        std::vector<std::string> &intermediateValues,
-                        UnaryPredicateT const &predicate,
-                        size_t const ngramRangeMin,
-                        size_t const ngramRangeMax,
-                        std::function<void (IteratorT, IteratorT)> const &callback);
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            ParseNgramChar
@@ -120,22 +103,11 @@ void ParseNgramWordCopy(std::string const &input,
 ///                     output: ["jumpy", "umpy ", "mpy f", "py fo", "y fox"]
 ///
 template <typename IteratorT>
-void ParseNgramChar(std::string &input,
-                    std::vector<std::string> &intermediateValues,
+void ParseNgramChar(std::string const &input,
                     size_t const ngramRangeMin,
                     size_t const ngramRangeMax,
                     std::function<void (IteratorT, IteratorT)> const &callback);
 
-/////////////////////////////////////////////////////////////////////////
-///  \fn            ParseNgramCharCopy
-///  \brief         See ParseNgramChar
-///
-template <typename IteratorT>
-void ParseNgramCharCopy(std::string const &input,
-                        std::vector<std::string> &intermediateValues,
-                        size_t const ngramRangeMin,
-                        size_t const ngramRangeMax,
-                        std::function<void (IteratorT, IteratorT)> const &callback);
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            ParseNgramCharwb
@@ -152,112 +124,12 @@ template <
     typename IteratorT,
     typename UnaryPredicateT
 >
-void ParseNgramCharwb(std::string &input,
-                      std::vector<std::string> &intermediateValues,
+void ParseNgramCharwb(std::string const &input,
                       UnaryPredicateT const &predicate,
                       size_t const ngramRangeMin,
                       size_t const ngramRangeMax,
                       std::function<void (IteratorT, IteratorT)> const &callback);
 
-/////////////////////////////////////////////////////////////////////////
-///  \fn            ParseNgramCharwbCopy
-///  \brief         See ParseNgramCharwb
-///
-template <
-    typename IteratorT,
-    typename UnaryPredicateT
->
-void ParseNgramCharwbCopy(std::string const &input,
-                          std::vector<std::string> &intermediateValues,
-                          UnaryPredicateT const &predicate,
-                          size_t const ngramRangeMin,
-                          size_t const ngramRangeMax,
-                          std::function<void (IteratorT, IteratorT)> const &callback);
-
-/////////////////////////////////////////////////////////////////////////
-///  \fn            UParse
-///  \brief         See Parse, uniform signature
-///
-template <
-    typename IteratorT,
-    typename UnaryPredicateT,
-    typename RegexT
->
-void UParse(std::string const &input,
-            std::vector<std::string> &,
-            UnaryPredicateT const &predicate,
-            RegexT const &,
-            size_t const,
-            size_t const,
-            std::function<void (IteratorT, IteratorT)> const &callback);
-
-/////////////////////////////////////////////////////////////////////////
-///  \fn            UParseRegex
-///  \brief         See ParseRegex, uniform signature
-///
-template <
-    typename IteratorT,
-    typename UnaryPredicateT,
-    typename RegexT
->
-void UParseRegex(std::string const &input,
-                 std::vector<std::string> &intermediateValues,
-                 UnaryPredicateT const &,
-                 RegexT const &regexToken,
-                 size_t const,
-                 size_t const,
-                 std::function<void (IteratorT, IteratorT)> const &callback);
-
-/////////////////////////////////////////////////////////////////////////
-///  \fn            UParseNgramWordCopy
-///  \brief         See ParseNgramWordCopy, uniform signature
-///
-template <
-    typename IteratorT,
-    typename UnaryPredicateT,
-    typename RegexT
->
-void UParseNgramWordCopy(std::string const &input,
-                         std::vector<std::string> &intermediateValues,
-                         UnaryPredicateT const &predicate,
-                         RegexT const &,
-                         size_t const ngramRangeMin,
-                         size_t const ngramRangeMax,
-                         std::function<void (IteratorT, IteratorT)> const &callback);
-
-/////////////////////////////////////////////////////////////////////////
-///  \fn            UParseNgramCharCopy
-///  \brief         See ParseNgramCharCopy, uniform signature
-///
-template <
-    typename IteratorT,
-    typename UnaryPredicateT,
-    typename RegexT
->
-void UParseNgramCharCopy(std::string const &input,
-                         std::vector<std::string> &intermediateValues,
-                         UnaryPredicateT const &,
-                         RegexT const &,
-                         size_t const ngramRangeMin,
-                         size_t const ngramRangeMax,
-                         std::function<void (IteratorT, IteratorT)> const &callback);
-
-/////////////////////////////////////////////////////////////////////////
-///  \fn            UParseNgramCharwbCopy
-///  \brief         See ParseNgramCharwbCopy, uniform signature
-///
-template <
-    typename IteratorT,
-    typename UnaryPredicateT,
-    typename RegexT
->
-void UParseNgramCharwbCopy(std::string const &input,
-                           std::vector<std::string> &intermediateValues,
-                           UnaryPredicateT const &predicate,
-                           RegexT const &,
-                           size_t const ngramRangeMin,
-                           size_t const ngramRangeMax,
-                           std::function<void (IteratorT, IteratorT)> const &callback);
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -270,9 +142,26 @@ void UParseNgramCharwbCopy(std::string const &input,
 // ----------------------------------------------------------------------
 namespace Details {
 
+template <typename UnaryPredicateT>
+std::string StringPadding(std::string input, UnaryPredicateT predicate) {
+
+    bool isFirstPredicate = predicate(input.at(0));
+    bool isLastPredicate = predicate(input.at(input.length() - 1));
+
+    if (!isFirstPredicate && !isLastPredicate) {
+        return " " + input + " ";
+    } else if (!isFirstPredicate) {
+        return " " + input;
+    } else if (!isLastPredicate){
+        return input + " ";
+    } else {
+        return input;
+    }
+}
+
 template<typename IteratorT>
-inline std::vector<IteratorT> IteratorVectorGenerator(IteratorT const & begin,
-                                                      IteratorT const & end) {
+inline std::vector<IteratorT> IteratorVectorGenerator(IteratorT begin,
+                                                      IteratorT end) {
     std::vector<IteratorT> wordIterVector;
 
     wordIterVector.reserve(static_cast<size_t>(std::distance(begin, end) + 1));
@@ -320,23 +209,20 @@ template <
 >
 inline void ParseRegex(IteratorT const &begin,
                        IteratorT const &end,
-                       std::vector<std::string> &intermediateValues,
                        RegexT const &regexToken,
                        std::function<void (IteratorT, IteratorT)> const &callback) {
 
     std::sregex_iterator iter(begin, end, regexToken);
     std::sregex_iterator iterEnd;
 
-    //this hardcode is not good but I did not find a better way
-    //prevent vector re-allocation caused dangling iterator
-    intermediateValues.reserve(100);
-
     while (iter != iterEnd) {
-        std::string iterStringConst = iter->str();
-        intermediateValues.emplace_back(std::move(iterStringConst));
-        IteratorT beginRef = intermediateValues.back().begin();
-        IteratorT endRef = intermediateValues.back().end();
-        callback(beginRef, endRef);
+        IteratorT                           matchStart(begin);
+        std::advance(matchStart, iter->position());
+
+        IteratorT                           matchEnd(matchStart);
+        std::advance(matchEnd, iter->length());
+
+        callback(matchStart, matchEnd);
         ++iter;
     }
 }
@@ -446,31 +332,29 @@ template <
     typename RegexT
 >
 void ParseRegex(std::string const &input,
-                std::vector<std::string> &intermediateValues,
                 RegexT const &regexToken,
                 std::function<void (IteratorT, IteratorT)> const &callback) {
 
-    Details::ParseRegex(input.begin(), input.end(), intermediateValues, regexToken, callback);
+    Details::ParseRegex(input.begin(), input.end(), regexToken, callback);
 }
 
 template <
     typename IteratorT,
     typename UnaryPredicateT
 >
-void ParseNgramWord(std::string &input,
-                    std::vector<std::string> &intermediateValues,
+void ParseNgramWord(std::string const &input,
                     UnaryPredicateT const &predicate,
                     size_t const ngramRangeMin,
                     size_t const ngramRangeMax,
                     std::function<void (IteratorT, IteratorT)> const &callback) {
 
-    intermediateValues.emplace_back(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
+    //std::string trimedString(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
 
     //wordIterPairVector is used to store the begin and end iterator of words in input
     std::vector<std::pair<IteratorT, IteratorT>> wordIterPairVector;
     Details::Parse<IteratorT, UnaryPredicateT>(
-        intermediateValues[0].begin(),
-        intermediateValues[0].end(),
+        input.begin(),
+        input.end(),
         predicate,
         [&wordIterPairVector] (IteratorT iterBegin, IteratorT iterEnd) {
             wordIterPairVector.emplace_back(iterBegin, iterEnd);
@@ -490,188 +374,55 @@ void ParseNgramWord(std::string &input,
     }
 }
 
-template <
-    typename IteratorT,
-    typename UnaryPredicateT
->
-void ParseNgramWordCopy(std::string const &input,
-                        std::vector<std::string> &intermediateValues,
-                        UnaryPredicateT const &predicate,
-                        size_t const ngramRangeMin,
-                        size_t const ngramRangeMax,
-                        std::function<void (IteratorT, IteratorT)> const &callback) {
-
-    //copy string to trim
-    std::string inputCopy(input);
-    ParseNgramWord(inputCopy, intermediateValues, predicate, ngramRangeMin, ngramRangeMax, callback);
-}
-
 template <typename IteratorT>
-void ParseNgramChar(std::string &input,
-                    std::vector<std::string> &intermediateValues,
+void ParseNgramChar(std::string const &input,
                     size_t const ngramRangeMin,
                     size_t const ngramRangeMax,
                     std::function<void (IteratorT, IteratorT)> const &callback) {
 
-    intermediateValues.emplace_back(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
-
-    if (ngramRangeMin < 1 || ngramRangeMin > ngramRangeMax || ngramRangeMax > intermediateValues[0].size())
+    if (ngramRangeMin < 1 || ngramRangeMin > ngramRangeMax || ngramRangeMax > input.size())
         throw std::invalid_argument("ngramRangeMin and ngramRangeMax not valid");
 
-    Details::ParseNgramCharHelper<IteratorT>(intermediateValues[0].begin(), intermediateValues[0].end(), ngramRangeMin, ngramRangeMax, callback);
+    Details::ParseNgramCharHelper<IteratorT>(input.begin(), input.end(), ngramRangeMin, ngramRangeMax, callback);
 }
 
-template <typename IteratorT>
-void ParseNgramCharCopy(std::string const &input,
-                        std::vector<std::string> &intermediateValues,
-                        size_t const ngramRangeMin,
-                        size_t const ngramRangeMax,
-                        std::function<void (IteratorT, IteratorT)> const &callback) {
-
-    //copy string to trim
-    std::string inputCopy(input);
-    ParseNgramChar(inputCopy, intermediateValues, ngramRangeMin, ngramRangeMax, callback);
-}
 
 template <
     typename IteratorT,
     typename UnaryPredicateT
 >
-void ParseNgramCharwb(std::string &input,
-                      std::vector<std::string> &intermediateValues,
+void ParseNgramCharwb(std::string const &input,
                       UnaryPredicateT const &predicate,
                       size_t const ngramRangeMin,
                       size_t const ngramRangeMax,
                       std::function<void (IteratorT, IteratorT)> const &callback) {
 
-    //this hardcode is not good but I did not find a better way
-    //prevent vector re-allocation caused dangling iterator
-    intermediateValues.reserve(100);
-
-    intermediateValues.emplace_back(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
-
-    //wordIterPairVector is used to store the begin and end iterator of words in input
+    //the pair represents a char(predicate returns true) followed by beginning position of a word,
+    //the size of this vector will be 1 + number of words
     std::vector<std::pair<IteratorT, IteratorT>> wordIterPairVector;
-    Details::Parse<IteratorT, UnaryPredicateT>(
-        intermediateValues[0].begin(),
-        intermediateValues[0].end(),
-        predicate,
-        [&wordIterPairVector] (IteratorT iterBegin, IteratorT iterEnd) {
-            wordIterPairVector.emplace_back(iterBegin, iterEnd);
-        }
-    );
 
-    if (wordIterPairVector.size() == 0)
-        throw std::invalid_argument("wordIterPairVector.size() == 0");
+    IteratorT itr = input.begin();
+    IteratorT end = input.end();
+
+    while (itr != end) {
+        if (predicate(*itr)) {
+            IteratorT spaceItr = itr;
+            IteratorT wordBeginItr = ++itr;
+            wordIterPairVector.emplace_back(spaceItr, wordBeginItr);
+        } else {
+            ++itr;
+        }
+    }
 
     if (ngramRangeMin < 1 || ngramRangeMin > ngramRangeMax )
         throw std::invalid_argument("ngramRangeMin and ngramRangeMax not valid");
 
-    for (size_t pairIdx = 0; pairIdx < wordIterPairVector.size(); ++pairIdx) {
-        //copy
-        std::string paddedWord = " " + std::string(wordIterPairVector[pairIdx].first, wordIterPairVector[pairIdx].second) + " ";
-        intermediateValues.push_back(std::move(paddedWord));
-
-        Details::ParseNgramCharHelper<IteratorT>(intermediateValues[pairIdx + 1].begin(), intermediateValues[pairIdx + 1].end(), ngramRangeMin, ngramRangeMax, callback);
+    for (size_t pairIdx = 0; pairIdx < wordIterPairVector.size() - 1; ++pairIdx) {
+        //using wordIterPairVector[pairIdx + 1] because that represents the pairIdx's words ending position(considering predicate returning true char)
+        Details::ParseNgramCharHelper<IteratorT>(wordIterPairVector[pairIdx].first, wordIterPairVector[pairIdx + 1].second, ngramRangeMin, ngramRangeMax, callback);
     }
 }
 
-template <
-    typename IteratorT,
-    typename UnaryPredicateT
->
-void ParseNgramCharwbCopy(std::string const &input,
-                          std::vector<std::string> &intermediateValues,
-                          UnaryPredicateT const &predicate,
-                          size_t const ngramRangeMin,
-                          size_t const ngramRangeMax,
-                          std::function<void (IteratorT, IteratorT)> const &callback) {
-
-    //copy string to trim
-    std::string inputCopy(input);
-    ParseNgramCharwb(inputCopy, intermediateValues, predicate, ngramRangeMin, ngramRangeMax, callback);
-}
-
-//to uniform so that all parse functions have same number of signature
-template <
-    typename IteratorT,
-    typename UnaryPredicateT,
-    typename RegexT
->
-void UParse(std::string const &input,
-            std::vector<std::string> &,
-            UnaryPredicateT const &predicate,
-            RegexT const &,
-            size_t const,
-            size_t const,
-            std::function<void (IteratorT, IteratorT)> const &callback) {
-
-    Parse(input, predicate, callback);
-}
-
-template <
-    typename IteratorT,
-    typename UnaryPredicateT,
-    typename RegexT
->
-void UParseRegex(std::string const &input,
-                 std::vector<std::string> &intermediateValues,
-                 UnaryPredicateT const &,
-                 RegexT const &regexToken,
-                 size_t const,
-                 size_t const,
-                 std::function<void (IteratorT, IteratorT)> const &callback) {
-
-    ParseRegex(input, intermediateValues, regexToken, callback);
-}
-
-template <
-    typename IteratorT,
-    typename UnaryPredicateT,
-    typename RegexT
->
-void UParseNgramWordCopy(std::string const &input,
-                         std::vector<std::string> &intermediateValues,
-                         UnaryPredicateT const &predicate,
-                         RegexT const &,
-                         size_t const ngramRangeMin,
-                         size_t const ngramRangeMax,
-                         std::function<void (IteratorT, IteratorT)> const &callback) {
-
-    ParseNgramWordCopy(input, intermediateValues, predicate, ngramRangeMin, ngramRangeMax, callback);
-}
-
-template <
-    typename IteratorT,
-    typename UnaryPredicateT,
-    typename RegexT
->
-void UParseNgramCharCopy(std::string const &input,
-                         std::vector<std::string> &intermediateValues,
-                         UnaryPredicateT const &,
-                         RegexT const &,
-                         size_t const ngramRangeMin,
-                         size_t const ngramRangeMax,
-                         std::function<void (IteratorT, IteratorT)> const &callback) {
-
-    ParseNgramCharCopy(input, intermediateValues, ngramRangeMin, ngramRangeMax, callback);
-}
-
-template <
-    typename IteratorT,
-    typename UnaryPredicateT,
-    typename RegexT
->
-void UParseNgramCharwbCopy(std::string const &input,
-                           std::vector<std::string> &intermediateValues,
-                           UnaryPredicateT const &predicate,
-                           RegexT const &,
-                           size_t const ngramRangeMin,
-                           size_t const ngramRangeMax,
-                           std::function<void (IteratorT, IteratorT)> const &callback) {
-
-    ParseNgramCharwbCopy(input, intermediateValues, predicate, ngramRangeMin, ngramRangeMax, callback);
-}
 
 } // namespace Strings
 } // namespace Featurizer
