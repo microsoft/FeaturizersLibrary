@@ -283,4 +283,30 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_CreateTransformerSaveData(
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_Transform(/*in*/ FromStringFeaturizer_bool_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
+/* ---------------------------------------------------------------------- */
+/* |  FromStringFeaturizer <string> */
+struct FromStringFeaturizer_string_EstimatorHandle {};
+struct FromStringFeaturizer_string_TransformerHandle {};
+
+/* Training Methods */
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_CreateEstimator(/*out*/ FromStringFeaturizer_string_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_DestroyEstimator(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_GetState(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_IsTrainingComplete(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_Fit(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const *input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_FitBuffer(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_OnDataCompleted(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_CompleteTraining(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+
+/* Inference Methods */
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_CreateTransformerFromEstimator(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pEstimatorHandle, /*out*/ FromStringFeaturizer_string_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ FromStringFeaturizer_string_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_DestroyTransformer(/*in*/ FromStringFeaturizer_string_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_CreateTransformerSaveData(/*in*/ FromStringFeaturizer_string_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_Transform(/*in*/ FromStringFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+
 } // extern "C"

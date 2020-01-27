@@ -4,6 +4,7 @@
 # ----------------------------------------------------------------------
 """Contains the Plugin object"""
 
+import itertools
 import os
 import sys
 import textwrap
@@ -41,6 +42,7 @@ class Plugin(PluginBase):
     @staticmethod
     @Interface.override
     def Generate(
+        open_file_func,
         global_custom_structs,
         global_custom_enums,
         data,
@@ -54,7 +56,7 @@ class Plugin(PluginBase):
             type_info_data = []
 
             for items in data:
-                type_info_data.append([TypeInfoData(item) for item in items])
+                type_info_data.append([TypeInfoData(item, global_custom_structs, global_custom_enums) for item in items])
 
         for desc, func in [("Generating .h files...", _GenerateHeaderFile)]:
             status_stream.write(desc)
@@ -73,6 +75,7 @@ class Plugin(PluginBase):
                     )
                     with dm.stream.DoneManager() as this_dm:
                         this_dm.result = func(
+                            open_file_func,
                             output_dir,
                             items,
                             items_type_info_data,
@@ -90,8 +93,8 @@ class Plugin(PluginBase):
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
-def _GenerateHeaderFile(output_dir, items, all_type_info_data, output_stream):
-    with open(
+def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, output_stream):
+    with open_file_func(
         os.path.join(output_dir, "SharedLibraryTests_{}.h".format(items[0].name)),
         "w",
     ) as f:
@@ -319,20 +322,30 @@ class TypeInfoData(object):
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
-    def __init__(self, item):
+    def __init__(self, item, global_custom_structs, global_custom_enums):
         # Create the custom structs
         custom_structs = OrderedDict()
 
-        for custom_struct in getattr(item, "custom_structs", []):
+        for custom_struct in itertools.chain(global_custom_structs, getattr(item, "custom_structs", [])):
             members = OrderedDict()
 
             for member in custom_struct.members:
                 tif = self._GetTypeInfoClass(member.type)
                 assert tif, member.type
 
-                members[member.name] = tif()
+                assert member.name not in members, member.name
+                members[member.name] = tif(
+                    member_type=member.type,
+                    create_type_info_factory_func=self._GetTypeInfoClass,
+                )
 
             custom_structs[custom_struct.name] = members
+
+        # Create the custom enums
+        custom_enums = OrderedDict()
+
+        for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
+            custom_enums[custom_enum.name] = custom_enum
 
         # Create the configuration param factories
         configuration_param_type_info_factories = []
@@ -341,19 +354,36 @@ class TypeInfoData(object):
             tif = self._GetTypeInfoClass(configuration_param.type)
             assert tif, configuration_param.type
 
-            configuration_param_type_info_factories.append(tif(custom_structs))
+            configuration_param_type_info_factories.append(
+                tif(
+                    custom_structs=custom_structs,
+                    custom_enums=custom_enums,
+                    member_type=configuration_param.type,
+                    create_type_info_factory_func=self._GetTypeInfoClass,
+                ),
+            )
 
         # Create the input factory
         tif = self._GetTypeInfoClass(item.input_type)
         assert tif, item.input_type
 
-        input_type_info_factory = tif(custom_structs)
+        input_type_info_factory = tif(
+            custom_structs=custom_structs,
+            custom_enums=custom_enums,
+            member_type=item.input_type,
+            create_type_info_factory_func=self._GetTypeInfoClass,
+        )
 
         # Create the output factory
         tif = self._GetTypeInfoClass(item.output_type)
         assert tif, item.output_type
 
-        output_type_info_factory = tif(custom_structs)
+        output_type_info_factory = tif(
+            custom_structs=custom_structs,
+            custom_enums=custom_enums,
+            member_type=item.output_type,
+            create_type_info_factory_func=self._GetTypeInfoClass,
+        )
 
         # Commit the results
         self.CustomStructs                              = custom_structs
@@ -377,15 +407,19 @@ class TypeInfoData(object):
     def _GetTypeInfoClass(cls, the_type):
         if cls._type_info_factory_classes is None:
             from Plugins.SharedLibraryTestsPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
+            from Plugins.SharedLibraryTestsPluginImpl.MatrixTypeInfoFactory import MatrixTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl import ScalarTypeInfoFactories
             from Plugins.SharedLibraryTestsPluginImpl.SparseVectorEncodingTypeInfoFactory import SparseVectorEncodingTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl import StructTypeInfoFactories
+            from Plugins.SharedLibraryTestsPluginImpl.VectorTypeInfoFactory import VectorTypeInfoFactory
 
             type_info_factory_classes = [
                 DatetimeTypeInfoFactory,
+                MatrixTypeInfoFactory,
                 SparseVectorEncodingTypeInfoFactory,
                 StringTypeInfoFactory,
+                VectorTypeInfoFactory,
             ]
 
             for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
@@ -404,7 +438,12 @@ class TypeInfoData(object):
             cls._type_info_factory_classes = type_info_factory_classes
 
         for type_info_factory_class in cls._type_info_factory_classes:
-            if type_info_factory_class.TypeName == the_type:
-                return type_info_factory_class
+            if isinstance(type_info_factory_class.TypeName, six.string_types):
+                if type_info_factory_class.TypeName == the_type:
+                    return type_info_factory_class
+
+            elif hasattr(type_info_factory_class.TypeName, "match"):
+                if type_info_factory_class.TypeName.match(the_type):
+                    return type_info_factory_class
 
         return None

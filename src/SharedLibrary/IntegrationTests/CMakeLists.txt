@@ -34,8 +34,11 @@ foreach(_test_name IN ITEMS
     SharedLibrary_FromStringFeaturizer_IntegrationTest
     SharedLibrary_HOHVFeaturizer_IntegrationTest
     SharedLibrary_IMFeaturizer_IntegrationTest
+    SharedLibrary_L1NormalizeFeaturizer_IntegrationTest
+    SharedLibrary_L2NormalizeFeaturizer_IntegrationTest
     SharedLibrary_LEFeaturizer_IntegrationTest
     SharedLibrary_MASFeaturizer_IntegrationTest
+    SharedLibrary_MNormalizeFeaturizer_IntegrationTest
     SharedLibrary_MDFeaturizer_IntegrationTest
     SharedLibrary_MeanIFeaturizer_IntegrationTest
     SharedLibrary_MedianIFeaturizer_IntegrationTest
@@ -44,9 +47,11 @@ foreach(_test_name IN ITEMS
     SharedLibrary_ModeIFeaturizer_IntegrationTest
     SharedLibrary_NumericalizeFeaturizer_IntegrationTest
     SharedLibrary_OHEFeaturizer_IntegrationTest
+    SharedLibrary_PCAFeaturizer_IntegrationTest
     SharedLibrary_RSFeaturizer_IntegrationTest
     SharedLibrary_SSWFeaturizer_IntegrationTest
     SharedLibrary_StringFeaturizer_IntegrationTest
+    SharedLibrary_TruncatedSVDFeaturizer_IntegrationTest
     SharedLibrary_TSIFeaturizer_IntegrationTest
 )
     add_executable(${_test_name} ${_test_name}.cpp)

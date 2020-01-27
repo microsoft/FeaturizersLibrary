@@ -3840,6 +3840,387 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_Transform(/*in*/ FromStrin
     }
 }
 
+/* ---------------------------------------------------------------------- */
+/* |                                                                      */
+/* |  FromStringFeaturizer <string> */
+/* |                                                                      */
+/* ---------------------------------------------------------------------- */
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_CreateEstimator(/*out*/ FromStringFeaturizer_string_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        // No validation
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+
+        pEstimator->begin_training();
+
+        size_t index(g_pointerTable.Add(pEstimator));
+        *ppHandle = reinterpret_cast<FromStringFeaturizer_string_EstimatorHandle*>(index);
+
+
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_DestroyEstimator(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>>(index);
+        g_pointerTable.Remove(index);
+
+        delete pEstimator;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_GetState(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pState == nullptr) throw std::invalid_argument("'pState' is null");
+
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pState = static_cast<TrainingState>(estimator.get_state());
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_IsTrainingComplete(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
+
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_Fit(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const *input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+        if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
+
+
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_FitBuffer(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
+
+
+
+        if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
+
+        std::vector<std::string> input_buffer;
+
+        input_buffer.reserve(input_items);
+
+        char const * const * const input_end(input_ptr + input_items);
+
+        while(input_ptr != input_end) {
+        #if (defined __apple_build_version__)
+            input_buffer.push_back(*input_ptr);
+        #else
+            input_buffer.emplace_back(*input_ptr);
+        #endif
+            ++input_ptr;
+        }
+
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_OnDataCompleted(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.on_data_completed();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_CompleteTraining(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
+
+        estimator.complete_training();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_CreateTransformerFromEstimator(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pEstimatorHandle, /*out*/ FromStringFeaturizer_string_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
+        if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
+
+
+
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformerType*>(estimator.create_transformer().release());
+
+
+        size_t index = g_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<FromStringFeaturizer_string_TransformerHandle*>(index);
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ FromStringFeaturizer_string_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
+        if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
+        if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
+
+        Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
+
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformerType(archive));
+
+        size_t index = g_pointerTable.Add(pTransformer);
+        *ppTransformerHandle = reinterpret_cast<FromStringFeaturizer_string_TransformerHandle*>(index);
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_DestroyTransformer(/*in*/ FromStringFeaturizer_string_TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        size_t index = reinterpret_cast<size_t>(pHandle);
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformerType>(index);
+        g_pointerTable.Remove(index);
+
+
+        delete pTransformer;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_CreateTransformerSaveData(/*in*/ FromStringFeaturizer_string_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+        if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
+        if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
+
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Archive archive;
+
+        transformer.save(archive);
+
+        Microsoft::Featurizer::Archive::ByteArray const buffer(archive.commit());
+
+        unsigned char * new_buffer(new unsigned char[buffer.size()]);
+
+        std::copy(buffer.begin(), buffer.end(), new_buffer);
+
+        *ppBuffer = new_buffer;
+        *pBufferSize = buffer.size();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_Transform(/*in*/ FromStringFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+
+        if(input == nullptr) throw std::invalid_argument("'input' is null");
+        if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        // Input
+        auto result(transformer.execute(input));
+
+        // Output
+        if(result.empty()) {
+            *output_ptr = nullptr;
+            *output_items = 0;
+        }
+        else {
+            char * string_buffer(new char[result.size() + 1]);
+
+            std::copy(result.begin(), result.end(), string_buffer);
+            string_buffer[result.size()] = 0;
+
+            *output_ptr = string_buffer;
+            *output_items = result.size();
+        }
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("Invalid buffer");
+        if(result_ptr != nullptr && result_items == 0) throw std::invalid_argument("Invalid buffer");
+
+        if(result_ptr)
+            delete [] result_ptr;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)

@@ -351,13 +351,38 @@ void Updaters::MaxNormUpdater<T>::update_impl(T input, std::false_type /*is_null
     update_impl(input);
 }
 
+namespace Details {
+
+template <typename T>
+inline T abs(T const &value, typename std::enable_if<std::is_signed<T>::value, void *>::type=nullptr) {
+    return static_cast<T>(std::abs(value));
+}
+
+template <typename T>
+T const & abs(T const &value, typename std::enable_if<std::is_signed<T>::value == false, void *>::type=nullptr) {
+    return value;
+}
+
+} // namespace Details
+
+
 template <typename T>
 template <typename U>
 void Updaters::MaxNormUpdater<T>::update_impl(U input) {
     _has_valid_input = true;
-    _max_norm = std::max(static_cast<typename TypeSelector::MaxNormTypeSelector<T>::type>(std::abs(input)), _max_norm);
-}
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wabsolute-value"
+#endif
+
+    _max_norm = std::max(static_cast<typename TypeSelector::MaxNormTypeSelector<T>::type>(Details::abs(input)), _max_norm);
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+
+}
 
 template <typename T>
 typename TypeSelector::MaxNormTypeSelector<T>::type Updaters::MaxNormUpdater<T>::commit(void) {

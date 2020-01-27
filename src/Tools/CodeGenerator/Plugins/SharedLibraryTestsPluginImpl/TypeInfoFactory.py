@@ -70,6 +70,9 @@ class TypeInfoFactory(Interface.Interface):
     def __init__(
         self,
         custom_structs=None,
+        custom_enums=None,
+        member_type=None,
+        create_type_info_factory_func=None,
     ):
         # By default, custom structs are not used or preserved. Custom overridden
         # factories may use this information.

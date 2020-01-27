@@ -11,28 +11,56 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
+// SVD results can have different sign for result in different environment
+// so we create this function so that the largest number within a column is always positive
+// in order to always get a deterministic result across envrionment between UNIX and Windows
+template<typename MatrixType>
+inline MatrixType& svd_flip(MatrixType& mat) {
+    using Scalar = typename MatrixType::Scalar;
+
+    typedef typename MatrixType::Index Index;
+
+    for(Index col = 0; col < mat.cols(); ++col)
+    {
+        Scalar largest = mat(0,col);
+        for(Index row = 1; row < mat.rows(); ++row) {
+            largest = std::abs(mat(row, col)) > std::abs(largest) ? mat(row, col) : largest;
+        }
+        if (largest < 0) {
+            for(Index row = 0; row < mat.rows(); ++row) {
+                mat(row, col) = -mat(row, col);
+            }
+        }
+    }
+    return mat;
+}
+
 /////////////////////////////////////////////////////////////////////////
 ///  \class         TruncatedSVDTransformer
 ///  \brief         Contains SVDComponents and use SVDComponents to project
 ///                 matrix for dimensionality reduction, also provides
 ///                 SVDComponents retriving
 ///
-template <typename MatrixT>
-class TruncatedSVDTransformer : public StandardTransformer<MatrixT, MatrixT> {
+template <
+    typename InputEigenMatrixT,
+    typename OutputEigenMatrixT=Eigen::MatrixX<typename InputEigenMatrixT::Scalar>
+>
+class TruncatedSVDTransformer : public StandardTransformer<InputEigenMatrixT, OutputEigenMatrixT> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                                   = StandardTransformer<MatrixT, MatrixT>;
+    using BaseType                          = StandardTransformer<InputEigenMatrixT, OutputEigenMatrixT>;
+    using EigenMatrix                       = Eigen::MatrixX<typename InputEigenMatrixT::Scalar>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    explicit TruncatedSVDTransformer(MatrixT singularvectors);
+    explicit TruncatedSVDTransformer(EigenMatrix singularvectors);
     explicit TruncatedSVDTransformer(Archive &ar);
 
     ~TruncatedSVDTransformer(void) override = default;
@@ -49,7 +77,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    MatrixT const                                    _singularvectors;
+    EigenMatrix const                       _singularvectors;
 
     // ----------------------------------------------------------------------
     // |
@@ -63,10 +91,13 @@ private:
 
         if (input.cols() != _singularvectors.rows())
             throw std::invalid_argument("Input matrix cols() invalid");
-
-        callback(input * _singularvectors);
+        
+        EigenMatrix result = input * _singularvectors;
+        
+        callback(svd_flip(result));
     }
 };
+
 
 //the following functions are introduced from RedSVD
 //Copyright attached
@@ -174,18 +205,19 @@ inline void gram_schmidt(MatrixType& mat) {
 ///                 and creates a `SVDTransformer` object.
 ///
 template <
-    typename MatrixT,
+    typename InputEigenMatrixT,
+    typename OutputEigenMatrixT=Eigen::MatrixX<typename InputEigenMatrixT::Scalar>,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class TruncatedSVDEstimator : public TransformerEstimator<MatrixT, MatrixT> {
+class TruncatedSVDEstimator : public TransformerEstimator<InputEigenMatrixT, OutputEigenMatrixT> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = TransformerEstimator<MatrixT, MatrixT>;
-    using TransformerType                   = TruncatedSVDTransformer<MatrixT>;
+    using BaseType                          = TransformerEstimator<InputEigenMatrixT, OutputEigenMatrixT>;
+    using TransformerType                   = TruncatedSVDTransformer<InputEigenMatrixT, OutputEigenMatrixT>;
 
     // ----------------------------------------------------------------------
     // |
@@ -200,72 +232,74 @@ public:
 private:
     // ----------------------------------------------------------------------
     // |
+    // |  Private Types
+    // |
+    // ----------------------------------------------------------------------
+    using EigenMatrix                       = Eigen::MatrixX<typename InputEigenMatrixT::Scalar>;
+
+    // ----------------------------------------------------------------------
+    // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
     size_t const                            _colIndex;
-    MatrixT                                 _matrix;
 
-    bool                                    _hasCalledFit;
+    EigenMatrix                             _state;
+
     // ----------------------------------------------------------------------
     // |
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
     bool begin_training_impl(void) override;
+
     // MSVC has problems when the declaration and definition are separated
-    FitResult fit_impl(typename BaseType::InputType const *pBuffer, size_t) override {
+    FitResult fit_impl(typename BaseType::InputType const *pBuffer, size_t cElements) override {
+        if(cElements != 1)
+            throw std::runtime_error("Only 1 matrix can be provided");
 
-        if (_hasCalledFit)
-            throw std::runtime_error("fit_impl() should not be called move than once in TruncatedSVDFeaturizer");
-
-        _matrix = *pBuffer;
-        _hasCalledFit = true;
-
-        return FitResult::Continue;
-    }
-    void complete_training_impl(void) override;
-
-    // MSVC has problems when the definition is separate from the declaration
-    typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        //the following code in this function is introduced from RedSVD
-        typedef typename MatrixT::Scalar Scalar;
-        typedef typename Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> DenseMatrix;
-
-        Eigen::Index rank = (_matrix.rows() < _matrix.cols()) ? _matrix.rows() : _matrix.cols();
+        auto const &                        matrix(*pBuffer);
+        Eigen::Index                        rank((matrix.rows() < matrix.cols()) ? matrix.rows() : matrix.cols());
 
         // Gaussian Random Matrix for _matrix^T
-        DenseMatrix O(_matrix.rows(), rank);
+        EigenMatrix                         O(matrix.rows(), rank);
         sample_gaussian(O);
 
         // Compute Sample Matrix of _matrix^T
-        DenseMatrix Y = _matrix.transpose() * O;
+        EigenMatrix                         Y(matrix.transpose() * O);
 
         // Orthonormalize Y
         gram_schmidt(Y);
 
         // Range(B) = Range(_matrix^T)
-        DenseMatrix B = _matrix * Y;
-
-        // free _matrix
-        _matrix.resize(0, 0);
+        EigenMatrix                         B(matrix * Y);
 
         // Gaussian Random Matrix
-        DenseMatrix P(B.cols(), rank);
+        EigenMatrix                         P(B.cols(), rank);
+
         sample_gaussian(P);
 
         // Compute Sample Matrix of B
-        DenseMatrix Z = B * P;
+        EigenMatrix                         Z(B * P);
 
         // Orthonormalize Z
         gram_schmidt(Z);
 
         // Range(C) = Range(B)
-        DenseMatrix C = Z.transpose() * B;
+        EigenMatrix                         C(Z.transpose() * B);
 
-        Eigen::JacobiSVD<DenseMatrix> svdOfC(C, Eigen::ComputeThinV);
+        Eigen::JacobiSVD<EigenMatrix>       svdOfC(C, Eigen::ComputeThinV);
 
-        return typename BaseType::TransformerUniquePtr(new TruncatedSVDTransformer<MatrixT>(Y * svdOfC.matrixV()));
+        _state = Y * svdOfC.matrixV();
+
+        return FitResult::Complete;
+    }
+
+    void complete_training_impl(void) override;
+
+    // MSVC has problems when the definition is separate from the declaration
+    typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
+        return typename BaseType::TransformerUniquePtr(new TransformerType(std::move(_state)));
     }
 };
 
@@ -284,15 +318,15 @@ private:
 // |  TruncatedSVDTransformer
 // |
 // ----------------------------------------------------------------------
-template <typename MatrixT>
-TruncatedSVDTransformer<MatrixT>::TruncatedSVDTransformer(MatrixT singularvectors) :
+template <typename InputEigenMatrixT, typename OutputEigenMatrixT>
+TruncatedSVDTransformer<InputEigenMatrixT, OutputEigenMatrixT>::TruncatedSVDTransformer(EigenMatrix singularvectors) :
     _singularvectors(std::move(singularvectors)) {
     if(_singularvectors.size() == 0)
         throw std::invalid_argument("singularvectors");
 }
 
-template <typename MatrixT>
-TruncatedSVDTransformer<MatrixT>::TruncatedSVDTransformer(Archive &ar) :
+template <typename InputEigenMatrixT, typename OutputEigenMatrixT>
+TruncatedSVDTransformer<InputEigenMatrixT, OutputEigenMatrixT>::TruncatedSVDTransformer(Archive &ar) :
     TruncatedSVDTransformer(
         [&ar](void) {
             // Version
@@ -303,23 +337,23 @@ TruncatedSVDTransformer<MatrixT>::TruncatedSVDTransformer(Archive &ar) :
                 throw std::runtime_error("Unsupported archive version");
 
             // Data
-            MatrixT                        singularvectors(Traits<MatrixT>::deserialize(ar));
+            EigenMatrix                     singularvectors(Traits<EigenMatrix>::deserialize(ar));
 
-            return TruncatedSVDTransformer<MatrixT>(std::move(singularvectors));
+            return TruncatedSVDTransformer(std::move(singularvectors));
         }()
     ) {
 }
 
-template <typename MatrixT>
-bool TruncatedSVDTransformer<MatrixT>::operator==(TruncatedSVDTransformer const &other) const {
+template <typename InputEigenMatrixT, typename OutputEigenMatrixT>
+bool TruncatedSVDTransformer<InputEigenMatrixT, OutputEigenMatrixT>::operator==(TruncatedSVDTransformer const &other) const {
     if ((this->_singularvectors - other._singularvectors).norm() > 0.000001f)
         return false;
 
     return true;
 }
 
-template <typename MatrixT>
-void TruncatedSVDTransformer<MatrixT>::save(Archive &ar) const /*override*/ {
+template <typename InputEigenMatrixT, typename OutputEigenMatrixT>
+void TruncatedSVDTransformer<InputEigenMatrixT, OutputEigenMatrixT>::save(Archive &ar) const /*override*/ {
     // Version
     Traits<std::uint16_t>::serialize(ar, 1); // Major
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
@@ -333,8 +367,8 @@ void TruncatedSVDTransformer<MatrixT>::save(Archive &ar) const /*override*/ {
 // |  TruncatedSVDEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename MatrixT, size_t MaxNumTrainingItemsV>
-TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::TruncatedSVDEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+template <typename InputEigenMatrixT, typename OutputEigenMatrixT, size_t MaxNumTrainingItemsV>
+TruncatedSVDEstimator<InputEigenMatrixT, OutputEigenMatrixT, MaxNumTrainingItemsV>::TruncatedSVDEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
     BaseType("SVDEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
@@ -345,20 +379,19 @@ TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::TruncatedSVDEstimator(Anno
                 return colIndex;
             }()
         )
-    ),
-    _hasCalledFit(false) {
+    ) {
 }
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-template <typename MatrixT,size_t MaxNumTrainingItemsV>
-bool TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+template <typename InputEigenMatrixT, typename OutputEigenMatrixT, size_t MaxNumTrainingItemsV>
+bool TruncatedSVDEstimator<InputEigenMatrixT, OutputEigenMatrixT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
     return true;
 }
 
-template <typename MatrixT, size_t MaxNumTrainingItemsV>
-void TruncatedSVDEstimator<MatrixT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+template <typename InputEigenMatrixT, typename OutputEigenMatrixT, size_t MaxNumTrainingItemsV>
+void TruncatedSVDEstimator<InputEigenMatrixT, OutputEigenMatrixT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
 } // namespace Featurizers
