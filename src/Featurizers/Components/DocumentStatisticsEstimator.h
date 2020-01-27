@@ -136,6 +136,7 @@ private:
 
     template <typename PredicateT, typename IteratorT>
     using ParseFunctionType                 = std::function<void (std::string const &,
+                                                                  std::vector<std::string> &,
                                                                   PredicateT const &,
                                                                   std::regex const &,
                                                                   size_t const,
@@ -573,17 +574,17 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTraining
         //initialize parse function
         if (_analyzer == AnalyzerMethod::Word) {
             if (!_regexToken.empty()) {
-                _parseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseRegex<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+                _parseFunc = Microsoft::Featurizer::Strings::UParseRegex<std::string::const_iterator, std::function<bool (char)>, std::regex>;
             } else if (_ngramRangeMin == 1 && _ngramRangeMax == 1) {
-                _parseFunc = Microsoft::Featurizer::Strings::Wrapper::UParse<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+                _parseFunc = Microsoft::Featurizer::Strings::UParse<std::string::const_iterator, std::function<bool (char)>, std::regex>;
             } else {
-                _parseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseNgramWordCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+                _parseFunc = Microsoft::Featurizer::Strings::UParseNgramWordCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
             }
         } else if (_analyzer == AnalyzerMethod::Char) {
-            _parseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseNgramCharCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+            _parseFunc = Microsoft::Featurizer::Strings::UParseNgramCharCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
         } else {
             assert(_analyzer == AnalyzerMethod::Charwb);
-            _parseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseNgramCharwbCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+            _parseFunc = Microsoft::Featurizer::Strings::UParseNgramCharwbCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
         }
 }
 
@@ -643,8 +644,11 @@ template <typename SetT, typename CreateKeyFuncT, typename KeyToStringFuncT>
 void Details::DocumentStatisticsTrainingOnlyPolicy::fit_impl(InputType const &input, CreateKeyFuncT const &createKeyFunc, KeyToStringFuncT const &keyToStringFunc) {
     SetT                                    documents;
 
+    std::vector<std::string> intermediateValues;
+
     _parseFunc(
         input,
+        intermediateValues,
         [](char c) {return std::isspace(c);},
         std::regex(_regexToken),
         _ngramRangeMin,

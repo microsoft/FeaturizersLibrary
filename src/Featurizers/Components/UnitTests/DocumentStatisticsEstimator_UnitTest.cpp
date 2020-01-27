@@ -155,6 +155,40 @@ TEST_CASE("string_idf_custom_decorator") {
                    ngramRangeMax);
 }
 
+TEST_CASE("string_idf_regex_no_decorator") {
+    FrequencyMap const                         termFreqLabel({{"jumpy", 1}, {"fox", 1}});
+    IndexMap const                             termIndexLabel({{"fox", 0}, {"jumpy", 1}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
+    std::uint32_t const                        docuNumsLabel(1);
+
+    std::vector<std::vector<std::string>> const
+                                               inputBatches({{"jumpy fox"}});
+
+    //parameter initialization
+    StringDecorator decorator;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
+    std::string regexToken = "[^\\s]+";
+    nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
+    nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
+    std::float_t minDf = 0.0f;
+    std::float_t maxDf = 1.0f;
+    std::uint32_t ngramRangeMin = 1;
+    std::uint32_t ngramRangeMax = 1;
+
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
+}
+
 TEST_CASE("string_idf_custom_regex") {
     FrequencyMap const                         termFreqLabel({{"orange",3}, {"apple", 1}, {"peach", 3}, {"grape", 2}, {"banana",1}});
     IndexMap const                             termIndexLabel({{"apple", 0}, {"banana",1}, {"grape", 2}, {"orange",3}, {"peach", 4}});
@@ -190,34 +224,39 @@ TEST_CASE("string_idf_custom_regex") {
                    ngramRangeMax);
 }
 
-// //problematic test(dangling iterators)
-// TEST_CASE("string_idf_ngramword_no_decorator") {
-//     FrequencyMap const                         termFreqLabel({{"jumpy", 1}, {"fox", 1}, {"jumpy fox", 1}});
-//     IndexMap const                             termIndexLabel({{"fox", 0}, {"jumpy fox", 2}, {"jumpy", 1}});
-//     FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
-//     std::uint32_t const                        docuNumsLabel(1);
+TEST_CASE("string_idf_ngramword_no_decorator") {
+    FrequencyMap const                         termFreqLabel({{"jumpy", 1}, {"fox", 1}, {"jumpy fox", 1}});
+    IndexMap const                             termIndexLabel({{"fox", 0}, {"jumpy fox", 2}, {"jumpy", 1}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
+    std::uint32_t const                        docuNumsLabel(1);
 
-//     std::vector<std::vector<std::string>> const
-//                                                inputBatches({{"jumpy fox"}});
+    std::vector<std::vector<std::string>> const
+                                               inputBatches({{"jumpy fox"}});
 
-//     //parameter initialization
-//     //StringDecorator decorator = Microsoft::Featurizer::Strings::ToLower;
-//     StringDecorator decorator;
-//     AnalyzerMethod analyzer = AnalyzerMethod::Word;
-//     std::string regexToken = "";
-//     nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
-//     nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
-//     std::float_t minDf = 0.0f;
-//     std::float_t maxDf = 1.0f;
-//     std::uint32_t ngramRangeMin = 1;
-//     std::uint32_t ngramRangeMax = 2;
+    //parameter initialization
+    StringDecorator decorator;
+    AnalyzerMethod analyzer = AnalyzerMethod::Word;
+    std::string regexToken = "";
+    nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
+    nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
+    std::float_t minDf = 0.0f;
+    std::float_t maxDf = 1.0f;
+    std::uint32_t ngramRangeMin = 1;
+    std::uint32_t ngramRangeMax = 2;
 
-//     FrequencyAndIndexMap const                 termFreqAndIndexAnnotation(TrainTermFrequencyAndIndex(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-//     std::uint32_t const                        docuNumsAnnotation(TrainDocuNum(inputBatches, decorator, analyzer, regexToken, existingVocabulary, maxFeatures, minDf, maxDf, ngramRangeMin, ngramRangeMax));
-
-//     CHECK(termFreqAndIndexAnnotation == termFreqAndIndexLabel);
-//     CHECK(docuNumsAnnotation == docuNumsLabel);
-// }
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
+}
 
 TEST_CASE("string_idf_ngramword") {
     FrequencyMap const                         termFreqLabel({{"jumpy", 1}, {"fox", 1}, {"jumpy fox", 1}});
@@ -254,6 +293,40 @@ TEST_CASE("string_idf_ngramword") {
                    ngramRangeMax);
 }
 
+TEST_CASE("string_idf_ngramchar_no_decorator") {
+    FrequencyMap const                         termFreqLabel({{"jumpy f", 1}, {"mpy fox", 1}, {"umpy fo", 1}});
+    IndexMap const                             termIndexLabel({{"jumpy f", 0}, {"mpy fox", 1}, {"umpy fo", 2}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
+    std::uint32_t const                        docuNumsLabel(1);
+
+    std::vector<std::vector<std::string>> const
+                                               inputBatches({{"jumpy fox"}});
+
+    //parameter initialization
+    StringDecorator decorator;
+    AnalyzerMethod analyzer = AnalyzerMethod::Char;
+    std::string regexToken = "";
+    nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
+    nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
+    std::float_t minDf = 0.0f;
+    std::float_t maxDf = 1.0f;
+    std::uint32_t ngramRangeMin = 7;
+    std::uint32_t ngramRangeMax = 7;
+
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
+}
+
 TEST_CASE("string_idf_ngramchar") {
     FrequencyMap const                         termFreqLabel({{"jumpy f", 1}, {"mpy fox", 1}, {"umpy fo", 1}});
     IndexMap const                             termIndexLabel({{"jumpy f", 0}, {"mpy fox", 1}, {"umpy fo", 2}});
@@ -274,6 +347,41 @@ TEST_CASE("string_idf_ngramchar") {
     std::float_t maxDf = 1.0f;
     std::uint32_t ngramRangeMin = 7;
     std::uint32_t ngramRangeMax = 7;
+
+    DSRTestWrapper(inputBatches,
+                   termFreqAndIndexLabel,
+                   docuNumsLabel,
+                   decorator,
+                   analyzer,
+                   regexToken,
+                   existingVocabulary,
+                   maxFeatures,
+                   minDf,
+                   maxDf,
+                   ngramRangeMin,
+                   ngramRangeMax);
+}
+
+TEST_CASE("string_idf_ngramcharwb_no_decorator") {
+    FrequencyMap const                         termFreqLabel({{" jump", 1}, {"jumpy", 1}, {"umpy ", 1}, {" abcd", 1}, {"abcd ", 1}});
+    IndexMap const                             termIndexLabel({{" jump", 1}, {"jumpy", 3}, {"umpy ", 4}, {" abcd", 0}, {"abcd ", 2}});
+    FrequencyAndIndexMap const                 termFreqAndIndexLabel = NS::Featurizers::Components::MergeTwoMapsWithSameKeys(termFreqLabel, termIndexLabel);
+    std::uint32_t const                        docuNumsLabel(1);
+
+    std::vector<std::vector<std::string>> const
+                                               inputBatches({{"jumpy abcd"}});
+
+    //parameter initialization
+    //StringDecorator decorator = Microsoft::Featurizer::Strings::ToLower;
+    StringDecorator decorator;
+    AnalyzerMethod analyzer = AnalyzerMethod::Charwb;
+    std::string regexToken = "";
+    nonstd::optional<IndexMap> existingVocabulary = nonstd::optional<IndexMap>();
+    nonstd::optional<std::uint32_t> maxFeatures = nonstd::optional<std::uint32_t>();
+    std::float_t minDf = 0.0f;
+    std::float_t maxDf = 1.0f;
+    std::uint32_t ngramRangeMin = 5;
+    std::uint32_t ngramRangeMax = 5;
 
     DSRTestWrapper(inputBatches,
                    termFreqAndIndexLabel,
