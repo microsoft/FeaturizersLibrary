@@ -235,10 +235,16 @@ inline void ParseRegex(IteratorT const &begin,
     std::sregex_iterator iterEnd;
 
     while (iter != iterEnd) {
-        std::string const iterStringConst = iter->str();
-        IteratorT beginRef = iterStringConst.begin();
-        IteratorT endRef = iterStringConst.end();
-        callback(beginRef, endRef);
+        IteratorT                           matchStart(begin);
+
+        std::advance(matchStart, iter->position());
+
+        IteratorT                           matchEnd(matchStart);
+
+        std::advance(matchEnd, iter->length());
+
+        callback(matchStart, matchEnd);
+
         ++iter;
     }
 }
