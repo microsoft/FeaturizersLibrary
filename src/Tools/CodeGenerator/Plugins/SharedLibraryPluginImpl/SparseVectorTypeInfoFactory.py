@@ -2,9 +2,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the SparseVectorEncodingTypeInfoFactory object"""
+"""Contains the SparseVectorTypeInfoFactory object"""
 
 import os
+import re
 import textwrap
 
 import CommonEnvironment
@@ -19,13 +20,13 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class SparseVectorEncodingTypeInfoFactory(TypeInfoFactory):
+class SparseVectorTypeInfoFactory(TypeInfoFactory):
     # ----------------------------------------------------------------------
     # |
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
-    TypeName                                = Interface.DerivedProperty("SparseVectorEncoding")
+    TypeName                                = Interface.DerivedProperty(re.compile(r"sparse_vector\<(?P<type>\S+)\>"))
     CppType                                 = Interface.DerivedProperty(None)
 
     # ----------------------------------------------------------------------
@@ -40,22 +41,19 @@ class SparseVectorEncodingTypeInfoFactory(TypeInfoFactory):
         member_type=None,
         create_type_info_factory_func=None,
     ):
-        if custom_structs:
-            assert self.TypeName in custom_structs, custom_structs
-            member_info = custom_structs[self.TypeName]
+        if member_type is not None:
+            assert create_type_info_factory_func is not None
 
-            if (
-                len(member_info) != 1
-                or "type" not in member_info
-            ):
-                raise Exception("'{}' types should have 1 member with the name 'type'".format(self.TypeName))
+            match = self.TypeName.match(member_type)
+            assert match, member_type
 
-            the_type = member_info["type"]
+            the_type = match.group("type")
 
-            if the_type.TypeName not in ["int8", "int16", "int32", "int64", "uint8", "uint16", "uint32", "uint64", "double", "float", "bool"]:
-                raise Exception("'{}' is not an expected type".format(the_type.TypeName))
+            type_info = create_type_info_factory_func(the_type)
+            if not hasattr(type_info, "CType"):
+                raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a sparse_vector".format(the_type))
 
-            self._type                      = the_type
+            self._type_info                 = type_info
 
     # ----------------------------------------------------------------------
     @Interface.override
@@ -79,7 +77,7 @@ class SparseVectorEncodingTypeInfoFactory(TypeInfoFactory):
             [
                 "/*out*/ uint64_t * {}_numElements".format(arg_name),
                 "/*out*/ uint64_t * {}_numValues".format(arg_name),
-                "/*out*/ {} **{}_values".format(self._type.CType, arg_name),
+                "/*out*/ {} **{}_values".format(self._type_info.CType, arg_name),
                 "/*out*/ uint64_t **{}_indexes".format(arg_name),
             ],
             textwrap.dedent(
@@ -105,16 +103,17 @@ class SparseVectorEncodingTypeInfoFactory(TypeInfoFactory):
                     *pIndex++ = encoding.Index;
                 }}
 
-                *{name}_numElements = {result}.NumElements;
-                *{name}_numValues = {result}.Values.size();
+                {pointer}{name}_numElements = {result}.NumElements;
+                {pointer}{name}_numValues = {result}.Values.size();
 
-                *{name}_values = pValues.release();
-                *{name}_indexes = pIndexes.release();
+                {pointer}{name}_values = pValues.release();
+                {pointer}{name}_indexes = pIndexes.release();
                 """,
             ).format(
                 name=arg_name,
                 result=result_name,
-                type=self._type.CppType,
+                type=self._type_info.CppType,
+                pointer="" if is_struct_member else "*",
             ),
         )
 
@@ -128,7 +127,7 @@ class SparseVectorEncodingTypeInfoFactory(TypeInfoFactory):
             [
                 "/*in*/ uint64_t {}_numElements".format(arg_name),
                 "/*in*/ uint64_t {}_numValues".format(arg_name),
-                "/*in*/ {} const * {}_values".format(self._type.CType, arg_name),
+                "/*in*/ {} const * {}_values".format(self._type_info.CType, arg_name),
                 "/*in*/ uint64_t const * {}_indexes".format(arg_name),
             ],
             textwrap.dedent(

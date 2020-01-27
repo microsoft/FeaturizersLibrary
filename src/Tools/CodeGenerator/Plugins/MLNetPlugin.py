@@ -94,7 +94,7 @@ def _FillList(item, status_stream, unsupported_types, global_custom_structs, glo
     try:
         return CSharpData(item, global_custom_structs, global_custom_enums)
     except Exception as e:
-        if "is not a supported type" in e.args[0]:
+        if "is not a supported type" in e.args[0] and hasattr(item, "custom_structs"):
             if item.custom_structs[0].name not in unsupported_types:
                 status_stream.write(
                     "{}\tUnsupported type '{}' found in class '{}'. The corrsponding methods will not be generated for this type.\n".format(
@@ -913,6 +913,8 @@ class CSharpData(object):
             from Plugins.MLNetPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
             from Plugins.MLNetPluginImpl.MatrixTypeInfoFactory import MatrixTypeInfoFactory
             from Plugins.MLNetPluginImpl import ScalarTypeInfoFactories
+            from Plugins.MLNetPluginImpl.SingleValueSparseVectorTypeInfoFactory import SingleValueSparseVectorTypeInfoFactory
+            from Plugins.MLNetPluginImpl.SparseVectorTypeInfoFactory import SparseVectorTypeInfoFactory
             from Plugins.MLNetPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.MLNetPluginImpl import StructTypeInfoFactories
             from Plugins.MLNetPluginImpl.VectorTypeInfoFactory import VectorTypeInfoFactory
@@ -920,6 +922,8 @@ class CSharpData(object):
             type_info_factory_classes = [
                 DatetimeTypeInfoFactory,
                 MatrixTypeInfoFactory,
+                SingleValueSparseVectorTypeInfoFactory,
+                SparseVectorTypeInfoFactory,
                 StringTypeInfoFactory,
                 VectorTypeInfoFactory,
             ]

@@ -409,7 +409,8 @@ class TypeInfoData(object):
             from Plugins.SharedLibraryTestsPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl.MatrixTypeInfoFactory import MatrixTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl import ScalarTypeInfoFactories
-            from Plugins.SharedLibraryTestsPluginImpl.SparseVectorEncodingTypeInfoFactory import SparseVectorEncodingTypeInfoFactory
+            from Plugins.SharedLibraryTestsPluginImpl.SingleValueSparseVectorTypeInfoFactory import SingleValueSparseVectorTypeInfoFactory
+            from Plugins.SharedLibraryTestsPluginImpl.SparseVectorTypeInfoFactory import SparseVectorTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl import StructTypeInfoFactories
             from Plugins.SharedLibraryTestsPluginImpl.VectorTypeInfoFactory import VectorTypeInfoFactory
@@ -417,7 +418,8 @@ class TypeInfoData(object):
             type_info_factory_classes = [
                 DatetimeTypeInfoFactory,
                 MatrixTypeInfoFactory,
-                SparseVectorEncodingTypeInfoFactory,
+                SingleValueSparseVectorTypeInfoFactory,
+                SparseVectorTypeInfoFactory,
                 StringTypeInfoFactory,
                 VectorTypeInfoFactory,
             ]

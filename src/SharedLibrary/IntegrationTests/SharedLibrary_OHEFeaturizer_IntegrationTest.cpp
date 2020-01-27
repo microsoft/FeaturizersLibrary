@@ -29,14 +29,14 @@ TEST_CASE("int8") {
             static_cast<std::int8_t>(15),
             static_cast<std::int8_t>(20)
         },
-        [](std::vector<OneHotEncoding> const &args) {
+        [](std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &args) {
             UNSCOPED_INFO(args.size());
             if(args.size() != 5)
                 return false;
 
             // First value
             UNSCOPED_INFO("First value");
-            OneHotEncoding const & ohs1(args[0]);
+            Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t> const & ohs1(args[0]);
 
             if(ohs1.NumElements != 8) return false;
             if(ohs1.Value != 1) return false;
@@ -44,7 +44,7 @@ TEST_CASE("int8") {
 
             // Second value
             UNSCOPED_INFO("Second value");
-            OneHotEncoding const & ohs2(args[1]);
+            Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t> const & ohs2(args[1]);
 
             if(ohs2.NumElements != 8) return false;
             if(ohs2.Value != 1) return false;
@@ -52,7 +52,7 @@ TEST_CASE("int8") {
 
             // Third value
             UNSCOPED_INFO("Third value");
-            OneHotEncoding const & ohs3(args[2]);
+            Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t> const & ohs3(args[2]);
 
             if(ohs3.NumElements != 8) return false;
             if(ohs3.Value != 1) return false;
@@ -60,7 +60,7 @@ TEST_CASE("int8") {
 
             // Fourth value
             UNSCOPED_INFO("Fourth value");
-            OneHotEncoding const & ohs4(args[3]);
+            Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t> const & ohs4(args[3]);
 
             if(ohs4.NumElements != 8) return false;
             if(ohs4.Value != 1) return false;
@@ -68,7 +68,7 @@ TEST_CASE("int8") {
 
             // Fifth value
             UNSCOPED_INFO("Fifth value");
-            OneHotEncoding const & ohs5(args[4]);
+            Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t> const & ohs5(args[4]);
 
             if(ohs5.NumElements != 8) return false;
             if(ohs5.Value != 1) return false;
@@ -80,4 +80,3 @@ TEST_CASE("int8") {
         bool(true)
     );
 }
-
