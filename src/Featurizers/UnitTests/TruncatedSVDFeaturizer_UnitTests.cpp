@@ -161,6 +161,61 @@ TEST_CASE("Invalid_fit") {
     CHECK_THROWS_WITH(estimator.fit(trainingMatrix), "`fit` should not be invoked on an estimator that is not training or is already finished/complete");
 }
 
+TEST_CASE("Different training and inferencing data") {
+    using MatrixType = Eigen::MatrixX<std::double_t>;
+
+    MatrixType trainingMatrix(3, 3);
+    trainingMatrix(0, 0) = -1;
+    trainingMatrix(0, 1) = -1;
+    trainingMatrix(0, 2) =  0;
+    trainingMatrix(1, 0) =  0;
+    trainingMatrix(1, 1) = -2;
+    trainingMatrix(1, 2) = -1;
+    trainingMatrix(2, 0) = -3;
+    trainingMatrix(2, 1) =  0;
+    trainingMatrix(2, 2) = -2;
+
+    MatrixType inferenceMatrix(3, 3);
+    inferenceMatrix(0, 0) = 1;
+    inferenceMatrix(0, 1) = 0;
+    inferenceMatrix(0, 2) = 0;
+    inferenceMatrix(1, 0) = 0;
+    inferenceMatrix(1, 1) = 1;
+    inferenceMatrix(1, 2) = 0;
+    inferenceMatrix(2, 0) = 0;
+    inferenceMatrix(2, 1) = 0;
+    inferenceMatrix(2, 2) = 1;
+
+    using SVDEstimator                                 = NS::Featurizers::TruncatedSVDEstimator<MatrixType>;
+    NS::AnnotationMapsPtr const                        pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+
+    std::vector<std::vector<MatrixType>> trainingBatches  = NS::TestHelpers::make_vector<std::vector<MatrixType>>(
+        NS::TestHelpers::make_vector<MatrixType>(trainingMatrix)
+    );
+
+    std::vector<MatrixType> inputContainers = NS::TestHelpers::make_vector<MatrixType>(inferenceMatrix);
+    std::vector<MatrixType> outputContainer = NS::TestHelpers::TransformerEstimatorTest(SVDEstimator(pAllColumnAnnotations, 0), trainingBatches, inputContainers);
+
+
+    MatrixType inferenceOutput(3, 3);
+    inferenceOutput(0, 0) =  0.805055;
+    inferenceOutput(0, 1) = -0.315909;
+    inferenceOutput(0, 2) = -0.502083;
+    inferenceOutput(1, 0) =  0.204052;
+    inferenceOutput(1, 1) =  0.942224;
+    inferenceOutput(1, 2) = -0.265661;
+    inferenceOutput(2, 0) =  0.557;
+    inferenceOutput(2, 1) =  0.111421;
+    inferenceOutput(2, 2) =  0.823005;
+
+    for (MatrixType::Index col=0; col < outputContainer[0].cols(); ++col) {
+        for (MatrixType::Index row=0; row < outputContainer[0].rows(); ++row) {
+                 CHECK(Approx(inferenceOutput(row, col)) == outputContainer[0](row, col));
+        }
+    }
+}
+
+
 TEST_CASE("Serialization/Deserialization") {
     using MatrixT = Eigen::MatrixX<float>;
     using TransformerType = NS::Featurizers::TruncatedSVDTransformer<MatrixT>;

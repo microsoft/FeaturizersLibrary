@@ -407,6 +407,7 @@ class TypeInfoData(object):
     def _GetTypeInfoClass(cls, the_type):
         if cls._type_info_factory_classes is None:
             from Plugins.SharedLibraryTestsPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
+            from Plugins.SharedLibraryTestsPluginImpl.MatrixTypeInfoFactory import MatrixTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl import ScalarTypeInfoFactories
             from Plugins.SharedLibraryTestsPluginImpl.SparseVectorEncodingTypeInfoFactory import SparseVectorEncodingTypeInfoFactory
             from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
@@ -415,6 +416,7 @@ class TypeInfoData(object):
 
             type_info_factory_classes = [
                 DatetimeTypeInfoFactory,
+                MatrixTypeInfoFactory,
                 SparseVectorEncodingTypeInfoFactory,
                 StringTypeInfoFactory,
                 VectorTypeInfoFactory,
