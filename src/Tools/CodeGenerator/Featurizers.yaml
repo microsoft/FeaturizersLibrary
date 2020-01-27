@@ -57,10 +57,63 @@ featurizers:
       vocabulary established during training.
 
       C++-style pseudo signature:
-        TODO
+        CountVector execute(std::string const &value);
 
       Examples:
-        TODO
+        Assuming the training data is...
+        ["orange apple orange grape", "grape carrot carrot apple", "peach banana orange banana"]
+
+        The input data is...
+        "banana grape grape apple apple apple orange"
+
+        The result will be computed by...
+          categorize and compute each word's number of apperance in input data, we have "apple -> 3", "banana -> 1", "grape -> 2", "orange -> 1"
+          construct a dictionary and assign id for each unique word using training data, we have "apple -> 0", "banana -> 1", "grape -> 3", "orange -> 4"
+          generate TFStruct by combining <word's id, word's number of apperance>
+
+        The result is...
+        [3, 1, 0, 2, 1]
+
+    type_mappings:
+      - input_type: std::string
+        output_type: sparse_vector<int>
+
+    configuration_params:
+      - type: bool
+        name: lowercase
+        is_optional: false
+
+      - type: int
+        name: analyzer
+        is_optional: false
+
+      - type: string
+        name: regexToken
+        is_optional: false
+
+      - type: uint32
+        name: topKTerms
+        is_optional: true
+
+      - type: float
+        name: minDf
+        is_optional: false
+
+      - type: float
+        name: maxDf
+        is_optional: false
+
+      - type: uint32
+        name: ngramRangeMin
+        is_optional: false
+
+      - type: uint32
+        name: ngramRangeMax
+        is_optional: false
+
+      - type: bool
+        name: binary
+        is_optional: false
 
     status: Pending
 
@@ -191,6 +244,7 @@ featurizers:
           - float
           - double
           - bool
+          - string
 
     is_input_a_template: false
     is_output_a_template: true
@@ -309,6 +363,88 @@ featurizers:
         output_type: bool
 
   # ----------------------------------------------------------------------
+  - name: L1NormalizeFeaturizer
+    estimator_name: L1NormalizeEstimator
+    num_output_columns: 1
+    description: |-
+      Computes the L1 norm for a provided data set and normalize every row so that
+      its L1 norm is 1
+
+      C++-style pseudo signature:
+        template <typename IteratorT> std::vector<std::double_t> execute(std::pair<IteratorT, IteratorT> const &value);
+        template <typename IteratorT> std::vector<std::double_t> execute(std::tuple<IteratorT, IteratorT> const &value);
+
+      Examples:
+        Given the training data
+        [[4, 1, 2, 2],
+         [1, 3, 9, 3],
+         [5, 7, 5, 1]]
+
+         L1 norms for each row are: [9, 16, 18]
+
+        execute([4,1,2,2]) = [4/9, 1/9, 2/9, 2/9]
+        execute([1,3,9,3]) = [1/16, 3/16, 9/16, 3/16]
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+
+    type_mappings:
+      - input_type: vector<T>
+        output_type: vector<double>
+
+  # ----------------------------------------------------------------------
+  - name: L2NormalizeFeaturizer
+    estimator_name: L2NormalizeEstimator
+    num_output_columns: 1
+    description: |-
+      Computes the L2 norm for a provided data set and normalize every row so that
+      its L2 norm is 1
+
+      C++-style pseudo signature:
+        template <typename IteratorT> std::vector<std::double_t> execute(std::pair<IteratorT, IteratorT> const &value);
+        template <typename IteratorT> std::vector<std::double_t> execute(std::tuple<IteratorT, IteratorT> const &value);
+
+      Examples:
+        Given the training data
+        [[4, 1, 2, 2],
+         [1, 3, 9, 3],
+         [5, 7, 5, 1]]
+
+         L2 norms for each row are: [5, 10, 10]
+
+        execute([4,1,2,2]) = [4/5, 1/5, 2/5, 2/5]
+        execute([1,3,9,3]) = [1/10, 3/10, 9/10, 3/10]
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+
+    type_mappings:
+      - input_type: vector<T>
+        output_type: vector<double>
+
+  # ----------------------------------------------------------------------
   - name: LabelEncoderFeaturizer
     estimator_name: LabelEncoderEstimator
     num_output_columns: 1
@@ -394,6 +530,47 @@ featurizers:
 
       - input_type: TInputDouble
         output_type: double
+
+  # ----------------------------------------------------------------------
+  - name: MaxNormalizeFeaturizer
+    estimator_name: MaxNormalizeEstimator
+    num_output_columns: 1
+    description: |-
+      Computes the max norm for a provided data set and normalize every row so that
+      its max norm is 1
+
+      C++-style pseudo signature:
+        template <typename IteratorT> std::vector<std::double_t> execute(std::pair<IteratorT, IteratorT> const &value);
+        template <typename IteratorT> std::vector<std::double_t> execute(std::tuple<IteratorT, IteratorT> const &value);
+
+      Examples:
+        Given the training data
+        [[4, 1, 2, 2],
+         [1, 3, 9, 3],
+         [5, 7, 5, 1]]
+
+         Max norms for each row are: [4, 9, 7]
+
+        execute([4,1,2,2]) = [4/4, 1/4, 2/4, 2/4]
+        execute([1,3,9,3]) = [1/9, 3/9, 9/9, 3/9]
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+
+    type_mappings:
+      - input_type: vector<T>
+        output_type: vector<double>
 
   # ----------------------------------------------------------------------
   - name: MeanImputerFeaturizer
@@ -748,13 +925,25 @@ featurizers:
     estimator_name: PCAEstimator
     num_output_columns: 1
     description: |-
-      TODO
+      Principal component analysis and matrix projection
 
       C++-style pseudo signature:
-        TODO
+        template <typename MatrixT> MatrixT execute(MatrixT const &value);
 
       Examples:
-        TODO
+        Assuming the training matrix A
+        By applying PCA we get the eigenvector P
+        the projecting matrix of an input matrix X is X*P^T
+
+    templates:
+      - name: T
+        types:
+          - float
+          - double
+
+    type_mappings:
+      - input_type: matrix<T>
+        output_type: matrix<T>
 
     status: Pending
 
@@ -808,135 +997,6 @@ featurizers:
       - type: float
         name: qRangeMax
         is_optional: true
-
-  # ----------------------------------------------------------------------
-  - name: L1NormalizerFeaturizer
-    estimator_name: L1NormalizeEstimator
-    num_output_columns: 1
-    description: |-
-      Computes the L1 norm for a provided data set and normalize every row so that
-      its L1 norm is 1
-
-      C++-style pseudo signature:
-        template <typename IteratorT> std::vector<std::double_t> execute(std::pair<IteratorT, IteratorT> const &value);
-        template <typename IteratorT> std::vector<std::double_t> execute(std::tuple<IteratorT, IteratorT> const &value);
-
-      Examples:
-        Given the training data
-        [[4, 1, 2, 2],
-         [1, 3, 9, 3],
-         [5, 7, 5, 1]]
-
-         L1 norms for each row are: [9, 16, 18]
-
-        execute([4,1,2,2]) = [4/9, 1/9, 2/9, 2/9]
-        execute([1,3,9,3]) = [1/16, 3/16, 9/16, 3/16]
-
-    templates:
-      - name: T
-        types:
-          - int8
-          - int16
-          - int32
-          - int64
-          - uint8
-          - uint16
-          - uint32
-          - uint64
-          - float
-          - double
-
-    type_mappings:
-      - input_type: vector<T>
-        output_type: vector<double>
-
-    status: Pending
-
-  # ----------------------------------------------------------------------
-  - name: L2NormalizerFeaturizer
-    estimator_name: L2NormalizeEstimator
-    num_output_columns: 1
-    description: |-
-      Computes the L2 norm for a provided data set and normalize every row so that
-      its L2 norm is 1
-
-      C++-style pseudo signature:
-        template <typename IteratorT> std::vector<std::double_t> execute(std::pair<IteratorT, IteratorT> const &value);
-        template <typename IteratorT> std::vector<std::double_t> execute(std::tuple<IteratorT, IteratorT> const &value);
-
-      Examples:
-        Given the training data
-        [[4, 1, 2, 2],
-         [1, 3, 9, 3],
-         [5, 7, 5, 1]]
-
-         L2 norms for each row are: [5, 10, 10]
-
-        execute([4,1,2,2]) = [4/5, 1/5, 2/5, 2/5]
-        execute([1,3,9,3]) = [1/10, 3/10, 9/10, 3/10]
-
-    templates:
-      - name: T
-        types:
-          - int8
-          - int16
-          - int32
-          - int64
-          - uint8
-          - uint16
-          - uint32
-          - uint64
-          - float
-          - double
-
-    type_mappings:
-      - input_type: vector<T>
-        output_type: vector<double>
-
-    status: Pending
-
-  # ----------------------------------------------------------------------
-  - name: MaxNormalizerFeaturizer
-    estimator_name: MaxNormalizeEstimator
-    num_output_columns: 1
-    description: |-
-      Computes the max norm for a provided data set and normalize every row so that
-      its max norm is 1
-
-      C++-style pseudo signature:
-        template <typename IteratorT> std::vector<std::double_t> execute(std::pair<IteratorT, IteratorT> const &value);
-        template <typename IteratorT> std::vector<std::double_t> execute(std::tuple<IteratorT, IteratorT> const &value);
-
-      Examples:
-        Given the training data
-        [[4, 1, 2, 2],
-         [1, 3, 9, 3],
-         [5, 7, 5, 1]]
-
-         Max norms for each row are: [4, 9, 7]
-
-        execute([4,1,2,2]) = [4/4, 1/4, 2/4, 2/4]
-        execute([1,3,9,3]) = [1/9, 3/9, 9/9, 3/9]
-
-    templates:
-      - name: T
-        types:
-          - int8
-          - int16
-          - int32
-          - int64
-          - uint8
-          - uint16
-          - uint32
-          - uint64
-          - float
-          - double
-
-    type_mappings:
-      - input_type: vector<T>
-        output_type: vector<double>
-
-    status: Pending
 
   # ----------------------------------------------------------------------
   - name: StandardScaleWrapperFeaturizer
@@ -1028,13 +1088,92 @@ featurizers:
     estimator_name: TfidfVectorizerEstimator
     num_output_columns: 1
     description: |-
-      TODO
+      Convert a collection of raw documents to a matrix of TF-IDF features
 
       C++-style pseudo signature:
-        TODO
+        TfidfVector execute(std::string const &value);
 
       Examples:
-        TODO
+        Assuming the training data is...
+        ["this is the first document", "this document is the second document", "and this is the third one", "is this the first document"]
+
+        Assuming the input data is...
+        "this is the first document"
+        The default result will be...
+        [0. , 0.469791f, 0.580286f, 0.384085f, 0. , 0. , 0.384085f, 0. , 0.384085f]
+
+        Assuming the input data is...
+        "this document is the second document"
+        The default result will be...
+        [0. , 0.687624f, 0. , 0.281089f, 0. , 0.538648f, 0.281089f, 0. , 0.281089f]
+
+        Assuming the input data is...
+        "and this is the third one"
+        The default result will be...
+        [0.511849f, 0. , 0. , 0.267104f, 0.511849f, 0. , 0.267104f, 0.511849f, 0.267104f]
+
+        Assuming the input data is...
+        "is this the first document"
+        The default result will be...
+        [0. , 0.469791f, ,0.580286f, 0.384085f, 0. , 0. , 0.384085f, 0. , 0.384085f]
+
+
+    type_mappings:
+      - input_type: std::string
+        output_type: sparse_vector<float>
+
+    configuration_params:
+      - type: bool
+        name: lowercase
+        is_optional: false
+
+      - type: int
+        name: analyzer
+        is_optional: false
+
+      - type: string
+        name: regexToken
+        is_optional: false
+
+      - type: uint32
+        name: topKTerms
+        is_optional: true
+
+      - type: float
+        name: minDf
+        is_optional: false
+
+      - type: float
+        name: maxDf
+        is_optional: false
+
+      - type: uint32
+        name: ngramRangeMin
+        is_optional: false
+
+      - type: uint32
+        name: ngramRangeMax
+        is_optional: false
+
+      - type: bool
+        name: binary
+        is_optional: false
+
+      - type: int
+        name: normPolicy
+        is_optional: false
+
+      - type: bool
+        name: useIdf
+        is_optional: false
+
+      - type: bool
+        name: smoothIdf
+        is_optional: false
+
+      - type: bool
+        name: sublinearTf
+        is_optional: false
 
     status: Pending
 
@@ -1121,12 +1260,24 @@ featurizers:
     estimator_name: TruncatedSVDWrapperEstimator
     num_output_columns: 1
     description: |-
-      TODO
+      Dimensionality reduction using truncated SVD algorithm
 
       C++-style pseudo signature:
-        TODO
+        template <typename MatrixT> MatrixT execute(MatrixT const &value);
 
       Examples:
-        TODO
+        Assuming the training matrix A
+        By applying TruncatedSVD we get the right singular vector P
+        the projecting matrix of an input matrix X is X*P
+
+    templates:
+      - name: T
+        types:
+          - float
+          - double
+
+    type_mappings:
+      - input_type: matrix<T>
+        output_type: matrix<T>
 
     status: Pending

@@ -44,6 +44,7 @@ class Plugin(PluginBase):
     @staticmethod
     @Interface.override
     def Generate(
+        open_file_func,
         global_custom_structs,
         global_custom_enums,
         data,
@@ -63,7 +64,7 @@ class Plugin(PluginBase):
 
         status_stream.write("Generating Common Files...")
         with status_stream.DoneManager() as this_dm:
-            this_dm.result = _GenerateCommonFiles(output_dir, this_dm.stream)
+            this_dm.result = _GenerateCommonFiles(open_file_func, output_dir, this_dm.stream)
             if this_dm.result != 0:
                 return this_dm.result
 
@@ -86,6 +87,7 @@ class Plugin(PluginBase):
                     )
                     with dm.stream.DoneManager() as this_dm:
                         this_dm.result = func(
+                            open_file_func,
                             output_dir,
                             items,
                             items_c_data,
@@ -145,8 +147,8 @@ def _CreateInterfaceSubstitutionDict(item, c_data):
 
 
 # ----------------------------------------------------------------------
-def _GenerateCommonFiles(output_dir, output_stream):
-    with open(os.path.join(output_dir, "SharedLibrary_Common.h"), "w") as f:
+def _GenerateCommonFiles(open_file_func, output_dir, output_stream):
+    with open_file_func(os.path.join(output_dir, "SharedLibrary_Common.h"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -290,7 +292,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
             ),
         )
 
-    with open(os.path.join(output_dir, "SharedLibrary_Common.cpp"), "w") as f:
+    with open_file_func(os.path.join(output_dir, "SharedLibrary_Common.cpp"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -396,7 +398,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
             ),
         )
 
-    with open(os.path.join(output_dir, "SharedLibrary_Common.hpp"), "w") as f:
+    with open_file_func(os.path.join(output_dir, "SharedLibrary_Common.hpp"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -436,7 +438,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
             ),
         )
 
-    with open(os.path.join(output_dir, "SharedLibrary_PointerTable.h"), "w") as f:
+    with open_file_func(os.path.join(output_dir, "SharedLibrary_PointerTable.h"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -453,7 +455,7 @@ def _GenerateCommonFiles(output_dir, output_stream):
             ),
         )
 
-    with open(os.path.join(output_dir, "SharedLibrary_PointerTable.cpp"), "w") as f:
+    with open_file_func(os.path.join(output_dir, "SharedLibrary_PointerTable.cpp"), "w") as f:
         f.write(
             textwrap.dedent(
                 """\
@@ -481,8 +483,8 @@ def _GenerateCommonFiles(output_dir, output_stream):
 
 
 # ----------------------------------------------------------------------
-def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
-    with open(
+def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_stream):
+    with open_file_func(
         os.path.join(output_dir, "SharedLibrary_{}.h".format(items[0].name)),
         "w",
     ) as f:
@@ -686,8 +688,8 @@ def _GenerateHeaderFile(output_dir, items, c_data_items, output_stream):
 
 
 # ----------------------------------------------------------------------
-def _GenerateCppFile(output_dir, items, c_data_items, output_stream):
-    with open(
+def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_stream):
+    with open_file_func(
         os.path.join(output_dir, "SharedLibrary_{}.cpp".format(items[0].name)),
         "w",
     ) as f:
@@ -1234,7 +1236,10 @@ class CData(object):
                 assert tif, member.type
 
                 assert member.name not in members, member.name
-                members[member.name] = tif()
+                members[member.name] = tif(
+                    member_type=member.type,
+                    create_type_info_factory_func=self._GetTypeInfoClass,
+                )
 
             custom_structs[custom_struct.name] = members
 
@@ -1251,19 +1256,36 @@ class CData(object):
             tif = self._GetTypeInfoClass(configuration_param.type)
             assert tif, configuration_param.type
 
-            configuration_param_type_info_factories.append(tif(custom_structs))
+            configuration_param_type_info_factories.append(
+                tif(
+                    custom_structs=custom_structs,
+                    custom_enums=custom_enums,
+                    member_type=configuration_param.type,
+                    create_type_info_factory_func=self._GetTypeInfoClass,
+                ),
+            )
 
         # Create the input factory
         tif = self._GetTypeInfoClass(item.input_type)
         assert tif, item.input_type
 
-        input_type_info_factory = tif(custom_structs)
+        input_type_info_factory = tif(
+            custom_structs=custom_structs,
+            custom_enums=custom_enums,
+            member_type=item.input_type,
+            create_type_info_factory_func=self._GetTypeInfoClass,
+        )
 
         # Create the output factory
         tif = self._GetTypeInfoClass(item.output_type)
         assert tif, item.output_type
 
-        output_type_info_factory = tif(custom_structs)
+        output_type_info_factory = tif(
+            custom_structs=custom_structs,
+            custom_enums=custom_enums,
+            member_type=item.output_type,
+            create_type_info_factory_func=self._GetTypeInfoClass,
+        )
 
         # Commit the results
         self.CustomStructs                              = custom_structs
@@ -1296,11 +1318,13 @@ class CData(object):
             from Plugins.SharedLibraryPluginImpl.SparseVectorEncodingTypeInfoFactory import SparseVectorEncodingTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl import StructTypeInfoFactories
+            from Plugins.SharedLibraryPluginImpl.VectorTypeInfoFactory import VectorTypeInfoFactory
 
             type_info_factory_classes = [
                 DateTimeTypeInfoFactory,
                 SparseVectorEncodingTypeInfoFactory,
                 StringTypeInfoFactory,
+                VectorTypeInfoFactory,
             ]
 
             for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:

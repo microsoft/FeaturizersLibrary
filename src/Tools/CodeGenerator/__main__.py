@@ -4,11 +4,14 @@
 # ----------------------------------------------------------------------
 """Tool that generates code using in the Featurizer ecosystem."""
 
+import contextlib
 import copy
+import hashlib
 import importlib
 import itertools
 import os
 import re
+import shutil
 import sys
 import textwrap
 
@@ -21,6 +24,7 @@ import CommonEnvironment
 from CommonEnvironment.CallOnExit import CallOnExit
 from CommonEnvironment import CommandLine
 from CommonEnvironment import FileSystem
+from CommonEnvironment.Shell.All import CurrentShell
 from CommonEnvironment.StreamDecorator import StreamDecorator
 from CommonEnvironment import StringHelpers
 
@@ -95,6 +99,7 @@ SUPPORTED_TYPES                             = set(
         "string",
         "bool",
         "datetime",
+        re.compile(r"vector\<\S+\>"),
     ],
 )
 
@@ -288,11 +293,8 @@ def EntryPoint(
                                 raise Exception("The custom enum '{}' in '{}' has already been defined as a global custom enum.\n".format(custom_enum.name, item.name))
 
                         for mapping in item.type_mappings:
-                            # Since we can have multiple templates this is for when a mapping doesn't use a template or not the current template
-                            if (
-                                mapping.input_type != template.name
-                                and mapping.output_type != template.name
-                            ):
+                            # TODO: sub all types (for example: map<K, V>
+                            if not regex.search(mapping.input_type) and not regex.search(mapping.output_type):
                                 continue
 
                             new_item.input_type = regex.sub(
@@ -319,6 +321,18 @@ def EntryPoint(
             for items in data:
                 for item in items:
                     # ----------------------------------------------------------------------
+                    def IsSupportedType(typename):
+                        for potential_type in SUPPORTED_TYPES:
+                            if hasattr(potential_type, "match"):
+                                if potential_type.match(typename):
+                                    return True
+
+                            elif typename == potential_type:
+                                return True
+
+                        return False
+
+                    # ----------------------------------------------------------------------
                     def IsCustomStructType(typename):
                         return any(
                             custom_struct
@@ -337,7 +351,7 @@ def EntryPoint(
                     # ----------------------------------------------------------------------
 
                     if (
-                        item.input_type not in SUPPORTED_TYPES
+                        not IsSupportedType(item.input_type)
                         and not IsCustomStructType(item.input_type)
                         and not IsCustomEnumType(item.input_type)
                     ):
@@ -349,7 +363,7 @@ def EntryPoint(
                         ) from None
 
                     if (
-                        item.output_type not in SUPPORTED_TYPES
+                        not IsSupportedType(item.output_type)
                         and not IsCustomStructType(item.output_type)
                         and not IsCustomEnumType(item.output_type)
                     ):
@@ -364,7 +378,43 @@ def EntryPoint(
         with dm.stream.DoneManager() as this_dm:
             FileSystem.MakeDirs(output_dir)
 
+            # ----------------------------------------------------------------------
+            def CalcHash(filename):
+                hash = hashlib.sha256()
+
+                with open(filename, "rb") as f:
+                    while True:
+                        block = f.read(4096)
+                        if not block:
+                            break
+
+                        hash.update(block)
+
+                return hash.digest()
+
+            # ----------------------------------------------------------------------
+            @contextlib.contextmanager
+            def FileWriter(filename, mode):
+                """\
+                Method that writes to a temporary location and only copies to the intended
+                destination if there are changes. This prevents full rebuilds (which are
+                triggered based on timestamps) on files that haven't changed.
+                """
+
+                temp_filename = CurrentShell.CreateTempFilename()
+                with open(temp_filename, mode) as f:
+                    yield f
+
+                if not os.path.isfile(filename) or CalcHash(temp_filename) != CalcHash(filename):
+                    FileSystem.RemoveFile(filename)
+                    shutil.move(temp_filename, filename)
+                else:
+                    FileSystem.RemoveFile(temp_filename)
+
+            # ----------------------------------------------------------------------
+
             this_dm.result = plugin.Generate(
+                FileWriter,
                 global_custom_structs,
                 global_custom_enums,
                 data,
