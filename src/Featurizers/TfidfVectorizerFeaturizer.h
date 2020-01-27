@@ -147,19 +147,6 @@ private:
             }
         );
 
-        // Strings::Parse<std::string::const_iterator>(
-        //     input,
-        //     [](char c) {return std::isspace(c);},
-        //     [&documentTermFrequency] (std::string::const_iterator iterStart, std::string::const_iterator iterEnd) {
-        //         MapWithIterRange::iterator docuTermFreqIter(documentTermFrequency.find(std::make_tuple(iterStart, iterEnd)));
-        //         if (docuTermFreqIter != documentTermFrequency.end()) {
-        //             ++docuTermFreqIter->second;
-        //         } else {
-        //             documentTermFrequency.insert(std::make_pair(std::make_tuple(iterStart, iterEnd), 1));
-        //         }
-        //     }
-        // );
-
         std::float_t normVal = 0.0f;
         std::vector<std::tuple<std::uint32_t, std::float_t>> results;
         for (auto const & wordIteratorPair : documentTermFrequency) {
