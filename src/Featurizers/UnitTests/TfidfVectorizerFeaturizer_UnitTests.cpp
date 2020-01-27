@@ -30,7 +30,46 @@ void SparseVectorNumericCheck(NS::Featurizers::SparseVectorEncoding<T> const &a,
     }
 }
 
-TEST_CASE("string_standard_1") {
+TEST_CASE("string_standard_1_with_decorator") {
+    using InputType       = std::string;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
+
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
+                                NS::TestHelpers::make_vector<InputType>("this is THE first document"),
+                                NS::TestHelpers::make_vector<InputType>("this DOCUMENT is the second document"),
+                                NS::TestHelpers::make_vector<InputType>("and this is the THIRD one"),
+                                NS::TestHelpers::make_vector<InputType>("IS this THE first document")
+                            );
+
+    auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("THIS is the FIRST document");
+
+    std::vector<TransformedType::ValueEncoding> values;
+    values.emplace_back(TransformedType::ValueEncoding(0.469791f, 1));
+    values.emplace_back(TransformedType::ValueEncoding(0.580286f, 2));
+    values.emplace_back(TransformedType::ValueEncoding(0.384085f, 3));
+    values.emplace_back(TransformedType::ValueEncoding(0.384085f, 6));
+    values.emplace_back(TransformedType::ValueEncoding(0.384085f, 8));
+
+    auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
+    auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
+                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                    NS::CreateTestAnnotationMapsPtr(1),
+                                    0,
+                                    true,
+                                    AnalyzerMethod::Word,
+                                    ""
+                                ),
+                                trainingBatches,
+                                inferencingInput
+                            );
+
+    SparseVectorNumericCheck<std::float_t>(std::move(inferencingOutput[0]), std::move(inferencingLabel[0]));
+
+    // for (auto const & item : result[0].Values)
+    //     std::cout << item.Value << ", "<< item.Index << std::endl;
+}
+
+TEST_CASE("string_standard_1_no_decorator") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
@@ -55,7 +94,7 @@ TEST_CASE("string_standard_1") {
                                 NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
-                                    true,
+                                    false,
                                     AnalyzerMethod::Word,
                                     ""
                                 ),

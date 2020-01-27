@@ -53,6 +53,7 @@ public:
 
     template <typename PredicateT, typename IteratorT>
     using ParseFunctionType                  = std::function<void (std::string const &,
+                                                                   std::vector<std::string> &,
                                                                    PredicateT const &,
                                                                    std::regex const &,
                                                                    size_t const,
@@ -131,8 +132,11 @@ private:
 
         std::string decoratedInput = Lowercase ? Strings::ToLower(input) : input;
 
+        std::vector<std::string> intermediateValues;
+
         ParseFunc(
             decoratedInput,
+            intermediateValues,
             [](char c) {return std::isspace(c);},
             std::regex(RegexToken),
             NgramRangeMin,
@@ -466,17 +470,17 @@ TfidfVectorizerTransformer::TfidfVectorizerTransformer(IndexMap labels,
         //initialize parse function(this part shares the same code with documentstatsestimator, consider refactor)
         if (Analyzer == AnalyzerMethod::Word) {
             if (!RegexToken.empty()) {
-                ParseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseRegex<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+                ParseFunc = Microsoft::Featurizer::Strings::UParseRegex<std::string::const_iterator, std::function<bool (char)>, std::regex>;
             } else if (NgramRangeMin == 1 && NgramRangeMax == 1) {
-                ParseFunc = Microsoft::Featurizer::Strings::Wrapper::UParse<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+                ParseFunc = Microsoft::Featurizer::Strings::UParse<std::string::const_iterator, std::function<bool (char)>, std::regex>;
             } else {
-                ParseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseNgramWordCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+                ParseFunc = Microsoft::Featurizer::Strings::UParseNgramWordCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
             }
         } else if (Analyzer == AnalyzerMethod::Char) {
-            ParseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseNgramCharCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+            ParseFunc = Microsoft::Featurizer::Strings::UParseNgramCharCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
         } else {
             assert(Analyzer == AnalyzerMethod::Charwb);
-            ParseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseNgramCharwbCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+            ParseFunc = Microsoft::Featurizer::Strings::UParseNgramCharwbCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
         }
 }
 
