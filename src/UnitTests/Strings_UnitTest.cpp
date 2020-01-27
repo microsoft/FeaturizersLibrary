@@ -63,20 +63,25 @@ void ParseRegexTest(std::string const & input,
                     std::vector<std::string> const & label,
                     std::string const & token = "[^\\s]+") {
     std::regex rgx(token);
+    std::vector<std::string> interMediateValues1;
 
     std::vector<std::string> output1;
     Details::ParseRegex<std::string::const_iterator, std::regex>(
         input.begin(),
         input.end(),
+        interMediateValues1,
         rgx,
         [&output1] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
             output1.emplace_back(std::string(iterBegin, iterEnd));
         }
     );
     CHECK(output1 == label);
+
+    std::vector<std::string> interMediateValues2;
     std::vector<std::string> output2;
     ParseRegex<std::string::const_iterator, std::regex>(
         input,
+        interMediateValues2,
         rgx,
         [&output2] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
             output2.emplace_back(std::string(iterBegin, iterEnd));
@@ -90,8 +95,10 @@ void ParseNgramWordTest(std::string & input,
                         size_t ngramRangeMin,
                         size_t ngramRangeMax) {
     std::vector<std::string> output1;
+    std::vector<std::string> interMediateValues1;
     ParseNgramWord<std::string::const_iterator>(
         input,
+        interMediateValues1,
         isWhiteSpace,
         ngramRangeMin,
         ngramRangeMax,
@@ -101,8 +108,10 @@ void ParseNgramWordTest(std::string & input,
     );
     CHECK(output1 == label);
     std::vector<std::string> output2;
+    std::vector<std::string> interMediateValues2;
     ParseNgramWord<std::string::const_iterator>(
         input,
+        interMediateValues2,
         isWhiteSpace,
         ngramRangeMin,
         ngramRangeMax,
@@ -118,8 +127,10 @@ void ParseNgramWordCopyTest(std::string const & input,
                             size_t ngramRangeMin,
                             size_t ngramRangeMax) {
     std::vector<std::string> output;
+    std::vector<std::string> interMediateValues;
     ParseNgramWordCopy<std::string::const_iterator>(
         input,
+        interMediateValues,
         isWhiteSpace,
         ngramRangeMin,
         ngramRangeMax,
@@ -135,8 +146,10 @@ void ParseNgramCharTest(std::string & input,
                         size_t ngramRangeMin,
                         size_t ngramRangeMax) {
     std::vector<std::string> output1;
+    std::vector<std::string> interMediateValues1;
     ParseNgramChar<std::string::const_iterator>(
         input,
+        interMediateValues1,
         ngramRangeMin,
         ngramRangeMax,
         [&output1] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
@@ -145,8 +158,10 @@ void ParseNgramCharTest(std::string & input,
     );
     CHECK(output1 == label);
     std::vector<std::string> output2;
+    std::vector<std::string> interMediateValues2;
     ParseNgramChar<std::string::const_iterator>(
         input,
+        interMediateValues2,
         ngramRangeMin,
         ngramRangeMax,
         [&output2] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
@@ -161,8 +176,10 @@ void ParseNgramCharCopyTest(std::string const & input,
                             size_t ngramRangeMin,
                             size_t ngramRangeMax) {
     std::vector<std::string> output;
+    std::vector<std::string> interMediateValues;
     ParseNgramCharCopy<std::string::const_iterator>(
         input,
+        interMediateValues,
         ngramRangeMin,
         ngramRangeMax,
         [&output] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
@@ -177,8 +194,10 @@ void ParseNgramCharwbTest(std::string & input,
                           size_t ngramRangeMin,
                           size_t ngramRangeMax) {
     std::vector<std::string> output1;
+    std::vector<std::string> interMediateValues1;
     ParseNgramCharwb<std::string::const_iterator>(
         input,
+        interMediateValues1,
         isWhiteSpace,
         ngramRangeMin,
         ngramRangeMax,
@@ -188,8 +207,10 @@ void ParseNgramCharwbTest(std::string & input,
     );
     CHECK(output1 == label);
     std::vector<std::string> output2;
+    std::vector<std::string> interMediateValues2;
     ParseNgramCharwb<std::string::const_iterator>(
         input,
+        interMediateValues2,
         isWhiteSpace,
         ngramRangeMin,
         ngramRangeMax,
@@ -205,8 +226,10 @@ void ParseNgramCharwbCopyTest(std::string const & input,
                               size_t ngramRangeMin,
                               size_t ngramRangeMax) {
     std::vector<std::string> output;
+    std::vector<std::string> interMediateValues;
     ParseNgramCharwbCopy<std::string::const_iterator>(
         input,
+        interMediateValues,
         isWhiteSpace,
         ngramRangeMin,
         ngramRangeMax,
