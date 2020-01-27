@@ -11,6 +11,7 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
+
 /////////////////////////////////////////////////////////////////////////
 ///  \class         PCATransformer
 ///  \brief         Contains PCAComponents and use PCAComponents to project
@@ -19,7 +20,7 @@ namespace Featurizers {
 ///
 template <
     typename InputEigenMatrixT,
-    typename OutputEigenMatrixT=Eigen::MatrixX<typename InputEigenMatrixT::Scalar>
+    typename OutputEigenMatrixT = typename InputMatrixTypeMapper<InputEigenMatrixT>::OutType
 >
 class PCATransformer : public StandardTransformer<InputEigenMatrixT, OutputEigenMatrixT> {
 public:
@@ -30,7 +31,7 @@ public:
     // ----------------------------------------------------------------------
     using BaseType                          = StandardTransformer<InputEigenMatrixT, OutputEigenMatrixT>;
 
-    using EigenMatrix                       = Eigen::MatrixX<typename InputEigenMatrixT::Scalar>;
+    using EigenMatrix                       = typename InputMatrixTypeMapper<InputEigenMatrixT>::MatrixType;
 
     // ----------------------------------------------------------------------
     // |
@@ -85,7 +86,7 @@ private:
 ///
 template <
     typename InputEigenMatrixT,
-    typename OutputEigenMatrixT=Eigen::MatrixX<typename InputEigenMatrixT::Scalar>,
+    typename OutputEigenMatrixT= typename InputMatrixTypeMapper<InputEigenMatrixT>::OutType,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class PCAEstimator : public TransformerEstimator<InputEigenMatrixT, OutputEigenMatrixT> {
@@ -114,7 +115,7 @@ private:
     // |  Private Types
     // |
     // ----------------------------------------------------------------------
-    using EigenMatrix                       = Eigen::MatrixX<typename InputEigenMatrixT::Scalar>;
+    using EigenMatrix                       = typename InputMatrixTypeMapper<InputEigenMatrixT>::MatrixType;
     using SelfAdjointEigenSolver            = Eigen::SelfAdjointEigenSolver<EigenMatrix>;
     using EigenVectors                      = typename SelfAdjointEigenSolver::EigenvectorsType;
 
