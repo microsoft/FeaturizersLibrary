@@ -464,7 +464,7 @@ void ParseNgramWord(std::string &input,
                     size_t const ngramRangeMax,
                     std::function<void (IteratorT, IteratorT)> const &callback) {
 
-    intermediateValues.emplace_back(std::move(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input)));
+    intermediateValues.emplace_back(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
 
     //wordIterPairVector is used to store the begin and end iterator of words in input
     std::vector<std::pair<IteratorT, IteratorT>> wordIterPairVector;
@@ -513,7 +513,7 @@ void ParseNgramChar(std::string &input,
                     size_t const ngramRangeMax,
                     std::function<void (IteratorT, IteratorT)> const &callback) {
 
-    intermediateValues.emplace_back(std::move(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input)));
+    intermediateValues.emplace_back(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
 
     if (ngramRangeMin < 1 || ngramRangeMin > ngramRangeMax || ngramRangeMax > intermediateValues[0].size())
         throw std::invalid_argument("ngramRangeMin and ngramRangeMax not valid");
@@ -548,7 +548,7 @@ void ParseNgramCharwb(std::string &input,
     //prevent vector re-allocation caused dangling iterator
     intermediateValues.reserve(100);
 
-    intermediateValues.emplace_back(std::move(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input)));
+    intermediateValues.emplace_back(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
 
     //wordIterPairVector is used to store the begin and end iterator of words in input
     std::vector<std::pair<IteratorT, IteratorT>> wordIterPairVector;
