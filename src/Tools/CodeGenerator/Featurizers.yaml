@@ -295,7 +295,7 @@ featurizers:
 
     type_mappings:
       - input_type: T
-        output_type: HashOneHotEncoding
+        output_type: single_value_sparse_vector<uint8>
 
     configuration_params:
       - type: uint32
@@ -305,21 +305,6 @@ featurizers:
       - type: uint32
         name: numCols
         is_optional: false
-
-    custom_structs:
-      - name: HashOneHotEncoding
-        description: |-
-          A structure is returned rather than the vector, as the vector is sparse and can be
-          recreated within the framework according to optimizations specific to the framework
-          itself.
-
-        members:
-          - type: uint64
-            name: NumElements
-          - type: uint8
-            name: Value
-          - type: uint64
-            name: Index
 
   # ----------------------------------------------------------------------
   - name: ImputationMarkerFeaturizer
@@ -898,27 +883,12 @@ featurizers:
 
     type_mappings:
       - input_type: T
-        output_type: OneHotEncoding
+        output_type: single_value_sparse_vector<uint8>
 
     configuration_params:
       - type: bool
         name: suppressUnrecognizedErrors
         is_optional: false
-
-    custom_structs:
-      - name: OneHotEncoding
-        description: |-
-          A structure is returned rather than the vector, as the vector is sparse and can be
-          recreated within the framework according to optimizations specific to the framework
-          itself.
-
-        members:
-          - type: uint64
-            name: NumElements
-          - type: uint8
-            name: Value
-          - type: uint64
-            name: Index
 
   # ----------------------------------------------------------------------
   - name: PCAFeaturizer

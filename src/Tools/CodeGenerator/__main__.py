@@ -101,6 +101,8 @@ SUPPORTED_TYPES                             = set(
         "datetime",
         re.compile(r"matrix\<\S+\>"),
         re.compile(r"vector\<\S+\>"),
+        re.compile(r"sparse_vector\<\S+\>"),
+        re.compile(r"single_value_sparse_vector\<\S+\>"),
     ],
 )
 

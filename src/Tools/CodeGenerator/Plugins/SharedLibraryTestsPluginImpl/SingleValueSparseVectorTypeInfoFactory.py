@@ -2,9 +2,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the SparseVectorEncodingTypeInfoFactory object"""
+"""Contains the SingleValueSparseVectorTypeInfoFactory object"""
 
 import os
+import re
 import textwrap
 
 import CommonEnvironment
@@ -19,13 +20,13 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class SparseVectorEncodingTypeInfoFactory(TypeInfoFactory):
+class SingleValueSparseVectorTypeInfoFactory(TypeInfoFactory):
     # ----------------------------------------------------------------------
     # |
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
-    TypeName                                = Interface.DerivedProperty("SparseVectorEncoding")
+    TypeName                                = Interface.DerivedProperty(re.compile(r"single_value_sparse_vector\<(?P<type>\S+)\>"))
     CppType                                 = Interface.DerivedProperty(None)
 
     # ----------------------------------------------------------------------
@@ -40,22 +41,19 @@ class SparseVectorEncodingTypeInfoFactory(TypeInfoFactory):
         member_type=None,
         create_type_info_factory_func=None,
     ):
-        if custom_structs:
-            assert self.TypeName in custom_structs, custom_structs
-            member_info = custom_structs[self.TypeName]
+        if member_type is not None:
+            assert create_type_info_factory_func is not None
 
-            if (
-                len(member_info) != 1
-                or "type" not in member_info
-            ):
-                raise Exception("'{}' types should have 1 member with the name 'type'".format(self.TypeName))
+            match = self.TypeName.match(member_type)
+            assert match, member_type
 
-            the_type = member_info["type"]
+            the_type = match.group("type")
 
-            if the_type.TypeName not in ["int8", "int16", "int32", "int64", "uint8", "uint16", "uint32", "uint64", "double", "float", "bool"]:
-                raise Exception("'{}' is not an expected type".format(the_type.TypeName))
+            type_info = create_type_info_factory_func(the_type)
+            if not hasattr(type_info, "CType"):
+                raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a single_value_sparse_vector".format(the_type))
 
-            self._type                      = the_type
+            self._type_info                 = type_info
 
     # ----------------------------------------------------------------------
     @Interface.override
@@ -73,33 +71,31 @@ class SparseVectorEncodingTypeInfoFactory(TypeInfoFactory):
         result_name="result",
     ):
         return self.Result(
-            "Microsoft::Featurizer::Featurizers::SparseVectorEncoding<{}>".format(self._type.CppType),
+            "Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<{}>".format(self._type_info.CppType),
             textwrap.dedent(
                 """\
-                uint64_t numElements(0);
-                uint64_t numValues(0);
-                {type} * pValues(nullptr);
-                uint64_t *pIndexes(nullptr);
+                uint64_t {result}_numElements(0);
+                {type} {result}_value;
+                uint64_t {result}_index(0);
                 """,
             ).format(
-                type=self._type.CppType,
+                type=self._type_info.CppType,
+                result=result_name,
             ),
-            "&numElements, &numValues, &pValues, &pIndexes",
+            "&{result}_numElements, &{result}_value, &{result}_index".format(
+                result=result_name,
+            ),
             textwrap.dedent(
                 """\
-                std::vector<typename Microsoft::Featurizer::Featurizers::SparseVectorEncoding<{type}>::ValueEncoding> encodings;
-                {type} const *pValue(pValues);
-                uint64_t const *pIndex(pIndexes);
-
-                while(numValues--) {{
-                    encodings.emplace_back(*pValue++, *pIndex++);
-                }}
-
-                results.emplace_back(numElements, std::move(encodings));
-                """
+                #if (defined __apple_build_version__)
+                results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<{type}>({result}_numElements, {result}_value, {result}_index));
+                #else
+                results.emplace_back({result}_numElements, {result}_value, {result}_index);
+                #endif
+                """,
             ).format(
-                type=self._type.CppType
+                result=result_name,
+                type=self._type_info.CppType,
             ),
-            "numElements, numValues, pValues, pIndexes",
-            destroy_inline=True,
+            None,
         )

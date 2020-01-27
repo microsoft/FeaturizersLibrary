@@ -1316,7 +1316,8 @@ class CData(object):
             from Plugins.SharedLibraryPluginImpl.DatetimeTypeInfoFactory import DateTimeTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl.MatrixTypeInfoFactory import MatrixTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl import ScalarTypeInfoFactories
-            from Plugins.SharedLibraryPluginImpl.SparseVectorEncodingTypeInfoFactory import SparseVectorEncodingTypeInfoFactory
+            from Plugins.SharedLibraryPluginImpl.SingleValueSparseVectorTypeInfoFactory import SingleValueSparseVectorTypeInfoFactory
+            from Plugins.SharedLibraryPluginImpl.SparseVectorTypeInfoFactory import SparseVectorTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl import StructTypeInfoFactories
             from Plugins.SharedLibraryPluginImpl.VectorTypeInfoFactory import VectorTypeInfoFactory
@@ -1324,7 +1325,8 @@ class CData(object):
             type_info_factory_classes = [
                 DateTimeTypeInfoFactory,
                 MatrixTypeInfoFactory,
-                SparseVectorEncodingTypeInfoFactory,
+                SingleValueSparseVectorTypeInfoFactory,
+                SparseVectorTypeInfoFactory,
                 StringTypeInfoFactory,
                 VectorTypeInfoFactory,
             ]

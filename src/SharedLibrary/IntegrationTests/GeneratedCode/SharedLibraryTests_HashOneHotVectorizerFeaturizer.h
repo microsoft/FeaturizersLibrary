@@ -17,7 +17,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -88,30 +88,29 @@ void HashOneHotVectorizerFeaturizer_int8_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotEncoding> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotEncoding result;
+        uint64_t result_numElements(0);
+        std::uint8_t result_value;
+        uint64_t result_index(0);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int8_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(result);
+        results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
-        results.emplace_back(result);
+        results.emplace_back(result_numElements, result_value, result_index);
         #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_int8_DestroyTransformedData(&result, &pErrorInfo));
-        REQUIRE(pErrorInfo == nullptr);
-    }
+    // No trailing destroy statement
 
     // Destroy the transformer
     REQUIRE(HashOneHotVectorizerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -124,7 +123,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -195,30 +194,29 @@ void HashOneHotVectorizerFeaturizer_int16_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotEncoding> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotEncoding result;
+        uint64_t result_numElements(0);
+        std::uint8_t result_value;
+        uint64_t result_index(0);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int16_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(result);
+        results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
-        results.emplace_back(result);
+        results.emplace_back(result_numElements, result_value, result_index);
         #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_int16_DestroyTransformedData(&result, &pErrorInfo));
-        REQUIRE(pErrorInfo == nullptr);
-    }
+    // No trailing destroy statement
 
     // Destroy the transformer
     REQUIRE(HashOneHotVectorizerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -231,7 +229,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -302,30 +300,29 @@ void HashOneHotVectorizerFeaturizer_int32_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotEncoding> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotEncoding result;
+        uint64_t result_numElements(0);
+        std::uint8_t result_value;
+        uint64_t result_index(0);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int32_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(result);
+        results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
-        results.emplace_back(result);
+        results.emplace_back(result_numElements, result_value, result_index);
         #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_int32_DestroyTransformedData(&result, &pErrorInfo));
-        REQUIRE(pErrorInfo == nullptr);
-    }
+    // No trailing destroy statement
 
     // Destroy the transformer
     REQUIRE(HashOneHotVectorizerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -338,7 +335,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -409,30 +406,29 @@ void HashOneHotVectorizerFeaturizer_int64_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotEncoding> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotEncoding result;
+        uint64_t result_numElements(0);
+        std::uint8_t result_value;
+        uint64_t result_index(0);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int64_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(result);
+        results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
-        results.emplace_back(result);
+        results.emplace_back(result_numElements, result_value, result_index);
         #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_int64_DestroyTransformedData(&result, &pErrorInfo));
-        REQUIRE(pErrorInfo == nullptr);
-    }
+    // No trailing destroy statement
 
     // Destroy the transformer
     REQUIRE(HashOneHotVectorizerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -445,7 +441,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -516,30 +512,29 @@ void HashOneHotVectorizerFeaturizer_uint8_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotEncoding> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotEncoding result;
+        uint64_t result_numElements(0);
+        std::uint8_t result_value;
+        uint64_t result_index(0);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint8_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(result);
+        results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
-        results.emplace_back(result);
+        results.emplace_back(result_numElements, result_value, result_index);
         #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint8_DestroyTransformedData(&result, &pErrorInfo));
-        REQUIRE(pErrorInfo == nullptr);
-    }
+    // No trailing destroy statement
 
     // Destroy the transformer
     REQUIRE(HashOneHotVectorizerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -552,7 +547,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -623,30 +618,29 @@ void HashOneHotVectorizerFeaturizer_uint16_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotEncoding> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotEncoding result;
+        uint64_t result_numElements(0);
+        std::uint8_t result_value;
+        uint64_t result_index(0);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint16_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(result);
+        results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
-        results.emplace_back(result);
+        results.emplace_back(result_numElements, result_value, result_index);
         #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint16_DestroyTransformedData(&result, &pErrorInfo));
-        REQUIRE(pErrorInfo == nullptr);
-    }
+    // No trailing destroy statement
 
     // Destroy the transformer
     REQUIRE(HashOneHotVectorizerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -659,7 +653,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -730,30 +724,29 @@ void HashOneHotVectorizerFeaturizer_uint32_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotEncoding> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotEncoding result;
+        uint64_t result_numElements(0);
+        std::uint8_t result_value;
+        uint64_t result_index(0);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint32_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(result);
+        results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
-        results.emplace_back(result);
+        results.emplace_back(result_numElements, result_value, result_index);
         #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint32_DestroyTransformedData(&result, &pErrorInfo));
-        REQUIRE(pErrorInfo == nullptr);
-    }
+    // No trailing destroy statement
 
     // Destroy the transformer
     REQUIRE(HashOneHotVectorizerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -766,7 +759,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -837,30 +830,29 @@ void HashOneHotVectorizerFeaturizer_uint64_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotEncoding> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotEncoding result;
+        uint64_t result_numElements(0);
+        std::uint8_t result_value;
+        uint64_t result_index(0);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint64_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(result);
+        results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
-        results.emplace_back(result);
+        results.emplace_back(result_numElements, result_value, result_index);
         #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint64_DestroyTransformedData(&result, &pErrorInfo));
-        REQUIRE(pErrorInfo == nullptr);
-    }
+    // No trailing destroy statement
 
     // Destroy the transformer
     REQUIRE(HashOneHotVectorizerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -873,7 +865,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -944,30 +936,29 @@ void HashOneHotVectorizerFeaturizer_float_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotEncoding> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotEncoding result;
+        uint64_t result_numElements(0);
+        std::uint8_t result_value;
+        uint64_t result_index(0);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_float_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(result);
+        results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
-        results.emplace_back(result);
+        results.emplace_back(result_numElements, result_value, result_index);
         #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_float_DestroyTransformedData(&result, &pErrorInfo));
-        REQUIRE(pErrorInfo == nullptr);
-    }
+    // No trailing destroy statement
 
     // Destroy the transformer
     REQUIRE(HashOneHotVectorizerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -980,7 +971,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -1051,30 +1042,29 @@ void HashOneHotVectorizerFeaturizer_double_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotEncoding> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotEncoding result;
+        uint64_t result_numElements(0);
+        std::uint8_t result_value;
+        uint64_t result_index(0);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_double_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(result);
+        results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
-        results.emplace_back(result);
+        results.emplace_back(result_numElements, result_value, result_index);
         #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_double_DestroyTransformedData(&result, &pErrorInfo));
-        REQUIRE(pErrorInfo == nullptr);
-    }
+    // No trailing destroy statement
 
     // Destroy the transformer
     REQUIRE(HashOneHotVectorizerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -1087,7 +1077,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_bool_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -1158,30 +1148,29 @@ void HashOneHotVectorizerFeaturizer_bool_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotEncoding> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotEncoding result;
+        uint64_t result_numElements(0);
+        std::uint8_t result_value;
+        uint64_t result_index(0);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_bool_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_bool_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(result);
+        results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
-        results.emplace_back(result);
+        results.emplace_back(result_numElements, result_value, result_index);
         #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_bool_DestroyTransformedData(&result, &pErrorInfo));
-        REQUIRE(pErrorInfo == nullptr);
-    }
+    // No trailing destroy statement
 
     // Destroy the transformer
     REQUIRE(HashOneHotVectorizerFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
@@ -1194,7 +1183,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void HashOneHotVectorizerFeaturizer_string_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<HashOneHotEncoding> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -1265,30 +1254,29 @@ void HashOneHotVectorizerFeaturizer_string_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<HashOneHotEncoding> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        HashOneHotEncoding result;
+        uint64_t result_numElements(0);
+        std::uint8_t result_value;
+        uint64_t result_index(0);
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(result);
+        results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
-        results.emplace_back(result);
+        results.emplace_back(result_numElements, result_value, result_index);
         #endif
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(HashOneHotVectorizerFeaturizer_string_DestroyTransformedData(&result, &pErrorInfo));
-        REQUIRE(pErrorInfo == nullptr);
-    }
+    // No trailing destroy statement
 
     // Destroy the transformer
     REQUIRE(HashOneHotVectorizerFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
