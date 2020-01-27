@@ -55,7 +55,7 @@ TEST_CASE("string_standard_1") {
                                 NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
-                                    Microsoft::Featurizer::Strings::ToLower,
+                                    true,
                                     AnalyzerMethod::Word,
                                     ""
                                 ),

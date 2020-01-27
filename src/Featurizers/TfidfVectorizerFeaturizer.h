@@ -49,6 +49,15 @@ public:
     using FrequencyMap                       = IndexMap;
     using IterRangeType                      = std::tuple<std::string::const_iterator, std::string::const_iterator>;
     using MapWithIterRange                   = std::map<IterRangeType, std::uint32_t, Components::IterRangeComp>;
+    using AnalyzerMethod                     = Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
+
+    template <typename PredicateT, typename IteratorT>
+    using ParseFunctionType                  = std::function<void (std::string const &,
+                                                                   PredicateT const &,
+                                                                   std::regex const &,
+                                                                   size_t const,
+                                                                   size_t const,
+                                                                   std::function<void (IteratorT, IteratorT)> const &)>;
 
     // ----------------------------------------------------------------------
     // |
@@ -60,7 +69,7 @@ public:
         L2 = 2
     };
 
-    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------P
     // |
     // |  Public Data
     // |
@@ -70,6 +79,18 @@ public:
     std::uint32_t const                      TotalNumsDocuments;
     NormMethod const                         Norm;
     TfidfPolicy const                        TfidfParameters;
+
+    //data for execute same parse function as in documentstatisticestimator
+    bool const                               Lowercase;
+    AnalyzerMethod const                     Analyzer;
+    std::string const                        RegexToken;
+    std::uint32_t const                      NgramRangeMin;
+    std::uint32_t const                      NgramRangeMax;
+
+    ParseFunctionType<
+        std::function<bool(char)>,
+        std::string::const_iterator
+    >                                        ParseFunc;
 
     // ----------------------------------------------------------------------
     // |
@@ -81,7 +102,12 @@ public:
         FrequencyMap docuFreq,
         std::uint32_t totalNumDocus,
         NormMethod norm,
-        TfidfPolicy tfidfParameters
+        TfidfPolicy tfidfParameters,
+        bool lowercase,
+        AnalyzerMethod analyzer,
+        std::string regexToken,
+        std::uint32_t ngramRangeMin,
+        std::uint32_t ngramRangeMax
     );
     explicit TfidfVectorizerTransformer(Archive &ar);
 
@@ -103,10 +129,14 @@ private:
         //termfrequency for specific document
         MapWithIterRange documentTermFrequency;
 
-        //todo: will use vector<functor> after string header file is done
-        Strings::Parse<std::string::const_iterator>(
-            input,
+        std::string decoratedInput = Lowercase ? Strings::ToLower(input) : input;
+
+        ParseFunc(
+            decoratedInput,
             [](char c) {return std::isspace(c);},
+            std::regex(RegexToken),
+            NgramRangeMin,
+            NgramRangeMax,
             [&documentTermFrequency] (std::string::const_iterator iterStart, std::string::const_iterator iterEnd) {
                 MapWithIterRange::iterator docuTermFreqIter(documentTermFrequency.find(std::make_tuple(iterStart, iterEnd)));
                 if (docuTermFreqIter != documentTermFrequency.end()) {
@@ -116,6 +146,19 @@ private:
                 }
             }
         );
+
+        // Strings::Parse<std::string::const_iterator>(
+        //     input,
+        //     [](char c) {return std::isspace(c);},
+        //     [&documentTermFrequency] (std::string::const_iterator iterStart, std::string::const_iterator iterEnd) {
+        //         MapWithIterRange::iterator docuTermFreqIter(documentTermFrequency.find(std::make_tuple(iterStart, iterEnd)));
+        //         if (docuTermFreqIter != documentTermFrequency.end()) {
+        //             ++docuTermFreqIter->second;
+        //         } else {
+        //             documentTermFrequency.insert(std::make_pair(std::make_tuple(iterStart, iterEnd), 1));
+        //         }
+        //     }
+        // );
 
         std::float_t normVal = 0.0f;
         std::vector<std::tuple<std::uint32_t, std::float_t>> results;
@@ -138,7 +181,7 @@ private:
                 if ((TfidfParameters & TfidfPolicy::Binary) == TfidfPolicy::Binary) {
                     tf = 1.0f;
                 } else if (!((TfidfParameters & TfidfPolicy::SublinearTf) == TfidfPolicy::SublinearTf)) {
-                    tf = wordIteratorPair.second;
+                    tf = static_cast<std::float_t>(wordIteratorPair.second);
                 } else {
                     tf = 1.0f + std::log(static_cast<std::float_t>(wordIteratorPair.second));
                 }
@@ -216,6 +259,7 @@ public:
     using IndexMap                          = TfidfVectorizerTransformer::IndexMap;
     using FrequencyMap                      = TfidfVectorizerTransformer::FrequencyMap;
     using NormMethod                        = TfidfVectorizerTransformer::NormMethod;
+    using AnalyzerMethod                    = TfidfVectorizerTransformer::AnalyzerMethod;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -225,7 +269,12 @@ public:
         AnnotationMapsPtr pAllColumnAnnotations,
         size_t colIndex,
         NormMethod norm,
-        TfidfPolicy tfidfParameters
+        TfidfPolicy tfidfParameters,
+        bool lowercase,
+        AnalyzerMethod analyzer,
+        std::string regexToken,
+        std::uint32_t ngramRangeMin,
+        std::uint32_t ngramRangeMax
     );
     ~TfidfVectorizerEstimatorImpl(void) override = default;
 
@@ -241,6 +290,11 @@ private:
     NormMethod const                         _norm;
     TfidfPolicy const                        _tfidfParameters;
 
+    bool const                               _lowercase;
+    AnalyzerMethod const                     _analyzer;
+    std::string const                        _regexToken;
+    std::uint32_t const                      _ngramRangeMin;
+    std::uint32_t const                      _ngramRangeMax;
     // ----------------------------------------------------------------------
     // |
     // |  Private Methods
@@ -279,15 +333,20 @@ private:
             termIndexes.insert(std::make_pair(termFrequencyAndIndexPair.first, termFrequencyAndIndexPair.second.Index));
         }
 
-        return typename BaseType::TransformerUniquePtr(new TfidfVectorizerTransformer(
-                                                            std::move(termIndexes),
-                                                            std::move(termFrequencys),
-                                                            std::move(totalNumDocus),
-                                                            std::move(_norm),
-                                                            std::move(_tfidfParameters)
-                                                            )
-                                                      );
-
+        return typename BaseType::TransformerUniquePtr(
+            new TfidfVectorizerTransformer(
+                std::move(termIndexes),
+                std::move(termFrequencys),
+                std::move(totalNumDocus),
+                std::move(_norm),
+                std::move(_tfidfParameters),
+                std::move(_lowercase),
+                std::move(_analyzer),
+                std::move(_regexToken),
+                std::move(_ngramRangeMin),
+                std::move(_ngramRangeMax)
+            )
+        );
     }
 };
 
@@ -328,7 +387,7 @@ public:
     TfidfVectorizerEstimator(
         AnnotationMapsPtr pAllColumnAnnotations,
         size_t colIndex,
-        StringDecorator decorator,
+        bool lowercase,
         AnalyzerMethod analyzer,
         std::string regex,
         std::float_t minDf = 0.0f,
@@ -362,15 +421,15 @@ public:
 // ----------------------------------------------------------------------
 constexpr TfidfPolicy operator|(TfidfPolicy const & a, TfidfPolicy const & b) {
     return static_cast<TfidfPolicy>(
-        static_cast<unsigned int>(a)
-        | static_cast<unsigned int>(b)
+        static_cast<std::uint32_t>(a)
+        | static_cast<std::uint32_t>(b)
     );
 }
 
 constexpr TfidfPolicy operator&(TfidfPolicy const & a, TfidfPolicy const & b) {
     return static_cast<TfidfPolicy>(
-        static_cast<unsigned int>(a)
-        & static_cast<unsigned int>(b)
+        static_cast<std::uint32_t>(a)
+        & static_cast<std::uint32_t>(b)
     );
 }
 
@@ -383,7 +442,12 @@ TfidfVectorizerTransformer::TfidfVectorizerTransformer(IndexMap labels,
                                                        IndexMap docuFreq,
                                                        std::uint32_t totalNumDocus,
                                                        NormMethod norm,
-                                                       TfidfPolicy tfidfParameters) :
+                                                       TfidfPolicy tfidfParameters,
+                                                       bool lowercase,
+                                                       AnalyzerMethod analyzer,
+                                                       std::string regexToken,
+                                                       std::uint32_t ngramRangeMin,
+                                                       std::uint32_t ngramRangeMax) :
     Labels(
         std::move(
             [&labels](void) ->  IndexMap & {
@@ -406,18 +470,40 @@ TfidfVectorizerTransformer::TfidfVectorizerTransformer(IndexMap labels,
     ),
     TotalNumsDocuments(std::move(totalNumDocus)),
     Norm(std::move(norm)),
-    TfidfParameters(std::move(tfidfParameters)) {
+    TfidfParameters(std::move(tfidfParameters)),
+    Lowercase(std::move(lowercase)),
+    Analyzer(std::move(analyzer)),
+    RegexToken(std::move(regexToken)),
+    NgramRangeMin(std::move(ngramRangeMin)),
+    NgramRangeMax(std::move(ngramRangeMax)) {
+        //initialize parse function(this part shares the same code with documentstatsestimator, consider refactor)
+        if (Analyzer == AnalyzerMethod::Word) {
+            if (!RegexToken.empty()) {
+                ParseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseRegex<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+            } else if (NgramRangeMin == 1 && NgramRangeMax == 1) {
+                ParseFunc = Microsoft::Featurizer::Strings::Wrapper::UParse<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+            } else {
+                ParseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseNgramWordCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+            }
+        } else if (Analyzer == AnalyzerMethod::Char) {
+            ParseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseNgramCharCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+        } else {
+            assert(Analyzer == AnalyzerMethod::Charwb);
+            ParseFunc = Microsoft::Featurizer::Strings::Wrapper::UParseNgramCharwbCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+        }
 }
 
 TfidfVectorizerTransformer::TfidfVectorizerTransformer(Archive &ar) :
     Labels(Traits<decltype(Labels)>::deserialize(ar)),
     DocumentFreq(Traits<decltype(DocumentFreq)>::deserialize(ar)),
     TotalNumsDocuments(Traits<decltype(TotalNumsDocuments)>::deserialize(ar)),
-    //todo: unsigned char ?
-    //Norm(Traits<decltype(Norm)>::deserialize(ar)),
-    Norm(),
-    //todo: uint32 ?
-    TfidfParameters() {
+    Norm(static_cast<NormMethod>(Traits<std::uint8_t>::deserialize(ar))),
+    TfidfParameters(static_cast<TfidfPolicy>(Traits<std::uint32_t>::deserialize(ar))),
+    Lowercase(Traits<decltype(Lowercase)>::deserialize(ar)),
+    Analyzer(static_cast<AnalyzerMethod>(Traits<std::uint8_t>::deserialize(ar))),
+    RegexToken(Traits<decltype(RegexToken)>::deserialize(ar)),
+    NgramRangeMin(Traits<decltype(NgramRangeMin)>::deserialize(ar)),
+    NgramRangeMax(Traits<decltype(NgramRangeMax)>::deserialize(ar)) {
 }
 
 void TfidfVectorizerTransformer::save(Archive &ar) const /*override*/ {
@@ -425,11 +511,13 @@ void TfidfVectorizerTransformer::save(Archive &ar) const /*override*/ {
     Traits<decltype(Labels)>::serialize(ar, Labels);
     Traits<decltype(DocumentFreq)>::serialize(ar, DocumentFreq);
     Traits<decltype(TotalNumsDocuments)>::serialize(ar, TotalNumsDocuments);
-    //todo
-    //Traits<decltype(Norm)>::serialize(ar, Norm);
-
-    //todo
-    //Traits<decltype(TfidfPolicy)>::serialize(ar, TfidfPolicy);
+    Traits<std::uint8_t>::serialize(ar, static_cast<std::uint8_t>(Norm));
+    Traits<std::uint32_t>::serialize(ar, static_cast<std::uint32_t>(TfidfParameters));
+    Traits<decltype(Lowercase)>::serialize(ar, Lowercase);
+    Traits<std::uint8_t>::serialize(ar, static_cast<std::uint8_t>(Analyzer));
+    Traits<decltype(RegexToken)>::serialize(ar, RegexToken);
+    Traits<decltype(NgramRangeMin)>::serialize(ar, NgramRangeMin);
+    Traits<decltype(NgramRangeMax)>::serialize(ar, NgramRangeMax);
 }
 
 bool TfidfVectorizerTransformer::operator==(TfidfVectorizerTransformer const &other) const {
@@ -437,7 +525,12 @@ bool TfidfVectorizerTransformer::operator==(TfidfVectorizerTransformer const &ot
         && DocumentFreq == other.DocumentFreq
         && TotalNumsDocuments == other.TotalNumsDocuments
         && Norm == other.Norm
-        && TfidfParameters == other.TfidfParameters;
+        && TfidfParameters == other.TfidfParameters
+        && Lowercase == other.Lowercase
+        && Analyzer == other.Analyzer
+        && RegexToken == other.RegexToken
+        && NgramRangeMin == other.NgramRangeMin
+        && NgramRangeMax == other.NgramRangeMax;
 }
 
 // ----------------------------------------------------------------------
@@ -450,7 +543,7 @@ template <size_t MaxNumTrainingItemsV>
 TfidfVectorizerEstimator<MaxNumTrainingItemsV>::TfidfVectorizerEstimator(
     AnnotationMapsPtr pAllColumnAnnotations,
     size_t colIndex,
-    StringDecorator decorator,
+    bool lowercase,
     AnalyzerMethod analyzer,
     std::string regex,
     std::float_t minDf,
@@ -465,7 +558,8 @@ TfidfVectorizerEstimator<MaxNumTrainingItemsV>::TfidfVectorizerEstimator(
     BaseType(
         "TfidfVectorizerEstimator",
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, colIndex, &decorator, &analyzer, &regex, &vocabulary, &topKTerms, &minDf, &maxDf, &ngramRangeMin, &ngramRangeMax](void) {
+        [pAllColumnAnnotations, colIndex, lowercase, analyzer, regex, &vocabulary, &topKTerms, &minDf, &maxDf, ngramRangeMin, ngramRangeMax](void) {
+            StringDecorator decorator = lowercase ? Microsoft::Featurizer::Strings::ToLower : StringDecorator();
             return Components::DocumentStatisticsEstimator<MaxNumTrainingItemsV>(
                 std::move(pAllColumnAnnotations),
                 std::move(colIndex),
@@ -480,12 +574,17 @@ TfidfVectorizerEstimator<MaxNumTrainingItemsV>::TfidfVectorizerEstimator(
                 std::move(ngramRangeMax)
             );
         },
-        [pAllColumnAnnotations, colIndex, &norm, &tfidfParameters](void) {
+        [pAllColumnAnnotations, colIndex, &norm, &tfidfParameters, lowercase, analyzer, regex, ngramRangeMin, ngramRangeMax](void) {
             return Details::TfidfVectorizerEstimatorImpl<MaxNumTrainingItemsV>(
                 std::move(pAllColumnAnnotations),
                 std::move(colIndex),
                 std::move(norm),
-                std::move(tfidfParameters)
+                std::move(tfidfParameters),
+                std::move(lowercase),
+                std::move(analyzer),
+                std::move(regex),
+                std::move(ngramRangeMin),
+                std::move(ngramRangeMax)
             );
         }
     ) {
@@ -501,7 +600,12 @@ Details::TfidfVectorizerEstimatorImpl<MaxNumTrainingItemsV>::TfidfVectorizerEsti
     AnnotationMapsPtr pAllColumnAnnotations,
     size_t colIndex,
     NormMethod norm,
-    TfidfPolicy tfidfParameters
+    TfidfPolicy tfidfParameters,
+    bool lowercase,
+    AnalyzerMethod analyzer,
+    std::string regexToken,
+    std::uint32_t ngramRangeMin,
+    std::uint32_t ngramRangeMax
 ) :
     BaseType("TfidfVectorizerEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
@@ -515,7 +619,12 @@ Details::TfidfVectorizerEstimatorImpl<MaxNumTrainingItemsV>::TfidfVectorizerEsti
         )
     ),
     _norm(std::move(norm)),
-    _tfidfParameters(std::move(tfidfParameters)) {
+    _tfidfParameters(std::move(tfidfParameters)),
+    _lowercase(std::move(lowercase)),
+    _analyzer(std::move(analyzer)),
+    _regexToken(std::move(regexToken)),
+    _ngramRangeMin(std::move(ngramRangeMin)),
+    _ngramRangeMax(std::move(ngramRangeMax)) {
 }
 
 // ----------------------------------------------------------------------
