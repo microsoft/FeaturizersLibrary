@@ -581,9 +581,8 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTraining
                     };
                 } else {
                     parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
-                        std::string const processedInput(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
                         Microsoft::Featurizer::Strings::ParseNgramWord<std::string::const_iterator, std::function<bool (char)>>(
-                            processedInput,
+                            input,
                             [] (char c) {return std::isspace(c);},
                             _ngramRangeMin,
                             _ngramRangeMax,
@@ -593,9 +592,8 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTraining
                 }
             } else if (_analyzer == AnalyzerMethod::Char) {
                 parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
-                    std::string const processedInput(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
                     Microsoft::Featurizer::Strings::ParseNgramChar<std::string::const_iterator>(
-                        processedInput,
+                        input,
                         _ngramRangeMin,
                         _ngramRangeMax,
                         callback
@@ -605,12 +603,9 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTraining
                 assert(_analyzer == AnalyzerMethod::Charwb);
 
                 parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
-                    auto predicate = [] (char c) {return std::isspace(c);};
-                    std::string processedInput(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
-                    std::string const paddingInput(Microsoft::Featurizer::Strings::Details::StringPadding<std::function<bool (char)>>(processedInput, predicate));
                     Microsoft::Featurizer::Strings::ParseNgramCharwb<std::string::const_iterator, std::function<bool (char)>>(
-                        paddingInput,
-                        predicate,
+                        input,
+                        [] (char c) {return std::isspace(c);},
                         _ngramRangeMin,
                         _ngramRangeMax,
                         callback
@@ -685,8 +680,25 @@ template <typename SetT, typename CreateKeyFuncT, typename KeyToStringFuncT>
 void Details::DocumentStatisticsTrainingOnlyPolicy::fit_impl(InputType const &input, CreateKeyFuncT const &createKeyFunc, KeyToStringFuncT const &keyToStringFunc) {
     SetT                                    documents;
 
+    std::string processedInput;
+    if (_analyzer == AnalyzerMethod::Word) {
+        if (_regexToken.empty() && !(_ngramRangeMin == 1 && _ngramRangeMax == 1)) {
+            processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input);
+        } else {
+            processedInput = input;
+        }
+    } else if (_analyzer == AnalyzerMethod::Char) {
+        processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input);
+    } else {
+        assert(_analyzer == AnalyzerMethod::Charwb);
+        auto predicate = [] (char c) {return std::isspace(c);};
+
+        std::string processedString(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
+        processedInput = Microsoft::Featurizer::Strings::Details::StringPadding<std::function<bool (char)>>(processedString, predicate);
+    }
+
     _parseFunc(
-        input,
+        processedInput,
         [&createKeyFunc, &documents] (InputTypeConstIterator begin, InputTypeConstIterator end) {
             documents.insert(createKeyFunc(begin, end));
         }
