@@ -182,7 +182,7 @@ private:
             indexMap.insert(std::make_pair(freqAndIndex.first, freqAndIndex.second.Index));
         }
 
-        return std::make_unique<CountVectorizerTransformer>(indexMap, _binary);
+        return typename BaseType::TransformerUniquePtr(new CountVectorizerTransformer(indexMap, _binary));
     }
 };
 
