@@ -29,6 +29,7 @@ enum class TfidfPolicy : unsigned int {
         SublinearTf = 1 << 3
 };
 
+//override | and & operator for TfidfPolicy
 constexpr TfidfPolicy operator|(TfidfPolicy const & a, TfidfPolicy const & b);
 constexpr TfidfPolicy operator&(TfidfPolicy const & a, TfidfPolicy const & b);
 
@@ -165,8 +166,8 @@ private:
 
             if (labelIter != Labels.end()) {
 
-                std::float_t tf;
-                std::float_t idf;
+                double tf;
+                double idf;
 
                 //calculate tf(term frequency) which measures how frequently a term occurs in a document.
                 //Since every document is different in length, it is possible that a term would appear much more times
@@ -175,11 +176,11 @@ private:
                 //TF(t) = (Number of times term t appears in a document) / (Total number of terms in the document)
                 //source:http://www.tfidf.com/
                 if ((TfidfParameters & TfidfPolicy::Binary) == TfidfPolicy::Binary) {
-                    tf = 1.0f;
+                    tf = 1.0;
                 } else if (!((TfidfParameters & TfidfPolicy::SublinearTf) == TfidfPolicy::SublinearTf)) {
-                    tf = static_cast<std::float_t>(wordIteratorPair.second);
+                    tf = wordIteratorPair.second;
                 } else {
-                    tf = 1.0f + std::log(static_cast<std::float_t>(wordIteratorPair.second));
+                    tf = 1.0 + std::log(wordIteratorPair.second);
                 }
 
                 //calculate idf(inverse document frequency) which measures how important a term is. While computing TF,
@@ -189,15 +190,15 @@ private:
                 //IDF(t) = log_e(Total number of documents / Number of documents with term t in it).
                 //source:http://www.tfidf.com/
                 if (!((TfidfParameters & TfidfPolicy::UseIdf) == TfidfPolicy::UseIdf)) {
-                    idf = 1.0f;
+                    idf = 1.0;
                 } else if ((TfidfParameters & TfidfPolicy::SmoothIdf) == TfidfPolicy::SmoothIdf) {
-                    idf = 1.0f + std::log((1 + TotalNumsDocuments) / (1.0f + static_cast<std::float_t>(DocumentFreq.at(word))));
+                    idf = 1.0 + std::log((1 + TotalNumsDocuments) / (1.0 + DocumentFreq.at(word)));
                 } else {
-                    idf = 1.0f + std::log((1 + TotalNumsDocuments) / static_cast<std::float_t>(DocumentFreq.at(word)));
+                    idf = 1.0 + std::log((1 + TotalNumsDocuments) / (0.0 + DocumentFreq.at(word)));
                 }
 
                 //calculate tfidf (tfidf = tf * idf)
-                std::float_t tfidf = tf * idf;
+                std::float_t tfidf = static_cast<std::float_t>(tf * idf);
 
                 //calculate normVal
                 if(Norm == NormMethod::L1) {

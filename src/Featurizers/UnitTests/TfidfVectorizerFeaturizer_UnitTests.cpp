@@ -48,7 +48,7 @@ TEST_CASE("string_standard_1_with_decorator") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("THIS is the FIRST document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.469791f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.580286f, 2));
     values.emplace_back(TransformedType::ValueEncoding(0.384085f, 3));
@@ -84,7 +84,7 @@ TEST_CASE("string_standard_1_no_decorator") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("this is the first document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.469791f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.580286f, 2));
     values.emplace_back(TransformedType::ValueEncoding(0.384085f, 3));
@@ -119,7 +119,7 @@ TEST_CASE("string_standard_2_with_decorator") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("this DOCUMENT is the second document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.687624f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.281089f, 3));
     values.emplace_back(TransformedType::ValueEncoding(0.538648f, 5));
@@ -155,7 +155,7 @@ TEST_CASE("string_standard_2_no_decorator") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("this document is the second document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.687624f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.281089f, 3));
     values.emplace_back(TransformedType::ValueEncoding(0.538648f, 5));
@@ -190,7 +190,7 @@ TEST_CASE("string_standard_3_with_decorator") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("and this is the THIRD one");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.511849f, 0));
     values.emplace_back(TransformedType::ValueEncoding(0.267104f, 3));
     values.emplace_back(TransformedType::ValueEncoding(0.511849f, 4));
@@ -227,7 +227,7 @@ TEST_CASE("string_standard_3_no_decorator") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("and this is the third one");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.511849f, 0));
     values.emplace_back(TransformedType::ValueEncoding(0.267104f, 3));
     values.emplace_back(TransformedType::ValueEncoding(0.511849f, 4));
@@ -263,7 +263,7 @@ TEST_CASE("string_standard_4_with_decorator") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("IS this THE first document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.469791f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.580286f, 2));
     values.emplace_back(TransformedType::ValueEncoding(0.384085f, 3));
@@ -299,7 +299,7 @@ TEST_CASE("string_standard_4_no_decorator") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("is this the first document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.469791f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.580286f, 2));
     values.emplace_back(TransformedType::ValueEncoding(0.384085f, 3));
@@ -334,7 +334,7 @@ TEST_CASE("string_L1Norm") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("is this the first document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.213315f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.263487f, 2));
     values.emplace_back(TransformedType::ValueEncoding(0.174399f, 3));
@@ -370,7 +370,7 @@ TEST_CASE("string_bitflag_1000") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("the second document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.577350f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.577350f, 5));
     values.emplace_back(TransformedType::ValueEncoding(0.577350f, 6));
@@ -405,7 +405,7 @@ TEST_CASE("string_bitflag_1110") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("the second document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.492489f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.771579f, 5));
     values.emplace_back(TransformedType::ValueEncoding(0.402642f, 6));
@@ -440,7 +440,7 @@ TEST_CASE("string_bitflag_1100") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("the second document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.464313f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.801943f, 5));
     values.emplace_back(TransformedType::ValueEncoding(0.375901f, 6));
@@ -475,7 +475,7 @@ TEST_CASE("string_bitflag_0000") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("the second document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.577350f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.577350f, 5));
     values.emplace_back(TransformedType::ValueEncoding(0.577350f, 6));
@@ -510,7 +510,7 @@ TEST_CASE("string_bitflag_0100") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("the second document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.464313f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.801943f, 5));
     values.emplace_back(TransformedType::ValueEncoding(0.375901f, 6));
@@ -545,7 +545,7 @@ TEST_CASE("string_bitflag_0001") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("the second document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.577350f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.577350f, 5));
     values.emplace_back(TransformedType::ValueEncoding(0.577350f, 6));
@@ -580,7 +580,7 @@ TEST_CASE("string_bitflag_0111") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("the second document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.492489f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.771579f, 5));
     values.emplace_back(TransformedType::ValueEncoding(0.402642f, 6));
@@ -615,7 +615,7 @@ TEST_CASE("string_bitflag_0101") {
 
     auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("the second document");
 
-    std::vector<TransformedType::ValueEncoding> values;
+    std::vector<TransformedType::ValueEncoding> values{};
     values.emplace_back(TransformedType::ValueEncoding(0.464313f, 1));
     values.emplace_back(TransformedType::ValueEncoding(0.801943f, 5));
     values.emplace_back(TransformedType::ValueEncoding(0.375901f, 6));
