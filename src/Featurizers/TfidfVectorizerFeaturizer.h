@@ -50,15 +50,11 @@ public:
     using IterRangeType                      = std::tuple<std::string::const_iterator, std::string::const_iterator>;
     using MapWithIterRange                   = std::map<IterRangeType, std::uint32_t, Components::IterRangeComp>;
     using AnalyzerMethod                     = Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
-
-    template <typename PredicateT, typename IteratorT>
-    using ParseFunctionType                  = std::function<void (std::string const &,
-                                                                   std::vector<std::string> &,
-                                                                   PredicateT const &,
-                                                                   std::regex const &,
-                                                                   size_t const,
-                                                                   size_t const,
-                                                                   std::function<void (IteratorT, IteratorT)> const &)>;
+    using StringIterator                     = std::string::const_iterator;
+    using ParseFunctionType                  = std::function<
+                                                   void (std::string const &,
+                                                   std::function<void (StringIterator, StringIterator)> const &)
+                                               >;
 
     // ----------------------------------------------------------------------
     // |
@@ -88,10 +84,7 @@ public:
     std::uint32_t const                      NgramRangeMin;
     std::uint32_t const                      NgramRangeMax;
 
-    ParseFunctionType<
-        std::function<bool(char)>,
-        std::string::const_iterator
-    >                                        ParseFunc;
+    ParseFunctionType const                  ParseFunc;
 
     // ----------------------------------------------------------------------
     // |
@@ -132,15 +125,25 @@ private:
 
         std::string decoratedInput = Lowercase ? Strings::ToLower(input) : input;
 
-        std::vector<std::string> intermediateValues;
+        std::string processedInput;
+        if (Analyzer == AnalyzerMethod::Word) {
+            if (RegexToken.empty() && !(NgramRangeMin == 1 && NgramRangeMax == 1)) {
+                processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput);
+            } else {
+                processedInput = decoratedInput;
+            }
+        } else if (Analyzer == AnalyzerMethod::Char) {
+            processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput);
+        } else {
+            assert(Analyzer == AnalyzerMethod::Charwb);
+            auto predicate = [] (char c) {return std::isspace(c);};
+
+            std::string processedString(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput));
+            processedInput = Microsoft::Featurizer::Strings::Details::StringPadding<std::function<bool (char)>>(processedString, predicate);
+        }
 
         ParseFunc(
-            decoratedInput,
-            intermediateValues,
-            [](char c) {return std::isspace(c);},
-            std::regex(RegexToken),
-            NgramRangeMin,
-            NgramRangeMax,
+            processedInput,
             [&documentTermFrequency] (std::string::const_iterator iterStart, std::string::const_iterator iterEnd) {
                 MapWithIterRange::iterator docuTermFreqIter(documentTermFrequency.find(std::make_tuple(iterStart, iterEnd)));
                 if (docuTermFreqIter != documentTermFrequency.end()) {
@@ -466,22 +469,64 @@ TfidfVectorizerTransformer::TfidfVectorizerTransformer(IndexMap labels,
     Analyzer(std::move(analyzer)),
     RegexToken(std::move(regexToken)),
     NgramRangeMin(std::move(ngramRangeMin)),
-    NgramRangeMax(std::move(ngramRangeMax)) {
-        //initialize parse function(this part shares the same code with documentstatsestimator, consider refactor)
-        if (Analyzer == AnalyzerMethod::Word) {
-            if (!RegexToken.empty()) {
-                ParseFunc = Microsoft::Featurizer::Strings::UParseRegex<std::string::const_iterator, std::function<bool (char)>, std::regex>;
-            } else if (NgramRangeMin == 1 && NgramRangeMax == 1) {
-                ParseFunc = Microsoft::Featurizer::Strings::UParse<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+    NgramRangeMax(std::move(ngramRangeMax)),
+    ParseFunc(
+        [this](void) -> ParseFunctionType {
+            //initialize parse function
+            ParseFunctionType parseFunc;
+            if (Analyzer == AnalyzerMethod::Word) {
+                if (!RegexToken.empty()) {
+                    parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                        Microsoft::Featurizer::Strings::ParseRegex<std::string::const_iterator, std::regex>(
+                            input,
+                            std::regex(RegexToken),
+                            callback
+                        );
+                    };
+                } else if (NgramRangeMin == 1 && NgramRangeMax == 1) {
+                    parseFunc = [] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                        Microsoft::Featurizer::Strings::Parse<std::string::const_iterator, std::function<bool (char)>>(
+                            input,
+                            [] (char c) {return std::isspace(c);},
+                            callback
+                        );
+                    };
+                } else {
+                    parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                        Microsoft::Featurizer::Strings::ParseNgramWord<std::string::const_iterator, std::function<bool (char)>>(
+                            input,
+                            [] (char c) {return std::isspace(c);},
+                            NgramRangeMin,
+                            NgramRangeMax,
+                            callback
+                        );
+                    };
+                }
+            } else if (Analyzer == AnalyzerMethod::Char) {
+                parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                    Microsoft::Featurizer::Strings::ParseNgramChar<std::string::const_iterator>(
+                        input,
+                        NgramRangeMin,
+                        NgramRangeMax,
+                        callback
+                    );
+                };
             } else {
-                ParseFunc = Microsoft::Featurizer::Strings::UParseNgramWordCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
+                assert(Analyzer == AnalyzerMethod::Charwb);
+
+                parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                    Microsoft::Featurizer::Strings::ParseNgramCharwb<std::string::const_iterator, std::function<bool (char)>>(
+                        input,
+                        [] (char c) {return std::isspace(c);},
+                        NgramRangeMin,
+                        NgramRangeMax,
+                        callback
+                    );
+                };
             }
-        } else if (Analyzer == AnalyzerMethod::Char) {
-            ParseFunc = Microsoft::Featurizer::Strings::UParseNgramCharCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
-        } else {
-            assert(Analyzer == AnalyzerMethod::Charwb);
-            ParseFunc = Microsoft::Featurizer::Strings::UParseNgramCharwbCopy<std::string::const_iterator, std::function<bool (char)>, std::regex>;
-        }
+            return parseFunc;
+        }()
+    ) {
 }
 
 TfidfVectorizerTransformer::TfidfVectorizerTransformer(Archive &ar) :
