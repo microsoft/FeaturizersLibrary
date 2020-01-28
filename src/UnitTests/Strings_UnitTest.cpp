@@ -100,34 +100,6 @@ void ParseNgramWordTest(std::string & input,
         }
     );
     CHECK(output1 == label);
-    std::vector<std::string> output2;
-    ParseNgramWord<std::string::const_iterator>(
-        input,
-        isWhiteSpace,
-        ngramRangeMin,
-        ngramRangeMax,
-        [&output2] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
-            output2.emplace_back(std::string(iterBegin, iterEnd));
-        }
-    );
-    CHECK(output2 == label);
-}
-
-void ParseNgramWordCopyTest(std::string const & input,
-                            std::vector<std::string> const & label,
-                            size_t ngramRangeMin,
-                            size_t ngramRangeMax) {
-    std::vector<std::string> output;
-    ParseNgramWordCopy<std::string::const_iterator>(
-        input,
-        isWhiteSpace,
-        ngramRangeMin,
-        ngramRangeMax,
-        [&output] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
-            output.emplace_back(std::string(iterBegin, iterEnd));
-        }
-    );
-    CHECK(output == label);
 }
 
 void ParseNgramCharTest(std::string & input,
@@ -144,32 +116,6 @@ void ParseNgramCharTest(std::string & input,
         }
     );
     CHECK(output1 == label);
-    std::vector<std::string> output2;
-    ParseNgramChar<std::string::const_iterator>(
-        input,
-        ngramRangeMin,
-        ngramRangeMax,
-        [&output2] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
-            output2.emplace_back(std::string(iterBegin, iterEnd));
-        }
-    );
-    CHECK(output2 == label);
-}
-
-void ParseNgramCharCopyTest(std::string const & input,
-                            std::vector<std::string> const & label,
-                            size_t ngramRangeMin,
-                            size_t ngramRangeMax) {
-    std::vector<std::string> output;
-    ParseNgramCharCopy<std::string::const_iterator>(
-        input,
-        ngramRangeMin,
-        ngramRangeMax,
-        [&output] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
-            output.emplace_back(std::string(iterBegin, iterEnd));
-        }
-    );
-    CHECK(output == label);
 }
 
 void ParseNgramCharwbTest(std::string & input,
@@ -187,34 +133,6 @@ void ParseNgramCharwbTest(std::string & input,
         }
     );
     CHECK(output1 == label);
-    std::vector<std::string> output2;
-    ParseNgramCharwb<std::string::const_iterator>(
-        input,
-        isWhiteSpace,
-        ngramRangeMin,
-        ngramRangeMax,
-        [&output2] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
-            output2.emplace_back(std::string(iterBegin, iterEnd));
-        }
-    );
-    CHECK(output2 == label);
-}
-
-void ParseNgramCharwbCopyTest(std::string const & input,
-                              std::vector<std::string> const & label,
-                              size_t ngramRangeMin,
-                              size_t ngramRangeMax) {
-    std::vector<std::string> output;
-    ParseNgramCharwbCopy<std::string::const_iterator>(
-        input,
-        isWhiteSpace,
-        ngramRangeMin,
-        ngramRangeMax,
-        [&output] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
-            output.emplace_back(std::string(iterBegin, iterEnd));
-        }
-    );
-    CHECK(output == label);
 }
 
 TEST_CASE("IteratorVectorGenerator") {
@@ -257,7 +175,7 @@ TEST_CASE("Trim") {
 }
 
 TEST_CASE("ReplaceAndTrimDuplicate") {
-    std::string input(" ! is  this the   * first#document  ?   ");
+    std::string input("!is  this the   * first#document  ?");
     std::string label(" is this the first document ");
     std::string output(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
     CHECK(output == label);
@@ -288,19 +206,19 @@ TEST_CASE("ParseRegex") {
 }
 
 TEST_CASE("ParseNgramWord") {
-    CHECK_THROWS_WITH(ParseNgramWordCopyTest(" ", {}, 1, 1), "wordIterPairVector.size() == 0");
-    CHECK_THROWS_WITH(ParseNgramWordCopyTest("hi", {}, 0, 3), "ngramRangeMin and ngramRangeMax not valid");
-    ParseNgramWordCopyTest("? this$is a   document  &", {"this", "is", "a", "document"}, 1, 1);
-    ParseNgramWordCopyTest("? this$is a   document  &", {"this is a", "is a document"}, 3, 3);
-    ParseNgramWordCopyTest("? this$is a   document  &", {"this is", "is a", "a document"}, 2, 2);
-    ParseNgramWordCopyTest("? this$is a   document  &", {"this is a document"}, 4, 4);
-    ParseNgramWordCopyTest("? this$is a   document  &", {"this", "is", "a", "document", "this is", "is a", "a document"}, 1, 2);
-    ParseNgramWordCopyTest("? this$is a   document  &", {"this is", "is a", "a document", "this is a", "is a document"}, 2, 3);
-    ParseNgramWordCopyTest("? this$is a   document  &", {"this is a", "is a document", "this is a document"}, 3, 4);
-    ParseNgramWordCopyTest("? this$is a   document  &", {"this", "is", "a", "document", "this is", "is a", "a document", "this is a", "is a document"}, 1, 3);
-    ParseNgramWordCopyTest("? this$is a   document  &", {"this is", "is a", "a document", "this is a", "is a document", "this is a document"}, 2, 4);
-    ParseNgramWordCopyTest("? this$is a   document  &", {"this", "is", "a", "document", "this is", "is a", "a document", "this is a", "is a document", "this is a document"}, 1, 4);
-    std::string input(" bi-grams    are cool! ");
+    std::string inputRaw("? this$is a   document  &");
+    std::string input0(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(inputRaw));
+    ParseNgramWordTest(input0, {"this", "is", "a", "document"}, 1, 1);
+    ParseNgramWordTest(input0, {"this is a", "is a document"}, 3, 3);
+    ParseNgramWordTest(input0, {"this is", "is a", "a document"}, 2, 2);
+    ParseNgramWordTest(input0, {"this is a document"}, 4, 4);
+    ParseNgramWordTest(input0, {"this", "is", "a", "document", "this is", "is a", "a document"}, 1, 2);
+    ParseNgramWordTest(input0, {"this is", "is a", "a document", "this is a", "is a document"}, 2, 3);
+    ParseNgramWordTest(input0, {"this is a", "is a document", "this is a document"}, 3, 4);
+    ParseNgramWordTest(input0, {"this", "is", "a", "document", "this is", "is a", "a document", "this is a", "is a document"}, 1, 3);
+    ParseNgramWordTest(input0, {"this is", "is a", "a document", "this is a", "is a document", "this is a document"}, 2, 4);
+    ParseNgramWordTest(input0, {"this", "is", "a", "document", "this is", "is a", "a document", "this is a", "is a document", "this is a document"}, 1, 4);
+    std::string input(" bi grams are cool ");
     std::string emptyInput(" ");
     CHECK_THROWS_WITH(ParseNgramWordTest(emptyInput, {}, 1, 1), "wordIterPairVector.size() == 0");
     CHECK_THROWS_WITH(ParseNgramWordTest(input, {}, 0, 8), "ngramRangeMin and ngramRangeMax not valid");
@@ -313,18 +231,17 @@ TEST_CASE("ParseNgramCharHelper") {
 }
 
 TEST_CASE("ParseNgramChar") {
-    CHECK_THROWS_WITH(ParseNgramCharCopyTest("hi", {}, 0, 3), "ngramRangeMin and ngramRangeMax not valid");
-    CHECK_THROWS_WITH(ParseNgramCharCopyTest("jumpy   ?? fox", {}, 10, 10), "ngramRangeMin and ngramRangeMax not valid");
-    ParseNgramCharCopyTest("jumpy   ?? fox", {"j", "u", "m", "p", "y", " ", "f", "o", "x"}, 1, 1);
-    ParseNgramCharCopyTest("jumpy   ?? fox", {"ju", "um", "mp", "py", "y ", " f", "fo", "ox"}, 2, 2);
-    ParseNgramCharCopyTest("jumpy   ?? fox", {"jum", "ump", "mpy", "py ", "y f", " fo", "fox"}, 3, 3);
-    ParseNgramCharCopyTest("jumpy   ?? fox", {"jump", "umpy", "mpy ", "py f", "y fo", " fox"}, 4, 4);
-    ParseNgramCharCopyTest("jumpy   ?? fox", {"jumpy", "umpy ", "mpy f", "py fo", "y fox"}, 5, 5);
-    ParseNgramCharCopyTest("jumpy   ?? fox", {"jumpy ", "umpy f", "mpy fo", "py fox"}, 6, 6);
-    ParseNgramCharCopyTest("jumpy   ?? fox", {"jumpy f", "umpy fo", "mpy fox"}, 7, 7);
-    ParseNgramCharCopyTest("jumpy   ?? fox", {"jumpy fo", "umpy fox"}, 8, 8);
-    ParseNgramCharCopyTest("jumpy   ?? fox", {"jumpy fox"}, 9, 9);
-    std::string input("jumpy   ?? fox");
+    std::string inputRaw("jumpy   ?? fox");
+    std::string input(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(inputRaw));
+    ParseNgramCharTest(input, {"j", "u", "m", "p", "y", " ", "f", "o", "x"}, 1, 1);
+    ParseNgramCharTest(input, {"ju", "um", "mp", "py", "y ", " f", "fo", "ox"}, 2, 2);
+    ParseNgramCharTest(input, {"jum", "ump", "mpy", "py ", "y f", " fo", "fox"}, 3, 3);
+    ParseNgramCharTest(input, {"jump", "umpy", "mpy ", "py f", "y fo", " fox"}, 4, 4);
+    ParseNgramCharTest(input, {"jumpy", "umpy ", "mpy f", "py fo", "y fox"}, 5, 5);
+    ParseNgramCharTest(input, {"jumpy ", "umpy f", "mpy fo", "py fox"}, 6, 6);
+    ParseNgramCharTest(input, {"jumpy f", "umpy fo", "mpy fox"}, 7, 7);
+    ParseNgramCharTest(input, {"jumpy fo", "umpy fox"}, 8, 8);
+    ParseNgramCharTest(input, {"jumpy fox"}, 9, 9);
     std::string emptyInput(" ");
     CHECK_THROWS_WITH(ParseNgramCharTest(emptyInput, {}, 0, 3), "ngramRangeMin and ngramRangeMax not valid");
     CHECK_THROWS_WITH(ParseNgramCharTest(input, {}, 10, 10), "ngramRangeMin and ngramRangeMax not valid");
@@ -332,19 +249,19 @@ TEST_CASE("ParseNgramChar") {
 }
 
 TEST_CASE("ParseNgramCharwb") {
-    CHECK_THROWS_WITH(ParseNgramCharwbCopyTest(" ", {}, 1, 1), "wordIterPairVector.size() == 0");
-    CHECK_THROWS_WITH(ParseNgramCharwbCopyTest("hi", {}, 0, 3), "ngramRangeMin and ngramRangeMax not valid");
-    ParseNgramCharwbCopyTest("? jumpy ^fox )", {" ", "j", "u", "m", "p", "y", " ", " ", "f", "o", "x", " "}, 1, 1);
-    ParseNgramCharwbCopyTest("? jumpy ^fox )", {" j", "ju", "um", "mp", "py", "y ", " f", "fo", "ox", "x "}, 2, 2);
-    ParseNgramCharwbCopyTest("? jumpy ^fox )", {" ju", "jum", "ump", "mpy", "py ", " fo", "fox", "ox "}, 3, 3);
-    ParseNgramCharwbCopyTest("? jumpy ^fox )", {" jum", "jump", "umpy", "mpy ", " fox", "fox "}, 4, 4);
-    ParseNgramCharwbCopyTest("? jumpy ^fox )", {" jump", "jumpy", "umpy ", " fox "}, 5, 5);
-    ParseNgramCharwbCopyTest("? jumpy ^fox )", {" jumpy", "jumpy "}, 6, 6);
-    ParseNgramCharwbCopyTest("? jumpy ^fox )", {" jumpy "}, 7, 7);
-    ParseNgramCharwbCopyTest("? jumpy ^fox )", {}, 8, 8);
+    std::string inputRaw = "? jumpy ^fox )";
+    std::string inputPre(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(inputRaw));
+    std::string input0(Details::StringPadding<std::function<bool (char)>>(inputPre, isWhiteSpace));
+    CHECK_THROWS_WITH(ParseNgramCharwbTest(input0, {}, 0, 3), "ngramRangeMin and ngramRangeMax not valid");
+    ParseNgramCharwbTest(input0, {" ", "j", "u", "m", "p", "y", " ", " ", "f", "o", "x", " "}, 1, 1);
+    ParseNgramCharwbTest(input0, {" j", "ju", "um", "mp", "py", "y ", " f", "fo", "ox", "x "}, 2, 2);
+    ParseNgramCharwbTest(input0, {" ju", "jum", "ump", "mpy", "py ", " fo", "fox", "ox "}, 3, 3);
+    ParseNgramCharwbTest(input0, {" jum", "jump", "umpy", "mpy ", " fox", "fox "}, 4, 4);
+    ParseNgramCharwbTest(input0, {" jump", "jumpy", "umpy ", " fox "}, 5, 5);
+    ParseNgramCharwbTest(input0, {" jumpy", "jumpy "}, 6, 6);
+    ParseNgramCharwbTest(input0, {" jumpy "}, 7, 7);
+    ParseNgramCharwbTest(input0, {}, 8, 8);
     std::string input("? jumpy ^fox )");
-    std::string emptyInput(" ");
-    CHECK_THROWS_WITH(ParseNgramCharwbTest(emptyInput, {}, 1, 1), "wordIterPairVector.size() == 0");
     CHECK_THROWS_WITH(ParseNgramCharwbTest(input, {}, 0, 8), "ngramRangeMin and ngramRangeMax not valid");
     ParseNgramCharwbTest(input, {}, 8, 8);
 }
