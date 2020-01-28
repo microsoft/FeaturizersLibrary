@@ -21,6 +21,35 @@ namespace Components {
 
 
 static constexpr char const * const         DocumentStatisticsEstimatorName("DocumentStatisticsEstimator");
+// iterator range comparison struct
+struct IterRangeComp {
+    bool operator()(const std::tuple<std::string::const_iterator, std::string::const_iterator>& a,
+                    const std::tuple<std::string::const_iterator, std::string::const_iterator>& b) const {
+
+        std::string::const_iterator s1 = std::get<0>(a);
+        std::string::const_iterator e1 = std::get<1>(a);
+        std::string::const_iterator s2 = std::get<0>(b);
+        std::string::const_iterator e2 = std::get<1>(b);
+
+        if(std::distance(s1, e1) < std::distance(s2, e2)) {
+            return true;
+        } else if (std::distance(s2, e2) < std::distance(s1, e1)) {
+            return false;
+        }
+
+        while (s1 != e1) {
+            assert(s2 != e2);
+            if (*s2 < *s1) {
+                return false;
+            } else if (*s1 < *s2) {
+                return true;
+            }
+            ++s1;
+            ++s2;
+        }
+        return false;
+    }
+};
 
 /////////////////////////////////////////////////////////////////////////
 ///  \struct        FrequencyAndIndex
@@ -329,34 +358,6 @@ DocumentStatisticsEstimator<MaxNumTrainingItemsV>::DocumentStatisticsEstimator(
 // ----------------------------------------------------------------------
 namespace {
 
-struct IterRangeComp {
-    bool operator()(const std::tuple<std::string::const_iterator, std::string::const_iterator>& a,
-                    const std::tuple<std::string::const_iterator, std::string::const_iterator>& b) const {
-
-        std::string::const_iterator s1 = std::get<0>(a);
-        std::string::const_iterator e1 = std::get<1>(a);
-        std::string::const_iterator s2 = std::get<0>(b);
-        std::string::const_iterator e2 = std::get<1>(b);
-
-        if(std::distance(s1, e1) < std::distance(s2, e2)) {
-            return true;
-        } else if (std::distance(s2, e2) < std::distance(s1, e1)) {
-            return false;
-        }
-
-        while (s1 != e1) {
-            assert(s2 != e2);
-            if (*s2 < *s1) {
-                return false;
-            } else if (*s1 < *s2) {
-                return true;
-            }
-            ++s1;
-            ++s2;
-        }
-        return false;
-    }
-};
 
 inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreqMap(Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap termFrequency,
                                                                                     std::float_t minDf,
