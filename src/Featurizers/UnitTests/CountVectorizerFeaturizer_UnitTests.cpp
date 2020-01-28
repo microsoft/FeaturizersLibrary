@@ -19,7 +19,7 @@ using AnalyzerMethod = NS::Featurizers::Components::Details::DocumentStatisticsT
 
 
 TEST_CASE("empty index map") {
-    CHECK_THROWS_WITH(NS::Featurizers::CountVectorizerTransformer(IndexMapType(), false), "Index map is empty!");
+    CHECK_THROWS_WITH(NS::Featurizers::CountVectorizerTransformer(IndexMapType(), false, false, AnalyzerMethod::Word, "", 1, 1), "Index map is empty!");
 }
 
 TEST_CASE("empty training data - without binary") {
@@ -33,7 +33,7 @@ TEST_CASE("empty training data - without binary") {
 
     CHECK_THROWS_WITH(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, Microsoft::Featurizer::Strings::ToLower, AnalyzerMethod::Word, "",
+            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, false, AnalyzerMethod::Word, "",
                                                                                                                               1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, false),
             trainingBatches,
             inferencingInput
@@ -54,7 +54,7 @@ TEST_CASE("empty inferencing data - without binary") {
 
     CHECK_THROWS_WITH(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, Microsoft::Featurizer::Strings::ToLower, AnalyzerMethod::Word, "",
+            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, false, AnalyzerMethod::Word, "",
                                                                                                                               1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, false),
             trainingBatches,
             inferencingInput
@@ -86,7 +86,7 @@ TEST_CASE("string_nobinary") {
 
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, Microsoft::Featurizer::Strings::ToLower, AnalyzerMethod::Word, "",
+            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, false, AnalyzerMethod::Word, "",
                                                                                                                               1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, false),
             trainingBatches,
             inferencingInput
@@ -119,7 +119,7 @@ TEST_CASE("string_binary") {
 
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, Microsoft::Featurizer::Strings::ToLower, AnalyzerMethod::Word, "",
+            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, false, AnalyzerMethod::Word, "",
                                                                                                                               1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, true),
             trainingBatches,
             inferencingInput
@@ -140,7 +140,7 @@ TEST_CASE("Serialization/Deserialization") {
         }
     );
 
-    TransformerType                         original(indexMap, false);
+    TransformerType                         original(indexMap, false, false, AnalyzerMethod::Word, "", 1, 1);
     NS::Archive                             out;
 
     original.save(out);

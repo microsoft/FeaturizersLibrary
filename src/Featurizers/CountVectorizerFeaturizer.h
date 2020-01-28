@@ -27,21 +27,15 @@ public:
     // ----------------------------------------------------------------------
     using BaseType                           = StandardTransformer<std::string, SparseVectorEncoding<std::uint32_t>>;
     using IndexMapType                       = std::unordered_map<std::string, std::uint32_t>;
+    using AnalyzerMethod                     = Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
 
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Data
-    // |
-    // ----------------------------------------------------------------------
-    IndexMapType const                       Labels;
-    bool const                               Binary;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    CountVectorizerTransformer(IndexMapType map, bool binary);
+    CountVectorizerTransformer(IndexMapType map, bool binary, bool lower, AnalyzerMethod analyzer, std::string regex, std::uint32_t ngram_min, std::uint32_t ngram_max);
     CountVectorizerTransformer(Archive &ar);
 
     ~CountVectorizerTransformer(void) override = default;
@@ -60,6 +54,29 @@ private:
     // ----------------------------------------------------------------------
     using IterRangeType                      = std::tuple<std::string::const_iterator, std::string::const_iterator>;
     using AppearanceMapType                  = typename std::map<IterRangeType, std::uint32_t, Components::IterRangeComp>;
+    using StringIterator                     = std::string::const_iterator;
+    using ParseFunctionType                  = std::function<
+                                                   void (std::string const &,
+                                                   std::function<void (StringIterator, StringIterator)> const &)
+                                               >;
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+    IndexMapType const                       _labels;
+    bool const                               _binary;
+
+    //data for execute same parse function as in documentstatisticestimator
+    bool const                               _lower;
+    AnalyzerMethod const                     _analyzer;
+    std::string const                        _regex;
+    std::uint32_t const                      _ngram_min;
+    std::uint32_t const                      _ngram_max;
+
+
+    ParseFunctionType const                  _parse_func;
+
     // ----------------------------------------------------------------------
     // |
     // |  Private Methodsa
@@ -71,9 +88,8 @@ private:
 
         AppearanceMapType appearanceMap;
 
-        Strings::Parse<std::string::const_iterator>(
+        _parse_func(
             input,
-            [](char c) {return std::isspace(c);},
             [&appearanceMap] (std::string::const_iterator iter_start, std::string::const_iterator iter_end) {
 
                 AppearanceMapType::iterator iter_apperance(appearanceMap.find(std::make_tuple(iter_start, iter_end)));
@@ -91,10 +107,10 @@ private:
         for (auto const & wordAppearance : appearanceMap) {
             std::string const word = std::string(std::get<0>(wordAppearance.first), std::get<1>(wordAppearance.first));
 
-            typename IndexMapType::const_iterator const      iter_label(Labels.find(word));
+            typename IndexMapType::const_iterator const      iter_label(_labels.find(word));
 
-            if (iter_label != Labels.end()) {
-                if (Binary) {
+            if (iter_label != _labels.end()) {
+                if (_binary) {
                     result.emplace_back(SparseVectorEncoding<std::uint32_t>::ValueEncoding(1, iter_label->second));
                 } else {
                     result.emplace_back(SparseVectorEncoding<std::uint32_t>::ValueEncoding(wordAppearance.second, iter_label->second));
@@ -108,7 +124,7 @@ private:
                 return a.Index < b.Index;
             }
         );
-        callback(SparseVectorEncoding<std::uint32_t>(Labels.size(), std::move(result)));
+        callback(SparseVectorEncoding<std::uint32_t>(_labels.size(), std::move(result)));
 
     }
 };
@@ -139,7 +155,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    CountVectorizerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool binary);
+    CountVectorizerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool binary, bool lower, AnalyzerMethod analyzer, std::string regex, std::uint32_t ngram_min, std::uint32_t ngram_max);
     ~CountVectorizerEstimatorImpl(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(CountVectorizerEstimatorImpl);
@@ -153,6 +169,13 @@ private:
     size_t const                             _colIndex;
 
     bool const                               _binary;
+
+    //data for execute same parse function as in documentstatisticestimator
+    bool const                               _lower;
+    AnalyzerMethod const                     _analyzer;
+    std::string const                        _regex;
+    std::uint32_t const                      _ngram_min;
+    std::uint32_t const                      _ngram_max;
 
     // ----------------------------------------------------------------------
     // |
@@ -186,7 +209,7 @@ private:
             indexMap.insert(std::make_pair(freqAndIndex.first, freqAndIndex.second.Index));
         }
 
-        return typename BaseType::TransformerUniquePtr(new CountVectorizerTransformer(indexMap, _binary));
+        return typename BaseType::TransformerUniquePtr(new CountVectorizerTransformer(indexMap, _binary, _lower, _analyzer, _regex, _ngram_min, _ngram_max));
     }
 };
 
@@ -222,7 +245,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    CountVectorizerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, StringDecorator decorator,
+    CountVectorizerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool lower,
                                                                       AnalyzerMethod analyzer, std::string regex, std::float_t max_df,
                                                                       std::float_t min_df, nonstd::optional<std::uint32_t> top_k_terms,
                                                                       nonstd::optional<IndexMapType> vocabulary,
@@ -247,8 +270,8 @@ public:
 // |  CountVectorizerTransformer
 // |
 // ----------------------------------------------------------------------
-CountVectorizerTransformer::CountVectorizerTransformer(IndexMapType map, bool binary) :
-    Labels(
+CountVectorizerTransformer::CountVectorizerTransformer(IndexMapType map, bool binary, bool lower, AnalyzerMethod analyzer, std::string regex, std::uint32_t ngram_min, std::uint32_t ngram_max) :
+    _labels(
         std::move([&map](void) ->  IndexMapType & {
             if (map.size() == 0) {
                 throw std::invalid_argument("Index map is empty!");
@@ -256,7 +279,67 @@ CountVectorizerTransformer::CountVectorizerTransformer(IndexMapType map, bool bi
             return map;
         }()
         )),
-    Binary(std::move(binary)) {
+    _binary(std::move(binary)),
+    _lower(std::move(lower)),
+    _analyzer(std::move(analyzer)),
+    _regex(std::move(regex)),
+    _ngram_min(std::move(ngram_min)),
+    _ngram_max(std::move(ngram_max)),
+    _parse_func([this](void) -> ParseFunctionType {
+            //initialize parse function
+            ParseFunctionType parseFunc;
+            if (_analyzer == AnalyzerMethod::Word) {
+                if (!_regex.empty()) {
+                    parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                        Microsoft::Featurizer::Strings::ParseRegex<std::string::const_iterator, std::regex>(
+                            input,
+                            std::regex(_regex),
+                            callback
+                        );
+                    };
+                } else if (_ngram_min == 1 && _ngram_max == 1) {
+                    parseFunc = [] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                        Microsoft::Featurizer::Strings::Parse<std::string::const_iterator, std::function<bool (char)>>(
+                            input,
+                            [] (char c) {return std::isspace(c);},
+                            callback
+                        );
+                    };
+                } else {
+                    parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                        Microsoft::Featurizer::Strings::ParseNgramWord<std::string::const_iterator, std::function<bool (char)>>(
+                            input,
+                            [] (char c) {return std::isspace(c);},
+                            _ngram_min,
+                            _ngram_max,
+                            callback
+                        );
+                    };
+                }
+            } else if (_analyzer == AnalyzerMethod::Char) {
+                parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                    Microsoft::Featurizer::Strings::ParseNgramChar<std::string::const_iterator>(
+                        input,
+                        _ngram_min,
+                        _ngram_max,
+                        callback
+                    );
+                };
+            } else {
+                assert(_analyzer == AnalyzerMethod::Charwb);
+
+                parseFunc = [this] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                    Microsoft::Featurizer::Strings::ParseNgramCharwb<std::string::const_iterator, std::function<bool (char)>>(
+                        input,
+                        [] (char c) {return std::isspace(c);},
+                        _ngram_min,
+                        _ngram_max,
+                        callback
+                    );
+                };
+            }
+            return parseFunc;
+        }()) {
 }
 
 CountVectorizerTransformer::CountVectorizerTransformer(Archive &ar) :
@@ -273,7 +356,13 @@ CountVectorizerTransformer::CountVectorizerTransformer(Archive &ar) :
             IndexMapType           labels(Traits<IndexMapType>::deserialize(ar));
             bool                   binary(Traits<bool>::deserialize(ar));
 
-            return CountVectorizerTransformer(std::move(labels), std::move(binary));
+            bool                   lower(Traits<bool>::deserialize(ar));
+            AnalyzerMethod         analyzer(static_cast<AnalyzerMethod>(Traits<std::uint8_t>::deserialize(ar)));
+            std::string            regex(Traits<std::string>::deserialize(ar));
+            std::uint32_t          ngram_min(Traits<std::uint32_t>::deserialize(ar));
+            std::uint32_t          ngram_max(Traits<std::uint32_t>::deserialize(ar));
+
+            return CountVectorizerTransformer(std::move(labels), std::move(binary), std::move(lower), std::move(analyzer), std::move(regex), std::move(ngram_min), std::move(ngram_max));
         }()
     ) {
 }
@@ -284,13 +373,23 @@ void CountVectorizerTransformer::save(Archive &ar) const /*override*/ {
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
-    Traits<decltype(Labels)>::serialize(ar, Labels);
-    Traits<decltype(Binary)>::serialize(ar, Binary);
+    Traits<decltype(_labels)>::serialize(ar, _labels);
+    Traits<decltype(_binary)>::serialize(ar, _binary);
+    Traits<decltype(_lower)>::serialize(ar, _lower);
+    Traits<std::uint8_t>::serialize(ar, static_cast<std::uint8_t>(_analyzer));
+    Traits<decltype(_regex)>::serialize(ar, _regex);
+    Traits<decltype(_ngram_min)>::serialize(ar, _ngram_min);
+    Traits<decltype(_ngram_max)>::serialize(ar, _ngram_max);
 }
 
 bool CountVectorizerTransformer::operator==(CountVectorizerTransformer const &other) const {
-    return Labels == other.Labels
-        && Binary == other.Binary;
+    return _labels == other._labels
+        && _binary == other._binary
+        && _lower == other._lower
+        && _analyzer == other._analyzer
+        && _regex == other._regex
+        && _ngram_min == other._ngram_min
+        && _ngram_max == other._ngram_max;
 }
 
 // ----------------------------------------------------------------------
@@ -300,7 +399,7 @@ bool CountVectorizerTransformer::operator==(CountVectorizerTransformer const &ot
 // ----------------------------------------------------------------------
 
 template <size_t MaxNumTrainingItemsV>
-CountVectorizerEstimator<MaxNumTrainingItemsV>::CountVectorizerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, StringDecorator decorator,
+CountVectorizerEstimator<MaxNumTrainingItemsV>::CountVectorizerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool lower,
                                                                                            AnalyzerMethod analyzer, std::string regex, std::float_t max_df,
                                                                                            std::float_t min_df, nonstd::optional<std::uint32_t> top_k_terms,
                                                                                            nonstd::optional<IndexMapType> vocabulary,
@@ -308,7 +407,8 @@ CountVectorizerEstimator<MaxNumTrainingItemsV>::CountVectorizerEstimator(Annotat
     BaseType(
         "CountVectorizerEstimator",
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, colIndex, &decorator, &analyzer, &regex, &vocabulary, &top_k_terms, &min_df, &max_df, &ngram_min, &ngram_max](void) {
+        [pAllColumnAnnotations, colIndex, lower, analyzer, regex, &vocabulary, &top_k_terms, &min_df, &max_df, ngram_min, ngram_max](void) {
+            StringDecorator decorator = lower ? Microsoft::Featurizer::Strings::ToLower : StringDecorator();
             return Components::DocumentStatisticsEstimator<MaxNumTrainingItemsV>(
                 std::move(pAllColumnAnnotations),
                 std::move(colIndex),
@@ -323,11 +423,16 @@ CountVectorizerEstimator<MaxNumTrainingItemsV>::CountVectorizerEstimator(Annotat
                 std::move(ngram_max)
                 );
         },
-        [pAllColumnAnnotations, colIndex, &binary](void) {
+        [pAllColumnAnnotations, colIndex, &binary, &lower, &analyzer, &regex, &ngram_min, &ngram_max](void) {
             return Details::CountVectorizerEstimatorImpl<MaxNumTrainingItemsV>(
                 std::move(pAllColumnAnnotations),
                 std::move(colIndex),
-                std::move(binary)
+                std::move(binary),
+                std::move(lower),
+                std::move(analyzer),
+                std::move(regex),
+                std::move(ngram_min),
+                std::move(ngram_max)
             );
         }
     ) {
@@ -339,7 +444,7 @@ CountVectorizerEstimator<MaxNumTrainingItemsV>::CountVectorizerEstimator(Annotat
 // |
 // ----------------------------------------------------------------------
 template <size_t MaxNumTrainingItemsV>
-Details::CountVectorizerEstimatorImpl<MaxNumTrainingItemsV>::CountVectorizerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool binary) :
+Details::CountVectorizerEstimatorImpl<MaxNumTrainingItemsV>::CountVectorizerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool binary, bool lower, AnalyzerMethod analyzer, std::string regex, std::uint32_t ngram_min, std::uint32_t ngram_max) :
     BaseType("CountVectorizerEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
@@ -351,7 +456,12 @@ Details::CountVectorizerEstimatorImpl<MaxNumTrainingItemsV>::CountVectorizerEsti
             }()
         )
     ),
-    _binary(std::move(binary)) {
+    _binary(std::move(binary)),
+    _lower(std::move(lower)),
+    _analyzer(std::move(analyzer)),
+    _regex(std::move(regex)),
+    _ngram_min(std::move(ngram_min)),
+    _ngram_max(std::move(ngram_max)) {
 }
 
 // ----------------------------------------------------------------------
