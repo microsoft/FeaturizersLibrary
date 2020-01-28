@@ -146,7 +146,7 @@ using ColMajMatrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::Col
 
 // Force to provide mappings for other types
 template <typename InputEigenMatrixT>
-struct InputMatrixTypeMapper;
+struct InputMatrixTypeMapper {};
 
 //Mapping of ColMajor
 template <typename T>
