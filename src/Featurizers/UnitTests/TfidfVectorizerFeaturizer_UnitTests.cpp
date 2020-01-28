@@ -17,7 +17,6 @@ namespace NS = Microsoft::Featurizer;
 using IndexMap = typename NS::Featurizers::TfidfVectorizerTransformer::IndexMap;
 using AnalyzerMethod = NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
 using NormMethod = typename NS::Featurizers::TfidfVectorizerTransformer::NormMethod;
-using TfidfPolicy = typename NS::Featurizers::TfidfPolicy;
 
 template<typename T>
 void SparseVectorNumericCheck(NS::Featurizers::SparseVectorEncoding<T> const &a,
@@ -360,6 +359,7 @@ TEST_CASE("string_L1Norm") {
 TEST_CASE("string_bitflag_1000") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
+    using TfidfPolicy     = typename NS::Featurizers::TfidfPolicy;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                                 NS::TestHelpers::make_vector<InputType>("this is the first document"),
@@ -395,6 +395,7 @@ TEST_CASE("string_bitflag_1000") {
 TEST_CASE("string_bitflag_1110") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
+    using TfidfPolicy     = typename NS::Featurizers::TfidfPolicy;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                                 NS::TestHelpers::make_vector<InputType>("this is the first document"),
@@ -430,6 +431,7 @@ TEST_CASE("string_bitflag_1110") {
 TEST_CASE("string_bitflag_1100") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
+    using TfidfPolicy     = typename NS::Featurizers::TfidfPolicy;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                                 NS::TestHelpers::make_vector<InputType>("this is the first document"),
@@ -465,6 +467,7 @@ TEST_CASE("string_bitflag_1100") {
 TEST_CASE("string_bitflag_0000") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
+    using TfidfPolicy     = typename NS::Featurizers::TfidfPolicy;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                                 NS::TestHelpers::make_vector<InputType>("this is the first document"),
@@ -500,6 +503,7 @@ TEST_CASE("string_bitflag_0000") {
 TEST_CASE("string_bitflag_0100") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
+    using TfidfPolicy     = typename NS::Featurizers::TfidfPolicy;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                                 NS::TestHelpers::make_vector<InputType>("this is the first document"),
@@ -535,6 +539,7 @@ TEST_CASE("string_bitflag_0100") {
 TEST_CASE("string_bitflag_0001") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
+    using TfidfPolicy     = typename NS::Featurizers::TfidfPolicy;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                                 NS::TestHelpers::make_vector<InputType>("this is the first document"),
@@ -570,6 +575,7 @@ TEST_CASE("string_bitflag_0001") {
 TEST_CASE("string_bitflag_0111") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
+    using TfidfPolicy     = typename NS::Featurizers::TfidfPolicy;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                                 NS::TestHelpers::make_vector<InputType>("this is the first document"),
@@ -605,6 +611,7 @@ TEST_CASE("string_bitflag_0111") {
 TEST_CASE("string_bitflag_0101") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
+    using TfidfPolicy     = typename NS::Featurizers::TfidfPolicy;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                                 NS::TestHelpers::make_vector<InputType>("this is the first document"),
