@@ -27,7 +27,6 @@ public:
     // ----------------------------------------------------------------------
     using BaseType                           = StandardTransformer<std::string, SparseVectorEncoding<std::uint32_t>>;
     using IndexMapType                       = std::unordered_map<std::string, std::uint32_t>;
-    using IterRangeType                      = std::tuple<std::string::const_iterator, std::string::const_iterator>;
 
     // ----------------------------------------------------------------------
     // |
@@ -56,14 +55,19 @@ public:
 private:
     // ----------------------------------------------------------------------
     // |
+    // |  Private Types
+    // |
+    // ----------------------------------------------------------------------
+    using IterRangeType                      = std::tuple<std::string::const_iterator, std::string::const_iterator>;
+    using AppearanceMapType                  = typename std::map<IterRangeType, std::uint32_t, Components::IterRangeComp>;
+    // ----------------------------------------------------------------------
+    // |
     // |  Private Methodsa
     // |
     // ----------------------------------------------------------------------
 
     // MSVC has problems when the definition and declaration are separated
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-
-        using AppearanceMapType = typename std::map<IterRangeType, std::uint32_t, Components::IterRangeComp>;
 
         AppearanceMapType appearanceMap;
 
