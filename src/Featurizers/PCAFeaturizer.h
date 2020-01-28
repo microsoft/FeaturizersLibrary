@@ -86,7 +86,7 @@ private:
 ///
 template <
     typename InputEigenMatrixT,
-    typename OutputEigenMatrixT= typename InputMatrixTypeMapper<InputEigenMatrixT>::OutType,
+    typename OutputEigenMatrixT = typename InputMatrixTypeMapper<InputEigenMatrixT>::OutType,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class PCAEstimator : public TransformerEstimator<InputEigenMatrixT, OutputEigenMatrixT> {
