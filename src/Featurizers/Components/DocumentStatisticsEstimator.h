@@ -434,23 +434,33 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreq
 
     //using target value and remaining value to modify termFrequency
     //didn't find a way to use loop, just remain the original
+
+    std::vector<FrequencyMap::iterator> candidateToErase;
+
     FrequencyMap::iterator termFrequencyIter = termFrequency.begin();
     while (termFrequencyIter != termFrequency.end()) {
         if (termFrequencyIter->second < targetValue) {
             termFrequencyIter = termFrequency.erase(termFrequencyIter);
             continue;
         } else if (termFrequencyIter->second == targetValue) {
-            if (remainingTargetValue == 0) {
-               termFrequencyIter = termFrequency.erase(termFrequencyIter);
-               continue;
-            } else {
-                ++termFrequencyIter;
-                --remainingTargetValue;
-            }
+            candidateToErase.emplace_back(termFrequencyIter);
+            ++termFrequencyIter;
         } else {
             ++termFrequencyIter;
         }
     }
+
+    //To ensure deterministic solution
+    std::sort(
+        candidateToErase.begin(),
+        candidateToErase.end(),
+        [](FrequencyMap::iterator a, FrequencyMap::iterator b) {
+            return a->first < b->first;
+        }
+    );
+
+    for (size_t toEraseIdx = static_cast<size_t>(remainingTargetValue); toEraseIdx < candidateToErase.size(); ++toEraseIdx)
+        termFrequency.erase(candidateToErase[toEraseIdx]);
 
     return termFrequency;
 }
