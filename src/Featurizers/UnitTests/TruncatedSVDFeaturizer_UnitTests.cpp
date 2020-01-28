@@ -273,7 +273,6 @@ TEST_CASE("Standard ") {
 TEST_CASE("Map") {
     TruncatedSVDTransformerTestMapColMaj<float>();
     TruncatedSVDTransformerTestMapColMaj<double>();
-    TruncatedSVDTransformerTestMapColMajConst<float>();
     TruncatedSVDTransformerTestMapColMajConst<double>();
 
     TruncatedSVDTransformerTestMapRowMaj<float>();
