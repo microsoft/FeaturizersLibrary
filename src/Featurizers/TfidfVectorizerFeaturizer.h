@@ -384,14 +384,14 @@ public:
         bool lowercase,
         AnalyzerMethod analyzer,
         std::string regex,
+        NormMethod norm = NormMethod::L2,
+        TfidfPolicy tfidfParameters = TfidfPolicy::UseIdf|TfidfPolicy::SmoothIdf,
         std::float_t minDf = 0.0f,
         std::float_t maxDf = 1.0f,
         nonstd::optional<std::uint32_t> topKTerms = nonstd::optional<std::uint32_t>(),
         nonstd::optional<IndexMap> vocabulary = nonstd::optional<IndexMap>(),
         std::uint32_t ngramRangeMin = 1,
-        std::uint32_t ngramRangeMax = 1,
-        NormMethod norm = NormMethod::L2,
-        TfidfPolicy tfidfParameters = TfidfPolicy::UseIdf|TfidfPolicy::SmoothIdf
+        std::uint32_t ngramRangeMax = 1
     );
     ~TfidfVectorizerEstimator(void) override = default;
 
@@ -582,14 +582,14 @@ TfidfVectorizerEstimator<MaxNumTrainingItemsV>::TfidfVectorizerEstimator(
     bool lowercase,
     AnalyzerMethod analyzer,
     std::string regex,
+    NormMethod norm,
+    TfidfPolicy tfidfParameters,
     std::float_t minDf,
     std::float_t maxDf,
     nonstd::optional<std::uint32_t> topKTerms,
     nonstd::optional<IndexMap> vocabulary,
     std::uint32_t ngramRangeMin,
-    std::uint32_t ngramRangeMax,
-    NormMethod norm,
-    TfidfPolicy tfidfParameters
+    std::uint32_t ngramRangeMax
 ) :
     BaseType(
         "TfidfVectorizerEstimator",

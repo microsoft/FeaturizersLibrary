@@ -322,13 +322,6 @@ DocumentStatisticsEstimator<MaxNumTrainingItemsV>::DocumentStatisticsEstimator(
     ) {
 }
 
-// ----------------------------------------------------------------------
-// |
-// |  Anonymous namespace
-// |
-// ----------------------------------------------------------------------
-namespace {
-
 struct IterRangeComp {
     bool operator()(const std::tuple<std::string::const_iterator, std::string::const_iterator>& a,
                     const std::tuple<std::string::const_iterator, std::string::const_iterator>& b) const {
@@ -357,6 +350,13 @@ struct IterRangeComp {
         return false;
     }
 };
+
+// ----------------------------------------------------------------------
+// |
+// |  Anonymous namespace
+// |
+// ----------------------------------------------------------------------
+namespace {
 
 inline Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreqMap(Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap termFrequency,
                                                                                     std::float_t minDf,
