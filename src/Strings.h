@@ -419,7 +419,15 @@ void ParseNgramCharwb(std::string const &input,
         throw std::invalid_argument("ngramRangeMin and ngramRangeMax not valid");
 
     for (size_t pairIdx = 0; pairIdx < wordIterPairVector.size() - 1; ++pairIdx) {
-        //using wordIterPairVector[pairIdx + 1] because that represents the pairIdx's words ending position(considering predicate returning true char)
+        // using wordIterPairVector[pairIdx + 1] because that represents the pairIdx's words ending position(considering predicate returning true char)
+        // for example, if we have a decorated string " hello world " and iterator pairs are stored in v
+        //
+        // v[0].first stores the position of the leading space in front of "hello"
+        // v[0].second stores the position of "h"
+        // v[1].first stores the position of the leading space in front of "world"
+        // v[1].second stores the position of "w"
+        //
+        // in order to parse " hello ", we need v[0].first and v[1].second
         Details::ParseNgramCharHelper<IteratorT>(wordIterPairVector[pairIdx].first, wordIterPairVector[pairIdx + 1].second, ngramRangeMin, ngramRangeMax, callback);
     }
 }
