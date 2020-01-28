@@ -51,7 +51,7 @@ std::string Trim(std::string input,
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            Parse
-///  \brief         Parse string by predicate and callback each element
+///  \brief         Parse string using predicate and callback each element
 ///
 template <
     typename IteratorT,
@@ -63,7 +63,7 @@ void Parse(std::string const &input,
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            ParseRegex
-///  \brief         Parse string by RegexToken and callback each element
+///  \brief         Parse string using RegexToken and callback each element
 ///
 template <
     typename IteratorT,
@@ -76,12 +76,13 @@ void ParseRegex(std::string const &input,
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            ParseNgramWord
 ///  \brief         N-gram applies to word(word n-grams). The Ngram range
-///                 is the lower and upper boundary of the range of n-values
-///                 for different n-grams to be extracted.
+///                 is the lower and upper boundary of the range of words
+///                 can appear in a single output string
 ///                 Example:
 ///                     input: "word1 word2 word3"
 ///                     n-gram range: (1, 2)
 ///                     output: ["word1","word2","word3","word1 word2","word2 word3"]
+///                 In this case, there can be 1 or 2 words within a single output string
 ///
 template <
     typename IteratorT,
@@ -111,7 +112,7 @@ void ParseNgramChar(std::string const &input,
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            ParseNgramCharwb
-///  \brief         N-gram applies to character within bound(charwb n-grams).
+///  \brief         N-gram applies to charwb(character within bound).
 ///                 Each word will be padded with whitespace and then applied
 ///                 char n-grams.
 ///
@@ -418,7 +419,15 @@ void ParseNgramCharwb(std::string const &input,
         throw std::invalid_argument("ngramRangeMin and ngramRangeMax not valid");
 
     for (size_t pairIdx = 0; pairIdx < wordIterPairVector.size() - 1; ++pairIdx) {
-        //using wordIterPairVector[pairIdx + 1] because that represents the pairIdx's words ending position(considering predicate returning true char)
+        // using wordIterPairVector[pairIdx + 1] because that represents the pairIdx's words ending position(considering predicate returning true char)
+        // for example, if we have a decorated string " hello world " and iterator pairs are stored in v
+        //
+        // v[0].first stores the position of the leading space in front of "hello"
+        // v[0].second stores the position of "h"
+        // v[1].first stores the position of the leading space in front of "world"
+        // v[1].second stores the position of "w"
+        //
+        // in order to parse " hello ", we need v[0].first and v[1].second
         Details::ParseNgramCharHelper<IteratorT>(wordIterPairVector[pairIdx].first, wordIterPairVector[pairIdx + 1].second, ngramRangeMin, ngramRangeMax, callback);
     }
 }
