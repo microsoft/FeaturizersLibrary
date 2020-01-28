@@ -180,7 +180,7 @@ struct InputMatrixTypeMapper<Eigen::Map<RowMajMatrix<T>>> {
 };
 
 template<typename T>
-struct InputMatrixTypeMapper<Eigen::Map<const RowMajMatrix<T>>> {
+struct InputMatrixTypeMapper<const Eigen::Map<RowMajMatrix<T>>> {
     using OutType = RowMajMatrix<T>;
     using MatrixType = RowMajMatrix<T>;
 };
@@ -192,7 +192,7 @@ struct InputMatrixTypeMapper<Eigen::Map<ColMajMatrix<T>>> {
 };
 
 template<typename T>
-struct InputMatrixTypeMapper<Eigen::Map<const ColMajMatrix<T>>> {
+struct InputMatrixTypeMapper<const Eigen::Map<ColMajMatrix<T>>> {
     using OutType = ColMajMatrix<T>;
     using MatrixType = ColMajMatrix<T>;
 };

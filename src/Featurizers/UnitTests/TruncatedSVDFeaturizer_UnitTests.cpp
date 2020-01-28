@@ -164,7 +164,7 @@ void TruncatedSVDTransformerTestMapColMaj(void) {
 template <typename T>
 void TruncatedSVDTransformerTestMapColMajConst(void) {
     // ----------------------------------------------------------------------
-    using Matrix = Eigen::Map<const NS::ColMajMatrix<T>>;
+    using Matrix = const Eigen::Map<NS::ColMajMatrix<T>>;
     // ----------------------------------------------------------------------
 
     // Column major order
@@ -232,7 +232,7 @@ void TruncatedSVDTransformerTestMapRowMaj(void) {
 template <typename T>
 void TruncatedSVDTransformerTestMapRowMajConst(void) {
     // ----------------------------------------------------------------------
-    using Matrix = Eigen::Map<const NS::RowMajMatrix<T>>;
+    using Matrix = const Eigen::Map<NS::RowMajMatrix<T>>;
     // ----------------------------------------------------------------------
 
     // Row major order
