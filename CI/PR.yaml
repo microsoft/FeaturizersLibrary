@@ -64,66 +64,12 @@ stages:
 
       # ----------------------------------------------------------------------
       # Sanity Builds
-
-      # When code coverage is enabled, we only test debug builds. Execute release tests to ensure that everything is working.
-      - template: "templates/BuildAndTest.job_template.yaml"
-        parameters:
-          agent_pool: FeaturizersLibrary
-          agent_pool_is_custom: true
-          configuration: x64
-          job_display_name: "[Test Only] Windows-x64-Clang 8"
-          operating_system: Windows
-          test_only: true
-          tester_release_only: true
-
-      - template: "templates/BuildAndTest.job_template.yaml"
-        parameters:
-          agent_pool: FeaturizersLibrary
-          agent_pool_is_custom: true
-          configuration: x64_MSVC_2019
-          job_display_name: "Windows-x64-MSVC 2019"
-          operating_system: Windows
-
-      - template: "templates/BuildAndTest.job_template.yaml"
-        parameters:
-          agent_pool: FeaturizersLibrary
-          agent_pool_is_custom: true
-          configuration: x86_MSVC_2019
-          job_display_name: "Windows-x86-MSVC 2019"
-          operating_system: Windows
-
-      - template: "templates/BuildAndTest.job_template.yaml"
-        parameters:
-          agent_pool: FeaturizersLibrary
-          agent_pool_is_custom: true
-          configuration: x64_MSVC_2017
-          job_display_name: "Windows-x64-MSVC 2017"
-          operating_system: Windows
-
-      - template: "templates/BuildAndTest.job_template.yaml"
-        parameters:
-          agent_pool: FeaturizersLibrary
-          agent_pool_is_custom: true
-          configuration: x86_MSVC_2017
-          job_display_name: "Windows-x86-MSVC 2017"
-          operating_system: Windows
-
-      - template: "templates/BuildAndTest.job_template.yaml"
-        parameters:
-          agent_pool: FeaturizersLibrary
-          agent_pool_is_custom: true
-          configuration: x64_Clang_8
-          job_display_name: "Ubuntu 16.04-x64-Clang 8"
-          operating_system: Linux
-
-      # TODO: Disabled for now - template: "templates/BuildAndTest.job_template.yaml"
-      # TODO: Disabled for now   parameters:
-      # TODO: Disabled for now     agent_pool: FeaturizersLibrary
-      # TODO: Disabled for now     agent_pool_is_custom: true
-      # TODO: Disabled for now     agent_pool_container: centos7
-      # TODO: Disabled for now     configuration: system_compiler
-      # TODO: Disabled for now     job_display_name: "CentOS 7-x64-GCC"
-      # TODO: Disabled for now     operating_system: Linux
+      #
+      #   These builds are ordered from those that traditionally take the longest
+      #   time to complete to those that take the least amount of time to complete
+      #   to maximize overall throughput. Note that we aren't ordering the official
+      #   builds, as we always want to see the results of those builds before these
+      #   builds.
 
       # Note that the universal_linux build is generating code that produces runtime errors. This build remains to ensure
       # that the code compiles on older platforms.
@@ -144,6 +90,67 @@ stages:
           job_display_name: "MacOS 10.13-x64-Clang"
           job_name_unique_id: "1013"
           operating_system: MacOS
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x86_MSVC_2017
+          job_display_name: "Windows-x86-MSVC 2017"
+          operating_system: Windows
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x64_MSVC_2017
+          job_display_name: "Windows-x64-MSVC 2017"
+          operating_system: Windows
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x86_MSVC_2019
+          job_display_name: "Windows-x86-MSVC 2019"
+          operating_system: Windows
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x64_MSVC_2019
+          job_display_name: "Windows-x64-MSVC 2019"
+          operating_system: Windows
+
+      # When code coverage is enabled, we only test debug builds. Execute release tests to ensure that everything is working.
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x64
+          job_display_name: "[Test Only] Windows-x64-Clang 8"
+          operating_system: Windows
+          test_only: true
+          tester_release_only: true
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x64_Clang_8
+          job_display_name: "Ubuntu 16.04-x64-Clang 8"
+          operating_system: Linux
+
+      # TODO: Disabled for now - template: "templates/BuildAndTest.job_template.yaml"
+      # TODO: Disabled for now   parameters:
+      # TODO: Disabled for now     agent_pool: FeaturizersLibrary
+      # TODO: Disabled for now     agent_pool_is_custom: true
+      # TODO: Disabled for now     agent_pool_container: centos7
+      # TODO: Disabled for now     configuration: system_compiler
+      # TODO: Disabled for now     job_display_name: "CentOS 7-x64-GCC"
+      # TODO: Disabled for now     operating_system: Linux
+
 
   - stage: PostBuild_Stage
     displayName: "Post Build:"
