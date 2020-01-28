@@ -15,11 +15,22 @@
 namespace NS = Microsoft::Featurizer;
 
 using IndexMapType   = std::unordered_map<std::string, std::uint32_t>;
-using AnalyzerMethod = NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
+using AnalyzerMethod = NS::Featurizers::Components::AnalyzerMethod;
 
 
 TEST_CASE("empty index map") {
+    IndexMapType indexMap(
+        {
+            {"apple", 1},
+            {"banana", 2},
+            {"grape", 3},
+            {"orange", 4},
+            {"peach", 5}
+        }
+    );
     CHECK_THROWS_WITH(NS::Featurizers::CountVectorizerTransformer(IndexMapType(), false, false, AnalyzerMethod::Word, "", 1, 1), "Index map is empty!");
+    CHECK_THROWS_WITH(NS::Featurizers::CountVectorizerTransformer(indexMap, false, false, AnalyzerMethod::Word, "", 0, 1), "ngramRangeMin");
+    CHECK_THROWS_WITH(NS::Featurizers::CountVectorizerTransformer(indexMap, false, false, AnalyzerMethod::Word, "", 1, 0), "ngramRangeMax");
 }
 
 TEST_CASE("empty training data - without binary") {

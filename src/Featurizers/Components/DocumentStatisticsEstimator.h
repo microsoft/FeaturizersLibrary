@@ -51,6 +51,11 @@ struct IterRangeComp {
     }
 };
 
+enum class AnalyzerMethod : unsigned char {
+    Word = 1,
+    Char = 2,
+    Charwb = 3
+};
 /////////////////////////////////////////////////////////////////////////
 ///  \struct        FrequencyAndIndex
 ///  \brief         This struct is a combination of values of FrequencyMap and
@@ -129,11 +134,6 @@ public:
     // ----------------------------------------------------------------------
     static constexpr char const * const     NameValue = DocumentStatisticsEstimatorName;
 
-    enum class AnalyzerMethod : unsigned char {
-        Word = 1,
-        Char = 2,
-        Charwb = 3
-    };
 
     // ----------------------------------------------------------------------
     // |
@@ -226,7 +226,6 @@ public:
     using BaseType                          = TrainingOnlyEstimatorImpl<Details::DocumentStatisticsTrainingOnlyPolicy, MaxNumTrainingItemsV>;
     using StringDecorator                   = Details::DocumentStatisticsTrainingOnlyPolicy::StringDecorator;
     using IndexMap                          = Details::DocumentStatisticsTrainingOnlyPolicy::IndexMap;
-    using AnalyzerMethod                    = Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods

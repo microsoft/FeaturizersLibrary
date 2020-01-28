@@ -27,7 +27,7 @@ public:
     // ----------------------------------------------------------------------
     using BaseType                           = StandardTransformer<std::string, SparseVectorEncoding<std::uint32_t>>;
     using IndexMapType                       = std::unordered_map<std::string, std::uint32_t>;
-    using AnalyzerMethod                     = Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
+    using AnalyzerMethod                     = Components::AnalyzerMethod;
 
 
     // ----------------------------------------------------------------------
@@ -88,8 +88,27 @@ private:
 
         AppearanceMapType appearanceMap;
 
+        std::string decoratedInput = _lower ? Strings::ToLower(input) : input;
+        std::string processedInput;
+
+        if (_analyzer == AnalyzerMethod::Word) {
+            if (_regex.empty() && !(_ngram_min == 1 && _ngram_max == 1)) {
+                processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput);
+            } else {
+                processedInput = decoratedInput;
+            }
+        } else if (_analyzer == AnalyzerMethod::Char) {
+            processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput);
+        } else {
+            assert(_analyzer == AnalyzerMethod::Charwb);
+            auto predicate = [] (char c) {return std::isspace(c);};
+
+            std::string processedString(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput));
+            processedInput = Microsoft::Featurizer::Strings::Details::StringPadding<std::function<bool (char)>>(processedString, predicate);
+        }
+
         _parse_func(
-            input,
+            processedInput,
             [&appearanceMap] (std::string::const_iterator iter_start, std::string::const_iterator iter_end) {
 
                 AppearanceMapType::iterator iter_apperance(appearanceMap.find(std::make_tuple(iter_start, iter_end)));
@@ -148,7 +167,7 @@ public:
     using TransformerType                   = CountVectorizerTransformer;
     using IndexMapType                      = CountVectorizerTransformer::IndexMapType;
     using StringDecorator                   = std::function<std::string (std::string)>;
-    using AnalyzerMethod                    = Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
+    using AnalyzerMethod                    = Components::AnalyzerMethod;
 
     // ----------------------------------------------------------------------
     // |
@@ -239,7 +258,7 @@ public:
 
     using IndexMapType                      = CountVectorizerTransformer::IndexMapType;
     using StringDecorator                   = std::function<std::string (std::string)>;
-    using AnalyzerMethod                    = Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
+    using AnalyzerMethod                    = Components::AnalyzerMethod;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -283,8 +302,24 @@ CountVectorizerTransformer::CountVectorizerTransformer(IndexMapType map, bool bi
     _lower(std::move(lower)),
     _analyzer(std::move(analyzer)),
     _regex(std::move(regex)),
-    _ngram_min(std::move(ngram_min)),
-    _ngram_max(std::move(ngram_max)),
+    _ngram_min(
+        std::move(
+            [&ngram_min](void) -> std::uint32_t & {
+                if(ngram_min == 0)
+                    throw std::invalid_argument("ngramRangeMin");
+
+                return ngram_min;
+            }()
+        )),
+    _ngram_max(
+        std::move(
+            [&ngram_max](void) -> std::uint32_t & {
+                if(ngram_max == 0)
+                    throw std::invalid_argument("ngramRangeMax");
+
+                return ngram_max;
+            }()
+        )),
     _parse_func([this](void) -> ParseFunctionType {
             //initialize parse function
             ParseFunctionType parseFunc;
