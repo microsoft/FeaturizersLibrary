@@ -568,16 +568,6 @@ TfidfVectorizerTransformer::TfidfVectorizerTransformer(Archive &ar) :
                     );
         }()
     ) {
-    // Labels(Traits<decltype(Labels)>::deserialize(ar)),
-    // DocumentFreq(Traits<decltype(DocumentFreq)>::deserialize(ar)),
-    // TotalNumsDocuments(Traits<decltype(TotalNumsDocuments)>::deserialize(ar)),
-    // Norm(static_cast<NormMethod>(Traits<std::uint8_t>::deserialize(ar))),
-    // TfidfParameters(static_cast<TfidfPolicy>(Traits<std::uint32_t>::deserialize(ar))),
-    // Lowercase(Traits<decltype(Lowercase)>::deserialize(ar)),
-    // Analyzer(static_cast<AnalyzerMethod>(Traits<std::uint8_t>::deserialize(ar))),
-    // RegexToken(Traits<decltype(RegexToken)>::deserialize(ar)),
-    // NgramRangeMin(Traits<decltype(NgramRangeMin)>::deserialize(ar)),
-    // NgramRangeMax(Traits<decltype(NgramRangeMax)>::deserialize(ar)) {
 }
 
 void TfidfVectorizerTransformer::save(Archive &ar) const /*override*/ {
