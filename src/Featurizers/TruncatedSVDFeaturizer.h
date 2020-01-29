@@ -43,7 +43,7 @@ inline MatrixType& svd_flip(MatrixType& mat) {
 ///
 template <
     typename InputEigenMatrixT,
-    typename OutputEigenMatrixT=Eigen::MatrixX<typename InputEigenMatrixT::Scalar>
+    typename OutputEigenMatrixT = typename InputMatrixTypeMapper<InputEigenMatrixT>::OutType
 >
 class TruncatedSVDTransformer : public StandardTransformer<InputEigenMatrixT, OutputEigenMatrixT> {
 public:
@@ -53,7 +53,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = StandardTransformer<InputEigenMatrixT, OutputEigenMatrixT>;
-    using EigenMatrix                       = Eigen::MatrixX<typename InputEigenMatrixT::Scalar>;
+    using EigenMatrix                       = typename InputMatrixTypeMapper<InputEigenMatrixT>::MatrixType;
 
     // ----------------------------------------------------------------------
     // |
@@ -206,7 +206,7 @@ inline void gram_schmidt(MatrixType& mat) {
 ///
 template <
     typename InputEigenMatrixT,
-    typename OutputEigenMatrixT=Eigen::MatrixX<typename InputEigenMatrixT::Scalar>,
+    typename OutputEigenMatrixT = typename InputMatrixTypeMapper<InputEigenMatrixT>::OutType,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class TruncatedSVDEstimator : public TransformerEstimator<InputEigenMatrixT, OutputEigenMatrixT> {
@@ -235,7 +235,7 @@ private:
     // |  Private Types
     // |
     // ----------------------------------------------------------------------
-    using EigenMatrix                       = Eigen::MatrixX<typename InputEigenMatrixT::Scalar>;
+    using EigenMatrix                       = typename InputMatrixTypeMapper<InputEigenMatrixT>::MatrixType;
 
     // ----------------------------------------------------------------------
     // |
