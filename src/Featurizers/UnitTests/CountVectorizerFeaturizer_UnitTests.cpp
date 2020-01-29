@@ -72,7 +72,7 @@ TEST_CASE("empty inferencing data - without binary without decorator") {
         ), "'values' is empty"
     );
 }
-TEST_CASE("string - without binary without decorator") {
+TEST_CASE("string - without binary, without decorator, analyze word, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
 
@@ -106,7 +106,7 @@ TEST_CASE("string - without binary without decorator") {
         )== inferencingOutput
     );
 }
-TEST_CASE("string - without binary with decorator") {
+TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
 
@@ -139,7 +139,7 @@ TEST_CASE("string - without binary with decorator") {
     );
 }
 
-TEST_CASE("string - with binary without decorator") {
+TEST_CASE("string - with binary without decorator, analyze word, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
 
@@ -173,7 +173,7 @@ TEST_CASE("string - with binary without decorator") {
 }
 
 
-TEST_CASE("string - with binary with decorator") {
+TEST_CASE("string - with binary with decorator, analyze word, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
 
@@ -206,6 +206,178 @@ TEST_CASE("string - with binary with decorator") {
     );
 }
 
+TEST_CASE("string - with binary with decorator, analyze word, maxdf = 0.7, mindf = 0.5, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
+    using InputType       = std::string;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
+                            NS::TestHelpers::make_vector<InputType>("oraNge apple oranGE grape"),
+                            NS::TestHelpers::make_vector<InputType>("grApe caRrOt carrot apple"),
+                            NS::TestHelpers::make_vector<InputType>("peach Banana orange banana")
+                            );
+
+    auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("banana grape grape apple apple apple orange");
+
+    std::vector<TransformedType::ValueEncoding> values;
+    values.emplace_back(TransformedType::ValueEncoding(1,0));
+    values.emplace_back(TransformedType::ValueEncoding(1,1));
+    values.emplace_back(TransformedType::ValueEncoding(1,2));
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
+                                                                           TransformedType(3
+                                                                           , std::move(values))
+                                                                          );
+
+
+    CHECK(
+        NS::TestHelpers::TransformerEstimatorTest(
+            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",
+                                                                                                                              0.7f, 0.5f, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, true),
+            trainingBatches,
+            inferencingInput
+        )== inferencingOutput
+    );
+}
+
+TEST_CASE("string - without binary with decorator, analyze char, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
+    using InputType       = std::string;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
+                            NS::TestHelpers::make_vector<InputType>("oraNge apple oranGE grape"),
+                            NS::TestHelpers::make_vector<InputType>("grApe caRrOt carrot apple"),
+                            NS::TestHelpers::make_vector<InputType>("peach Banana orange banana")
+                            );
+
+    auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("banana grape grape apple apple apple orange");
+
+    std::vector<TransformedType::ValueEncoding> values;
+    values.emplace_back(TransformedType::ValueEncoding(6,0));
+    values.emplace_back(TransformedType::ValueEncoding(9,1));
+    values.emplace_back(TransformedType::ValueEncoding(1,2));
+    values.emplace_back(TransformedType::ValueEncoding(6,4));
+    values.emplace_back(TransformedType::ValueEncoding(3,5));
+    values.emplace_back(TransformedType::ValueEncoding(3,7));
+    values.emplace_back(TransformedType::ValueEncoding(3,8));
+    values.emplace_back(TransformedType::ValueEncoding(1,9));
+    values.emplace_back(TransformedType::ValueEncoding(8,10));
+    values.emplace_back(TransformedType::ValueEncoding(3,11));
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
+                                                                           TransformedType(13
+                                                                           , std::move(values))
+                                                                          );
+
+
+    CHECK(
+        NS::TestHelpers::TransformerEstimatorTest(
+            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Char, "",
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, false),
+            trainingBatches,
+            inferencingInput
+        )== inferencingOutput
+    );
+}
+
+TEST_CASE("string - without binary with decorator, analyze charwb, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
+    using InputType       = std::string;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
+                            NS::TestHelpers::make_vector<InputType>("oraNge apple oranGE grape"),
+                            NS::TestHelpers::make_vector<InputType>("grApe caRrOt carrot apple"),
+                            NS::TestHelpers::make_vector<InputType>("peach Banana orange banana")
+                            );
+
+    auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("banana grape grape apple apple apple orange");
+
+    std::vector<TransformedType::ValueEncoding> values;
+    values.emplace_back(TransformedType::ValueEncoding(14,0));
+    values.emplace_back(TransformedType::ValueEncoding(9,1));
+    values.emplace_back(TransformedType::ValueEncoding(1,2));
+    values.emplace_back(TransformedType::ValueEncoding(6,4));
+    values.emplace_back(TransformedType::ValueEncoding(3,5));
+    values.emplace_back(TransformedType::ValueEncoding(3,7));
+    values.emplace_back(TransformedType::ValueEncoding(3,8));
+    values.emplace_back(TransformedType::ValueEncoding(1,9));
+    values.emplace_back(TransformedType::ValueEncoding(8,10));
+    values.emplace_back(TransformedType::ValueEncoding(3,11));
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
+                                                                           TransformedType(13
+                                                                           , std::move(values))
+                                                                          );
+
+
+    CHECK(
+        NS::TestHelpers::TransformerEstimatorTest(
+            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Charwb, "",
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, false),
+            trainingBatches,
+            inferencingInput
+        )== inferencingOutput
+    );
+}
+
+
+TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mindf = 0, topk = 3, empty vocabulary, ngram_min = 1, ngram_max = 1") {
+    using InputType       = std::string;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
+                            NS::TestHelpers::make_vector<InputType>("oraNge apple oranGE grape"),
+                            NS::TestHelpers::make_vector<InputType>("grApe caRrOt carrot apple"),
+                            NS::TestHelpers::make_vector<InputType>("peach Banana orange banana")
+                            );
+
+    auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("banana grape grape apple apple apple orange");
+
+    std::vector<TransformedType::ValueEncoding> values;
+    values.emplace_back(TransformedType::ValueEncoding(3,0));
+    values.emplace_back(TransformedType::ValueEncoding(2,1));
+    values.emplace_back(TransformedType::ValueEncoding(1,2));
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
+                                                                           TransformedType(3
+                                                                           , std::move(values))
+                                                                          );
+
+
+    CHECK(
+        NS::TestHelpers::TransformerEstimatorTest(
+            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(static_cast<std::uint32_t>(3)), nonstd::optional<IndexMapType>(), 1, 1, false),
+            trainingBatches,
+            inferencingInput
+        )== inferencingOutput
+    );
+}
+
+TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 2, ngram_max = 3") {
+    using InputType       = std::string;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
+                            NS::TestHelpers::make_vector<InputType>("oraNge apple oranGE grape"),
+                            NS::TestHelpers::make_vector<InputType>("grApe caRrOt carrot apple"),
+                            NS::TestHelpers::make_vector<InputType>("peach Banana orange banana")
+                            );
+
+    auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("banana grape grape apple apple apple orange");
+
+    std::vector<TransformedType::ValueEncoding> values;
+    values.emplace_back(TransformedType::ValueEncoding(1,0));
+    auto inferencingOutput = NS::TestHelpers::make_vector<TransformedType>(
+                                                                           TransformedType(15
+                                                                           , std::move(values))
+                                                                          );
+
+
+    CHECK(
+        NS::TestHelpers::TransformerEstimatorTest(
+            NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 2, 3, false),
+            trainingBatches,
+            inferencingInput
+        )== inferencingOutput
+    );
+}
 TEST_CASE("Serialization/Deserialization") {
     using TransformerType = NS::Featurizers::CountVectorizerTransformer;
 

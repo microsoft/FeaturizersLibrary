@@ -346,7 +346,7 @@ void CountVectorizerTransformer::save(Archive &ar) const /*override*/ {
     Traits<decltype(_labels)>::serialize(ar, _labels);
     Traits<decltype(_binary)>::serialize(ar, _binary);
     Traits<decltype(_lower)>::serialize(ar, _lower);
-    Traits<std::uint8_t>::serialize(ar, static_cast<std::uint8_t>(_analyzer));
+    Traits<std::underlying_type<AnalyzerMethod>::type>::serialize(ar, static_cast<std::underlying_type<AnalyzerMethod>::type>(_analyzer));
     Traits<decltype(_regex)>::serialize(ar, _regex);
     Traits<decltype(_ngram_min)>::serialize(ar, _ngram_min);
     Traits<decltype(_ngram_max)>::serialize(ar, _ngram_max);
