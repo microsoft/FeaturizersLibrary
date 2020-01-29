@@ -196,7 +196,7 @@ void PCATransformerTestMapColMajor(void) {
 template <typename T>
 void PCATransformerTestMapColMajorConst(void) {
     // ----------------------------------------------------------------------
-    using Matrix = const Eigen::Map<NS::ColMajMatrix<T>>;
+    using Matrix = Eigen::Map<const NS::ColMajMatrix<T>>;
     // ----------------------------------------------------------------------
 
     // -1 -1
@@ -207,7 +207,7 @@ void PCATransformerTestMapColMajorConst(void) {
     //  3  2
 
     // Column major order
-    T                                       data[]{
+    const T                    data[] = {
         -1, -2, -3, 1, 2, 3,
         -1, -1, -2, 1, 1, 2
         };
@@ -217,7 +217,7 @@ void PCATransformerTestMapColMajorConst(void) {
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
 
-    T                                       labelData[]{
+    const T labelData[] = {
         -0.2935787f, 0.2513348f, -0.0422439f, 0.2935787f, -0.2513348f, 0.0422439f,
         -1.3834058f, -2.2218980f, -3.6053038f, 1.3834058f, 2.2218980f, 3.6053038f
 
@@ -283,7 +283,7 @@ void PCATransformerTestMapRowMajor(void) {
 template <typename T>
 void PCATransformerTestMapRowMajorConst(void) {
     // ----------------------------------------------------------------------
-    using Matrix = const Eigen::Map<NS::RowMajMatrix<T>>;
+    using Matrix = Eigen::Map<const NS::RowMajMatrix<T>>;
     // ----------------------------------------------------------------------
 
     // -1 -1
@@ -295,7 +295,7 @@ void PCATransformerTestMapRowMajorConst(void) {
 
     // Column major order
     // Row major order
-    T                                       data[]{
+    const T  data[] = {
         -1, -1,
         -2, -1,
         -3, -2,
@@ -309,7 +309,7 @@ void PCATransformerTestMapRowMajorConst(void) {
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
 
-    T                                       labelData[]{
+    const T labelData[] = {
         -0.2935787f, -1.3834058f,
         0.2513348f, -2.2218980f,
         -0.0422439f, -3.6053038f,
@@ -338,9 +338,9 @@ TEST_CASE("Standard") {
 
 TEST_CASE("Map") {
     PCATransformerTestMapColMajor<float>();
-//    PCATransformerTestMapColMajorConst<double>();
+    PCATransformerTestMapColMajorConst<double>();
     PCATransformerTestMapRowMajor<float>();
-//    PCATransformerTestMapRowMajorConst<double>();
+    PCATransformerTestMapRowMajorConst<double>();
 }
 
 TEST_CASE("Invalid_Annotation ColMajor") {

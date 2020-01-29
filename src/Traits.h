@@ -144,57 +144,48 @@ using RowMajMatrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::Row
 template<class T>
 using ColMajMatrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
 
+namespace Details {
 // Force to provide mappings for other types
+// The following two level specialization is provided to
+// address MSVC++ 2017 shortcomings
 template <typename InputEigenMatrixT>
-struct InputMatrixTypeMapper {};
-
-//Mapping of ColMajor
-template <typename T>
-struct InputMatrixTypeMapper<RowMajMatrix<T>> {
-    using OutType = RowMajMatrix<T>;
-    using MatrixType = RowMajMatrix<T>;
-};
+struct MatrixTypeMapper;
 
 template <typename T>
-struct InputMatrixTypeMapper<const RowMajMatrix<T>> {
-    using OutType = RowMajMatrix<T>;
-    using MatrixType = RowMajMatrix<T>;
+struct MatrixTypeMapper<RowMajMatrix<T>> {
+    typedef RowMajMatrix<T> OutType;
+    typedef RowMajMatrix<T> MatrixType;
 };
 
 template <typename T>
-struct InputMatrixTypeMapper<ColMajMatrix<T>> {
-    using OutType = ColMajMatrix<T>;
-    using MatrixType = ColMajMatrix<T>;
+struct MatrixTypeMapper<const RowMajMatrix<T>> {
+    typedef RowMajMatrix<T> OutType;
+    typedef RowMajMatrix<T> MatrixType;
 };
 
 template <typename T>
-struct InputMatrixTypeMapper<const ColMajMatrix<T>> {
-    using OutType = ColMajMatrix<T>;
-    using MatrixType = ColMajMatrix<T>;
+struct MatrixTypeMapper<ColMajMatrix<T>> {
+    typedef ColMajMatrix<T> OutType;
+    typedef ColMajMatrix<T> MatrixType;
+};
+
+template <typename T>
+struct MatrixTypeMapper<const ColMajMatrix<T>> {
+    typedef ColMajMatrix<T> OutType;
+    typedef ColMajMatrix<T> MatrixType;
+};
+}  // namespace Details
+
+template<typename T>
+struct InputMatrixTypeMapper {
+    using OutType = typename Details::MatrixTypeMapper<T>::OutType;
+    using MatrixType = typename Details::MatrixTypeMapper<T>::MatrixType;
 };
 
 template<typename T>
-struct InputMatrixTypeMapper<Eigen::Map<RowMajMatrix<T>>> {
-    using OutType = RowMajMatrix<T>;
-    using MatrixType = RowMajMatrix<T>;
-};
-
-template<typename T>
-struct InputMatrixTypeMapper<const Eigen::Map<RowMajMatrix<T>>> {
-    using OutType = RowMajMatrix<T>;
-    using MatrixType = RowMajMatrix<T>;
-};
-
-template<typename T>
-struct InputMatrixTypeMapper<Eigen::Map<ColMajMatrix<T>>> {
-    using OutType = ColMajMatrix<T>;
-    using MatrixType = ColMajMatrix<T>;
-};
-
-template<typename T>
-struct InputMatrixTypeMapper<const Eigen::Map<ColMajMatrix<T>>> {
-    using OutType = ColMajMatrix<T>;
-    using MatrixType = ColMajMatrix<T>;
+struct InputMatrixTypeMapper<Eigen::Map<T>> {
+    using OutType = typename std::remove_cv<T>::type;
+    using MatrixType = typename std::remove_cv<T>::type;
 };
 
 /////////////////////////////////////////////////////////////////////////
