@@ -56,6 +56,28 @@ enum class AnalyzerMethod : unsigned char {
     Char = 2,
     Charwb = 3
 };
+
+std::string Decorate(std::string const& input, bool const& lower, AnalyzerMethod const& analyzer, std::string const& regex, std::uint32_t const& ngram_min, std::uint32_t const& ngram_max) {
+
+    std::string decoratedInput = lower ? Strings::ToLower(input) : input;
+    std::string processedInput;
+
+    if (analyzer == AnalyzerMethod::Word) {
+        if (regex.empty() && !(ngram_min == 1 && ngram_max == 1)) {
+            processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput);
+        } else {
+            processedInput = decoratedInput;
+        }
+    } else if (analyzer == AnalyzerMethod::Char) {
+        processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput);
+    } else {
+        assert(analyzer == AnalyzerMethod::Charwb);
+        auto predicate = [] (char c) {return std::isspace(c);};
+        std::string processedString(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput));
+        processedInput = Microsoft::Featurizer::Strings::Details::StringPadding<std::function<bool (char)>>(processedString, predicate);
+    }
+    return processedInput;
+}
 /////////////////////////////////////////////////////////////////////////
 ///  \struct        FrequencyAndIndex
 ///  \brief         This struct is a combination of values of FrequencyMap and

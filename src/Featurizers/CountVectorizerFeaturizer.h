@@ -88,24 +88,7 @@ private:
 
         AppearanceMapType appearanceMap;
 
-        std::string decoratedInput = _lower ? Strings::ToLower(input) : input;
-        std::string processedInput;
-
-        if (_analyzer == AnalyzerMethod::Word) {
-            if (_regex.empty() && !(_ngram_min == 1 && _ngram_max == 1)) {
-                processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput);
-            } else {
-                processedInput = decoratedInput;
-            }
-        } else if (_analyzer == AnalyzerMethod::Char) {
-            processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput);
-        } else {
-            assert(_analyzer == AnalyzerMethod::Charwb);
-            auto predicate = [] (char c) {return std::isspace(c);};
-
-            std::string processedString(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput));
-            processedInput = Microsoft::Featurizer::Strings::Details::StringPadding<std::function<bool (char)>>(processedString, predicate);
-        }
+        std::string processedInput(Components::Decorate(input, _lower, _analyzer, _regex, _ngram_min, _ngram_max));
 
         _parse_func(
             processedInput,
