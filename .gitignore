@@ -17,6 +17,7 @@ CmakeSettings.json
 
 **/.vscode/*
 **/build/*
+**/build_17/*
 **/.vs/*
 **/out/*
 
