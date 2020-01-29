@@ -95,8 +95,6 @@ TEST_CASE("string - without binary, without decorator, analyze word, maxdf = 1, 
                                                                            TransformedType(9
                                                                            , std::move(values))
                                                                           );
-
-
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, false, AnalyzerMethod::Word, "",
@@ -127,8 +125,6 @@ TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mind
                                                                            TransformedType(6
                                                                            , std::move(values))
                                                                           );
-
-
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",
@@ -160,8 +156,6 @@ TEST_CASE("string - with binary without decorator, analyze word, maxdf = 1, mind
                                                                            TransformedType(6
                                                                            , std::move(values))
                                                                           );
-
-
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, false, AnalyzerMethod::Word, "",
@@ -194,8 +188,6 @@ TEST_CASE("string - with binary with decorator, analyze word, maxdf = 1, mindf =
                                                                            TransformedType(6
                                                                            , std::move(values))
                                                                           );
-
-
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",
@@ -226,8 +218,6 @@ TEST_CASE("string - with binary with decorator, analyze word, maxdf = 0.7, mindf
                                                                            TransformedType(3
                                                                            , std::move(values))
                                                                           );
-
-
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",
@@ -265,8 +255,6 @@ TEST_CASE("string - without binary with decorator, analyze char, maxdf = 1, mind
                                                                            TransformedType(13
                                                                            , std::move(values))
                                                                           );
-
-
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Char, "",
@@ -304,8 +292,6 @@ TEST_CASE("string - without binary with decorator, analyze charwb, maxdf = 1, mi
                                                                            TransformedType(13
                                                                            , std::move(values))
                                                                           );
-
-
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Charwb, "",
@@ -337,8 +323,6 @@ TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mind
                                                                            TransformedType(3
                                                                            , std::move(values))
                                                                           );
-
-
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",
@@ -367,8 +351,6 @@ TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mind
                                                                            TransformedType(15
                                                                            , std::move(values))
                                                                           );
-
-
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",

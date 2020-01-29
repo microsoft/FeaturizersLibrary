@@ -202,10 +202,7 @@ private:
 
         typename Components::DocumentStatisticsAnnotationData::FrequencyAndIndexMap const &
                                                             freqAndIndexes(data.TermFrequencyAndIndex);
-
-
         typename CountVectorizerTransformer::IndexMapType indexMap;
-
 
         for (auto const & freqAndIndex : freqAndIndexes) {
             indexMap.insert(std::make_pair(freqAndIndex.first, freqAndIndex.second.Index));
@@ -446,6 +443,6 @@ template <size_t MaxNumTrainingItemsV>
 void Details::CountVectorizerEstimatorImpl<MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
-}
-}
-}
+} // namespace Featurizers
+} // namespace Featurizer
+} // namespace Mirosoft
