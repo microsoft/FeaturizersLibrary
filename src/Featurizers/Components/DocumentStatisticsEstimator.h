@@ -29,17 +29,17 @@ enum class AnalyzerMethod : unsigned char {
     Char = 2,
     Charwb = 3
 };
-void GenerateParseFunc(ParseFunctionType &parseFunc, AnalyzerMethod const &_analyzer, std::string const & _regexToken, std::uint32_t const & _ngramRangeMin, std::uint32_t const & _ngramRangeMax) {
-    if (_analyzer == AnalyzerMethod::Word) {
-        if (!_regexToken.empty()) {
-            parseFunc = [&] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+void GenerateParseFunc(ParseFunctionType &parseFunc, AnalyzerMethod const &analyzer, std::string const & regexToken, std::uint32_t const & ngramRangeMin, std::uint32_t const & ngramRangeMax) {
+    if (analyzer == AnalyzerMethod::Word) {
+        if (!regexToken.empty()) {
+            parseFunc = [regexToken] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
                 Microsoft::Featurizer::Strings::ParseRegex<std::string::const_iterator, std::regex>(
                     input,
-                    std::regex(_regexToken),
+                    std::regex(regexToken),
                     callback
                 );
             };
-        } else if (_ngramRangeMin == 1 && _ngramRangeMax == 1) {
+        } else if (ngramRangeMin == 1 && ngramRangeMax == 1) {
             parseFunc = [] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
                 Microsoft::Featurizer::Strings::Parse<std::string::const_iterator, std::function<bool (char)>>(
                     input,
@@ -48,33 +48,33 @@ void GenerateParseFunc(ParseFunctionType &parseFunc, AnalyzerMethod const &_anal
                 );
             };
         } else {
-            parseFunc = [&] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+            parseFunc = [ngramRangeMin, ngramRangeMax] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
                 Microsoft::Featurizer::Strings::ParseNgramWord<std::string::const_iterator, std::function<bool (char)>>(
                     input,
                     [] (char c) {return std::isspace(c);},
-                    _ngramRangeMin,
-                    _ngramRangeMax,
+                    ngramRangeMin,
+                    ngramRangeMax,
                     callback
                 );
             };
         }
-    } else if (_analyzer == AnalyzerMethod::Char) {
-        parseFunc = [&] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+    } else if (analyzer == AnalyzerMethod::Char) {
+        parseFunc = [ngramRangeMin, ngramRangeMax] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
             Microsoft::Featurizer::Strings::ParseNgramChar<std::string::const_iterator>(
                 input,
-                _ngramRangeMin,
-                _ngramRangeMax,
+                ngramRangeMin,
+                ngramRangeMax,
                 callback
             );
         };
     } else {
-        assert(_analyzer == AnalyzerMethod::Charwb);
-        parseFunc = [&] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+        assert(analyzer == AnalyzerMethod::Charwb);
+        parseFunc = [ngramRangeMin, ngramRangeMax] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
             Microsoft::Featurizer::Strings::ParseNgramCharwb<std::string::const_iterator, std::function<bool (char)>>(
                 input,
                 [] (char c) {return std::isspace(c);},
-                _ngramRangeMin,
-                _ngramRangeMax,
+                ngramRangeMin,
+                ngramRangeMax,
                 callback
             );
         };
