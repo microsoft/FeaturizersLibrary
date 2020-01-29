@@ -51,6 +51,7 @@ foreach(_test_name IN ITEMS
     StandardScaleWrapperFeaturizer_UnitTest
     StringFeaturizer_UnitTest
     Structs_UnitTest
+    TfidfVectorizerFeaturizer_UnitTests
     TimeSeriesImputerFeaturizer_UnitTest
     TruncatedSVDFeaturizer_UnitTests
 )
