@@ -24,12 +24,14 @@ static constexpr char const * const         DocumentStatisticsEstimatorName("Doc
 
 using StringIterator                    = std::string::const_iterator;
 using ParseFunctionType                 = std::function<void (std::string const &, std::function<void (StringIterator, StringIterator)> const &)>;
+
 enum class AnalyzerMethod : unsigned char {
     Word = 1,
     Char = 2,
     Charwb = 3
 };
-void GenerateParseFunc(ParseFunctionType &parseFunc, AnalyzerMethod const &analyzer, std::string const & regexToken, std::uint32_t const & ngramRangeMin, std::uint32_t const & ngramRangeMax) {
+
+void DocumentParseFuncGenerator(ParseFunctionType &parseFunc, AnalyzerMethod const &analyzer, std::string const & regexToken, std::uint32_t const & ngramRangeMin, std::uint32_t const & ngramRangeMax) {
     if (analyzer == AnalyzerMethod::Word) {
         if (!regexToken.empty()) {
             parseFunc = [regexToken] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
@@ -80,7 +82,8 @@ void GenerateParseFunc(ParseFunctionType &parseFunc, AnalyzerMethod const &analy
         };
     }
 }
-std::string Decorate(std::string const& input, bool const& lower, AnalyzerMethod const& analyzer, std::string const& regex, std::uint32_t const& ngram_min, std::uint32_t const& ngram_max) {
+
+std::string DocumentDecorator(std::string const& input, bool const& lower, AnalyzerMethod const& analyzer, std::string const& regex, std::uint32_t const& ngram_min, std::uint32_t const& ngram_max) {
 
     std::string decoratedInput = lower ? Strings::ToLower(input) : input;
     std::string processedInput;
@@ -101,6 +104,7 @@ std::string Decorate(std::string const& input, bool const& lower, AnalyzerMethod
     }
     return processedInput;
 }
+
 /////////////////////////////////////////////////////////////////////////
 ///  \struct        FrequencyAndIndex
 ///  \brief         This struct is a combination of values of FrequencyMap and
@@ -640,7 +644,7 @@ inline Details::DocumentStatisticsTrainingOnlyPolicy::DocumentStatisticsTraining
     _parseFunc(
         [this](void) -> ParseFunctionType {
             ParseFunctionType parseFunc;
-            GenerateParseFunc(parseFunc, _analyzer, _regexToken, _ngramRangeMin, _ngramRangeMax);
+            DocumentParseFuncGenerator(parseFunc, _analyzer, _regexToken, _ngramRangeMin, _ngramRangeMax);
             return parseFunc;
         }()
     ),
