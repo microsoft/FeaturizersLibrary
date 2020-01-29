@@ -131,6 +131,72 @@ inline bool IsValid(TypeId id) {
         || id == TypeId::Map;
 }
 
+// This mapper infers the type of the output Matrix
+// base on the input matrix type. Note, that it has to be
+// either an Eigen::Matrix or Eigen::Map
+
+// Define a RowMajor type
+template<class T>
+using RowMajMatrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+
+// Define a ColMajor type which can be Eigen:MatrixX<T> but we choose
+// to be a bit verbose
+template<class T>
+using ColMajMatrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
+
+// Force to provide mappings for other types
+template <typename InputEigenMatrixT>
+struct InputMatrixTypeMapper {};
+
+//Mapping of ColMajor
+template <typename T>
+struct InputMatrixTypeMapper<RowMajMatrix<T>> {
+    using OutType = RowMajMatrix<T>;
+    using MatrixType = RowMajMatrix<T>;
+};
+
+template <typename T>
+struct InputMatrixTypeMapper<const RowMajMatrix<T>> {
+    using OutType = RowMajMatrix<T>;
+    using MatrixType = RowMajMatrix<T>;
+};
+
+template <typename T>
+struct InputMatrixTypeMapper<ColMajMatrix<T>> {
+    using OutType = ColMajMatrix<T>;
+    using MatrixType = ColMajMatrix<T>;
+};
+
+template <typename T>
+struct InputMatrixTypeMapper<const ColMajMatrix<T>> {
+    using OutType = ColMajMatrix<T>;
+    using MatrixType = ColMajMatrix<T>;
+};
+
+template<typename T>
+struct InputMatrixTypeMapper<Eigen::Map<RowMajMatrix<T>>> {
+    using OutType = RowMajMatrix<T>;
+    using MatrixType = RowMajMatrix<T>;
+};
+
+template<typename T>
+struct InputMatrixTypeMapper<const Eigen::Map<RowMajMatrix<T>>> {
+    using OutType = RowMajMatrix<T>;
+    using MatrixType = RowMajMatrix<T>;
+};
+
+template<typename T>
+struct InputMatrixTypeMapper<Eigen::Map<ColMajMatrix<T>>> {
+    using OutType = ColMajMatrix<T>;
+    using MatrixType = ColMajMatrix<T>;
+};
+
+template<typename T>
+struct InputMatrixTypeMapper<const Eigen::Map<ColMajMatrix<T>>> {
+    using OutType = ColMajMatrix<T>;
+    using MatrixType = ColMajMatrix<T>;
+};
+
 /////////////////////////////////////////////////////////////////////////
 ///  \struct        Traits
 ///  \brief         We have a range of of types we are dealing with. Many types
@@ -938,25 +1004,25 @@ struct Traits<std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT>> : publi
 };
 
 template <typename T>
-struct Traits<Eigen::MatrixX<T>> : public TraitsImpl<Eigen::MatrixX<T>> {
+struct Traits<ColMajMatrix<T>> : public TraitsImpl<ColMajMatrix<T>> {
 
-    static std::string ToString(Eigen::MatrixX<T> const &value) {
+    static std::string ToString(ColMajMatrix<T> const &value) {
         return ToStringImpl(value.data(), static_cast<size_t>(value.size()));
     }
 
-    static Eigen::MatrixX<T> FromString(std::string const &value) {
+    static ColMajMatrix<T> FromString(std::string const &value) {
         std::ignore = value; throw std::logic_error("Not Implemented Yet");
     }
 
     template <typename ArchiveT>
-    static ArchiveT & serialize(ArchiveT &ar, Eigen::MatrixX<T> const &value) {
-        using MatrixT = Eigen::MatrixX<T>;
+    static ArchiveT & serialize(ArchiveT &ar, ColMajMatrix<T> const &value) {
+        using MatrixT = ColMajMatrix<T>;
 
         ar.serialize(static_cast<typename MatrixT::Index>(value.rows()));
         ar.serialize(static_cast<typename MatrixT::Index>(value.cols()));
 
-        for (typename MatrixT::Index rowId = 0; rowId < value.rows(); ++rowId) {
-            for (typename MatrixT::Index colId = 0; colId < value.cols(); ++colId) {
+        for(typename MatrixT::Index colId = 0; colId < value.cols(); ++colId) {
+            for(typename MatrixT::Index rowId = 0; rowId < value.rows(); ++rowId) {
                 Traits<typename MatrixT::Scalar>::serialize(ar, value(rowId, colId));
             }
         }
@@ -965,22 +1031,68 @@ struct Traits<Eigen::MatrixX<T>> : public TraitsImpl<Eigen::MatrixX<T>> {
     }
 
     template <typename ArchiveT>
-    static Eigen::MatrixX<T> deserialize(ArchiveT &ar) {
-        using MatrixT  = Eigen::MatrixX<T>;
+    static ColMajMatrix<T> deserialize(ArchiveT &ar) {
+        using MatrixT  = ColMajMatrix<T>;
 
         typename MatrixT::Index                 numRows(ar.template deserialize<typename MatrixT::Index>());
         typename MatrixT::Index                 numCols(ar.template deserialize<typename MatrixT::Index>());
 
         MatrixT                                 result(numRows, numCols);
 
-        for (typename MatrixT::Index rowId = 0; rowId < numRows; ++rowId) {
-            for (typename MatrixT::Index colId = 0; colId < numCols; ++colId) {
+        for(typename MatrixT::Index colId = 0; colId < numCols; ++colId) {
+            for(typename MatrixT::Index rowId = 0; rowId < numRows; ++rowId) {
                 result(rowId, colId) = Traits<typename MatrixT::Scalar>::deserialize(ar);
             }
         }
 
         return result;
     }
+};
+
+template <typename T>
+struct Traits<RowMajMatrix<T>> : public TraitsImpl<RowMajMatrix<T>> {
+
+    static std::string ToString(RowMajMatrix<T> const& value) {
+        return ToStringImpl(value.data(), static_cast<size_t>(value.size()));
+        }
+
+    static RowMajMatrix<T> FromString(std::string const& value) {
+        std::ignore = value; throw std::logic_error("Not Implemented Yet");
+        }
+
+    template <typename ArchiveT>
+    static ArchiveT& serialize(ArchiveT& ar, RowMajMatrix<T> const& value) {
+        using MatrixT = RowMajMatrix<T>;
+
+        ar.serialize(static_cast<typename MatrixT::Index>(value.rows()));
+        ar.serialize(static_cast<typename MatrixT::Index>(value.cols()));
+
+        for(typename MatrixT::Index rowId = 0; rowId < value.rows(); ++rowId) {
+            for(typename MatrixT::Index colId = 0; colId < value.cols(); ++colId) {
+                Traits<typename MatrixT::Scalar>::serialize(ar, value(rowId, colId));
+                }
+            }
+
+        return ar;
+    }
+
+    template <typename ArchiveT>
+    static RowMajMatrix<T> deserialize(ArchiveT& ar) {
+        using MatrixT = RowMajMatrix<T>;
+
+        typename MatrixT::Index                 numRows(ar.template deserialize<typename MatrixT::Index>());
+        typename MatrixT::Index                 numCols(ar.template deserialize<typename MatrixT::Index>());
+
+        MatrixT                                 result(numRows, numCols);
+
+        for(typename MatrixT::Index rowId = 0; rowId < numRows; ++rowId) {
+            for(typename MatrixT::Index colId = 0; colId < numCols; ++colId) {
+                result(rowId, colId) = Traits<typename MatrixT::Scalar>::deserialize(ar);
+                }
+            }
+
+        return result;
+     }
 };
 
 template <typename... Types>
