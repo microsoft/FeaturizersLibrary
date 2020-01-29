@@ -637,6 +637,41 @@ TEST_CASE("string_bitflag_0101") {
     SparseVectorNumericCheck<std::float_t>(std::move(inferencingOutput[0]), std::move(inferencingLabel[0]));
 }
 
+// TEST_CASE("Serialization/Deserialization") {
+//     using TransformerType = NS::Featurizers::TfidfVectorizerTransformer;
+
+//     IndexMapType indexMap(
+//         {
+//             {"apple", 1},
+//             {"banana", 2},
+//             {"grape", 3},
+//             {"orange", 4},
+//             {"peach", 5}
+//         }
+//     );
+
+//     IndexMap labels,
+//         FrequencyMap docuFreq,
+//         std::uint32_t totalNumDocus,
+//         NormMethod norm,
+//         TfidfPolicy tfidfParameters,
+//         bool lowercase,
+//         AnalyzerMethod analyzer,
+//         std::string regexToken,
+//         std::uint32_t ngramRangeMin,
+//         std::uint32_t ngramRangeMax
+
+//     TransformerType                         original(indexMap,indexMap, false, false, AnalyzerMethod::Word, "", 1, 1);
+//     NS::Archive                             out;
+
+//     original.save(out);
+
+//     NS::Archive                             in(out.commit());
+//     TransformerType                         other(in);
+
+//     CHECK(other == original);
+// }
+
 
 
 
