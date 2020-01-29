@@ -637,45 +637,228 @@ TEST_CASE("string_bitflag_0101") {
     SparseVectorNumericCheck<std::float_t>(std::move(inferencingOutput[0]), std::move(inferencingLabel[0]));
 }
 
-// TEST_CASE("Serialization/Deserialization") {
-//     using TransformerType = NS::Featurizers::TfidfVectorizerTransformer;
+TEST_CASE("string_new_input") {
+    using InputType       = std::string;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
-//     IndexMapType indexMap(
-//         {
-//             {"apple", 1},
-//             {"banana", 2},
-//             {"grape", 3},
-//             {"orange", 4},
-//             {"peach", 5}
-//         }
-//     );
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
+                                NS::TestHelpers::make_vector<InputType>("this is THE first document"),
+                                NS::TestHelpers::make_vector<InputType>("this DOCUMENT is the second document"),
+                                NS::TestHelpers::make_vector<InputType>("and this is the THIRD one"),
+                                NS::TestHelpers::make_vector<InputType>("IS this THE first document")
+                            );
 
-//     IndexMap labels,
-//         FrequencyMap docuFreq,
-//         std::uint32_t totalNumDocus,
-//         NormMethod norm,
-//         TfidfPolicy tfidfParameters,
-//         bool lowercase,
-//         AnalyzerMethod analyzer,
-//         std::string regexToken,
-//         std::uint32_t ngramRangeMin,
-//         std::uint32_t ngramRangeMax
+    auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("THESE are the Third document");
 
-//     TransformerType                         original(indexMap,indexMap, false, false, AnalyzerMethod::Word, "", 1, 1);
-//     NS::Archive                             out;
+    std::vector<TransformedType::ValueEncoding> values{};
+    values.emplace_back(TransformedType::ValueEncoding(0.492489f, 1));
+    values.emplace_back(TransformedType::ValueEncoding(0.402642f, 6));
+    values.emplace_back(TransformedType::ValueEncoding(0.771579f, 7));
 
-//     original.save(out);
+    auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
+    auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
+                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                    NS::CreateTestAnnotationMapsPtr(1),
+                                    0,
+                                    true,
+                                    AnalyzerMethod::Word,
+                                    ""
+                                ),
+                                trainingBatches,
+                                inferencingInput
+                            );
 
-//     NS::Archive                             in(out.commit());
-//     TransformerType                         other(in);
+    SparseVectorNumericCheck<std::float_t>(std::move(inferencingOutput[0]), std::move(inferencingLabel[0]));
+}
 
-//     CHECK(other == original);
-// }
+TEST_CASE("string_punctuation") {
+    using InputType       = std::string;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
+                                NS::TestHelpers::make_vector<InputType>(" this is, THE first document."),
+                                NS::TestHelpers::make_vector<InputType>(" this DOCUMENT is the second document."),
+                                NS::TestHelpers::make_vector<InputType>("and this is the THIRD one."),
+                                NS::TestHelpers::make_vector<InputType>("  IS this THE first document?")
+                            );
 
+    auto inferencingInput =  NS::TestHelpers::make_vector<InputType>(" THESE are the Third document. ");
 
+    std::vector<TransformedType::ValueEncoding> values{};
+    values.emplace_back(TransformedType::ValueEncoding(0.492489f, 1));
+    values.emplace_back(TransformedType::ValueEncoding(0.402642f, 6));
+    values.emplace_back(TransformedType::ValueEncoding(0.771579f, 7));
 
+    auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
+    auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
+                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                    NS::CreateTestAnnotationMapsPtr(1),
+                                    0,
+                                    true,
+                                    AnalyzerMethod::Word,
+                                    "[^\\s|,|.|?]+"
+                                ),
+                                trainingBatches,
+                                inferencingInput
+                            );
 
+    SparseVectorNumericCheck<std::float_t>(std::move(inferencingOutput[0]), std::move(inferencingLabel[0]));
+}
 
+TEST_CASE("string_punctuation_word_ngram") {
+    using InputType       = std::string;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
+                                NS::TestHelpers::make_vector<InputType>("???jumpy? fox&*%")
+                            );
 
+    auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("^jumpy %$fox  ");
+
+    std::vector<TransformedType::ValueEncoding> values{};
+    values.emplace_back(TransformedType::ValueEncoding(0.57735f, 0));
+    values.emplace_back(TransformedType::ValueEncoding(0.57735f, 1));
+    values.emplace_back(TransformedType::ValueEncoding(0.57735f, 2));
+
+    auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(3, std::move(values)));
+    auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
+                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                    NS::CreateTestAnnotationMapsPtr(1),
+                                    0,
+                                    true,
+                                    AnalyzerMethod::Word,
+                                    "",
+                                    NormMethod::L2,
+                                    TfidfPolicy::UseIdf|TfidfPolicy::SmoothIdf,
+                                    0.0f,
+                                    1.0f,
+                                    nonstd::optional<std::uint32_t>(),
+                                    nonstd::optional<IndexMap>(),
+                                    1,
+                                    2
+                                ),
+                                trainingBatches,
+                                inferencingInput
+                            );
+
+    SparseVectorNumericCheck<std::float_t>(std::move(inferencingOutput[0]), std::move(inferencingLabel[0]));
+}
+
+TEST_CASE("string_punctuation_char_ngram") {
+    using InputType       = std::string;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
+
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
+                                NS::TestHelpers::make_vector<InputType>("jumpy?& fox")
+                            );
+
+    auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("^jumpy %$fox");
+
+    std::vector<TransformedType::ValueEncoding> values{};
+    values.emplace_back(TransformedType::ValueEncoding(0.447214f, 0));
+    values.emplace_back(TransformedType::ValueEncoding(0.447214f, 1));
+    values.emplace_back(TransformedType::ValueEncoding(0.447214f, 2));
+    values.emplace_back(TransformedType::ValueEncoding(0.447214f, 3));
+    values.emplace_back(TransformedType::ValueEncoding(0.447214f, 4));
+
+    auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(5, std::move(values)));
+    auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
+                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                    NS::CreateTestAnnotationMapsPtr(1),
+                                    0,
+                                    true,
+                                    AnalyzerMethod::Char,
+                                    "",
+                                    NormMethod::L2,
+                                    TfidfPolicy::UseIdf|TfidfPolicy::SmoothIdf,
+                                    0.0f,
+                                    1.0f,
+                                    nonstd::optional<std::uint32_t>(),
+                                    nonstd::optional<IndexMap>(),
+                                    5,
+                                    5
+                                ),
+                                trainingBatches,
+                                inferencingInput
+                            );
+
+    SparseVectorNumericCheck<std::float_t>(std::move(inferencingOutput[0]), std::move(inferencingLabel[0]));
+}
+
+TEST_CASE("string_punctuation_charwb_ngram") {
+    using InputType       = std::string;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
+
+    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
+                                NS::TestHelpers::make_vector<InputType>("jumpy?& fox")
+                            );
+
+    auto inferencingInput =  NS::TestHelpers::make_vector<InputType>("^jumpy %$fox");
+
+    std::vector<TransformedType::ValueEncoding> values{};
+    values.emplace_back(TransformedType::ValueEncoding(0.5f, 0));
+    values.emplace_back(TransformedType::ValueEncoding(0.5f, 1));
+    values.emplace_back(TransformedType::ValueEncoding(0.5f, 2));
+    values.emplace_back(TransformedType::ValueEncoding(0.5f, 3));
+
+    auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(4, std::move(values)));
+    auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
+                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                    NS::CreateTestAnnotationMapsPtr(1),
+                                    0,
+                                    true,
+                                    AnalyzerMethod::Charwb,
+                                    "",
+                                    NormMethod::L2,
+                                    TfidfPolicy::UseIdf|TfidfPolicy::SmoothIdf,
+                                    0.0f,
+                                    1.0f,
+                                    nonstd::optional<std::uint32_t>(),
+                                    nonstd::optional<IndexMap>(),
+                                    5,
+                                    5
+                                ),
+                                trainingBatches,
+                                inferencingInput
+                            );
+
+    SparseVectorNumericCheck<std::float_t>(std::move(inferencingOutput[0]), std::move(inferencingLabel[0]));
+}
+
+TEST_CASE("Serialization/Deserialization") {
+    using TransformerType = NS::Featurizers::TfidfVectorizerTransformer;
+
+    IndexMap indexMap(
+        {
+            {"apple", 1},
+            {"banana", 2},
+            {"grape", 3},
+            {"orange", 4},
+            {"peach", 5}
+        }
+    );
+
+    TransformerType                         original(indexMap, indexMap, 5, NormMethod::L2, TfidfPolicy::UseIdf, true, AnalyzerMethod::Word, "", 1, 1);
+    NS::Archive                             out;
+
+    original.save(out);
+
+    NS::Archive                             in(out.commit());
+    TransformerType                         other(in);
+
+    CHECK(other == original);
+}
+
+TEST_CASE("Serialization Version Error") {
+    NS::Archive                             out;
+
+    out.serialize(static_cast<std::uint16_t>(2));
+    out.serialize(static_cast<std::uint16_t>(0));
+
+    NS::Archive                             in(out.commit());
+
+    CHECK_THROWS_WITH(
+        NS::Featurizers::TfidfVectorizerTransformer(in),
+        Catch::Contains("Unsupported archive version")
+    );
+}

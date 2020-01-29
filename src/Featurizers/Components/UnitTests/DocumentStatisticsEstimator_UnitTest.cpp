@@ -95,7 +95,7 @@ void TestGeneratingParseFunc(std::string input,
                              std::uint32_t const & ngramRangeMax) {
     ParseFunctionType parseFunc;
     NS::Featurizers::Components::DocumentParseFuncGenerator(parseFunc, analyzer, regexToken, ngramRangeMin, ngramRangeMax);
- 
+
     std::vector<std::string> output;
     parseFunc(
         input,
@@ -105,7 +105,7 @@ void TestGeneratingParseFunc(std::string input,
     );
     CHECK(output == label);
 }
- 
+
 TEST_CASE("TestGeneratingParseFunc") {
     TestGeneratingParseFunc("jumpy fox", {"jumpy", "fox"}, AnalyzerMethod::Word, "", 1, 1);
     TestGeneratingParseFunc("jumpy fox", {"jumpy", "fox"}, AnalyzerMethod::Word, "[^\\s]+", 1, 1);
