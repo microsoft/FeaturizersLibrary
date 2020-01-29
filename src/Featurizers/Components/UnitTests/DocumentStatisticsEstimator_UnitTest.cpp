@@ -17,7 +17,7 @@ using FrequencyMap                         = IndexMap;
 using FrequencyAndIndexMap                 = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
 using StringDecorator                      = NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy::StringDecorator;
 using FrequencyAndIndex                    = NS::Featurizers::Components::FrequencyAndIndex;
-using AnalyzerMethod                       = NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
+using AnalyzerMethod                       = NS::Featurizers::Components::AnalyzerMethod;
 
 
 
