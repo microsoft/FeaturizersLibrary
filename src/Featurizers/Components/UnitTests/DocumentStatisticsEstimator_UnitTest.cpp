@@ -17,7 +17,9 @@ using FrequencyMap                         = IndexMap;
 using FrequencyAndIndexMap                 = NS::Featurizers::Components::DocumentStatisticsAnnotationData::FrequencyAndIndexMap;
 using StringDecorator                      = NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy::StringDecorator;
 using FrequencyAndIndex                    = NS::Featurizers::Components::FrequencyAndIndex;
-using AnalyzerMethod                       = NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy::AnalyzerMethod;
+using AnalyzerMethod                       = NS::Featurizers::Components::AnalyzerMethod;
+using StringIterator                       = std::string::const_iterator;
+using ParseFunctionType                    = std::function<void (std::string const &, std::function<void (StringIterator, StringIterator)> const &)>;
 
 
 
@@ -83,6 +85,50 @@ TEST_CASE("invalid_trainingpolicy") {
     CHECK_THROWS_WITH(NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy(decorator, analyzer, regexToken, existingVocabulary, maxFeatures, 0.0f, 1.0f, 0, 1), "ngramRangeMin");
     CHECK_THROWS_WITH(NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy(decorator, analyzer, regexToken, existingVocabulary, maxFeatures, 0.0f, 1.0f, 1, 0), "ngramRangeMax");
     CHECK_THROWS_WITH(NS::Featurizers::Components::Details::DocumentStatisticsTrainingOnlyPolicy(decorator, analyzer, regexToken, existingVocabulary, maxFeatures, 0.0f, 1.0f, 2, 1), "_ngramRangeMin > _ngramRangeMax");
+}
+
+void TestGeneratingParseFunc(std::string input,
+                             std::vector<std::string> label,
+                             AnalyzerMethod const &analyzer,
+                             std::string const & regexToken,
+                             std::uint32_t const & ngramRangeMin,
+                             std::uint32_t const & ngramRangeMax) {
+    ParseFunctionType parseFunc;
+    NS::Featurizers::Components::DocumentParseFuncGenerator(parseFunc, analyzer, regexToken, ngramRangeMin, ngramRangeMax);
+ 
+    std::vector<std::string> output;
+    parseFunc(
+        input,
+        [&output] (StringIterator begin, StringIterator end) {
+            output.emplace_back(std::string(begin, end));
+        }
+    );
+    CHECK(output == label);
+}
+ 
+TEST_CASE("TestGeneratingParseFunc") {
+    TestGeneratingParseFunc("jumpy fox", {"jumpy", "fox"}, AnalyzerMethod::Word, "", 1, 1);
+    TestGeneratingParseFunc("jumpy fox", {"jumpy", "fox"}, AnalyzerMethod::Word, "[^\\s]+", 1, 1);
+    TestGeneratingParseFunc("jumpy fox", {"jumpy", "fox", "jumpy fox"}, AnalyzerMethod::Word, "", 1, 2);
+    TestGeneratingParseFunc("jumpy fox", {"jumpy", "umpy ", "mpy f", "py fo", "y fox"}, AnalyzerMethod::Char, "", 5, 5);
+    TestGeneratingParseFunc(" jumpy fox ", {" jump", "jumpy", "umpy ", " fox "}, AnalyzerMethod::Charwb, "", 5, 5);
+}
+
+TEST_CASE("DocumentDecorator functionality") {
+    //  with lower, analyze word, empty regex, ngram_min == 1 and ngram_max == 1
+    CHECK(NS::Featurizers::Components::DocumentDecorator("   This ,is a document", true, AnalyzerMethod::Word, "", 1, 1) == "   this ,is a document");
+    //  without lower, analyze word, empty regex, ngram_min == 1 and ngram_max == 1
+    CHECK(NS::Featurizers::Components::DocumentDecorator("   This ,is a document", false, AnalyzerMethod::Word, "", 1, 1) == "   This ,is a document");
+    //  without lower, analyze word, non-empty regex, ngram_min == 1 and ngram_max == 1
+    CHECK(NS::Featurizers::Components::DocumentDecorator("   This ,is a document", false, AnalyzerMethod::Word, "abc", 1, 1) == "   This ,is a document");
+    //  without lower, analyze word, empty regex, ngram_min == 0 and ngram_max == 0
+    CHECK(NS::Featurizers::Components::DocumentDecorator("    This, is      a document", false, AnalyzerMethod::Word, "", 0, 0) == " This is a document");
+    //  without lower, analyze word, non-empty regex, ngram_min == 0 and ngram_max == 0
+    CHECK(NS::Featurizers::Components::DocumentDecorator("   This, is      a document", false, AnalyzerMethod::Word, "abc", 0, 0) == "   This, is      a document");
+    //  without lower, analyze char, non-empty regex, ngram_min == 0 and ngram_max == 0
+    CHECK(NS::Featurizers::Components::DocumentDecorator("  This, is      a document", false, AnalyzerMethod::Char, "abc", 0, 0) == " This is a document");
+    //  without lower, analyze charwb, non-empty regex, ngram_min == 0 and ngram_max == 0
+    CHECK(NS::Featurizers::Components::DocumentDecorator("  This, is      a document", false, AnalyzerMethod::Charwb, "abc", 0, 0) == " This is a document ");
 }
 
 TEST_CASE("string_idf") {

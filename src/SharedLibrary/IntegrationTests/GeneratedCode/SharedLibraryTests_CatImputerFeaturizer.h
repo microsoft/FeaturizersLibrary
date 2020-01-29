@@ -1232,9 +1232,9 @@ void CatImputerFeaturizer_string_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents

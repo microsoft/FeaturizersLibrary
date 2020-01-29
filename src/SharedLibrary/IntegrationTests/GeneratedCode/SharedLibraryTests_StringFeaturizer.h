@@ -13,18 +13,19 @@
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int8> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void StringFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     StringFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_int8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int8_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -99,9 +100,9 @@ void StringFeaturizer_int8_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents
@@ -120,18 +121,19 @@ void StringFeaturizer_int8_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int16> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void StringFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     StringFeaturizer_int16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_int16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int16_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -206,9 +208,9 @@ void StringFeaturizer_int16_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents
@@ -227,18 +229,19 @@ void StringFeaturizer_int16_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int32> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void StringFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     StringFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_int32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int32_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -313,9 +316,9 @@ void StringFeaturizer_int32_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents
@@ -334,18 +337,19 @@ void StringFeaturizer_int32_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int64> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void StringFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     StringFeaturizer_int64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_int64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_int64_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -420,9 +424,9 @@ void StringFeaturizer_int64_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents
@@ -441,18 +445,19 @@ void StringFeaturizer_int64_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <uint8> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void StringFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     StringFeaturizer_uint8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_uint8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint8_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -527,9 +532,9 @@ void StringFeaturizer_uint8_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents
@@ -548,18 +553,19 @@ void StringFeaturizer_uint8_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <uint16> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void StringFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     StringFeaturizer_uint16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_uint16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint16_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -634,9 +640,9 @@ void StringFeaturizer_uint16_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents
@@ -655,18 +661,19 @@ void StringFeaturizer_uint16_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <uint32> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void StringFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     StringFeaturizer_uint32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_uint32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint32_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -741,9 +748,9 @@ void StringFeaturizer_uint32_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents
@@ -762,18 +769,19 @@ void StringFeaturizer_uint32_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <uint64> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void StringFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     StringFeaturizer_uint64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_uint64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_uint64_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -848,9 +856,9 @@ void StringFeaturizer_uint64_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents
@@ -869,18 +877,19 @@ void StringFeaturizer_uint64_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <float> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void StringFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     StringFeaturizer_float_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_float_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_float_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -955,9 +964,9 @@ void StringFeaturizer_float_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents
@@ -976,18 +985,19 @@ void StringFeaturizer_float_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <double> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void StringFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     StringFeaturizer_double_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_double_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_double_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1062,9 +1072,9 @@ void StringFeaturizer_double_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents
@@ -1083,18 +1093,19 @@ void StringFeaturizer_double_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <bool> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void StringFeaturizer_bool_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     StringFeaturizer_bool_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_bool_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_bool_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1169,9 +1180,9 @@ void StringFeaturizer_bool_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents
@@ -1190,18 +1201,19 @@ void StringFeaturizer_bool_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <string> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void StringFeaturizer_string_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     StringFeaturizer_string_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(StringFeaturizer_string_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(StringFeaturizer_string_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1276,9 +1288,9 @@ void StringFeaturizer_string_Test(
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
-        results.push_back(std::string(result_ptr));
+        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
-        results.emplace_back(std::string(result_ptr));
+        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
         #endif
         
         // Destroy the contents
