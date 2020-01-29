@@ -7,6 +7,7 @@
 #include "catch.hpp"
 
 #include "../StringFeaturizer.h"
+#include "../../Archive.h"
 
 /////////////////////////////////////////////////////////////////////////
 ///  Tests are lighter for this featurizer because we are directly
@@ -87,6 +88,22 @@ TEST_CASE("Transformer_Maps") {
     m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(93), 0.147));
     std::string map_s{ "{5:35.800000,93:0.147000}" };
     CHECK(NS::Featurizers::StringTransformer<std::map<std::int16_t, std::double_t>>().execute(m) == map_s);
+}
+
+TEST_CASE("Use Empty Strings") {
+    CHECK(NS::Featurizers::StringTransformer<float>(false).execute(NS::Traits<float>::CreateNullValue()) == "NaN");
+    CHECK(NS::Featurizers::StringTransformer<float>(true).execute(NS::Traits<float>::CreateNullValue()) == "");
+
+    CHECK(NS::Featurizers::StringTransformer<nonstd::optional<int>>(false).execute(nonstd::optional<int>()) == "NULL");
+    CHECK(NS::Featurizers::StringTransformer<nonstd::optional<int>>(false).execute(10) == "10");
+    CHECK(NS::Featurizers::StringTransformer<nonstd::optional<int>>(true).execute(nonstd::optional<int>()) == "");
+    CHECK(NS::Featurizers::StringTransformer<nonstd::optional<int>>(true).execute(10) == "10");
+}
+
+TEST_CASE("Use empty strings - error") {
+    NS::Featurizers::StringTransformer<int>(false);
+    CHECK_THROWS_WITH(NS::Featurizers::StringTransformer<int>(true), Catch::Contains("empty strings cannot be used with types"));
+    NS::Featurizers::StringTransformer<nonstd::optional<int>>(true);
 }
 
 TEST_CASE("Serialization") {

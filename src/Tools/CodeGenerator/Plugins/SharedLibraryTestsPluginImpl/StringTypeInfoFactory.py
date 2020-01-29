@@ -68,9 +68,9 @@ class StringTypeInfoFactory(TypeInfoFactory):
             textwrap.dedent(
                 """\
                 #if (defined __apple_build_version__)
-                results.push_back(std::string({result}_ptr));
+                results.push_back({result}_ptr ? std::string({result}_ptr) : std::string());
                 #else
-                results.emplace_back(std::string({result}_ptr));
+                results.emplace_back({result}_ptr ? std::string({result}_ptr) : std::string());
                 #endif
                 """,
             ).format(

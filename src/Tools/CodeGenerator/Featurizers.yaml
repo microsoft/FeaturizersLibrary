@@ -1081,6 +1081,11 @@ featurizers:
       - input_type: T
         output_type: string
 
+    configuration_params:
+      - type: bool
+        name: useEmptyStringsForNullValues
+        is_optional: false
+
   # ----------------------------------------------------------------------
   - name: TfidfVectorizerFeaturizer
     estimator_name: TfidfVectorizerEstimator

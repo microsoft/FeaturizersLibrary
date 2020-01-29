@@ -28,7 +28,7 @@ extern "C" {
 /* |  StringFeaturizer <int8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_CreateEstimator(/*out*/ StringFeaturizer_int8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues, /*out*/ StringFeaturizer_int8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -36,7 +36,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_CreateEstimator(/*out*/ String
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , useEmptyStringsForNullValues);
 
         pEstimator->begin_training();
 
@@ -394,7 +394,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int8_DestroyTransformedData(/*in*/ 
 /* |  StringFeaturizer <int16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_CreateEstimator(/*out*/ StringFeaturizer_int16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues, /*out*/ StringFeaturizer_int16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -402,7 +402,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_CreateEstimator(/*out*/ Strin
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , useEmptyStringsForNullValues);
 
         pEstimator->begin_training();
 
@@ -760,7 +760,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int16_DestroyTransformedData(/*in*/
 /* |  StringFeaturizer <int32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_CreateEstimator(/*out*/ StringFeaturizer_int32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues, /*out*/ StringFeaturizer_int32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -768,7 +768,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_CreateEstimator(/*out*/ Strin
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , useEmptyStringsForNullValues);
 
         pEstimator->begin_training();
 
@@ -1126,7 +1126,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int32_DestroyTransformedData(/*in*/
 /* |  StringFeaturizer <int64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_CreateEstimator(/*out*/ StringFeaturizer_int64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues, /*out*/ StringFeaturizer_int64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1134,7 +1134,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_CreateEstimator(/*out*/ Strin
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::int64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , useEmptyStringsForNullValues);
 
         pEstimator->begin_training();
 
@@ -1492,7 +1492,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_int64_DestroyTransformedData(/*in*/
 /* |  StringFeaturizer <uint8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_CreateEstimator(/*out*/ StringFeaturizer_uint8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues, /*out*/ StringFeaturizer_uint8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1500,7 +1500,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_CreateEstimator(/*out*/ Strin
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint8_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , useEmptyStringsForNullValues);
 
         pEstimator->begin_training();
 
@@ -1858,7 +1858,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint8_DestroyTransformedData(/*in*/
 /* |  StringFeaturizer <uint16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_CreateEstimator(/*out*/ StringFeaturizer_uint16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues, /*out*/ StringFeaturizer_uint16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1866,7 +1866,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_CreateEstimator(/*out*/ Stri
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint16_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , useEmptyStringsForNullValues);
 
         pEstimator->begin_training();
 
@@ -2224,7 +2224,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint16_DestroyTransformedData(/*in*
 /* |  StringFeaturizer <uint32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_CreateEstimator(/*out*/ StringFeaturizer_uint32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues, /*out*/ StringFeaturizer_uint32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2232,7 +2232,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_CreateEstimator(/*out*/ Stri
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint32_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , useEmptyStringsForNullValues);
 
         pEstimator->begin_training();
 
@@ -2590,7 +2590,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint32_DestroyTransformedData(/*in*
 /* |  StringFeaturizer <uint64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_CreateEstimator(/*out*/ StringFeaturizer_uint64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues, /*out*/ StringFeaturizer_uint64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2598,7 +2598,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_CreateEstimator(/*out*/ Stri
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::uint64_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , useEmptyStringsForNullValues);
 
         pEstimator->begin_training();
 
@@ -2956,7 +2956,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_uint64_DestroyTransformedData(/*in*
 /* |  StringFeaturizer <float> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_float_CreateEstimator(/*out*/ StringFeaturizer_float_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_float_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues, /*out*/ StringFeaturizer_float_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2964,7 +2964,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_CreateEstimator(/*out*/ Strin
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , useEmptyStringsForNullValues);
 
         pEstimator->begin_training();
 
@@ -3322,7 +3322,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_float_DestroyTransformedData(/*in*/
 /* |  StringFeaturizer <double> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_double_CreateEstimator(/*out*/ StringFeaturizer_double_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_double_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues, /*out*/ StringFeaturizer_double_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3330,7 +3330,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_CreateEstimator(/*out*/ Stri
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , useEmptyStringsForNullValues);
 
         pEstimator->begin_training();
 
@@ -3688,7 +3688,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_double_DestroyTransformedData(/*in*
 /* |  StringFeaturizer <bool> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateEstimator(/*out*/ StringFeaturizer_bool_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues, /*out*/ StringFeaturizer_bool_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3696,7 +3696,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_CreateEstimator(/*out*/ String
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::StringEstimator<bool>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+        Microsoft::Featurizer::Featurizers::StringEstimator<bool>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<bool>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , useEmptyStringsForNullValues);
 
         pEstimator->begin_training();
 
@@ -4054,7 +4054,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_bool_DestroyTransformedData(/*in*/ 
 /* |  StringFeaturizer <string> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateEstimator(/*out*/ StringFeaturizer_string_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues, /*out*/ StringFeaturizer_string_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -4062,7 +4062,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_CreateEstimator(/*out*/ Stri
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::StringEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) );
+        Microsoft::Featurizer::Featurizers::StringEstimator<std::string>* pEstimator = new Microsoft::Featurizer::Featurizers::StringEstimator<std::string>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1) , useEmptyStringsForNullValues);
 
         pEstimator->begin_training();
 
