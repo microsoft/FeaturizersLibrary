@@ -15,7 +15,7 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../HashOneHotVectorizerFeaturizer.h
     ${_this_path}/../ImputationMarkerFeaturizer.h
     ${_this_path}/../L1NormalizeFeaturizer.h
-    ${_this_path}/../L2NormalizeFeaturizer.h    
+    ${_this_path}/../L2NormalizeFeaturizer.h
     ${_this_path}/../LabelEncoderFeaturizer.h
     ${_this_path}/../MaxAbsScalarFeaturizer.h
     ${_this_path}/../MaxNormalizeFeaturizer.h
@@ -35,6 +35,7 @@ add_library(FeaturizersCode STATIC
     ${_this_path}/../StringFeaturizer.h
     ${_this_path}/../Structs.h
     ${_this_path}/../TestHelpers.h
+    ${_this_path}/../TfidfVectorizerFeaturizer.h
     ${_this_path}/../TimeSeriesImputerFeaturizer.h
 
     ${_this_path}/../Components/Components.h
