@@ -185,7 +185,7 @@ private:
 
                 //calculate normVal
                 if(Norm == NormMethod::L1) {
-                    normVal += abs(tfidf);
+                    normVal += tfidf;
                 } else if (Norm == NormMethod::L2) {
                     normVal += tfidf * tfidf;
                 }
