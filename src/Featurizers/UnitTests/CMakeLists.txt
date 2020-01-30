@@ -30,6 +30,7 @@ enable_testing()
 
 foreach(_test_name IN ITEMS
     CatImputerFeaturizer_UnitTests
+    CountVectorizerFeaturizer_UnitTests
     DateTimeFeaturizer_UnitTests
     FromStringFeaturizer_UnitTest
     HashOneHotVectorizerFeaturizer_UnitTests
@@ -51,6 +52,7 @@ foreach(_test_name IN ITEMS
     StandardScaleWrapperFeaturizer_UnitTest
     StringFeaturizer_UnitTest
     Structs_UnitTest
+    TfidfVectorizerFeaturizer_UnitTests
     TimeSeriesImputerFeaturizer_UnitTest
     TruncatedSVDFeaturizer_UnitTests
 )
