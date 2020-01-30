@@ -8,6 +8,7 @@
 #include <iterator>
 #include <unordered_map>
 #include <queue>
+#include <regex>
 #include <set>
 
 #include "TrainingOnlyEstimatorImpl.h"
@@ -31,79 +32,8 @@ enum class AnalyzerMethod : unsigned char {
     Charwb = 3
 };
 
-void DocumentParseFuncGenerator(ParseFunctionType &parseFunc, AnalyzerMethod const &analyzer, std::string const & regexToken, std::uint32_t const & ngramRangeMin, std::uint32_t const & ngramRangeMax) {
-    if (analyzer == AnalyzerMethod::Word) {
-        if (!regexToken.empty()) {
-            parseFunc = [regexToken] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
-                Microsoft::Featurizer::Strings::ParseRegex<std::string::const_iterator, std::regex>(
-                    input,
-                    std::regex(regexToken),
-                    callback
-                );
-            };
-        } else if (ngramRangeMin == 1 && ngramRangeMax == 1) {
-            parseFunc = [] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
-                Microsoft::Featurizer::Strings::Parse<std::string::const_iterator, std::function<bool (char)>>(
-                    input,
-                    [] (char c) {return std::isspace(c);},
-                    callback
-                );
-            };
-        } else {
-            parseFunc = [ngramRangeMin, ngramRangeMax] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
-                Microsoft::Featurizer::Strings::ParseNgramWord<std::string::const_iterator, std::function<bool (char)>>(
-                    input,
-                    [] (char c) {return std::isspace(c);},
-                    ngramRangeMin,
-                    ngramRangeMax,
-                    callback
-                );
-            };
-        }
-    } else if (analyzer == AnalyzerMethod::Char) {
-        parseFunc = [ngramRangeMin, ngramRangeMax] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
-            Microsoft::Featurizer::Strings::ParseNgramChar<std::string::const_iterator>(
-                input,
-                ngramRangeMin,
-                ngramRangeMax,
-                callback
-            );
-        };
-    } else {
-        assert(analyzer == AnalyzerMethod::Charwb);
-        parseFunc = [ngramRangeMin, ngramRangeMax] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
-            Microsoft::Featurizer::Strings::ParseNgramCharwb<std::string::const_iterator, std::function<bool (char)>>(
-                input,
-                [] (char c) {return std::isspace(c);},
-                ngramRangeMin,
-                ngramRangeMax,
-                callback
-            );
-        };
-    }
-}
-
-std::string DocumentDecorator(std::string const& input, bool const& lower, AnalyzerMethod const& analyzer, std::string const& regex, std::uint32_t const& ngram_min, std::uint32_t const& ngram_max) {
-
-    std::string decoratedInput = lower ? Strings::ToLower(input) : input;
-    std::string processedInput;
-
-    if (analyzer == AnalyzerMethod::Word) {
-        if (regex.empty() && !(ngram_min == 1 && ngram_max == 1)) {
-            processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput);
-        } else {
-            processedInput = decoratedInput;
-        }
-    } else if (analyzer == AnalyzerMethod::Char) {
-        processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput);
-    } else {
-        assert(analyzer == AnalyzerMethod::Charwb);
-        auto predicate = [] (char c) {return std::isspace(c);};
-        std::string processedString(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput));
-        processedInput = Microsoft::Featurizer::Strings::Details::StringPadding<std::function<bool (char)>>(processedString, predicate);
-    }
-    return processedInput;
-}
+void DocumentParseFuncGenerator(ParseFunctionType &parseFunc, AnalyzerMethod const &analyzer, std::string const & regexToken, std::uint32_t const & ngramRangeMin, std::uint32_t const & ngramRangeMax);
+std::string DocumentDecorator(std::string const& input, bool const& lower, AnalyzerMethod const& analyzer, std::string const& regex, std::uint32_t const& ngram_min, std::uint32_t const& ngram_max);
 
 /////////////////////////////////////////////////////////////////////////
 ///  \struct        FrequencyAndIndex
@@ -303,13 +233,86 @@ public:
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
+inline void DocumentParseFuncGenerator(ParseFunctionType &parseFunc, AnalyzerMethod const &analyzer, std::string const & regexToken, std::uint32_t const & ngramRangeMin, std::uint32_t const & ngramRangeMax) {
+    if (analyzer == AnalyzerMethod::Word) {
+        if (!regexToken.empty()) {
+            parseFunc = [regexToken] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                Microsoft::Featurizer::Strings::ParseRegex<std::string::const_iterator, std::regex>(
+                    input,
+                    std::regex(regexToken),
+                    callback
+                );
+            };
+        } else if (ngramRangeMin == 1 && ngramRangeMax == 1) {
+            parseFunc = [] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                Microsoft::Featurizer::Strings::Parse<std::string::const_iterator, std::function<bool (char)>>(
+                    input,
+                    [] (char c) {return std::isspace(c);},
+                    callback
+                );
+            };
+        } else {
+            parseFunc = [ngramRangeMin, ngramRangeMax] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+                Microsoft::Featurizer::Strings::ParseNgramWord<std::string::const_iterator, std::function<bool (char)>>(
+                    input,
+                    [] (char c) {return std::isspace(c);},
+                    ngramRangeMin,
+                    ngramRangeMax,
+                    callback
+                );
+            };
+        }
+    } else if (analyzer == AnalyzerMethod::Char) {
+        parseFunc = [ngramRangeMin, ngramRangeMax] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+            Microsoft::Featurizer::Strings::ParseNgramChar<std::string::const_iterator>(
+                input,
+                ngramRangeMin,
+                ngramRangeMax,
+                callback
+            );
+        };
+    } else {
+        assert(analyzer == AnalyzerMethod::Charwb);
+        parseFunc = [ngramRangeMin, ngramRangeMax] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
+            Microsoft::Featurizer::Strings::ParseNgramCharwb<std::string::const_iterator, std::function<bool (char)>>(
+                input,
+                [] (char c) {return std::isspace(c);},
+                ngramRangeMin,
+                ngramRangeMax,
+                callback
+            );
+        };
+    }
+}
+
+inline std::string DocumentDecorator(std::string const& input, bool const& lower, AnalyzerMethod const& analyzer, std::string const& regex, std::uint32_t const& ngram_min, std::uint32_t const& ngram_max) {
+
+    std::string decoratedInput = lower ? Strings::ToLower(input) : input;
+    std::string processedInput;
+
+    if (analyzer == AnalyzerMethod::Word) {
+        if (regex.empty() && !(ngram_min == 1 && ngram_max == 1)) {
+            processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput);
+        } else {
+            processedInput = decoratedInput;
+        }
+    } else if (analyzer == AnalyzerMethod::Char) {
+        processedInput = Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput);
+    } else {
+        assert(analyzer == AnalyzerMethod::Charwb);
+        auto predicate = [] (char c) {return std::isspace(c);};
+        std::string processedString(Microsoft::Featurizer::Strings::Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(decoratedInput));
+        processedInput = Microsoft::Featurizer::Strings::Details::StringPadding<std::function<bool (char)>>(processedString, predicate);
+    }
+    return processedInput;
+}
 
 // ----------------------------------------------------------------------
 // |
 // |  FrequencyAndIndexStruct
 // |
 // ----------------------------------------------------------------------
-FrequencyAndIndex::FrequencyAndIndex(std::uint32_t termFrequency, std::uint32_t index) :
+inline FrequencyAndIndex::FrequencyAndIndex(std::uint32_t termFrequency, std::uint32_t index) :
     TermFrequency(
         std::move(
             [&termFrequency](void) -> std::uint32_t & {
@@ -323,7 +326,7 @@ FrequencyAndIndex::FrequencyAndIndex(std::uint32_t termFrequency, std::uint32_t 
     Index(std::move(index)) {
 }
 
-bool FrequencyAndIndex::operator==(FrequencyAndIndex const &other) const {
+inline bool FrequencyAndIndex::operator==(FrequencyAndIndex const &other) const {
     return (TermFrequency == other.TermFrequency) && (Index == other.Index);
 }
 

@@ -13,8 +13,10 @@ TEST_CASE("int8") {
         std::vector<std::int8_t>{
             static_cast<std::int8_t>(15)
         },
-        [](std::vector<HashOneHotEncoding> const &args) {
-            HashOneHotEncoding const & obj(args[0]);
+        [](std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &args) {
+            REQUIRE(args.size() == 1);
+
+            Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t> const & obj(args[0]);
             return (obj.Index == 29 && obj.NumElements == 100 && obj.Value == 1);
         },
         static_cast<std::uint32_t>(2),
@@ -28,13 +30,13 @@ TEST_CASE("string") {
         std::vector<std::string>{
             static_cast<std::string>("hello")
         },
-        [](std::vector<HashOneHotEncoding> const &args) {
-            HashOneHotEncoding const & obj(args[0]);
+        [](std::vector<Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>> const &args) {
+            REQUIRE(args.size() == 1);
+
+            Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t> const & obj(args[0]);
             return (obj.Index == 25 && obj.NumElements == 100 && obj.Value == 1);
         },
         static_cast<std::uint32_t>(2),
         static_cast<std::uint32_t>(100)
     );
 }
-
-

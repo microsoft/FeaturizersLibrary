@@ -94,7 +94,7 @@ def _FillList(item, status_stream, unsupported_types, global_custom_structs, glo
     try:
         return CSharpData(item, global_custom_structs, global_custom_enums)
     except Exception as e:
-        if "is not a supported type" in e.args[0]:
+        if "is not a supported type" in e.args[0] and hasattr(item, "custom_structs"):
             if item.custom_structs[0].name not in unsupported_types:
                 status_stream.write(
                     "{}\tUnsupported type '{}' found in class '{}'. The corrsponding methods will not be generated for this type.\n".format(
@@ -825,6 +825,21 @@ class CSharpData(object):
     # |
     # ----------------------------------------------------------------------
     def __init__(self, item, global_custom_structs, global_custom_enums):
+        # Create the custom enums
+        custom_enums = OrderedDict()
+
+        for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
+            if isinstance(custom_enum.underlying_type, six.string_types):
+                tif = self._GetTypeInfoClass(custom_enum.underlying_type)
+                assert tif, custom_enum.underlying_type
+
+                custom_enum.underlying_type = tif(
+                    member_type=custom_enum.underlying_type,
+                    create_type_info_factory_func=self._GetTypeInfoClass,
+                )
+
+            custom_enums[custom_enum.name] = custom_enum
+
         # Create the custom structs
         custom_structs = OrderedDict()
 
@@ -843,27 +858,26 @@ class CSharpData(object):
 
             custom_structs[custom_struct.name] = members
 
-        # Create the custom enums
-        custom_enums = OrderedDict()
-
-        for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
-            custom_enums[custom_enum.name] = custom_enum
-
         # Create the configuration param factories
         configuration_param_type_info_factories = []
 
         for configuration_param in getattr(item, "configuration_params", []):
-            tif = self._GetTypeInfoClass(configuration_param.type)
-            assert tif, configuration_param.type
+            if configuration_param.type in custom_enums:
+                tif = custom_enums[configuration_param.type].underlying_type
+                configuration_param.is_enum = True
 
-            configuration_param_type_info_factories.append(
-                tif(
+            else:
+                tif = self._GetTypeInfoClass(configuration_param.type)
+                assert tif, configuration_param.type
+
+                tif = tif(
                     custom_structs=custom_structs,
                     custom_enums=custom_enums,
                     member_type=configuration_param.type,
                     create_type_info_factory_func=self._GetTypeInfoClass,
-                ),
-            )
+                )
+
+            configuration_param_type_info_factories.append(tif)
 
         # Create the input factory
         tif = self._GetTypeInfoClass(item.input_type)
@@ -913,6 +927,8 @@ class CSharpData(object):
             from Plugins.MLNetPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
             from Plugins.MLNetPluginImpl.MatrixTypeInfoFactory import MatrixTypeInfoFactory
             from Plugins.MLNetPluginImpl import ScalarTypeInfoFactories
+            from Plugins.MLNetPluginImpl.SingleValueSparseVectorTypeInfoFactory import SingleValueSparseVectorTypeInfoFactory
+            from Plugins.MLNetPluginImpl.SparseVectorTypeInfoFactory import SparseVectorTypeInfoFactory
             from Plugins.MLNetPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.MLNetPluginImpl import StructTypeInfoFactories
             from Plugins.MLNetPluginImpl.VectorTypeInfoFactory import VectorTypeInfoFactory
@@ -920,6 +936,8 @@ class CSharpData(object):
             type_info_factory_classes = [
                 DatetimeTypeInfoFactory,
                 MatrixTypeInfoFactory,
+                SingleValueSparseVectorTypeInfoFactory,
+                SparseVectorTypeInfoFactory,
                 StringTypeInfoFactory,
                 VectorTypeInfoFactory,
             ]

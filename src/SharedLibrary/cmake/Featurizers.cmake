@@ -69,6 +69,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_Common.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_Common.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_Common.hpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_CountVectorizerFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_CountVectorizerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_FromStringFeaturizer.cpp
@@ -113,6 +115,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_TfidfVectorizerFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_TfidfVectorizerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_TruncatedSVDFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_TruncatedSVDFeaturizer.h
 

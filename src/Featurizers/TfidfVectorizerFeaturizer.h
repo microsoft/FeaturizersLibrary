@@ -56,6 +56,7 @@ public:
                                                    void (std::string const &,
                                                    std::function<void (StringIterator, StringIterator)> const &)
                                                >;
+    using TfidfPolicy                       = Microsoft::Featurizer::Featurizers::TfidfPolicy;
 
     // ----------------------------------------------------------------------
     // |
@@ -357,6 +358,7 @@ public:
     using StringDecorator               = Components::Details::DocumentStatisticsTrainingOnlyPolicy::StringDecorator;
     using AnalyzerMethod                = Components::AnalyzerMethod;
     using NormMethod                    = TfidfVectorizerTransformer::NormMethod;
+    using TfidfPolicy                   = TfidfVectorizerTransformer::TfidfPolicy;
 
     // ----------------------------------------------------------------------
     // |
@@ -374,9 +376,9 @@ public:
         std::float_t minDf = 0.0f,
         std::float_t maxDf = 1.0f,
         nonstd::optional<std::uint32_t> topKTerms = nonstd::optional<std::uint32_t>(),
-        nonstd::optional<IndexMap> vocabulary = nonstd::optional<IndexMap>(),
         std::uint32_t ngramRangeMin = 1,
-        std::uint32_t ngramRangeMax = 1
+        std::uint32_t ngramRangeMax = 1,
+        nonstd::optional<IndexMap> vocabulary = nonstd::optional<IndexMap>()
     );
     ~TfidfVectorizerEstimator(void) override = default;
 
@@ -552,9 +554,9 @@ TfidfVectorizerEstimator<MaxNumTrainingItemsV>::TfidfVectorizerEstimator(
     std::float_t minDf,
     std::float_t maxDf,
     nonstd::optional<std::uint32_t> topKTerms,
-    nonstd::optional<IndexMap> vocabulary,
     std::uint32_t ngramRangeMin,
-    std::uint32_t ngramRangeMax
+    std::uint32_t ngramRangeMax,
+    nonstd::optional<IndexMap> vocabulary
 ) :
     BaseType(
         "TfidfVectorizerEstimator",

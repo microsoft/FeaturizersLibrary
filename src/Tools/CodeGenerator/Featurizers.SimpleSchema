@@ -16,8 +16,10 @@
     [name string]
     [description Description]
     [starting_index int min=0 default="1" ?]
+    [underlying_type string default="uint32" ?]
 
     <values string +>
+    <integer_values int *>
 
 <featurizers +>:
     [name string]
@@ -39,6 +41,13 @@
         [name string]
         [description Description]
         <types string +>
+
+    # Set this value to true when the featurizer is a template but can be invoked
+    # without any template args.
+    #
+    # TODO: This is a hack that should go away once MaxNumTrainingItemsV is no longer
+    #       a template on trainable featurizers.
+    <featurizer_is_a_template bool default=false ?>
 
     [input_description Description]
     [output_description Description]

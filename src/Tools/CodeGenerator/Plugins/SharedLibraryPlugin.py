@@ -110,7 +110,7 @@ def _CreateInterfaceSubstitutionDict(item, c_data):
     if template is None:
         suffix = "_"
         type_desc = ""
-        cpp_template_suffix = ""
+        cpp_template_suffix = "" if not item.featurizer_is_a_template else "<>"
     else:
         templates = []
 
@@ -581,27 +581,30 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_
                 custom_enums.append(
                     textwrap.dedent(
                         """\
-                        enum {name}Value {{
+                        enum {item_name}_{enum_name}Value {{
                             {values}
                         }};
 
-                        typedef unsigned char {name}Type;
+                        typedef {type} {item_name}_{enum_name}Type;
                         """,
                     ).format(
-                        name=enum_name,
+                        item_name=item.name,
+                        enum_name=enum_name,
                         values=StringHelpers.LeftJustify(
-                            "\n".join(
+                            ",\n".join(
                                 [
-                                    "{}_{}{}".format(
+                                    "{}_{}_{}={}".format(
+                                        item.name,
                                         enum_name,
                                         this_enum_value,
-                                        "" if this_enum_index != 0 else "={}".format(enum_info.starting_index),
+                                        this_enum_integer,
                                     )
-                                    for this_enum_index, this_enum_value in enumerate(enum_info.values)
+                                    for this_enum_value, this_enum_integer in six.iteritems(enum_info.values)
                                 ]
                             ),
                             4,
                         ),
+                        type=enum_info.underlying_type.CType,
                     ),
                 )
 
@@ -782,10 +785,18 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                     item.configuration_params,
                     c_data.ConfigurationParamTypeInfoFactories,
                 ):
+                    if getattr(configuration_param, "is_enum", False):
+                        invocation_template = "static_cast<typename Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::{enum_name}>({{}})".format(
+                            enum_name=configuration_param.type,
+                            **d
+                        )
+                    else:
+                        invocation_template = "{}"
+
                     info = type_info.GetInputInfo(
                         configuration_param.name,
                         getattr(configuration_param, "is_optional", False),
-                        "{}",
+                        invocation_template,
                     )
 
                     construct_params += info.ParameterDecl
@@ -1225,6 +1236,21 @@ class CData(object):
     # |
     # ----------------------------------------------------------------------
     def __init__(self, item, global_custom_structs, global_custom_enums):
+        # Create the custom enums
+        custom_enums = OrderedDict()
+
+        for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
+            if isinstance(custom_enum.underlying_type, six.string_types):
+                tif = self._GetTypeInfoClass(custom_enum.underlying_type)
+                assert tif, custom_enum.underlying_type
+
+                custom_enum.underlying_type = tif(
+                    member_type=custom_enum.underlying_type,
+                    create_type_info_factory_func=self._GetTypeInfoClass,
+                )
+
+            custom_enums[custom_enum.name] = custom_enum
+
         # Create the custom structs
         custom_structs = OrderedDict()
 
@@ -1243,27 +1269,26 @@ class CData(object):
 
             custom_structs[custom_struct.name] = members
 
-        # Create the custom enums
-        custom_enums = OrderedDict()
-
-        for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
-            custom_enums[custom_enum.name] = custom_enum
-
         # Create the configuration param factories
         configuration_param_type_info_factories = []
 
         for configuration_param in getattr(item, "configuration_params", []):
-            tif = self._GetTypeInfoClass(configuration_param.type)
-            assert tif, configuration_param.type
+            if configuration_param.type in custom_enums:
+                tif = custom_enums[configuration_param.type].underlying_type
+                configuration_param.is_enum = True
 
-            configuration_param_type_info_factories.append(
-                tif(
+            else:
+                tif = self._GetTypeInfoClass(configuration_param.type)
+                assert tif, configuration_param.type
+
+                tif = tif(
                     custom_structs=custom_structs,
                     custom_enums=custom_enums,
                     member_type=configuration_param.type,
                     create_type_info_factory_func=self._GetTypeInfoClass,
-                ),
-            )
+                )
+
+            configuration_param_type_info_factories.append(tif)
 
         # Create the input factory
         tif = self._GetTypeInfoClass(item.input_type)
@@ -1316,7 +1341,8 @@ class CData(object):
             from Plugins.SharedLibraryPluginImpl.DatetimeTypeInfoFactory import DateTimeTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl.MatrixTypeInfoFactory import MatrixTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl import ScalarTypeInfoFactories
-            from Plugins.SharedLibraryPluginImpl.SparseVectorEncodingTypeInfoFactory import SparseVectorEncodingTypeInfoFactory
+            from Plugins.SharedLibraryPluginImpl.SingleValueSparseVectorTypeInfoFactory import SingleValueSparseVectorTypeInfoFactory
+            from Plugins.SharedLibraryPluginImpl.SparseVectorTypeInfoFactory import SparseVectorTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
             from Plugins.SharedLibraryPluginImpl import StructTypeInfoFactories
             from Plugins.SharedLibraryPluginImpl.VectorTypeInfoFactory import VectorTypeInfoFactory
@@ -1324,7 +1350,8 @@ class CData(object):
             type_info_factory_classes = [
                 DateTimeTypeInfoFactory,
                 MatrixTypeInfoFactory,
-                SparseVectorEncodingTypeInfoFactory,
+                SingleValueSparseVectorTypeInfoFactory,
+                SparseVectorTypeInfoFactory,
                 StringTypeInfoFactory,
                 VectorTypeInfoFactory,
             ]

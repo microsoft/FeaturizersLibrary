@@ -45,7 +45,7 @@ TEST_CASE("empty training data - without binary without decorator") {
     CHECK_THROWS_WITH(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, false, AnalyzerMethod::Word, "",
-                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, false),
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), 1, 1, false),
             trainingBatches,
             inferencingInput
         ), "termFrequencyAndIndex"
@@ -66,7 +66,7 @@ TEST_CASE("empty inferencing data - without binary without decorator") {
     CHECK_THROWS_WITH(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, false, AnalyzerMethod::Word, "",
-                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, false),
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), 1, 1, false),
             trainingBatches,
             inferencingInput
         ), "'values' is empty"
@@ -98,7 +98,7 @@ TEST_CASE("string - without binary, without decorator, analyze word, maxdf = 1, 
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, false, AnalyzerMethod::Word, "",
-                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, false),
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), 1, 1, false),
             trainingBatches,
             inferencingInput
         )== inferencingOutput
@@ -128,7 +128,7 @@ TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mind
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",
-                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, false),
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), 1, 1, false),
             trainingBatches,
             inferencingInput
         )== inferencingOutput
@@ -159,7 +159,7 @@ TEST_CASE("string - with binary without decorator, analyze word, maxdf = 1, mind
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, false, AnalyzerMethod::Word, "",
-                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, true),
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), 1, 1, true),
             trainingBatches,
             inferencingInput
         )== inferencingOutput
@@ -191,7 +191,7 @@ TEST_CASE("string - with binary with decorator, analyze word, maxdf = 1, mindf =
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",
-                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, true),
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), 1, 1, true),
             trainingBatches,
             inferencingInput
         )== inferencingOutput
@@ -221,7 +221,7 @@ TEST_CASE("string - with binary with decorator, analyze word, maxdf = 0.7, mindf
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",
-                                                                                                                              0.7f, 0.5f, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, true),
+                                                                                                                              0.7f, 0.5f, nonstd::optional<std::uint32_t>(), 1, 1, true),
             trainingBatches,
             inferencingInput
         )== inferencingOutput
@@ -258,7 +258,7 @@ TEST_CASE("string - without binary with decorator, analyze char, maxdf = 1, mind
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Char, "",
-                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, false),
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), 1, 1, false),
             trainingBatches,
             inferencingInput
         )== inferencingOutput
@@ -295,7 +295,7 @@ TEST_CASE("string - without binary with decorator, analyze charwb, maxdf = 1, mi
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Charwb, "",
-                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 1, 1, false),
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), 1, 1, false),
             trainingBatches,
             inferencingInput
         )== inferencingOutput
@@ -326,7 +326,7 @@ TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mind
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",
-                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(static_cast<std::uint32_t>(3)), nonstd::optional<IndexMapType>(), 1, 1, false),
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(static_cast<std::uint32_t>(3)), 1, 1, false),
             trainingBatches,
             inferencingInput
         )== inferencingOutput
@@ -354,7 +354,7 @@ TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mind
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             NS::Featurizers::CountVectorizerEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, true, AnalyzerMethod::Word, "",
-                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), nonstd::optional<IndexMapType>(), 2, 3, false),
+                                                                                                                              1.0, 0, nonstd::optional<std::uint32_t>(), 2, 3, false),
             trainingBatches,
             inferencingInput
         )== inferencingOutput

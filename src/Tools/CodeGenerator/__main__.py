@@ -101,6 +101,8 @@ SUPPORTED_TYPES                             = set(
         "datetime",
         re.compile(r"matrix\<\S+\>"),
         re.compile(r"vector\<\S+\>"),
+        re.compile(r"sparse_vector\<\S+\>"),
+        re.compile(r"single_value_sparse_vector\<\S+\>"),
     ],
 )
 
@@ -192,6 +194,27 @@ def EntryPoint(
             ),
             suffix=lambda: "\n" if nonlocals.skipped else None,
         ) as this_dm:
+            # ----------------------------------------------------------------------
+            def NormalizeEnum(enum):
+                # Simplify the provided enum structure be creating an ordered dictionary with names and values
+                if hasattr(enum, "integer_values"):
+                    if len(enum.integer_values) != len(enum.values):
+                        raise Exception("When integer values are specified for an enum, the number of integers must match the number of enums ('{}', '{}')".format(enum.values, enum.integer_values))
+
+                    integer_values = enum.integer_values
+                    del enum.integer_values
+                else:
+                    integer_values = list(range(enum.starting_index, enum.starting_index + len(enum.values)))
+
+                del enum.starting_index
+
+                assert len(enum.values) == len(integer_values), (enum.values, integer_values)
+                enum.values = OrderedDict([(k, v) for k, v in zip(enum.values, integer_values)])
+
+                return enum
+
+            # ----------------------------------------------------------------------
+
             # Get the global custom structs
             global_custom_struct_names = set()
             global_custom_structs = []
@@ -212,7 +235,7 @@ def EntryPoint(
                     raise Exception("The custom enum '{}' has already been defined".format(item.name))
 
                 global_custom_enum_names.add(item.name)
-                global_custom_enums.append(item)
+                global_custom_enums.append(NormalizeEnum(item))
 
             # If there are templates at play, preprocess the content and expand the values
             new_data = []
@@ -244,6 +267,9 @@ def EntryPoint(
                     nonlocals.skipped += 1
 
                     continue
+
+                for enum in getattr(item, "custom_enums", []):
+                    NormalizeEnum(enum)
 
                 if not hasattr(item, "templates"):
                     assert item.type_mappings
@@ -292,6 +318,8 @@ def EntryPoint(
                         for custom_enum in getattr(new_item, "custom_enums", []):
                             if any(gce for gce in global_custom_enums if gce.name == custom_enum.name):
                                 raise Exception("The custom enum '{}' in '{}' has already been defined as a global custom enum.\n".format(custom_enum.name, item.name))
+
+                            custom_enum.underlying_type = regex.sub(template_type, custom_enum.underlying_type)
 
                         for mapping in item.type_mappings:
                             # TODO: sub all types (for example: map<K, V>
