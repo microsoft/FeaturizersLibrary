@@ -196,7 +196,7 @@ private:
             }
         }
         //normVal will never be 0 as long as results is not empty
-        assert(normVal != 0.0f);
+        assert(normVal > 0.0f);
 
         // l2-norm calibration
         if (Norm == NormMethod::L2)
@@ -296,11 +296,9 @@ private:
         // ----------------------------------------------------------------------
         using DocumentStatisticsAnnotationData          = Components::DocumentStatisticsAnnotationData;
         using DocumentStatisticsEstimator               = Components::DocumentStatisticsEstimator<MaxNumTrainingItemsV>;
-
         // ----------------------------------------------------------------------
 
         DocumentStatisticsAnnotationData const &        data(DocumentStatisticsEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::DocumentStatisticsEstimatorName));
-
 
         typename DocumentStatisticsAnnotationData::FrequencyAndIndexMap const &
                                                         termFrequencyAndIndex(data.TermFrequencyAndIndex);
