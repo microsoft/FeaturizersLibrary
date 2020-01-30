@@ -25,7 +25,7 @@ Note that these commands should be invoked within the root of the repository.
 
 **Linux**
 
-1) Run `sudo bootstrap.sh ..`
+1) Run `sudo ./bootstrap.sh ..`
 
     This will need to happen once per machine or after a repository has moved to a different directory. Note that `sudo` is not necessary when running within a Docker container.
 
