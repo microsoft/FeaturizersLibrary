@@ -20,11 +20,11 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 # ----------------------------------------------------------------------
 
 _PLUGINS                                    = [
-    # BugBug ("MLNet", os.path.join(_script_dir, "..", "..", "GeneratedCode", "ML.NET")),
-    # BugBug (
-    # BugBug     "OnnxRuntime",
-    # BugBug     os.path.join(_script_dir, "..", "..", "GeneratedCode", "OnnxRuntime"),
-    # BugBug ),
+    ("MLNet", os.path.join(_script_dir, "..", "..", "GeneratedCode", "ML.NET")),
+    (
+        "OnnxRuntime",
+        os.path.join(_script_dir, "..", "..", "GeneratedCode", "OnnxRuntime"),
+    ),
     (
         "SharedLibrary",
         os.path.join(_script_dir, "..", "..", "SharedLibrary", "GeneratedCode"),

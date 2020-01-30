@@ -825,6 +825,21 @@ class CSharpData(object):
     # |
     # ----------------------------------------------------------------------
     def __init__(self, item, global_custom_structs, global_custom_enums):
+        # Create the custom enums
+        custom_enums = OrderedDict()
+
+        for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
+            if isinstance(custom_enum.underlying_type, six.string_types):
+                tif = self._GetTypeInfoClass(custom_enum.underlying_type)
+                assert tif, custom_enum.underlying_type
+
+                custom_enum.underlying_type = tif(
+                    member_type=custom_enum.underlying_type,
+                    create_type_info_factory_func=self._GetTypeInfoClass,
+                )
+
+            custom_enums[custom_enum.name] = custom_enum
+
         # Create the custom structs
         custom_structs = OrderedDict()
 
@@ -843,27 +858,26 @@ class CSharpData(object):
 
             custom_structs[custom_struct.name] = members
 
-        # Create the custom enums
-        custom_enums = OrderedDict()
-
-        for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
-            custom_enums[custom_enum.name] = custom_enum
-
         # Create the configuration param factories
         configuration_param_type_info_factories = []
 
         for configuration_param in getattr(item, "configuration_params", []):
-            tif = self._GetTypeInfoClass(configuration_param.type)
-            assert tif, configuration_param.type
+            if configuration_param.type in custom_enums:
+                tif = custom_enums[configuration_param.type].underlying_type
+                configuration_param.is_enum = True
 
-            configuration_param_type_info_factories.append(
-                tif(
+            else:
+                tif = self._GetTypeInfoClass(configuration_param.type)
+                assert tif, configuration_param.type
+
+                tif = tif(
                     custom_structs=custom_structs,
                     custom_enums=custom_enums,
                     member_type=configuration_param.type,
                     create_type_info_factory_func=self._GetTypeInfoClass,
-                ),
-            )
+                )
+
+            configuration_param_type_info_factories.append(tif)
 
         # Create the input factory
         tif = self._GetTypeInfoClass(item.input_type)
