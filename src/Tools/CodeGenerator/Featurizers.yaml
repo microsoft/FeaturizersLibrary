@@ -74,16 +74,24 @@ featurizers:
         The result is...
         [3, 1, 0, 2, 1]
 
+    featurizer_is_a_template: true
+
     type_mappings:
-      - input_type: std::string
-        output_type: sparse_vector<int>
+      - input_type: string
+        output_type: sparse_vector<uint32>
+
+    custom_enums:
+      - name: AnalyzerMethod
+        description: Used by Text-based parsers to determine the granularity of tokens extracted transformation.
+        values: [Word, Char, Charwb]
+        underlying_type: uint8
 
     configuration_params:
       - type: bool
-        name: lowercase
+        name: lower
         is_optional: false
 
-      - type: int
+      - type: AnalyzerMethod
         name: analyzer
         is_optional: false
 
@@ -91,17 +99,17 @@ featurizers:
         name: regexToken
         is_optional: false
 
-      - type: uint32
-        name: topKTerms
-        is_optional: true
+      - type: float
+        name: maxDf
+        is_optional: false
 
       - type: float
         name: minDf
         is_optional: false
 
-      - type: float
-        name: maxDf
-        is_optional: false
+      - type: uint32
+        name: topKTerms
+        is_optional: true
 
       - type: uint32
         name: ngramRangeMin
@@ -114,8 +122,6 @@ featurizers:
       - type: bool
         name: binary
         is_optional: false
-
-    status: Pending
 
   # ----------------------------------------------------------------------
   - name: DateTimeFeaturizer
@@ -1090,9 +1096,25 @@ featurizers:
         The default result will be...
         [0. , 0.469791f, ,0.580286f, 0.384085f, 0. , 0. , 0.384085f, 0. , 0.384085f]
 
+    featurizer_is_a_template: true
+
+    custom_enums:
+      - name: AnalyzerMethod
+        description: Used by Text-based parsers to determine the granularity of tokens extracted transformation.
+        values: [Word, Char, Charwb]
+        underlying_type: uint8
+
+      - name: NormMethod
+        values: [L1, L2]
+        underlying_type: uint8
+
+      - name: TfidfPolicy
+        values: [Binary, UseIdf, SmoothIdf, SublinearTf]
+        integer_values: [1, 2, 4, 8]
+        underlying_type: uint32
 
     type_mappings:
-      - input_type: std::string
+      - input_type: string
         output_type: sparse_vector<float>
 
     configuration_params:
@@ -1100,7 +1122,7 @@ featurizers:
         name: lowercase
         is_optional: false
 
-      - type: int
+      - type: AnalyzerMethod
         name: analyzer
         is_optional: false
 
@@ -1108,9 +1130,13 @@ featurizers:
         name: regexToken
         is_optional: false
 
-      - type: uint32
-        name: topKTerms
-        is_optional: true
+      - type: NormMethod
+        name: norm
+        is_optional: false
+
+      - type: TfidfPolicy
+        name: policy
+        is_optional: false
 
       - type: float
         name: minDf
@@ -1121,34 +1147,16 @@ featurizers:
         is_optional: false
 
       - type: uint32
+        name: topKTerms
+        is_optional: true
+
+      - type: uint32
         name: ngramRangeMin
         is_optional: false
 
       - type: uint32
         name: ngramRangeMax
         is_optional: false
-
-      - type: bool
-        name: binary
-        is_optional: false
-
-      - type: int
-        name: normPolicy
-        is_optional: false
-
-      - type: bool
-        name: useIdf
-        is_optional: false
-
-      - type: bool
-        name: smoothIdf
-        is_optional: false
-
-      - type: bool
-        name: sublinearTf
-        is_optional: false
-
-    status: Pending
 
   # ----------------------------------------------------------------------
   - name: TimeSeriesImputerFeaturizer
