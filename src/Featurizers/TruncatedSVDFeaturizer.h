@@ -71,6 +71,9 @@ public:
 
     void save(Archive &ar) const override;
 
+    std::ptrdiff_t getEigenVectorRowsNumber() const;
+    std::ptrdiff_t getEigenVectorColsNumber() const;
+
 private:
     // ----------------------------------------------------------------------
     // |
@@ -91,9 +94,9 @@ private:
 
         if (input.cols() != _singularvectors.rows())
             throw std::invalid_argument("Input matrix cols() invalid");
-        
+
         EigenMatrix result = input * _singularvectors;
-        
+
         callback(svd_flip(result));
     }
 };
@@ -360,6 +363,16 @@ void TruncatedSVDTransformer<InputEigenMatrixT, OutputEigenMatrixT>::save(Archiv
 
     // Data
     Traits<decltype(_singularvectors)>::serialize(ar, _singularvectors);
+}
+
+template <typename InputEigenMatrixT, typename OutputEigenMatrixT>
+std::ptrdiff_t TruncatedSVDTransformer<InputEigenMatrixT, OutputEigenMatrixT>::getEigenVectorRowsNumber() const {
+    return _singularvectors.rows();
+}
+
+template <typename InputEigenMatrixT, typename OutputEigenMatrixT>
+std::ptrdiff_t TruncatedSVDTransformer<InputEigenMatrixT, OutputEigenMatrixT>::getEigenVectorColsNumber() const {
+    return _singularvectors.cols();
 }
 
 // ----------------------------------------------------------------------

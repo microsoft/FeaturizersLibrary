@@ -544,3 +544,47 @@ TEST_CASE("Serialization Version Error RowMajor") {
         Catch::Contains("Unsupported archive version")
     );
 }
+
+TEST_CASE("access to shape information ColMajor") {
+    using MatrixT = Eigen::MatrixX<float>;
+    MatrixT singularVectors(6, 2);
+    singularVectors(0, 0) = -1;
+    singularVectors(0, 1) = -1;
+    singularVectors(1, 0) = -2;
+    singularVectors(1, 1) = -1;
+    singularVectors(2, 0) = -3;
+    singularVectors(2, 1) = -2;
+    singularVectors(3, 0) = 1;
+    singularVectors(3, 1) = 1;
+    singularVectors(4, 0) = 2;
+    singularVectors(4, 1) = 1;
+    singularVectors(5, 0) = 3;
+    singularVectors(5, 1) = 2;
+
+    Microsoft::Featurizer::Featurizers::TruncatedSVDTransformer<MatrixT>    svdTransformer(singularVectors);
+
+    CHECK(svdTransformer.getEigenVectorRowsNumber() == 6);
+    CHECK(svdTransformer.getEigenVectorColsNumber() == 2);
+}
+
+TEST_CASE("access to shape information RowMajor") {
+    using MatrixT = NS::RowMajMatrix<float>;
+    MatrixT singularVectors(6, 2);
+    singularVectors(0, 0) = -1;
+    singularVectors(0, 1) = -1;
+    singularVectors(1, 0) = -2;
+    singularVectors(1, 1) = -1;
+    singularVectors(2, 0) = -3;
+    singularVectors(2, 1) = -2;
+    singularVectors(3, 0) = 1;
+    singularVectors(3, 1) = 1;
+    singularVectors(4, 0) = 2;
+    singularVectors(4, 1) = 1;
+    singularVectors(5, 0) = 3;
+    singularVectors(5, 1) = 2;
+
+    Microsoft::Featurizer::Featurizers::TruncatedSVDTransformer<MatrixT>    svdTransformer(singularVectors);
+
+    CHECK(svdTransformer.getEigenVectorRowsNumber() == 6);
+    CHECK(svdTransformer.getEigenVectorColsNumber() == 2);
+}
