@@ -164,11 +164,11 @@ void TruncatedSVDTransformerTestMapColMaj(void) {
 template <typename T>
 void TruncatedSVDTransformerTestMapColMajConst(void) {
     // ----------------------------------------------------------------------
-    using Matrix = const Eigen::Map<NS::ColMajMatrix<T>>;
+    using Matrix = Eigen::Map<const NS::ColMajMatrix<T>>;
     // ----------------------------------------------------------------------
 
     // Column major order
-    T                                       data[]{
+    const T   data[] = {
         -1, 0, -3,
         -1, -2, 0,
         0, -1, -2
@@ -180,7 +180,7 @@ void TruncatedSVDTransformerTestMapColMajConst(void) {
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
 
-    T                                       labelData[]{
+    const T labelData[] = {
         -1.009107f, -0.965105f, -3.529165f,
         0.626315f, 1.995869f, -0.724887f,
         -0.767745f, 0.291682f, 0.139759f
@@ -232,11 +232,11 @@ void TruncatedSVDTransformerTestMapRowMaj(void) {
 template <typename T>
 void TruncatedSVDTransformerTestMapRowMajConst(void) {
     // ----------------------------------------------------------------------
-    using Matrix = const Eigen::Map<NS::RowMajMatrix<T>>;
+    using Matrix = Eigen::Map<const NS::RowMajMatrix<T>>;
     // ----------------------------------------------------------------------
 
     // Row major order
-    T                                       data[]{
+    const T  data[] = {
         -1, -1, 0,
         0, -2, -1,
         -3, 0, -2
@@ -246,7 +246,7 @@ void TruncatedSVDTransformerTestMapRowMajConst(void) {
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
-    T                                       labelData[]{
+    const T labelData[] = {
         -1.009107f, 0.626315f, -0.767745f,
         -0.965105f, 1.995869f, 0.291682f,
         -3.529165f, -0.724887f, 0.139759f

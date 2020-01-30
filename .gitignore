@@ -16,7 +16,7 @@ coverage.xml
 CmakeSettings.json
 
 **/.vscode/*
-**/build/*
+**/build*/*
 **/.vs/*
 **/out/*
 
