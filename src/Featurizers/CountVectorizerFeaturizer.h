@@ -247,8 +247,8 @@ public:
     CountVectorizerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool lower,
                                                                       AnalyzerMethod analyzer, std::string regex, std::float_t max_df,
                                                                       std::float_t min_df, nonstd::optional<std::uint32_t> top_k_terms,
-                                                                      nonstd::optional<IndexMapType> vocabulary,
-                                                                      std::uint32_t ngram_min, std::uint32_t ngram_max, bool binary);
+                                                                      std::uint32_t ngram_min, std::uint32_t ngram_max, bool binary,
+                                                                      nonstd::optional<IndexMapType> vocabulary=nonstd::optional<IndexMapType>());
     ~CountVectorizerEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(CountVectorizerEstimator);
@@ -369,8 +369,8 @@ template <size_t MaxNumTrainingItemsV>
 CountVectorizerEstimator<MaxNumTrainingItemsV>::CountVectorizerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, bool lower,
                                                                                            AnalyzerMethod analyzer, std::string regex, std::float_t max_df,
                                                                                            std::float_t min_df, nonstd::optional<std::uint32_t> top_k_terms,
-                                                                                           nonstd::optional<IndexMapType> vocabulary,
-                                                                                           std::uint32_t ngram_min, std::uint32_t ngram_max, bool binary) :
+                                                                                           std::uint32_t ngram_min, std::uint32_t ngram_max, bool binary,
+                                                                                           nonstd::optional<IndexMapType> vocabulary) :
     BaseType(
         "CountVectorizerEstimator",
         pAllColumnAnnotations,

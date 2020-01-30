@@ -733,7 +733,6 @@ TEST_CASE("string_punctuation_word_ngram") {
                                     0.0f,
                                     1.0f,
                                     nonstd::optional<std::uint32_t>(),
-                                    nonstd::optional<IndexMap>(),
                                     1,
                                     2
                                 ),
@@ -774,7 +773,6 @@ TEST_CASE("string_punctuation_char_ngram") {
                                     0.0f,
                                     1.0f,
                                     nonstd::optional<std::uint32_t>(),
-                                    nonstd::optional<IndexMap>(),
                                     5,
                                     5
                                 ),
@@ -814,7 +812,6 @@ TEST_CASE("string_punctuation_charwb_ngram") {
                                     0.0f,
                                     1.0f,
                                     nonstd::optional<std::uint32_t>(),
-                                    nonstd::optional<IndexMap>(),
                                     5,
                                     5
                                 ),
