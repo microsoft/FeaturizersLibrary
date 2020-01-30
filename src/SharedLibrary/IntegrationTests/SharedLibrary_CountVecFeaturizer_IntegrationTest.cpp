@@ -8,7 +8,7 @@
 #include "GeneratedCode/SharedLibraryTests_CountVectorizerFeaturizer.h"
 
 TEST_CASE("Standard") {
-    uint32_t ngram_max(3);
+    std::uint32_t topK(3);
     CountVectorizerFeaturizer_Test(
         std::vector<std::string>{"oraNge apple oranGE grape", "grApe caRrOt carrot apple", "peach Banana orange banana"},
         std::vector<std::string>{"banana grape grape apple apple apple orange"},
@@ -21,11 +21,11 @@ TEST_CASE("Standard") {
                                          && obj.Values[2].Value == 1 && obj.Values[2].Index == 2);
         },
         true,
-        CountVectorizerFeaturizer_AnalyzerMethod_Word,
+        static_cast<std::uint8_t>(CountVectorizerFeaturizer_AnalyzerMethod_Word),
         "",
         1.0f,
         0.0f,
-        &ngram_max,
+        &topK,
         static_cast<std::uint32_t>(1),
         static_cast<std::uint32_t>(1),
         false
