@@ -93,8 +93,7 @@ void TestGeneratingParseFunc(std::string input,
                              std::string const & regexToken,
                              std::uint32_t const & ngramRangeMin,
                              std::uint32_t const & ngramRangeMax) {
-    ParseFunctionType parseFunc;
-    NS::Featurizers::Components::DocumentParseFuncGenerator(parseFunc, analyzer, regexToken, ngramRangeMin, ngramRangeMax);
+    ParseFunctionType parseFunc(NS::Featurizers::Components::DocumentParseFuncGenerator(analyzer, regexToken, ngramRangeMin, ngramRangeMax));
 
     std::vector<std::string> output;
     parseFunc(

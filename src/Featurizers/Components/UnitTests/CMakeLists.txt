@@ -24,6 +24,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
+include(${_this_path}/../cmake/FeaturizersComponentsCode.cmake)
+
 enable_testing()
 
 SET(
@@ -83,6 +85,10 @@ foreach(_test_name IN ITEMS ${_test_names})
     target_link_directories(
         ${_test_name} PRIVATE
         ${_libs}
+    )
+
+    target_link_libraries(${_test_name} PRIVATE
+        FeaturizersComponentsCode
     )
 
     add_test(NAME ${_test_name} COMMAND ${_test_name} --success)
