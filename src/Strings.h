@@ -19,14 +19,14 @@ namespace Strings {
 ///  \brief         lowercase string
 ///                 only support ASCII, will do UTF-8 in later PR
 ///
-inline std::string ToLower(std::string input);
+inline std::string ToLower(std::string const & input);
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            ToUpper
 ///  \brief         uppercase string
 ///                 only support ASCII, will do UTF-8 in later PR
 ///
-inline std::string ToUpper(std::string input);
+inline std::string ToUpper(std::string const & input);
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            TrimLeft
@@ -34,7 +34,7 @@ inline std::string ToUpper(std::string input);
 ///                 in a string
 ///
 template <typename UnaryPredicateT>
-std::string TrimLeft(std::string input,
+std::string TrimLeft(std::string const & input,
                      UnaryPredicateT predicate);
 
 /////////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ std::string TrimLeft(std::string input,
 ///                 in a string
 ///
 template <typename UnaryPredicateT>
-std::string TrimRight(std::string input,
+std::string TrimRight(std::string const & input,
                       UnaryPredicateT predicate);
 
 /////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ std::string TrimRight(std::string input,
 ///                 by predicate in a string
 ///
 template <typename UnaryPredicateT>
-std::string Trim(std::string input,
+std::string Trim(std::string const & input,
                  UnaryPredicateT predicate);
 
 /////////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ void ParseNgramCharwb(std::string const &input,
 namespace Details {
 
 template <typename UnaryPredicateT>
-std::string StringPadding(std::string input, UnaryPredicateT predicate) {
+std::string StringPadding(std::string const & input, UnaryPredicateT predicate) {
 
     bool isFirstPredicate = predicate(input.at(0));
     bool isLastPredicate = predicate(input.at(input.length() - 1));
@@ -254,13 +254,14 @@ void ParseNgramCharHelper(IteratorT const &begin,
 }
 
 template <typename PredicateT>
-std::string ReplaceAndDeDuplicate(std::string input,
+std::string ReplaceAndDeDuplicate(std::string const & input,
                                   PredicateT predicate = [](char c) {if (std::ispunct(c)) return true; return false;}) {
+    std::string inputCopy(input);
     //replace all punctuations with spaces
     std::transform(
-        input.begin(),
-        input.end(),
-        input.begin(),
+        inputCopy.begin(),
+        inputCopy.end(),
+        inputCopy.begin(),
         [&predicate](char c) {
             if (predicate(c) )
                 return ' ';
@@ -270,55 +271,59 @@ std::string ReplaceAndDeDuplicate(std::string input,
 
     //remove duplicate space
     bool prevIsSpace = false;
-    input.erase(
+    inputCopy.erase(
         std::remove_if(
-            input.begin(),
-            input.end(),
+            inputCopy.begin(),
+            inputCopy.end(),
             [&prevIsSpace](char curr){
                 bool isDupSpace = std::isspace(curr) && prevIsSpace;
                 prevIsSpace = std::isspace(curr);
                 return isDupSpace;
             }
         ),
-        input.end()
+        inputCopy.end()
     );
 
-    return input;
+    return inputCopy;
 }
 
 } // namespace Details
 
-inline std::string ToLower(std::string input) {
+inline std::string ToLower(std::string const & input) {
     //static_cast<char> is to suppress MSVC compiler warning on implicitly conversion of int to char
-    std::transform(input.begin(), input.end(), input.begin(), [](char c) { return static_cast<char>(std::tolower(c)); });
-    return input;
+    std::string inputCopy(input);
+    std::transform(inputCopy.begin(), inputCopy.end(), inputCopy.begin(), [](char c) { return static_cast<char>(std::tolower(c)); });
+    return inputCopy;
 }
 
-inline std::string ToUpper(std::string input) {
+inline std::string ToUpper(std::string const & input) {
     //static_cast<char> is to suppress MSVC compiler warning on implicitly conversion of int to char
-    std::transform(input.begin(), input.end(), input.begin(), [](char c) { return static_cast<char>(std::toupper(c)); });
-    return input;
+    std::string inputCopy(input);
+    std::transform(inputCopy.begin(), inputCopy.end(), inputCopy.begin(), [](char c) { return static_cast<char>(std::toupper(c)); });
+    return inputCopy;
 }
 
 template <typename UnaryPredicateT>
-std::string TrimLeft(std::string input,
+std::string TrimLeft(std::string const & input,
                      UnaryPredicateT predicate) {
-    input.erase(input.begin(), std::find_if(input.begin(), input.end(), [&predicate](char c) {
+    std::string inputCopy(input);
+    inputCopy.erase(inputCopy.begin(), std::find_if(inputCopy.begin(), inputCopy.end(), [&predicate](char c) {
         return !predicate(c);
     }));
-    return input;
+    return inputCopy;
 }
 
 template <typename UnaryPredicateT>
-std::string TrimRight(std::string input,
+std::string TrimRight(std::string const & input,
                       UnaryPredicateT predicate) {
-    input.erase(std::find_if(input.rbegin(), input.rend(), [&predicate](char c) {
-        return !predicate(c);}).base(), input.end());
-    return input;
+    std::string inputCopy(input);
+    inputCopy.erase(std::find_if(inputCopy.rbegin(), inputCopy.rend(), [&predicate](char c) {
+        return !predicate(c);}).base(), inputCopy.end());
+    return inputCopy;
 }
 
 template <typename UnaryPredicateT>
-std::string Trim(std::string input,
+std::string Trim(std::string const & input,
                  UnaryPredicateT predicate) {
     return TrimRight(TrimLeft(input, predicate), predicate);
 }
@@ -354,8 +359,6 @@ void ParseNgramWord(std::string const &input,
                     size_t const ngramRangeMin,
                     size_t const ngramRangeMax,
                     std::function<void (IteratorT, IteratorT)> const &callback) {
-
-    //std::string trimedString(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
 
     //wordIterPairVector is used to store the begin and end iterator of words in input
     std::vector<std::pair<IteratorT, IteratorT>> wordIterPairVector;
