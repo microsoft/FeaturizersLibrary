@@ -479,8 +479,8 @@ featurizers:
         is_optional: false
 
   # ----------------------------------------------------------------------
-  - name: MaxAbsScalarFeaturizer
-    estimator_name: MaxAbsScalarEstimator
+  - name: MaxAbsScalerFeaturizer
+    estimator_name: MaxAbsScalerEstimator
     num_output_columns: 1
     is_output_a_template: true
     description: |-
@@ -695,8 +695,8 @@ featurizers:
           value will be used for imputation.
 
   # ----------------------------------------------------------------------
-  - name: MinMaxScalarFeaturizer
-    estimator_name: MinMaxScalarEstimator
+  - name: MinMaxScalerFeaturizer
+    estimator_name: MinMaxScalerEstimator
     num_output_columns: 1
     description: |-
       Scales input based on the scale that results from the minimum and maximum values encountered
@@ -922,12 +922,12 @@ featurizers:
         output_type: matrix<T>
 
   # ----------------------------------------------------------------------
-  - name: RobustScalarFeaturizer
-    estimator_name: RobustScalarEstimator
+  - name: RobustScalerFeaturizer
+    estimator_name: RobustScalerEstimator
     num_output_columns: 1
     is_output_a_template: true
     description: |-
-      MinMaxScalarEstimator + centering?
+      MinMaxScalerEstimator + centering?
 
       C++-style pseudo signature:
           TODO

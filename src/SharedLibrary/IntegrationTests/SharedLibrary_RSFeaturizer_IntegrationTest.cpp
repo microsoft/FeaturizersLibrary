@@ -5,8 +5,8 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "GeneratedCode/SharedLibraryTests_RobustScalarFeaturizer.h"
-#include "../SharedLibrary_RobustScalarFeaturizerCustom.h"
+#include "GeneratedCode/SharedLibraryTests_RobustScalerFeaturizer.h"
+#include "../SharedLibrary_RobustScalerFeaturizerCustom.h"
 #include "../../3rdParty/optional.h"
 
 template <typename T>
@@ -26,7 +26,7 @@ TEST_CASE("standard-int8-float_t") {
     std::float_t const                      qMin(25.0f);
     std::float_t const                      qMax(75.0f);
 
-    RobustScalarFeaturizer_int8_Test(
+    RobustScalerFeaturizer_int8_Test(
         std::vector<std::int8_t>{
             static_cast<std::int8_t>(1),
             static_cast<std::int8_t>(3),
@@ -54,7 +54,7 @@ TEST_CASE("standard-int32-double") {
     std::float_t const                      qMin(25.0f);
     std::float_t const                      qMax(75.0f);
 
-    RobustScalarFeaturizer_int32_Test(
+    RobustScalerFeaturizer_int32_Test(
         std::vector<std::int32_t>{
             static_cast<std::int32_t>(1),
             static_cast<std::int32_t>(3),
@@ -82,9 +82,9 @@ TEST_CASE("CreateEstimatorWithDefault-int8") {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    RobustScalarFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalerFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_int8_CreateEstimatorWithDefault(true, &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int8_CreateEstimatorWithDefault(true, &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 }
@@ -93,9 +93,9 @@ TEST_CASE("CreateEstimatorWithDefault-int32") {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    RobustScalarFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalerFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(RobustScalarFeaturizer_int32_CreateEstimatorWithDefault(true, &pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int32_CreateEstimatorWithDefault(true, &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 }

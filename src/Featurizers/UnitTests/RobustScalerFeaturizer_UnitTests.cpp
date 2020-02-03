@@ -7,7 +7,7 @@
 
 #include "../../3rdParty/optional.h"
 #include "../../Archive.h"
-#include "../../Featurizers/RobustScalarFeaturizer.h"
+#include "../../Featurizers/RobustScalerFeaturizer.h"
 #include "../TestHelpers.h"
 
 namespace NS = Microsoft::Featurizer;
@@ -41,7 +41,7 @@ void TestWrapper_Default_WithCentering(){
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(NS::CreateTestAnnotationMapsPtr(1), 0, true),
+                NS::Featurizers::RobustScalerEstimator<InputT, TransformedT>::CreateWithDefaultScaling(NS::CreateTestAnnotationMapsPtr(1), 0, true),
                 trainingBatches,
                 inferencingInput
             ),
@@ -79,7 +79,7 @@ void TestWrapper_Default_NoCentering(){
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(NS::CreateTestAnnotationMapsPtr(1), 0, false),
+                NS::Featurizers::RobustScalerEstimator<InputT, TransformedT>::CreateWithDefaultScaling(NS::CreateTestAnnotationMapsPtr(1), 0, false),
                 trainingBatches,
                 inferencingInput
             ),
@@ -111,7 +111,7 @@ void TestWrapper_Default_NoCentering_ZeroScale(){
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>::CreateWithDefaultScaling(NS::CreateTestAnnotationMapsPtr(1), 0, false),
+                NS::Featurizers::RobustScalerEstimator<InputT, TransformedT>::CreateWithDefaultScaling(NS::CreateTestAnnotationMapsPtr(1), 0, false),
                 trainingBatches,
                 inferencingInput
             ),
@@ -149,7 +149,7 @@ void TestWrapper_WithCentering_NoScaling(){
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0, true),
+                NS::Featurizers::RobustScalerEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0, true),
                 trainingBatches,
                 inferencingInput
             ),
@@ -187,7 +187,7 @@ void TestWrapper_WithCentering_CustomScaling(std::float_t q_min, std::float_t q_
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0, true, q_min, q_max),
+                NS::Featurizers::RobustScalerEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0, true, q_min, q_max),
                 trainingBatches,
                 inferencingInput
             ),
@@ -225,7 +225,7 @@ void TestWrapper_NoCentering_CustomScaling(std::float_t q_min, std::float_t q_ma
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                NS::Featurizers::RobustScalarEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0, false, q_min, q_max),
+                NS::Featurizers::RobustScalerEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0, false, q_min, q_max),
                 trainingBatches,
                 inferencingInput
             ),
@@ -250,25 +250,25 @@ void TestWrapper_Integration_Tests(){
 }
 
 //Integration test
-TEST_CASE("RobustScalarFeaturizer - input<int8_t> - output<float_t/double_t>") {
+TEST_CASE("RobustScalerFeaturizer - input<int8_t> - output<float_t/double_t>") {
     TestWrapper_Integration_Tests<std::int8_t, std::float_t>();
     TestWrapper_Integration_Tests<std::int8_t, std::double_t>();
 }
 
-TEST_CASE("RobustScalarFeaturizer - input<float_t> - output<float_t/double_t>") {
+TEST_CASE("RobustScalerFeaturizer - input<float_t> - output<float_t/double_t>") {
     TestWrapper_Integration_Tests<std::float_t, std::float_t>();
     TestWrapper_Integration_Tests<std::float_t, std::double_t>();
 }
 
 TEST_CASE("Serialization") {
-    NS::Featurizers::RobustScalarTransformer<std::int8_t, std::double_t>    original(1.0, 2.0);
+    NS::Featurizers::RobustScalerTransformer<std::int8_t, std::double_t>    original(1.0, 2.0);
     NS::Archive                                                             out;
 
     original.save(out);
 
     NS::Archive                             in(out.commit());
 
-    NS::Featurizers::RobustScalarTransformer<std::int8_t, std::double_t>    other(in);
+    NS::Featurizers::RobustScalerTransformer<std::int8_t, std::double_t>    other(in);
 
     CHECK(other == original);
 }
@@ -282,7 +282,7 @@ TEST_CASE("Serialization Version Error") {
     NS::Archive                             in(out.commit());
 
     CHECK_THROWS_WITH(
-        (NS::Featurizers::RobustScalarTransformer<std::int8_t, std::double_t>(in)),
+        (NS::Featurizers::RobustScalerTransformer<std::int8_t, std::double_t>(in)),
         Catch::Contains("Unsupported archive version")
     );
 }

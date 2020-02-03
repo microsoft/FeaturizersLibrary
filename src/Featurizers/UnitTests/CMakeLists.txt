@@ -36,18 +36,18 @@ foreach(_test_name IN ITEMS
     HashOneHotVectorizerFeaturizer_UnitTests
     ImputationMarkerFeaturizer_UnitTests
     LabelEncoderFeaturizer_UnitTests
-    MaxAbsScalarFeaturizer_UnitTests
+    MaxAbsScalerFeaturizer_UnitTests
     MeanImputerFeaturizer_UnitTest
     MedianImputerFeaturizer_UnitTest
     MinMaxImputerFeaturizer_UnitTest
-    MinMaxScalarFeaturizer_UnitTests
+    MinMaxScalerFeaturizer_UnitTests
     MissingDummiesFeaturizer_UnitTests
     NormalizeFeaturizer_UnitTests
     ModeImputerFeaturizer_UnitTest
     NumericalizeFeaturizer_UnitTests
     OneHotEncoderFeaturizer_UnitTests
     PCAFeaturizer_UnitTests
-    RobustScalarFeaturizer_UnitTests
+    RobustScalerFeaturizer_UnitTests
     SampleAddFeaturizer_UnitTest
     StandardScaleWrapperFeaturizer_UnitTest
     StringFeaturizer_UnitTest

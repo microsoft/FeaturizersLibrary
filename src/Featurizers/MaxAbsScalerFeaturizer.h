@@ -17,12 +17,12 @@ namespace Featurizers {
 
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MaxAbsScalarTransformer
+///  \class         MaxAbsScalerTransformer
 ///  \brief         This class retrieves a MaxAbsValueAnnotation and computes
 ///                 using the scale.
 ///
 template <typename InputT, typename TransformedT>
-class MaxAbsScalarTransformer : public StandardTransformer<InputT, TransformedT> {
+class MaxAbsScalerTransformer : public StandardTransformer<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -43,14 +43,14 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MaxAbsScalarTransformer(typename BaseType::TransformedType scale);
-    MaxAbsScalarTransformer(Archive & ar);
+    MaxAbsScalerTransformer(typename BaseType::TransformedType scale);
+    MaxAbsScalerTransformer(Archive & ar);
 
-    ~MaxAbsScalarTransformer(void) override = default;
+    ~MaxAbsScalerTransformer(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MaxAbsScalarTransformer);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MaxAbsScalerTransformer);
 
-    bool operator==(MaxAbsScalarTransformer const &other) const;
+    bool operator==(MaxAbsScalerTransformer const &other) const;
 
     void save(Archive & ar) const override;
 
@@ -66,7 +66,7 @@ private:
 namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MaxAbsScalarEstimatorImpl
+///  \class         MaxAbsScalerEstimatorImpl
 ///  \brief         retrieves a MaxAbsValueAnnotation and computes
 ///                 using the scale.
 ///
@@ -76,7 +76,7 @@ template <
     typename TransformedT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class MaxAbsScalarEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
+class MaxAbsScalerEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -84,17 +84,17 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = TransformerEstimator<InputT, TransformedT>;
-    using TransformerType                   = MaxAbsScalarTransformer<InputT, TransformedT>;
+    using TransformerType                   = MaxAbsScalerTransformer<InputT, TransformedT>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MaxAbsScalarEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
-    ~MaxAbsScalarEstimatorImpl(void) override = default;
+    MaxAbsScalerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~MaxAbsScalerEstimatorImpl(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MaxAbsScalarEstimatorImpl);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MaxAbsScalerEstimatorImpl);
 
 private:
     // ----------------------------------------------------------------------
@@ -123,7 +123,7 @@ private:
 
         MaxAbsValueAnnotationData const &     data(MaxAbsValueEstimator::get_annotation_data(BaseType::get_column_annotations(), _colIndex, Components::MaxAbsValueEstimatorName));
 
-        return typename BaseType::TransformerUniquePtr(new MaxAbsScalarTransformer<InputT, TransformedT>(data.Value));
+        return typename BaseType::TransformerUniquePtr(new MaxAbsScalerTransformer<InputT, TransformedT>(data.Value));
     }
 };
 
@@ -131,18 +131,18 @@ private:
 
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MaxAbsScalarEstimator
-///  \brief         This class 'chains' MaxAbsValueEstimator and MaxAbsScalarEstimator.
+///  \class         MaxAbsScalerEstimator
+///  \brief         This class 'chains' MaxAbsValueEstimator and MaxAbsScalerEstimator.
 ///
 template <
     typename InputT,
     typename TransformedT,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class MaxAbsScalarEstimator :
+class MaxAbsScalerEstimator :
     public Components::PipelineExecutionEstimatorImpl<
         Components::MaxAbsValueEstimator<InputT, TransformedT, MaxNumTrainingItemsV>,
-        Details::MaxAbsScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
+        Details::MaxAbsScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -152,7 +152,7 @@ public:
     // ----------------------------------------------------------------------
     using BaseType = Components::PipelineExecutionEstimatorImpl<
         Components::MaxAbsValueEstimator<InputT, TransformedT, MaxNumTrainingItemsV>,
-        Details::MaxAbsScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
+        Details::MaxAbsScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
     >;
 
     // ----------------------------------------------------------------------
@@ -160,10 +160,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MaxAbsScalarEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
-    ~MaxAbsScalarEstimator(void) override = default;
+    MaxAbsScalerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~MaxAbsScalerEstimator(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MaxAbsScalarEstimator);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MaxAbsScalerEstimator);
 };
 
 // ----------------------------------------------------------------------
@@ -183,13 +183,13 @@ public:
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
-MaxAbsScalarTransformer<InputT, TransformedT>::MaxAbsScalarTransformer(typename BaseType::TransformedType scale) :
+MaxAbsScalerTransformer<InputT, TransformedT>::MaxAbsScalerTransformer(typename BaseType::TransformedType scale) :
     Scale(std::move(scale)) {
 }
 
 template <typename InputT, typename TransformedT>
-MaxAbsScalarTransformer<InputT, TransformedT>::MaxAbsScalarTransformer(Archive &ar) :
-    MaxAbsScalarTransformer(
+MaxAbsScalerTransformer<InputT, TransformedT>::MaxAbsScalerTransformer(Archive &ar) :
+    MaxAbsScalerTransformer(
         [&ar](void) {
             // Version
             std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
@@ -199,13 +199,13 @@ MaxAbsScalarTransformer<InputT, TransformedT>::MaxAbsScalarTransformer(Archive &
                 throw std::runtime_error("Unsupported archive version");
 
             // Data
-            return MaxAbsScalarTransformer(Traits<decltype(Scale)>::deserialize(ar));
+            return MaxAbsScalerTransformer(Traits<decltype(Scale)>::deserialize(ar));
         }()
     ) {
 }
 
 template <typename InputT, typename TransformedT>
-bool MaxAbsScalarTransformer<InputT, TransformedT>::operator==(MaxAbsScalarTransformer const &other) const {
+bool MaxAbsScalerTransformer<InputT, TransformedT>::operator==(MaxAbsScalerTransformer const &other) const {
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wfloat-equal"
@@ -219,7 +219,7 @@ bool MaxAbsScalarTransformer<InputT, TransformedT>::operator==(MaxAbsScalarTrans
 }
 
 template <typename InputT, typename TransformedT>
-void MaxAbsScalarTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
+void MaxAbsScalerTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
     // Version
     Traits<std::uint16_t>::serialize(ar, 1); // Major
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
@@ -232,7 +232,7 @@ void MaxAbsScalarTransformer<InputT, TransformedT>::save(Archive &ar) const /*ov
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
-void MaxAbsScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
+void MaxAbsScalerTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
@@ -254,12 +254,12 @@ void MaxAbsScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseTy
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::MaxAbsScalarEstimatorImpl
+// |  Details::MaxAbsScalerEstimatorImpl
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-Details::MaxAbsScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::MaxAbsScalarEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
-    BaseType("MaxAbsScalarEstimatorImpl", std::move(pAllColumnAnnotations)),
+Details::MaxAbsScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::MaxAbsScalerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+    BaseType("MaxAbsScalerEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
             [this, &colIndex](void) -> size_t & {
@@ -276,32 +276,32 @@ Details::MaxAbsScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-bool Details::MaxAbsScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+bool Details::MaxAbsScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
     return false;
 }
 
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-FitResult Details::MaxAbsScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
+FitResult Details::MaxAbsScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
     throw std::runtime_error("This should not be called");
 }
 
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-void Details::MaxAbsScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+void Details::MaxAbsScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
 
 // ----------------------------------------------------------------------
 // |
-// |  MaxAbsScalarEstimator
+// |  MaxAbsScalerEstimator
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-MaxAbsScalarEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::MaxAbsScalarEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+MaxAbsScalerEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::MaxAbsScalerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
     BaseType(
-        "MaxAbsScalarEstimator",
+        "MaxAbsScalerEstimator",
         pAllColumnAnnotations,
         [pAllColumnAnnotations, colIndex](void) { return Components::MaxAbsValueEstimator<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
-        [pAllColumnAnnotations, colIndex](void) { return Details::MaxAbsScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
+        [pAllColumnAnnotations, colIndex](void) { return Details::MaxAbsScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
     ) {
 }
 

@@ -6,7 +6,7 @@
 #include "catch.hpp"
 
 #include "../../3rdParty/optional.h"
-#include "../../Featurizers/MaxAbsScalarFeaturizer.h"
+#include "../../Featurizers/MaxAbsScalerFeaturizer.h"
 #include "../TestHelpers.h"
 
 namespace NS = Microsoft::Featurizer;
@@ -40,10 +40,10 @@ void TestWrapper(){
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                NS::Featurizers::MaxAbsScalarEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0),
+                NS::Featurizers::MaxAbsScalerEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0),
                 trainingBatches,
                 inferencingInput
-            ), 
+            ),
             inferencingOutput
         )
     );
@@ -73,10 +73,10 @@ void TestWrapper_ZeroScale(){
     CHECK(
         NS::TestHelpers::FuzzyCheck(
             NS::TestHelpers::TransformerEstimatorTest(
-                NS::Featurizers::MaxAbsScalarEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0),
+                NS::Featurizers::MaxAbsScalerEstimator<InputT, TransformedT>(NS::CreateTestAnnotationMapsPtr(1), 0),
                 trainingBatches,
                 inferencingInput
-            ), 
+            ),
             inferencingOutput
         )
     );
@@ -91,25 +91,25 @@ void TestWrapper_Integration_Tests(){
 }
 
 //Integration test
-TEST_CASE("MaxAbsScalarFeaturizer - input<int8_t> - output<float_t/double_t>") {
+TEST_CASE("MaxAbsScalerFeaturizer - input<int8_t> - output<float_t/double_t>") {
     TestWrapper_Integration_Tests<std::int8_t, std::float_t>();
     TestWrapper_Integration_Tests<std::int8_t, std::double_t>();
 }
 
-TEST_CASE("MaxAbsScalarFeaturizer - input<float_t> - output<float_t/double_t>") {
+TEST_CASE("MaxAbsScalerFeaturizer - input<float_t> - output<float_t/double_t>") {
     TestWrapper_Integration_Tests<std::float_t, std::float_t>();
     TestWrapper_Integration_Tests<std::float_t, std::double_t>();
 }
 
 
 TEST_CASE("Serialization") {
-    NS::Featurizers::MaxAbsScalarTransformer<std::uint8_t, std::double_t>   original(1.0);
+    NS::Featurizers::MaxAbsScalerTransformer<std::uint8_t, std::double_t>   original(1.0);
     NS::Archive                                                             out;
 
     original.save(out);
 
     NS::Archive                                                             in(out.commit());
-    NS::Featurizers::MaxAbsScalarTransformer<std::uint8_t, std::double_t>   other(in);
+    NS::Featurizers::MaxAbsScalerTransformer<std::uint8_t, std::double_t>   other(in);
 
     CHECK(other == original);
 }
@@ -123,7 +123,7 @@ TEST_CASE("Serialization Version Error") {
     NS::Archive                             in(out.commit());
 
     CHECK_THROWS_WITH(
-        (NS::Featurizers::MaxAbsScalarTransformer<std::uint8_t, std::double_t>(in)),
+        (NS::Featurizers::MaxAbsScalerTransformer<std::uint8_t, std::double_t>(in)),
         Catch::Contains("Unsupported archive version")
     );
 }
