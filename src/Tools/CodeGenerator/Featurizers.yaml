@@ -67,9 +67,9 @@ featurizers:
         "banana grape grape apple apple apple orange"
 
         The result will be computed by...
-          categorize and compute each word's number of apperance in input data, we have "apple -> 3", "banana -> 1", "grape -> 2", "orange -> 1"
+          categorize and compute each word's number of appearance in input data, we have "apple -> 3", "banana -> 1", "grape -> 2", "orange -> 1"
           construct a dictionary and assign id for each unique word using training data, we have "apple -> 0", "banana -> 1", "grape -> 3", "orange -> 4"
-          generate TFStruct by combining <word's id, word's number of apperance>
+          generate TFStruct by combining <word's id, word's number of appearance>
 
         The result is...
         [3, 1, 0, 2, 1]

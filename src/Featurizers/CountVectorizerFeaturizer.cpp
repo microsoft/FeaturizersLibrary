@@ -111,10 +111,10 @@ void CountVectorizerTransformer::execute_impl(typename BaseType::InputType const
         processedInput,
         [&appearanceMap] (std::string::const_iterator iter_start, std::string::const_iterator iter_end) {
 
-            AppearanceMapType::iterator iter_apperance(appearanceMap.find(std::make_tuple(iter_start, iter_end)));
+            AppearanceMapType::iterator iter_appearance(appearanceMap.find(std::make_tuple(iter_start, iter_end)));
 
-            if (iter_apperance != appearanceMap.end()) {
-                ++iter_apperance->second;
+            if (iter_appearance != appearanceMap.end()) {
+                ++iter_appearance->second;
             } else {
                 appearanceMap.insert(std::make_pair(std::make_tuple(iter_start, iter_end), 1));
             }
