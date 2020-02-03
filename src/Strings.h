@@ -4,8 +4,11 @@
 // ----------------------------------------------------------------------
 #pragma once
 
+#include<algorithm>
+#include<functional>
 #include<regex>
 #include<string>
+#include<vector>
 
 namespace Microsoft {
 namespace Featurizer {
