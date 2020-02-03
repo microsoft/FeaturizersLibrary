@@ -219,8 +219,8 @@ inline void ParseRegex(IteratorT const &begin,
                        RegexT const &regexToken,
                        std::function<void (IteratorT, IteratorT)> const &callback) {
 
-    std::regex_iterator<IteratorT> iter(begin, end, regexToken);
-    std::regex_iterator<IteratorT> iterEnd;
+    std::sregex_iterator iter(begin, end, regexToken);
+    std::sregex_iterator iterEnd;
 
     while (iter != iterEnd) {
         IteratorT                           matchStart(begin);
