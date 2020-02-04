@@ -17,22 +17,6 @@ namespace NS = Microsoft::Featurizer;
 using IndexMapType   = std::unordered_map<std::string, std::uint32_t>;
 using AnalyzerMethod = NS::Featurizers::Components::AnalyzerMethod;
 
-
-TEST_CASE("empty index map") {
-    IndexMapType indexMap(
-        {
-            {"apple", 1},
-            {"banana", 2},
-            {"grape", 3},
-            {"orange", 4},
-            {"peach", 5}
-        }
-    );
-    CHECK_THROWS_WITH(NS::Featurizers::CountVectorizerTransformer(IndexMapType(), false, false, AnalyzerMethod::Word, "", 1, 1), "Index map is empty!");
-    CHECK_THROWS_WITH(NS::Featurizers::CountVectorizerTransformer(indexMap, false, false, AnalyzerMethod::Word, "", 0, 1), "ngramRangeMin");
-    CHECK_THROWS_WITH(NS::Featurizers::CountVectorizerTransformer(indexMap, false, false, AnalyzerMethod::Word, "", 1, 0), "ngramRangeMax");
-}
-
 TEST_CASE("empty training data - without binary without decorator") {
     using InputType       = std::string;
 
@@ -72,9 +56,10 @@ TEST_CASE("empty inferencing data - without binary without decorator") {
         ), "'values' is empty"
     );
 }
+
 TEST_CASE("string - without binary, without decorator, analyze word, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
     using InputType       = std::string;
-    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                             NS::TestHelpers::make_vector<InputType>("orange apple oranGE grape"),
@@ -106,7 +91,7 @@ TEST_CASE("string - without binary, without decorator, analyze word, maxdf = 1, 
 }
 TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
     using InputType       = std::string;
-    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                             NS::TestHelpers::make_vector<InputType>("oraNge apple oranGE grape"),
@@ -137,7 +122,7 @@ TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mind
 
 TEST_CASE("string - with binary without decorator, analyze word, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
     using InputType       = std::string;
-    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                             NS::TestHelpers::make_vector<InputType>("orange apple orange grape"),
@@ -169,7 +154,7 @@ TEST_CASE("string - with binary without decorator, analyze word, maxdf = 1, mind
 
 TEST_CASE("string - with binary with decorator, analyze word, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
     using InputType       = std::string;
-    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                             NS::TestHelpers::make_vector<InputType>("oraNge apple oranGE grape"),
@@ -200,7 +185,7 @@ TEST_CASE("string - with binary with decorator, analyze word, maxdf = 1, mindf =
 
 TEST_CASE("string - with binary with decorator, analyze word, maxdf = 0.7, mindf = 0.5, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
     using InputType       = std::string;
-    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                             NS::TestHelpers::make_vector<InputType>("oraNge apple oranGE grape"),
@@ -230,7 +215,7 @@ TEST_CASE("string - with binary with decorator, analyze word, maxdf = 0.7, mindf
 
 TEST_CASE("string - without binary with decorator, analyze char, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
     using InputType       = std::string;
-    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                             NS::TestHelpers::make_vector<InputType>("oraNge apple oranGE grape"),
@@ -267,7 +252,7 @@ TEST_CASE("string - without binary with decorator, analyze char, maxdf = 1, mind
 
 TEST_CASE("string - without binary with decorator, analyze charwb, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 1, ngram_max = 1") {
     using InputType       = std::string;
-    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                             NS::TestHelpers::make_vector<InputType>("oraNge apple oranGE grape"),
@@ -305,7 +290,7 @@ TEST_CASE("string - without binary with decorator, analyze charwb, maxdf = 1, mi
 
 TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mindf = 0, topk = 3, empty vocabulary, ngram_min = 1, ngram_max = 1") {
     using InputType       = std::string;
-    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                             NS::TestHelpers::make_vector<InputType>("oraNge apple oranGE grape"),
@@ -335,7 +320,7 @@ TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mind
 
 TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mindf = 0, topk = null, empty vocabulary, ngram_min = 2, ngram_max = 3") {
     using InputType       = std::string;
-    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::uint32_t>;
+    using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
 
     auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<InputType>>(
                             NS::TestHelpers::make_vector<InputType>("oraNge apple oranGE grape"),
@@ -360,40 +345,5 @@ TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mind
         )== inferencingOutput
     );
 }
-TEST_CASE("Serialization/Deserialization") {
-    using TransformerType = NS::Featurizers::CountVectorizerTransformer;
 
-    IndexMapType indexMap(
-        {
-            {"apple", 1},
-            {"banana", 2},
-            {"grape", 3},
-            {"orange", 4},
-            {"peach", 5}
-        }
-    );
 
-    TransformerType                         original(indexMap, false, false, AnalyzerMethod::Word, "", 1, 1);
-    NS::Archive                             out;
-
-    original.save(out);
-
-    NS::Archive                             in(out.commit());
-    TransformerType                         other(in);
-
-    CHECK(other == original);
-}
-
-TEST_CASE("Serialization Version Error") {
-    NS::Archive                             out;
-
-    out.serialize(static_cast<std::uint16_t>(2));
-    out.serialize(static_cast<std::uint16_t>(0));
-
-    NS::Archive                             in(out.commit());
-
-    CHECK_THROWS_WITH(
-        NS::Featurizers::CountVectorizerTransformer(in),
-        Catch::Contains("Unsupported archive version")
-    );
-}

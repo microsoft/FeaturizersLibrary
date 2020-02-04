@@ -14,7 +14,6 @@ function(Impl)
 
         ${_this_path}/../CatImputerFeaturizer.h
         ${_this_path}/../CountVectorizerFeaturizer.h
-        ${_this_path}/../CountVectorizerFeaturizer.cpp
         ${_this_path}/../DateTimeFeaturizer.h
         ${_this_path}/../DateTimeFeaturizer.cpp
         ${_this_path}/../FromStringFeaturizer.h
