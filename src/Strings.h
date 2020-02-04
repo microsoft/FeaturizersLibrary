@@ -4,6 +4,12 @@
 // ----------------------------------------------------------------------
 #pragma once
 
+#include<algorithm>
+#include<functional>
+#include<regex>
+#include<string>
+#include<vector>
+
 namespace Microsoft {
 namespace Featurizer {
 namespace Strings {
@@ -144,7 +150,7 @@ void ParseNgramCharwb(std::string const &input,
 namespace Details {
 
 template <typename UnaryPredicateT>
-std::string StringPadding(std::string input, UnaryPredicateT predicate) {
+std::string StringPadding(std::string const & input, UnaryPredicateT predicate) {
 
     bool isFirstPredicate = predicate(input.at(0));
     bool isLastPredicate = predicate(input.at(input.length() - 1));
@@ -348,8 +354,6 @@ void ParseNgramWord(std::string const &input,
                     size_t const ngramRangeMin,
                     size_t const ngramRangeMax,
                     std::function<void (IteratorT, IteratorT)> const &callback) {
-
-    //std::string trimedString(Details::ReplaceAndDeDuplicate<std::function<bool (char)>>(input));
 
     //wordIterPairVector is used to store the begin and end iterator of words in input
     std::vector<std::pair<IteratorT, IteratorT>> wordIterPairVector;
