@@ -19,14 +19,14 @@ namespace Strings {
 ///  \brief         lowercase string
 ///                 only support ASCII, will do UTF-8 in later PR
 ///
-inline std::string ToLower(std::string const & input);
+inline std::string ToLower(std::string input);
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            ToUpper
 ///  \brief         uppercase string
 ///                 only support ASCII, will do UTF-8 in later PR
 ///
-inline std::string ToUpper(std::string const & input);
+inline std::string ToUpper(std::string input);
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            TrimLeft
@@ -34,7 +34,7 @@ inline std::string ToUpper(std::string const & input);
 ///                 in a string
 ///
 template <typename UnaryPredicateT>
-std::string TrimLeft(std::string const & input,
+std::string TrimLeft(std::string input,
                      UnaryPredicateT predicate);
 
 /////////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ std::string TrimLeft(std::string const & input,
 ///                 in a string
 ///
 template <typename UnaryPredicateT>
-std::string TrimRight(std::string const & input,
+std::string TrimRight(std::string input,
                       UnaryPredicateT predicate);
 
 /////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ std::string TrimRight(std::string const & input,
 ///                 by predicate in a string
 ///
 template <typename UnaryPredicateT>
-std::string Trim(std::string const & input,
+std::string Trim(std::string input,
                  UnaryPredicateT predicate);
 
 /////////////////////////////////////////////////////////////////////////
@@ -254,14 +254,13 @@ void ParseNgramCharHelper(IteratorT const &begin,
 }
 
 template <typename PredicateT>
-std::string ReplaceAndDeDuplicate(std::string const & input,
+std::string ReplaceAndDeDuplicate(std::string input,
                                   PredicateT predicate = [](char c) {if (std::ispunct(c)) return true; return false;}) {
-    std::string inputCopy(input);
     //replace all punctuations with spaces
     std::transform(
-        inputCopy.begin(),
-        inputCopy.end(),
-        inputCopy.begin(),
+        input.begin(),
+        input.end(),
+        input.begin(),
         [&predicate](char c) {
             if (predicate(c) )
                 return ' ';
@@ -271,59 +270,55 @@ std::string ReplaceAndDeDuplicate(std::string const & input,
 
     //remove duplicate space
     bool prevIsSpace = false;
-    inputCopy.erase(
+    input.erase(
         std::remove_if(
-            inputCopy.begin(),
-            inputCopy.end(),
+            input.begin(),
+            input.end(),
             [&prevIsSpace](char curr){
                 bool isDupSpace = std::isspace(curr) && prevIsSpace;
                 prevIsSpace = std::isspace(curr);
                 return isDupSpace;
             }
         ),
-        inputCopy.end()
+        input.end()
     );
 
-    return inputCopy;
+    return input;
 }
 
 } // namespace Details
 
-inline std::string ToLower(std::string const & input) {
+inline std::string ToLower(std::string input) {
     //static_cast<char> is to suppress MSVC compiler warning on implicitly conversion of int to char
-    std::string inputCopy(input);
-    std::transform(inputCopy.begin(), inputCopy.end(), inputCopy.begin(), [](char c) { return static_cast<char>(std::tolower(c)); });
-    return inputCopy;
+    std::transform(input.begin(), input.end(), input.begin(), [](char c) { return static_cast<char>(std::tolower(c)); });
+    return input;
 }
 
-inline std::string ToUpper(std::string const & input) {
+inline std::string ToUpper(std::string input) {
     //static_cast<char> is to suppress MSVC compiler warning on implicitly conversion of int to char
-    std::string inputCopy(input);
-    std::transform(inputCopy.begin(), inputCopy.end(), inputCopy.begin(), [](char c) { return static_cast<char>(std::toupper(c)); });
-    return inputCopy;
+    std::transform(input.begin(), input.end(), input.begin(), [](char c) { return static_cast<char>(std::toupper(c)); });
+    return input;
 }
 
 template <typename UnaryPredicateT>
-std::string TrimLeft(std::string const & input,
+std::string TrimLeft(std::string input,
                      UnaryPredicateT predicate) {
-    std::string inputCopy(input);
-    inputCopy.erase(inputCopy.begin(), std::find_if(inputCopy.begin(), inputCopy.end(), [&predicate](char c) {
+    input.erase(input.begin(), std::find_if(input.begin(), input.end(), [&predicate](char c) {
         return !predicate(c);
     }));
-    return inputCopy;
+    return input;
 }
 
 template <typename UnaryPredicateT>
-std::string TrimRight(std::string const & input,
+std::string TrimRight(std::string input,
                       UnaryPredicateT predicate) {
-    std::string inputCopy(input);
-    inputCopy.erase(std::find_if(inputCopy.rbegin(), inputCopy.rend(), [&predicate](char c) {
-        return !predicate(c);}).base(), inputCopy.end());
-    return inputCopy;
+    input.erase(std::find_if(input.rbegin(), input.rend(), [&predicate](char c) {
+        return !predicate(c);}).base(), input.end());
+    return input;
 }
 
 template <typename UnaryPredicateT>
-std::string Trim(std::string const & input,
+std::string Trim(std::string input,
                  UnaryPredicateT predicate) {
     return TrimRight(TrimLeft(input, predicate), predicate);
 }
