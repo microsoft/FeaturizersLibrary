@@ -5,7 +5,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "GeneratedCode/SharedLibraryTests_MaxAbsScalarFeaturizer.h"
+#include "GeneratedCode/SharedLibraryTests_MaxAbsScalerFeaturizer.h"
 #include "../../3rdParty/optional.h"
 
 template <typename T>
@@ -22,7 +22,7 @@ bool FuzzyCheck(std::vector<T> const & vec1, std::vector<T> const & vec2, std::d
 }
 
 TEST_CASE("standard-int8_t-float_t") {
-    MaxAbsScalarFeaturizer_int8_Test(
+    MaxAbsScalerFeaturizer_int8_Test(
         std::vector<std::int8_t>{
             static_cast<std::int8_t>(1),
             static_cast<std::int8_t>(3),
@@ -46,5 +46,3 @@ TEST_CASE("standard-int8_t-float_t") {
         }
     );
 }
-
-

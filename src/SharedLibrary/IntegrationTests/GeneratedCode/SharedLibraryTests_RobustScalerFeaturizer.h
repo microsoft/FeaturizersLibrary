@@ -4,7 +4,7 @@
 /* ---------------------------------------------------------------------- */
 #pragma once
 
-#include "SharedLibrary_MaxAbsScalarFeaturizer.h"
+#include "SharedLibrary_RobustScalerFeaturizer.h"
 
 #include "Traits.h"
 #include "Featurizers/Structs.h"
@@ -12,19 +12,20 @@
 #include "SharedLibrary_Common.hpp"
 
 /* ---------------------------------------------------------------------- */
-/* |  MaxAbsScalarFeaturizer <int8> */
-template <typename VectorInputT>
-void MaxAbsScalarFeaturizer_int8_Test(
+/* |  RobustScalerFeaturizer <int8> */
+template <typename VectorInputT, typename... ConstructorArgTs>
+void RobustScalerFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::float_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MaxAbsScalarFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalerFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_int8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int8_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -35,7 +36,7 @@ void MaxAbsScalarFeaturizer_int8_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MaxAbsScalarFeaturizer_int8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_int8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -44,7 +45,7 @@ void MaxAbsScalarFeaturizer_int8_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MaxAbsScalarFeaturizer_int8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_int8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -54,7 +55,7 @@ void MaxAbsScalarFeaturizer_int8_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MaxAbsScalarFeaturizer_int8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalerFeaturizer_int8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -62,7 +63,7 @@ void MaxAbsScalarFeaturizer_int8_Test(
         }
     }
 
-    MaxAbsScalarFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalerFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -70,20 +71,20 @@ void MaxAbsScalarFeaturizer_int8_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MaxAbsScalarFeaturizer_int8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_int8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MaxAbsScalarFeaturizer_int8_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalerFeaturizer_int8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_int8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MaxAbsScalarFeaturizer_int8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -94,7 +95,7 @@ void MaxAbsScalarFeaturizer_int8_Test(
     for(auto const & input : inference_input) {
         std::float_t result;
 
-        REQUIRE(MaxAbsScalarFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -110,24 +111,25 @@ void MaxAbsScalarFeaturizer_int8_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MaxAbsScalarFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MaxAbsScalarFeaturizer <int16> */
-template <typename VectorInputT>
-void MaxAbsScalarFeaturizer_int16_Test(
+/* |  RobustScalerFeaturizer <int16> */
+template <typename VectorInputT, typename... ConstructorArgTs>
+void RobustScalerFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::float_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MaxAbsScalarFeaturizer_int16_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalerFeaturizer_int16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_int16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int16_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -138,7 +140,7 @@ void MaxAbsScalarFeaturizer_int16_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MaxAbsScalarFeaturizer_int16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_int16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -147,7 +149,7 @@ void MaxAbsScalarFeaturizer_int16_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MaxAbsScalarFeaturizer_int16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_int16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -157,7 +159,7 @@ void MaxAbsScalarFeaturizer_int16_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MaxAbsScalarFeaturizer_int16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalerFeaturizer_int16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -165,7 +167,7 @@ void MaxAbsScalarFeaturizer_int16_Test(
         }
     }
 
-    MaxAbsScalarFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalerFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -173,20 +175,20 @@ void MaxAbsScalarFeaturizer_int16_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MaxAbsScalarFeaturizer_int16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_int16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MaxAbsScalarFeaturizer_int16_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalerFeaturizer_int16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_int16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MaxAbsScalarFeaturizer_int16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -197,7 +199,7 @@ void MaxAbsScalarFeaturizer_int16_Test(
     for(auto const & input : inference_input) {
         std::float_t result;
 
-        REQUIRE(MaxAbsScalarFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -213,24 +215,25 @@ void MaxAbsScalarFeaturizer_int16_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MaxAbsScalarFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MaxAbsScalarFeaturizer <uint8> */
-template <typename VectorInputT>
-void MaxAbsScalarFeaturizer_uint8_Test(
+/* |  RobustScalerFeaturizer <uint8> */
+template <typename VectorInputT, typename... ConstructorArgTs>
+void RobustScalerFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::float_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MaxAbsScalarFeaturizer_uint8_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalerFeaturizer_uint8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_uint8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint8_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -241,7 +244,7 @@ void MaxAbsScalarFeaturizer_uint8_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MaxAbsScalarFeaturizer_uint8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_uint8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -250,7 +253,7 @@ void MaxAbsScalarFeaturizer_uint8_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MaxAbsScalarFeaturizer_uint8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_uint8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -260,7 +263,7 @@ void MaxAbsScalarFeaturizer_uint8_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MaxAbsScalarFeaturizer_uint8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalerFeaturizer_uint8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -268,7 +271,7 @@ void MaxAbsScalarFeaturizer_uint8_Test(
         }
     }
 
-    MaxAbsScalarFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalerFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -276,20 +279,20 @@ void MaxAbsScalarFeaturizer_uint8_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MaxAbsScalarFeaturizer_uint8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_uint8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MaxAbsScalarFeaturizer_uint8_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalerFeaturizer_uint8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_uint8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MaxAbsScalarFeaturizer_uint8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -300,7 +303,7 @@ void MaxAbsScalarFeaturizer_uint8_Test(
     for(auto const & input : inference_input) {
         std::float_t result;
 
-        REQUIRE(MaxAbsScalarFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -316,24 +319,25 @@ void MaxAbsScalarFeaturizer_uint8_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MaxAbsScalarFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MaxAbsScalarFeaturizer <uint16> */
-template <typename VectorInputT>
-void MaxAbsScalarFeaturizer_uint16_Test(
+/* |  RobustScalerFeaturizer <uint16> */
+template <typename VectorInputT, typename... ConstructorArgTs>
+void RobustScalerFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::float_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MaxAbsScalarFeaturizer_uint16_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalerFeaturizer_uint16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_uint16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint16_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -344,7 +348,7 @@ void MaxAbsScalarFeaturizer_uint16_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MaxAbsScalarFeaturizer_uint16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_uint16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -353,7 +357,7 @@ void MaxAbsScalarFeaturizer_uint16_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MaxAbsScalarFeaturizer_uint16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_uint16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -363,7 +367,7 @@ void MaxAbsScalarFeaturizer_uint16_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MaxAbsScalarFeaturizer_uint16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalerFeaturizer_uint16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -371,7 +375,7 @@ void MaxAbsScalarFeaturizer_uint16_Test(
         }
     }
 
-    MaxAbsScalarFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalerFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -379,20 +383,20 @@ void MaxAbsScalarFeaturizer_uint16_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MaxAbsScalarFeaturizer_uint16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_uint16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MaxAbsScalarFeaturizer_uint16_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalerFeaturizer_uint16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_uint16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MaxAbsScalarFeaturizer_uint16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -403,7 +407,7 @@ void MaxAbsScalarFeaturizer_uint16_Test(
     for(auto const & input : inference_input) {
         std::float_t result;
 
-        REQUIRE(MaxAbsScalarFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -419,24 +423,25 @@ void MaxAbsScalarFeaturizer_uint16_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MaxAbsScalarFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MaxAbsScalarFeaturizer <float> */
-template <typename VectorInputT>
-void MaxAbsScalarFeaturizer_float_Test(
+/* |  RobustScalerFeaturizer <float> */
+template <typename VectorInputT, typename... ConstructorArgTs>
+void RobustScalerFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::float_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MaxAbsScalarFeaturizer_float_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalerFeaturizer_float_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_float_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_float_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -447,7 +452,7 @@ void MaxAbsScalarFeaturizer_float_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MaxAbsScalarFeaturizer_float_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_float_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -456,7 +461,7 @@ void MaxAbsScalarFeaturizer_float_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MaxAbsScalarFeaturizer_float_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_float_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -466,7 +471,7 @@ void MaxAbsScalarFeaturizer_float_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MaxAbsScalarFeaturizer_float_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalerFeaturizer_float_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -474,7 +479,7 @@ void MaxAbsScalarFeaturizer_float_Test(
         }
     }
 
-    MaxAbsScalarFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalerFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -482,20 +487,20 @@ void MaxAbsScalarFeaturizer_float_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MaxAbsScalarFeaturizer_float_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_float_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MaxAbsScalarFeaturizer_float_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalerFeaturizer_float_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_float_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_float_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MaxAbsScalarFeaturizer_float_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_float_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -506,7 +511,7 @@ void MaxAbsScalarFeaturizer_float_Test(
     for(auto const & input : inference_input) {
         std::float_t result;
 
-        REQUIRE(MaxAbsScalarFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -522,24 +527,25 @@ void MaxAbsScalarFeaturizer_float_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MaxAbsScalarFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MaxAbsScalarFeaturizer <int32> */
-template <typename VectorInputT>
-void MaxAbsScalarFeaturizer_int32_Test(
+/* |  RobustScalerFeaturizer <int32> */
+template <typename VectorInputT, typename... ConstructorArgTs>
+void RobustScalerFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::double_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MaxAbsScalarFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalerFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_int32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int32_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -550,7 +556,7 @@ void MaxAbsScalarFeaturizer_int32_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MaxAbsScalarFeaturizer_int32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_int32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -559,7 +565,7 @@ void MaxAbsScalarFeaturizer_int32_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MaxAbsScalarFeaturizer_int32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_int32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -569,7 +575,7 @@ void MaxAbsScalarFeaturizer_int32_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MaxAbsScalarFeaturizer_int32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalerFeaturizer_int32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -577,7 +583,7 @@ void MaxAbsScalarFeaturizer_int32_Test(
         }
     }
 
-    MaxAbsScalarFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalerFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -585,20 +591,20 @@ void MaxAbsScalarFeaturizer_int32_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MaxAbsScalarFeaturizer_int32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_int32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MaxAbsScalarFeaturizer_int32_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalerFeaturizer_int32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_int32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MaxAbsScalarFeaturizer_int32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -609,7 +615,7 @@ void MaxAbsScalarFeaturizer_int32_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MaxAbsScalarFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -625,24 +631,25 @@ void MaxAbsScalarFeaturizer_int32_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MaxAbsScalarFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MaxAbsScalarFeaturizer <int64> */
-template <typename VectorInputT>
-void MaxAbsScalarFeaturizer_int64_Test(
+/* |  RobustScalerFeaturizer <int64> */
+template <typename VectorInputT, typename... ConstructorArgTs>
+void RobustScalerFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::double_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MaxAbsScalarFeaturizer_int64_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalerFeaturizer_int64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_int64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int64_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -653,7 +660,7 @@ void MaxAbsScalarFeaturizer_int64_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MaxAbsScalarFeaturizer_int64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_int64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -662,7 +669,7 @@ void MaxAbsScalarFeaturizer_int64_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MaxAbsScalarFeaturizer_int64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_int64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -672,7 +679,7 @@ void MaxAbsScalarFeaturizer_int64_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MaxAbsScalarFeaturizer_int64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalerFeaturizer_int64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -680,7 +687,7 @@ void MaxAbsScalarFeaturizer_int64_Test(
         }
     }
 
-    MaxAbsScalarFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalerFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -688,20 +695,20 @@ void MaxAbsScalarFeaturizer_int64_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MaxAbsScalarFeaturizer_int64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_int64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MaxAbsScalarFeaturizer_int64_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalerFeaturizer_int64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_int64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MaxAbsScalarFeaturizer_int64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -712,7 +719,7 @@ void MaxAbsScalarFeaturizer_int64_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MaxAbsScalarFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -728,24 +735,25 @@ void MaxAbsScalarFeaturizer_int64_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MaxAbsScalarFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MaxAbsScalarFeaturizer <uint32> */
-template <typename VectorInputT>
-void MaxAbsScalarFeaturizer_uint32_Test(
+/* |  RobustScalerFeaturizer <uint32> */
+template <typename VectorInputT, typename... ConstructorArgTs>
+void RobustScalerFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::double_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MaxAbsScalarFeaturizer_uint32_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalerFeaturizer_uint32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_uint32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint32_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -756,7 +764,7 @@ void MaxAbsScalarFeaturizer_uint32_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MaxAbsScalarFeaturizer_uint32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_uint32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -765,7 +773,7 @@ void MaxAbsScalarFeaturizer_uint32_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MaxAbsScalarFeaturizer_uint32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_uint32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -775,7 +783,7 @@ void MaxAbsScalarFeaturizer_uint32_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MaxAbsScalarFeaturizer_uint32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalerFeaturizer_uint32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -783,7 +791,7 @@ void MaxAbsScalarFeaturizer_uint32_Test(
         }
     }
 
-    MaxAbsScalarFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalerFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -791,20 +799,20 @@ void MaxAbsScalarFeaturizer_uint32_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MaxAbsScalarFeaturizer_uint32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_uint32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MaxAbsScalarFeaturizer_uint32_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalerFeaturizer_uint32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_uint32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MaxAbsScalarFeaturizer_uint32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -815,7 +823,7 @@ void MaxAbsScalarFeaturizer_uint32_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MaxAbsScalarFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -831,24 +839,25 @@ void MaxAbsScalarFeaturizer_uint32_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MaxAbsScalarFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MaxAbsScalarFeaturizer <uint64> */
-template <typename VectorInputT>
-void MaxAbsScalarFeaturizer_uint64_Test(
+/* |  RobustScalerFeaturizer <uint64> */
+template <typename VectorInputT, typename... ConstructorArgTs>
+void RobustScalerFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::double_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MaxAbsScalarFeaturizer_uint64_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalerFeaturizer_uint64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_uint64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint64_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -859,7 +868,7 @@ void MaxAbsScalarFeaturizer_uint64_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MaxAbsScalarFeaturizer_uint64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_uint64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -868,7 +877,7 @@ void MaxAbsScalarFeaturizer_uint64_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MaxAbsScalarFeaturizer_uint64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_uint64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -878,7 +887,7 @@ void MaxAbsScalarFeaturizer_uint64_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MaxAbsScalarFeaturizer_uint64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalerFeaturizer_uint64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -886,7 +895,7 @@ void MaxAbsScalarFeaturizer_uint64_Test(
         }
     }
 
-    MaxAbsScalarFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalerFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -894,20 +903,20 @@ void MaxAbsScalarFeaturizer_uint64_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MaxAbsScalarFeaturizer_uint64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_uint64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MaxAbsScalarFeaturizer_uint64_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalerFeaturizer_uint64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_uint64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MaxAbsScalarFeaturizer_uint64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -918,7 +927,7 @@ void MaxAbsScalarFeaturizer_uint64_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MaxAbsScalarFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -934,24 +943,25 @@ void MaxAbsScalarFeaturizer_uint64_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MaxAbsScalarFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MaxAbsScalarFeaturizer <double> */
-template <typename VectorInputT>
-void MaxAbsScalarFeaturizer_double_Test(
+/* |  RobustScalerFeaturizer <double> */
+template <typename VectorInputT, typename... ConstructorArgTs>
+void RobustScalerFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::double_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MaxAbsScalarFeaturizer_double_EstimatorHandle *pEstimatorHandle(nullptr);
+    RobustScalerFeaturizer_double_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_double_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_double_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -962,7 +972,7 @@ void MaxAbsScalarFeaturizer_double_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MaxAbsScalarFeaturizer_double_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_double_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -971,7 +981,7 @@ void MaxAbsScalarFeaturizer_double_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MaxAbsScalarFeaturizer_double_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(RobustScalerFeaturizer_double_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -981,7 +991,7 @@ void MaxAbsScalarFeaturizer_double_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MaxAbsScalarFeaturizer_double_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(RobustScalerFeaturizer_double_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -989,7 +999,7 @@ void MaxAbsScalarFeaturizer_double_Test(
         }
     }
 
-    MaxAbsScalarFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    RobustScalerFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -997,20 +1007,20 @@ void MaxAbsScalarFeaturizer_double_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MaxAbsScalarFeaturizer_double_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_double_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MaxAbsScalarFeaturizer_double_TransformerHandle * pTransformerHandle(nullptr);
+    RobustScalerFeaturizer_double_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MaxAbsScalarFeaturizer_double_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_double_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MaxAbsScalarFeaturizer_double_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_double_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -1021,7 +1031,7 @@ void MaxAbsScalarFeaturizer_double_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MaxAbsScalarFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(RobustScalerFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -1037,7 +1047,7 @@ void MaxAbsScalarFeaturizer_double_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MaxAbsScalarFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(RobustScalerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 

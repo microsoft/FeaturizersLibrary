@@ -23,18 +23,18 @@ function(Impl)
         ${_this_path}/../L1NormalizeFeaturizer.h
         ${_this_path}/../L2NormalizeFeaturizer.h
         ${_this_path}/../LabelEncoderFeaturizer.h
-        ${_this_path}/../MaxAbsScalarFeaturizer.h
+        ${_this_path}/../MaxAbsScalerFeaturizer.h
         ${_this_path}/../MaxNormalizeFeaturizer.h
         ${_this_path}/../MeanImputerFeaturizer.h
         ${_this_path}/../MedianImputerFeaturizer.h
         ${_this_path}/../MinMaxImputerFeaturizer.h
-        ${_this_path}/../MinMaxScalarFeaturizer.h
+        ${_this_path}/../MinMaxScalerFeaturizer.h
         ${_this_path}/../MissingDummiesFeaturizer.h
         ${_this_path}/../ModeImputerFeaturizer.h
         ${_this_path}/../NumericalizeFeaturizer.h
         ${_this_path}/../OneHotEncoderFeaturizer.h
         ${_this_path}/../PCAFeaturizer.h
-        ${_this_path}/../RobustScalarFeaturizer.h
+        ${_this_path}/../RobustScalerFeaturizer.h
         ${_this_path}/../SampleAddFeaturizer.h
         ${_this_path}/../SampleAddFeaturizer.cpp
         ${_this_path}/../StandardScaleWrapperFeaturizer.h

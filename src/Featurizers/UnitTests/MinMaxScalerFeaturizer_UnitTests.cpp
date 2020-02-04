@@ -6,7 +6,7 @@
 #include "catch.hpp"
 
 #include "../../3rdParty/optional.h"
-#include "../../Featurizers/MinMaxScalarFeaturizer.h"
+#include "../../Featurizers/MinMaxScalerFeaturizer.h"
 #include "../TestHelpers.h"
 #include "../../Archive.h"
 #include "../../Traits.h"
@@ -33,7 +33,7 @@ TEST_CASE("int") {
 
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::MinMaxScalarEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
+            NS::Featurizers::MinMaxScalerEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
             trainingBatches,
             inferencingInput
         ) == inferencingOutput
@@ -59,7 +59,7 @@ TEST_CASE("float") {
 
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::MinMaxScalarEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
+            NS::Featurizers::MinMaxScalerEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
             trainingBatches,
             inferencingInput
         ) == inferencingOutput
@@ -82,7 +82,7 @@ TEST_CASE("only one input") {
 
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::MinMaxScalarEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
+            NS::Featurizers::MinMaxScalerEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
             trainingBatches,
             inferencingInput
         ) == inferencingOutput
@@ -107,7 +107,7 @@ TEST_CASE("null training data") {
 
 
     std::vector<TransformedType> inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-            NS::Featurizers::MinMaxScalarEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
+            NS::Featurizers::MinMaxScalerEstimator<InputType, TransformedType>(NS::CreateTestAnnotationMapsPtr(1), 0),
             trainingBatches,
             inferencingInput
     );
@@ -117,14 +117,14 @@ TEST_CASE("null training data") {
 TEST_CASE("Serialization/Deserialization") {
     using InputType       = std::float_t;
     using TransformedType = std::double_t;
-    using TransformerType = NS::Featurizers::MinMaxScalarTransformer<InputType, TransformedType>;
+    using TransformerType = NS::Featurizers::MinMaxScalerTransformer<InputType, TransformedType>;
 
     auto model = std::make_shared<TransformerType>(static_cast<InputType>(-5), static_cast<InputType>(9));
 
     NS::Archive archive;
     model->save(archive);
     std::vector<unsigned char> vec = archive.commit();
-    
+
     NS::Archive loader(vec);
     TransformerType modelLoaded(loader);
     CHECK(modelLoaded == *model);
@@ -139,7 +139,7 @@ TEST_CASE("Serialization Version Error") {
     NS::Archive                             in(out.commit());
 
     CHECK_THROWS_WITH(
-        (NS::Featurizers::MinMaxScalarTransformer<std::uint8_t, std::double_t>(in)),
+        (NS::Featurizers::MinMaxScalerTransformer<std::uint8_t, std::double_t>(in)),
         Catch::Contains("Unsupported archive version")
     );
 }
