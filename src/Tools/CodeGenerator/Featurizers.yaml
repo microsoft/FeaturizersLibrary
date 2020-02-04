@@ -1077,7 +1077,7 @@ featurizers:
         ["this is the first document", "this document is the second document", "and this is the third one", "is this the first document"]
 
         Assuming the input data is...
-        "this is the first document"None
+        "this is the first document"
         The default result will be...
         [0. , 0.469791f, 0.580286f, 0.384085f, 0. , 0. , 0.384085f, 0. , 0.384085f]
 
