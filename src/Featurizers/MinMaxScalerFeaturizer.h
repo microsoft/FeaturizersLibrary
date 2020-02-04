@@ -12,14 +12,14 @@ namespace Featurizer {
 namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MinMaxScalarTransformer
+///  \class         MinMaxScalerTransformer
 ///  \brief         Scales values based on learned min and max values.
 ///
 template <
     typename InputT,
     typename TransformedT=std::double_t
 >
-class MinMaxScalarTransformer : public StandardTransformer<InputT, TransformedT> {
+class MinMaxScalerTransformer : public StandardTransformer<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -35,14 +35,14 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MinMaxScalarTransformer(typename BaseType::InputType min, typename BaseType::InputType max);
-    MinMaxScalarTransformer(Archive &ar);
+    MinMaxScalerTransformer(typename BaseType::InputType min, typename BaseType::InputType max);
+    MinMaxScalerTransformer(Archive &ar);
 
-    ~MinMaxScalarTransformer(void) override = default;
+    ~MinMaxScalerTransformer(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxScalarTransformer);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxScalerTransformer);
 
-    bool operator==(MinMaxScalarTransformer const &other) const;
+    bool operator==(MinMaxScalerTransformer const &other) const;
 
     void save(Archive &ar) const override;
 
@@ -72,16 +72,16 @@ private:
 namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MinMaxScalarEstimatorImpl
+///  \class         MinMaxScalerEstimatorImpl
 ///  \brief         Estimator that reads an annotation created by the `MinMaxEstimator`
-///                 and creates a `MinMaxScalarTransformer` object.
+///                 and creates a `MinMaxScalerTransformer` object.
 ///
 template <
     typename InputT,
     typename TransformedT=std::double_t,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class MinMaxScalarEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
+class MinMaxScalerEstimatorImpl : public TransformerEstimator<InputT, TransformedT> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -89,17 +89,17 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = TransformerEstimator<InputT, TransformedT>;
-    using TransformerType                   = MinMaxScalarTransformer<InputT, TransformedT>;
+    using TransformerType                   = MinMaxScalerTransformer<InputT, TransformedT>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MinMaxScalarEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
-    ~MinMaxScalarEstimatorImpl(void) override = default;
+    MinMaxScalerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~MinMaxScalerEstimatorImpl(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxScalarEstimatorImpl);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxScalerEstimatorImpl);
 
 private:
     // ----------------------------------------------------------------------
@@ -127,25 +127,25 @@ private:
 
         MinMaxAnnotationData const &        data(MinMaxEstimator::get_annotation_data(this->get_column_annotations(), _colIndex, Components::MinMaxEstimatorName));
 
-        return typename BaseType::TransformerUniquePtr(new MinMaxScalarTransformer<InputT, TransformedT>(data.Min, data.Max));
+        return typename BaseType::TransformerUniquePtr(new MinMaxScalerTransformer<InputT, TransformedT>(data.Min, data.Max));
     }
 };
 
 } // namespace Details
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         MinMaxScalarFeaturizer
-///  \brief         Creates the `MinMaxScalarTransformer` object.
+///  \class         MinMaxScalerFeaturizer
+///  \brief         Creates the `MinMaxScalerTransformer` object.
 ///
 template <
     typename InputT,
     typename TransformedT=std::double_t,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class MinMaxScalarEstimator :
+class MinMaxScalerEstimator :
     public Components::PipelineExecutionEstimatorImpl<
         Components::MinMaxEstimator<InputT, MaxNumTrainingItemsV>,
-        Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
+        Details::MinMaxScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -156,7 +156,7 @@ public:
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
             Components::MinMaxEstimator<InputT, MaxNumTrainingItemsV>,
-            Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
+            Details::MinMaxScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>
         >;
 
     // ----------------------------------------------------------------------
@@ -164,10 +164,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    MinMaxScalarEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
-    ~MinMaxScalarEstimator(void) override = default;
+    MinMaxScalerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~MinMaxScalerEstimator(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxScalarEstimator);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MinMaxScalerEstimator);
 };
 
 // ----------------------------------------------------------------------
@@ -182,11 +182,11 @@ public:
 
 // ----------------------------------------------------------------------
 // |
-// |  MinMaxScalarTransformer
+// |  MinMaxScalerTransformer
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
-MinMaxScalarTransformer<InputT, TransformedT>::MinMaxScalarTransformer(typename BaseType::InputType min, typename BaseType::InputType max) :
+MinMaxScalerTransformer<InputT, TransformedT>::MinMaxScalerTransformer(typename BaseType::InputType min, typename BaseType::InputType max) :
     _min(std::move(min)),
     _span(
         [this, &max](void) -> typename BaseType::InputType {
@@ -199,8 +199,8 @@ MinMaxScalarTransformer<InputT, TransformedT>::MinMaxScalarTransformer(typename 
 }
 
 template <typename InputT, typename TransformedT>
-MinMaxScalarTransformer<InputT, TransformedT>::MinMaxScalarTransformer(Archive &ar) :
-    MinMaxScalarTransformer(
+MinMaxScalerTransformer<InputT, TransformedT>::MinMaxScalerTransformer(Archive &ar) :
+    MinMaxScalerTransformer(
         [&ar](void) {
             // Version
             std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
@@ -213,13 +213,13 @@ MinMaxScalarTransformer<InputT, TransformedT>::MinMaxScalarTransformer(Archive &
             typename BaseType::InputType    min(Traits<typename BaseType::InputType>::deserialize(ar));
             typename BaseType::InputType    max(Traits<typename BaseType::InputType>::deserialize(ar));
 
-            return MinMaxScalarTransformer<InputT, TransformedT>(std::move(min), std::move(max));
+            return MinMaxScalerTransformer<InputT, TransformedT>(std::move(min), std::move(max));
         }()
     ) {
 }
 
 template <typename InputT, typename TransformedT>
-bool MinMaxScalarTransformer<InputT, TransformedT>::operator==(MinMaxScalarTransformer const &other) const {
+bool MinMaxScalerTransformer<InputT, TransformedT>::operator==(MinMaxScalerTransformer const &other) const {
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
@@ -236,7 +236,7 @@ bool MinMaxScalarTransformer<InputT, TransformedT>::operator==(MinMaxScalarTrans
 }
 
 template <typename InputT, typename TransformedT>
-void MinMaxScalarTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
+void MinMaxScalerTransformer<InputT, TransformedT>::save(Archive &ar) const /*override*/ {
     // Version
     Traits<std::uint16_t>::serialize(ar, 1); // Major
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
@@ -254,12 +254,12 @@ void MinMaxScalarTransformer<InputT, TransformedT>::save(Archive &ar) const /*ov
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT>
-void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
+void MinMaxScalerTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
     execute_impl(input, callback, std::integral_constant<bool, Microsoft::Featurizer::Traits<InputT>::IsNullableType>());
 }
 
 template <typename InputT, typename TransformedT>
-void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::true_type) {
+void MinMaxScalerTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::true_type) {
     // ----------------------------------------------------------------------
     using InputTraits                       = Traits<InputT>;
     using TransformedTraits                 = Traits<TransformedT>;
@@ -274,13 +274,13 @@ void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseTy
 }
 
 template <typename InputT, typename TransformedT>
-void MinMaxScalarTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::false_type) {
+void MinMaxScalerTransformer<InputT, TransformedT>::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback, std::false_type) {
     execute_implex(input, callback);
 }
 
 template <typename InputT, typename TransformedT>
 template <typename U>
-void MinMaxScalarTransformer<InputT, TransformedT>::execute_implex(U const &input, typename BaseType::CallbackFunction const &callback) {
+void MinMaxScalerTransformer<InputT, TransformedT>::execute_implex(U const &input, typename BaseType::CallbackFunction const &callback) {
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wdouble-promotion"
@@ -301,27 +301,27 @@ void MinMaxScalarTransformer<InputT, TransformedT>::execute_implex(U const &inpu
 
 // ----------------------------------------------------------------------
 // |
-// |  MinMaxScalarEstimator
+// |  MinMaxScalerEstimator
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-MinMaxScalarEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::MinMaxScalarEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+MinMaxScalerEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::MinMaxScalerEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
     BaseType(
-        "MinMaxScalarEstimator",
+        "MinMaxScalerEstimator",
         pAllColumnAnnotations,
         [pAllColumnAnnotations, colIndex](void) { return Components::MinMaxEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); },
-        [pAllColumnAnnotations, colIndex](void) { return Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
+        [pAllColumnAnnotations, colIndex](void) { return Details::MinMaxScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
     ) {
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::MinMaxScalarEstimatorImpl
+// |  Details::MinMaxScalerEstimatorImpl
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::MinMaxScalarEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
-    BaseType("MinMaxScalarEstimatorImpl", std::move(pAllColumnAnnotations)),
+Details::MinMaxScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::MinMaxScalerEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+    BaseType("MinMaxScalerEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
             [this, &colIndex](void) -> size_t & {
@@ -338,17 +338,17 @@ Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-bool Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+bool Details::MinMaxScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
     return false;
 }
 
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-FitResult Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
+FitResult Details::MinMaxScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::fit_impl(typename BaseType::InputType const *, size_t) /*override*/ {
     throw std::runtime_error("This will never be called");
 }
 
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-void Details::MinMaxScalarEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+void Details::MinMaxScalerEstimatorImpl<InputT, TransformedT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
 
 } // namespace Featurizers

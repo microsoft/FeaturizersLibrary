@@ -250,7 +250,7 @@ Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreqMap(Det
     std::uint32_t const & topKTermsValue(*topKTerms);
 
     //modify termFrequency by selecting top "topKTermsValue" terms
-    //targetPack contains targetValue(apperance number) and remainingTargetValue
+    //targetPack contains targetValue(appearance number) and remainingTargetValue
     //Assuming an vector [2,3,3,7,7,6,5,4,4,4,4,4] and the aim is to find top k values(if k = 6)
     //after partial sorting we know the 6th largest value is 4(the targetValue)
     //and there are one 4 ahead of it(remainingTargetValue)
@@ -259,7 +259,7 @@ Details::DocumentStatisticsTrainingOnlyPolicy::FrequencyMap PruneTermFreqMap(Det
             std::vector<std::uint32_t> frequencyVector;
             frequencyVector.reserve(termFrequency.size());
 
-            //put all apperance number into a vector
+            //put all appearance number into a vector
             std::transform(
                 termFrequency.begin(),
                 termFrequency.end(),

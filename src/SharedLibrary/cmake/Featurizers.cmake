@@ -59,8 +59,8 @@ function(Impl)
 
         ${_featurizers_this_path}/../SharedLibrary_DateTimeFeaturizerCustom.h
         ${_featurizers_this_path}/../SharedLibrary_DateTimeFeaturizerCustom.cpp
-        ${_featurizers_this_path}/../SharedLibrary_RobustScalarFeaturizerCustom.h
-        ${_featurizers_this_path}/../SharedLibrary_RobustScalarFeaturizerCustom.cpp
+        ${_featurizers_this_path}/../SharedLibrary_RobustScalerFeaturizerCustom.h
+        ${_featurizers_this_path}/../SharedLibrary_RobustScalerFeaturizerCustom.cpp
         ${_featurizers_this_path}/../SharedLibrary_TimeSeriesImputerFeaturizer.h
         ${_featurizers_this_path}/../SharedLibrary_TimeSeriesImputerFeaturizer.cpp
 
@@ -85,8 +85,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_L2NormalizeFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.h
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalarFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalarFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalerFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxNormalizeFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxNormalizeFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MeanImputerFeaturizer.cpp
@@ -95,8 +95,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MedianImputerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxImputerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxImputerFeaturizer.h
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxScalarFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxScalarFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxScalerFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MinMaxScalerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MissingDummiesFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MissingDummiesFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ModeImputerFeaturizer.cpp
@@ -109,8 +109,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PCAFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PointerTable.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PointerTable.h
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.cpp
-        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalarFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalerFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.cpp

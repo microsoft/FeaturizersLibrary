@@ -4,7 +4,7 @@
 /* ---------------------------------------------------------------------- */
 #pragma once
 
-#include "SharedLibrary_MinMaxScalarFeaturizer.h"
+#include "SharedLibrary_MinMaxScalerFeaturizer.h"
 
 #include "Traits.h"
 #include "Featurizers/Structs.h"
@@ -12,9 +12,9 @@
 #include "SharedLibrary_Common.hpp"
 
 /* ---------------------------------------------------------------------- */
-/* |  MinMaxScalarFeaturizer <int8> */
+/* |  MinMaxScalerFeaturizer <int8> */
 template <typename VectorInputT>
-void MinMaxScalarFeaturizer_int8_Test(
+void MinMaxScalerFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::double_t> const &)> const &verify_func
@@ -22,9 +22,9 @@ void MinMaxScalarFeaturizer_int8_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MinMaxScalarFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
+    MinMaxScalerFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_int8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -35,7 +35,7 @@ void MinMaxScalarFeaturizer_int8_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MinMaxScalarFeaturizer_int8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_int8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -44,7 +44,7 @@ void MinMaxScalarFeaturizer_int8_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MinMaxScalarFeaturizer_int8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_int8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -54,7 +54,7 @@ void MinMaxScalarFeaturizer_int8_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MinMaxScalarFeaturizer_int8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(MinMaxScalerFeaturizer_int8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -62,7 +62,7 @@ void MinMaxScalarFeaturizer_int8_Test(
         }
     }
 
-    MinMaxScalarFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MinMaxScalerFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -70,20 +70,20 @@ void MinMaxScalarFeaturizer_int8_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MinMaxScalarFeaturizer_int8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_int8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MinMaxScalarFeaturizer_int8_TransformerHandle * pTransformerHandle(nullptr);
+    MinMaxScalerFeaturizer_int8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_int8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MinMaxScalarFeaturizer_int8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -94,7 +94,7 @@ void MinMaxScalarFeaturizer_int8_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MinMaxScalarFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -110,14 +110,14 @@ void MinMaxScalarFeaturizer_int8_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MinMaxScalarFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MinMaxScalarFeaturizer <int16> */
+/* |  MinMaxScalerFeaturizer <int16> */
 template <typename VectorInputT>
-void MinMaxScalarFeaturizer_int16_Test(
+void MinMaxScalerFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::double_t> const &)> const &verify_func
@@ -125,9 +125,9 @@ void MinMaxScalarFeaturizer_int16_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MinMaxScalarFeaturizer_int16_EstimatorHandle *pEstimatorHandle(nullptr);
+    MinMaxScalerFeaturizer_int16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_int16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -138,7 +138,7 @@ void MinMaxScalarFeaturizer_int16_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MinMaxScalarFeaturizer_int16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_int16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -147,7 +147,7 @@ void MinMaxScalarFeaturizer_int16_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MinMaxScalarFeaturizer_int16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_int16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -157,7 +157,7 @@ void MinMaxScalarFeaturizer_int16_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MinMaxScalarFeaturizer_int16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(MinMaxScalerFeaturizer_int16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -165,7 +165,7 @@ void MinMaxScalarFeaturizer_int16_Test(
         }
     }
 
-    MinMaxScalarFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MinMaxScalerFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -173,20 +173,20 @@ void MinMaxScalarFeaturizer_int16_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MinMaxScalarFeaturizer_int16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_int16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MinMaxScalarFeaturizer_int16_TransformerHandle * pTransformerHandle(nullptr);
+    MinMaxScalerFeaturizer_int16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_int16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MinMaxScalarFeaturizer_int16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -197,7 +197,7 @@ void MinMaxScalarFeaturizer_int16_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MinMaxScalarFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -213,14 +213,14 @@ void MinMaxScalarFeaturizer_int16_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MinMaxScalarFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MinMaxScalarFeaturizer <int32> */
+/* |  MinMaxScalerFeaturizer <int32> */
 template <typename VectorInputT>
-void MinMaxScalarFeaturizer_int32_Test(
+void MinMaxScalerFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::double_t> const &)> const &verify_func
@@ -228,9 +228,9 @@ void MinMaxScalarFeaturizer_int32_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MinMaxScalarFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
+    MinMaxScalerFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_int32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -241,7 +241,7 @@ void MinMaxScalarFeaturizer_int32_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MinMaxScalarFeaturizer_int32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_int32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -250,7 +250,7 @@ void MinMaxScalarFeaturizer_int32_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MinMaxScalarFeaturizer_int32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_int32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -260,7 +260,7 @@ void MinMaxScalarFeaturizer_int32_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MinMaxScalarFeaturizer_int32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(MinMaxScalerFeaturizer_int32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -268,7 +268,7 @@ void MinMaxScalarFeaturizer_int32_Test(
         }
     }
 
-    MinMaxScalarFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MinMaxScalerFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -276,20 +276,20 @@ void MinMaxScalarFeaturizer_int32_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MinMaxScalarFeaturizer_int32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_int32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MinMaxScalarFeaturizer_int32_TransformerHandle * pTransformerHandle(nullptr);
+    MinMaxScalerFeaturizer_int32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_int32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MinMaxScalarFeaturizer_int32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -300,7 +300,7 @@ void MinMaxScalarFeaturizer_int32_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MinMaxScalarFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -316,14 +316,14 @@ void MinMaxScalarFeaturizer_int32_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MinMaxScalarFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MinMaxScalarFeaturizer <int64> */
+/* |  MinMaxScalerFeaturizer <int64> */
 template <typename VectorInputT>
-void MinMaxScalarFeaturizer_int64_Test(
+void MinMaxScalerFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::double_t> const &)> const &verify_func
@@ -331,9 +331,9 @@ void MinMaxScalarFeaturizer_int64_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MinMaxScalarFeaturizer_int64_EstimatorHandle *pEstimatorHandle(nullptr);
+    MinMaxScalerFeaturizer_int64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_int64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -344,7 +344,7 @@ void MinMaxScalarFeaturizer_int64_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MinMaxScalarFeaturizer_int64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_int64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -353,7 +353,7 @@ void MinMaxScalarFeaturizer_int64_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MinMaxScalarFeaturizer_int64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_int64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -363,7 +363,7 @@ void MinMaxScalarFeaturizer_int64_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MinMaxScalarFeaturizer_int64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(MinMaxScalerFeaturizer_int64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -371,7 +371,7 @@ void MinMaxScalarFeaturizer_int64_Test(
         }
     }
 
-    MinMaxScalarFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MinMaxScalerFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -379,20 +379,20 @@ void MinMaxScalarFeaturizer_int64_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MinMaxScalarFeaturizer_int64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_int64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MinMaxScalarFeaturizer_int64_TransformerHandle * pTransformerHandle(nullptr);
+    MinMaxScalerFeaturizer_int64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_int64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MinMaxScalarFeaturizer_int64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -403,7 +403,7 @@ void MinMaxScalarFeaturizer_int64_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MinMaxScalarFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -419,14 +419,14 @@ void MinMaxScalarFeaturizer_int64_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MinMaxScalarFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MinMaxScalarFeaturizer <uint8> */
+/* |  MinMaxScalerFeaturizer <uint8> */
 template <typename VectorInputT>
-void MinMaxScalarFeaturizer_uint8_Test(
+void MinMaxScalerFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::double_t> const &)> const &verify_func
@@ -434,9 +434,9 @@ void MinMaxScalarFeaturizer_uint8_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MinMaxScalarFeaturizer_uint8_EstimatorHandle *pEstimatorHandle(nullptr);
+    MinMaxScalerFeaturizer_uint8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_uint8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -447,7 +447,7 @@ void MinMaxScalarFeaturizer_uint8_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MinMaxScalarFeaturizer_uint8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_uint8_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -456,7 +456,7 @@ void MinMaxScalarFeaturizer_uint8_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MinMaxScalarFeaturizer_uint8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_uint8_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -466,7 +466,7 @@ void MinMaxScalarFeaturizer_uint8_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MinMaxScalarFeaturizer_uint8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(MinMaxScalerFeaturizer_uint8_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -474,7 +474,7 @@ void MinMaxScalarFeaturizer_uint8_Test(
         }
     }
 
-    MinMaxScalarFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MinMaxScalerFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -482,20 +482,20 @@ void MinMaxScalarFeaturizer_uint8_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MinMaxScalarFeaturizer_uint8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_uint8_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MinMaxScalarFeaturizer_uint8_TransformerHandle * pTransformerHandle(nullptr);
+    MinMaxScalerFeaturizer_uint8_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_uint8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint8_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MinMaxScalarFeaturizer_uint8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint8_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -506,7 +506,7 @@ void MinMaxScalarFeaturizer_uint8_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MinMaxScalarFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -522,14 +522,14 @@ void MinMaxScalarFeaturizer_uint8_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MinMaxScalarFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MinMaxScalarFeaturizer <uint16> */
+/* |  MinMaxScalerFeaturizer <uint16> */
 template <typename VectorInputT>
-void MinMaxScalarFeaturizer_uint16_Test(
+void MinMaxScalerFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::double_t> const &)> const &verify_func
@@ -537,9 +537,9 @@ void MinMaxScalarFeaturizer_uint16_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MinMaxScalarFeaturizer_uint16_EstimatorHandle *pEstimatorHandle(nullptr);
+    MinMaxScalerFeaturizer_uint16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_uint16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -550,7 +550,7 @@ void MinMaxScalarFeaturizer_uint16_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MinMaxScalarFeaturizer_uint16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_uint16_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -559,7 +559,7 @@ void MinMaxScalarFeaturizer_uint16_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MinMaxScalarFeaturizer_uint16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_uint16_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -569,7 +569,7 @@ void MinMaxScalarFeaturizer_uint16_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MinMaxScalarFeaturizer_uint16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(MinMaxScalerFeaturizer_uint16_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -577,7 +577,7 @@ void MinMaxScalarFeaturizer_uint16_Test(
         }
     }
 
-    MinMaxScalarFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MinMaxScalerFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -585,20 +585,20 @@ void MinMaxScalarFeaturizer_uint16_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MinMaxScalarFeaturizer_uint16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_uint16_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MinMaxScalarFeaturizer_uint16_TransformerHandle * pTransformerHandle(nullptr);
+    MinMaxScalerFeaturizer_uint16_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_uint16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint16_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MinMaxScalarFeaturizer_uint16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint16_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -609,7 +609,7 @@ void MinMaxScalarFeaturizer_uint16_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MinMaxScalarFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -625,14 +625,14 @@ void MinMaxScalarFeaturizer_uint16_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MinMaxScalarFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MinMaxScalarFeaturizer <uint32> */
+/* |  MinMaxScalerFeaturizer <uint32> */
 template <typename VectorInputT>
-void MinMaxScalarFeaturizer_uint32_Test(
+void MinMaxScalerFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::double_t> const &)> const &verify_func
@@ -640,9 +640,9 @@ void MinMaxScalarFeaturizer_uint32_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MinMaxScalarFeaturizer_uint32_EstimatorHandle *pEstimatorHandle(nullptr);
+    MinMaxScalerFeaturizer_uint32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_uint32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -653,7 +653,7 @@ void MinMaxScalarFeaturizer_uint32_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MinMaxScalarFeaturizer_uint32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_uint32_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -662,7 +662,7 @@ void MinMaxScalarFeaturizer_uint32_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MinMaxScalarFeaturizer_uint32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_uint32_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -672,7 +672,7 @@ void MinMaxScalarFeaturizer_uint32_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MinMaxScalarFeaturizer_uint32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(MinMaxScalerFeaturizer_uint32_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -680,7 +680,7 @@ void MinMaxScalarFeaturizer_uint32_Test(
         }
     }
 
-    MinMaxScalarFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MinMaxScalerFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -688,20 +688,20 @@ void MinMaxScalarFeaturizer_uint32_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MinMaxScalarFeaturizer_uint32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_uint32_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MinMaxScalarFeaturizer_uint32_TransformerHandle * pTransformerHandle(nullptr);
+    MinMaxScalerFeaturizer_uint32_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_uint32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint32_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MinMaxScalarFeaturizer_uint32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint32_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -712,7 +712,7 @@ void MinMaxScalarFeaturizer_uint32_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MinMaxScalarFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -728,14 +728,14 @@ void MinMaxScalarFeaturizer_uint32_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MinMaxScalarFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MinMaxScalarFeaturizer <uint64> */
+/* |  MinMaxScalerFeaturizer <uint64> */
 template <typename VectorInputT>
-void MinMaxScalarFeaturizer_uint64_Test(
+void MinMaxScalerFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::double_t> const &)> const &verify_func
@@ -743,9 +743,9 @@ void MinMaxScalarFeaturizer_uint64_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MinMaxScalarFeaturizer_uint64_EstimatorHandle *pEstimatorHandle(nullptr);
+    MinMaxScalerFeaturizer_uint64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_uint64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -756,7 +756,7 @@ void MinMaxScalarFeaturizer_uint64_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MinMaxScalarFeaturizer_uint64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_uint64_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -765,7 +765,7 @@ void MinMaxScalarFeaturizer_uint64_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MinMaxScalarFeaturizer_uint64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_uint64_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -775,7 +775,7 @@ void MinMaxScalarFeaturizer_uint64_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MinMaxScalarFeaturizer_uint64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(MinMaxScalerFeaturizer_uint64_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -783,7 +783,7 @@ void MinMaxScalarFeaturizer_uint64_Test(
         }
     }
 
-    MinMaxScalarFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MinMaxScalerFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -791,20 +791,20 @@ void MinMaxScalarFeaturizer_uint64_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MinMaxScalarFeaturizer_uint64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_uint64_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MinMaxScalarFeaturizer_uint64_TransformerHandle * pTransformerHandle(nullptr);
+    MinMaxScalerFeaturizer_uint64_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_uint64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint64_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MinMaxScalarFeaturizer_uint64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint64_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -815,7 +815,7 @@ void MinMaxScalarFeaturizer_uint64_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MinMaxScalarFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -831,14 +831,14 @@ void MinMaxScalarFeaturizer_uint64_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MinMaxScalarFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MinMaxScalarFeaturizer <float> */
+/* |  MinMaxScalerFeaturizer <float> */
 template <typename VectorInputT>
-void MinMaxScalarFeaturizer_float_Test(
+void MinMaxScalerFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::double_t> const &)> const &verify_func
@@ -846,9 +846,9 @@ void MinMaxScalarFeaturizer_float_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MinMaxScalarFeaturizer_float_EstimatorHandle *pEstimatorHandle(nullptr);
+    MinMaxScalerFeaturizer_float_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_float_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_float_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -859,7 +859,7 @@ void MinMaxScalarFeaturizer_float_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MinMaxScalarFeaturizer_float_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_float_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -868,7 +868,7 @@ void MinMaxScalarFeaturizer_float_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MinMaxScalarFeaturizer_float_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_float_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -878,7 +878,7 @@ void MinMaxScalarFeaturizer_float_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MinMaxScalarFeaturizer_float_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(MinMaxScalerFeaturizer_float_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -886,7 +886,7 @@ void MinMaxScalarFeaturizer_float_Test(
         }
     }
 
-    MinMaxScalarFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MinMaxScalerFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -894,20 +894,20 @@ void MinMaxScalarFeaturizer_float_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MinMaxScalarFeaturizer_float_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_float_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MinMaxScalarFeaturizer_float_TransformerHandle * pTransformerHandle(nullptr);
+    MinMaxScalerFeaturizer_float_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_float_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_float_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MinMaxScalarFeaturizer_float_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_float_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -918,7 +918,7 @@ void MinMaxScalarFeaturizer_float_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MinMaxScalarFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -934,14 +934,14 @@ void MinMaxScalarFeaturizer_float_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MinMaxScalarFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 
 /* ---------------------------------------------------------------------- */
-/* |  MinMaxScalarFeaturizer <double> */
+/* |  MinMaxScalerFeaturizer <double> */
 template <typename VectorInputT>
-void MinMaxScalarFeaturizer_double_Test(
+void MinMaxScalerFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
     std::function<bool (std::vector<std::double_t> const &)> const &verify_func
@@ -949,9 +949,9 @@ void MinMaxScalarFeaturizer_double_Test(
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
-    MinMaxScalarFeaturizer_double_EstimatorHandle *pEstimatorHandle(nullptr);
+    MinMaxScalerFeaturizer_double_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_double_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_double_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -962,7 +962,7 @@ void MinMaxScalarFeaturizer_double_Test(
         while(true) {
             TrainingState trainingState(0);
 
-            REQUIRE(MinMaxScalarFeaturizer_double_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_double_GetState(pEstimatorHandle, &trainingState, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(trainingState != Training)
@@ -971,7 +971,7 @@ void MinMaxScalarFeaturizer_double_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MinMaxScalarFeaturizer_double_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
+            REQUIRE(MinMaxScalerFeaturizer_double_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -981,7 +981,7 @@ void MinMaxScalarFeaturizer_double_Test(
 
             ++iter;
             if(iter == training_input.end()) {
-                REQUIRE(MinMaxScalarFeaturizer_double_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
+                REQUIRE(MinMaxScalerFeaturizer_double_OnDataCompleted(pEstimatorHandle, &pErrorInfo));
                 REQUIRE(pErrorInfo == nullptr);
 
                 iter = training_input.begin();
@@ -989,7 +989,7 @@ void MinMaxScalarFeaturizer_double_Test(
         }
     }
 
-    MinMaxScalarFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
+    MinMaxScalerFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
 
@@ -997,20 +997,20 @@ void MinMaxScalarFeaturizer_double_Test(
     {
         bool is_complete(false);
 
-        REQUIRE(MinMaxScalarFeaturizer_double_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_double_IsTrainingComplete(pEstimatorHandle, &is_complete, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
         REQUIRE(is_complete);
     }
 
     // Create the Transformer
-    MinMaxScalarFeaturizer_double_TransformerHandle * pTransformerHandle(nullptr);
+    MinMaxScalerFeaturizer_double_TransformerHandle * pTransformerHandle(nullptr);
 
-    REQUIRE(MinMaxScalarFeaturizer_double_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_double_CreateTransformerFromEstimator(pEstimatorHandle, &pTransformerHandle, &pErrorInfo));
     REQUIRE(pTransformerHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
     // Destroy the estimator
-    REQUIRE(MinMaxScalarFeaturizer_double_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_double_DestroyEstimator(pEstimatorHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
@@ -1021,7 +1021,7 @@ void MinMaxScalarFeaturizer_double_Test(
     for(auto const & input : inference_input) {
         std::double_t result;
 
-        REQUIRE(MinMaxScalarFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__)
@@ -1037,7 +1037,7 @@ void MinMaxScalarFeaturizer_double_Test(
     // No trailing destroy statement
 
     // Destroy the transformer
-    REQUIRE(MinMaxScalarFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
+    REQUIRE(MinMaxScalerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
 

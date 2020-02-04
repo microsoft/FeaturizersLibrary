@@ -5,10 +5,10 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "GeneratedCode/SharedLibraryTests_MinMaxScalarFeaturizer.h"
+#include "GeneratedCode/SharedLibraryTests_MinMaxScalerFeaturizer.h"
 
 TEST_CASE("double_t") {
-    MinMaxScalarFeaturizer_double_Test(
+    MinMaxScalerFeaturizer_double_Test(
         std::vector<std::double_t>{
             static_cast<std::double_t>(-1),
             static_cast<std::double_t>(-0.5),
