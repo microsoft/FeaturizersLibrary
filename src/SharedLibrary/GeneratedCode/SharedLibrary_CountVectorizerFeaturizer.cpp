@@ -341,7 +341,7 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateTransformerSaveData(
     }
 }
 
-FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Transform(/*in*/ CountVectorizerFeaturizer_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ uint64_t * output_numElements, /*out*/ uint64_t * output_numValues, /*out*/ uint32_t **output_values, /*out*/ uint64_t **output_indexes, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Transform(/*in*/ CountVectorizerFeaturizer_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ uint64_t * output_numElements, /*out*/ uint64_t * output_numValues, /*out*/ float **output_values, /*out*/ uint64_t **output_indexes, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -363,10 +363,10 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Transform(/*in*/ CountVect
         auto result(transformer.execute(input));
 
         // Output
-        std::unique_ptr<std::uint32_t []> pValues(new std::uint32_t [result.Values.size()]);
+        std::unique_ptr<std::float_t []> pValues(new std::float_t [result.Values.size()]);
         std::unique_ptr<uint64_t []> pIndexes(new uint64_t [result.Values.size()]);
 
-        std::uint32_t * pValue(pValues.get());
+        std::float_t * pValue(pValues.get());
         uint64_t * pIndex(pIndexes.get());
 
         for(auto const & encoding : result.Values) {
@@ -388,7 +388,7 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Transform(/*in*/ CountVect
     }
 }
 
-FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_DestroyTransformedData(/*in*/ uint64_t result_numElements, /*in*/ uint64_t result_numValues, /*in*/ uint32_t const * result_values, /*in*/ uint64_t const * result_indexes, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_DestroyTransformedData(/*in*/ uint64_t result_numElements, /*in*/ uint64_t result_numValues, /*in*/ float const * result_values, /*in*/ uint64_t const * result_indexes, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 

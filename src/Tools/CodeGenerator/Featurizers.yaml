@@ -78,7 +78,7 @@ featurizers:
 
     type_mappings:
       - input_type: string
-        output_type: sparse_vector<uint32>
+        output_type: sparse_vector<float>
 
     custom_enums:
       - name: AnalyzerMethod
@@ -1105,7 +1105,7 @@ featurizers:
         underlying_type: uint8
 
       - name: NormMethod
-        values: [L1, L2]
+        values: [L1, L2, None]
         underlying_type: uint8
 
       - name: TfidfPolicy

@@ -17,7 +17,7 @@ template <typename VectorInputT, typename... ConstructorArgTs>
 void CountVectorizerFeaturizer_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::uint32_t>> const &)> const &verify_func,
+    std::function<bool (std::vector<Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::float_t>> const &)> const &verify_func,
     ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
@@ -88,21 +88,21 @@ void CountVectorizerFeaturizer_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::uint32_t>> results;
+    std::vector<Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::float_t>> results;
 
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
         uint64_t numElements(0);
         uint64_t numValues(0);
-        std::uint32_t * pValues(nullptr);
+        std::float_t * pValues(nullptr);
         uint64_t *pIndexes(nullptr);
 
         REQUIRE(CountVectorizerFeaturizer_Transform(pTransformerHandle, input.c_str(), &numElements, &numValues, &pValues, &pIndexes, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        std::vector<typename Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::uint32_t>::ValueEncoding> encodings;
-        std::uint32_t const *pValue(pValues);
+        std::vector<typename Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::float_t>::ValueEncoding> encodings;
+        std::float_t const *pValue(pValues);
         uint64_t const *pIndex(pIndexes);
 
         while(numValues--) {
