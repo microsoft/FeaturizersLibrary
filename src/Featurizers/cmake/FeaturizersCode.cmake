@@ -41,7 +41,6 @@ function(Impl)
         ${_this_path}/../Structs.h
         ${_this_path}/../TestHelpers.h
         ${_this_path}/../TfidfVectorizerFeaturizer.h
-        ${_this_path}/../TfidfVectorizerFeaturizer.cpp
         ${_this_path}/../TimeSeriesImputerFeaturizer.h
 
         ${_this_path}/../Base/NormalizeFeaturizer.h

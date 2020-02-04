@@ -78,7 +78,7 @@ featurizers:
 
     type_mappings:
       - input_type: string
-        output_type: sparse_vector<float>
+        output_type: sparse_vector<uint32>
 
     custom_enums:
       - name: AnalyzerMethod
@@ -1077,7 +1077,7 @@ featurizers:
         ["this is the first document", "this document is the second document", "and this is the third one", "is this the first document"]
 
         Assuming the input data is...
-        "this is the first document"
+        "this is the first document"None
         The default result will be...
         [0. , 0.469791f, 0.580286f, 0.384085f, 0. , 0. , 0.384085f, 0. , 0.384085f]
 

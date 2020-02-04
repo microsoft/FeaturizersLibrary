@@ -12,13 +12,13 @@ TEST_CASE("Standard") {
     CountVectorizerFeaturizer_Test(
         std::vector<std::string>{"oraNge apple oranGE grape", "grApe caRrOt carrot apple", "peach Banana orange banana"},
         std::vector<std::string>{"banana grape grape apple apple apple orange"},
-        [](std::vector<Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::float_t>> const &args) {
+        [](std::vector<Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::uint32_t>> const &args) {
             REQUIRE(args.size() == 1);
 
-            Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::float_t> const & obj(args[0]);
-            return (obj.NumElements == 3 && Approx(obj.Values[0].Value) == 3 && Approx(obj.Values[0].Index) == 0
-                                         && Approx(obj.Values[1].Value) == 2 && Approx(obj.Values[1].Index) == 1
-                                         && Approx(obj.Values[2].Value) == 1 && Approx(obj.Values[2].Index) == 2);
+            Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::uint32_t> const & obj(args[0]);
+            return (obj.NumElements == 3 && obj.Values[0].Value == 3 && obj.Values[0].Index == 0
+                                         && obj.Values[1].Value == 2 && obj.Values[1].Index == 1
+                                         && obj.Values[2].Value == 1 && obj.Values[2].Index == 2);
         },
         true,
         static_cast<std::uint8_t>(CountVectorizerFeaturizer_AnalyzerMethod_Word),

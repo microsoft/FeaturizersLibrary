@@ -23,7 +23,7 @@ template <size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
 class CountVectorizerEstimator :
     public Components::PipelineExecutionEstimatorImpl<
         Components::DocumentStatisticsEstimator<MaxNumTrainingItemsV>,
-        Details::TfidfVectorizerEstimatorImpl<MaxNumTrainingItemsV>
+        Details::TfidfVectorizerEstimatorImpl<SparseVectorEncoding<std::uint32_t>, MaxNumTrainingItemsV>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -31,16 +31,17 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
+    using TransformedT = SparseVectorEncoding<std::uint32_t>;
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
             Components::DocumentStatisticsEstimator<MaxNumTrainingItemsV>,
-            Details::TfidfVectorizerEstimatorImpl<MaxNumTrainingItemsV>
+            Details::TfidfVectorizerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>
         >;
 
-    using IndexMapType                      = Microsoft::Featurizer::Featurizers::TfidfVectorizerTransformer::IndexMap;
+    using IndexMapType                      = Microsoft::Featurizer::Featurizers::TfidfVectorizerTransformer<TransformedT>::IndexMap;
     using StringDecorator                   = std::function<std::string (std::string)>;
     using AnalyzerMethod                    = Components::AnalyzerMethod;
-    using NormMethod                        = Microsoft::Featurizer::Featurizers::TfidfVectorizerTransformer::NormMethod;
+    using NormMethod                        = Microsoft::Featurizer::Featurizers::TfidfVectorizerTransformer<TransformedT>::NormMethod;
     using TfidfPolicy                       = Microsoft::Featurizer::Featurizers::TfidfPolicy;
 
     // ----------------------------------------------------------------------
@@ -118,7 +119,7 @@ CountVectorizerEstimator<MaxNumTrainingItemsV>::CountVectorizerEstimator(
                 );
         },
         [pAllColumnAnnotations, colIndex, &binary, &lower, &analyzer, &regex, &ngram_min, &ngram_max](void) {
-            return Details::TfidfVectorizerEstimatorImpl<MaxNumTrainingItemsV>(
+            return Details::TfidfVectorizerEstimatorImpl<TransformedT, MaxNumTrainingItemsV>(
                 std::move(pAllColumnAnnotations),
                 std::move(colIndex),
                 NormMethod::None,

@@ -14,9 +14,10 @@
 
 namespace NS = Microsoft::Featurizer;
 
-using IndexMap = typename NS::Featurizers::TfidfVectorizerTransformer::IndexMap;
+using TransformedT = NS::Featurizers::SparseVectorEncoding<std::float_t>;
+using IndexMap = typename NS::Featurizers::TfidfVectorizerTransformer<TransformedT>::IndexMap;
 using AnalyzerMethod = NS::Featurizers::Components::AnalyzerMethod;
-using NormMethod = typename NS::Featurizers::TfidfVectorizerTransformer::NormMethod;
+using NormMethod = typename NS::Featurizers::TfidfVectorizerTransformer<TransformedT>::NormMethod;
 using TfidfPolicy = NS::Featurizers::TfidfPolicy;
 
 template<typename T>
@@ -57,7 +58,7 @@ TEST_CASE("string_standard_1_with_decorator") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     true,
@@ -93,7 +94,7 @@ TEST_CASE("string_standard_1_no_decorator") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -128,7 +129,7 @@ TEST_CASE("string_standard_2_with_decorator") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     true,
@@ -164,7 +165,7 @@ TEST_CASE("string_standard_2_no_decorator") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -200,7 +201,7 @@ TEST_CASE("string_standard_3_with_decorator") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     true,
@@ -237,7 +238,7 @@ TEST_CASE("string_standard_3_no_decorator") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -272,7 +273,7 @@ TEST_CASE("string_standard_4_with_decorator") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     true,
@@ -308,7 +309,7 @@ TEST_CASE("string_standard_4_no_decorator") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -343,7 +344,7 @@ TEST_CASE("string_L1Norm") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -377,7 +378,7 @@ TEST_CASE("string_bitflag_1000") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -412,7 +413,7 @@ TEST_CASE("string_bitflag_1110") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -447,7 +448,7 @@ TEST_CASE("string_bitflag_1100") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -482,7 +483,7 @@ TEST_CASE("string_bitflag_0000") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -517,7 +518,7 @@ TEST_CASE("string_bitflag_0100") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -552,7 +553,7 @@ TEST_CASE("string_bitflag_0001") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -587,7 +588,7 @@ TEST_CASE("string_bitflag_0111") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -622,7 +623,7 @@ TEST_CASE("string_bitflag_0101") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     false,
@@ -657,7 +658,7 @@ TEST_CASE("string_new_input") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     true,
@@ -691,7 +692,7 @@ TEST_CASE("string_punctuation") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(9, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     true,
@@ -722,7 +723,7 @@ TEST_CASE("string_punctuation_word_ngram") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(3, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     true,
@@ -762,7 +763,7 @@ TEST_CASE("string_punctuation_char_ngram") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(5, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     true,
@@ -801,7 +802,7 @@ TEST_CASE("string_punctuation_charwb_ngram") {
 
     auto inferencingLabel = NS::TestHelpers::make_vector<TransformedType>(TransformedType(4, std::move(values)));
     auto inferencingOutput = NS::TestHelpers::TransformerEstimatorTest(
-                                NS::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>(
+                                NS::Featurizers::TfidfVectorizerEstimator<TransformedType, std::numeric_limits<size_t>::max()>(
                                     NS::CreateTestAnnotationMapsPtr(1),
                                     0,
                                     true,
@@ -823,8 +824,6 @@ TEST_CASE("string_punctuation_charwb_ngram") {
 }
 
 TEST_CASE("Serialization/Deserialization") {
-    using TransformerType = NS::Featurizers::TfidfVectorizerTransformer;
-
     IndexMap indexMap(
         {
             {"apple", 1},
@@ -835,13 +834,15 @@ TEST_CASE("Serialization/Deserialization") {
         }
     );
 
-    TransformerType                         original(indexMap, indexMap, 5, NormMethod::L2, TfidfPolicy::UseIdf, true, AnalyzerMethod::Word, "", 1, 1);
+    NS::Featurizers::TfidfVectorizerTransformer<Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::float_t>>                        
+                                            original(indexMap, indexMap, 5, NormMethod::L2, TfidfPolicy::UseIdf, true, AnalyzerMethod::Word, "", 1, 1);
     NS::Archive                             out;
 
     original.save(out);
 
     NS::Archive                             in(out.commit());
-    TransformerType                         other(in);
+    NS::Featurizers::TfidfVectorizerTransformer<Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::float_t>>                         
+                                            other(in);
 
     CHECK(other == original);
 }
@@ -855,7 +856,7 @@ TEST_CASE("Serialization Version Error") {
     NS::Archive                             in(out.commit());
 
     CHECK_THROWS_WITH(
-        NS::Featurizers::TfidfVectorizerTransformer(in),
+        NS::Featurizers::TfidfVectorizerTransformer<Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::float_t>>(in),
         Catch::Contains("Unsupported archive version")
     );
 }
