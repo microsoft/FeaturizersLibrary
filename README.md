@@ -82,13 +82,14 @@ Once CMake has generated the build files, within `<WorkSpace Dir>/build` run...
 
 Documentation
 --------------
--[Preview 4](https://featurizerslibrarybuild.blob.core.windows.net/archive/0.3.6-preview.4/Documentation/Microsoft.Featurizer-cpp/v1.0/html/index.html)
+**Latest release**
+-[0.3.6-preview 4](https://featurizerslibrarybuild.blob.core.windows.net/archive/0.3.6-preview.4/Documentation/Microsoft.Featurizer-cpp/v1.0/html/index.html)
 
--[Preview 3](https://featurizerslibrarybuild.blob.core.windows.net/archive/0.3.6-preview.3/Documentation/Microsoft.Featurizer-cpp/v1.0/html/index.html)
+-[0.3.6-preview 3](https://featurizerslibrarybuild.blob.core.windows.net/archive/0.3.6-preview.3/Documentation/Microsoft.Featurizer-cpp/v1.0/html/index.html)
 
--[Preview 2](https://featurizerslibrarybuild.blob.core.windows.net/archive/0.3.6-preview.2/Documentation/Microsoft.Featurizer-cpp/v1.0/html/index.html)
+-[0.3.6-preview 2](https://featurizerslibrarybuild.blob.core.windows.net/archive/0.3.6-preview.2/Documentation/Microsoft.Featurizer-cpp/v1.0/html/index.html)
 
--[Preview 1](https://featurizerslibrarybuild.blob.core.windows.net/archive/0.3.6-preview.1/Documentation/Microsoft.Featurizer-cpp/v1.0/html/index.html)
+-[0.3.6-preview 1](https://featurizerslibrarybuild.blob.core.windows.net/archive/0.3.6-preview.1/Documentation/Microsoft.Featurizer-cpp/v1.0/html/index.html)
 
 ## Featurizers
 Information for setup/configuration of the Featurizers library can be found [here](src/FeaturizerPrep/Readme.md)
