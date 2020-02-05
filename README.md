@@ -83,6 +83,7 @@ Once CMake has generated the build files, within `<WorkSpace Dir>/build` run...
 Documentation
 --------------
 **Latest release**
+
 -[0.3.6-preview 4](https://featurizerslibrarybuild.blob.core.windows.net/archive/0.3.6-preview.4/Documentation/Microsoft.Featurizer-cpp/v1.0/html/index.html)
 
 -[0.3.6-preview 3](https://featurizerslibrarybuild.blob.core.windows.net/archive/0.3.6-preview.3/Documentation/Microsoft.Featurizer-cpp/v1.0/html/index.html)
