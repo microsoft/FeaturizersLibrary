@@ -1189,7 +1189,7 @@ featurizers:
   - name: TimeSeriesImputerFeaturizer
     estimator_name: TimeSeriesImputerEstimator
     release_version: 0.3.6
-    is_stateful_transformer: true
+    has_dynamic_output: true
     num_output_columns: 1
     description: |-
       Imputes rows and column values such that the generated output does not contain any
