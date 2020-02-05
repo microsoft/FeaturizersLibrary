@@ -24,9 +24,20 @@
 <featurizers +>:
     [name string]
     [estimator_name string]
+
+    [release_version string]
+    [updated_version string ?]
+    [deprecated_version string ?]
+
     [num_output_columns int min=1]
     [description Description]
     [status enum values=["Pending", "External", "Available"] default="Available" ?]
+
+    # Most Transformers are stateless / self contained. However, some generate state
+    # that is consumed during future transformation invocations. For those Transformers
+    # that require state, care must be taken in the binding code to ensure that state
+    # is maintained between invocations.
+    [is_stateful_transformer bool default=false ?]
 
     # TODO: I hope that we don't need this value once we get rid of column-based
     #       annotations in favor of "ModelContexts".

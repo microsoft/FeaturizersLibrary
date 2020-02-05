@@ -2,6 +2,10 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: CatImputerFeaturizer
     estimator_name: CatImputerEstimator
+
+    release_version: 0.3.0
+    deprecated_version: 0.3.6
+
     num_output_columns: 1
     description: |-
       *****
@@ -51,6 +55,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: CountVectorizerFeaturizer
     estimator_name: CountVectorizerEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Returns the count of the number of occurrances of each distinct item according to a
@@ -126,6 +131,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: DateTimeFeaturizer
     estimator_name: DateTimeEstimator
+    release_version: 0.3.6
     num_output_columns: 21
     creates_annotations: false
     description: |-
@@ -223,6 +229,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: FromStringFeaturizer
     estimator_name: FromStringEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     creates_annotations: false
     description: |-
@@ -262,6 +269,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: HashOneHotVectorizerFeaturizer
     estimator_name: HashOneHotVectorizerEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     creates_annotations: false
     description: |-
@@ -315,6 +323,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: ImputationMarkerFeaturizer
     estimator_name: ImputationMarkerEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     creates_annotations: false
     description: |-
@@ -356,6 +365,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: L1NormalizeFeaturizer
     estimator_name: L1NormalizeEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Computes the L1 norm for a provided data set and normalize every row so that
@@ -397,6 +407,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: L2NormalizeFeaturizer
     estimator_name: L2NormalizeEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Computes the L2 norm for a provided data set and normalize every row so that
@@ -438,6 +449,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: LabelEncoderFeaturizer
     estimator_name: LabelEncoderEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Returns a unique id for the input based on all values encountered during training.
@@ -481,6 +493,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: MaxAbsScalerFeaturizer
     estimator_name: MaxAbsScalerEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     is_output_a_template: true
     description: |-
@@ -525,6 +538,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: MaxNormalizeFeaturizer
     estimator_name: MaxNormalizeEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Computes the max norm for a provided data set and normalize every row so that
@@ -566,6 +580,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: MeanImputerFeaturizer
     estimator_name: MeanImputerEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Imputes (populates) values with the mean (average) value encountered during
@@ -603,6 +618,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: MedianImputerFeaturizer
     estimator_name: MedianImputerEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     is_output_a_template: true
     description: |-
@@ -650,6 +666,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: MinMaxImputerFeaturizer
     estimator_name: MinMaxImputerEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Imputes (populates) values with the minimum or maximum value encountered during
@@ -697,6 +714,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: MinMaxScalerFeaturizer
     estimator_name: MinMaxScalerEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Scales input based on the scale that results from the minimum and maximum values encountered
@@ -735,6 +753,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: MissingDummiesFeaturizer
     estimator_name: MissingDummiesEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     creates_annotations: false
     description: |-
@@ -776,6 +795,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: ModeImputerFeaturizer
     estimator_name: ModeImputerEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Imputes (populates) values with the mode (most frequent) value encountered during
@@ -816,6 +836,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: NumericalizeFeaturizer
     estimator_name: NumericalizeEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       This is the LabelEncoder, but returns a null value for categories not encountered during training.
@@ -854,6 +875,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: OneHotEncoderFeaturizer
     estimator_name: OneHotEncoderEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Produces a one hot vector based on categories calculated during training.
@@ -899,6 +921,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: PCAFeaturizer
     estimator_name: PCAEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Principal component analysis and matrix projection
@@ -924,6 +947,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: RobustScalerFeaturizer
     estimator_name: RobustScalerEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     is_output_a_template: true
     description: |-
@@ -975,6 +999,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: StandardScaleWrapperFeaturizer
     estimator_name: StandardScaleWrapperEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Standardize features by removing the mean and scaling to unit variance based on input flag with_mean and with_std
@@ -1025,6 +1050,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: StringFeaturizer
     estimator_name: StringEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     creates_annotations: false
     description: |-
@@ -1065,6 +1091,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: TfidfVectorizerFeaturizer
     estimator_name: TfidfVectorizerEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Convert a collection of raw documents to a matrix of TF-IDF features
@@ -1161,6 +1188,8 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: TimeSeriesImputerFeaturizer
     estimator_name: TimeSeriesImputerEstimator
+    release_version: 0.3.6
+    is_stateful_transformer: true
     num_output_columns: 1
     description: |-
       Imputes rows and column values such that the generated output does not contain any
@@ -1239,6 +1268,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: TruncatedSVDFeaturizer
     estimator_name: TruncatedSVDEstimator
+    release_version: 0.3.6
     num_output_columns: 1
     description: |-
       Dimensionality reduction using truncated SVD algorithm
