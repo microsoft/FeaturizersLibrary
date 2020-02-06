@@ -28,13 +28,12 @@ public:
     // ----------------------------------------------------------------------
     using BaseType                           = StandardTransformer<std::string, SparseVectorEncoding<std::uint32_t>>;
     using TfidfEstimator                     = Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<std::numeric_limits<size_t>::max()>;
-    using TransformerUniquePtrType           = TfidfEstimator::TransformerUniquePtr;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    CountVectorizerTransformer(TransformerUniquePtrType pTransformer);
+    CountVectorizerTransformer(TfidfEstimator::TransformerUniquePtr pTfidfTransformer);
     CountVectorizerTransformer(Archive &ar);
 
     ~CountVectorizerTransformer(void) override = default;
@@ -51,7 +50,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    TransformerUniquePtrType                _pTransformer;
+    TfidfEstimator::TransformerUniquePtr         _pTfidfTransformer;
     // ----------------------------------------------------------------------
     // |
     // |  Private Methodsa
@@ -134,8 +133,7 @@ private:
 
     // MSVC has problems when the declaration and definition are separated
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        _tfidfEstimator.complete_training();
-        typename TfidfEstimator::TransformerUniquePtr           pTransformer(CountVectorizerEstimator<MaxNumTrainingItemsV>::_tfidfEstimator.create_transformer());
+        typename TfidfEstimator::TransformerUniquePtr           pTransformer(_tfidfEstimator.create_transformer());
         return typename BaseType::TransformerUniquePtr(new CountVectorizerTransformer(std::move(pTransformer)));
     }
 };
@@ -182,21 +180,19 @@ CountVectorizerEstimator<MaxNumTrainingItemsV>::CountVectorizerEstimator(
         )
     ),
     _tfidfEstimator(
-       TfidfEstimator(
-           pAllColumnAnnotations,
-           colIndex,
-           lower,
-           analyzer,
-           regex,
-           NormMethod::None,
-           binary ? (TfidfPolicy::Binary) : static_cast<TfidfPolicy>(0),
-           min_df,
-           max_df,
-           top_k_terms,
-           ngram_min,
-           ngram_max,
-           vocabulary
-       )
+       pAllColumnAnnotations,
+       colIndex,
+       lower,
+       analyzer,
+       regex,
+       NormMethod::None,
+       binary ? (TfidfPolicy::Binary) : static_cast<TfidfPolicy>(0),
+       min_df,
+       max_df,
+       top_k_terms,
+       ngram_min,
+       ngram_max,
+       vocabulary
     ){
 }
 
@@ -211,6 +207,7 @@ bool CountVectorizerEstimator<MaxNumTrainingItemsV>::begin_training_impl(void) /
 
 template <size_t MaxNumTrainingItemsV>
 void CountVectorizerEstimator<MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+    _tfidfEstimator.complete_training();
 }
 
 } // namespace Featurizers

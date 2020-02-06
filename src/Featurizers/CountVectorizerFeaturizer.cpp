@@ -14,8 +14,8 @@ namespace Featurizers {
 // |  CountVectorizerTransformer
 // |
 // ----------------------------------------------------------------------
-CountVectorizerTransformer::CountVectorizerTransformer(TransformerUniquePtrType pTransformer) :
-    _pTransformer(std::move(pTransformer)) {
+CountVectorizerTransformer::CountVectorizerTransformer(TfidfEstimator::TransformerUniquePtr pTfidfTransformer) :
+    _pTfidfTransformer(std::move(pTfidfTransformer)) {
 }
 
 CountVectorizerTransformer::CountVectorizerTransformer(Archive &ar) :
@@ -30,11 +30,11 @@ CountVectorizerTransformer::CountVectorizerTransformer(Archive &ar) :
 }
 
 bool CountVectorizerTransformer::operator==(CountVectorizerTransformer const &other) const {
-    return dynamic_cast<TfidfVectorizerTransformer &>(*_pTransformer) == dynamic_cast<TfidfVectorizerTransformer &>(*other._pTransformer);
+    return dynamic_cast<TfidfVectorizerTransformer const &>(*_pTfidfTransformer) == dynamic_cast<TfidfVectorizerTransformer const &>(*other._pTfidfTransformer);
 }
 
 void CountVectorizerTransformer::save(Archive &ar) const {
-    _pTransformer->save(ar);
+    _pTfidfTransformer->save(ar);
 }
 
 // ----------------------------------------------------------------------
@@ -42,11 +42,12 @@ void CountVectorizerTransformer::save(Archive &ar) const {
 // ----------------------------------------------------------------------
 void CountVectorizerTransformer::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
 
-    _pTransformer->execute(
+    _pTfidfTransformer->execute(
         input,
         [&callback](SparseVectorEncoding<std::float_t> obj) {
 
             std::vector<SparseVectorEncoding<std::uint32_t>::ValueEncoding> values;
+            values.reserve(obj.Values.size());
             for (SparseVectorEncoding<std::float_t>::ValueEncoding const & item : obj.Values)
                 values.emplace_back(SparseVectorEncoding<std::uint32_t>::ValueEncoding(static_cast<std::uint32_t>(item.Value), item.Index));
 
