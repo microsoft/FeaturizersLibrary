@@ -51,11 +51,12 @@ public:
     using MapWithIterRange                   = std::map<IterRangeType, std::uint32_t, Components::IterRangeComp>;
     using AnalyzerMethod                     = Components::AnalyzerMethod;
     using StringIterator                     = std::string::const_iterator;
-    using TfidfPolicy                       = Microsoft::Featurizer::Featurizers::TfidfPolicy;
+    using TfidfPolicy                        = Microsoft::Featurizer::Featurizers::TfidfPolicy;
 
     enum class NormMethod : unsigned char {
         L1 = 1,
-        L2 = 2
+        L2 = 2,
+        None = 3
     };
 
     // ----------------------------------------------------------------------
