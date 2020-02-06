@@ -30,7 +30,7 @@ CountVectorizerTransformer::CountVectorizerTransformer(Archive &ar) :
 }
 
 bool CountVectorizerTransformer::operator==(CountVectorizerTransformer const &other) const {
-    return _pTransformer == other._pTransformer;
+    return dynamic_cast<TfidfVectorizerTransformer &>(*_pTransformer) == dynamic_cast<TfidfVectorizerTransformer &>(*other._pTransformer);
 }
 
 void CountVectorizerTransformer::save(Archive &ar) const {
