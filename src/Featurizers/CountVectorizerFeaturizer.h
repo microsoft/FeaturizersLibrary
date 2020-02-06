@@ -48,12 +48,6 @@ public:
 private:
     // ----------------------------------------------------------------------
     // |
-    // |  Private Types
-    // |
-    // ----------------------------------------------------------------------
-
-    // ----------------------------------------------------------------------
-    // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
@@ -86,12 +80,6 @@ public:
     using AnalyzerMethod                    = Components::AnalyzerMethod;
     using NormMethod                        = Microsoft::Featurizer::Featurizers::TfidfVectorizerTransformer::NormMethod;
     using TfidfPolicy                       = Microsoft::Featurizer::Featurizers::TfidfPolicy;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Data
-    // |
-    // ----------------------------------------------------------------------
 
     // ----------------------------------------------------------------------
     // |
@@ -139,7 +127,6 @@ private:
 
     // MSVC has problems when the declaration and definition are separated
     FitResult fit_impl(typename BaseType::InputType const *pBuffer, size_t cElements) override {
-
         return _tfidfEstimator.fit(pBuffer, cElements);
     }
 
@@ -147,11 +134,8 @@ private:
 
     // MSVC has problems when the declaration and definition are separated
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-
         _tfidfEstimator.complete_training();
-
         typename TfidfEstimator::TransformerUniquePtr           pTransformer(CountVectorizerEstimator<MaxNumTrainingItemsV>::_tfidfEstimator.create_transformer());
-
         return typename BaseType::TransformerUniquePtr(new CountVectorizerTransformer(std::move(pTransformer)));
     }
 };
