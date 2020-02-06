@@ -24,9 +24,25 @@
 <featurizers +>:
     [name string]
     [estimator_name string]
+
+    [release_version string]
+    [updated_version string ?]
+    [deprecated_version string ?]
+
     [num_output_columns int min=1]
     [description Description]
     [status enum values=["Pending", "External", "Available"] default="Available" ?]
+
+    # Most Transformers output 1 item for each input (there is a 1:1 relationship between
+    # input and output). More exotic transformers will output 0-N items for each input, and
+    # need to be explicitly flushed when all input is complete. Set this value to true for
+    # those featurizers that support dynamic output.
+    #
+    # Note that dynamic output generally implies that state is required by the transformer
+    # between calls to the Transformer's execute method. The framework must take care to
+    # ensure this state is maintained by batching, extracting state info between invocations,
+    # or some other method.
+    [has_dynamic_output bool default=false ?]
 
     # TODO: I hope that we don't need this value once we get rid of column-based
     #       annotations in favor of "ModelContexts".
