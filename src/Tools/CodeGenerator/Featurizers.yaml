@@ -1132,7 +1132,7 @@ featurizers:
         underlying_type: uint8
 
       - name: NormMethod
-        values: [L1, L2]
+        values: [L1, L2, None]
         underlying_type: uint8
 
       - name: TfidfPolicy

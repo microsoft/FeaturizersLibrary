@@ -18,7 +18,8 @@ typedef uint8_t TfidfVectorizerFeaturizer_AnalyzerMethodType;
 
 enum TfidfVectorizerFeaturizer_NormMethodValue {
     TfidfVectorizerFeaturizer_NormMethod_L1=1,
-    TfidfVectorizerFeaturizer_NormMethod_L2=2
+    TfidfVectorizerFeaturizer_NormMethod_L2=2,
+    TfidfVectorizerFeaturizer_NormMethod_None=3
 };
 
 typedef uint8_t TfidfVectorizerFeaturizer_NormMethodType;
