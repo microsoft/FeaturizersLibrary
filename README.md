@@ -80,5 +80,26 @@ Once CMake has generated the build files, within `<WorkSpace Dir>/build` run...
 - [Build] `cmake --build .` or `ninja -v` (if the build generator was Ninja)
 - [Test] `ctest --parallel`
 
+Documentation
+--------------
+
+Documentation for each build is automatically generated from source code using [Doxygen](http://www.doxygen.nl/). Documentation for releases and recent builds can be viewed via the links as following.
+
+**Releases**
+
+- [0.3.6-preview.4](https://featurizerslibrarybuild.blob.core.windows.net/archive/0.3.6-preview.4/Documentation/Microsoft.Featurizer-cpp/v1.0/html/index.html)
+
+<!--
+This section is not included now because Azure storage blob doesn't provide a renaming functionality
+
+**Latest Build**
+
+- [Latest](https://featurizerslibrarybuild.blob.core.windows.net/archive/Latest_build/Documentation/Microsoft.Featurizer-cpp/v1.0/html/index.html)
+-->
+
+**Other**
+
+- [Browse all builds](https://featurizerslibrarybuild.z5.web.core.windows.net/)
+
 ## Featurizers
 Information for setup/configuration of the Featurizers library can be found [here](src/FeaturizerPrep/Readme.md)
