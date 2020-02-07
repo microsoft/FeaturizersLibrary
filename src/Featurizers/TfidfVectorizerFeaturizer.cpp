@@ -201,12 +201,18 @@ void TfidfVectorizerTransformer::execute_impl(typename BaseType::InputType const
             results.emplace_back(std::make_tuple(labelIter->second, tfidf));
         }
     }
-    //normVal will never be 0 as long as results is not empty
-    assert(normVal > 0.0f);
+     //normVal will be zero when the input is empty
+    if (_norm == NormMethod::L1 || _norm == NormMethod::L2)
+        assert(normVal >= 0.0f);
+    else
+        assert(normVal == 0.0f);
 
     // l2-norm calibration
     if (_norm == NormMethod::L2)
         normVal = sqrt(normVal);
+
+    if (_norm == NormMethod::None)
+        normVal = 1.0;
 
     std::vector<SparseVectorEncoding<std::float_t>::ValueEncoding> sparseVector;
 

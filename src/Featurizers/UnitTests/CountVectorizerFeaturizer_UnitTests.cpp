@@ -17,22 +17,6 @@ namespace NS = Microsoft::Featurizer;
 using IndexMapType   = std::unordered_map<std::string, std::uint32_t>;
 using AnalyzerMethod = NS::Featurizers::Components::AnalyzerMethod;
 
-
-TEST_CASE("empty index map") {
-    IndexMapType indexMap(
-        {
-            {"apple", 1},
-            {"banana", 2},
-            {"grape", 3},
-            {"orange", 4},
-            {"peach", 5}
-        }
-    );
-    CHECK_THROWS_WITH(NS::Featurizers::CountVectorizerTransformer(IndexMapType(), false, false, AnalyzerMethod::Word, "", 1, 1), "Index map is empty!");
-    CHECK_THROWS_WITH(NS::Featurizers::CountVectorizerTransformer(indexMap, false, false, AnalyzerMethod::Word, "", 0, 1), "ngramRangeMin");
-    CHECK_THROWS_WITH(NS::Featurizers::CountVectorizerTransformer(indexMap, false, false, AnalyzerMethod::Word, "", 1, 0), "ngramRangeMax");
-}
-
 TEST_CASE("empty training data - without binary without decorator") {
     using InputType       = std::string;
 
@@ -361,7 +345,10 @@ TEST_CASE("string - without binary with decorator, analyze word, maxdf = 1, mind
     );
 }
 TEST_CASE("Serialization/Deserialization") {
-    using TransformerType = NS::Featurizers::CountVectorizerTransformer;
+    using NormMethod = typename NS::Featurizers::TfidfVectorizerTransformer::NormMethod;
+    using TfidfPolicy = NS::Featurizers::TfidfPolicy;
+    using TfidfTransformerType = NS::Featurizers::TfidfVectorizerTransformer;
+    using CountTransformerType = NS::Featurizers::CountVectorizerTransformer;
 
     IndexMapType indexMap(
         {
@@ -373,13 +360,15 @@ TEST_CASE("Serialization/Deserialization") {
         }
     );
 
-    TransformerType                         original(indexMap, false, false, AnalyzerMethod::Word, "", 1, 1);
+    CountTransformerType                    original(std::unique_ptr<TfidfTransformerType>(
+                                                new TfidfTransformerType(indexMap, indexMap, 5, NormMethod::L2, TfidfPolicy::UseIdf, true, AnalyzerMethod::Word, "", 1, 1))
+                                            );
     NS::Archive                             out;
 
     original.save(out);
 
     NS::Archive                             in(out.commit());
-    TransformerType                         other(in);
+    CountTransformerType                    other(in);
 
     CHECK(other == original);
 }
