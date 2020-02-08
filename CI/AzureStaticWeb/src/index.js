@@ -32,7 +32,7 @@ class App extends React.Component {
         // this lists Blobs in pages defined in state.pageSize
         this.setState({ loading: true });
 
-        // Use AnonymousCredential since $web container is made a 'public container'
+        // Use AnonymousCredential since archive container is made a 'public container'
         // and does not require authorization
         const anonymousCredential = new AnonymousCredential();
         const pipeline = StorageURL.newPipeline(anonymousCredential);
@@ -44,7 +44,7 @@ class App extends React.Component {
 
         // If you are using a SAS token, simply append to ContainerURL here.
         // We will use anonymous access hence no SAS token
-        const containerName = container //+ `?st=2018-11-06T06%3A15%3A24Z&se=2019-11-07T06%3A15%3A00Z&sp=rl&sv=2018-03-28&sr=c&sig=4vCT7aInDWRiypkuYlezN8dos0K2h2DvQ0pnNkMJSFs%3D`;
+        const containerName = container
         const containerURL = ContainerURL.fromServiceURL(serviceURL, containerName);
 
         // Fetch the prefix in the query params to browse into folders
@@ -80,7 +80,7 @@ class App extends React.Component {
                     return row => {
                         if (row[sort.id] === null) {
                             return -Infinity;
-                        } // TODO: following is a workaround to special case contentLength and lastModified
+                        }
                         else if(row[sort.id] === undefined){
                             if(row.properties === undefined)
                             {
@@ -95,7 +95,6 @@ class App extends React.Component {
                     };
                 }),
                 state.sorted.map(d => (d.desc ? "desc" : "asc"))
-                // ['asc']
               );
 
             // Store the state
@@ -133,6 +132,7 @@ class App extends React.Component {
         const { data, pages, markers, loading, prefix } = this.state;
 
         // If this is a directory view, add a go back link for the root
+        // reverse the data order so that latest build is at top
         var dataset = data.reverse()
         if(prefix !== null)
         {
