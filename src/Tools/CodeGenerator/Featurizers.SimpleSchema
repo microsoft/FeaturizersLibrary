@@ -44,6 +44,9 @@
     # or some other method.
     [has_dynamic_output bool default=false ?]
 
+    # True if the transformer maintains state between 'execute' invocations.
+    [transformer_maintains_state bool default=false ?]
+
     # TODO: I hope that we don't need this value once we get rid of column-based
     #       annotations in favor of "ModelContexts".
     [creates_annotations bool default=true ?]

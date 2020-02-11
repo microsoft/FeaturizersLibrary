@@ -12,11 +12,13 @@ function(Impl)
     add_library(FeaturizersCode STATIC
         ${_this_path}/../../3rdParty/MurmurHash3.cpp
 
+        ${_this_path}/../BackwardFillImputerFeaturizer.h
         ${_this_path}/../CatImputerFeaturizer.h
         ${_this_path}/../CountVectorizerFeaturizer.h
         ${_this_path}/../CountVectorizerFeaturizer.cpp
         ${_this_path}/../DateTimeFeaturizer.h
         ${_this_path}/../DateTimeFeaturizer.cpp
+        ${_this_path}/../ForwardFillImputerFeaturizer.h
         ${_this_path}/../FromStringFeaturizer.h
         ${_this_path}/../HashOneHotVectorizerFeaturizer.h
         ${_this_path}/../ImputationMarkerFeaturizer.h
