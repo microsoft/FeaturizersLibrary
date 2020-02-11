@@ -99,6 +99,15 @@ stages:
 
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          agent_pool_container: centos7
+          configuration: system_compiler
+          job_display_name: "CentOS 7-x64-GCC"
+          operating_system: Linux
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
           agent_pool: macOS-10.13
           configuration: system_compiler
           job_display_name: "MacOS 10.13-x64-Clang"
@@ -155,15 +164,6 @@ stages:
           configuration: x64_Clang_8
           job_display_name: "Ubuntu 16.04-x64-Clang 8"
           operating_system: Linux
-
-      # TODO: Disabled for now - template: "templates/BuildAndTest.job_template.yaml"
-      # TODO: Disabled for now   parameters:
-      # TODO: Disabled for now     agent_pool: FeaturizersLibrary
-      # TODO: Disabled for now     agent_pool_is_custom: true
-      # TODO: Disabled for now     agent_pool_container: centos7
-      # TODO: Disabled for now     configuration: system_compiler
-      # TODO: Disabled for now     job_display_name: "CentOS 7-x64-GCC"
-      # TODO: Disabled for now     operating_system: Linux
 
   - stage: PostBuild_Stage
     displayName: "Post Build:"
