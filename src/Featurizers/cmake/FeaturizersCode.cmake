@@ -15,6 +15,7 @@ function(Impl)
         ${_this_path}/../CountVectorizerFeaturizer.cpp
         ${_this_path}/../DateTimeFeaturizer.h
         ${_this_path}/../DateTimeFeaturizer.cpp
+        ${_this_path}/../ForwardFillImputerFeaturizer.h
         ${_this_path}/../FromStringFeaturizer.h
         ${_this_path}/../HashOneHotVectorizerFeaturizer.h
         ${_this_path}/../ImputationMarkerFeaturizer.h

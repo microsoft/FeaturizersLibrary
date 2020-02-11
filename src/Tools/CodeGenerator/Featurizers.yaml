@@ -1,5 +1,60 @@
 featurizers:
   # ----------------------------------------------------------------------
+  - name: BackwardFillImputerFeaturizer
+    estimator_name: BackwardFillImputerEstimator
+    release_version: 0.3.6
+    num_output_columns: 1
+    creates_annotations: false
+    description: |-
+      Imputes (populates) previously encountered null values with the current non-null value encountered during
+      inference time.
+
+      C++-style pseudo signature:
+        float execute(float const &value);
+        std::string execute(std::optional<std::string> const &value);
+
+      Examples:
+        execute(1.0) -> 1.0
+
+        execute(NaN) -> 2.0  // Latest non-null value is 2.0
+        execute(2.0) -> 2.0
+
+        execute(3.0) -> 3.0
+
+        execute(NaN) -> 4.0  // Last non-null value was 4.0
+        execute(NaN) -> 4.0  // Last non-null value was 4.0
+        execute(4.0) -> 4.0
+
+        execute(NaN)
+        flush() // Exception, as pending values remain
+
+    has_dynamic_output: true
+    transformer_maintains_state: true
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+          - string
+
+    type_mappings:
+      - input_type: T
+        is_input_optional: true
+        output_type: T
+
+    status: Pending
+
+  # ----------------------------------------------------------------------
   - name: CatImputerFeaturizer
     estimator_name: CatImputerEstimator
 
@@ -225,6 +280,55 @@ featurizers:
             name: holidayName
           - type: uint8
             name: isPaidTimeOff
+
+  # ----------------------------------------------------------------------
+  - name: ForwardFillImputerFeaturizer
+    estimator_name: ForwardFillImputerEstimator
+    release_version: 0.3.6
+    num_output_columns: 1
+    creates_annotations: false
+    description: |-
+      Imputes (populates) values with the last non-null value encountered during
+      inference time.
+
+      C++-style pseudo signature:
+        float execute(float const &value);
+        std::string execute(std::optional<std::string> const &value);
+
+      Examples:
+        execute(NaN) // Exception, as a non-value value has not been encountered
+        execute(1.0) -> 1.0
+        execute(NaN) -> 1.0  // Last non-null value was 1.0
+        execute(2.0) -> 2.0
+        execute(3.0) -> 3.0
+        execute(NaN) -> 3.0  // Last non-null value was 3.0
+        execute(NaN) -> 3.0  // Last non-null value was 3.0
+        execute(4.0) -> 4.0
+
+    transformer_maintains_state: true
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+          - string
+
+    type_mappings:
+      - input_type: T
+        is_input_optional: true
+        output_type: T
+
+    status: Pending
 
   # ----------------------------------------------------------------------
   - name: FromStringFeaturizer
@@ -1210,6 +1314,7 @@ featurizers:
     estimator_name: TimeSeriesImputerEstimator
     release_version: 0.3.6
     has_dynamic_output: true
+    transformer_maintains_state: true
     num_output_columns: 1
     description: |-
       Imputes rows and column values such that the generated output does not contain any
