@@ -363,10 +363,13 @@ void ParseRegex(char const *pString, size_t cCharacters,
 
     re2::StringPiece                        sp(pString, cCharacters);
     re2::RE2                                pattern(regexToken);
+    size_t                                  start_loc(0);
+    re2::StringPiece                        submatch;
+    const RE2::Anchor                       anchor(RE2::UNANCHORED);
 
-    // BugBug: This doesn't work as expected
-    while(RE2::Consume(&sp, pattern)) {
-        callback(sp.data(), sp.size());
+    while(pattern.Match(sp, start_loc, sp.size(), anchor, &submatch, 1)) {
+        callback(submatch.data(), submatch.size());
+        start_loc = ((size_t)(submatch.data() - sp.data())) + submatch.length();
     }
 }
 
