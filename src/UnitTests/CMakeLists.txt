@@ -22,6 +22,9 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(_src_this_path ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
+include(${_src_this_path}/../Featurizers/cmake/FeaturizersCode.cmake)
+
 enable_testing()
 
 foreach(_test_name IN ITEMS
@@ -32,8 +35,18 @@ foreach(_test_name IN ITEMS
 )
     add_executable(${_test_name} ${_test_name}.cpp)
 
-    target_include_directories(${_test_name} PRIVATE ${_includes})
+    target_include_directories(
+        ${_test_name} PRIVATE
+        ${_includes}
+        FeaturizersCode
+    )
+
     target_link_directories(${_test_name} PRIVATE ${_libs})
+
+    target_link_libraries(
+        ${_test_name}
+        FeaturizersCode
+    )
 
     add_test(NAME ${_test_name} COMMAND ${_test_name} --success)
 endforeach()
