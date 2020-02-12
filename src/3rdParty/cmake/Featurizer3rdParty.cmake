@@ -16,9 +16,44 @@ function(Impl)
         ${_this_path}/../optional.h
     )
 
+    # ----------------------------------------------------------------------
+    macro(PreserveCompilerSettings)
+        foreach(_flag_prefix IN ITEMS
+            C
+            CXX
+            EXE_LINKER
+            STATIC_LINKER
+            SHARED_LINKER
+            MODULE_LINKER
+        )
+            set(_original_CMAKE_${_flag_prefix}_FLAGS "${CMAKE_${_flag_prefix}_FLAGS}")
+        endforeach()
+    endmacro()
+
+    macro(RestoreCompilerSettings)
+        foreach(_flag_prefix IN ITEMS
+            C
+            CXX
+            EXE_LINKER
+            STATIC_LINKER
+            SHARED_LINKER
+            MODULE_LINKER
+        )
+            set(CMAKE_${_flag_prefix}_FLAGS "${_original_CMAKE_${_flag_prefix}_FLAGS}")
+        endforeach()
+    endmacro()
+
+    # ----------------------------------------------------------------------
+
     # Add re2
+    PreserveCompilerSettings()
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
+
     set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
     add_subdirectory(${_this_path}/../re2 ${CMAKE_CURRENT_BINARY_DIR}/3rdParty/re2 EXCLUDE_FROM_ALL)
+
+    RestoreCompilerSettings()
 
     target_include_directories(
         ${_project_name} PUBLIC

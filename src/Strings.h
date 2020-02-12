@@ -10,8 +10,19 @@
 #include <string>
 #include <vector>
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#   pragma clang diagnostic ignored "-Wunknown-argument"
+#   pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
+
 #include "re2/re2.h"
 #include "re2/stringpiece.h"
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 namespace Microsoft {
 namespace Featurizer {

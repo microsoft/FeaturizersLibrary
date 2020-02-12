@@ -9,12 +9,12 @@ Container Registry so that it can be used during builds.
 
     2) Login to the ACR:
 
-            docker login --username featurizerslibrarybuild --password-stdin featurizerslibrarybuild.azurecr.io
+            docker login --username featurizerslibrarybuild --password <password> featurizerslibrarybuild.azurecr.io
 
             Where '<password>` can be found by:
 
                 a) Log into the Azure portal
-                b) Navigate to the 'featurizerbuild' ACR resource
+                b) Navigate to the 'FeaturizerLibraryBuild' ACR resource in the 'featurizerlibrarybuild' Resource Group
                 c) Select 'Access Keys'
                 d) Copy the value for 'password'
 
