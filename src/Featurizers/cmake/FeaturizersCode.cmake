@@ -9,15 +9,7 @@ function(Impl)
 
     include(${_this_path}/../Components/cmake/FeaturizersComponentsCode.cmake)
 
-    message(STATUS "# ----------------------------------------------------------------------")
-    message(STATUS "# |")
-    message(STATUS "# |  Building ${_this_path}")
-    message(STATUS "# |")
-    message(STATUS "# ----------------------------------------------------------------------")
-
     add_library(FeaturizersCode STATIC
-        ${_this_path}/../../3rdParty/MurmurHash3.cpp
-
         ${_this_path}/../CatImputerFeaturizer.h
         ${_this_path}/../CountVectorizerFeaturizer.h
         ${_this_path}/../CountVectorizerFeaturizer.cpp

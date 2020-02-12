@@ -10,12 +10,6 @@ function(Impl)
 
     include(${_this_path}/../../../3rdParty/cmake/Featurizer3rdParty.cmake)
 
-    message(STATUS "# ----------------------------------------------------------------------")
-    message(STATUS "# |")
-    message(STATUS "# |  Building ${_this_path}")
-    message(STATUS "# |")
-    message(STATUS "# ----------------------------------------------------------------------")
-
     add_library(FeaturizersComponentsCode STATIC
         ${_this_path}/../Components.h
         ${_this_path}/../DocumentStatisticsEstimator.h
