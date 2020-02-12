@@ -94,12 +94,12 @@ public:
 
             std::uint32_t &                 count(
                 [this, &input](void) -> std::uint32_t & {
-                    typename BaseType::Results::CountMap::iterator const    i(BaseType::_counts.find(input));
+                    typename BaseType::Results::CountMap::iterator const    i(CountEstimatorPolicyBase<T>::_counts.find(input));
 
                     if(i != BaseType::_counts.end())
                         return i->second;
 
-                    std::pair<typename BaseType::Results::CountMap::iterator, bool> const   result(BaseType::_counts.emplace(std::make_pair(input, 0)));
+                    std::pair<typename BaseType::Results::CountMap::iterator, bool> const   result(CountEstimatorPolicyBase<T>::_counts.emplace(std::make_pair(input, 0)));
 
                     return result.first->second;
                 }()
