@@ -350,30 +350,13 @@ void ParseRegex(char const *pString, size_t cCharacters,
     if(pString == nullptr) throw std::invalid_argument("pString");
     if(cCharacters == 0) throw std::invalid_argument("cCharacters");
 
-#if 1 // BugBug
     re2::StringPiece                        sp(pString, cCharacters);
     re2::RE2                                pattern(regexToken);
 
-    (void)(callback); // BugBug
+    // BugBug: This doesn't work as expected
     while(RE2::Consume(&sp, pattern)) {
-        // BugBug
+        callback(sp.data(), sp.size());
     }
-
-#else
-    std::regex_iterator<char const *> iter(pString, pString + cCharacters, regexToken);
-    std::regex_iterator<char const *> iterEnd;
-
-    while (iter != iterEnd) {
-        char const *                        matchStart(pString);
-        std::advance(matchStart, iter->position());
-
-        char const *                        matchEnd(matchStart);
-        std::advance(matchEnd, iter->length());
-
-        callback(matchStart, matchEnd - matchStart);
-        ++iter;
-    }
-#endif
 }
 
 template <
