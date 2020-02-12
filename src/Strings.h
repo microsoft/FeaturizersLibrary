@@ -369,7 +369,7 @@ void ParseRegex(char const *pString, size_t cCharacters,
 
     while(pattern.Match(sp, start_loc, sp.size(), anchor, &submatch, 1)) {
         callback(submatch.data(), submatch.size());
-        start_loc = ((size_t)(submatch.data() - sp.data())) + submatch.length();
+        start_loc = static_cast<size_t>(submatch.data() - sp.data()) + submatch.length();
     }
 }
 
