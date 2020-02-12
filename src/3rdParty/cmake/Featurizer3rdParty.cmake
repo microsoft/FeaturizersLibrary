@@ -17,6 +17,7 @@ function(Impl)
     )
 
     # Add re2
+    set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
     add_subdirectory(${_this_path}/../re2 ${CMAKE_CURRENT_BINARY_DIR}/3rdParty/re2 EXCLUDE_FROM_ALL)
 
     target_include_directories(

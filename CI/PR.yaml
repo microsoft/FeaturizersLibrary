@@ -29,38 +29,38 @@ stages:
     jobs:
       # ----------------------------------------------------------------------
       # Official Builds
-      # BugBug - template: "templates/BuildAndTest.job_template.yaml"
-      # BugBug   parameters:
-      # BugBug     agent_pool: FeaturizersLibrary
-      # BugBug     agent_pool_is_custom: true
-      # BugBug     configuration: x64
-      # BugBug     operating_system: Windows
-      # BugBug     job_display_name: "Windows-x64-Clang 8"
-      # BugBug     tester_code_coverage: True
-      # BugBug
-      # BugBug - template: "templates/BuildAndTest.job_template.yaml"
-      # BugBug   parameters:
-      # BugBug     agent_pool: FeaturizersLibrary
-      # BugBug     agent_pool_is_custom: true
-      # BugBug     configuration: x86
-      # BugBug     job_display_name: "Windows-x86-Clang 8"
-      # BugBug     operating_system: Windows
-      # BugBug
-      # BugBug - template: "templates/BuildAndTest.job_template.yaml"
-      # BugBug   parameters:
-      # BugBug     agent_pool: FeaturizersLibrary
-      # BugBug     agent_pool_is_custom: true
-      # BugBug     configuration: system_compiler
-      # BugBug     job_display_name: "Ubuntu 16.04-x64-GCC"
-      # BugBug     operating_system: Linux
-      # BugBug
-      # BugBug - template: "templates/BuildAndTest.job_template.yaml"
-      # BugBug   parameters:
-      # BugBug     agent_pool: macOS-10.14
-      # BugBug     configuration: system_compiler
-      # BugBug     job_display_name: "MacOS 10.14-x64-Clang"
-      # BugBug     job_name_unique_id: "1014"
-      # BugBug     operating_system: MacOS
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x64
+          operating_system: Windows
+          job_display_name: "Windows-x64-Clang 8"
+          tester_code_coverage: True
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x86
+          job_display_name: "Windows-x86-Clang 8"
+          operating_system: Windows
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: system_compiler
+          job_display_name: "Ubuntu 16.04-x64-GCC"
+          operating_system: Linux
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: macOS-10.14
+          configuration: system_compiler
+          job_display_name: "MacOS 10.14-x64-Clang"
+          job_name_unique_id: "1014"
+          operating_system: MacOS
 
       # ----------------------------------------------------------------------
       # Sanity Builds
@@ -92,74 +92,74 @@ stages:
           job_display_name: "CentOS 7-x64-GCC"
           operating_system: Linux
 
-      # BugBug - template: "templates/BuildAndTest.job_template.yaml"
-      # BugBug   parameters:
-      # BugBug     agent_pool: FeaturizersLibrary
-      # BugBug     agent_pool_is_custom: true
-      # BugBug     agent_pool_container: ubuntu16.04-gcc4.8
-      # BugBug     configuration: system_compiler
-      # BugBug     operating_system: Linux
-      # BugBug     job_display_name: "[Build Only] Holy Build Box-x64-GCC"
-      # BugBug     tester_build_only: true
-      # BugBug
-      # BugBug - template: "templates/BuildAndTest.job_template.yaml"
-      # BugBug   parameters:
-      # BugBug     agent_pool: macOS-10.13
-      # BugBug     configuration: system_compiler
-      # BugBug     job_display_name: "MacOS 10.13-x64-Clang"
-      # BugBug     job_name_unique_id: "1013"
-      # BugBug     operating_system: MacOS
-      # BugBug
-      # BugBug - template: "templates/BuildAndTest.job_template.yaml"
-      # BugBug   parameters:
-      # BugBug     agent_pool: FeaturizersLibrary
-      # BugBug     agent_pool_is_custom: true
-      # BugBug     configuration: x86_MSVC_2017
-      # BugBug     job_display_name: "Windows-x86-MSVC 2017"
-      # BugBug     operating_system: Windows
-      # BugBug
-      # BugBug - template: "templates/BuildAndTest.job_template.yaml"
-      # BugBug   parameters:
-      # BugBug     agent_pool: FeaturizersLibrary
-      # BugBug     agent_pool_is_custom: true
-      # BugBug     configuration: x64_MSVC_2017
-      # BugBug     job_display_name: "Windows-x64-MSVC 2017"
-      # BugBug     operating_system: Windows
-      # BugBug
-      # BugBug - template: "templates/BuildAndTest.job_template.yaml"
-      # BugBug   parameters:
-      # BugBug     agent_pool: FeaturizersLibrary
-      # BugBug     agent_pool_is_custom: true
-      # BugBug     configuration: x86_MSVC_2019
-      # BugBug     job_display_name: "Windows-x86-MSVC 2019"
-      # BugBug     operating_system: Windows
-      # BugBug
-      # BugBug - template: "templates/BuildAndTest.job_template.yaml"
-      # BugBug   parameters:
-      # BugBug     agent_pool: FeaturizersLibrary
-      # BugBug     agent_pool_is_custom: true
-      # BugBug     configuration: x64_MSVC_2019
-      # BugBug     job_display_name: "Windows-x64-MSVC 2019"
-      # BugBug     operating_system: Windows
-      # BugBug
-      # BugBug # When code coverage is enabled, we only test debug builds. Execute release tests to ensure that everything is working.
-      # BugBug - template: "templates/BuildAndTest.job_template.yaml"
-      # BugBug   parameters:
-      # BugBug     agent_pool: FeaturizersLibrary
-      # BugBug     agent_pool_is_custom: true
-      # BugBug     configuration: x64
-      # BugBug     job_display_name: "[Test Only] Windows-x64-Clang 8"
-      # BugBug     operating_system: Windows
-      # BugBug     test_only: true
-      # BugBug     tester_release_only: true
-      # BugBug
-      # BugBug - template: "templates/BuildAndTest.job_template.yaml"
-      # BugBug   parameters:
-      # BugBug     agent_pool: FeaturizersLibrary
-      # BugBug     agent_pool_is_custom: true
-      # BugBug     configuration: x64_Clang_8
-      # BugBug     job_display_name: "Ubuntu 16.04-x64-Clang 8"
-      # BugBug     operating_system: Linux
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          agent_pool_container: ubuntu16.04-gcc4.8
+          configuration: system_compiler
+          operating_system: Linux
+          job_display_name: "[Build Only] Holy Build Box-x64-GCC"
+          tester_build_only: true
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: macOS-10.13
+          configuration: system_compiler
+          job_display_name: "MacOS 10.13-x64-Clang"
+          job_name_unique_id: "1013"
+          operating_system: MacOS
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x86_MSVC_2017
+          job_display_name: "Windows-x86-MSVC 2017"
+          operating_system: Windows
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x64_MSVC_2017
+          job_display_name: "Windows-x64-MSVC 2017"
+          operating_system: Windows
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x86_MSVC_2019
+          job_display_name: "Windows-x86-MSVC 2019"
+          operating_system: Windows
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x64_MSVC_2019
+          job_display_name: "Windows-x64-MSVC 2019"
+          operating_system: Windows
+
+      # When code coverage is enabled, we only test debug builds. Execute release tests to ensure that everything is working.
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x64
+          job_display_name: "[Test Only] Windows-x64-Clang 8"
+          operating_system: Windows
+          test_only: true
+          tester_release_only: true
+
+      - template: "templates/BuildAndTest.job_template.yaml"
+        parameters:
+          agent_pool: FeaturizersLibrary
+          agent_pool_is_custom: true
+          configuration: x64_Clang_8
+          job_display_name: "Ubuntu 16.04-x64-Clang 8"
+          operating_system: Linux
 
   - stage: PostBuild_Stage
     displayName: "Post Build:"
