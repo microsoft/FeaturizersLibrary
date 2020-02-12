@@ -94,16 +94,6 @@ stages:
 
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
-          agent_pool: FeaturizersLibrary
-          agent_pool_is_custom: true
-          agent_pool_container: ubuntu16.04-gcc4.8
-          configuration: system_compiler
-          operating_system: Linux
-          job_display_name: "[Build Only] Holy Build Box-x64-GCC"
-          tester_build_only: true
-
-      - template: "templates/BuildAndTest.job_template.yaml"
-        parameters:
           agent_pool: macOS-10.13
           configuration: system_compiler
           job_display_name: "MacOS 10.13-x64-Clang"
