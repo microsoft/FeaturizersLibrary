@@ -53,8 +53,7 @@ void DSRTestWrapper(std::vector<std::vector<std::string>> const &inputBatches,
 
     NS::Featurizers::Components::DocumentStatisticsAnnotationData const &
                                                                             annotation(estimator.get_annotation_data());
-    // BugBug CHECK(annotation.TermFrequencyAndIndex == label);
-    (void)(label); // BugBug
+    CHECK(annotation.TermFrequencyAndIndex == label);
     CHECK(annotation.TotalNumDocuments == docuNumsLabel);
 }
 
@@ -103,8 +102,7 @@ void TestGeneratingParseFunc(std::string input,
             output.emplace_back(std::string(begin, end));
         }
     );
-    // BugBug CHECK(output == label);
-    (void)(label); // BugBug
+    CHECK(output == label);
 }
 
 TEST_CASE("TestGeneratingParseFunc") {

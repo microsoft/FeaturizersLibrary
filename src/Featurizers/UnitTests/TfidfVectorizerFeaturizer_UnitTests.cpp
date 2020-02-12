@@ -671,7 +671,6 @@ TEST_CASE("string_new_input") {
     SparseVectorNumericCheck<std::float_t>(std::move(inferencingOutput[0]), std::move(inferencingLabel[0]));
 }
 
-#if 0 // BugBug
 TEST_CASE("string_punctuation") {
     using InputType       = std::string;
     using TransformedType = NS::Featurizers::SparseVectorEncoding<std::float_t>;
@@ -705,7 +704,6 @@ TEST_CASE("string_punctuation") {
 
     SparseVectorNumericCheck<std::float_t>(std::move(inferencingOutput[0]), std::move(inferencingLabel[0]));
 }
-#endif
 
 TEST_CASE("string_punctuation_word_ngram") {
     using InputType       = std::string;

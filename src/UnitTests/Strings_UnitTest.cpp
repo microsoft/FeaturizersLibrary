@@ -70,7 +70,7 @@ void ParseRegexTest(std::string const & input,
             output1.emplace_back(std::string(iterBegin, iterEnd));
         }
     );
-    // BugBug CHECK(output1 == label);
+    CHECK(output1 == label);
     std::vector<std::string> output2;
     ParseRegex(
         input,
@@ -79,8 +79,7 @@ void ParseRegexTest(std::string const & input,
             output2.emplace_back(std::string(iterBegin, iterEnd));
         }
     );
-    // BugBug CHECK(output2 == label);
-    (void)(label);
+    CHECK(output2 == label);
 }
 
 void ParseNgramWordTest(std::string & input,
