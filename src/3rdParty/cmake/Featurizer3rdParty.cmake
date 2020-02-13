@@ -50,7 +50,7 @@ function(Impl)
 
     PreserveCompilerSettings()
     if (CMAKE_CXX_COMPIlER_ID MATCHES Clang OR _compiler_basename MATCHES "clang-cl.exe")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -Wno-unknown-warning-option")
         if (UNIX)
             find_package(Threads)
             target_link_libraries(Featurizer3rdParty PUBLIC ${CMAKE_THREAD_LIBS_INIT})
