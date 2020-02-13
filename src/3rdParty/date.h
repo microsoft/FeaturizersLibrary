@@ -4317,7 +4317,7 @@ template <class Duration>
 struct fields
 {
     year_month_day        ymd{year{0}/0/0};
-    weekday               wd{7u};
+    weekday               wd{weekday(7u)};
     time_of_day<Duration> tod{};
 
     fields() = default;
