@@ -50,7 +50,7 @@ function(Impl)
 
     PreserveCompilerSettings()
     if (CMAKE_CXX_COMPIlER_ID MATCHES Clang OR _compiler_basename MATCHES "clang-cl.exe")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything ")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" )
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
