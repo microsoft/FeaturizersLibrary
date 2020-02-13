@@ -6004,7 +6004,8 @@ from_stream(std::basic_istream<CharT, Traits>& is, const CharT* fmt,
                 {
 #if !ONLY_C_LOCALE
                     ios_base::iostate err = ios_base::goodbit;
-                    f.get(is, nullptr, is, err, &tm, command, fmt+1);
+                    // BugBug f.get(is, nullptr, is, err, &tm, command, fmt+1);
+                    f.get_date(is, nullptr, is, err, &tm); // BugBug
                     if ((err & ios::failbit) == 0)
                         m = tm.tm_mon + 1;
                     is.setstate(err);
@@ -6026,7 +6027,9 @@ from_stream(std::basic_istream<CharT, Traits>& is, const CharT* fmt,
                 {
 #if !ONLY_C_LOCALE
                     ios_base::iostate err = ios_base::goodbit;
-                    f.get(is, nullptr, is, err, &tm, command, fmt+1);
+                    // BugBug f.get(is, nullptr, is, err, &tm, command, fmt+1);
+                    f.get_date(is, nullptr, is, err, &tm); // BugBug
+                    f.get_time(is, nullptr, is, err, &tm); // BugBug
                     if ((err & ios::failbit) == 0)
                     {
                         Y = tm.tm_year + 1900;
@@ -6081,7 +6084,8 @@ from_stream(std::basic_istream<CharT, Traits>& is, const CharT* fmt,
                 {
 #if !ONLY_C_LOCALE
                     ios_base::iostate err = ios_base::goodbit;
-                    f.get(is, nullptr, is, err, &tm, command, fmt+1);
+                    // BugBug f.get(is, nullptr, is, err, &tm, command, fmt+1);
+                    f.get_date(is, nullptr, is, err, &tm); // BugBug
                     if ((err & ios::failbit) == 0)
                     {
                         Y = tm.tm_year + 1900;
@@ -6105,7 +6109,8 @@ from_stream(std::basic_istream<CharT, Traits>& is, const CharT* fmt,
                 {
 #if !ONLY_C_LOCALE
                     ios_base::iostate err = ios_base::goodbit;
-                    f.get(is, nullptr, is, err, &tm, command, fmt+1);
+                    // BugBug f.get(is, nullptr, is, err, &tm, command, fmt+1);
+                    f.get_time(is, nullptr, is, err, &tm); // BugBug
                     if ((err & ios::failbit) == 0)
                     {
                         h = hours{tm.tm_hour};
@@ -6148,7 +6153,8 @@ from_stream(std::basic_istream<CharT, Traits>& is, const CharT* fmt,
                     else
                     {
                         ios_base::iostate err = ios_base::goodbit;
-                        f.get(is, nullptr, is, err, &tm, command, fmt+1);
+                        // BugBug f.get(is, nullptr, is, err, &tm, command, fmt+1);
+                        f.get_date(is, nullptr, is, err, &tm); // BugBug
                         if ((err & ios::failbit) == 0)
                         {
                             auto tY = tm.tm_year + 1900;
