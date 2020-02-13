@@ -5978,7 +5978,9 @@ from_stream(std::basic_istream<CharT, Traits>& is, const CharT* fmt,
                 {
 #if !ONLY_C_LOCALE
                     ios_base::iostate err = ios_base::goodbit;
-                    f.get(is, nullptr, is, err, &tm, command, fmt+1);
+
+                    // BugBug f.get(is, nullptr, is, err, &tm, command, fmt+1);
+                    f.get_weekday(is, nullptr, is, err, &tm); // BugBug
                     if ((err & ios::failbit) == 0)
                         wd = tm.tm_wday;
                     is.setstate(err);
