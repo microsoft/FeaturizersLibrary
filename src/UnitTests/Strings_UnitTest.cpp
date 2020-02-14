@@ -62,22 +62,19 @@ void ParseTest(std::string const & input, std::vector<std::string> const & label
 void ParseRegexTest(std::string const & input,
                     std::vector<std::string> const & label,
                     std::string const & token = "[^\\s]+") {
-    std::regex rgx(token);
-
     std::vector<std::string> output1;
-    Details::ParseRegex<std::string::const_iterator, std::regex>(
-        input.begin(),
-        input.end(),
-        rgx,
+    ParseRegex(
+        input,
+        token,
         [&output1] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
             output1.emplace_back(std::string(iterBegin, iterEnd));
         }
     );
     CHECK(output1 == label);
     std::vector<std::string> output2;
-    ParseRegex<std::string::const_iterator, std::regex>(
+    ParseRegex(
         input,
-        rgx,
+        token,
         [&output2] (std::string::const_iterator iterBegin, std::string::const_iterator iterEnd) {
             output2.emplace_back(std::string(iterBegin, iterEnd));
         }

@@ -2,16 +2,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
-
 # This is defined as a function to limit the visibility of _this_path so that
 # it doesn't conflict with other cmake modules.
 function(Impl)
+    get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
+
     include(${_this_path}/../Components/cmake/FeaturizersComponentsCode.cmake)
 
     add_library(FeaturizersCode STATIC
-        ${_this_path}/../../3rdParty/MurmurHash3.cpp
-
         ${_this_path}/../CatImputerFeaturizer.h
         ${_this_path}/../CountVectorizerFeaturizer.h
         ${_this_path}/../CountVectorizerFeaturizer.cpp
@@ -48,7 +46,11 @@ function(Impl)
         ${_this_path}/../Base/NormalizeFeaturizer.h
     )
 
-    target_link_libraries(FeaturizersCode PRIVATE
+    target_include_directories(FeaturizersCode PUBLIC
+        FeaturizersComponentsCode
+    )
+
+    target_link_libraries(FeaturizersCode PUBLIC
         FeaturizersComponentsCode
     )
 

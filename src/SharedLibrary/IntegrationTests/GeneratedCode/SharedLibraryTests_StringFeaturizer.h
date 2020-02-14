@@ -99,7 +99,7 @@ void StringFeaturizer_int8_Test(
         REQUIRE(StringFeaturizer_int8_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
@@ -207,7 +207,7 @@ void StringFeaturizer_int16_Test(
         REQUIRE(StringFeaturizer_int16_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
@@ -315,7 +315,7 @@ void StringFeaturizer_int32_Test(
         REQUIRE(StringFeaturizer_int32_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
@@ -423,7 +423,7 @@ void StringFeaturizer_int64_Test(
         REQUIRE(StringFeaturizer_int64_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
@@ -531,7 +531,7 @@ void StringFeaturizer_uint8_Test(
         REQUIRE(StringFeaturizer_uint8_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
@@ -639,7 +639,7 @@ void StringFeaturizer_uint16_Test(
         REQUIRE(StringFeaturizer_uint16_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
@@ -747,7 +747,7 @@ void StringFeaturizer_uint32_Test(
         REQUIRE(StringFeaturizer_uint32_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
@@ -855,7 +855,7 @@ void StringFeaturizer_uint64_Test(
         REQUIRE(StringFeaturizer_uint64_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
@@ -963,7 +963,7 @@ void StringFeaturizer_float_Test(
         REQUIRE(StringFeaturizer_float_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
@@ -1071,7 +1071,7 @@ void StringFeaturizer_double_Test(
         REQUIRE(StringFeaturizer_double_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
@@ -1179,7 +1179,7 @@ void StringFeaturizer_bool_Test(
         REQUIRE(StringFeaturizer_bool_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
@@ -1287,7 +1287,7 @@ void StringFeaturizer_string_Test(
         REQUIRE(StringFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());

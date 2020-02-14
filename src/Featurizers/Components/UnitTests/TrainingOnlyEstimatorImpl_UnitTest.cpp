@@ -41,7 +41,6 @@ protected:
     // ----------------------------------------------------------------------
     // |  Protected Data
     typename Results::CountMap              _counts;
-
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -61,12 +60,12 @@ public:
     void fit(U const &input) {
         std::uint32_t &                     count(
             [this, &input](void) -> std::uint32_t & {
-                typename BaseType::Results::CountMap::iterator const        i(BaseType::_counts.find(input));
+                typename BaseType::Results::CountMap::iterator const        i(this->_counts.find(input));
 
-                if(i != BaseType::_counts.end())
+                if(i != this->_counts.end())
                     return i->second;
 
-                std::pair<typename BaseType::Results::CountMap::iterator, bool> const   result(BaseType::_counts.emplace(std::make_pair(input, 0)));
+                std::pair<typename BaseType::Results::CountMap::iterator, bool> const   result(this->_counts.emplace(std::make_pair(input, 0)));
 
                 return result.first->second;
             }()
@@ -94,12 +93,12 @@ public:
 
             std::uint32_t &                 count(
                 [this, &input](void) -> std::uint32_t & {
-                    typename BaseType::Results::CountMap::iterator const    i(BaseType::_counts.find(input));
+                    typename BaseType::Results::CountMap::iterator const    i(this->_counts.find(input));
 
-                    if(i != BaseType::_counts.end())
+                    if(i != this->_counts.end())
                         return i->second;
 
-                    std::pair<typename BaseType::Results::CountMap::iterator, bool> const   result(BaseType::_counts.emplace(std::make_pair(input, 0)));
+                    std::pair<typename BaseType::Results::CountMap::iterator, bool> const   result(this->_counts.emplace(std::make_pair(input, 0)));
 
                     return result.first->second;
                 }()

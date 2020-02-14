@@ -54,10 +54,7 @@ def Build(
     no_build_info=False,
     keep_temp_dir=False,
     cmake_generator=(
-        None
-        if os.getenv("DEVELOPMENT_ENVIRONMENT_REPOSITORY_CONFIGURATION")
-        == "universal_linux"
-        else "Ninja"
+        None if os.getenv("DEVELOPMENT_ENVIRONMENT_REPOSITORY_CONFIGURATION") == "universal_linux" or os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_USE_DEFAULT_CMAKE_GENERATOR") else "Ninja"
     ),
     output_stream=sys.stdout,
     verbose=False,

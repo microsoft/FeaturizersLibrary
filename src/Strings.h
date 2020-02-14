@@ -4,11 +4,25 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include<algorithm>
-#include<functional>
-#include<regex>
-#include<string>
-#include<vector>
+#include <algorithm>
+#include <functional>
+#include <regex>
+#include <string>
+#include <vector>
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#   pragma clang diagnostic ignored "-Wunknown-argument"
+#   pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
+
+#include "re2/re2.h"
+#include "re2/stringpiece.h"
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 namespace Microsoft {
 namespace Featurizer {
@@ -71,13 +85,16 @@ void Parse(std::string const &input,
 ///  \fn            ParseRegex
 ///  \brief         Parse string using RegexToken and callback each element
 ///
-template <
-    typename IteratorT,
-    typename RegexT
->
+template <typename RegexT>
 void ParseRegex(std::string const &input,
                 RegexT const &regexToken,
-                std::function<void (IteratorT, IteratorT)> const &callback);
+                std::function<void (std::string::const_iterator, std::string::const_iterator)> const &callback);
+
+template <typename RegexT>
+void ParseRegex(char const *pString, size_t cCharacters,
+                RegexT const &regexToken,
+                std::function<void (char const *, size_t)> const &callback);
+
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            ParseNgramWord
@@ -210,30 +227,6 @@ void Parse(IteratorT const &begin,
         callback(left, right);
 }
 
-template <
-    typename IteratorT,
-    typename RegexT
->
-inline void ParseRegex(IteratorT const &begin,
-                       IteratorT const &end,
-                       RegexT const &regexToken,
-                       std::function<void (IteratorT, IteratorT)> const &callback) {
-
-    std::sregex_iterator iter(begin, end, regexToken);
-    std::sregex_iterator iterEnd;
-
-    while (iter != iterEnd) {
-        IteratorT                           matchStart(begin);
-        std::advance(matchStart, iter->position());
-
-        IteratorT                           matchEnd(matchStart);
-        std::advance(matchEnd, iter->length());
-
-        callback(matchStart, matchEnd);
-        ++iter;
-    }
-}
-
 template <typename IteratorT>
 void ParseNgramCharHelper(IteratorT const &begin,
                           IteratorT const &end,
@@ -334,15 +327,50 @@ void Parse(std::string const &input,
     Details::Parse(input.begin(), input.end(), predicate, callback);
 }
 
-template <
-    typename IteratorT,
-    typename RegexT
->
+template <typename RegexT>
 void ParseRegex(std::string const &input,
                 RegexT const &regexToken,
-                std::function<void (IteratorT, IteratorT)> const &callback) {
+                std::function<void (std::string::const_iterator, std::string::const_iterator)> const &callback) {
+    // This is a hack; we want the callback function for this function overload to deal in iterators, but the actual
+    // implementation of this function deals with character pointers. Map the callback's input from char pointers to
+    // iterators to preserve a consistent interface.
+    char const * const                      pInput(input.c_str());
 
-    Details::ParseRegex(input.begin(), input.end(), regexToken, callback);
+    ParseRegex(
+        input.c_str(),
+        input.size(),
+        regexToken,
+        [&input, &callback, &pInput](char const *pString, size_t cCharacters) {
+            std::string::const_iterator     begin(input.begin());
+
+            std::advance(begin, pString - pInput);
+
+            std::string::const_iterator     end(begin);
+
+            std::advance(end, cCharacters);
+
+            callback(begin, end);
+        }
+    );
+}
+
+template <typename RegexT>
+void ParseRegex(char const *pString, size_t cCharacters,
+                RegexT const &regexToken,
+                std::function<void (char const *, size_t)> const &callback) {
+    if(pString == nullptr) throw std::invalid_argument("pString");
+    if(cCharacters == 0) throw std::invalid_argument("cCharacters");
+
+    re2::StringPiece                        sp(pString, cCharacters);
+    re2::RE2                                pattern(regexToken);
+    size_t                                  start_loc(0);
+    re2::StringPiece                        submatch;
+    const RE2::Anchor                       anchor(RE2::UNANCHORED);
+
+    while(pattern.Match(sp, start_loc, sp.size(), anchor, &submatch, 1)) {
+        callback(submatch.data(), submatch.size());
+        start_loc = static_cast<size_t>(submatch.data() - sp.data()) + submatch.length();
+    }
 }
 
 template <

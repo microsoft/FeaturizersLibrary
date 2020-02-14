@@ -375,9 +375,9 @@ ParseFunctionType DocumentParseFuncGenerator(AnalyzerMethod const &analyzer, std
     if (analyzer == AnalyzerMethod::Word) {
         if (!regexToken.empty()) {
             return [regexToken] (std::string const & input, std::function<void (StringIterator, StringIterator)> const &callback) {
-                Microsoft::Featurizer::Strings::ParseRegex<std::string::const_iterator, std::regex>(
+                Microsoft::Featurizer::Strings::ParseRegex(
                     input,
-                    std::regex(regexToken),
+                    regexToken,
                     callback
                 );
             };

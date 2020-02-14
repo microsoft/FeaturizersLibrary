@@ -8,6 +8,8 @@
 function(Impl)
     get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
+    include(${_this_path}/../../../3rdParty/cmake/Featurizer3rdParty.cmake)
+
     add_library(FeaturizersComponentsCode STATIC
         ${_this_path}/../Components.h
         ${_this_path}/../DocumentStatisticsEstimator.h
@@ -34,6 +36,16 @@ function(Impl)
 
         ${_this_path}/../Details/EstimatorTraits.h
         ${_this_path}/../Details/PipelineExecutionEstimatorImpl_details.h
+    )
+
+    target_include_directories(
+        FeaturizersComponentsCode PUBLIC
+        Featurizer3rdParty
+    )
+
+    target_link_libraries(
+        FeaturizersComponentsCode PUBLIC
+        Featurizer3rdParty
     )
 endfunction()
 
