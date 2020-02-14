@@ -168,7 +168,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int8_FitBuffer(/*in*/ Missi
         std::int8_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int8_t>::CreateNullValue());
         #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int8_t>::CreateNullValue());
@@ -515,7 +515,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int16_FitBuffer(/*in*/ Miss
         std::int16_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int16_t>::CreateNullValue());
         #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int16_t>::CreateNullValue());
@@ -862,7 +862,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int32_FitBuffer(/*in*/ Miss
         std::int32_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int32_t>::CreateNullValue());
         #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int32_t>::CreateNullValue());
@@ -1209,7 +1209,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_int64_FitBuffer(/*in*/ Miss
         std::int64_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int64_t>::CreateNullValue());
         #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int64_t>::CreateNullValue());
@@ -1556,7 +1556,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint8_FitBuffer(/*in*/ Miss
         std::uint8_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint8_t>::CreateNullValue());
         #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint8_t>::CreateNullValue());
@@ -1903,7 +1903,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint16_FitBuffer(/*in*/ Mis
         std::uint16_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint16_t>::CreateNullValue());
         #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint16_t>::CreateNullValue());
@@ -2250,7 +2250,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint32_FitBuffer(/*in*/ Mis
         std::uint32_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue());
         #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue());
@@ -2597,7 +2597,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_uint64_FitBuffer(/*in*/ Mis
         std::uint64_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint64_t>::CreateNullValue());
         #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint64_t>::CreateNullValue());
@@ -2944,7 +2944,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_float_FitBuffer(/*in*/ Miss
         std::float_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
         #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
@@ -3291,7 +3291,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_double_FitBuffer(/*in*/ Mis
         std::double_t const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue());
         #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue());
@@ -3638,7 +3638,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_bool_FitBuffer(/*in*/ Missi
         bool const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<bool>::CreateNullValue());
         #else
             input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<bool>::CreateNullValue());
@@ -3985,7 +3985,7 @@ FEATURIZER_LIBRARY_API bool MissingDummiesFeaturizer_string_FitBuffer(/*in*/ Mis
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? *input_ptr : nonstd::optional<std::string>());
         #else
             input_buffer.emplace_back(*input_ptr ? *input_ptr : nonstd::optional<std::string>());

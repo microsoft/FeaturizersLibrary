@@ -100,7 +100,7 @@ void OneHotEncoderFeaturizer_int8_Test(
         REQUIRE(OneHotEncoderFeaturizer_int8_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
         results.emplace_back(result_numElements, result_value, result_index);
@@ -206,7 +206,7 @@ void OneHotEncoderFeaturizer_int16_Test(
         REQUIRE(OneHotEncoderFeaturizer_int16_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
         results.emplace_back(result_numElements, result_value, result_index);
@@ -312,7 +312,7 @@ void OneHotEncoderFeaturizer_int32_Test(
         REQUIRE(OneHotEncoderFeaturizer_int32_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
         results.emplace_back(result_numElements, result_value, result_index);
@@ -418,7 +418,7 @@ void OneHotEncoderFeaturizer_int64_Test(
         REQUIRE(OneHotEncoderFeaturizer_int64_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
         results.emplace_back(result_numElements, result_value, result_index);
@@ -524,7 +524,7 @@ void OneHotEncoderFeaturizer_uint8_Test(
         REQUIRE(OneHotEncoderFeaturizer_uint8_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
         results.emplace_back(result_numElements, result_value, result_index);
@@ -630,7 +630,7 @@ void OneHotEncoderFeaturizer_uint16_Test(
         REQUIRE(OneHotEncoderFeaturizer_uint16_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
         results.emplace_back(result_numElements, result_value, result_index);
@@ -736,7 +736,7 @@ void OneHotEncoderFeaturizer_uint32_Test(
         REQUIRE(OneHotEncoderFeaturizer_uint32_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
         results.emplace_back(result_numElements, result_value, result_index);
@@ -842,7 +842,7 @@ void OneHotEncoderFeaturizer_uint64_Test(
         REQUIRE(OneHotEncoderFeaturizer_uint64_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
         results.emplace_back(result_numElements, result_value, result_index);
@@ -948,7 +948,7 @@ void OneHotEncoderFeaturizer_float_Test(
         REQUIRE(OneHotEncoderFeaturizer_float_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
         results.emplace_back(result_numElements, result_value, result_index);
@@ -1054,7 +1054,7 @@ void OneHotEncoderFeaturizer_double_Test(
         REQUIRE(OneHotEncoderFeaturizer_double_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
         results.emplace_back(result_numElements, result_value, result_index);
@@ -1160,7 +1160,7 @@ void OneHotEncoderFeaturizer_bool_Test(
         REQUIRE(OneHotEncoderFeaturizer_bool_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
         results.emplace_back(result_numElements, result_value, result_index);
@@ -1266,7 +1266,7 @@ void OneHotEncoderFeaturizer_string_Test(
         REQUIRE(OneHotEncoderFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<std::uint8_t>(result_numElements, result_value, result_index));
         #else
         results.emplace_back(result_numElements, result_value, result_index);

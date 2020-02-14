@@ -89,7 +89,7 @@ class MatrixTypeInfoFactory(TypeInfoFactory):
             ),
             textwrap.dedent(
                 """\
-                #if (defined __apple_build_version__)
+                #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
                 results.push_back(Eigen::Map<Eigen::MatrixX<{type}>>({name}_ptr, static_cast<Eigen::Index>({name}_cols), static_cast<Eigen::Index>({name}_rows)));
                 #else
                 results.emplace_back(Eigen::Map<Eigen::MatrixX<{type}>>({name}_ptr, static_cast<Eigen::Index>({name}_cols), static_cast<Eigen::Index>({name}_rows)));

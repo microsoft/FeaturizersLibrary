@@ -168,7 +168,7 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_FitBuffer(/*in*/ CountVect
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);

@@ -97,7 +97,7 @@ void ModeImputerFeaturizer_int8_Test(
         REQUIRE(ModeImputerFeaturizer_int8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -200,7 +200,7 @@ void ModeImputerFeaturizer_int16_Test(
         REQUIRE(ModeImputerFeaturizer_int16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -303,7 +303,7 @@ void ModeImputerFeaturizer_int32_Test(
         REQUIRE(ModeImputerFeaturizer_int32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -406,7 +406,7 @@ void ModeImputerFeaturizer_int64_Test(
         REQUIRE(ModeImputerFeaturizer_int64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -509,7 +509,7 @@ void ModeImputerFeaturizer_uint8_Test(
         REQUIRE(ModeImputerFeaturizer_uint8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -612,7 +612,7 @@ void ModeImputerFeaturizer_uint16_Test(
         REQUIRE(ModeImputerFeaturizer_uint16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -715,7 +715,7 @@ void ModeImputerFeaturizer_uint32_Test(
         REQUIRE(ModeImputerFeaturizer_uint32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -818,7 +818,7 @@ void ModeImputerFeaturizer_uint64_Test(
         REQUIRE(ModeImputerFeaturizer_uint64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -921,7 +921,7 @@ void ModeImputerFeaturizer_float_Test(
         REQUIRE(ModeImputerFeaturizer_float_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -1024,7 +1024,7 @@ void ModeImputerFeaturizer_double_Test(
         REQUIRE(ModeImputerFeaturizer_double_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -1127,7 +1127,7 @@ void ModeImputerFeaturizer_bool_Test(
         REQUIRE(ModeImputerFeaturizer_bool_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -1231,7 +1231,7 @@ void ModeImputerFeaturizer_string_Test(
         REQUIRE(ModeImputerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(result_ptr ? std::string(result_ptr) : std::string());
         #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());

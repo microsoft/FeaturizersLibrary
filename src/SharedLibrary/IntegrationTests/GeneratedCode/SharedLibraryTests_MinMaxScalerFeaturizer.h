@@ -97,7 +97,7 @@ void MinMaxScalerFeaturizer_int8_Test(
         REQUIRE(MinMaxScalerFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -200,7 +200,7 @@ void MinMaxScalerFeaturizer_int16_Test(
         REQUIRE(MinMaxScalerFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -303,7 +303,7 @@ void MinMaxScalerFeaturizer_int32_Test(
         REQUIRE(MinMaxScalerFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -406,7 +406,7 @@ void MinMaxScalerFeaturizer_int64_Test(
         REQUIRE(MinMaxScalerFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -509,7 +509,7 @@ void MinMaxScalerFeaturizer_uint8_Test(
         REQUIRE(MinMaxScalerFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -612,7 +612,7 @@ void MinMaxScalerFeaturizer_uint16_Test(
         REQUIRE(MinMaxScalerFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -715,7 +715,7 @@ void MinMaxScalerFeaturizer_uint32_Test(
         REQUIRE(MinMaxScalerFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -818,7 +818,7 @@ void MinMaxScalerFeaturizer_uint64_Test(
         REQUIRE(MinMaxScalerFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -921,7 +921,7 @@ void MinMaxScalerFeaturizer_float_Test(
         REQUIRE(MinMaxScalerFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -1024,7 +1024,7 @@ void MinMaxScalerFeaturizer_double_Test(
         REQUIRE(MinMaxScalerFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));

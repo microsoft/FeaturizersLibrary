@@ -98,7 +98,7 @@ void RobustScalerFeaturizer_int8_Test(
         REQUIRE(RobustScalerFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -202,7 +202,7 @@ void RobustScalerFeaturizer_int16_Test(
         REQUIRE(RobustScalerFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -306,7 +306,7 @@ void RobustScalerFeaturizer_uint8_Test(
         REQUIRE(RobustScalerFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -410,7 +410,7 @@ void RobustScalerFeaturizer_uint16_Test(
         REQUIRE(RobustScalerFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -514,7 +514,7 @@ void RobustScalerFeaturizer_float_Test(
         REQUIRE(RobustScalerFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -618,7 +618,7 @@ void RobustScalerFeaturizer_int32_Test(
         REQUIRE(RobustScalerFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -722,7 +722,7 @@ void RobustScalerFeaturizer_int64_Test(
         REQUIRE(RobustScalerFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -826,7 +826,7 @@ void RobustScalerFeaturizer_uint32_Test(
         REQUIRE(RobustScalerFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -930,7 +930,7 @@ void RobustScalerFeaturizer_uint64_Test(
         REQUIRE(RobustScalerFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));
@@ -1034,7 +1034,7 @@ void RobustScalerFeaturizer_double_Test(
         REQUIRE(RobustScalerFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::move(result));
         #else
         results.emplace_back(std::move(result));

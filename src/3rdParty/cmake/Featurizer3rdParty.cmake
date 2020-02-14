@@ -49,20 +49,14 @@ function(Impl)
     get_filename_component(_compiler_basename "${CMAKE_CXX_COMPILER}" NAME)
 
     PreserveCompilerSettings()
+
+    # Ignore warnings in re2
     if (CMAKE_CXX_COMPILER_ID MATCHES Clang OR _compiler_basename MATCHES "clang-cl.exe")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-        if (UNIX)
-            find_package(Threads)
-            target_link_libraries(Featurizer3rdParty PUBLIC ${CMAKE_THREAD_LIBS_INIT})
-        endif()
-    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" )
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        find_package(Threads)
-        target_link_libraries(Featurizer3rdParty PUBLIC ${CMAKE_THREAD_LIBS_INIT})
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-missing-field-initializers -Wno-unknown-warning-option")
-    else()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything ")
+    elseif (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
     endif()
 
     set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
@@ -79,6 +73,14 @@ function(Impl)
         ${_project_name} PUBLIC
         re2
     )
+
+    if (UNIX)
+        find_package(Threads)
+        target_link_libraries(
+            ${_project_name} PUBLIC
+            ${CMAKE_THREAD_LIBS_INIT}
+        )
+    endif()
 endfunction()
 
 Impl()

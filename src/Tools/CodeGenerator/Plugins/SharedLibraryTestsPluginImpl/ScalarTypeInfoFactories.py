@@ -62,7 +62,7 @@ class _ScalarTypeInfoFactory(TypeInfoFactory):
             "&{}".format(result_name),
             textwrap.dedent(
                 """\
-                #if (defined __apple_build_version__)
+                #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
                 results.push_back(std::move({result}));
                 #else
                 results.emplace_back(std::move({result}));

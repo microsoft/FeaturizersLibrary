@@ -98,7 +98,7 @@ void L2NormalizeFeaturizer_int8_Test(
         REQUIRE(L2NormalizeFeaturizer_int8_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
         #else
         results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
@@ -205,7 +205,7 @@ void L2NormalizeFeaturizer_int16_Test(
         REQUIRE(L2NormalizeFeaturizer_int16_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
         #else
         results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
@@ -312,7 +312,7 @@ void L2NormalizeFeaturizer_int32_Test(
         REQUIRE(L2NormalizeFeaturizer_int32_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
         #else
         results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
@@ -419,7 +419,7 @@ void L2NormalizeFeaturizer_int64_Test(
         REQUIRE(L2NormalizeFeaturizer_int64_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
         #else
         results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
@@ -526,7 +526,7 @@ void L2NormalizeFeaturizer_uint8_Test(
         REQUIRE(L2NormalizeFeaturizer_uint8_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
         #else
         results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
@@ -633,7 +633,7 @@ void L2NormalizeFeaturizer_uint16_Test(
         REQUIRE(L2NormalizeFeaturizer_uint16_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
         #else
         results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
@@ -740,7 +740,7 @@ void L2NormalizeFeaturizer_uint32_Test(
         REQUIRE(L2NormalizeFeaturizer_uint32_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
         #else
         results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
@@ -847,7 +847,7 @@ void L2NormalizeFeaturizer_uint64_Test(
         REQUIRE(L2NormalizeFeaturizer_uint64_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
         #else
         results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
@@ -954,7 +954,7 @@ void L2NormalizeFeaturizer_float_Test(
         REQUIRE(L2NormalizeFeaturizer_float_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
         #else
         results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
@@ -1061,7 +1061,7 @@ void L2NormalizeFeaturizer_double_Test(
         REQUIRE(L2NormalizeFeaturizer_double_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
         #else
         results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));

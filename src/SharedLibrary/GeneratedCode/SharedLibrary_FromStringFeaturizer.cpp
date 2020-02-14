@@ -168,7 +168,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int8_FitBuffer(/*in*/ FromStrin
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);
@@ -515,7 +515,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int16_FitBuffer(/*in*/ FromStri
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);
@@ -862,7 +862,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int32_FitBuffer(/*in*/ FromStri
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);
@@ -1209,7 +1209,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int64_FitBuffer(/*in*/ FromStri
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);
@@ -1556,7 +1556,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint8_FitBuffer(/*in*/ FromStri
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);
@@ -1903,7 +1903,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint16_FitBuffer(/*in*/ FromStr
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);
@@ -2250,7 +2250,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint32_FitBuffer(/*in*/ FromStr
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);
@@ -2597,7 +2597,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint64_FitBuffer(/*in*/ FromStr
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);
@@ -2944,7 +2944,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_float_FitBuffer(/*in*/ FromStri
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);
@@ -3291,7 +3291,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_double_FitBuffer(/*in*/ FromStr
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);
@@ -3638,7 +3638,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_FitBuffer(/*in*/ FromStrin
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);
@@ -3985,7 +3985,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_FitBuffer(/*in*/ FromStr
         char const * const * const input_end(input_ptr + input_items);
 
         while(input_ptr != input_end) {
-        #if (defined __apple_build_version__)
+        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr);
         #else
             input_buffer.emplace_back(*input_ptr);

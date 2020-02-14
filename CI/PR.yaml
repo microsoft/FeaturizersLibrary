@@ -35,7 +35,7 @@ stages:
           agent_pool_is_custom: true
           configuration: x64
           operating_system: Windows
-          job_display_name: "Windows-x64-Clang 8"
+          job_display_name: "Windows-x64-Clang 8.0.0"
           tester_code_coverage: True
 
       - template: "templates/BuildAndTest.job_template.yaml"
@@ -43,7 +43,7 @@ stages:
           agent_pool: FeaturizersLibrary
           agent_pool_is_custom: true
           configuration: x86
-          job_display_name: "Windows-x86-Clang 8"
+          job_display_name: "Windows-x86-Clang 8.0.0"
           operating_system: Windows
 
       - template: "templates/BuildAndTest.job_template.yaml"
@@ -51,14 +51,14 @@ stages:
           agent_pool: FeaturizersLibrary
           agent_pool_is_custom: true
           configuration: system_compiler
-          job_display_name: "Ubuntu 16.04-x64-GCC"
+          job_display_name: "Ubuntu 16.04-x64-GCC 5.4.0"
           operating_system: Linux
 
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
           agent_pool: macOS-10.14
           configuration: system_compiler
-          job_display_name: "MacOS 10.14-x64-Clang"
+          job_display_name: "MacOS 10.14-x64-Clang Apple 11.0.0"
           job_name_unique_id: "1014"
           operating_system: MacOS
 
@@ -73,15 +73,19 @@ stages:
 
       # Note that the universal_linux build is generating code that produces runtime errors. This build remains to ensure
       # that the code compiles on older platforms.
-      - template: "templates/BuildAndTest.job_template.yaml"
-        parameters:
-          agent_pool: FeaturizersLibrary
-          agent_pool_is_custom: true
-          agent_pool_container: universal_linux
-          configuration: universal_linux
-          operating_system: Linux
-          job_display_name: "[Build Only] Holy Build Box-x64-GCC"
-          tester_build_only: true
+
+      # This build is not currently working, as it runs into linker errors associated with older compilers. We are disabing
+      # this functionality for now.
+      #
+      # - template: "templates/BuildAndTest.job_template.yaml"
+      #   parameters:
+      #     agent_pool: FeaturizersLibrary
+      #     agent_pool_is_custom: true
+      #     agent_pool_container: universal_linux
+      #     configuration: universal_linux
+      #     operating_system: Linux
+      #     job_display_name: "[Build Only] Holy Build Box-x64-GCC 4.4.7 20120313 (updated stdlib)"
+      #     tester_build_only: true
 
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
@@ -89,14 +93,14 @@ stages:
           agent_pool_is_custom: true
           agent_pool_container: centos7
           configuration: system_compiler
-          job_display_name: "CentOS 7-x64-GCC"
+          job_display_name: "CentOS 7-x64-GCC 4.8.5"
           operating_system: Linux
 
       - template: "templates/BuildAndTest.job_template.yaml"
         parameters:
           agent_pool: macOS-10.13
           configuration: system_compiler
-          job_display_name: "MacOS 10.13-x64-Clang"
+          job_display_name: "MacOS 10.13-x64-Clang Apple 10.0.0"
           job_name_unique_id: "1013"
           operating_system: MacOS
 
@@ -105,7 +109,7 @@ stages:
           agent_pool: FeaturizersLibrary
           agent_pool_is_custom: true
           configuration: x86_MSVC_2017
-          job_display_name: "Windows-x86-MSVC 2017"
+          job_display_name: "Windows-x86-MSVC 2017 (19.16.27027.1)"
           operating_system: Windows
 
       - template: "templates/BuildAndTest.job_template.yaml"
@@ -113,7 +117,7 @@ stages:
           agent_pool: FeaturizersLibrary
           agent_pool_is_custom: true
           configuration: x64_MSVC_2017
-          job_display_name: "Windows-x64-MSVC 2017"
+          job_display_name: "Windows-x64-MSVC 2017 (19.16.27027.1)"
           operating_system: Windows
 
       - template: "templates/BuildAndTest.job_template.yaml"
@@ -121,7 +125,7 @@ stages:
           agent_pool: FeaturizersLibrary
           agent_pool_is_custom: true
           configuration: x86_MSVC_2019
-          job_display_name: "Windows-x86-MSVC 2019"
+          job_display_name: "Windows-x86-MSVC 2019 (19.20.27508.1)"
           operating_system: Windows
 
       - template: "templates/BuildAndTest.job_template.yaml"
@@ -129,7 +133,7 @@ stages:
           agent_pool: FeaturizersLibrary
           agent_pool_is_custom: true
           configuration: x64_MSVC_2019
-          job_display_name: "Windows-x64-MSVC 2019"
+          job_display_name: "Windows-x64-MSVC 2019 (19.20.27508.1)"
           operating_system: Windows
 
       # When code coverage is enabled, we only test debug builds. Execute release tests to ensure that everything is working.
@@ -138,7 +142,7 @@ stages:
           agent_pool: FeaturizersLibrary
           agent_pool_is_custom: true
           configuration: x64
-          job_display_name: "[Test Only] Windows-x64-Clang 8"
+          job_display_name: "[Test Only] Windows-x64-Clang 8.0.0"
           operating_system: Windows
           test_only: true
           tester_release_only: true
@@ -148,7 +152,7 @@ stages:
           agent_pool: FeaturizersLibrary
           agent_pool_is_custom: true
           configuration: x64_Clang_8
-          job_display_name: "Ubuntu 16.04-x64-Clang 8"
+          job_display_name: "Ubuntu 16.04-x64-Clang 8.0.0"
           operating_system: Linux
 
   - stage: PostBuild_Stage

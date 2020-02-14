@@ -209,14 +209,14 @@ template <typename InputT, typename TransformedT, bool InterpolateValuesV>
 template <typename U>
 void Details::MedianTrainingOnlyPolicy<InputT, TransformedT, InterpolateValuesV>::fit_impl(U const &input) {
     if(_smaller.empty() || static_cast<TransformedT>(input) <= _smaller.top()) {
-#if (defined __apple_build_version__)
+#if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         _smaller.push(static_cast<TransformedT>(input));
 #else
         _smaller.emplace(static_cast<TransformedT>(input));
 #endif
     }
     else {
-#if (defined __apple_build_version__)
+#if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         _larger.push(static_cast<TransformedT>(input));
 #else
         _larger.emplace(static_cast<TransformedT>(input));
@@ -225,7 +225,7 @@ void Details::MedianTrainingOnlyPolicy<InputT, TransformedT, InterpolateValuesV>
 
     // Rebalance if necessary
     if(_smaller.size() >= _larger.size() + 2) {
-#if (defined __apple_build_version__)
+#if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         _larger.push(_smaller.top());
 #else
         _larger.emplace(_smaller.top());
@@ -233,7 +233,7 @@ void Details::MedianTrainingOnlyPolicy<InputT, TransformedT, InterpolateValuesV>
         _smaller.pop();
     }
     else if(_larger.size() > _smaller.size()) {
-#if (defined __apple_build_version__)
+#if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
         _smaller.push(_larger.top());
 #else
         _smaller.emplace(_larger.top());

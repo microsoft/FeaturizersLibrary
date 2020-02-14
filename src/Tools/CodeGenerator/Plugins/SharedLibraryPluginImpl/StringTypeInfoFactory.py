@@ -70,7 +70,7 @@ class StringTypeInfoFactory(TypeInfoFactory):
                 char const * const * const {name}_end({name}_ptr + {name}_items);
 
                 while({name}_ptr != {name}_end) {{
-                #if (defined __apple_build_version__)
+                #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
                     {name}_buffer.push_back(*{name}_ptr ? *{name}_ptr : nonstd::optional<std::string>());
                 #else
                     {name}_buffer.emplace_back(*{name}_ptr ? *{name}_ptr : nonstd::optional<std::string>());
@@ -92,7 +92,7 @@ class StringTypeInfoFactory(TypeInfoFactory):
                 char const * const * const {name}_end({name}_ptr + {name}_items);
 
                 while({name}_ptr != {name}_end) {{
-                #if (defined __apple_build_version__)
+                #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
                     {name}_buffer.push_back(*{name}_ptr);
                 #else
                     {name}_buffer.emplace_back(*{name}_ptr);
