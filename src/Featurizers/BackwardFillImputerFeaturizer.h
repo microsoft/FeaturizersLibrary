@@ -44,6 +44,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     BackwardFillImputerTransformer(void);
+    BackwardFillImputerTransformer(T defaultValue);
     BackwardFillImputerTransformer(Archive &ar);
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(BackwardFillImputerTransformer);
@@ -58,9 +59,21 @@ public:
 private:
     // ----------------------------------------------------------------------
     // |
+    // |  Private Types
+    // |
+    // ----------------------------------------------------------------------
+    using NullableType                      = nonstd::optional<T>;
+
+    // ----------------------------------------------------------------------
+    // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
+    // We are using nonstd::optional here, as we always want the type to be optional
+    // and not result is default values which my not be optional (for example, double
+    // is technically optional (as it supports NaN), but default-constructs as something
+    // that isn't NaN; we avoid this problem by always using optional).
+    NullableType const                      _defaultValue;
     std::uint32_t                           _numPending;
 
     // ----------------------------------------------------------------------
@@ -89,9 +102,22 @@ private:
         _numPending = 0;
     }
 
-    void flush_impl(typename BaseType::CallbackFunction const &) override {
-        if(_numPending != 0)
-            throw std::runtime_error("Pending backward fill items remain");
+    void flush_impl(typename BaseType::CallbackFunction const &callback) override {
+        // ----------------------------------------------------------------------
+        using NullableTypeTraits            = Traits<NullableType>;
+        // ----------------------------------------------------------------------
+
+        if(_numPending != 0) {
+            if(NullableTypeTraits::IsNull(_defaultValue))
+                throw std::runtime_error("Pending backward fill items remain");
+
+            T const &                       defaultValue(NullableTypeTraits::GetNullableValue(_defaultValue));
+
+            while(_numPending) {
+                callback(defaultValue);
+                _numPending--;
+            }
+        }
     }
 };
 
@@ -117,18 +143,33 @@ BackwardFillImputerTransformer<T>::BackwardFillImputerTransformer(void) :
 }
 
 template <typename T>
+BackwardFillImputerTransformer<T>::BackwardFillImputerTransformer(T defaultValue) :
+    _defaultValue(std::move(defaultValue)),
+    _numPending(0) {
+}
+
+template <typename T>
 BackwardFillImputerTransformer<T>::BackwardFillImputerTransformer(Archive &ar) :
     BackwardFillImputerTransformer(
         [&ar](void) {
+            // ----------------------------------------------------------------------
+            using NullableTypeTraits        = Traits<NullableType>;
+            // ----------------------------------------------------------------------
+
             // Version
-            std::uint16_t                           majorVersion(Traits<std::uint16_t>::deserialize(ar));
-            std::uint16_t                           minorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
 
             if(majorVersion != 1 || minorVersion != 0)
                 throw std::runtime_error("Unsupported archive version");
 
-            // No data to deserialize
-            return BackwardFillImputerTransformer();
+            // Data
+            NullableType                    defaultValue(Traits<NullableType>::deserialize(ar));
+
+            if(NullableTypeTraits::IsNull(defaultValue))
+                return BackwardFillImputerTransformer();
+
+            return BackwardFillImputerTransformer(std::move(NullableTypeTraits::GetNullableValue(defaultValue)));
         }()
     ) {
 }
@@ -150,13 +191,32 @@ void BackwardFillImputerTransformer<T>::save(Archive &ar) const /*override*/ {
     Traits<std::uint16_t>::serialize(ar, 1); // Major
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
-    // No data to serialize
+    // Data
+    Traits<NullableType>::serialize(ar, _defaultValue);
 }
 
 template <typename T>
-bool BackwardFillImputerTransformer<T>::operator==(BackwardFillImputerTransformer const &) const {
-    // No state to compare
-    return true;
+bool BackwardFillImputerTransformer<T>::operator==(BackwardFillImputerTransformer const &other) const {
+    if(_numPending != other._numPending)
+        return false;
+
+    // We aren't using nonstd::optional's comparison operator as we aren't able to disable compiler warnings
+    // associated with the comparison of float values as that code has already been #included by the time
+    // that we get here. Do things manually instead.
+    if(static_cast<bool>(_defaultValue) != static_cast<bool>(_defaultValue))
+        return false;
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
+
+    return static_cast<bool>(_defaultValue) == false || *_defaultValue == *other._defaultValue;
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+
 }
 
 } // namespace Featurizers

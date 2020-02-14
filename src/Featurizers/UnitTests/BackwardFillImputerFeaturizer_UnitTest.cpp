@@ -131,6 +131,8 @@ TEST_CASE("Pending and reset") {
 
     CHECK(transformer.has_pending() == false);
     transformer.execute(NS::Traits<double>::CreateNullValue(), callback);
+    transformer.execute(NS::Traits<double>::CreateNullValue(), callback);
+    transformer.execute(NS::Traits<double>::CreateNullValue(), callback);
 
     CHECK(transformer.has_pending());
     CHECK_THROWS_WITH(transformer.flush(callback), "Pending backward fill items remain");
@@ -143,16 +145,66 @@ TEST_CASE("Pending and reset") {
     CHECK(output.empty());
 }
 
+TEST_CASE("Pending with default") {
+    NS::Featurizers::BackwardFillImputerTransformer<double>                 transformer(0.0);
+    std::vector<double>                                                     output;
+
+    auto const callback =
+        [&output](double value) {
+            output.emplace_back(std::move(value));
+        };
+
+    CHECK(transformer.has_pending() == false);
+    transformer.execute(NS::Traits<double>::CreateNullValue(), callback);
+    transformer.execute(NS::Traits<double>::CreateNullValue(), callback);
+    transformer.execute(NS::Traits<double>::CreateNullValue(), callback);
+
+    CHECK(transformer.has_pending());
+    transformer.flush(callback); // This will throw an exception when a default value is not provided
+    CHECK(transformer.has_pending() == false);
+
+    CHECK(output == std::vector<double>{0.0, 0.0, 0.0});
+}
+
 TEST_CASE("Serialization") {
-    NS::Featurizers::BackwardFillImputerTransformer<double>                 transformer;
-    NS::Archive                                                             out;
+    size_t                                  defaultArchiveSize(0);
+    size_t                                  valueArchiveSize(0);
 
-    transformer.save(out);
+    {
+        NS::Featurizers::BackwardFillImputerTransformer<double>             transformer;
+        NS::Archive                                                         out;
 
-    NS::Archive                                                             in(out.commit());
-    NS::Featurizers::BackwardFillImputerTransformer<double>                 other(in);
+        transformer.save(out);
 
-    CHECK(other == transformer);
+        NS::Archive::ByteArray              bytes(out.commit());
+
+        defaultArchiveSize = bytes.size();
+        CHECK(defaultArchiveSize != 0);
+
+        NS::Archive                                                         in(std::move(bytes));
+        NS::Featurizers::BackwardFillImputerTransformer<double>             other(in);
+
+        CHECK(other == transformer);
+    }
+
+    {
+        NS::Featurizers::BackwardFillImputerTransformer<double>             transformer(1.0);
+        NS::Archive                                                         out;
+
+        transformer.save(out);
+
+        NS::Archive::ByteArray              bytes(out.commit());
+
+        valueArchiveSize = bytes.size();
+        CHECK(valueArchiveSize != 0);
+
+        NS::Archive                                                         in(std::move(bytes));
+        NS::Featurizers::BackwardFillImputerTransformer<double>             other(in);
+
+        CHECK(other == transformer);
+    }
+
+    CHECK(defaultArchiveSize < valueArchiveSize);
 }
 
 TEST_CASE("Serialization Version Error") {

@@ -38,6 +38,24 @@ public:
             T
         >;
 
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    ForwardFillImputerTransformer(void) = default;
+    ForwardFillImputerTransformer(T defaultValue);
+    ForwardFillImputerTransformer(Archive &ar);
+
+    ~ForwardFillImputerTransformer(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(ForwardFillImputerTransformer);
+
+    bool operator==(ForwardFillImputerTransformer const &other) const;
+    bool operator!=(ForwardFillImputerTransformer const &other) const;
+
+    void save(Archive &ar) const override;
+
 private:
     // ----------------------------------------------------------------------
     // |
@@ -60,8 +78,10 @@ private:
         // ----------------------------------------------------------------------
 
         if(TheseTraits::IsNull(input)) {
-            if(_validLastValue == false)
+            if(_validLastValue == false) {
+                // This scenario will happen when the first imputed item is null, as we haven't seen a valid value yet.
                 throw std::runtime_error("No source value for forward fill");
+            }
 
             callback(_lastValue);
         }
@@ -82,6 +102,83 @@ private:
 ///
 template <typename T>
 using ForwardFillImputerEstimator           = Components::InferenceOnlyEstimatorImpl<ForwardFillImputerTransformer<T>>;
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// |
+// |  Implementation
+// |
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+template <typename T>
+ForwardFillImputerTransformer<T>::ForwardFillImputerTransformer(T defaultValue) :
+    _lastValue(std::move(defaultValue)),
+    _validLastValue(true) {
+}
+
+template <typename T>
+ForwardFillImputerTransformer<T>::ForwardFillImputerTransformer(Archive &ar) :
+    ForwardFillImputerTransformer(
+        [&ar](void) {
+            // Version
+            std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
+            std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
+
+            if(majorVersion != 1 || minorVersion != 0)
+                throw std::runtime_error("Unsupported archive version");
+
+            // Data
+            bool                            validLastValue(Traits<bool>::deserialize(ar));
+
+            if(validLastValue == false)
+                return ForwardFillImputerTransformer();
+
+            T                               lastValue(Traits<T>::deserialize(ar));
+
+            return ForwardFillImputerTransformer(std::move(lastValue));
+        }()
+    ) {
+}
+
+template <typename T>
+bool ForwardFillImputerTransformer<T>::operator==(ForwardFillImputerTransformer const &other) const {
+    if(_validLastValue != other._validLastValue)
+        return false;
+
+    if(_validLastValue == false)
+        return true;
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
+
+    return _lastValue == other._lastValue;
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
+}
+
+template <typename T>
+bool ForwardFillImputerTransformer<T>::operator!=(ForwardFillImputerTransformer const &other) const {
+    return (*this == other) == false;
+}
+
+template <typename T>
+void ForwardFillImputerTransformer<T>::save(Archive &ar) const /*override*/ {
+    // Version
+    Traits<std::uint16_t>::serialize(ar, 1); // Major
+    Traits<std::uint16_t>::serialize(ar, 0); // Minor
+
+    // Data
+    Traits<bool>::serialize(ar, _validLastValue);
+
+    if(_validLastValue)
+        Traits<T>::serialize(ar, _lastValue);
+}
 
 } // namespace Featurizers
 } // namespace Featurizer

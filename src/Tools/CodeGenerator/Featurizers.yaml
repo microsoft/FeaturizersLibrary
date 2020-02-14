@@ -2,7 +2,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: BackwardFillImputerFeaturizer
     estimator_name: BackwardFillImputerEstimator
-    release_version: 0.3.6
+    release_version: 0.4.0
     num_output_columns: 1
     creates_annotations: false
     description: |-
@@ -284,7 +284,7 @@ featurizers:
   # ----------------------------------------------------------------------
   - name: ForwardFillImputerFeaturizer
     estimator_name: ForwardFillImputerEstimator
-    release_version: 0.3.6
+    release_version: 0.4.0
     num_output_columns: 1
     creates_annotations: false
     description: |-
