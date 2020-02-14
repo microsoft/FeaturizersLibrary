@@ -10,6 +10,7 @@ function(Impl)
     include(${_this_path}/../Components/cmake/FeaturizersComponentsCode.cmake)
 
     add_library(FeaturizersCode STATIC
+        ${_this_path}/../BackwardFillImputerFeaturizer.h
         ${_this_path}/../CatImputerFeaturizer.h
         ${_this_path}/../CountVectorizerFeaturizer.h
         ${_this_path}/../CountVectorizerFeaturizer.cpp
