@@ -23,7 +23,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(_src_this_path ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
-include(${_src_this_path}/../Featurizers/cmake/FeaturizersCode.cmake)
+include(${_src_this_path}/../3rdParty/cmake/Featurizer3rdParty.cmake)
 
 enable_testing()
 
@@ -38,14 +38,14 @@ foreach(_test_name IN ITEMS
     target_include_directories(
         ${_test_name} PRIVATE
         ${_includes}
-        FeaturizersCode
+        Featurizer3rdParty
     )
 
     target_link_directories(${_test_name} PRIVATE ${_libs})
 
     target_link_libraries(
         ${_test_name}
-        FeaturizersCode
+        Featurizer3rdParty
     )
 
     add_test(NAME ${_test_name} COMMAND ${_test_name} --success)
