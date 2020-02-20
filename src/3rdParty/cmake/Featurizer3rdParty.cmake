@@ -59,8 +59,6 @@ function(Impl)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
     endif()
 
-    RestoreCompilerSettings()
-
     if(NOT TARGET re2::re2)
         set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
@@ -79,6 +77,8 @@ function(Impl)
             re2
         )
     endif()
+
+    RestoreCompilerSettings()
 
     if (UNIX)
         find_package(Threads)
