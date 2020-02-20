@@ -23,7 +23,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(_src_this_path ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
-
 include(${_src_this_path}/../3rdParty/cmake/Featurizer3rdParty.cmake)
 
 enable_testing()
