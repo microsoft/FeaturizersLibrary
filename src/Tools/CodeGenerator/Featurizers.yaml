@@ -1286,6 +1286,70 @@ featurizers:
     status: External
 
   # ----------------------------------------------------------------------
+  - name: LagLeadOperatorFeaturizer
+    estimator_name: LagLeadOperatorEstimator
+    release_version: 0.4.0
+    num_output_columns: 1
+    description: |-
+      Computes lags and leads for values. Works for general time series data sets.
+      For sparse time series data sets, forward fill imputer will be applied.
+
+      C++-style pseudo signature:
+        template <typename T> double execute(std::tuple<std::chrono::system_clock::time_point, T, uint8> const &value);
+
+      Examples:
+          Assuming we have max horizon = 2 and we want to lag 1 and 2
+          +---------------+-------+------------------+-------------------+-------------------+
+          | time          | target| horizon_origin   | target_lag_1      | target_lag_2      |
+          +===============+=======+==================+===================+===================+
+          | 2017-01-01    | 8     | 2016-11-01       | NAN               | NAN               |
+          +---------------+-------+------------------+-------------------+-------------------+
+          | 2017-01-01    | 8     | 2016-12-01       | NAN               | NAN               |
+          +---------------+-------+------------------+-------------------+-------------------+
+          | 2017-02-01    | 9     | 2016-12-01       | NAN               | NAN               |
+          +---------------+-------+------------------+-------------------+-------------------+
+          | 2017-02-01    | 9     | 2017-01-01       | 8                 | NAN               |
+          +---------------+-------+------------------+-------------------+-------------------+
+          | 2017-03-01    | 10    | 2017-01-01       | 8                 | NAN               |
+          +---------------+-------+------------------+-------------------+-------------------+
+          | 2017-03-01    | 10    | 2017-02-01       | 9                 | 8                 |
+          +---------------+-------+------------------+-------------------+-------------------+
+          | 2017-04-01    | 11    | 2017-02-01       | 10                | 8                 |
+          +---------------+-------+------------------+-------------------+-------------------+
+          | 2017-04-01    | 11    | 2017-03-01       | 11                | 10                |
+          +---------------+-------+------------------+-------------------+-------------------+
+
+          Minus lags means lead in this featurizer
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+
+    type_mappings:
+      - input_type: T
+        output_type: double
+
+    configuration_params:
+      - type: uint8
+        name: horizon
+        is_optional: false
+
+      - type: int8
+        name: lags
+        is_optional: false
+
+    status: pending
+
+  # ----------------------------------------------------------------------
   - name: TruncatedSVDFeaturizer
     estimator_name: TruncatedSVDEstimator
     release_version: 0.3.6
