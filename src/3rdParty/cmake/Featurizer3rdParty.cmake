@@ -59,20 +59,26 @@ function(Impl)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
     endif()
 
-    set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
-    add_subdirectory(${_this_path}/../re2 ${CMAKE_CURRENT_BINARY_DIR}/3rdParty/re2 EXCLUDE_FROM_ALL)
-
     RestoreCompilerSettings()
 
-    target_include_directories(
-        ${_project_name} PUBLIC
-        ${_this_path}/../re2
-    )
+    if(NOT TARGET re2::re2)
+        set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
-    target_link_libraries(
-        ${_project_name} PUBLIC
-        re2
-    )
+        add_subdirectory(${FEATURIZERS_ROOT}/src/3rdParty/re2 ${FEATURIZERS_ROOT}/src/3rdParty/re2 EXCLUDE_FROM_ALL)
+        set_target_properties(re2 PROPERTIES FOLDER "External/re2")
+        add_library(re2::re2 ALIAS re2)
+        set(RE2_INCLUDE_DIR ${FEATURIZERS_ROOT}/src/3rdParty/re2 CACHE PATH "" FORCE)
+    
+        target_include_directories(
+            ${_project_name} PUBLIC
+            ${_this_path}/../re2
+        )
+    
+        target_link_libraries(
+            ${_project_name} PUBLIC
+            re2
+        )
+    endif()
 
     if (UNIX)
         find_package(Threads)
