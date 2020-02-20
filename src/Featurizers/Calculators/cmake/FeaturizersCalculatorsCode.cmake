@@ -9,8 +9,6 @@ function(Impl)
     set(_project_name FeaturizersCalculatorsCode)
     get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
-    set(FEATURIZERS_ROOT ${_this_path}/../../../..)
-
     include(${_this_path}/../../../3rdParty/cmake/Featurizer3rdParty.cmake)
 
     # Uncomment this content if we add .cpp files to the directory

@@ -62,23 +62,24 @@ function(Impl)
     if(NOT TARGET re2::re2)
         set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
-        add_subdirectory(${FEATURIZERS_ROOT}/src/3rdParty/re2 ${FEATURIZERS_ROOT}/src/3rdParty/re2 EXCLUDE_FROM_ALL)
+        add_subdirectory(${_this_path}/../re2 ${CMAKE_CURRENT_BINARY_DIR}/3rdParty/re2 EXCLUDE_FROM_ALL)
         set_target_properties(re2 PROPERTIES FOLDER "External/re2")
         add_library(re2::re2 ALIAS re2)
-        set(RE2_INCLUDE_DIR ${FEATURIZERS_ROOT}/src/3rdParty/re2 CACHE PATH "" FORCE)
-    
-        target_include_directories(
-            ${_project_name} PUBLIC
-            ${_this_path}/../re2
-        )
-    
-        target_link_libraries(
-            ${_project_name} PUBLIC
-            re2
-        )
+        set(RE2_INCLUDE_DIR ${_this_path}/../re2 CACHE PATH "" FORCE)
+        
     endif()
 
-    RestoreCompilerSettings()
+    target_include_directories(
+        ${_project_name} PUBLIC
+        ${RE2_INCLUDE_DIR}
+    )
+
+    target_link_libraries(
+        ${_project_name} PUBLIC
+        re2
+    )
+
+    RestoreCompilerSettings() # Move below re2
 
     if (UNIX)
         find_package(Threads)

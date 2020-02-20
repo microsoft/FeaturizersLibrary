@@ -8,8 +8,6 @@
 function(Impl)
     get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
-    set(FEATURIZERS_ROOT ${_this_path}/../../../..)
-
     include(${_this_path}/../../../3rdParty/cmake/Featurizer3rdParty.cmake)
 
     add_library(FeaturizersComponentsCode STATIC
