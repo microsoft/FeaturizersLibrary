@@ -997,6 +997,26 @@ featurizers:
         is_optional: true
 
   # ----------------------------------------------------------------------
+  - name: ShortGrainDropperFeaturizer
+    estimator_name: ShortGrainDropperEstimator
+    release_version: 0.4.0
+    num_output_columns: 1
+    description: |-
+      Drop rows of TimeSeriesDataFrame with short grains
+
+      C++-style pseudo signature:
+        bool execute(std::vector<std::string> const &value);
+
+      Examples:
+        todo:
+
+    type_mappings:
+      - input_type: std::vector<std::string>
+        output_type: bool
+
+    status: pending
+
+  # ----------------------------------------------------------------------
   - name: StandardScaleWrapperFeaturizer
     estimator_name: StandardScaleWrapperEstimator
     release_version: 0.3.6
