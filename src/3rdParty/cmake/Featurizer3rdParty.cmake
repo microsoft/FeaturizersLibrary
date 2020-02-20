@@ -69,6 +69,8 @@ function(Impl)
         
     endif()
 
+    RestoreCompilerSettings()
+
     target_include_directories(
         ${_project_name} PUBLIC
         ${RE2_INCLUDE_DIR}
@@ -78,8 +80,6 @@ function(Impl)
         ${_project_name} PUBLIC
         re2
     )
-
-    RestoreCompilerSettings() # Move below re2
 
     if (UNIX)
         find_package(Threads)
