@@ -12,7 +12,7 @@
 namespace NS = Microsoft::Featurizer;
 
 void TestImpl(){
-    auto trainingBatches = 	NS::TestHelpers::make_vector<std::vector<std::vector<std::string>>>(
+    std::vector<std::vector<std::vector<std::string>>> trainingBatches = NS::TestHelpers::make_vector<std::vector<std::vector<std::string>>>(
         NS::TestHelpers::make_vector<std::vector<std::string>>(
             NS::TestHelpers::make_vector<std::string>("a", "b"),
             NS::TestHelpers::make_vector<std::string>("a", "b"),
@@ -30,7 +30,7 @@ void TestImpl(){
         )
     );
 
-    auto inferencingInput = NS::TestHelpers::make_vector<std::vector<std::string>>(
+    std::vector<std::vector<std::string>> inferencingInput = NS::TestHelpers::make_vector<std::vector<std::string>>(
         NS::TestHelpers::make_vector<std::string>("a", "b"),
         NS::TestHelpers::make_vector<std::string>("a", "c"),
         NS::TestHelpers::make_vector<std::string>("a", "d"),
@@ -38,13 +38,13 @@ void TestImpl(){
         NS::TestHelpers::make_vector<std::string>("e", "f")
     );
 
-    auto inferencingOutput = NS::TestHelpers::make_vector<bool>(
+    std::vector<bool> inferencingOutput = {
         false,
         true,
         true,
         true,
         false
-    );
+    };
 
     //parameter setting
     std::uint32_t windowSize = 0;
