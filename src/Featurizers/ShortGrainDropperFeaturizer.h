@@ -6,6 +6,9 @@
 
 #include "../Featurizer.h"
 #include "../Archive.h"
+#include <algorithm>
+#include <unordered_set>
+#include <unordered_map>
 
 namespace Microsoft {
 namespace Featurizer {
@@ -14,7 +17,7 @@ namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         ShortGrainDropperTransformer
-///  \brief
+///  \brief         Return true if a grain needs dropping
 ///
 class ShortGrainDropperTransformer : public StandardTransformer<std::vector<std::string>, bool> {
 public:
@@ -24,13 +27,13 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = StandardTransformer<std::vector<std::string>, bool>;
-
+    using GrainsSet                         = std::unordered_set<std::string>; //std::hash<std::string>, Traits<std::string>::key_equal>;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    explicit ShortGrainDropperTransformer();
+    explicit ShortGrainDropperTransformer(GrainsSet grainsToDrop);
     explicit ShortGrainDropperTransformer(Archive &ar);
 
     ~ShortGrainDropperTransformer(void) override = default;
@@ -47,7 +50,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    std::unordered_set<std::vector<std::string>> const _grainsToDrop;
+    GrainsSet const                         _grainsToDrop;
 
     // ----------------------------------------------------------------------
     // |
@@ -56,13 +59,13 @@ private:
     // ----------------------------------------------------------------------
      // MSVC has problems when the declaration and definition are separated
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-
+        callback(_grainsToDrop.find(Traits<decltype(input)>::ToString(input)) != _grainsToDrop.end());
     }
 };
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         PCAEstimator
-///  \brief         Estimator to calculate PCAComponents
+///  \class         ShortGrainDropperEstimator
+///  \brief         Estimator to determine which grain to drop
 ///
 template <
     size_t MaxNumTrainingItemsV = std::numeric_limits<size_t>::max()
@@ -75,14 +78,20 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = TransformerEstimator<std::vector<std::string>, bool>;
-    using TransformerType                   = ShortGrainDropperTransformer<std::vector<std::string>, bool>;
-
+    using TransformerType                   = ShortGrainDropperTransformer;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    ShortGrainDropperEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ShortGrainDropperEstimator(
+        AnnotationMapsPtr pAllColumnAnnotations,
+        size_t colIndex,
+        std::uint32_t windowSize,
+        std::vector<std::uint32_t> lags,
+        std::uint32_t maxHorizon,
+        nonstd::optional<std::uint32_t> cv
+    );
     ~ShortGrainDropperEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(ShortGrainDropperEstimator);
@@ -93,16 +102,16 @@ private:
     // |  Private Types
     // |
     // ----------------------------------------------------------------------
-
-
+    using GrainsSet                         = ShortGrainDropperTransformer::GrainsSet;
+    using GrainsMap                         = std::unordered_map<std::string, std::uint32_t>; // std::hash<std::string>, Traits<std::string>::key_equal>;
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
     size_t const                            _colIndex;
-
-    std::unordered_set<std::vector<std::string>> const _grainsToDrop;
+    std::uint32_t const                     _minPoints;
+    GrainsSet                               _grainsToDrop;
 
     // ----------------------------------------------------------------------
     // |
@@ -113,11 +122,24 @@ private:
 
     // MSVC has problems when the declaration and definition are separated
     FitResult fit_impl(typename BaseType::InputType const *pBuffer, size_t cElements) override {
-        if(cElements != 1)
-            throw std::runtime_error("Only 1 matrix can be provided");
 
-        auto const &                        matrix(*pBuffer);
+        InputType const * const                 pEndBuffer(pBuffer + cElements);
 
+        GrainsMap groupByGrains;
+        while(pBuffer != pEndBuffer) {
+            std::string pBufferStr = Traits<decltype(*pBuffer)>::ToString(*pBuffer);
+            GrainsMap::iterator grainsMapIter(groupByGrains.find(pBufferStr));
+            if (grainsMapIter != groupByGrains.end())
+                ++grainsMapIter->second;
+            else
+                groupByGrains.emplace(pBufferStr, 1);
+            ++pBuffer;
+        }
+
+        for (GrainsMap::value_type const & groupByGrainsElement : groupByGrains) {
+            if (groupByGrainsElement.second <= _minPoints)
+                _grainsToDrop.emplace(std::move(groupByGrainsElement.first));
+        }
 
         return FitResult::Complete;
     }
@@ -142,17 +164,15 @@ private:
 
 // ----------------------------------------------------------------------
 // |
-// |  PCATransformer
+// |  ShortGrainDropperTransformer
 // |
 // ----------------------------------------------------------------------
-ShortGrainDropperTransformer::ShortGrainDropperTransformer() :
-    _eigenvectors(std::move(eigenvectors)) {
-    if(_eigenvectors.size() == 0)
-        throw std::invalid_argument("eigenvectors");
+ShortGrainDropperTransformer::ShortGrainDropperTransformer(GrainsSet grainsToDrop) :
+    _grainsToDrop(std::move(grainsToDrop)) {
 }
 
 ShortGrainDropperTransformer::ShortGrainDropperTransformer(Archive &ar) :
-    PCATransformer(
+    ShortGrainDropperTransformer(
         [&ar](void) {
             // Version
             std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
@@ -162,13 +182,15 @@ ShortGrainDropperTransformer::ShortGrainDropperTransformer(Archive &ar) :
                 throw std::runtime_error("Unsupported archive version");
 
             // Data
-            return ShortGrainDropperTransformer(std::move());
+            GrainsSet                       grainsToDrop(Traits<GrainsSet>::deserialize(ar));
+
+            return ShortGrainDropperTransformer(std::move(grainsToDrop));
         }()
     ) {
 }
 
 bool ShortGrainDropperTransformer::operator==(ShortGrainDropperTransformer const &other) const {
-
+    return this->_grainsToDrop == other._grainsToDrop;
 }
 
 void ShortGrainDropperTransformer::save(Archive &ar) const /*override*/ {
@@ -177,16 +199,23 @@ void ShortGrainDropperTransformer::save(Archive &ar) const /*override*/ {
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
-    Traits<decltype(_eigenvectors)>::serialize(ar, _eigenvectors);
+    Traits<decltype(_grainsToDrop)>::serialize(ar, _grainsToDrop);
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  PCAEstimator
+// |  ShortGrainDropperEstimator
 // |
 // ----------------------------------------------------------------------
 template <size_t MaxNumTrainingItemsV>
-ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(
+    AnnotationMapsPtr pAllColumnAnnotations,
+    size_t colIndex,
+    std::uint32_t windowSize,
+    std::vector<std::uint32_t> lags,
+    std::uint32_t maxHorizon,
+    nonstd::optional<std::uint32_t> cv
+) :
     BaseType("ShortGrainDropperEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(
@@ -195,6 +224,15 @@ ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(Ann
                     throw std::invalid_argument("colIndex");
 
                 return colIndex;
+            }()
+        )
+    ),
+    _minPoints(
+        std::move(
+            [&windowSize, &lags, &maxHorizon, &cv](void) -> std::uint32_t {
+                if (!cv.has_value())
+                    return (maxHorizon + std::max(windowSize, *std::max_element(lags.cbegin(), lags.cend())) + 1);
+                return (2*maxHorizon + static_cast<std::uint32_t>(*cv) + std::max(windowSize, *std::max_element(lags.cbegin(), lags.cend())) + 1);
             }()
         )
     ) {
