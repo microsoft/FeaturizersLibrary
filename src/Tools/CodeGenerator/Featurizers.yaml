@@ -1302,7 +1302,7 @@ featurizers:
       Minus lags means lead in this featurizer.
 
       C++-style pseudo signature:
-        template <typename T> double execute(std::tuple<std::chrono::system_clock::time_point, T, std::chrono::system_clock::time_point> const &value);
+        template <typename T> vector<double> execute(std::tuple<std::chrono::system_clock::time_point, T, std::chrono::system_clock::time_point> const &value);
 
       Examples:
           A simple example would be max horizon = 1 and we want to lag 1
@@ -1343,6 +1343,8 @@ featurizers:
           and if we want to lag k for the row with time t,
           target_lag_k[t] = target[horizon_origin(t) - (k-1) * time_interval_between_rows]
 
+          Note that we are passing in a vector of lag orders so the above two examples can be completed within in one call to the LagLeadOperatorFeaturizer
+
     templates:
       - name: T
         types:
@@ -1366,7 +1368,7 @@ featurizers:
         name: horizon
         is_optional: false
 
-      - type: int8
+      - type: vector<int8>
         name: lags
         is_optional: false
 
