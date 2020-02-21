@@ -6,9 +6,6 @@
 
 #include "../Featurizer.h"
 #include "../Archive.h"
-#include <algorithm>
-#include <unordered_set>
-#include <unordered_map>
 
 namespace Microsoft {
 namespace Featurizer {
@@ -27,7 +24,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = StandardTransformer<std::vector<std::string>, bool>;
-    using GrainsSet                         = std::unordered_set<std::string>; //std::hash<std::string>, Traits<std::string>::key_equal>;
+    using GrainsSet                         = std::unordered_set<std::string>;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -103,7 +100,7 @@ private:
     // |
     // ----------------------------------------------------------------------
     using GrainsSet                         = ShortGrainDropperTransformer::GrainsSet;
-    using GrainsMap                         = std::unordered_map<std::string, std::uint32_t>; // std::hash<std::string>, Traits<std::string>::key_equal>;
+    using GrainsMap                         = std::unordered_map<std::string, std::uint32_t>;
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
@@ -168,6 +165,7 @@ private:
 // |
 // ----------------------------------------------------------------------
 ShortGrainDropperTransformer::ShortGrainDropperTransformer(GrainsSet grainsToDrop) :
+    //grainsToDrop can be empty
     _grainsToDrop(std::move(grainsToDrop)) {
 }
 
@@ -218,23 +216,25 @@ ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(
 ) :
     BaseType("ShortGrainDropperEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
-        std::move(
-            [this, &colIndex](void) -> size_t & {
-                if(colIndex >= this->get_column_annotations().size())
-                    throw std::invalid_argument("colIndex");
-
-                return colIndex;
-            }()
-        )
+        [this, &colIndex](void) -> size_t & {
+            if(colIndex >= this->get_column_annotations().size())
+                throw std::invalid_argument("colIndex");
+            return colIndex;
+        }()
     ),
     _minPoints(
-        std::move(
-            [&windowSize, &lags, &maxHorizon, &cv](void) -> std::uint32_t {
-                if (!cv.has_value())
-                    return (maxHorizon + std::max(windowSize, *std::max_element(lags.cbegin(), lags.cend())) + 1);
-                return (2*maxHorizon + static_cast<std::uint32_t>(*cv) + std::max(windowSize, *std::max_element(lags.cbegin(), lags.cend())) + 1);
-            }()
-        )
+        [&windowSize, &lags, &maxHorizon, &cv](void) -> std::uint32_t {
+            //it appears automl tests show that
+            //windowSize can be 0
+            //lags could contain 0s
+            //maxHorizon may not be 0, not sure currently
+            //cv may not be 0, not sure currently
+            if (lags.size() == 0)
+                throw std::invalid_argument("lags");
+            if (!cv.has_value())
+                return (maxHorizon + std::max(windowSize, *std::max_element(lags.cbegin(), lags.cend())) + 1);
+            return (2*maxHorizon + static_cast<std::uint32_t>(*cv) + std::max(windowSize, *std::max_element(lags.cbegin(), lags.cend())) + 1);
+        }()
     ) {
 }
 
