@@ -1011,8 +1011,25 @@ featurizers:
         todo:
 
     type_mappings:
-      - input_type: std::vector<std::string>
+      - input_type: vector<string>
         output_type: bool
+
+    configuration_params:
+      - type: uint32
+        name: windowSize
+        is_optional: false
+
+      - type: vector<uint32>
+        name: lags
+        is_optional: false
+
+      - type: uint32
+        name: maxHorizon
+        is_optional: false
+
+      - type: uint32
+        name: cv
+        is_optional: true
 
     status: pending
 
