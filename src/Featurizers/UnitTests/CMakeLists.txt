@@ -29,9 +29,11 @@ include(${_this_path}/../cmake/FeaturizersCode.cmake)
 enable_testing()
 
 foreach(_test_name IN ITEMS
+    BackwardFillImputerFeaturizer_UnitTest
     CatImputerFeaturizer_UnitTests
     CountVectorizerFeaturizer_UnitTests
     DateTimeFeaturizer_UnitTests
+    ForwardFillImputerFeaturizer_UnitTest
     FromStringFeaturizer_UnitTest
     HashOneHotVectorizerFeaturizer_UnitTests
     ImputationMarkerFeaturizer_UnitTests

@@ -31,6 +31,10 @@ enable_testing()
 SET(
     _test_names
     Calculators_UnitTest
+    SumCalculator_UnitTest
+    MaxCalculator_UnitTest
+    MinCalculator_UnitTest
+    MeanCalculator_UnitTest
 )
 
 foreach(_test_name IN ITEMS ${_test_names})
