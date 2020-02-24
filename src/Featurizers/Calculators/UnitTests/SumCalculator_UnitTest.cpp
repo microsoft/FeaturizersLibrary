@@ -33,16 +33,16 @@ TEST_CASE("Standard - double") {
     calc.update(1.0);
     calc.update(2.0);
 
-    CHECK(calc.commit() == 3.0);
+    CHECK(calc.commit() == Approx(3.0));
 
     calc.update(3.0);
-    CHECK(calc.commit() == 6.0);
+    CHECK(calc.commit() == Approx(6.0));
 
     calc.reset();
-    CHECK(calc.commit() == 0.0);
+    CHECK(calc.commit() == Approx(0.0));
 
     calc.update(10);
-    CHECK(calc.commit() == 10.0);
+    CHECK(calc.commit() == Approx(10.0));
 }
 
 TEST_CASE("With initial value") {

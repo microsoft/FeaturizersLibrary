@@ -38,19 +38,19 @@ TEST_CASE("Standard - double") {
     calc.update(1.0);
     calc.update(5.0);
 
-    CHECK(calc.commit() == 5.0);
+    CHECK(calc.commit() == Approx(5.0));
 
     calc.update(3.0);
-    CHECK(calc.commit() == 5.0);
+    CHECK(calc.commit() == Approx(5.0));
 
     calc.update(7.0);
-    CHECK(calc.commit() == 7.0);
+    CHECK(calc.commit() == Approx(7.0));
 
     calc.reset();
-    CHECK(calc.commit() == std::numeric_limits<double>::min());
+    CHECK(calc.commit() == Approx(std::numeric_limits<double>::min()));
 
     calc.update(10);
-    CHECK(calc.commit() == 10.0);
+    CHECK(calc.commit() == Approx(10.0));
 }
 
 TEST_CASE("All negative - int") {
