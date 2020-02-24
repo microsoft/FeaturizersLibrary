@@ -59,9 +59,22 @@ public:
 private:
     // ----------------------------------------------------------------------
     // |
+    // |  Private Types
+    // |
+    // ----------------------------------------------------------------------
+    using NullableType                      = nonstd::optional<T>;
+
+    // ----------------------------------------------------------------------
+    // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
+    // We are using nonstd::optional here, as we always want the type to be optional
+    // and not a special value of the type (for example, double is technically optional
+    // (as it supports NaN), but default-constructs as something that isn't NaN;
+    // we avoid this problem by always using optional).
+    NullableType const                      _defaultValue;
+
     T                                       _lastValue;
     bool                                    _validLastValue = false;
 
@@ -78,6 +91,12 @@ private:
         // ----------------------------------------------------------------------
 
         if(TheseTraits::IsNull(input)) {
+            // TODO: There may be scenarios where an exception isn't the desired behavior - the caller would want us to return
+            //       an optional value. However, adding this functionality will increase the complexity of the imputer. If we
+            //       decide to go this route, we should only exercise this code path if the output type is optional (right now,
+            //       this isn't possible as the output type is inferred) and the user opts-in to the behavior during object
+            //       construction. We need this explicit opt-in behavior so that we don't return NaNs for floats and doubles as
+            //       the default just because it happens to be an optional type.
             if(_validLastValue == false) {
                 // This scenario will happen when the first imputed item is null, as we haven't seen a valid value yet.
                 throw std::runtime_error("No source value for forward fill");
@@ -114,7 +133,8 @@ using ForwardFillImputerEstimator           = Components::InferenceOnlyEstimator
 // ----------------------------------------------------------------------
 template <typename T>
 ForwardFillImputerTransformer<T>::ForwardFillImputerTransformer(T defaultValue) :
-    _lastValue(std::move(defaultValue)),
+    _defaultValue(std::move(defaultValue)),
+    _lastValue(*_defaultValue),
     _validLastValue(true) {
 }
 
@@ -122,6 +142,10 @@ template <typename T>
 ForwardFillImputerTransformer<T>::ForwardFillImputerTransformer(Archive &ar) :
     ForwardFillImputerTransformer(
         [&ar](void) {
+            // ----------------------------------------------------------------------
+            using NullableTypeTraits        = Traits<NullableType>;
+            // ----------------------------------------------------------------------
+
             // Version
             std::uint16_t                   majorVersion(Traits<std::uint16_t>::deserialize(ar));
             std::uint16_t                   minorVersion(Traits<std::uint16_t>::deserialize(ar));
@@ -130,36 +154,37 @@ ForwardFillImputerTransformer<T>::ForwardFillImputerTransformer(Archive &ar) :
                 throw std::runtime_error("Unsupported archive version");
 
             // Data
-            bool                            validLastValue(Traits<bool>::deserialize(ar));
+            NullableType                    defaultValue(Traits<NullableType>::deserialize(ar));
 
-            if(validLastValue == false)
+            if(NullableTypeTraits::IsNull(defaultValue))
                 return ForwardFillImputerTransformer();
 
-            T                               lastValue(Traits<T>::deserialize(ar));
-
-            return ForwardFillImputerTransformer(std::move(lastValue));
+            return ForwardFillImputerTransformer(std::move(NullableTypeTraits::GetNullableValue(defaultValue)));
         }()
     ) {
 }
 
 template <typename T>
 bool ForwardFillImputerTransformer<T>::operator==(ForwardFillImputerTransformer const &other) const {
-    if(_validLastValue != other._validLastValue)
-        return false;
+    // Note that we aren't comparing _lastValue or _validLastValue as we are only using initial state to compare values
 
-    if(_validLastValue == false)
-        return true;
+    // We aren't using nonstd::optional's comparison operator as we aren't able to disable compiler warnings
+    // associated with the comparison of float values as that code has already been #included by the time
+    // that we get here. Do things manually instead.
+    if(static_cast<bool>(_defaultValue) != static_cast<bool>(other._defaultValue))
+        return false;
 
 #if (defined __clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wfloat-equal"
 #endif
 
-    return _lastValue == other._lastValue;
+    return static_cast<bool>(_defaultValue) == false || *_defaultValue == *other._defaultValue;
 
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif
+
 }
 
 template <typename T>
@@ -174,10 +199,9 @@ void ForwardFillImputerTransformer<T>::save(Archive &ar) const /*override*/ {
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
-    Traits<bool>::serialize(ar, _validLastValue);
+    Traits<NullableType>::serialize(ar, _defaultValue);
 
-    if(_validLastValue)
-        Traits<T>::serialize(ar, _lastValue);
+    // Note that we aren't serializing working state
 }
 
 } // namespace Featurizers

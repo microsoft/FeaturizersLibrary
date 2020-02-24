@@ -70,10 +70,11 @@ private:
     // |
     // ----------------------------------------------------------------------
     // We are using nonstd::optional here, as we always want the type to be optional
-    // and not result is default values which my not be optional (for example, double
-    // is technically optional (as it supports NaN), but default-constructs as something
-    // that isn't NaN; we avoid this problem by always using optional).
+    // and not a special value of the type (for example, double is technically optional
+    // (as it supports NaN), but default-constructs as something that isn't NaN;
+    // we avoid this problem by always using optional).
     NullableType const                      _defaultValue;
+
     std::uint32_t                           _numPending;
 
     // ----------------------------------------------------------------------
@@ -108,6 +109,12 @@ private:
         // ----------------------------------------------------------------------
 
         if(_numPending != 0) {
+            // TODO: There may be scenarios where an exception isn't the desired behavior - the caller would want us to return
+            //       an optional value. However, adding this functionality will increase the complexity of the imputer. If we
+            //       decide to go this route, we should only exercise this code path if the output type is optional (right now,
+            //       this isn't possible as the output type is inferred) and the user opts-in to the behavior during object
+            //       construction. We need this explicit opt-in behavior so that we don't return NaNs for floats and doubles as
+            //       the default just because it happens to be an optional type.
             if(NullableTypeTraits::IsNull(_defaultValue))
                 throw std::runtime_error("Pending backward fill items remain");
 
@@ -193,17 +200,18 @@ void BackwardFillImputerTransformer<T>::save(Archive &ar) const /*override*/ {
 
     // Data
     Traits<NullableType>::serialize(ar, _defaultValue);
+
+    // Note that we aren't serializing working state
 }
 
 template <typename T>
 bool BackwardFillImputerTransformer<T>::operator==(BackwardFillImputerTransformer const &other) const {
-    if(_numPending != other._numPending)
-        return false;
+    // Note that we aren't comparing _numPending as we are only using initial state to compare values
 
     // We aren't using nonstd::optional's comparison operator as we aren't able to disable compiler warnings
     // associated with the comparison of float values as that code has already been #included by the time
     // that we get here. Do things manually instead.
-    if(static_cast<bool>(_defaultValue) != static_cast<bool>(_defaultValue))
+    if(static_cast<bool>(_defaultValue) != static_cast<bool>(other._defaultValue))
         return false;
 
 #if (defined __clang__)

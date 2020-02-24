@@ -198,10 +198,26 @@ TEST_CASE("Serialization") {
         valueArchiveSize = bytes.size();
         CHECK(valueArchiveSize != 0);
 
-        NS::Archive                                                         in(std::move(bytes));
+        NS::Archive                                                         in(bytes);
         NS::Featurizers::BackwardFillImputerTransformer<double>             other(in);
 
         CHECK(other == transformer);
+
+        // Current state should not impact equality
+        other.execute(1.0, [](double) {});
+
+        CHECK(other == transformer);
+
+        // Current state should not impact serialization
+        {
+            NS::Archive                     otherOut;
+
+            other.save(otherOut);
+
+            NS::Archive::ByteArray          otherBytes(otherOut.commit());
+
+            CHECK(otherBytes == bytes);
+        }
     }
 
     CHECK(defaultArchiveSize < valueArchiveSize);

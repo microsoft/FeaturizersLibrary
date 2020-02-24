@@ -82,10 +82,11 @@ TEST_CASE("Comparison") {
     CHECK(transformer == Transformer());
     CHECK(transformer != Transformer(1.0));
 
+    // Current state should not impact quality
     transformer.execute(1.0);
 
-    CHECK(transformer != Transformer());
-    CHECK(transformer == Transformer(1.0));
+    CHECK(transformer == Transformer());
+    CHECK(transformer != Transformer(1.0));
 }
 
 TEST_CASE("Serialization") {
@@ -120,10 +121,23 @@ TEST_CASE("Serialization") {
         valueArchiveSize = bytes.size();
         CHECK(valueArchiveSize != 0);
 
-        NS::Archive                                                         in(std::move(bytes));
+        NS::Archive                                                         in(bytes);
         NS::Featurizers::ForwardFillImputerTransformer<double>              other(in);
 
         CHECK(other == transformer);
+
+        // Current state should not impact serialization
+        other.execute(1.0, [](double) {});
+
+        {
+            NS::Archive                     otherOut;
+
+            other.save(otherOut);
+
+            NS::Archive::ByteArray          otherBytes(otherOut.commit());
+
+            CHECK(otherBytes == bytes);
+        }
     }
 
     CHECK(defaultArchiveSize < valueArchiveSize);
