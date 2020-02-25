@@ -28,11 +28,10 @@ namespace Components {
         size_t size;
         size_t curr;
 
-
     public:
 
-        CircularIterator(Type* i, size_t s) 
-            : itr(i), size(s), curr(0)
+        CircularIterator(Type* i, size_t s, size_t starting_offset = 0) 
+            : itr(i), size(s), curr(starting_offset)
         { 
         }
 
@@ -40,7 +39,7 @@ namespace Components {
         {
             ++curr;
             curr %= size;
-            return this;
+            return *this;
         }
 
         CircularIterator operator++ (int) // Post-increment
@@ -51,17 +50,24 @@ namespace Components {
             return tmp; 
         }
 
+        CircularIterator operator+ (int amount)
+        {
+            CircularIterator tmp(*this);
+            tmp.curr = (tmp.curr + amount) % tmp.size;
+            return tmp; 
+        }
+
         // two-way comparison: v.begin() == v.cbegin() and vice versa
         template<class OtherType>
         bool operator == (const CircularIterator<OtherType>& rhs) const
         {
-            return itr == rhs.itr;
+            return itr == rhs.itr && curr == rhs.curr && size == rhs.size;
         }
 
         template<class OtherType>
         bool operator != (const CircularIterator<OtherType>& rhs) const
         {
-            return itr != rhs.itr;
+            return itr != rhs.itr || curr != rhs.curr || size != rhs.size;
         }
 
         Type& operator* () const
@@ -69,9 +75,9 @@ namespace Components {
             return *(itr+curr);
         }
 
-        Type& operator-> () const
+        Type* operator-> () const
         {
-            return *(itr+curr);
+            return (itr+curr);
         }
 
         // One way conversion: iterator -> const_iterator
@@ -80,17 +86,6 @@ namespace Components {
             return CircularIterator<const Type>(itr);
         }
     };
-
-
-
-
-    // `iterator` and `const_iterator` used by your class:
-    // typedef CircularIterator<T> iterator;
-    // typedef CircularIterator<const T> const_iterator;
-    // }
-
-
-
 
 } // Components
 } // Featurizers
