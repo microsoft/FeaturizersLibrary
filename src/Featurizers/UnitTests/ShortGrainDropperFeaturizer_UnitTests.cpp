@@ -47,10 +47,10 @@ void TestImpl(){
     };
 
     //parameter setting
-    std::uint32_t windowSize = 0;
-    std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(0, 0);
-    std::uint32_t maxHorizon = 1;
-    nonstd::optional<std::uint32_t> cv = static_cast<std::uint32_t>(1);
+    std::uint8_t windowSize = 0;
+    std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(0, 0);
+    std::uint8_t maxHorizon = 1;
+    nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
 
     using SGDEstimator = NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>;
     SGDEstimator                                        estimator(NS::CreateTestAnnotationMapsPtr(1), 0, windowSize, lags, maxHorizon, cv);
@@ -76,10 +76,10 @@ void TestImpl(){
 
 TEST_CASE("Invalid Transformer/Estimator") {
     //parameter setting
-    std::uint32_t windowSize = 0;
-    std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>();
-    std::uint32_t maxHorizon = 1;
-    nonstd::optional<std::uint32_t> cv = static_cast<std::uint32_t>(1);
+    std::uint8_t windowSize = 0;
+    std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>();
+    std::uint8_t maxHorizon = 1;
+    nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
 
     CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 2, windowSize, lags, maxHorizon, cv), "colIndex");
     CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, windowSize, lags, maxHorizon, cv), "lags");
@@ -92,7 +92,10 @@ TEST_CASE("Standard Test") {
 TEST_CASE("Serialization/Deserialization") {
     using TransformerType = NS::Featurizers::ShortGrainDropperTransformer;
 
-    std::unordered_set<std::string>         grainsToDrop({"aa", "ab"});
+    std::unordered_set<
+        std::vector<std::string>,
+        Microsoft::Featurizer::Featurizers::ContainerHash<std::vector<std::string>>
+    >                                       grainsToDrop({{"aa"}, {"ab"}});
 
     TransformerType                         original(std::move(grainsToDrop));
     NS::Archive                             out;

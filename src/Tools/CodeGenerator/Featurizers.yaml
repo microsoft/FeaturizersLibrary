@@ -1119,19 +1119,19 @@ featurizers:
         output_type: bool
 
     configuration_params:
-      - type: uint32
+      - type: uint8
         name: windowSize
         is_optional: false
 
-      - type: vector<uint32>
+      - type: vector<uint8>
         name: lags
         is_optional: false
 
-      - type: uint32
+      - type: uint8
         name: maxHorizon
         is_optional: false
 
-      - type: uint32
+      - type: uint8
         name: cv
         is_optional: true
 
