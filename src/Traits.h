@@ -16,18 +16,26 @@
 #include <vector>
 
 #if (defined __clang__)
+
+#define PRAGMA_IGNORE(w) \
+#if !defined(__has_warning) || __has_warning(#w) \
+#   _Pragma clang diagnostic ignored #w \
+#endif
+
 #   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wold-style-cast"
-#   pragma clang diagnostic ignored "-Wsign-conversion"
-#   pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
-#   pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
-#   pragma clang diagnostic ignored "-Wextra-semi-stmt"
-#   pragma clang diagnostic ignored "-Wmissing-noreturn"
-#   pragma clang diagnostic ignored "-Wdocumentation"
-#   pragma clang diagnostic ignored "-Wdouble-promotion"
-#   pragma clang diagnostic ignored "-Wcast-align"
-#   pragma clang diagnostic ignored "-Wfloat-equal"
-#   pragma clang diagnostic ignored "-Wshadow"
+PRAGMA_IGNORE(-Wold-style-cast)
+PRAGMA_IGNORE(-Wsign-conversion)
+PRAGMA_IGNORE(-Wdocumentation-unknown-command)
+PRAGMA_IGNORE(-Wzero-as-null-pointer-constant)
+PRAGMA_IGNORE(-Wextra-semi-stmt)
+PRAGMA_IGNORE(-Wmissing-noreturn)
+PRAGMA_IGNORE(-Wdocumentation)
+PRAGMA_IGNORE(-Wdouble-promotion)
+PRAGMA_IGNORE(-Wcast-align)
+PRAGMA_IGNORE(-Wfloat-equal)
+PRAGMA_IGNORE(-Wshadow)
+
+#undef PRAGMA_IGNORE
 #elif (defined _MSC_VER)
 #   pragma warning(push)
 #   pragma warning(disable: 4127)
