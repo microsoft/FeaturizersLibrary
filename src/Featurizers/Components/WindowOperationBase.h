@@ -96,13 +96,27 @@ namespace Components {
 
     };
 
+    /////////////////////////////////////////////////////////////////////////
+    ///  \class         CircularBuffer
+    ///  \brief         A custom container class created for operations with shifted windows
+    ///                 The goal is to minimize the memory allocation which is why we are using
+    ///                 a vector to store the data and use the CircularIterator above so that
+    ///                 memory for the data only need to be allocated once
+    ///
     template <class T>
     class CircularBuffer {
 
+        // maximum number of elements this container can hold
         size_t _max_size;
+
+        // start position of this circular buffer
         size_t _start_offset;
+
+        // current number of element held by this container
+        // start from 0 and grows to _max_size
         size_t _cur_size;
 
+        // actual data
         std::vector<T> _data;
 
     public:
@@ -159,11 +173,14 @@ namespace Components {
             }
         }
 
+        // provide a pair of begin and end iterator for the n elements requested
         std::tuple<iterator, iterator> range(size_t n) {
             // Since this class is used for window operations only
             // number of requested elements is never bigger than the max_size
             assert(n <= _max_size);
             if(n > _cur_size) {
+                // when there are not enough number of elements available
+                // return the begin and end iterator of available data
                 return std::make_tuple(begin(), end());
             }
             else {
@@ -182,9 +199,7 @@ namespace Components {
             // Sicne this class is used for window operations only
             // number of requested elements is never bigger than the max_size
             return range(n);
-
         }
-
     };
 
 } // Components
