@@ -209,6 +209,8 @@ void ShortGrainDropperEstimator<MaxNumTrainingItemsV>::complete_training_impl(vo
         if (groupByGrainsElement.second <= _minPoints)
             _grainsToDrop.emplace(std::move(groupByGrainsElement.first));
     }
+    //clear _groupByGrains
+    _groupByGrains = {};
 }
 
 } // namespace Featurizers

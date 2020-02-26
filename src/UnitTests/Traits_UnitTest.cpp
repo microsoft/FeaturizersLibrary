@@ -37,6 +37,46 @@ static_assert(std::is_same<Traits<std::vector<int>>::nullable_type, nonstd::opti
 static_assert(std::is_same<Traits<nonstd::optional<int>>::nullable_type, nonstd::optional<int>>::value, "Incorrect nullable type for nonstd::optional");
 static_assert(std::is_same<Traits<std::tuple<int>>::nullable_type, nonstd::optional<std::tuple<int>>>::value, "Incorrect nullable type for std::tuple");
 
+TEST_CASE("MurmurHash_Generator") {
+    CHECK(MurmurHashGenerator(true, 1) == 0x295d376d);
+    CHECK(MurmurHashGenerator(10, 1) == 0x12ec2126);
+    CHECK(MurmurHashGenerator(2.5f, 1) == 0x5edbc123);
+    CHECK(MurmurHashGenerator(2.5, 1) == 0x54263515);
+    CHECK(MurmurHashGenerator("abcd", 1) == 0x353b7271);
+}
+
+TEST_CASE("ContainerHash_Test") {
+    //no test for bool because c++ optimize vector<bool> which each bool takes 1 bit
+    //if vector<bool> is really needed in the future we could use int type
+    //the changes required to fit the test for vector<bool> will harm the performance
+    //of ContainerHash by copying the element in Container especially when the type is string
+
+    std::unordered_set<
+        std::vector<std::int8_t>,
+        ContainerHash<std::vector<std::int8_t>>
+    >                                       int8VecSet({{-1}, {2}});
+
+    std::unordered_set<
+        std::vector<std::uint8_t>,
+        ContainerHash<std::vector<std::uint8_t>>
+    >                                       uint8VecSet({{1}, {2}});
+
+    std::unordered_set<
+        std::vector<std::float_t>,
+        ContainerHash<std::vector<std::float_t>>
+    >                                       floatVecSet({{1.0f}, {2.0f}});
+
+    std::unordered_set<
+        std::vector<std::double_t>,
+        ContainerHash<std::vector<std::double_t>>
+    >                                       doubleVecSet({{1.0}, {2.0}});
+
+    std::unordered_set<
+        std::vector<std::string>,
+        ContainerHash<std::vector<std::string>>
+    >                                       strVecSet({{"a"}, {"b"}});
+}
+
 TEST_CASE("Transformer_Nullable") {
     nonstd::optional<std::int8_t> arg_null;
     std::float_t arg_f_ini = std::numeric_limits<std::float_t>::quiet_NaN();
