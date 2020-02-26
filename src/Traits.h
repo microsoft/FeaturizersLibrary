@@ -18,40 +18,40 @@
 #if (defined __clang__)
 #pragma clang diagnostic push
 #if !defined(__has_warning) || __has_warning("-Wold-style-cast")
-_Pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wold-style-cast"
 #endif
 #if !defined(__has_warning) || __has_warning("-Wsign-conversion")
-_Pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
 #endif
 #if !defined(__has_warning) || __has_warning("-Wdocumentation-unknown-command")
-_Pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 #endif
 #if !defined(__has_warning) || __has_warning("-Wzero-as-null-pointer-constant")
-_Pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
 #endif
 #if !defined(__has_warning) || __has_warning("-Wextra-semi-stmt")
-_Pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#pragma clang diagnostic ignored "-Wextra-semi-stmt"
 #endif
 #if !defined(__has_warning) || __has_warning("-Wmissing-noreturn")
-_Pragma clang diagnostic ignored "-Wmissing-noreturn"
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 #endif
 #if !defined(__has_warning) || __has_warning("-Wdocumentation")
-_Pragma clang diagnostic ignored "-Wdocumentation"
+#pragma clang diagnostic ignored "-Wdocumentation"
 #endif
 #if !defined(__has_warning) || __has_warning("-Wdouble-promotion")
-_Pragma clang diagnostic ignored "-Wdouble-promotion"
+#pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
 #if !defined(__has_warning) || __has_warning("-Wdouble-promotion")
-_Pragma clang diagnostic ignored "-Wdouble-promotion"
+#pragma clang diagnostic ignored "-Wdouble-promotion"
 #endif
 #if !defined(__has_warning) || __has_warning("-Wcast-align")
-_Pragma clang diagnostic ignored "-Wcast-align"
+#pragma clang diagnostic ignored "-Wcast-align"
 #endif
 #if !defined(__has_warning) || __has_warning("-Wfloat-equal")
-_Pragma clang diagnostic ignored "-Wfloat-equal"
+#pragma clang diagnostic ignored "-Wfloat-equal"
 #endif
 #if !defined(__has_warning) || __has_warning("-Wshadow")
-_Pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wshadow"
 #endif
 #elif (defined _MSC_VER)
 #pragma warning(push)
