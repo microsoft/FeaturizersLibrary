@@ -6,25 +6,11 @@
 
 #include "../Featurizer.h"
 #include "../Archive.h"
+#include "../Traits.h"
 
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         ContainerHash
-///  \brief         Hash function for Container type
-///
-template <typename Container>
-struct ContainerHash {
-    std::size_t operator()(Container const& container) const noexcept {
-        std::size_t hash = 0;
-        for (typename Container::value_type const & val : container)
-            hash ^= std::hash<typename Container::value_type>{}(val) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
-        return hash;
-    }
-};
-
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         ShortGrainDropperTransformer
@@ -38,7 +24,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = StandardTransformer<std::vector<std::string>, bool>;
-    using GrainsSet                         = std::unordered_set<std::vector<std::string>, ContainerHash<std::vector<std::string>>>;
+    using GrainsSet                         = std::unordered_set<std::vector<std::string>, Microsoft::Featurizer::ContainerHash<std::vector<std::string>>>;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -74,12 +60,8 @@ private:
 /////////////////////////////////////////////////////////////////////////
 ///  \class         ShortGrainDropperEstimator
 ///  \brief         Estimator to determine which grain to drop given the
-///                 threshod minPoints calculated by:
-///
-///                 windowSize: the rolling window size.
-///                 lags: The lag sizes.
-///                 maxHorizon: the desired length of forecasting (the number of new rows generated)
-///                 cv: the number of cross validations.
+///                 threshod minPoints calculated by windowSize, lags,
+///                 maxHorizon and cv.
 ///
 template <
     size_t MaxNumTrainingItemsV = std::numeric_limits<size_t>::max()
@@ -102,9 +84,13 @@ public:
         AnnotationMapsPtr pAllColumnAnnotations,
         size_t colIndex,
         std::uint8_t windowSize,
+        //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
         std::vector<std::uint8_t> lags,
+        //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
         std::uint8_t maxHorizon,
+        //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
         nonstd::optional<std::uint8_t> cv
+        //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
     );
     ~ShortGrainDropperEstimator(void) override = default;
 
@@ -117,7 +103,7 @@ private:
     // |
     // ----------------------------------------------------------------------
     using GrainsSet                         = ShortGrainDropperTransformer::GrainsSet;
-    using GrainsMap                         = std::unordered_map<std::vector<std::string>, std::uint32_t, ContainerHash<std::vector<std::string>>>;
+    using GrainsMap                         = std::unordered_map<std::vector<std::string>, std::uint32_t, Microsoft::Featurizer::ContainerHash<std::vector<std::string>>>;
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
@@ -126,6 +112,7 @@ private:
     size_t const                            _colIndex;
     std::uint16_t const                     _minPoints;
     GrainsSet                               _grainsToDrop;
+    GrainsMap                               _groupByGrains;
 
     // ----------------------------------------------------------------------
     // |
@@ -139,17 +126,16 @@ private:
 
         InputType const * const                 pEndBuffer(pBuffer + cElements);
 
-        GrainsMap groupByGrains;
         while(pBuffer != pEndBuffer) {
-            GrainsMap::iterator grainsMapIter(groupByGrains.find(*pBuffer));
-            if (grainsMapIter != groupByGrains.end())
+            GrainsMap::iterator grainsMapIter(_groupByGrains.find(*pBuffer));
+            if (grainsMapIter != _groupByGrains.end())
                 ++grainsMapIter->second;
             else
-                groupByGrains.emplace(*pBuffer, 1);
+                _groupByGrains.emplace(*pBuffer, 1);
             ++pBuffer;
         }
 
-        for (GrainsMap::value_type const & groupByGrainsElement : groupByGrains) {
+        for (GrainsMap::value_type const & groupByGrainsElement : _groupByGrains) {
             if (groupByGrainsElement.second <= _minPoints)
                 _grainsToDrop.emplace(std::move(groupByGrainsElement.first));
         }

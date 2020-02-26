@@ -161,7 +161,7 @@ TEST_CASE("Serialization/Deserialization") {
 
     std::unordered_set<
         std::vector<std::string>,
-        Microsoft::Featurizer::Featurizers::ContainerHash<std::vector<std::string>>
+        Microsoft::Featurizer::ContainerHash<std::vector<std::string>>
     >                                       grainsToDrop({{"aa"}, {"ab"}});
 
     TransformerType                         original(std::move(grainsToDrop));

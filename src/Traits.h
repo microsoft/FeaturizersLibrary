@@ -54,6 +54,7 @@
 #   pragma clang diagnostic pop
 #endif
 
+#include "3rdParty/MurmurHash3.h"
 #include "3rdParty/optional.h"
 
 namespace Microsoft {
@@ -131,6 +132,37 @@ inline bool IsValid(TypeId id) {
         || id == TypeId::Vector
         || id == TypeId::Map;
 }
+
+//Hash Functions related
+static inline std::uint32_t MurmurHashGenerator(std::string const & value, std::uint32_t seed) {
+    std::uint32_t hash;
+    MurmurHash3_x86_32(value.c_str(), static_cast<int>(sizeof(*value.c_str())) * static_cast<int>(value.size()), seed, &hash);
+    return hash;
+}
+
+template<typename T>
+static inline std::uint32_t MurmurHashGenerator(T const & value, std::uint32_t seed) {
+    static_assert(std::is_pod<T>::value, "Input must be PODs");
+
+    std::uint32_t hash;
+    MurmurHash3_x86_32(reinterpret_cast<unsigned char const*>(&value), sizeof(value), seed, &hash);
+    return hash;
+}
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ContainerHash
+///  \brief         Hash function for Container type
+///
+template <typename Container>
+struct ContainerHash {
+    std::size_t operator()(Container const& container) const noexcept {
+        std::uint32_t hash = 0;
+        for (typename Container::value_type const & val : container) {
+            hash = MurmurHashGenerator(val, hash);
+        }
+        return static_cast<std::size_t>(hash);
+    }
+};
 
 // This mapper infers the type of the output Matrix
 // base on the input matrix type. Note, that it has to be
