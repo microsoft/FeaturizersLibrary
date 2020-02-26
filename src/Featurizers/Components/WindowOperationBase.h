@@ -24,36 +24,38 @@ namespace Components {
                                Type*,
                                Type&>
     {
-        Type* itr;
-        size_t size;
-        size_t curr;
+        Type* _itr;
+        size_t _size;
+        size_t _cur;
+        size_t _max_increments;
+        size_t _cur_increment;
+        bool _at_end;
 
     public:
 
-        CircularIterator(Type* i, size_t s, size_t starting_offset = 0) 
-            : itr(i), size(s), curr(starting_offset)
+        CircularIterator(Type* type, size_t container_max_size, size_t max_increments, size_t starting_offset = 0) 
+            : _itr(type), _size(container_max_size), _cur(starting_offset),
+            _max_increments(max_increments), _cur_increment(0)
         { 
         }
 
         CircularIterator& operator++ () // Pre-increment
         {
-            ++curr;
-            curr %= size;
+            assert(++_cur_increment <= _max_increments);
+
+            ++_cur;
+            _cur %= _size;
             return *this;
         }
 
         CircularIterator operator++ (int) // Post-increment
         {
             CircularIterator tmp(*this);
-            ++curr;
-            curr %= size;
-            return tmp; 
-        }
 
-        CircularIterator operator+ (int amount)
-        {
-            CircularIterator tmp(*this);
-            tmp.curr = (tmp.curr + amount) % tmp.size;
+            assert(++_cur_increment <= _max_increments);
+
+            ++_cur;
+            _cur %= _size;
             return tmp; 
         }
 
@@ -61,30 +63,34 @@ namespace Components {
         template<class OtherType>
         bool operator == (const CircularIterator<OtherType>& rhs) const
         {
-            return itr == rhs.itr && curr == rhs.curr && size == rhs.size;
+            return _itr == rhs._itr && _cur == rhs._cur &&
+                !((_cur_increment == _max_increments) ^ (rhs._cur_increment == rhs._max_increments));
         }
 
         template<class OtherType>
         bool operator != (const CircularIterator<OtherType>& rhs) const
         {
-            return itr != rhs.itr || curr != rhs.curr || size != rhs.size;
+            return !operator==(rhs);
         }
 
         Type& operator* () const
         {
-            return *(itr+curr);
+            assert(_cur_increment != _max_increments);
+            return *(_itr+_cur);
         }
 
         Type* operator-> () const
         {
-            return (itr+curr);
+            assert(_cur_increment != _max_increments);
+            return (_itr+_cur);
         }
 
         // One way conversion: iterator -> const_iterator
         operator CircularIterator<const Type>() const
         {
-            return CircularIterator<const Type>(itr);
+            return CircularIterator<const Type>(_itr);
         }
+
     };
 
 } // Components
