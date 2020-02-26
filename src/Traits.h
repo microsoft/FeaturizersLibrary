@@ -19,7 +19,7 @@
 
 #define PRAGMA_IGNORE(w) \
 #if !defined(__has_warning) || __has_warning(#w) \
-#   _Pragma clang diagnostic ignored #w \
+_Pragma clang diagnostic ignored #w \
 #endif
 
 #   pragma clang diagnostic push
