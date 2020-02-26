@@ -109,7 +109,7 @@ namespace Components {
         typedef CircularIterator<T> iterator;
         typedef CircularIterator<const T> const_iterator;
 
-        CircularBuffer(size_t max_size) : _start_offset(0), _max_size(max_size), _cur_size(0) {
+        CircularBuffer(size_t max_size) : _max_size(max_size), _start_offset(0),  _cur_size(0) {
             _data.reserve(_max_size);
         }
 
@@ -157,6 +157,42 @@ namespace Components {
                 _data.emplace_back(std::move(value));
                 ++_cur_size;
             }
+        }
+
+        std::tuple<iterator, iterator> range(size_t n) {
+            // Sicne this class is used for window operations only
+            // number of requested elements is never bigger than the max_size
+            assert(n <= _max_size);
+            if(n > _cur_size) {
+                return std::make_tuple(begin(), end());
+            }
+            else {
+                return std::make_tuple(iterator(&_data[0], _cur_size, n, _start_offset),iterator(&_data[0], _cur_size, 0, _cur_size == _max_size ? _start_offset : _cur_size - 1));
+            }
+        }
+        std::tuple<const_iterator, const_iterator> range(size_t n) const {
+            // Sicne this class is used for window operations only
+            // number of requested elements is never bigger than the max_size
+            assert(n <= _max_size);
+            if(n > _cur_size) {
+                return std::make_tuple(cbegin(), cend());
+            }
+            else {
+                return std::make_tuple(const_iterator(&_data[0], _cur_size, n, _start_offset),const_iterator(&_data[0], _cur_size, 0, _cur_size == _max_size ? _start_offset : _cur_size - 1));
+            }
+
+        }
+        std::tuple<const_iterator, const_iterator> crange(size_t n) const {
+            // Sicne this class is used for window operations only
+            // number of requested elements is never bigger than the max_size
+            assert(n <= _max_size);
+            if(n > _cur_size) {
+                return std::make_tuple(cbegin(), cend());
+            }
+            else {
+                return std::make_tuple(const_iterator(&_data[0], _cur_size, n, _start_offset),const_iterator(&_data[0], _cur_size, 0, _cur_size == _max_size ? _start_offset : _cur_size - 1));
+            }
+
         }
 
     };
