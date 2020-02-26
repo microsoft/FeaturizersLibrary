@@ -254,6 +254,16 @@ TEST_CASE("CircularBuffer - Empty buffer") {
     CHECK(start_iter == end_iter);
 }
 
+TEST_CASE("CircularBuffer - Size 0 buffer") {
+    NS::Featurizers::Components::CircularBuffer<std::string> circ_buf(0);
+
+    auto start_iter = circ_buf.begin();
+    auto end_iter = circ_buf.end();
+
+    // Since there is no data, the start and end iterators should be equal.
+    CHECK(start_iter == end_iter);
+}
+
 TEST_CASE("CircularBuffer - Push") {
     NS::Featurizers::Components::CircularBuffer<std::string> circ_buf(5);
 
@@ -326,8 +336,6 @@ TEST_CASE("CircularBuffer - Range") {
         ++count;
     }
     CHECK(count == 2);
-
-
 
     // When the vector is not fully populated and the number of requested items is greater than the current populated size
     // the end iterator should be bounded by the currect populated size
