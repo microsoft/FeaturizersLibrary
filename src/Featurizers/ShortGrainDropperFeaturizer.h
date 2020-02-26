@@ -62,6 +62,7 @@ private:
 ///  \brief         Estimator to determine which grain to drop given the
 ///                 threshod minPoints calculated by windowSize, lags,
 ///                 maxHorizon and cv.
+///                 todo: more comments will add here later
 ///
 template <
     size_t MaxNumTrainingItemsV = std::numeric_limits<size_t>::max()
@@ -135,12 +136,7 @@ private:
             ++pBuffer;
         }
 
-        for (GrainsMap::value_type const & groupByGrainsElement : _groupByGrains) {
-            if (groupByGrainsElement.second <= _minPoints)
-                _grainsToDrop.emplace(std::move(groupByGrainsElement.first));
-        }
-
-        return FitResult::Complete;
+        return FitResult::Continue;
     }
 
     void complete_training_impl(void) override;
@@ -209,6 +205,10 @@ bool ShortGrainDropperEstimator<MaxNumTrainingItemsV>::begin_training_impl(void)
 
 template <size_t MaxNumTrainingItemsV>
 void ShortGrainDropperEstimator<MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+    for (GrainsMap::value_type const & groupByGrainsElement : _groupByGrains) {
+        if (groupByGrainsElement.second <= _minPoints)
+            _grainsToDrop.emplace(std::move(groupByGrainsElement.first));
+    }
 }
 
 } // namespace Featurizers
