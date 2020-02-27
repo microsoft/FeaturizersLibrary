@@ -10,10 +10,17 @@
 
 namespace NS = Microsoft::Featurizer;
 
-TEST_CASE("CircularIterator - Simple Test") {
-    // 20 is longer than the input array. Testing looping capabilities.
+TEST_CASE("CircularIterator - Constructor Exceptions") {
     std::vector<std::int16_t> v{1,2,3,4,5};
-    NS::Featurizers::Components::CircularIterator<std::int16_t> iter(&v[0], v.size(), 20);
+
+    CHECK_THROWS_WITH(NS::Featurizers::Components::CircularIterator<std::int16_t>(nullptr, 0, 0, 0), "Input data cannot be a nullptr");
+    CHECK_THROWS_WITH(NS::Featurizers::Components::CircularIterator<std::int16_t>(v.data(), 0, 0, 0), "Container max size cannot be 0");
+    CHECK_THROWS_WITH(NS::Featurizers::Components::CircularIterator<std::int16_t>(v.data(), v.size(), 20, 0), "Cannot increment more than max_size times");
+}
+
+TEST_CASE("CircularIterator - Simple Test") {
+    std::vector<std::int16_t> v{1,2,3,4,5};
+    NS::Featurizers::Components::CircularIterator<std::int16_t> iter(v.data(), v.size(), 5);
     CHECK(*iter == 1);
     iter++;
     CHECK(*iter == 2);
@@ -23,24 +30,12 @@ TEST_CASE("CircularIterator - Simple Test") {
     CHECK(*iter == 4);
     iter++;
     CHECK(*iter == 5);
-    iter++;
-    CHECK(*iter == 1);
-    iter++;
-    CHECK(*iter == 2);
-    iter++;
-    CHECK(*iter == 3);
-    iter++;
-    CHECK(*iter == 4);
-    iter++;
-    CHECK(*iter == 5);
-    iter++;
 }
 
 TEST_CASE("CircularIterator - Comparison Test") {
-    // 20 is longer than the input array. Testing looping capabilities while comparing iterators.
     std::vector<std::int16_t> v{1,2,3,4,5};
-    NS::Featurizers::Components::CircularIterator<std::int16_t> iter1(&v[0], v.size(), 20);
-    NS::Featurizers::Components::CircularIterator<std::int16_t> iter2(&v[0], v.size(), 20);
+    NS::Featurizers::Components::CircularIterator<std::int16_t> iter1(v.data(), v.size(), 5);
+    NS::Featurizers::Components::CircularIterator<std::int16_t> iter2(v.data(), v.size(), 5);
 
     // Should start out being equal
     CHECK(iter1 == iter2);
@@ -52,28 +47,12 @@ TEST_CASE("CircularIterator - Comparison Test") {
     // Should be equal again
     iter1++;
     CHECK(iter1 == iter2);
-
-    // Doing a full loop should result in the iterators being equal
-    // iter1 = 3, iter2 = 2
-    CHECK(++iter1 != iter2);
-
-    // iter1 = 4, iter2 = 2
-    CHECK(++iter1 != iter2);
-
-    // iter1 = 5, iter2 = 2
-    CHECK(++iter1 != iter2);
-
-    // iter1 = 1, iter2 = 2
-    CHECK(++iter1 != iter2);
-
-    // iter1 = 2, iter2 = 2
-    CHECK(++iter1 == iter2);
 }
 
 TEST_CASE("CircularIterator - Operations Test") {
     std::vector<std::int16_t> v{1,2,3,4,5};
 
-    NS::Featurizers::Components::CircularIterator<std::int16_t> iter(&v[0], v.size(), 5);
+    NS::Featurizers::Components::CircularIterator<std::int16_t> iter(v.data(), v.size(), 5);
 
     // Start deference should equal one
     CHECK(*iter == 1);
@@ -89,7 +68,7 @@ TEST_CASE("CircularIterator - Operations Test") {
 TEST_CASE("CircularIterator - String Test") {
     std::vector<std::string> v{"1","2","3","4","5"};
 
-    NS::Featurizers::Components::CircularIterator<std::string> iter(&v[0], v.size(), 5);
+    NS::Featurizers::Components::CircularIterator<std::string> iter(v.data(), v.size(), 5);
 
     // Start deference should equal one
     CHECK(*iter == "1");
@@ -106,11 +85,10 @@ TEST_CASE("CircularIterator - String Test") {
 }
 
 TEST_CASE("CircularIterator - Array Test") {
-    // 20 is longer than the input array. Testing looping capabilities. Just validating it works with multiple containers.
     std::int16_t v[]{1,2,3,4,5};
 
-    NS::Featurizers::Components::CircularIterator<std::int16_t> iter1(&v[0], 5, 20);
-    NS::Featurizers::Components::CircularIterator<std::int16_t> iter2(&v[0], 5, 20);
+    NS::Featurizers::Components::CircularIterator<std::int16_t> iter1(&v[0], 5, 5);
+    NS::Featurizers::Components::CircularIterator<std::int16_t> iter2(&v[0], 5, 5);
 
     // Should start out being equal
     CHECK(iter1 == iter2);
@@ -122,46 +100,13 @@ TEST_CASE("CircularIterator - Array Test") {
     // Should be equal again
     iter1++;
     CHECK(iter1 == iter2);
-
-    // Doing a full loop should result in the iterators being equal
-    // iter1 = 3, iter2 = 2
-    CHECK(++iter1 != iter2);
-
-    // iter1 = 4, iter2 = 2
-    CHECK(++iter1 != iter2);
-
-    // iter1 = 5, iter2 = 2
-    CHECK(++iter1 != iter2);
-
-    // iter1 = 1, iter2 = 2
-    CHECK(++iter1 != iter2);
-
-    // iter1 = 2, iter2 = 2
-    CHECK(++iter1 == iter2);
-}
-
-TEST_CASE("CircularIterator - Single Value Test") {
-    std::int16_t v = 1;
-
-    NS::Featurizers::Components::CircularIterator<std::int16_t> iter1(&v, 1, 2);
-    NS::Featurizers::Components::CircularIterator<std::int16_t> iter2(&v, 1, 2);
-
-    // Should start out being equal
-    CHECK(iter1 == iter2);
-
-    // Since only 1 value, increment should keep the same value
-    CHECK(++iter1 == iter2);
-
-    // Since only 1 value, increment should keep the same value
-    CHECK(iter1 == ++iter2);
-
 }
 
 TEST_CASE("CircularIterator - Starting offset Test") {
     std::vector<std::int16_t> v{1,2,3,4,5};
 
-    NS::Featurizers::Components::CircularIterator<std::int16_t> iter1(&v[0], v.size(), 5, 2);
-    NS::Featurizers::Components::CircularIterator<std::int16_t> iter2(&v[0], v.size(), 5);
+    NS::Featurizers::Components::CircularIterator<std::int16_t> iter1(v.data(), v.size(), 5, 2);
+    NS::Featurizers::Components::CircularIterator<std::int16_t> iter2(v.data(), v.size(), 5);
 
     // Should NOT start out being equal since iter1 has an offset of 2
     CHECK(iter1 != iter2);
@@ -176,8 +121,8 @@ TEST_CASE("CircularIterator - Starting offset Test") {
 TEST_CASE("CircularIterator - End iterator Test") {
     std::vector<std::int16_t> v{1,2,3,4,5};
 
-    NS::Featurizers::Components::CircularIterator<std::int16_t> iter1(&v[0], v.size(), 1, 2);
-    NS::Featurizers::Components::CircularIterator<std::int16_t> end_iter(&v[0], v.size(), 0, 3);
+    NS::Featurizers::Components::CircularIterator<std::int16_t> iter1(v.data(), v.size(), 1, 2);
+    NS::Featurizers::Components::CircularIterator<std::int16_t> end_iter(v.data(), v.size(), 0, 3);
 
     // Should NOT start out being equal since iter1 is not at end but end_iter is.
     CHECK(iter1 != end_iter);
@@ -191,8 +136,8 @@ TEST_CASE("CircularIterator - End iterator Test") {
 TEST_CASE("CircularIterator - End iterator Test While Loop") {
     std::vector<std::int16_t> v{1,2,3,4,5};
 
-    NS::Featurizers::Components::CircularIterator<std::int16_t> iter1(&v[0], v.size(), v.size());
-    NS::Featurizers::Components::CircularIterator<std::int16_t> end_iter(&v[0], v.size(), 0);
+    NS::Featurizers::Components::CircularIterator<std::int16_t> iter1(v.data(), v.size(), v.size());
+    NS::Featurizers::Components::CircularIterator<std::int16_t> end_iter(v.data(), v.size(), 0);
 
     // Should NOT start out being equal since iter1 is not at end but end_iter is.
     CHECK(iter1 != end_iter);
@@ -214,8 +159,8 @@ TEST_CASE("CircularIterator - End iterator Test While Loop") {
 TEST_CASE("CircularIterator - Const check") {
     std::vector<std::int16_t> v{1,2,3,4,5};
 
-    NS::Featurizers::Components::CircularIterator<const std::int16_t> iter1(&v[0], v.size(), v.size());
-    NS::Featurizers::Components::CircularIterator<const std::int16_t> end_iter(&v[0], v.size(), 0);
+    NS::Featurizers::Components::CircularIterator<const std::int16_t> iter1(v.data(), v.size(), v.size());
+    NS::Featurizers::Components::CircularIterator<const std::int16_t> end_iter(v.data(), v.size(), 0);
 
     // Should NOT start out being equal since iter1 is not at end but end_iter is.
     CHECK(iter1 != end_iter);
@@ -253,13 +198,7 @@ TEST_CASE("CircularBuffer - Empty buffer") {
 }
 
 TEST_CASE("CircularBuffer - Size 0 buffer") {
-    NS::Featurizers::Components::CircularBuffer<std::string> circ_buf(0);
-
-    auto start_iter = circ_buf.begin();
-    auto end_iter = circ_buf.end();
-
-    // Since there is no data, the start and end iterators should be equal.
-    CHECK(start_iter == end_iter);
+    CHECK_THROWS_WITH(NS::Featurizers::Components::CircularBuffer<std::string>(0), "Max size cannot be zero");
 }
 
 TEST_CASE("CircularBuffer - Push") {

@@ -21,7 +21,12 @@ namespace Components {
     ///  \brief         This class is a forward iterator that is used to implement a
     ///                 circular buffer. If the result of incrementing the iterator
     ///                 would move it past the end of the underlying data structure,
-    ///                 it will instead wrap around back to the beginning.
+    ///                 it will instead wrap around back to the beginning. This follows
+    ///                 STL iterators in that if the underlying data structure is changed,
+    ///                 the iterator is invalid and behavior is undefined if used.
+    ///                 This class is designed for use with the WindowFeaturizerBase and
+    ///                 so it uses assert and not exception. If this class needs to be
+    ///                 used elsewhere at a later date, then this will need to be addressed.
     ///
     template <class T>
     class CircularIterator
@@ -71,7 +76,16 @@ namespace Components {
 
         CircularIterator(T* T, size_t container_max_size, size_t max_increments, size_t starting_offset = 0)
             : _itr(T), _size(container_max_size), _cur_index(starting_offset),
-            _max_increments(max_increments), _cur_increment(0) {
+                _max_increments(max_increments), _cur_increment(0) {
+            if(_itr == nullptr) {
+                throw std::invalid_argument("Input data cannot be a nullptr");
+            }
+            if(_size == 0) {
+                throw std::invalid_argument("Container max size cannot be 0");
+            }
+            if(_max_increments > _size) {
+                throw std::invalid_argument("Cannot increment more than max_size times");
+            }
         }
 
         // Pre-increment operator.
@@ -87,22 +101,17 @@ namespace Components {
         CircularIterator operator++ (int) {
             CircularIterator tmp(*this);
 
-            assert(++_cur_increment <= _max_increments);
-
-            ++_cur_index;
-            _cur_index %= _size;
+            operator++();
             return tmp;
         }
 
         // Two-way comparison: v.begin() == v.cbegin() and vice versa.
-        template<class OtherType>
-        bool operator == (const CircularIterator<OtherType>& rhs) const {
+        bool operator == (const CircularIterator<T>& rhs) const {
             return _itr == rhs._itr && _cur_index == rhs._cur_index &&
                 !((_cur_increment == _max_increments) ^ (rhs._cur_increment == rhs._max_increments));
         }
 
-        template<class OtherType>
-        bool operator != (const CircularIterator<OtherType>& rhs) const {
+        bool operator != (const CircularIterator<T>& rhs) const {
             return !operator==(rhs);
         }
 
@@ -128,7 +137,10 @@ namespace Components {
     ///  \brief         A custom container class created for operations with shifted windows
     ///                 The goal is to minimize the memory allocation so when the item limit
     ///                 has been reached it overwrites the oldest item it is storing without
-    ///                 allocating new memory.
+    ///                 allocating new memory. This class is designed for use with the
+    ///                 WindowFeaturizerBase and so it uses assert and not exception. If this
+    ///                 class needs to be used elsewhere at a later date, then this will need
+    ///                 to be addressed.
     ///
     template <class T>
     class CircularBuffer {
@@ -141,31 +153,32 @@ namespace Components {
         // a vector so the "start" will change based on how much data has been overwritten.
         size_t                                  _start_offset;
 
-        // Current number of element held by this container. It start from 0 and grows to _max_size
-        size_t                                  _cur_size;
-
         // The vector that holds the actual data. This is set to hold _max_size elements and then
         // is never resized.
         std::vector<T>                          _data;
 
     public:
         // ----------------------------------------------------------------------
-        // |  Public Data
-        typedef CircularIterator<T>             iterator;
-        typedef CircularIterator<const T>       const_iterator;
+        // |  Public Types
+        using iterator = CircularIterator<T>;
+        using const_iterator = CircularIterator<const T>;
 
         // ----------------------------------------------------------------------
         // |  Public Methods
-        CircularBuffer(size_t max_size) : _max_size(max_size), _start_offset(0),  _cur_size(0) {
+        CircularBuffer(size_t max_size) : _max_size(max_size), _start_offset(0) {
+            if (_max_size == 0) {
+                throw std::invalid_argument("Max size cannot be zero");
+            }
+
             _data.reserve(_max_size);
         }
 
         iterator begin() {
             // When _cur_size is 0 we want to return an "end" iterator.
-            if (_cur_size == 0) {
+            if (_data.size() == 0) {
                 return iterator();
             }
-            return iterator(&_data[0], _max_size, _cur_size, _start_offset);
+            return iterator(_data.data(), _max_size, _data.size(), _start_offset);
         }
 
         const_iterator begin() const {
@@ -179,10 +192,10 @@ namespace Components {
         iterator end() {
             // End location of the iterator is equal to the start_offset if the buffer is full,
             // or equal to the _cur_size if it isnt full.
-            if (_cur_size == 0) {
+            if (_data.size() == 0) {
                 return iterator();
             }
-            return iterator(&_data[0], _max_size, 0, _cur_size == _max_size ? _start_offset : _cur_size);
+            return iterator(_data.data(), _max_size, 0, _data.size() == _max_size ? _start_offset : _data.size());
         }
 
         const_iterator end() const {
@@ -196,14 +209,12 @@ namespace Components {
         void push (T value) {
             // Make sure we update size and offset accordingly and insert correctly.
             // If we have filled the whole vector, then just update offset.
-            // If vector still has space, then just update the _cur_size;
-            if (_cur_size == _max_size) {
+            if (_data.size() == _max_size) {
                 _data[_start_offset] = value;
                 ++_start_offset;
                 _start_offset %= _max_size;
             } else {
                 _data.emplace_back(std::move(value));
-                ++_cur_size;
             }
         }
 
@@ -212,19 +223,20 @@ namespace Components {
             // Since this class is used for window operations only
             // number of requested elements is never bigger than the max_size
             assert(n + offset <= _max_size);
-            if(_cur_size == 0) {
+
+            if(_data.size() == 0) {
                 return std::make_tuple(iterator(), iterator());
             }
-            if(offset > _cur_size) {
+            if(offset > _data.size()) {
                 // if even the offset is greater than cur_size, return two end pointers
                 return std::make_tuple(end(), end());
             }
-            else if(n + offset > _cur_size) {
-                // if the sum of n and offset is greater than _cur_size, requested elements are bounded by end()
-                return std::make_tuple(iterator(&_data[0], _max_size, _cur_size - offset, (_start_offset + offset) % _max_size), end());
+            else if(n + offset > _data.size()) {
+                // if the sum of n and offset is greater than _data.size(), requested elements are bounded by end()
+                return std::make_tuple(iterator(_data.data(), _max_size, _data.size() - offset, (_start_offset + offset) % _max_size), end());
             }
             else {
-                return std::make_tuple(iterator(&_data[0], _max_size, n, (_start_offset + offset) % _max_size), iterator(&_data[0], _max_size, 0, (_start_offset + n + offset) % _max_size));
+                return std::make_tuple(iterator(_data.data(), _max_size, n, (_start_offset + offset) % _max_size), iterator(_data.data(), _max_size, 0, (_start_offset + n + offset) % _max_size));
             }
         }
 
