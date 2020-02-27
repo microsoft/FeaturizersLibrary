@@ -6,10 +6,9 @@
 #include "catch.hpp"
 
 #include "../../../3rdParty/optional.h"
-#include "../WindowOperationBase.h"
+#include "../WindowFeaturizerBase.h"
 
 namespace NS = Microsoft::Featurizer;
-
 
 TEST_CASE("CircularIterator - Simple Test") {
     // 20 is longer than the input array. Testing looping capabilities.
@@ -187,7 +186,6 @@ TEST_CASE("CircularIterator - End iterator Test") {
 
     // Increment iter1 to equal end_iter
     CHECK(++iter1 == end_iter);
-
 }
 
 TEST_CASE("CircularIterator - End iterator Test While Loop") {
@@ -419,15 +417,12 @@ TEST_CASE("CircularBuffer - range with offset") {
     // when offset is greater than current size, return iterators are all end iterators
     CHECK(start_iter == end_iter);
 
-
     range = circ_buf.range(2,2);
 
     start_iter = std::get<0>(range);
     end_iter = std::get<1>(range);
     // when n + offset is greater than current size
     CHECK(++start_iter == end_iter);
-
-
 
     range = circ_buf.range(2,1);
 

@@ -48,7 +48,7 @@ SET(
     StatisticalMetricsEstimator_UnitTest
     TrainingOnlyEstimatorImpl_UnitTest
     VectorNormsEstimator_UnitTest
-    WindowOperationBase_UnitTest
+    WindowFeaturizerBase_UnitTest
     # TODO: Add tests for:
     #   - TimeSeriesFrequencyEstimator
     #   - TimeSeriesMedianEstimator
