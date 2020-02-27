@@ -125,24 +125,23 @@ namespace Components {
 
     /////////////////////////////////////////////////////////////////////////
     ///  \class         CircularBuffer
-    ///  \brief         This class is a circular buffer. It stores a max number of items.
-    ///                 When the limit has been reached it overwrites the oldest item it is
-    ///                 storing without allocating new memory. 
+    ///  \brief         A custom container class created for operations with shifted windows
+    ///                 The goal is to minimize the memory allocation so when the item limit
+    ///                 has been reached it overwrites the oldest item it is storing without
+    ///                 allocating new memory. 
     ///
     template <class T>
     class CircularBuffer {
-        // ----------------------------------------------------------------------
-        // |  Private Data
-        
-        // The maximum number of elements to store. When this number is reached the oldest
-        // value is overwritten.
+
+        // Maximum number of elements this container can hold. When this number is reached
+        // the oldest value is overwritten.
         size_t _max_size;
 
-        // The current "start" of the data. This class is implemented by wrapping around
+        // The start position of this circular buffer. This class is implemented by wrapping around
         // a vector so the "start" will change based on how much data has been overwritten.
         size_t _start_offset;
 
-        // The current number of elements stored. This will always be <=_max_size.
+        // Current number of element held by this container. It start from 0 and grows to _max_size
         size_t _cur_size;
 
         // The vector that holds the actual data. This is set to hold _max_size elements and then
@@ -208,12 +207,14 @@ namespace Components {
             }
         }
 
-        // range returns start and end iterators that have <= n items.
+        // provide a pair of begin and end iterator for the n elements requested
         std::tuple<iterator, iterator> range(size_t n) {
             // Since this class is used for window operations only
             // number of requested elements is never bigger than the max_size
             assert(n <= _max_size);
             if(n > _cur_size) {
+                // when there are not enough number of elements available
+                // return the begin and end iterator of available data
                 return std::make_tuple(begin(), end());
             }
             else {
@@ -228,9 +229,7 @@ namespace Components {
 
         std::tuple<const_iterator, const_iterator> crange(size_t n) const {
             return range(n);
-
         }
-
     };
 
 } // Components

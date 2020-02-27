@@ -351,3 +351,32 @@ TEST_CASE("CircularBuffer - Range") {
     }
     CHECK(count == 3);
 }
+
+TEST_CASE("CircularBuffer - Empty buffer Range") {
+    using iterator = typename NS::Featurizers::Components::CircularBuffer<std::int16_t>::iterator;
+    NS::Featurizers::Components::CircularBuffer<std::int16_t> circ_buf(5);
+
+    std::tuple<iterator, iterator> range = circ_buf.range(3);
+
+    // when there's no data within the buffer, begin and iterators are both pointing to the start location
+    auto start_iter = std::get<0>(range);
+    auto end_iter = std::get<1>(range);
+
+    CHECK(start_iter == end_iter);
+}
+
+TEST_CASE("CircularBuffer - Range 0") {
+    using iterator = typename NS::Featurizers::Components::CircularBuffer<std::int16_t>::iterator;
+    NS::Featurizers::Components::CircularBuffer<std::int16_t> circ_buf(5);
+
+    circ_buf.push(1);
+    circ_buf.push(2);
+    circ_buf.push(3);
+
+    std::tuple<iterator, iterator> range = circ_buf.range(0);
+
+    auto start_iter = std::get<0>(range);
+    auto end_iter = std::get<1>(range);
+
+    CHECK(start_iter == end_iter);
+}
