@@ -37,6 +37,8 @@ function(Impl)
         ${_this_path}/../RobustScalerFeaturizer.h
         ${_this_path}/../SampleAddFeaturizer.h
         ${_this_path}/../SampleAddFeaturizer.cpp
+        ${_this_path}/../ShortGrainDropperFeaturizer.h
+        ${_this_path}/../ShortGrainDropperFeaturizer.cpp
         ${_this_path}/../StandardScaleWrapperFeaturizer.h
         ${_this_path}/../StringFeaturizer.h
         ${_this_path}/../Structs.h
