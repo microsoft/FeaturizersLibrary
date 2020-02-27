@@ -15,6 +15,14 @@ namespace Featurizers {
 namespace Components {
 
 // namespace Details {
+
+    /////////////////////////////////////////////////////////////////////////
+    ///  \class         CircularIterator
+    ///  \brief         This class is a forward iterator that is used to implement a
+    ///                 circular buffer. If the result of incrementing the iterator
+    ///                 would move it past the end of the underlying data structure,
+    ///                 it will instead wrap around back to the beginning.
+    ///
     template <class T>
     class CircularIterator
         : public std::iterator<std::forward_iterator_tag,
@@ -23,20 +31,39 @@ namespace Components {
                                T*,
                                T&> {
 
+        // Assert that this class handles all the iterator traits correctly. It inherits from std::iterator so it gets these by default,
+        // but this check is here just to guarantee it is correct.
         static_assert(std::is_same<typename std::iterator_traits<CircularIterator>::difference_type, std::ptrdiff_t>::value, "Make sure standard iterator handles iterator traits correctly!");
         static_assert(std::is_same<typename std::iterator_traits<CircularIterator>::value_type, T>::value, "Make sure standard iterator handles iterator traits correctly!");
         static_assert(std::is_same<typename std::iterator_traits<CircularIterator>::pointer, T*>::value, "Make sure standard iterator handles iterator traits correctly!");
         static_assert(std::is_same<typename std::iterator_traits<CircularIterator>::reference, T&>::value, "Make sure standard iterator handles iterator traits correctly!");
         static_assert(std::is_same<typename std::iterator_traits<CircularIterator>::iterator_category, std::forward_iterator_tag>::value, "Make sure standard iterator handles iterator traits correctly!");
 
-        T* _itr;
-        size_t _size;
-        size_t _cur_index;
-        size_t _max_increments;
-        size_t _cur_increment;
+        // ----------------------------------------------------------------------
+        // |  Private Data
+        
+        // Pointer to the first element of the underlying data structure.
+        T*                              _itr;
+
+        // The number of elements that the underlying data structure has.
+        size_t                          _size;
+
+        // The index this iterator is pointer it in the underlying data structure.
+        size_t                          _cur_index;
+
+        // The maximum number of times this iterator can be incremented. Since this iterator will
+        // wrap at the end of the data structure, there is no real "end" of the data so this is
+        // used to determine when we have met the "end".
+        size_t                          _max_increments;
+
+        // How many times we have incremented this iterator.
+        size_t                          _cur_increment;
 
     public:
+        // ----------------------------------------------------------------------
+        // |  Public Methods
 
+        // Default constructor, already at the "end".
         CircularIterator()
             : _itr(nullptr), _size(0), _cur_index(0),
             _max_increments(0), _cur_increment(0) {
@@ -47,7 +74,7 @@ namespace Components {
             _max_increments(max_increments), _cur_increment(0) {
         }
 
-        // Pre-increment
+        // Pre-increment operator.
         CircularIterator& operator++ () {
             assert(++_cur_increment <= _max_increments);
 
@@ -56,7 +83,7 @@ namespace Components {
             return *this;
         }
 
-        // Post-increment
+        // Post-increment operator.
         CircularIterator operator++ (int) {
             CircularIterator tmp(*this);
 
@@ -67,7 +94,7 @@ namespace Components {
             return tmp;
         }
 
-        // two-way comparison: v.begin() == v.cbegin() and vice versa
+        // Two-way comparison: v.begin() == v.cbegin() and vice versa.
         template<class OtherType>
         bool operator == (const CircularIterator<OtherType>& rhs) const {
             return _itr == rhs._itr && _cur_index == rhs._cur_index &&
@@ -96,24 +123,46 @@ namespace Components {
 
     };
 
+    /////////////////////////////////////////////////////////////////////////
+    ///  \class         CircularBuffer
+    ///  \brief         This class is a circular buffer. It stores a max number of items.
+    ///                 When the limit has been reached it overwrites the oldest item it is
+    ///                 storing without allocating new memory. 
+    ///
     template <class T>
     class CircularBuffer {
-
+        // ----------------------------------------------------------------------
+        // |  Private Data
+        
+        // The maximum number of elements to store. When this number is reached the oldest
+        // value is overwritten.
         size_t _max_size;
+
+        // The current "start" of the data. This class is implemented by wrapping around
+        // a vector so the "start" will change based on how much data has been overwritten.
         size_t _start_offset;
+
+        // The current number of elements stored. This will always be <=_max_size.
         size_t _cur_size;
 
+        // The vector that holds the actual data. This is set to hold _max_size elements and then
+        // is never resized.
         std::vector<T> _data;
 
     public:
+        // ----------------------------------------------------------------------
+        // |  Public Data
         typedef CircularIterator<T> iterator;
         typedef CircularIterator<const T> const_iterator;
 
+        // ----------------------------------------------------------------------
+        // |  Public Methods
         CircularBuffer(size_t max_size) : _max_size(max_size), _start_offset(0),  _cur_size(0) {
             _data.reserve(_max_size);
         }
 
         iterator begin() {
+            // When _cur_size is 0 we want to return an "end" iterator.
             if (_cur_size == 0) {
                 return iterator();
             }
@@ -159,6 +208,7 @@ namespace Components {
             }
         }
 
+        // range returns start and end iterators that have <= n items.
         std::tuple<iterator, iterator> range(size_t n) {
             // Since this class is used for window operations only
             // number of requested elements is never bigger than the max_size
@@ -172,15 +222,11 @@ namespace Components {
         }
 
         std::tuple<const_iterator, const_iterator> range(size_t n) const {
-            // Sicne this class is used for window operations only
-            // number of requested elements is never bigger than the max_size
             return range(n);
 
         }
 
         std::tuple<const_iterator, const_iterator> crange(size_t n) const {
-            // Sicne this class is used for window operations only
-            // number of requested elements is never bigger than the max_size
             return range(n);
 
         }
