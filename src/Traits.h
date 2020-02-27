@@ -17,21 +17,46 @@
 #include <vector>
 
 #if (defined __clang__)
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wold-style-cast"
-#   pragma clang diagnostic ignored "-Wsign-conversion"
-#   pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
-#   pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
-#   pragma clang diagnostic ignored "-Wextra-semi-stmt"
-#   pragma clang diagnostic ignored "-Wmissing-noreturn"
-#   pragma clang diagnostic ignored "-Wdocumentation"
-#   pragma clang diagnostic ignored "-Wdouble-promotion"
-#   pragma clang diagnostic ignored "-Wcast-align"
-#   pragma clang diagnostic ignored "-Wfloat-equal"
-#   pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic push
+#if !defined(__has_warning) || __has_warning("-Wold-style-cast")
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#endif
+#if !defined(__has_warning) || __has_warning("-Wsign-conversion")
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+#if !defined(__has_warning) || __has_warning("-Wdocumentation-unknown-command")
+#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#endif
+#if !defined(__has_warning) || __has_warning("-Wzero-as-null-pointer-constant")
+#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
+#if !defined(__has_warning) || __has_warning("-Wextra-semi-stmt")
+#pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#endif
+#if !defined(__has_warning) || __has_warning("-Wmissing-noreturn")
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
+#endif
+#if !defined(__has_warning) || __has_warning("-Wdocumentation")
+#pragma clang diagnostic ignored "-Wdocumentation"
+#endif
+#if !defined(__has_warning) || __has_warning("-Wdouble-promotion")
+#pragma clang diagnostic ignored "-Wdouble-promotion"
+#endif
+#if !defined(__has_warning) || __has_warning("-Wdouble-promotion")
+#pragma clang diagnostic ignored "-Wdouble-promotion"
+#endif
+#if !defined(__has_warning) || __has_warning("-Wcast-align")
+#pragma clang diagnostic ignored "-Wcast-align"
+#endif
+#if !defined(__has_warning) || __has_warning("-Wfloat-equal")
+#pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
+#if !defined(__has_warning) || __has_warning("-Wshadow")
+#pragma clang diagnostic ignored "-Wshadow"
+#endif
 #elif (defined _MSC_VER)
-#   pragma warning(push)
-#   pragma warning(disable: 4127)
+#pragma warning(push)
+#pragma warning(disable: 4127)
 #endif
 
 #include "3rdParty/eigen/Eigen/Dense"
