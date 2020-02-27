@@ -403,3 +403,36 @@ TEST_CASE("CircularBuffer - range wrapping") {
 
     CHECK(++start_iter == end_iter);
 }
+
+TEST_CASE("CircularBuffer - range with offset") {
+    using iterator = typename NS::Featurizers::Components::CircularBuffer<std::int16_t>::iterator;
+    NS::Featurizers::Components::CircularBuffer<std::int16_t> circ_buf(5);
+
+    circ_buf.push(1);
+    circ_buf.push(2);
+    circ_buf.push(3);
+
+    std::tuple<iterator, iterator> range = circ_buf.range(1, 4);
+
+    auto start_iter = std::get<0>(range);
+    auto end_iter = std::get<1>(range);
+    // when offset is greater than current size, return iterators are all end iterators
+    CHECK(start_iter == end_iter);
+
+
+    range = circ_buf.range(2,2);
+
+    start_iter = std::get<0>(range);
+    end_iter = std::get<1>(range);
+    // when n + offset is greater than current size
+    CHECK(++start_iter == end_iter);
+
+
+
+    range = circ_buf.range(2,1);
+
+    start_iter = std::get<0>(range);
+    end_iter = std::get<1>(range);
+    // when n and offset are not out of bound
+    CHECK(++(++start_iter) == end_iter);
+}

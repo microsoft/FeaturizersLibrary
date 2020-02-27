@@ -41,7 +41,7 @@ namespace Components {
 
         // ----------------------------------------------------------------------
         // |  Private Data
-        
+
         // Pointer to the first element of the underlying data structure.
         T*                              _itr;
 
@@ -128,7 +128,7 @@ namespace Components {
     ///  \brief         A custom container class created for operations with shifted windows
     ///                 The goal is to minimize the memory allocation so when the item limit
     ///                 has been reached it overwrites the oldest item it is storing without
-    ///                 allocating new memory. 
+    ///                 allocating new memory.
     ///
     template <class T>
     class CircularBuffer {
@@ -208,17 +208,23 @@ namespace Components {
         }
 
         // provide a pair of begin and end iterator for the n elements requested
-        std::tuple<iterator, iterator> range(size_t n) {
+        std::tuple<iterator, iterator> range(size_t n, size_t offset=0) {
             // Since this class is used for window operations only
             // number of requested elements is never bigger than the max_size
-            assert(n <= _max_size);
-            if(n > _cur_size) {
-                // when there are not enough number of elements available
-                // return the begin and end iterator of available data
-                return std::make_tuple(begin(), end());
+            assert(n + offset <= _max_size);
+            if(_cur_size == 0) {
+                return std::make_tuple(iterator(), iterator());
+            }
+            if(offset > _cur_size) {
+                // if even the offset is greater than cur_size, return two end pointers
+                return std::make_tuple(end(),end());
+            }
+            else if(n + offset > _cur_size) {
+                // if the sum of n and offset is greater than _cur_size, requested elements are bounded by end()
+                return std::make_tuple(iterator(&_data[0], _max_size, _cur_size - offset, (_start_offset+offset)%_max_size), end());
             }
             else {
-                return std::make_tuple(iterator(&_data[0], _max_size, n, _start_offset), iterator(&_data[0], _max_size, 0, (_start_offset + n) % _max_size));
+                return std::make_tuple(iterator(&_data[0], _max_size, n, (_start_offset+offset)%_max_size), iterator(&_data[0], _max_size, 0, (_start_offset + n + offset)%_max_size));
             }
         }
 
