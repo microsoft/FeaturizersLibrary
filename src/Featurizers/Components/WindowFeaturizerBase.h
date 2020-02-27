@@ -44,29 +44,12 @@ namespace Components {
         static_assert(std::is_same<typename std::iterator_traits<CircularIterator>::reference, T&>::value, "Make sure standard iterator handles iterator traits correctly!");
         static_assert(std::is_same<typename std::iterator_traits<CircularIterator>::iterator_category, std::forward_iterator_tag>::value, "Make sure standard iterator handles iterator traits correctly!");
 
-        // ----------------------------------------------------------------------
-        // |  Private Data
-
-        // Pointer to the first element of the underlying data structure.
-        T*                                      _itr;
-
-        // The number of elements that the underlying data structure has.
-        size_t                                  _size;
-
-        // The index this iterator is pointer it in the underlying data structure.
-        size_t                                  _cur_index;
-
-        // The maximum number of times this iterator can be incremented. Since this iterator will
-        // wrap at the end of the data structure, there is no real "end" of the data so this is
-        // used to determine when we have met the "end".
-        size_t                                  _max_increments;
-
-        // How many times we have incremented this iterator.
-        size_t                                  _cur_increment;
-
     public:
         // ----------------------------------------------------------------------
+        // |
         // |  Public Methods
+        // |
+        // ----------------------------------------------------------------------
 
         // Default constructor, already at the "end".
         CircularIterator()
@@ -74,8 +57,8 @@ namespace Components {
             _max_increments(0), _cur_increment(0) {
         }
 
-        CircularIterator(T* T, size_t container_max_size, size_t max_increments, size_t starting_offset = 0)
-            : _itr(T), _size(container_max_size), _cur_index(starting_offset),
+        CircularIterator(T* t, size_t container_max_size, size_t max_increments, size_t starting_offset = 0)
+            : _itr(t), _size(container_max_size), _cur_index(starting_offset),
                 _max_increments(max_increments), _cur_increment(0) {
             if(_itr == nullptr) {
                 throw std::invalid_argument("Input data cannot be a nullptr");
@@ -107,8 +90,12 @@ namespace Components {
 
         // Two-way comparison: v.begin() == v.cbegin() and vice versa.
         bool operator == (const CircularIterator<T>& rhs) const {
-            return _itr == rhs._itr && _cur_index == rhs._cur_index &&
-                !((_cur_increment == _max_increments) ^ (rhs._cur_increment == rhs._max_increments));
+            // Making sure the end state is the same for both iterators.
+            if((at_end() && !rhs.at_end()) || (!at_end() && rhs.at_end())) {
+                return false;
+            }
+
+            return _itr == rhs._itr && _cur_index == rhs._cur_index;
         }
 
         bool operator != (const CircularIterator<T>& rhs) const {
@@ -125,9 +112,38 @@ namespace Components {
             return (_itr+_cur_index);
         }
 
-        // One way conversion: iterator -> const_iterator
-        operator CircularIterator<const T>() const {
-            return CircularIterator<const T>(_itr);
+    private:
+        // ----------------------------------------------------------------------
+        // |
+        // |  Private Data
+        // |
+        // ----------------------------------------------------------------------
+
+        // Pointer to the first element of the underlying data structure.
+        T*                                      _itr;
+
+        // The number of elements that the underlying data structure has.
+        size_t                                  _size;
+
+        // The index this iterator is pointer it in the underlying data structure.
+        size_t                                  _cur_index;
+
+        // The maximum number of times this iterator can be incremented. Since this iterator will
+        // wrap at the end of the data structure, there is no real "end" of the data so this is
+        // used to determine when we have met the "end".
+        size_t                                  _max_increments;
+
+        // How many times we have incremented this iterator.
+        size_t                                  _cur_increment;
+
+        // ----------------------------------------------------------------------
+        // |
+        // |  Private Methods
+        // |
+        // ----------------------------------------------------------------------
+
+        bool at_end() const {
+            return _cur_increment == _max_increments;
         }
 
     };
@@ -145,26 +161,20 @@ namespace Components {
     template <class T>
     class CircularBuffer {
 
-        // Maximum number of elements this container can hold. When this number is reached
-        // the oldest value is overwritten.
-        size_t                                  _max_size;
-
-        // The start position of this circular buffer. This class is implemented by wrapping around
-        // a vector so the "start" will change based on how much data has been overwritten.
-        size_t                                  _start_offset;
-
-        // The vector that holds the actual data. This is set to hold _max_size elements and then
-        // is never resized.
-        std::vector<T>                          _data;
-
     public:
         // ----------------------------------------------------------------------
+        // |
         // |  Public Types
+        // |
+        // ----------------------------------------------------------------------
         using iterator = CircularIterator<T>;
         using const_iterator = CircularIterator<const T>;
 
         // ----------------------------------------------------------------------
+        // |
         // |  Public Methods
+        // |
+        // ----------------------------------------------------------------------
         CircularBuffer(size_t max_size) : _max_size(max_size), _start_offset(0) {
             if (_max_size == 0) {
                 throw std::invalid_argument("Max size cannot be zero");
@@ -174,36 +184,27 @@ namespace Components {
         }
 
         iterator begin() {
-            // When _cur_size is 0 we want to return an "end" iterator.
-            if (_data.size() == 0) {
-                return iterator();
-            }
-            return iterator(_data.data(), _max_size, _data.size(), _start_offset);
+            return begin_impl<iterator>();
         }
 
         const_iterator begin() const {
-            return begin();
+            return begin_impl<const_iterator>();
         }
 
         const_iterator cbegin() const {
-            return begin();
+            return begin_impl<const_iterator>();
         }
 
         iterator end() {
-            // End location of the iterator is equal to the start_offset if the buffer is full,
-            // or equal to the _cur_size if it isnt full.
-            if (_data.size() == 0) {
-                return iterator();
-            }
-            return iterator(_data.data(), _max_size, 0, _data.size() == _max_size ? _start_offset : _data.size());
+            return end_impl<iterator>();
         }
 
         const_iterator end() const {
-            return end();
+            return end_impl<const_iterator>();
         }
 
         const_iterator cend() const {
-            return end();
+            return end_impl<const_iterator>();
         }
 
         void push (T value) {
@@ -220,33 +221,81 @@ namespace Components {
 
         // provide a pair of begin and end iterator for the n elements requested
         std::tuple<iterator, iterator> range(size_t n, size_t offset=0) {
+            return range_impl<iterator>(n, offset);
+        }
+
+        std::tuple<const_iterator, const_iterator> range(size_t n, size_t offset=0) const {
+            return range_impl<const_iterator>(n, offset);
+        }
+
+        std::tuple<const_iterator, const_iterator> crange(size_t n, size_t offset=0) const {
+            return range_impl<const_iterator>(n, offset);
+        }
+
+    private:
+        // ----------------------------------------------------------------------
+        // |
+        // |  Private Data
+        // |
+        // ----------------------------------------------------------------------
+
+        // Maximum number of elements this container can hold. When this number is reached
+        // the oldest value is overwritten.
+        size_t                                  _max_size;
+
+        // The start position of this circular buffer. This class is implemented by wrapping around
+        // a vector so the "start" will change based on how much data has been overwritten.
+        size_t                                  _start_offset;
+
+        // The vector that holds the actual data. This is set to hold _max_size elements and then
+        // is never resized.
+        std::vector<T>                          _data;
+
+        // ----------------------------------------------------------------------
+        // |
+        // |  Private Methods
+        // |
+        // ----------------------------------------------------------------------
+
+        template <typename V>
+        V begin_impl() {
+            // When _cur_size is 0 we want to return an "end" iterator.
+            if (_data.size() == 0) {
+                return V();
+            }
+            return V(_data.data(), _max_size, _data.size(), _start_offset);
+        }
+
+        template <typename V>
+        V end_impl() {
+            // End location of the iterator is equal to the start_offset if the buffer is full,
+            // or equal to the _cur_size if it isnt full.
+            if (_data.size() == 0) {
+                return V();
+            }
+            return V(_data.data(), _max_size, 0, _data.size() == _max_size ? _start_offset : _data.size());
+        }
+
+        template <typename V>
+        std::tuple<V, V> range_impl(size_t n, size_t offset) {
             // Since this class is used for window operations only
             // number of requested elements is never bigger than the max_size
             assert(n + offset <= _max_size);
 
             if(_data.size() == 0) {
-                return std::make_tuple(iterator(), iterator());
+                return std::make_tuple(V(), V());
             }
             if(offset > _data.size()) {
                 // if even the offset is greater than cur_size, return two end pointers
-                return std::make_tuple(end(), end());
+                return std::make_tuple(end_impl<V>(), end_impl<V>());
             }
             else if(n + offset > _data.size()) {
                 // if the sum of n and offset is greater than _data.size(), requested elements are bounded by end()
-                return std::make_tuple(iterator(_data.data(), _max_size, _data.size() - offset, (_start_offset + offset) % _max_size), end());
+                return std::make_tuple(V(_data.data(), _max_size, _data.size() - offset, (_start_offset + offset) % _max_size), end_impl<V>());
             }
             else {
-                return std::make_tuple(iterator(_data.data(), _max_size, n, (_start_offset + offset) % _max_size), iterator(_data.data(), _max_size, 0, (_start_offset + n + offset) % _max_size));
+                return std::make_tuple(V(_data.data(), _max_size, n, (_start_offset + offset) % _max_size), V(_data.data(), _max_size, 0, (_start_offset + n + offset) % _max_size));
             }
-        }
-
-        std::tuple<const_iterator, const_iterator> range(size_t n) const {
-            return range(n);
-
-        }
-
-        std::tuple<const_iterator, const_iterator> crange(size_t n) const {
-            return range(n);
         }
     };
 
