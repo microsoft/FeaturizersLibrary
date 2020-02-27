@@ -13,6 +13,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #if (defined __clang__)
@@ -78,6 +79,7 @@
 #   pragma clang diagnostic pop
 #endif
 
+#include "3rdParty/MurmurHash3.h"
 #include "3rdParty/optional.h"
 
 namespace Microsoft {
@@ -155,6 +157,37 @@ inline bool IsValid(TypeId id) {
         || id == TypeId::Vector
         || id == TypeId::Map;
 }
+
+//Hash Functions related
+static inline std::uint32_t MurmurHashGenerator(std::string const & value, std::uint32_t seed) {
+    std::uint32_t hash;
+    MurmurHash3_x86_32(value.c_str(), static_cast<int>(sizeof(*value.c_str())) * static_cast<int>(value.size()), seed, &hash);
+    return hash;
+}
+
+template<typename T>
+static inline std::uint32_t MurmurHashGenerator(T const & value, std::uint32_t seed) {
+    static_assert(std::is_pod<T>::value, "Input must be PODs");
+
+    std::uint32_t hash;
+    MurmurHash3_x86_32(reinterpret_cast<unsigned char const*>(&value), sizeof(value), seed, &hash);
+    return hash;
+}
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ContainerHash
+///  \brief         Hash function for Container type
+///
+template <typename Container>
+struct ContainerHash {
+    std::size_t operator()(Container const& container) const noexcept {
+        std::uint32_t hash = 0;
+        for (typename Container::value_type const & val : container) {
+            hash = MurmurHashGenerator(val, hash);
+        }
+        return static_cast<std::size_t>(hash);
+    }
+};
 
 // This mapper infers the type of the output Matrix
 // base on the input matrix type. Note, that it has to be
@@ -975,6 +1008,56 @@ MapT DeserializeMap(ArchiveT &ar) {
     return result;
 }
 
+template <typename SetT>
+std::string ToSetString(SetT const &value) {
+    std::ostringstream                      out;
+
+    out << "{";
+
+    for(auto it = value.cbegin(); it != value.end(); ++it) {
+        out << Traits<typename SetT::key_type>::ToString(*it);
+        if(std::next(it) != value.end())
+            out << ",";
+    }
+
+    out << "}";
+
+    return out.str();
+}
+
+template <typename SetT>
+SetT FromSetString(std::string const &value) {
+    std::ignore = value;
+    throw std::logic_error("Not Implemented Yet");
+}
+
+template <typename ArchiveT, typename SetT>
+ArchiveT & SerializeSet(ArchiveT &ar, SetT const &value) {
+    ar.serialize(static_cast<std::uint32_t>(value.size()));
+
+    for(auto const &elem : value) {
+        Traits<typename SetT::key_type>::serialize(ar, elem);
+    }
+
+    return ar;
+}
+
+template <typename SetT, typename ArchiveT>
+SetT DeserializeSet(ArchiveT &ar) {
+    SetT                                    result;
+    std::uint32_t                           size(ar.template deserialize<std::uint32_t>());
+
+    while(size) {
+        typename SetT::key_type             key(Traits<typename SetT::key_type>::deserialize(ar));
+
+        result.emplace(std::move(key));
+
+        --size;
+    }
+
+    return result;
+}
+
 } // anonymous namespace
 
 template <typename KeyT, typename T, typename CompareT, typename AllocatorT>
@@ -1016,6 +1099,27 @@ struct Traits<std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT>> : publi
     template <typename ArchiveT>
     static std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT> deserialize(ArchiveT &ar) {
         return DeserializeMap<std::unordered_map<KeyT, T, HashT, KeyEqualT, AllocatorT>>(ar);
+    }
+};
+
+template <typename KeyT, typename HashT, typename KeyEqualT, typename AllocatorT>
+struct Traits<std::unordered_set<KeyT, HashT, KeyEqualT, AllocatorT>> : public TraitsImpl<std::unordered_set<KeyT, HashT, KeyEqualT, AllocatorT>> {
+    static std::string ToString(std::unordered_set<KeyT, HashT, KeyEqualT, AllocatorT> const &value) {
+        return ToSetString(value);
+    }
+
+    static std::unordered_set<KeyT, HashT, KeyEqualT, AllocatorT> FromString(std::string const &value) {
+        return FromSetString<std::unordered_set<KeyT, HashT, KeyEqualT, AllocatorT>>(value);
+    }
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::unordered_set<KeyT, HashT, KeyEqualT, AllocatorT> const &value) {
+        return SerializeSet(ar, value);
+    }
+
+    template <typename ArchiveT>
+    static std::unordered_set<KeyT, HashT, KeyEqualT, AllocatorT> deserialize(ArchiveT &ar) {
+        return DeserializeSet<std::unordered_set<KeyT, HashT, KeyEqualT, AllocatorT>>(ar);
     }
 };
 
