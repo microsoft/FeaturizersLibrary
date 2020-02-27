@@ -43,21 +43,21 @@ namespace Components {
         // |  Private Data
 
         // Pointer to the first element of the underlying data structure.
-        T*                              _itr;
+        T*                                      _itr;
 
         // The number of elements that the underlying data structure has.
-        size_t                          _size;
+        size_t                                  _size;
 
         // The index this iterator is pointer it in the underlying data structure.
-        size_t                          _cur_index;
+        size_t                                  _cur_index;
 
         // The maximum number of times this iterator can be incremented. Since this iterator will
         // wrap at the end of the data structure, there is no real "end" of the data so this is
         // used to determine when we have met the "end".
-        size_t                          _max_increments;
+        size_t                                  _max_increments;
 
         // How many times we have incremented this iterator.
-        size_t                          _cur_increment;
+        size_t                                  _cur_increment;
 
     public:
         // ----------------------------------------------------------------------
@@ -135,24 +135,24 @@ namespace Components {
 
         // Maximum number of elements this container can hold. When this number is reached
         // the oldest value is overwritten.
-        size_t _max_size;
+        size_t                                  _max_size;
 
         // The start position of this circular buffer. This class is implemented by wrapping around
         // a vector so the "start" will change based on how much data has been overwritten.
-        size_t _start_offset;
+        size_t                                  _start_offset;
 
         // Current number of element held by this container. It start from 0 and grows to _max_size
-        size_t _cur_size;
+        size_t                                  _cur_size;
 
         // The vector that holds the actual data. This is set to hold _max_size elements and then
         // is never resized.
-        std::vector<T> _data;
+        std::vector<T>                          _data;
 
     public:
         // ----------------------------------------------------------------------
         // |  Public Data
-        typedef CircularIterator<T> iterator;
-        typedef CircularIterator<const T> const_iterator;
+        typedef CircularIterator<T>             iterator;
+        typedef CircularIterator<const T>       const_iterator;
 
         // ----------------------------------------------------------------------
         // |  Public Methods
@@ -217,14 +217,14 @@ namespace Components {
             }
             if(offset > _cur_size) {
                 // if even the offset is greater than cur_size, return two end pointers
-                return std::make_tuple(end(),end());
+                return std::make_tuple(end(), end());
             }
             else if(n + offset > _cur_size) {
                 // if the sum of n and offset is greater than _cur_size, requested elements are bounded by end()
-                return std::make_tuple(iterator(&_data[0], _max_size, _cur_size - offset, (_start_offset+offset)%_max_size), end());
+                return std::make_tuple(iterator(&_data[0], _max_size, _cur_size - offset, (_start_offset + offset) % _max_size), end());
             }
             else {
-                return std::make_tuple(iterator(&_data[0], _max_size, n, (_start_offset+offset)%_max_size), iterator(&_data[0], _max_size, 0, (_start_offset + n + offset)%_max_size));
+                return std::make_tuple(iterator(&_data[0], _max_size, n, (_start_offset + offset) % _max_size), iterator(&_data[0], _max_size, 0, (_start_offset + n + offset) % _max_size));
             }
         }
 
