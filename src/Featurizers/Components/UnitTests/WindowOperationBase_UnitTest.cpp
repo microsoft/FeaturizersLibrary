@@ -380,3 +380,26 @@ TEST_CASE("CircularBuffer - Range 0") {
 
     CHECK(start_iter == end_iter);
 }
+
+TEST_CASE("CircularBuffer - range wrapping") {
+    using iterator = typename NS::Featurizers::Components::CircularBuffer<std::int16_t>::iterator;
+    NS::Featurizers::Components::CircularBuffer<std::int16_t> circ_buf(3);
+
+    circ_buf.push(1);
+    circ_buf.push(2);
+    circ_buf.push(3);
+    circ_buf.push(4);
+    circ_buf.push(5);
+
+    std::tuple<iterator, iterator> range = circ_buf.range(2);
+
+    auto start_iter = std::get<0>(range);
+    auto end_iter = std::get<1>(range);
+
+    CHECK(start_iter != end_iter);
+    CHECK(*start_iter == 3);
+
+    CHECK(*(++start_iter) == 4);
+
+    CHECK(++start_iter == end_iter);
+}

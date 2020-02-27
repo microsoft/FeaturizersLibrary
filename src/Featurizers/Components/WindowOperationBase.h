@@ -218,7 +218,7 @@ namespace Components {
                 return std::make_tuple(begin(), end());
             }
             else {
-                return std::make_tuple(iterator(&_data[0], _max_size, n, _start_offset), iterator(&_data[0], _max_size, 0, _start_offset + n));
+                return std::make_tuple(iterator(&_data[0], _max_size, n, _start_offset), iterator(&_data[0], _max_size, 0, (_start_offset + n) % _max_size));
             }
         }
 
