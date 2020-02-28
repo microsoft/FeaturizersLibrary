@@ -32,9 +32,50 @@ static_assert(std::is_same<Traits<std::array<char, 4>>::nullable_type, nonstd::o
 static_assert(std::is_same<Traits<bool>::nullable_type, nonstd::optional<bool>>::value, "Incorrect nullable type for std::string");
 static_assert(std::is_same<Traits<std::map<int,int>>::nullable_type, nonstd::optional<std::map<int,int>>>::value, "Incorrect nullable type for std::map");
 static_assert(std::is_same<Traits<std::unordered_map<int,int>>::nullable_type, nonstd::optional<std::unordered_map<int,int>>>::value, "Incorrect nullable type for std::unordered_map");
+static_assert(std::is_same<Traits<std::unordered_set<int,int>>::nullable_type, nonstd::optional<std::unordered_set<int,int>>>::value, "Incorrect nullable type for std::unordered_set");
 static_assert(std::is_same<Traits<std::vector<int>>::nullable_type, nonstd::optional<std::vector<int>>>::value, "Incorrect nullable type for std::vector");
 static_assert(std::is_same<Traits<nonstd::optional<int>>::nullable_type, nonstd::optional<int>>::value, "Incorrect nullable type for nonstd::optional");
 static_assert(std::is_same<Traits<std::tuple<int>>::nullable_type, nonstd::optional<std::tuple<int>>>::value, "Incorrect nullable type for std::tuple");
+
+TEST_CASE("MurmurHash_Generator") {
+    CHECK(MurmurHashGenerator(true, 1) == 0x295d376d);
+    CHECK(MurmurHashGenerator(10, 1) == 0x12ec2126);
+    CHECK(MurmurHashGenerator(2.5f, 1) == 0x5edbc123);
+    CHECK(MurmurHashGenerator(2.5, 1) == 0x54263515);
+    CHECK(MurmurHashGenerator("abcd", 1) == 0x353b7271);
+}
+
+TEST_CASE("ContainerHash_Test") {
+    //no test for bool because c++ optimize vector<bool> which each bool takes 1 bit
+    //if vector<bool> is really needed in the future we could use int type
+    //the changes required to fit the test for vector<bool> will harm the performance
+    //of ContainerHash by copying the element in Container especially when the type is string
+
+    std::unordered_set<
+        std::vector<std::int8_t>,
+        ContainerHash<std::vector<std::int8_t>>
+    >                                       int8VecSet({{-1}, {2}});
+
+    std::unordered_set<
+        std::vector<std::uint8_t>,
+        ContainerHash<std::vector<std::uint8_t>>
+    >                                       uint8VecSet({{1}, {2}});
+
+    std::unordered_set<
+        std::vector<std::float_t>,
+        ContainerHash<std::vector<std::float_t>>
+    >                                       floatVecSet({{1.0f}, {2.0f}});
+
+    std::unordered_set<
+        std::vector<std::double_t>,
+        ContainerHash<std::vector<std::double_t>>
+    >                                       doubleVecSet({{1.0}, {2.0}});
+
+    std::unordered_set<
+        std::vector<std::string>,
+        ContainerHash<std::vector<std::string>>
+    >                                       strVecSet({{"a"}, {"b"}});
+}
 
 TEST_CASE("Transformer_Nullable") {
     nonstd::optional<std::int8_t> arg_null;
@@ -240,13 +281,26 @@ TEST_CASE("Transformer_Maps") {
     CHECK_THROWS_WITH((Traits<std::map<std::int16_t, std::double_t>>::FromString(map_res)), "Not Implemented Yet");
 }
 
-TEST_CASE("Unordered map") {
+TEST_CASE("Transformer_UnorderedMaps") {
     std::unordered_map<std::int16_t, std::double_t> m;
     m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(5), 35.8));
     m.insert(std::pair<std::int16_t, std::double_t>(static_cast<std::int16_t>(93), 0.147));
     std::string map_res = Traits<std::unordered_map<std::int16_t, std::double_t>>::ToString(m);
     std::string map_s{ "{93:0.147000,5:35.800000}" };
     CHECK(map_res == map_s);
+
+    CHECK_THROWS_WITH((Traits<std::unordered_map<std::int16_t, std::double_t>>::FromString(map_res)), "Not Implemented Yet");
+}
+
+TEST_CASE("Transformer_UnorderedSets") {
+    std::unordered_set<std::int16_t> s;
+    s.insert(5);
+    s.insert(93);
+    std::string set_res = Traits<std::unordered_set<std::int16_t>>::ToString(s);
+    std::string set_s{ "{93,5}" };
+    CHECK(set_res == set_s);
+
+    CHECK_THROWS_WITH((Traits<std::unordered_set<std::int16_t>>::FromString(set_res)), "Not Implemented Yet");
 }
 
 TEST_CASE("Transformer_EigenMatrix") {
@@ -405,6 +459,9 @@ TEST_CASE("Serialization") {
     CHECK(SerializationTestImpl(std::unordered_map<int, std::string>{ {10, "ten"}, {20, "twenty"} }));
     CHECK(SerializationTestImpl(std::unordered_map<std::string, int>{ {"ten", 10}, {"twenty", 20} }));
 
+    CHECK(SerializationTestImpl(std::unordered_set<std::string>()));
+    CHECK(SerializationTestImpl(std::unordered_set<std::string>{ {"ten"}, {"twenty"} }));
+
     CHECK(SerializationTestImpl(Eigen::MatrixX<float>()));
     Eigen::MatrixX<float> matrix(1, 2);
     matrix(0, 0) = 1.0f;
@@ -439,6 +496,7 @@ TEST_CASE("CreateNullValue") {
     CHECK(TestCreateNullValue<std::vector<std::string>>());
     CHECK(TestCreateNullValue<std::map<std::string, std::uint32_t>>());
     CHECK(TestCreateNullValue<std::unordered_map<std::string, std::uint32_t>>());
+    CHECK(TestCreateNullValue<std::unordered_set<std::string>>());
     CHECK(TestCreateNullValue<Eigen::MatrixX<std::float_t>>());
     CHECK(TestCreateNullValue<nonstd::optional<std::int8_t>>());
 }

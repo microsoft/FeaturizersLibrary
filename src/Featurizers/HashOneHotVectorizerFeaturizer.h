@@ -7,30 +7,10 @@
 #include "Structs.h"
 #include "../Traits.h"
 #include "Components/InferenceOnlyFeaturizerImpl.h"
-#include "../3rdParty/MurmurHash3.h"
 
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
-
-namespace {
-
-static inline std::uint32_t MurmurHashHelper(std::string const &input, std::uint32_t hashingSeedVal) {
-    std::uint32_t colHashVal;
-    MurmurHash3_x86_32(input.c_str(), static_cast<int>(sizeof(*input.c_str())) * static_cast<int>(input.size()), hashingSeedVal, &colHashVal);
-    return colHashVal;
-}
-
-template<typename T>
-static inline std::uint32_t MurmurHashHelper(T const &input, std::uint32_t hashingSeedVal) {
-    static_assert(std::is_pod<T>::value, "Input must be PODs");
-
-    std::uint32_t colHashVal;
-    MurmurHash3_x86_32(reinterpret_cast<unsigned char const*>(&input), sizeof(input), hashingSeedVal, &colHashVal);
-    return colHashVal;
-}
-
-} // anonymous namespace
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         HashOneHotVectorizerTransformer
@@ -80,7 +60,7 @@ private:
     // MSVC has problems when the function is defined outside of the declaration
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
 
-        std::uint32_t colHashVal = MurmurHashHelper(input, _hashingSeedVal);
+        std::uint32_t colHashVal = MurmurHashGenerator(input, _hashingSeedVal);
 
         callback(
             SingleValueSparseVectorEncoding<std::uint8_t>(

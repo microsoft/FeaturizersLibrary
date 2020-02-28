@@ -51,6 +51,7 @@ foreach(_test_name IN ITEMS
     PCAFeaturizer_UnitTests
     RobustScalerFeaturizer_UnitTests
     SampleAddFeaturizer_UnitTest
+    ShortGrainDropperFeaturizer_UnitTests
     StandardScaleWrapperFeaturizer_UnitTest
     StringFeaturizer_UnitTest
     Structs_UnitTest
