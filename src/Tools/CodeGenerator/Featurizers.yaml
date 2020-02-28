@@ -1135,7 +1135,7 @@ featurizers:
         name: cv
         is_optional: true
 
-    status: pending
+    status: Pending
 
   # ----------------------------------------------------------------------
   - name: StandardScaleWrapperFeaturizer
@@ -1494,7 +1494,7 @@ featurizers:
         name: lags
         is_optional: false
 
-    status: pending
+    status: Pending
 
   # ----------------------------------------------------------------------
   - name: TruncatedSVDFeaturizer
