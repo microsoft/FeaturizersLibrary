@@ -73,7 +73,8 @@ namespace Components {
 
         // Pre-increment operator.
         CircularIterator& operator++ () {
-            assert(++_cur_increment <= _max_increments);
+            ++_cur_increment;
+            assert(_cur_increment <= _max_increments);
 
             ++_cur_index;
             _cur_index %= _size;
