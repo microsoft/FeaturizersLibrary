@@ -276,14 +276,14 @@ TEST_CASE("CircularBuffer - Range") {
 
     // When the vector is not fully populated and the number of requested items is greater than the current populated size
     // the end iterator should be bounded by the currect populated size
-    range = circ_buf.range(4);
+    std::tuple<iterator, iterator> range2 = circ_buf.range(4);
 
-    start_iter = std::get<0>(range);
-    end_iter = std::get<1>(range);
+    auto start_iter2 = std::get<0>(range2);
+    auto end_iter2 = std::get<1>(range2);
 
     count = 0;
-    while(start_iter != end_iter) {
-        ++start_iter;
+    while(start_iter2 != end_iter2) {
+        ++start_iter2;
         ++count;
     }
     CHECK(count == 3);
@@ -356,17 +356,17 @@ TEST_CASE("CircularBuffer - range with offset") {
     // when offset is greater than current size, return iterators are all end iterators
     CHECK(start_iter == end_iter);
 
-    range = circ_buf.range(2,2);
+    std::tuple<iterator, iterator> range2 = circ_buf.range(2,2);
 
-    start_iter = std::get<0>(range);
-    end_iter = std::get<1>(range);
+    auto start_iter2 = std::get<0>(range2);
+    auto end_iter2 = std::get<1>(range2);
     // when n + offset is greater than current size
-    CHECK(++start_iter == end_iter);
+    CHECK(++start_iter2 == end_iter2);
 
-    range = circ_buf.range(2,1);
+    std::tuple<iterator, iterator> range3 = circ_buf.range(2,1);
 
-    start_iter = std::get<0>(range);
-    end_iter = std::get<1>(range);
+    auto start_iter3 = std::get<0>(range3);
+    auto end_iter3 = std::get<1>(range3);
     // when n and offset are not out of bound
-    CHECK(++(++start_iter) == end_iter);
+    CHECK(++(++start_iter3) == end_iter3);
 }
