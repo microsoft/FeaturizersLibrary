@@ -10,12 +10,15 @@
 
 namespace NS = Microsoft::Featurizer;
 
-std::chrono::system_clock::time_point GetTimePoint(std::chrono::system_clock::time_point tp, int unitsToAdd, std::string = "days"){
-    return tp + std::chrono::minutes(unitsToAdd * (60*24));
+std::chrono::system_clock::time_point AddDays(std::chrono::system_clock::time_point tp, int daysToAdd){
+    return tp + std::chrono::minutes(daysToAdd * (60 * 24));
 }
 
-// test for overall estimator
-TEST_CASE("Simple Test") {
+std::chrono::system_clock::time_point AddMinutes(std::chrono::system_clock::time_point tp, int minutesToAdd){
+    return tp + std::chrono::minutes(minutesToAdd);
+}
+
+TEST_CASE("FrequencyEstimator - 1 Day Frequency") {
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 
     using inputType = std::chrono::system_clock::time_point;
@@ -23,12 +26,93 @@ TEST_CASE("Simple Test") {
     NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::Components::FrequencyEstimator<> estimator(pAllColumnAnnotations, 0);
 
-    NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{GetTimePoint(now, 0),
-                                                                            GetTimePoint(now, 1),
-                                                                            GetTimePoint(now, 2),
-                                                                            GetTimePoint(now, 3),
-                                                                            GetTimePoint(now, 4)}}));
+    NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{AddDays(now, 0),
+                                                                            AddDays(now, 1),
+                                                                            AddDays(now, 2)}}));
     NS::Featurizers::Components::FrequencyAnnotation const& frequency(estimator.get_annotation_data());
+    
+    CHECK(frequency.Value == std::chrono::minutes(60 * 24));
+}
 
-    CHECK(frequency.Value     ==  std::chrono::minutes(60*24));
+TEST_CASE("FrequencyEstimator - 1 Day Frequency with gap") {
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+
+    using inputType = std::chrono::system_clock::time_point;
+
+    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::Components::FrequencyEstimator<> estimator(pAllColumnAnnotations, 0);
+
+    // Should still have a frequency of 1 day even though there is a 2 day gap from 1 to 3
+    NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{AddDays(now, 0),
+                                                                            AddDays(now, 2),
+                                                                            AddDays(now, 3)}}));
+    NS::Featurizers::Components::FrequencyAnnotation const& frequency(estimator.get_annotation_data());
+    
+    CHECK(frequency.Value == std::chrono::minutes(60 * 24));
+}
+
+TEST_CASE("FrequencyEstimator - 2 Day Frequency") {
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+
+    using inputType = std::chrono::system_clock::time_point;
+
+    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::Components::FrequencyEstimator<> estimator(pAllColumnAnnotations, 0);
+
+    // Should still have a frequency of 1 day even though there is a 2 day gap from 1 to 3
+    NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{AddDays(now, 0),
+                                                                            AddDays(now, 2),
+                                                                            AddDays(now, 4)}}));
+    NS::Featurizers::Components::FrequencyAnnotation const& frequency(estimator.get_annotation_data());
+    
+    CHECK(frequency.Value == std::chrono::minutes(2 * 60 * 24));
+}
+
+TEST_CASE("FrequencyEstimator - 1 Minute Frequency") {
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+
+    using inputType = std::chrono::system_clock::time_point;
+
+    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::Components::FrequencyEstimator<> estimator(pAllColumnAnnotations, 0);
+
+    // Should still have a frequency of 1 day even though there is a 2 day gap from 1 to 3
+    NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{AddMinutes(now, 0),
+                                                                            AddMinutes(now, 1),
+                                                                            AddMinutes(now, 2)}}));
+    NS::Featurizers::Components::FrequencyAnnotation const& frequency(estimator.get_annotation_data());
+    
+    CHECK(frequency.Value == std::chrono::minutes(1));
+}
+
+TEST_CASE("FrequencyEstimator - 2 Minute Frequency") {
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+
+    using inputType = std::chrono::system_clock::time_point;
+
+    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::Components::FrequencyEstimator<> estimator(pAllColumnAnnotations, 0);
+
+    // Should still have a frequency of 1 day even though there is a 2 day gap from 1 to 3
+    NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{AddMinutes(now, 0),
+                                                                            AddMinutes(now, 2),
+                                                                            AddMinutes(now, 4)}}));
+    NS::Featurizers::Components::FrequencyAnnotation const& frequency(estimator.get_annotation_data());
+    
+    CHECK(frequency.Value == std::chrono::minutes(2));
+}
+
+TEST_CASE("FrequencyEstimator - Not in Chronological Order") {
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+
+    using inputType = std::chrono::system_clock::time_point;
+
+    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::Components::FrequencyEstimator<> estimator(pAllColumnAnnotations, 0);
+
+    // Should still have a frequency of 1 day even though there is a 2 day gap from 1 to 3
+    CHECK_THROWS_WITH(NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{AddMinutes(now, 0),
+                                                                            AddMinutes(now, 2),
+                                                                            AddMinutes(now, 1)}})),
+                                                                            "Input stream not in chronological order.");
 }

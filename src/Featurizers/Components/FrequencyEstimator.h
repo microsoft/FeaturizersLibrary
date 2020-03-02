@@ -155,6 +155,7 @@ void Details::FrequencyTrainingOnlyPolicy::fit(InputType const &input) {
     if (currFrequency <= _frequency) {
         _frequency = currFrequency;
     }
+    _lastObserved = input;
 }
 
 FrequencyAnnotation Details::FrequencyTrainingOnlyPolicy::complete_training(void) {
