@@ -33,6 +33,7 @@ SET(
     DocumentStatisticsEstimator_UnitTest
     # This test is optionally included below:
     #     GrainEstimatorImpl_UnitTest
+    FrequencyEstimator_UnitTest
     HistogramEstimator_UnitTest
     ImputerTransformer_UnitTest
     IndexMapEstimator_UnitTest
