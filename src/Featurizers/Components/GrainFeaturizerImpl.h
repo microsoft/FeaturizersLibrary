@@ -60,6 +60,7 @@ public:
 template <typename GrainT, typename EstimatorT>
 struct GrainFeaturizerTraits {
     // ----------------------------------------------------------------------
+    // |
     // |  Public Types
     static_assert(std::is_reference<GrainT>::value == false, "'GrainT' must not be a reference");
     static_assert(std::is_reference<typename EstimatorT::InputType>::value == false, "'EstimatorT::InputType' must not be a reference");
@@ -217,13 +218,10 @@ protected:
     // |  Protected Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorMap =
-        std::unordered_map<
-            GrainType,
-            EstimatorT,
-            std::hash<GrainType>,
-            typename Traits<GrainT>::key_equal
-        >;
+    // using GrainEstimatorType = Estimator;
+
+    // using GrainEstimatorTypeUniquePtr       = std::unique_ptr<GrainEstimatorType>;
+    using EstimatorMap                      = std::map<GrainT, EstimatorT>;
 
     // ----------------------------------------------------------------------
     // |
