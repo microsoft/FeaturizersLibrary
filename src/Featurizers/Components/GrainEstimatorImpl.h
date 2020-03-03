@@ -31,7 +31,7 @@ public:
             GrainT,
             AnnotationPtr,
             std::hash<GrainT>,
-            Traits<GrainT>::key_equal
+            typename Traits<GrainT>::key_equal
         >;
 
     // ----------------------------------------------------------------------
