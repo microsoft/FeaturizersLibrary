@@ -31,7 +31,7 @@ public:
             GrainT,
             AnnotationPtr,
             std::hash<GrainT>,
-            Traits<GrainT>::key_equal
+            typename Traits<GrainT>::key_equal
         >;
 
     // ----------------------------------------------------------------------
@@ -210,7 +210,7 @@ protected:
     // |  Protected Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorMap                      = typename GrainEstimatorAnnotation<GrainT>::AnnotationMap;
+    using EstimatorMap = std::map<GrainT, EstimatorT>;
 
     // ----------------------------------------------------------------------
     // |

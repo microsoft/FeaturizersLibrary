@@ -32,7 +32,7 @@ SET(
     _test_names
     DocumentStatisticsEstimator_UnitTest
     # This test is optionally included below:
-    #     GrainEstimatorImpl_UnitTest
+    GrainEstimatorImpl_UnitTest
     HistogramEstimator_UnitTest
     ImputerTransformer_UnitTest
     IndexMapEstimator_UnitTest
@@ -63,14 +63,14 @@ SET(
 #
 # disable that test for now.
 
-if(
-    WIN32                                                                       # 1
-    AND "$ENV{DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME}" STREQUAL "Clang-8"    # 2
-    AND "$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" STREQUAL "x86"         # 3
-    AND "${CMAKE_BUILD_TYPE}" MATCHES "^Release.*$"                             # 4
-)
-    list(REMOVE_ITEM _test_names GrainEstimatorImpl_UnitTest)
-endif()
+#if(
+#    WIN32                                                                       # 1
+#    AND "$ENV{DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME}" STREQUAL "Clang-8"    # 2
+#    AND "$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" STREQUAL "x86"         # 3
+#    AND "${CMAKE_BUILD_TYPE}" MATCHES "^Release.*$"                             # 4
+#)
+#    list(REMOVE_ITEM _test_names GrainEstimatorImpl_UnitTest)
+#endif()
 
 foreach(_test_name IN ITEMS ${_test_names})
     add_executable(
