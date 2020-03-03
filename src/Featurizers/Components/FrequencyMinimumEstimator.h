@@ -188,13 +188,13 @@ void Details::FrequencyMinimumTrainingOnlyPolicy<EstimatorT>::fit(InputType cons
 
 template <typename EstimatorT>
 FrequencyMinimumAnnotation Details::FrequencyMinimumTrainingOnlyPolicy<EstimatorT>::complete_training(void) {
-    GrainEstimatorAnnotation const & data(_estimator.get_annotation_data(_estimator.get_column_annotations(), _estimator.get_column_index(), GrainedFrequencyEstimatorName));
+    GrainEstimatorAnnotation<std::string> const & data(EstimatorT.get_annotation_data(EstimatorT.get_column_annotations(), EstimatorT.get_column_index(), GrainedFrequencyEstimatorName));
     AnnotationMap annotation(data.Annotations);
     auto it = annotation.begin();
     FrequencyType freq(std::chrono::system_clock::duration::max().count());
     while (it != annotation.end()) {
-        if (it->second < freq) {
-            freq = it->second;
+        if (freq >= it->second->Value) {
+            freq = it->second->Value;
         }
     }
     return FrequencyMinimumAnnotation(std::move(freq));

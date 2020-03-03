@@ -60,7 +60,10 @@ public:
 template <typename GrainT, typename EstimatorT>
 struct GrainEstimatorTraits {
     // ----------------------------------------------------------------------
+    // |
     // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
     using InputType                         = std::tuple<GrainT, typename EstimatorT::InputType>;
     using TransformedType                   = std::tuple<GrainT, typename Details::EstimatorOutputType<EstimatorT>::type>;
 };
@@ -210,7 +213,10 @@ protected:
     // |  Protected Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorMap                      = typename GrainEstimatorAnnotation<GrainT>::AnnotationMap;
+    // using GrainEstimatorType = Estimator;
+
+    // using GrainEstimatorTypeUniquePtr       = std::unique_ptr<GrainEstimatorType>;
+    using EstimatorMap                      = std::map<GrainT, EstimatorT>;
 
     // ----------------------------------------------------------------------
     // |
