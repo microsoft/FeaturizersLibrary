@@ -111,7 +111,7 @@ template <
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class FrequencyMinimumEstimator :
-    TrainingOnlyEstimatorImpl<
+    public TrainingOnlyEstimatorImpl<
         Details::FrequencyMinimumTrainingOnlyPolicy<FrequencyMinimumEstimator<MaxNumTrainingItemsV>>,
         MaxNumTrainingItemsV
     > {
@@ -188,7 +188,7 @@ void Details::FrequencyMinimumTrainingOnlyPolicy<EstimatorT>::fit(InputType cons
 
 template <typename EstimatorT>
 FrequencyMinimumAnnotation Details::FrequencyMinimumTrainingOnlyPolicy<EstimatorT>::complete_training(void) {
-    GrainEstimatorAnnotation const & data(_estimator.get_annotation_data(estimator.get_column_annotations(), estimator.get_column_index(), GrainedFrequencyEstimatorName));
+    GrainEstimatorAnnotation const & data(_estimator.get_annotation_data(_estimator.get_column_annotations(), _estimator.get_column_index(), GrainedFrequencyEstimatorName));
     AnnotationMap annotation(data.Annotations);
     auto it = annotation.begin();
     FrequencyType freq(std::chrono::system_clock::duration::max().count());
