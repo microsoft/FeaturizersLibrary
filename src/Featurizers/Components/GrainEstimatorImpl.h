@@ -299,6 +299,10 @@ public:
 
     ~GrainEstimatorImpl(void) override = default;
 
+    static GrainEstimatorAnnotation<GrainT> const & get_annotation_data(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name) {
+        return *(BaseType::template get_annotation_impl<GrainEstimatorAnnotation<GrainT>>(columnAnnotations, colIndex, name));
+    }
+
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GrainEstimatorImpl);
 };
 

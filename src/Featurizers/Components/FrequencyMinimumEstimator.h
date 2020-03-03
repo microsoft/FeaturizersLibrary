@@ -176,9 +176,17 @@ FrequencyMinimumEstimator<MaxNumTrainingItemsV>::FrequencyMinimumEstimator(Annot
 // |
 // ----------------------------------------------------------------------
 template <typename EstimatorT>
-Details::FrequencyMinimumTrainingOnlyPolicy<EstimatorT>::FrequencyMinimumTrainingOnlyPolicy(void) :
-    _estimator(GrainedFrequencyEstimator(std::make_shared<AnnotationMaps>(EstimatorT.get_column_annotations()),0)) {
-        _estimator.begin_training();
+Details::FrequencyMinimumTrainingOnlyPolicy<EstimatorT>::FrequencyMinimumTrainingOnlyPolicy(void) {    
+    EstimatorT                 const &          estimator(static_cast<EstimatorT const &>(*this));
+    _estimator = GrainedFrequencyEstimator(
+        GrainedFrequencyEstimatorName, 
+        std::make_shared<AnnotationMaps>(estimator.get_column_annotations()),
+        [](AnnotationMapsPtr pAllColumnAnnotationsParam) {
+        return FrequencyEstimator<>(std::move(pAllColumnAnnotationsParam), 0);
+    }
+    );
+        
+    _estimator.begin_training();
 }
 
 template <typename EstimatorT>
@@ -188,14 +196,21 @@ void Details::FrequencyMinimumTrainingOnlyPolicy<EstimatorT>::fit(InputType cons
 
 template <typename EstimatorT>
 FrequencyMinimumAnnotation Details::FrequencyMinimumTrainingOnlyPolicy<EstimatorT>::complete_training(void) {
-    GrainEstimatorAnnotation<std::string> const & data(EstimatorT.get_annotation_data(EstimatorT.get_column_annotations(), EstimatorT.get_column_index(), GrainedFrequencyEstimatorName));
-    AnnotationMap annotation(data.Annotations);
+    // GrainEstimatorAnnotation<std::string> const & data(EstimatorT.get_annotation_data(EstimatorT.get_column_annotations(), EstimatorT.get_column_index(), GrainedFrequencyEstimatorName));
+
+    // EstimatorT       const &          estimator(static_cast<EstimatorT const &>(*this));
+    GrainEstimatorAnnotation<std::string> const & data(_estimator.get_annotation_data(_estimator.get_column_annotations(), 0, GrainedFrequencyEstimatorName));
+
+
+
+    GrainEstimatorAnnotation<std::string>::AnnotationMap annotation(data.Annotations);
     auto it = annotation.begin();
     FrequencyType freq(std::chrono::system_clock::duration::max().count());
     while (it != annotation.end()) {
-        if (freq >= it->second->Value) {
-            freq = it->second->Value;
-        }
+        // if (freq >= it->second->Value) {
+        //     freq = it->second.Value;
+        // }
+        it++;
     }
     return FrequencyMinimumAnnotation(std::move(freq));
 }
