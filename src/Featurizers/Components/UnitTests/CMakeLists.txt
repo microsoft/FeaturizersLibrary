@@ -32,7 +32,7 @@ SET(
     _test_names
     DocumentStatisticsEstimator_UnitTest
     # This test is optionally included below:
-    #     GrainEstimatorImpl_UnitTest
+    GrainEstimatorImpl_UnitTest
     HistogramEstimator_UnitTest
     ImputerTransformer_UnitTest
     IndexMapEstimator_UnitTest
