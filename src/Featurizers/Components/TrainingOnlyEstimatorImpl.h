@@ -313,7 +313,7 @@ template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
 
 template <typename EstimatorPolicyT, size_t MaxNumTrainingItemsV>
 /*static*/ typename TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::AnnotationData const & TrainingOnlyEstimatorImpl<EstimatorPolicyT, MaxNumTrainingItemsV>::get_annotation_data(Annotation const &annotation) {
-    assert(dynamic_cast<AnnotationImpl const *>(&annotation));
+    // assert(dynamic_cast<AnnotationImpl const *>(&annotation));
     return static_cast<AnnotationImpl const &>(annotation);
 }
 
