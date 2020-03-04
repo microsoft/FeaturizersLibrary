@@ -210,7 +210,13 @@ protected:
     // |  Protected Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorMap = std::map<GrainT, EstimatorT>;
+    using EstimatorMap =
+        std::unordered_map<
+            GrainT,
+            EstimatorT,
+            std::hash<GrainT>,
+            typename Traits<GrainT>::key_equal
+        >;
 
     // ----------------------------------------------------------------------
     // |
