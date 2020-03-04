@@ -218,10 +218,13 @@ protected:
     // |  Protected Types
     // |
     // ----------------------------------------------------------------------
-    // using GrainEstimatorType = Estimator;
-
-    // using GrainEstimatorTypeUniquePtr       = std::unique_ptr<GrainEstimatorType>;
-    using EstimatorMap                      = std::map<GrainT, EstimatorT>;
+    using EstimatorMap =
+        std::unordered_map<
+            GrainT,
+            EstimatorT,
+            std::hash<GrainT>,
+            typename Traits<GrainT>::key_equal
+        >;
 
     // ----------------------------------------------------------------------
     // |
