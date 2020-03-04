@@ -15,7 +15,7 @@ std::chrono::system_clock::time_point AddDays(std::chrono::system_clock::time_po
 }
 
 
-TEST_CASE("Simple test") {
+TEST_CASE("Simple test - one grain") {
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 
     using inputType = std::tuple<std::string,std::chrono::system_clock::time_point>;
@@ -26,6 +26,25 @@ TEST_CASE("Simple test") {
     NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{std::make_tuple("one",AddDays(now, 0)),
                                                                             std::make_tuple("one",AddDays(now, 1)),
                                                                             std::make_tuple("one",AddDays(now, 2))}}));
+    NS::Featurizers::Components::FrequencyMinimumAnnotation const& frequency(estimator.get_annotation_data());
+
+    CHECK(frequency.Value == std::chrono::minutes(60 * 24));
+}
+
+TEST_CASE("Simple test two grains") {
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+
+    using inputType = std::tuple<std::string,std::chrono::system_clock::time_point>;
+
+    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::Components::FrequencyMinimumEstimator<> estimator(pAllColumnAnnotations, 0);
+
+    NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{std::make_tuple("one",AddDays(now, 0)),
+                                                                            std::make_tuple("one",AddDays(now, 1)),
+                                                                            std::make_tuple("one",AddDays(now, 2)),
+                                                                            std::make_tuple("two",AddDays(now, 0)),
+                                                                            std::make_tuple("two",AddDays(now, 2)),
+                                                                            std::make_tuple("two",AddDays(now, 4)),}}));
     NS::Featurizers::Components::FrequencyMinimumAnnotation const& frequency(estimator.get_annotation_data());
 
     CHECK(frequency.Value == std::chrono::minutes(60 * 24));
