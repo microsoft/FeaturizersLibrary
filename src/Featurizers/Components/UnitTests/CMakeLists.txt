@@ -31,7 +31,7 @@ enable_testing()
 SET(
     _test_names
     DocumentStatisticsEstimator_UnitTest
-    GrainEstimatorImpl_UnitTest
+    GrainFeaturizerImpl_UnitTest
     HistogramEstimator_UnitTest
     ImputerTransformer_UnitTest
     IndexMapEstimator_UnitTest
@@ -53,7 +53,7 @@ SET(
     #   - TimeSeriesMedianEstimator
 )
 
-# GrainEstimatorImpl_UnitTest causes an internal compile error under the scenario:
+# GrainFeaturizerImpl_UnitTest causes an internal compile error under the scenario:
 #
 #   - Windows (1)
 #   - Clang 8.0.0 and Clang 8.0.1 (the issue has been fixed on Clang 9.0.0) (2)
@@ -68,7 +68,7 @@ if(
     AND "$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" STREQUAL "x86"         # 3
     AND "${CMAKE_BUILD_TYPE}" MATCHES "^Release.*$"                             # 4
 )
-    list(REMOVE_ITEM _test_names GrainEstimatorImpl_UnitTest)
+    list(REMOVE_ITEM _test_names GrainFeaturizerImpl_UnitTest)
 endif()
 
 foreach(_test_name IN ITEMS ${_test_names})

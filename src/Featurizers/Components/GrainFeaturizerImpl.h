@@ -193,6 +193,7 @@ public:
     using InputType                         = typename TheseGrainEstimatorTraits::InputType;
     using TransformedType                   = typename TheseGrainEstimatorTraits::TransformedType;
 
+    using GrainEstimatorAnnotation          = Microsoft::Featurizer::Featurizers::Components::GrainEstimatorAnnotation<GrainType>;
     using CreateEstimatorFunc               = std::function<EstimatorT (AnnotationMapsPtr)>;
 
     // ----------------------------------------------------------------------
@@ -206,6 +207,9 @@ public:
     ~GrainEstimatorImplBase(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GrainEstimatorImplBase);
+
+    static GrainEstimatorAnnotation const & get_annotation(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name);
+    static GrainEstimatorAnnotation const * get_annotation_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name);
 
 protected:
     // ----------------------------------------------------------------------
@@ -523,6 +527,23 @@ Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::G
     _cRemainingTrainingItems(MaxNumTrainingItemsV) {
 }
 
+template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
+/*static*/ typename Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorAnnotation const &
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::get_annotation(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name) {
+    GrainEstimatorAnnotation const * const  ptr(get_annotation_nothrow(columnAnnotations, colIndex, name));
+
+    if(ptr == nullptr)
+        throw std::runtime_error("Annotation data was not found for this column");
+
+    return *ptr;
+}
+
+template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
+/*static*/ typename Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorAnnotation const *
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::get_annotation_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name) {
+    return BaseT::template get_annotation_impl<GrainEstimatorAnnotation>(columnAnnotations, colIndex, name);
+}
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -574,8 +595,7 @@ FitResult Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTraining
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
 void Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
     // ----------------------------------------------------------------------
-    using ThisAnnotation                    = GrainEstimatorAnnotation<GrainT>;
-    using ThisAnnotationMap                 = typename ThisAnnotation::AnnotationMap;
+    using GrainEstimatorAnnotationMap       = typename GrainEstimatorAnnotation::AnnotationMap;
     using Sizes                             = std::vector<size_t>;
     // ----------------------------------------------------------------------
 
@@ -608,7 +628,7 @@ void Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItems
         }()
     );
 
-    ThisAnnotationMap                       newAnnotations;
+    GrainEstimatorAnnotationMap             newAnnotations;
     size_t                                  colIndex(0);
 
     for(auto & kvp : _estimators) {
@@ -645,7 +665,7 @@ void Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItems
                     throw std::runtime_error("Unexpected AnnotationMap size");
 
                 // Insert this value into our working map
-                std::pair<typename ThisAnnotationMap::iterator, bool> const     result(newAnnotations.emplace(std::make_pair(kvp.first, std::move(iter->second[0]))));
+                std::pair<typename GrainEstimatorAnnotationMap::iterator, bool> const   result(newAnnotations.emplace(std::make_pair(kvp.first, std::move(iter->second[0]))));
 
                 if(result.first == newAnnotations.end() || result.second == false)
                     throw std::runtime_error("Invalid AnnotationMap insertion");
@@ -659,7 +679,7 @@ void Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItems
     }
 
     if(newAnnotations.empty() == false)
-        BaseT::add_annotation(std::make_shared<ThisAnnotation>(std::move(newAnnotations)), std::move(colIndex));
+        BaseT::add_annotation(std::make_shared<GrainEstimatorAnnotation>(std::move(newAnnotations)), std::move(colIndex));
 }
 
 } // namespace Components
