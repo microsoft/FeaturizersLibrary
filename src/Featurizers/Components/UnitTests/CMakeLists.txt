@@ -31,6 +31,8 @@ enable_testing()
 SET(
     _test_names
     DocumentStatisticsEstimator_UnitTest
+    FrequencyEstimator_UnitTest
+    GlobalMinimumFrequencyEstimator_UnitTest
     # This test is optionally included below:
     GrainFeaturizerImpl_UnitTest
     FrequencyEstimator_UnitTest
