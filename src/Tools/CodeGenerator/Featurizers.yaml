@@ -639,6 +639,72 @@ featurizers:
       - input_type: TInputDouble
         output_type: double
 
+    # ----------------------------------------------------------------------
+  - name: MaxHorizonFeaturizer
+    estimator_name: MaxHorizonFeaturizer
+    release_version: 0.4.0
+
+    description: |-
+
+      This Featurizer will be completely implemented in Frameworks(ORT and ML.NET).
+
+      This Transformer adds rows according to maxHorizon and also appends a column
+      which is horizon_origin. The overall number of output rows is maxHorizon times
+      the input's number of rows.
+
+      The type of input and output is abstracted to Tabular which corresponding to
+      Tensor in OnnxRuntime and IDataView in ML.NET.
+
+      C++-style pseudo signature:
+        Tabular execute(Tabular const &value)
+
+      Examples:
+
+        The Transformer duplicate rows according to maxHorizon, and adding one
+        column called horizon_origin. The following example sets maxHorizon as 2.
+
+        Input:
+          +------------+-------+-------+
+          | date       | grain | sales |
+          +============+=======+=======+
+          | 2017-01-01 | A     |  0    |
+          +------------+-------+-------+
+          | 2017-02-01 | A     |  1    |
+          +------------+-------+-------+
+          | 2017-03-01 | A     |  2    |
+          +------------+-------+-------+
+          | 2017-04-01 | A     |  3    |
+          +------------+-------+-------+
+
+        Output:
+          +------------+-------+-------+----------------+
+          | date       | grain | sales | horizon_origin |
+          +============+=======+=======+================+
+          | 2017-01-01 | A     | 0     | 1              |
+          +------------+-------+-------+----------------+
+          | 2017-01-01 | A     | 0     | 2              |
+          +------------+-------+-------+----------------+
+          | 2017-02-01 | A     | 1     | 1              |
+          +------------+-------+-------+----------------+
+          | 2017-02-01 | A     | 1     | 2              |
+          +------------+-------+-------+----------------+
+          | 2017-03-01 | A     | 2     | 1              |
+          +------------+-------+-------+----------------+
+          | 2017-03-01 | A     | 2     | 2              |
+          +------------+-------+-------+----------------+
+          | 2017-04-01 | A     | 3     | 1              |
+          +------------+-------+-------+----------------+
+          | 2017-04-01 | A     | 3     | 2              |
+          +------------+-------+-------+----------------+
+
+    configuration_params:
+      - type: uint8
+        name: maxHorizon
+        description: |-
+          maxHorizon determines the rows duplicating scale.
+
+    status: External
+
   # ----------------------------------------------------------------------
   - name: MaxNormalizeFeaturizer
     estimator_name: MaxNormalizeEstimator
