@@ -701,7 +701,7 @@ featurizers:
           +------------+-------+-------+----------------+
 
     configuration_params:
-      - type: uint16
+      - type: uint32
         name: maxHorizon
         description: |-
           maxHorizon determines the rows duplicating scale.
