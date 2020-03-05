@@ -190,7 +190,7 @@ public:
     using InputType                         = typename TheseGrainEstimatorTraits::InputType;
     using TransformedType                   = typename TheseGrainEstimatorTraits::TransformedType;
 
-    using GrainEstimatorAnnotation          = GrainEstimatorAnnotation<GrainType>;
+    using GrainEstimatorAnnotation          = Microsoft::Featurizer::Featurizers::Components::GrainEstimatorAnnotation<GrainType>;
     using CreateEstimatorFunc               = std::function<EstimatorT (AnnotationMapsPtr)>;
 
     // ----------------------------------------------------------------------
