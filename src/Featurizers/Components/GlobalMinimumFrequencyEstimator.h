@@ -8,7 +8,7 @@
 
 #include "TrainingOnlyEstimatorImpl.h"
 #include "FrequencyEstimator.h"
-#include "GrainEstimatorImpl.h"
+#include "GrainFeaturizerImpl.h"
 
 namespace Microsoft {
 namespace Featurizer {
@@ -17,17 +17,17 @@ namespace Components {
 
 // TODO: This should be removed in favor of the StatisticalMetricsEstimator
 
-static constexpr char const * const         FrequencyMinimumEstimatorName("FrequencyMinimumEstimator");
+static constexpr char const * const         GlobalMinimumFrequencyEstimatorName("GlobalMinimumFrequencyEstimator");
 static constexpr char const * const         GrainedFrequencyEstimatorName("GrainedFrequencyEstimator");
 
 using GrainedFrequencyEstimator = GrainEstimatorImpl<std::string, FrequencyEstimator<>>;
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         FrequencyMinimumAnnotation
+///  \class         GlobalMinimumFrequencyAnnotation
 ///  \brief         This is an annotation class which holds the frequency
 ///                 of TimeSeries
 ///
-class FrequencyMinimumAnnotation{
+class GlobalMinimumFrequencyAnnotation{
 public:
     // ----------------------------------------------------------------------
     // |
@@ -48,20 +48,20 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    FrequencyMinimumAnnotation(FrequencyType value);
-    ~FrequencyMinimumAnnotation(void) = default;
+    GlobalMinimumFrequencyAnnotation(FrequencyType value);
+    ~GlobalMinimumFrequencyAnnotation(void) = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FrequencyMinimumAnnotation);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GlobalMinimumFrequencyAnnotation);
 };
 
 namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         FrequencyMinimumTrainingOnlyPolicy
-///  \brief         `FrequencyMinimumEstimator` implementation details.
+///  \class         GlobalMinimumFrequencyTrainingOnlyPolicy
+///  \brief         `GlobalMinimumFrequencyEstimator` implementation details.
 ///
 template <typename EstimatorT>
-class FrequencyMinimumTrainingOnlyPolicy {
+class GlobalMinimumFrequencyTrainingOnlyPolicy {
 public:
 
     // ----------------------------------------------------------------------
@@ -76,17 +76,17 @@ public:
     // |  Public Data
     // |
     // ----------------------------------------------------------------------
-    static constexpr char const * const     NameValue = FrequencyMinimumEstimatorName;
+    static constexpr char const * const     NameValue = GlobalMinimumFrequencyEstimatorName;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    FrequencyMinimumTrainingOnlyPolicy(void);
+    GlobalMinimumFrequencyTrainingOnlyPolicy(void);
 
     void fit(InputType const &input);
-    FrequencyMinimumAnnotation complete_training(void);
+    GlobalMinimumFrequencyAnnotation complete_training(void);
 
 private:
     // ----------------------------------------------------------------------
@@ -104,15 +104,15 @@ private:
 };
 }
 /////////////////////////////////////////////////////////////////////////
-///  \typedef       FrequencyMinimumEstimator
+///  \typedef       GlobalMinimumFrequencyEstimator
 ///  \brief         A training-only class that finds the min, max
 ///
 template <
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class FrequencyMinimumEstimator :
+class GlobalMinimumFrequencyEstimator :
     public TrainingOnlyEstimatorImpl<
-        Details::FrequencyMinimumTrainingOnlyPolicy<FrequencyMinimumEstimator<MaxNumTrainingItemsV>>,
+        Details::GlobalMinimumFrequencyTrainingOnlyPolicy<GlobalMinimumFrequencyEstimator<MaxNumTrainingItemsV>>,
         MaxNumTrainingItemsV
     > {
 public:
@@ -123,7 +123,7 @@ public:
     // ----------------------------------------------------------------------
     using BaseType =
         TrainingOnlyEstimatorImpl<
-            Details::FrequencyMinimumTrainingOnlyPolicy<FrequencyMinimumEstimator<MaxNumTrainingItemsV>>,
+            Details::GlobalMinimumFrequencyTrainingOnlyPolicy<GlobalMinimumFrequencyEstimator<MaxNumTrainingItemsV>>,
             MaxNumTrainingItemsV
         >;
 
@@ -132,11 +132,11 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    FrequencyMinimumEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    GlobalMinimumFrequencyEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
 
-    ~FrequencyMinimumEstimator(void) override = default;
+    ~GlobalMinimumFrequencyEstimator(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FrequencyMinimumEstimator);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GlobalMinimumFrequencyEstimator);
 
 };
 
@@ -153,30 +153,30 @@ public:
 
 // ----------------------------------------------------------------------
 // |
-// |  FrequencyMinimumAnnotation
+// |  GlobalMinimumFrequencyAnnotation
 // |
 // ----------------------------------------------------------------------
-inline FrequencyMinimumAnnotation::FrequencyMinimumAnnotation(FrequencyMinimumAnnotation::FrequencyType value) :
+inline GlobalMinimumFrequencyAnnotation::GlobalMinimumFrequencyAnnotation(GlobalMinimumFrequencyAnnotation::FrequencyType value) :
     Value(std::move(value)) {
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  FrequencyMinimumEstimator
+// |  GlobalMinimumFrequencyEstimator
 // |
 // ----------------------------------------------------------------------
 template <size_t MaxNumTrainingItemsV>
-FrequencyMinimumEstimator<MaxNumTrainingItemsV>::FrequencyMinimumEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+GlobalMinimumFrequencyEstimator<MaxNumTrainingItemsV>::GlobalMinimumFrequencyEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
     BaseType(std::move(pAllColumnAnnotations), std::move(colIndex)) {
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  Details::FrequencyMinimumTrainingOnlyPolicy
+// |  Details::GlobalMinimumFrequencyTrainingOnlyPolicy
 // |
 // ----------------------------------------------------------------------
 template <typename EstimatorT>
-Details::FrequencyMinimumTrainingOnlyPolicy<EstimatorT>::FrequencyMinimumTrainingOnlyPolicy(void) :
+Details::GlobalMinimumFrequencyTrainingOnlyPolicy<EstimatorT>::GlobalMinimumFrequencyTrainingOnlyPolicy(void) :
     _estimator(
         GrainedFrequencyEstimatorName,
         std::make_shared<AnnotationMaps>(
@@ -195,26 +195,25 @@ Details::FrequencyMinimumTrainingOnlyPolicy<EstimatorT>::FrequencyMinimumTrainin
 }
 
 template <typename EstimatorT>
-void Details::FrequencyMinimumTrainingOnlyPolicy<EstimatorT>::fit(InputType const &input) {
+void Details::GlobalMinimumFrequencyTrainingOnlyPolicy<EstimatorT>::fit(InputType const &input) {
     _estimator.fit(input);
 }
 
 template <typename EstimatorT>
-FrequencyMinimumAnnotation Details::FrequencyMinimumTrainingOnlyPolicy<EstimatorT>::complete_training(void) {
+GlobalMinimumFrequencyAnnotation Details::GlobalMinimumFrequencyTrainingOnlyPolicy<EstimatorT>::complete_training(void) {
     _estimator.complete_training();
-    GrainEstimatorAnnotation<std::string> const & data(_estimator.get_annotation_data(_estimator.get_column_annotations(), 0, GrainedFrequencyEstimatorName));
+    GrainEstimatorAnnotation<std::string> const & data(GrainedFrequencyEstimator::get_annotation(_estimator.get_column_annotations(), 0, GrainedFrequencyEstimatorName));
 
     GrainEstimatorAnnotation<std::string>::AnnotationMap annotation(data.Annotations);
-    FrequencyType freq(std::chrono::system_clock::duration::max().count());
 
+    FrequencyType freq(std::chrono::system_clock::duration::max().count());
     for (auto it = annotation.begin(); it != annotation.end(); it++) {
-        // FrequencyAnnotation const & ann(FrequencyEstimator<>::get_annotation_data(*it->second));
         FrequencyType f(FrequencyEstimator<>::get_annotation_data(*it->second).Value);
         if (f < freq) {
             freq = f;
         }
     }
-    return FrequencyMinimumAnnotation(std::move(freq));
+    return GlobalMinimumFrequencyAnnotation(std::move(freq));
 }
 
 } // namespace Components

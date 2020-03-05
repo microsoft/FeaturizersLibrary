@@ -31,6 +31,8 @@ enable_testing()
 SET(
     _test_names
     DocumentStatisticsEstimator_UnitTest
+    FrequencyEstimator_UnitTest
+    GlobalMinimumFrequencyEstimator_UnitTest
     GrainFeaturizerImpl_UnitTest
     HistogramEstimator_UnitTest
     ImputerTransformer_UnitTest
