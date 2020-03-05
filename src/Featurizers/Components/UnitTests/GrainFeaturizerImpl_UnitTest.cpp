@@ -5,7 +5,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "../GrainEstimatorImpl.h"
+#include "../GrainFeaturizerImpl.h"
 #include "../InferenceOnlyFeaturizerImpl.h"
 #include "../TrainingOnlyEstimatorImpl.h"
 
@@ -200,9 +200,14 @@ private:
 // ----------------------------------------------------------------------
 template <typename GrainEstimatorT, typename InputT>
 typename Components::GrainEstimatorAnnotation<typename GrainEstimatorT::GrainType>::AnnotationMap
-Test(GrainEstimatorT &estimator, std::vector<InputT> const &inputs, bool createsAnnotations=true) {
+Test(
+    GrainEstimatorT &estimator,
+    std::vector<InputT> const &inputs,
+    bool createsAnnotations=true,
+    size_t colIndex=0
+) {
     // ----------------------------------------------------------------------
-    using GrainEstimatorAnnotation          = Components::GrainEstimatorAnnotation<typename GrainEstimatorT::GrainType>;
+    using GrainEstimatorAnnotation          = typename GrainEstimatorT::GrainEstimatorAnnotation;
     // ----------------------------------------------------------------------
 
     estimator.begin_training();
@@ -213,17 +218,7 @@ Test(GrainEstimatorT &estimator, std::vector<InputT> const &inputs, bool creates
         return typename GrainEstimatorAnnotation::AnnotationMap();
 
     NS::AnnotationMaps const &              allAnnotations(estimator.get_column_annotations());
-
-    REQUIRE(allAnnotations[0].empty() == false);
-
-    NS::AnnotationMap const &                           annotations(allAnnotations[0]);
-    NS::AnnotationMap::const_iterator const             iter(annotations.find(estimator.Name));
-
-    REQUIRE(iter != annotations.end());
-    REQUIRE(iter->second.size() == 1);
-    REQUIRE(dynamic_cast<GrainEstimatorAnnotation const *>(iter->second[0].get()));
-
-    GrainEstimatorAnnotation const &        thisAnnotation(static_cast<GrainEstimatorAnnotation const &>(*iter->second[0]));
+    GrainEstimatorAnnotation const &        thisAnnotation(GrainEstimatorT::get_annotation(allAnnotations, colIndex, estimator.Name));
 
     return thisAnnotation.Annotations;
 }

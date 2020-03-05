@@ -14,7 +14,7 @@ function(Impl)
         ${_this_path}/../Components.h
         ${_this_path}/../DocumentStatisticsEstimator.h
         ${_this_path}/../DocumentStatisticsEstimator.cpp
-        ${_this_path}/../GrainEstimatorImpl.h
+        ${_this_path}/../GrainFeaturizerImpl.h
         ${_this_path}/../HistogramEstimator.h
         ${_this_path}/../ImputerTransformer.h
         ${_this_path}/../IndexMapEstimator.h
