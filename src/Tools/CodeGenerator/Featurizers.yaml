@@ -68,8 +68,9 @@ featurizers:
             - double
 
     type_mappings:
-      - input_type: T
+      - input_type: tuple<datetime, vector<string>, uint8, T>
         output_type: double
+        is_output_optional: true
 
     custom_enums:
       - name: AnalyticalRollingWindowCalculation
@@ -1305,7 +1306,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
+      - input_type: tuple<datetime, vector<string>, uint8, T>
         output_type: T
         is_output_optional: true
 
