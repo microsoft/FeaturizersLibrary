@@ -60,7 +60,6 @@ public:
 template <typename GrainT, typename EstimatorT>
 struct GrainFeaturizerTraits {
     // ----------------------------------------------------------------------
-    // |
     // |  Public Types
     static_assert(std::is_reference<GrainT>::value == false, "'GrainT' must not be a reference");
     static_assert(std::is_reference<typename EstimatorT::InputType>::value == false, "'EstimatorT::InputType' must not be a reference");
@@ -306,15 +305,6 @@ public:
     using BaseType::BaseType;
 
     ~GrainEstimatorImpl(void) override = default;
-
-    static GrainEstimatorAnnotation<GrainT> const & get_annotation_data(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name) {
-        GrainEstimatorAnnotation<GrainT> const * const       ptr(BaseType::template get_annotation_impl<GrainEstimatorAnnotation<GrainT>>(columnAnnotations, colIndex, name));
-
-        if(ptr == nullptr)
-            throw std::runtime_error("Annotation data was not found for this column");
-
-        return *ptr;
-    }
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GrainEstimatorImpl);
 };
