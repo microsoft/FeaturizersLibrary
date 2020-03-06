@@ -134,3 +134,16 @@ TEST_CASE("FrequencyEstimator - Not in Chronological Order") {
                                                                             AddMinutes(now, 1)}})),
                                                                             "Input stream not in chronological order.");
 }
+
+TEST_CASE("FrequencyEstimator - Not enough rows") {
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+
+    using inputType = std::chrono::system_clock::time_point;
+
+    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::Components::FrequencyEstimator<> estimator(pAllColumnAnnotations, 0);
+
+    // Should throw since time is not in the correct order.
+    CHECK_THROWS_WITH(NS::TestHelpers::Train(estimator, std::vector<std::vector<inputType>>({{AddMinutes(now, 0)}})),
+                                                                            "Need to provide more than one value to get a frequency");
+}

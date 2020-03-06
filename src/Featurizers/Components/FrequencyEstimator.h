@@ -13,11 +13,7 @@ namespace Featurizer {
 namespace Featurizers {
 namespace Components {
 
-// TODO: This should be removed in favor of the StatisticalMetricsEstimator
-
 static constexpr char const * const         FrequencyEstimatorName("FrequencyEstimator");
-
-
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         FrequencyAnnotation
@@ -159,9 +155,11 @@ void Details::FrequencyTrainingOnlyPolicy::fit(InputType const &input) {
 }
 
 FrequencyAnnotation Details::FrequencyTrainingOnlyPolicy::complete_training(void) {
+    if (_frequency == std::chrono::system_clock::duration(std::chrono::system_clock::duration::max().count())) {
+        throw std::runtime_error("Need to provide more than one value to get a frequency");
+    }
     return FrequencyAnnotation(std::move(_frequency));
 }
-
 
 } // namespace Components
 } // namespace Featurizers
