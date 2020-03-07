@@ -7,6 +7,7 @@
 #include <limits>
 
 #include "TrainingOnlyEstimatorImpl.h"
+#include "GrainFeaturizerImpl.h"
 
 namespace Microsoft {
 namespace Featurizer {
@@ -14,6 +15,7 @@ namespace Featurizers {
 namespace Components {
 
 static constexpr char const * const         FrequencyEstimatorName("FrequencyEstimator");
+static constexpr char const * const         GrainedFrequencyEstimatorName("GrainedFrequencyEstimator");
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         FrequencyAnnotation
@@ -92,10 +94,8 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    FrequencyType _frequency;
-    InputType _lastObserved;
-
-    bool _hasSeenValues;
+    FrequencyType               _frequency;
+    nonstd::optional<InputType> _lastObserved;
 };
 }
 
@@ -107,6 +107,11 @@ template <
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 using FrequencyEstimator                       = TrainingOnlyEstimatorImpl<Details::FrequencyTrainingOnlyPolicy, MaxNumTrainingItemsV>;
+
+template <
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
+using GrainedFrequencyEstimator = GrainEstimatorImpl<std::vector<std::string>, FrequencyEstimator<MaxNumTrainingItemsV>>;
 
 
 // ----------------------------------------------------------------------
@@ -134,22 +139,18 @@ inline FrequencyAnnotation::FrequencyAnnotation(FrequencyAnnotation::FrequencyTy
 // |
 // ----------------------------------------------------------------------
 Details::FrequencyTrainingOnlyPolicy::FrequencyTrainingOnlyPolicy(void) :
-    _frequency(std::chrono::system_clock::duration::max().count()),
-    _hasSeenValues(false) {
+    _frequency(std::chrono::system_clock::duration::max().count()) {
 }
 
 void Details::FrequencyTrainingOnlyPolicy::fit(InputType const &input) {
-    if (!_hasSeenValues) {
-        _lastObserved = input;
-        _hasSeenValues = true;
-        return;
-    }
-    if (_lastObserved >= input) {
-        throw std::runtime_error("Input stream not in chronological order.");
-    }
-    FrequencyType currFrequency(input - _lastObserved);
-    if (currFrequency <= _frequency) {
-        _frequency = currFrequency;
+    if (_lastObserved.has_value()) {
+        if (*_lastObserved >= input) {
+            throw std::runtime_error("Input stream not in chronological order.");
+        }
+        FrequencyType currFrequency(input - *_lastObserved);
+        if (currFrequency <= _frequency) {
+            _frequency = currFrequency;
+        }
     }
     _lastObserved = input;
 }
