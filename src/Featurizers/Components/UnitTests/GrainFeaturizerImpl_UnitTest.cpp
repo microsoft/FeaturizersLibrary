@@ -232,54 +232,66 @@ TEST_CASE("Estimator") {
 
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     Estimator                               estimator(
-        "Test",
         pAllColumnAnnotations,
         [](NS::AnnotationMapsPtr pAllColumnAnnotationsParam) {
             return SumTrainingOnlyEstimator<>(std::move(pAllColumnAnnotationsParam), 0);
         }
     );
 
+    CHECK(strcmp(estimator.Name, "GrainSumTest") == 0);
+
+    std::string const                       grain1("one");
+    std::string const                       grain2("two");
+    std::string const                       grain3("three");
+    std::uint32_t const                     value10(10);
+    std::uint32_t const                     value20(20);
+
     SECTION("Single grain") {
         GrainEstimatorAnnotation::AnnotationMap annotations(
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("one", 20)
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain1, value20)
                 )
             )
         );
 
         REQUIRE(annotations.size() == 1);
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 30);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 30);
     }
 
     SECTION("Multiple grains") {
+        std::uint32_t const                 value100(100);
+        std::uint32_t const                 value200(200);
+        std::uint32_t const                 value1000(1000);
+        std::uint32_t const                 value2000(2000);
+
         GrainEstimatorAnnotation::AnnotationMap annotations(
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("two", 100),
-                    std::make_tuple("one", 10),
-                    std::make_tuple("one", 20),
-                    std::make_tuple("two", 200),
-                    std::make_tuple("three", 2000),
-                    std::make_tuple("three", 1000)
+                    typename Estimator::InputType(grain2, value100),
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain1, value20),
+                    typename Estimator::InputType(grain2, value200),
+                    typename Estimator::InputType(grain3, value2000),
+                    typename Estimator::InputType(grain3, value1000)
                 )
             )
         );
 
         REQUIRE(annotations.size() == 3);
 
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 30);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 30);
 
-        REQUIRE(annotations.find("two") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("two")->second).Value == 300);
+        REQUIRE(annotations.find(grain2) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain2)->second).Value == 300);
 
-        REQUIRE(annotations.find("three") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("three")->second).Value == 3000);
+        REQUIRE(annotations.find(grain3) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain3)->second).Value == 3000);
     }
 }
 
@@ -292,28 +304,33 @@ TEST_CASE("Estimator - limited total training items") {
 
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     Estimator                               estimator(
-        "Test",
         pAllColumnAnnotations,
         [](NS::AnnotationMapsPtr pAllColumnAnnotationsParam) {
             return ThisSumTrainingOnlyEstimator(std::move(pAllColumnAnnotationsParam), 0);
         }
     );
+    std::string const                       grain1("one");
+    std::string const                       grain2("two");
+    std::uint32_t const                     value10(10);
+    std::uint32_t const                     value20(20);
+    std::uint32_t const                     value30(30);
+    std::uint32_t const                     value40(40);
 
     SECTION("Single grain, equal number of items") {
         GrainEstimatorAnnotation::AnnotationMap annotations(
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("one", 20),
-                    std::make_tuple("one", 30)
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain1, value20),
+                    typename Estimator::InputType(grain1, value30)
                 )
             )
         );
 
         REQUIRE(annotations.size() == 1);
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 60);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 60);
     }
 
     SECTION("Single grain, smaller number of items") {
@@ -321,15 +338,15 @@ TEST_CASE("Estimator - limited total training items") {
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("one", 20)
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain1, value20)
                 )
             )
         );
 
         REQUIRE(annotations.size() == 1);
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 30);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 30);
     }
 
     SECTION("Single grain, larger number of items") {
@@ -337,103 +354,114 @@ TEST_CASE("Estimator - limited total training items") {
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("one", 20),
-                    std::make_tuple("one", 30),
-                    std::make_tuple("one", 40)          // This will be ignored
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain1, value20),
+                    typename Estimator::InputType(grain1, value30),
+                    typename Estimator::InputType(grain1, value40)    // This will be ignored
                 )
             )
         );
 
         REQUIRE(annotations.size() == 1);
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 60);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 60);
     }
 
     // When the number of training items is limited at the grain level, it applies to all input regardless of grain
     SECTION("Multiple grain, small number of items") {
+        std::uint32_t const                 value100(100);
+
         GrainEstimatorAnnotation::AnnotationMap annotations(
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("two", 100)
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain2, value100)
                 )
             )
         );
 
         REQUIRE(annotations.size() == 2);
 
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 10);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 10);
 
-        REQUIRE(annotations.find("two") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("two")->second).Value == 100);
+        REQUIRE(annotations.find(grain2) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain2)->second).Value == 100);
     }
 
     SECTION("Multiple grain, equal number of items") {
+        std::uint32_t const                 value100(100);
+
         GrainEstimatorAnnotation::AnnotationMap annotations(
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("two", 100),
-                    std::make_tuple("one", 20)
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain2, value100),
+                    typename Estimator::InputType(grain1, value20)
                 )
             )
         );
 
         REQUIRE(annotations.size() == 2);
 
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 30);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 30);
 
-        REQUIRE(annotations.find("two") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("two")->second).Value == 100);
+        REQUIRE(annotations.find(grain2) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain2)->second).Value == 100);
     }
 
     SECTION("Multiple grain, larger number of items") {
+        std::uint32_t const                 value100(100);
+        std::uint32_t const                 value200(200);
+
         GrainEstimatorAnnotation::AnnotationMap annotations(
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("two", 100),
-                    std::make_tuple("one", 20),
-                    std::make_tuple("two", 200)         // This will be ignored
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain2, value100),
+                    typename Estimator::InputType(grain1, value20),
+                    typename Estimator::InputType(grain2, value200)   // This will be ignored
                 )
             )
         );
 
         REQUIRE(annotations.size() == 2);
 
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 30);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 30);
 
-        REQUIRE(annotations.find("two") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("two")->second).Value == 100);
+        REQUIRE(annotations.find(grain2) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain2)->second).Value == 100);
     }
 
     SECTION("Multiple grain, larger number of items (new item after cutoff)") {
+        std::string const                   newGrain("A New Grain!!");
+        std::uint32_t const                 value100(100);
+        std::uint32_t const                 value0(0);
+
         GrainEstimatorAnnotation::AnnotationMap annotations(
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("two", 100),
-                    std::make_tuple("one", 20),
-                    std::make_tuple("A New Grain!!", 0) // This will be ignored
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain2, value100),
+                    typename Estimator::InputType(grain1, value20),
+                    typename Estimator::InputType(newGrain, value0) // This will be ignored
                 )
             )
         );
 
         REQUIRE(annotations.size() == 2);
 
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 30);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 30);
 
-        REQUIRE(annotations.find("two") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("two")->second).Value == 100);
+        REQUIRE(annotations.find(grain2) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain2)->second).Value == 100);
     }
 }
 
@@ -446,27 +474,34 @@ TEST_CASE("Estimator - limited individual training items") {
 
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     Estimator                               estimator(
-        "Test",
         pAllColumnAnnotations,
         [](NS::AnnotationMapsPtr pAllColumnAnnotationsParam) {
             return ThisSumTrainingOnlyEstimator(std::move(pAllColumnAnnotationsParam), 0);
         }
     );
+    std::string const                       grain1("one");
+    std::string const                       grain2("two");
+    std::uint32_t const                     value0(0);
+    std::uint32_t const                     value10(10);
+    std::uint32_t const                     value20(20);
+    std::uint32_t const                     value30(30);
+    std::uint32_t const                     value100(100);
+    std::uint32_t const                     value200(200);
 
     SECTION("Single grain, equal number of items") {
         GrainEstimatorAnnotation::AnnotationMap annotations(
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("one", 20)
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain1, value20)
                 )
             )
         );
 
         REQUIRE(annotations.size() == 1);
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 30);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 30);
     }
 
     SECTION("Single grain, smaller number of items") {
@@ -474,14 +509,14 @@ TEST_CASE("Estimator - limited individual training items") {
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10)
+                    typename Estimator::InputType(grain1, value10)
                 )
             )
         );
 
         REQUIRE(annotations.size() == 1);
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 10);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 10);
     }
 
     SECTION("Single grain, larger number of items") {
@@ -489,16 +524,16 @@ TEST_CASE("Estimator - limited individual training items") {
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("one", 20),
-                    std::make_tuple("one", 30)          // This will be ignored
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain1, value20),
+                    typename Estimator::InputType(grain1, value30) // This will be ignored
                 )
             )
         );
 
         REQUIRE(annotations.size() == 1);
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 30);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 30);
     }
 
     SECTION("Multiple grain, small number of items") {
@@ -506,19 +541,19 @@ TEST_CASE("Estimator - limited individual training items") {
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("two", 100)
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain2, value100)
                 )
             )
         );
 
         REQUIRE(annotations.size() == 2);
 
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 10);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 10);
 
-        REQUIRE(annotations.find("two") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("two")->second).Value == 100);
+        REQUIRE(annotations.find(grain2) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain2)->second).Value == 100);
     }
 
     SECTION("Multiple grain, equal number of items") {
@@ -526,21 +561,21 @@ TEST_CASE("Estimator - limited individual training items") {
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("two", 100),
-                    std::make_tuple("one", 20),
-                    std::make_tuple("two", 200)
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain2, value100),
+                    typename Estimator::InputType(grain1, value20),
+                    typename Estimator::InputType(grain2, value200)
                 )
             )
         );
 
         REQUIRE(annotations.size() == 2);
 
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 30);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 30);
 
-        REQUIRE(annotations.find("two") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("two")->second).Value == 300);
+        REQUIRE(annotations.find(grain2) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain2)->second).Value == 300);
     }
 
     SECTION("Multiple grain, larger number of items") {
@@ -548,51 +583,53 @@ TEST_CASE("Estimator - limited individual training items") {
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("one", 20),
-                    std::make_tuple("two", 100),
-                    std::make_tuple("one", 30),         // This will be ignored
-                    std::make_tuple("two", 200)
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain1, value20),
+                    typename Estimator::InputType(grain2, value100),
+                    typename Estimator::InputType(grain1, value30), // This will be ignored
+                    typename Estimator::InputType(grain2, value200)
                 )
             )
         );
 
         REQUIRE(annotations.size() == 2);
 
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 30);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 30);
 
-        REQUIRE(annotations.find("two") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("two")->second).Value == 300);
+        REQUIRE(annotations.find(grain2) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain2)->second).Value == 300);
     }
 
     SECTION("Multiple grain, larger number of items (new item after cutoff)") {
+        std::string const                   newGrain("A New Grain!!");
+
         GrainEstimatorAnnotation::AnnotationMap annotations(
             Test(
                 estimator,
                 NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                    std::make_tuple("one", 10),
-                    std::make_tuple("one", 20),
-                    std::make_tuple("one", 30),         // This will be ignored
-                    std::make_tuple("A New Grain!!", 0)
+                    typename Estimator::InputType(grain1, value10),
+                    typename Estimator::InputType(grain1, value20),
+                    typename Estimator::InputType(grain1, value30), // This will be ignored
+                    typename Estimator::InputType(newGrain, value0)
                 )
             )
         );
 
         REQUIRE(annotations.size() == 2);
 
-        REQUIRE(annotations.find("one") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("one")->second).Value == 30);
+        REQUIRE(annotations.find(grain1) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(grain1)->second).Value == 30);
 
-        REQUIRE(annotations.find("A New Grain!!") != annotations.end());
-        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find("A New Grain!!")->second).Value == 0);
+        REQUIRE(annotations.find(newGrain) != annotations.end());
+        CHECK(ThisSumTrainingOnlyEstimator::get_annotation_data(*annotations.find(newGrain)->second).Value == 0);
     }
 }
 
 template <typename TransformerT>
 void Execute(TransformerT &transformer, std::string const &grain, std::uint64_t const &input, std::uint64_t expected) {
     transformer.execute(
-        std::make_tuple(grain, input),
+        std::tuple<std::string const &, std::uint64_t const &>(grain, input),
         [&grain, &expected](std::tuple<std::string, std::uint64_t> value) {
             CHECK(std::get<0>(value) == grain);
             CHECK(std::get<1>(value) == expected);
@@ -606,87 +643,107 @@ TEST_CASE("Transformer") {
     // ----------------------------------------------------------------------
 
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    Estimator                               estimator("Test", pAllColumnAnnotations);
+    Estimator                               estimator(pAllColumnAnnotations);
+    std::string const                       grain1("one");
+    std::string const                       grain2("two");
 
     SECTION("Single grain") {
+        std::uint64_t const                 value10(10);
+        std::uint64_t const                 value20(20);
+
         Test(
             estimator,
             NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                std::make_tuple("one", 10),
-                std::make_tuple("one", 20)
+                typename Estimator::InputType(grain1, value10),
+                typename Estimator::InputType(grain1, value20)
             ),
             false
         );
 
         typename Estimator::TransformerUniquePtr const  pTransformer(estimator.create_transformer());
 
-        Execute(*pTransformer, "one", 1, 31);
-        Execute(*pTransformer, "one", 100, 130);
+        Execute(*pTransformer, grain1, 1, 31);
+        Execute(*pTransformer, grain1, 100, 130);
     }
 
     SECTION("Multi grain") {
+        std::uint64_t const                 value10(10);
+        std::uint64_t const                 value20(20);
+        std::uint64_t const                 value100(100);
+        std::uint64_t const                 value200(200);
+
         Test(
             estimator,
             NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                std::make_tuple("one", 10),
-                std::make_tuple("two", 100),
-                std::make_tuple("two", 200),
-                std::make_tuple("one", 20)
+                typename Estimator::InputType(grain1, value10),
+                typename Estimator::InputType(grain2, value100),
+                typename Estimator::InputType(grain2, value200),
+                typename Estimator::InputType(grain1, value20)
             ),
             false
         );
 
         typename Estimator::TransformerUniquePtr const  pTransformer(estimator.create_transformer());
 
-        Execute(*pTransformer, "one", 1, 31);
-        Execute(*pTransformer, "one", 100, 130);
+        Execute(*pTransformer, grain1, 1, 31);
+        Execute(*pTransformer, grain1, 100, 130);
 
-        Execute(*pTransformer, "two", 1, 301);
-        Execute(*pTransformer, "two", 1000, 1300);
+        Execute(*pTransformer, grain2, 1, 301);
+        Execute(*pTransformer, grain2, 1000, 1300);
     }
 
     SECTION("New Grain") {
+        std::uint64_t const                 value10(10);
+
         Test(
             estimator,
             NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                std::make_tuple("one", 10)
+                typename Estimator::InputType(grain1, value10)
             ),
             false
         );
 
         typename Estimator::TransformerUniquePtr const  pTransformer(estimator.create_transformer());
 
+        std::string const                   grain("A New Grain!!");
+        std::uint64_t const                 value(100);
+
         CHECK_THROWS_WITH(
             pTransformer->execute(
-                std::make_tuple("A New Grain!!", 100),
+                typename Estimator::InputType(grain, value),
                 [](std::tuple<std::string, std::uint64_t>) {}
             ),
             "Grain not found"
         );
 
-        Execute(*pTransformer, "one", 1, 11);
-        Execute(*pTransformer, "one", 100, 110);
+        Execute(*pTransformer, grain1, 1, 11);
+        Execute(*pTransformer, grain1, 100, 110);
     }
 
     SECTION("Archive") {
+        std::uint64_t const                 value10(10);
+        std::uint64_t const                 value20(20);
+        std::uint64_t const                 value100(100);
+        std::uint64_t const                 value200(200);
+
         Test(
             estimator,
             NS::TestHelpers::make_vector<typename Estimator::InputType>(
-                std::make_tuple("one", 10),
-                std::make_tuple("two", 100),
-                std::make_tuple("two", 200),
-                std::make_tuple("one", 20)
+                typename Estimator::InputType(grain1, value10),
+                typename Estimator::InputType(grain2, value100),
+                typename Estimator::InputType(grain2, value200),
+                typename Estimator::InputType(grain1, value20)
             ),
             false
         );
 
         typename Estimator::TransformerUniquePtr const  pTransformer(estimator.create_transformer());
 
-        Execute(*pTransformer, "one", 1, 31);
-        Execute(*pTransformer, "one", 100, 130);
+        Execute(*pTransformer, grain1, 1, 31);
+        Execute(*pTransformer, grain1, 100, 130);
 
-        Execute(*pTransformer, "two", 1, 301);
-        Execute(*pTransformer, "two", 1000, 1300);
+        Execute(*pTransformer, grain2, 1, 301);
+        Execute(*pTransformer, grain2, 1000, 1300);
 
         NS::Archive                         outArchive;
 
@@ -696,11 +753,11 @@ TEST_CASE("Transformer") {
 
         Components::GrainTransformer<std::string, DeltaEstimator>           otherTransformer(inArchive);
 
-        Execute(otherTransformer, "one", 1, 31);
-        Execute(otherTransformer, "one", 100, 130);
+        Execute(otherTransformer, grain1, 1, 31);
+        Execute(otherTransformer, grain1, 100, 130);
 
-        Execute(otherTransformer, "two", 1, 301);
-        Execute(otherTransformer, "two", 1000, 1300);
+        Execute(otherTransformer, grain2, 1, 301);
+        Execute(otherTransformer, grain2, 1000, 1300);
     }
 }
 
@@ -773,7 +830,7 @@ TEST_CASE("GrainEstimatorImpl - construct errors") {
     // ----------------------------------------------------------------------
 
     CHECK_THROWS_WITH(
-        GrainEstimator("Test", NS::CreateTestAnnotationMapsPtr(1), typename GrainEstimator::CreateEstimatorFunc()),
+        GrainEstimator(NS::CreateTestAnnotationMapsPtr(1), typename GrainEstimator::CreateEstimatorFunc()),
         "createFunc"
     );
 }
