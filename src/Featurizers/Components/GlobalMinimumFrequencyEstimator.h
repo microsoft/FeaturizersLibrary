@@ -63,8 +63,8 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using InputType                     = std::tuple<std::vector<std::string>, std::chrono::system_clock::time_point>;
-
+    using GrainType                     = std::vector<std::string>;
+    using InputType                     = std::tuple<GrainType const &, std::chrono::system_clock::time_point const &>;
     // ----------------------------------------------------------------------
     // |
     // |  Public Data
@@ -175,9 +175,9 @@ void Details::GlobalMinimumFrequencyTrainingOnlyPolicy<GlobalMinimumFrequencyEst
 template <typename GlobalMinimumFrequencyEstimatorT, size_t MaxNumTrainingItemsV>
 GlobalMinimumFrequencyAnnotation Details::GlobalMinimumFrequencyTrainingOnlyPolicy<GlobalMinimumFrequencyEstimatorT, MaxNumTrainingItemsV>::complete_training(void) {
     GlobalMinimumFrequencyEstimatorT                                         const & estimator(static_cast<GlobalMinimumFrequencyEstimatorT const &>(*this));
-    GrainEstimatorAnnotation<std::vector<std::string>> const & data(GrainedFrequencyEstimator<MaxNumTrainingItemsV>::get_annotation(estimator.get_column_annotations(), estimator.get_column_index(), GrainedFrequencyEstimatorName));
+    GrainEstimatorAnnotation<GrainType> const & data(GrainedFrequencyEstimator<MaxNumTrainingItemsV>::get_annotation(estimator.get_column_annotations(), estimator.get_column_index(), GrainedFrequencyEstimatorName));
 
-    GrainEstimatorAnnotation<std::vector<std::string>>::AnnotationMap const & annotation(data.Annotations);
+    GrainEstimatorAnnotation<GrainType>::AnnotationMap const & annotation(data.Annotations);
 
     FrequencyType freq(std::chrono::system_clock::duration::max().count());
     for(auto const & kvp : annotation) {
