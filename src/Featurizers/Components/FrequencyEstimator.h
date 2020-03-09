@@ -144,10 +144,11 @@ Details::FrequencyTrainingOnlyPolicy::FrequencyTrainingOnlyPolicy(void) :
 
 void Details::FrequencyTrainingOnlyPolicy::fit(InputType const &input) {
     if (_lastObserved.has_value()) {
-        if (*_lastObserved >= input) {
+        InputType const & lastObservedValue(*_lastObserved);
+        if (lastObservedValue >= input) {
             throw std::runtime_error("Input stream not in chronological order.");
         }
-        FrequencyType currFrequency(input - *_lastObserved);
+        FrequencyType currFrequency(input - lastObservedValue);
         if (currFrequency <= _frequency) {
             _frequency = currFrequency;
         }
