@@ -175,7 +175,7 @@ void Details::GlobalMinimumFrequencyTrainingOnlyPolicy<GlobalMinimumFrequencyEst
 template <typename GlobalMinimumFrequencyEstimatorT, size_t MaxNumTrainingItemsV>
 GlobalMinimumFrequencyAnnotation Details::GlobalMinimumFrequencyTrainingOnlyPolicy<GlobalMinimumFrequencyEstimatorT, MaxNumTrainingItemsV>::complete_training(void) {
     GlobalMinimumFrequencyEstimatorT                                         const & estimator(static_cast<GlobalMinimumFrequencyEstimatorT const &>(*this));
-    GrainEstimatorAnnotation<GrainType> const & data(GrainedFrequencyEstimator<MaxNumTrainingItemsV>::get_annotation(estimator.get_column_annotations(), estimator.get_column_index(), GrainedFrequencyEstimatorName));
+    GrainEstimatorAnnotation<GrainType> const & data(GrainedFrequencyEstimator<MaxNumTrainingItemsV>::get_annotation(estimator.get_column_annotations(), estimator.get_column_index(), GrainFrequencyEstimatorName));
 
     GrainEstimatorAnnotation<GrainType>::AnnotationMap const & annotation(data.Annotations);
 
