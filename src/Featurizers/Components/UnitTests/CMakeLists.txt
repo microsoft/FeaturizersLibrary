@@ -35,8 +35,6 @@ SET(
     GlobalMinimumFrequencyEstimator_UnitTest
     # This test is optionally included below:
     GrainFeaturizerImpl_UnitTest
-    FrequencyEstimator_UnitTest
-    FrequencyMinimumEstimator_UnitTest
     HistogramEstimator_UnitTest
     ImputerTransformer_UnitTest
     IndexMapEstimator_UnitTest

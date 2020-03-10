@@ -29,8 +29,7 @@ typename NS::Featurizers::Components::GlobalMinimumFrequencyAnnotation::Frequenc
     CHECK_THROWS_WITH(NS::TestHelpers::Train(tempGlobalMinimumFrequencyEstimator, batchedInput), "Annotation data was not found for this column");
 
     // Standard tests
-    NS::Featurizers::Components::GrainedFrequencyEstimator<>       grainedFrequencyEstimator(NS::Featurizers::Components::GrainedFrequencyEstimatorName,
-                                                                                             pAllColumnAnnotations, 
+    NS::Featurizers::Components::GrainedFrequencyEstimator<>       grainedFrequencyEstimator(pAllColumnAnnotations, 
                                                                                              [](NS::AnnotationMapsPtr pAllColumnAnnotationsParam) {
                                                                                                  return NS::Featurizers::Components::FrequencyEstimator<>(std::move(pAllColumnAnnotationsParam), 0);
                                                                                              });
