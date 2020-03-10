@@ -15,7 +15,7 @@ namespace Featurizers {
 namespace Components {
 
 static constexpr char const * const         FrequencyEstimatorName("FrequencyEstimator");
-static constexpr char const * const         GrainedFrequencyEstimatorName("GrainedFrequencyEstimator");
+static constexpr char const * const         GrainedFrequencyEstimatorName("GrainFrequencyEstimator");
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         FrequencyAnnotation
