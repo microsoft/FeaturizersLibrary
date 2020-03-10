@@ -27,11 +27,9 @@ public:
     // |
     // ----------------------------------------------------------------------
     using AnnotationMap =
-        std::unordered_map<
+        std::map<
             GrainT,
-            AnnotationPtr,
-            std::hash<GrainT>,
-            typename Traits<GrainT>::key_equal
+            AnnotationPtr
         >;
 
     // ----------------------------------------------------------------------
@@ -218,11 +216,9 @@ protected:
     // |
     // ----------------------------------------------------------------------
     using EstimatorMap =
-        std::unordered_map<
-            GrainType,
-            EstimatorT,
-            std::hash<GrainType>,
-            typename Traits<GrainT>::key_equal
+        std::map<
+            GrainT,
+            EstimatorT
         >;
 
     // ----------------------------------------------------------------------
