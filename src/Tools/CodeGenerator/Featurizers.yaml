@@ -1418,13 +1418,12 @@ featurizers:
       For sparse time series data sets, forward fill imputer will be applied so input time series would always be continuous
       and have a consistent time interval between rows.
 
-      Input type for this featurizer is a tuple of time point of current row, target column to lag or lead
-      and the horizon origin for the row.
+      Input type for this featurizer is a tuple of time point of current row, the grain column, the horizon and target column to lag or lead.
 
-      Minus lags means lead in this featurizer.
+      We use "start offset" to refer max horizon because it marks the position where the data we want starts and minus lags for lead in this featurizer.
 
       C++-style pseudo signature:
-        template <typename T> vector<double> execute(std::tuple<std::chrono::system_clock::time_point, T, std::chrono::system_clock::time_point> const &value);
+        template <typename T> vector<double> execute(std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, uint32, T> const &value);
 
       Examples:
           A simple example would be max horizon = 1 and we want to lag 1
@@ -1482,16 +1481,16 @@ featurizers:
           - double
 
     type_mappings:
-      - input_type: T
-        output_type: double
+      - input_type: tuple<datetime, vector<string>, uint32, T>
+        output_type: vector<double>
 
     configuration_params:
-      - type: uint8
-        name: horizon
+      - type: uint32
+        name: start_offset
         is_optional: false
 
-      - type: vector<int8>
-        name: lags
+      - type: vector<int32>
+        name: lag_offsets
         is_optional: false
 
     status: Pending
