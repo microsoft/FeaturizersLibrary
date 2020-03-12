@@ -228,6 +228,16 @@ AnnotationMapsPtr CreateTestAnnotationMapsPtr(size_t numCols);
 ///                 `Estimators` are only used during the training process.
 ///
 class Estimator {
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+
+    // This must be defined before Name
+    std::string const                       _optionalNameBuffer;
+
 public:
     // ----------------------------------------------------------------------
     // |
@@ -273,6 +283,7 @@ protected:
     // |
     // ----------------------------------------------------------------------
     Estimator(char const *name, AnnotationMapsPtr pAllColumnAnnotations);
+    Estimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
 
     /////////////////////////////////////////////////////////////////////////
     ///  \fn            add_annotation
@@ -302,6 +313,13 @@ private:
     // |
     // ----------------------------------------------------------------------
     AnnotationMapsPtr const                 _allColumnAnnotations;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    Estimator(std::string optionalNameBuffer, char const *name, AnnotationMapsPtr pAllColumnAnnotations);
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -351,6 +369,8 @@ public:
     // |
     // ----------------------------------------------------------------------
     FitEstimator(char const *name, AnnotationMapsPtr pAllColumnAnnotations);
+    FitEstimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations);
+
     ~FitEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FitEstimator);
@@ -610,24 +630,11 @@ inline AnnotationMaps const & Estimator::get_column_annotations(void) const {
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 inline Estimator::Estimator(char const *name, AnnotationMapsPtr pAllColumnAnnotations) :
-    Name(
-        [name](void) {
-            if(name == nullptr || *name == 0)
-                throw std::invalid_argument("name");
+    Estimator(std::string(), name, std::move(pAllColumnAnnotations)) {
+}
 
-            return name;
-        }()
-    ),
-    _allColumnAnnotations(
-        std::move(
-            [&pAllColumnAnnotations](void) -> AnnotationMapsPtr & {
-                if(!pAllColumnAnnotations || pAllColumnAnnotations->empty())
-                    throw std::invalid_argument("pAllColumnAnnotations");
-
-                return pAllColumnAnnotations;
-            }()
-        )
-    ) {
+inline Estimator::Estimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations) :
+    Estimator(std::move(name), nullptr, std::move(pAllColumnAnnotations)) {
 }
 
 /*static*/ inline void Estimator::add_annotation(AnnotationMapsPtr const allColumnAnnotations, AnnotationPtr pAnnotation, size_t colIndex, char const *name) {
@@ -694,6 +701,34 @@ DerivedAnnotationT * Estimator::get_annotation_impl(AnnotationMaps const &allAnn
 }
 
 // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+inline Estimator::Estimator(std::string optionalNameBuffer, char const *name, AnnotationMapsPtr pAllColumnAnnotations) :
+    _optionalNameBuffer(std::move(optionalNameBuffer)),
+    Name(
+        [this, name](void) {
+            if(_optionalNameBuffer.empty() == false)
+                return _optionalNameBuffer.c_str();
+
+            if(name == nullptr || *name == 0)
+                throw std::invalid_argument("name");
+
+            return name;
+        }()
+    ),
+    _allColumnAnnotations(
+        std::move(
+            [&pAllColumnAnnotations](void) -> AnnotationMapsPtr & {
+                if(!pAllColumnAnnotations || pAllColumnAnnotations->empty())
+                    throw std::invalid_argument("pAllColumnAnnotations");
+
+                return pAllColumnAnnotations;
+            }()
+        )
+    ) {
+}
+
+// ----------------------------------------------------------------------
 // |
 // |  FitEstimator
 // |
@@ -701,6 +736,12 @@ DerivedAnnotationT * Estimator::get_annotation_impl(AnnotationMaps const &allAnn
 template <typename InputT>
 FitEstimator<InputT>::FitEstimator(char const *name, AnnotationMapsPtr pAllColumnAnnotations) :
     Estimator(name, std::move(pAllColumnAnnotations)),
+    _state(TrainingState::Pending) {
+}
+
+template <typename InputT>
+FitEstimator<InputT>::FitEstimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations) :
+    Estimator(std::move(name), std::move(pAllColumnAnnotations)),
     _state(TrainingState::Pending) {
 }
 

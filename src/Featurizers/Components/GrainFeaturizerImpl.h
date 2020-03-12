@@ -27,11 +27,9 @@ public:
     // |
     // ----------------------------------------------------------------------
     using AnnotationMap =
-        std::unordered_map<
+        std::map<
             GrainT,
-            AnnotationPtr,
-            std::hash<GrainT>,
-            typename Traits<GrainT>::key_equal
+            AnnotationPtr
         >;
 
     // ----------------------------------------------------------------------
@@ -53,15 +51,18 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         GrainEstimatorTraits
+///  \class         GrainFeaturizerTraits
 ///  \brief         Traits common to all types of `Estimators` when used within
 ///                 a `GrainEstimator`.
 ///
 template <typename GrainT, typename EstimatorT>
-struct GrainEstimatorTraits {
+struct GrainFeaturizerTraits {
     // ----------------------------------------------------------------------
     // |  Public Types
-    using InputType                         = std::tuple<GrainT, typename EstimatorT::InputType>;
+    static_assert(std::is_reference<GrainT>::value == false, "'GrainT' must not be a reference");
+    static_assert(std::is_reference<typename EstimatorT::InputType>::value == false, "'EstimatorT::InputType' must not be a reference");
+
+    using InputType                         = std::tuple<GrainT const &, typename EstimatorT::InputType const &>;
     using TransformedType                   = std::tuple<GrainT, typename Details::EstimatorOutputType<EstimatorT>::type>;
 };
 
@@ -73,8 +74,8 @@ struct GrainEstimatorTraits {
 template <typename GrainT, typename EstimatorT>
 class GrainTransformer :
     public Transformer<
-        typename GrainEstimatorTraits<GrainT, EstimatorT>::InputType,
-        typename GrainEstimatorTraits<GrainT, EstimatorT>::TransformedType
+        typename GrainFeaturizerTraits<GrainT, EstimatorT>::InputType,
+        typename GrainFeaturizerTraits<GrainT, EstimatorT>::TransformedType
     > {
 public:
     // ----------------------------------------------------------------------
@@ -82,12 +83,12 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using TheseGrainEstimatorTraits         = GrainEstimatorTraits<GrainT, EstimatorT>;
+    using TheseGrainFeaturizerTraits        = GrainFeaturizerTraits<GrainT, EstimatorT>;
 
     using BaseType =
         Transformer<
-            typename TheseGrainEstimatorTraits::InputType,
-            typename TheseGrainEstimatorTraits::TransformedType
+            typename TheseGrainFeaturizerTraits::InputType,
+            typename TheseGrainFeaturizerTraits::TransformedType
         >;
 
     using GrainTransformerType =
@@ -185,10 +186,10 @@ public:
     // ----------------------------------------------------------------------
     using GrainType                         = GrainT;
 
-    using TheseGrainEstimatorTraits         = GrainEstimatorTraits<GrainT, EstimatorT>;
+    using TheseGrainFeaturizerTraits        = GrainFeaturizerTraits<GrainT, EstimatorT>;
 
-    using InputType                         = typename TheseGrainEstimatorTraits::InputType;
-    using TransformedType                   = typename TheseGrainEstimatorTraits::TransformedType;
+    using InputType                         = typename TheseGrainFeaturizerTraits::InputType;
+    using TransformedType                   = typename TheseGrainFeaturizerTraits::TransformedType;
 
     using GrainEstimatorAnnotation          = Microsoft::Featurizer::Featurizers::Components::GrainEstimatorAnnotation<GrainType>;
     using CreateEstimatorFunc               = std::function<EstimatorT (AnnotationMapsPtr)>;
@@ -198,8 +199,8 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    GrainEstimatorImplBase(char const *name, AnnotationMapsPtr pAllColumnAnnotations);
-    GrainEstimatorImplBase(char const *name, AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc);
+    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations);
+    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc);
 
     ~GrainEstimatorImplBase(void) override = default;
 
@@ -215,11 +216,9 @@ protected:
     // |
     // ----------------------------------------------------------------------
     using EstimatorMap =
-        std::unordered_map<
+        std::map<
             GrainT,
-            EstimatorT,
-            std::hash<GrainT>,
-            typename Traits<GrainT>::key_equal
+            EstimatorT
         >;
 
     // ----------------------------------------------------------------------
@@ -273,7 +272,7 @@ class GrainEstimatorImpl<
     typename std::enable_if<Details::IsTransformerEstimator<EstimatorT>::value == false>::type
 > :
     public Impl::GrainEstimatorImplBase<
-        FitEstimator<typename GrainEstimatorTraits<GrainT, EstimatorT>::InputType>,
+        FitEstimator<typename GrainFeaturizerTraits<GrainT, EstimatorT>::InputType>,
         GrainT,
         EstimatorT,
         MaxNumTrainingItemsV
@@ -284,7 +283,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using TheseGrainTraits                  = GrainEstimatorTraits<GrainT, EstimatorT>;
+    using TheseGrainTraits                  = GrainFeaturizerTraits<GrainT, EstimatorT>;
 
     using BaseType =
         Impl::GrainEstimatorImplBase<
@@ -320,8 +319,8 @@ class GrainEstimatorImpl<
 > :
     public Impl::GrainEstimatorImplBase<
         TransformerEstimator<
-            typename GrainEstimatorTraits<GrainT, EstimatorT>::InputType,
-            typename GrainEstimatorTraits<GrainT, EstimatorT>::TransformedType
+            typename GrainFeaturizerTraits<GrainT, EstimatorT>::InputType,
+            typename GrainFeaturizerTraits<GrainT, EstimatorT>::TransformedType
         >,
         GrainT,
         EstimatorT,
@@ -333,7 +332,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using TheseGrainTraits                  = GrainEstimatorTraits<GrainT, EstimatorT>;
+    using TheseGrainTraits                  = GrainFeaturizerTraits<GrainT, EstimatorT>;
 
     using BaseType =
         Impl::GrainEstimatorImplBase<
@@ -384,6 +383,10 @@ private:
 ///                 Estimators and Transformers can be written without
 ///                 being aware of grains, and then "wrapped" by this object
 ///                 in those scenarios where grain-specific state is required.
+///
+///
+///                 Note that the name of this estimator will be:
+///                     "Grain" + EstimatorT::Name
 ///
 ///                 Note that this using statement immediately forwards to
 ///                 a second implementation, as it isn't possible in C++
@@ -488,9 +491,8 @@ void GrainTransformer<GrainT, EstimatorT>::save(Archive &ar) const /*override*/ 
 // |
 // ----------------------------------------------------------------------
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(char const *name, AnnotationMapsPtr pAllColumnAnnotations) :
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations) :
     GrainEstimatorImplBase(
-        name,
         std::move(pAllColumnAnnotations),
         [](AnnotationMapsPtr pAllColumnAnnotationsParam) {
             return EstimatorT(std::move(pAllColumnAnnotationsParam));
@@ -499,19 +501,24 @@ Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::G
 }
 
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(char const *name, AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc) :
-    BaseT(name, pAllColumnAnnotations),
-    _pAllColumnAnnotations(pAllColumnAnnotations),
-    _createFunc(
-        std::move(
-            [&createFunc](void) -> CreateEstimatorFunc const & {
-                if(!createFunc)
-                    throw std::invalid_argument("createFunc");
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc) :
+    BaseT(
+        [pAllColumnAnnotations, &createFunc](void) -> std::string {
+            if(!createFunc)
+                throw std::invalid_argument("createFunc");
 
-                return createFunc;
-            }()
-        )
+            // Create the name of the GrainEstimator as "Grain<EstimatorName>". This is slightly more
+            // complicated than what would normally be expected, as we have to create an instance
+            // of the estimator before we can get its name.
+
+            EstimatorT const                estimator(createFunc(std::move(pAllColumnAnnotations)));
+
+            return std::string("Grain") + estimator.Name;
+        }(),
+        pAllColumnAnnotations
     ),
+    _pAllColumnAnnotations(pAllColumnAnnotations),
+    _createFunc(std::move(createFunc)), // Note that createFunc has been validated when creating the Estimator name in the call to BaseT's constructor above
     _cRemainingTrainingItems(MaxNumTrainingItemsV) {
 }
 

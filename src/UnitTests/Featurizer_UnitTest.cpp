@@ -48,6 +48,10 @@ public:
         Microsoft::Featurizer::Estimator(name, std::move(pAllColumnAnnotations)) {
     }
 
+    MyEstimator(std::string name, AnnotationMapsPtr pAllColumnAnnotations) :
+        Microsoft::Featurizer::Estimator(std::move(name), std::move(pAllColumnAnnotations)) {
+    }
+
     ~MyEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(MyEstimator);
@@ -91,12 +95,50 @@ TEST_CASE("Estimator") {
     CHECK_THROWS_WITH(estimator.get_annotation(99999), "colIndex");
 }
 
+TEST_CASE("Estimator - Movement and Names") {
+    AnnotationMapsPtr const                 pAllAnnotations(CreateTestAnnotationMapsPtr(2));
+
+    SECTION("Name Pointer") {
+        char const * const                  estimatorName("MyNewEstimator");
+        MyEstimator                         estimator1(estimatorName, pAllAnnotations);
+
+        CHECK(strcmp(estimator1.Name, "MyNewEstimator") == 0);
+        CHECK(reinterpret_cast<size_t>(estimator1.Name) == reinterpret_cast<size_t>(estimatorName)); // strings are pooled at compilation time, therefore the pointer should be the same
+
+        MyEstimator                         estimator2(std::move(estimator1));
+
+        CHECK(strcmp(estimator2.Name, "MyNewEstimator") == 0);
+        CHECK(reinterpret_cast<size_t>(estimator2.Name) == reinterpret_cast<size_t>(estimatorName)); // strings are pooled at compilation time, therefore the pointer should be the same
+    }
+
+    SECTION("Name Buffer") {
+        MyEstimator                         estimator1(std::string("MyNewEstimator"), pAllAnnotations);
+
+        CHECK(strcmp(estimator1.Name, "MyNewEstimator") == 0);
+        CHECK(reinterpret_cast<size_t>(estimator1.Name) != reinterpret_cast<size_t>("MyNewEstimator")); // This is not a pooled string
+
+        MyEstimator                         estimator2(std::move(estimator1));
+
+        CHECK(strcmp(estimator2.Name, "MyNewEstimator") == 0);
+        CHECK(reinterpret_cast<size_t>(estimator2.Name) != reinterpret_cast<size_t>("MyNewEstimator")); // This is not a pooled string
+
+        CHECK(reinterpret_cast<size_t>(estimator1.Name) == reinterpret_cast<size_t>(estimator2.Name)); // Since the memory was moved, the string buffer should be the same
+    }
+}
+
 class MyFitEstimator : public Microsoft::Featurizer::FitEstimator<int> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Methods
     MyFitEstimator(bool complete_on_begin, bool complete_on_fit, bool prevent_finished) :
         Microsoft::Featurizer::FitEstimator<int>("Name", CreateTestAnnotationMapsPtr(2)),
+        _complete_on_begin(complete_on_begin),
+        _complete_on_fit(complete_on_fit),
+        _prevent_finished(prevent_finished) {
+    }
+
+    MyFitEstimator(std::string name, bool complete_on_begin, bool complete_on_fit, bool prevent_finished) :
+        Microsoft::Featurizer::FitEstimator<int>(std::move(name), CreateTestAnnotationMapsPtr(2)),
         _complete_on_begin(complete_on_begin),
         _complete_on_fit(complete_on_fit),
         _prevent_finished(prevent_finished) {
@@ -215,6 +257,36 @@ TEST_CASE("FitEstimator - No Finished") {
     CHECK(estimator.get_state() == NS::TrainingState::Completed);
 }
 
+TEST_CASE("FitEstimator - Movement and Names") {
+    SECTION("Name Pointer") {
+        MyFitEstimator                      estimator1(false, false, false);
+
+        CHECK(strcmp(estimator1.Name, "Name") == 0);
+        CHECK(reinterpret_cast<size_t>(estimator1.Name) == reinterpret_cast<size_t>("Name")); // strings are pooled at compilation time, therefore the pointer should be the same
+
+        MyFitEstimator                      estimator2(std::move(estimator1));
+
+        CHECK(strcmp(estimator2.Name, "Name") == 0);
+        CHECK(reinterpret_cast<size_t>(estimator2.Name) == reinterpret_cast<size_t>("Name")); // strings are pooled at compilation time, therefore the pointer should be the same
+
+        CHECK(reinterpret_cast<size_t>(estimator1.Name) == reinterpret_cast<size_t>(estimator2.Name));
+    }
+
+    SECTION("Name Buffer") {
+        MyFitEstimator                      estimator1(std::string("MyNewEstimator"), false, false, false);
+
+        CHECK(strcmp(estimator1.Name, "MyNewEstimator") == 0);
+        CHECK(reinterpret_cast<size_t>(estimator1.Name) != reinterpret_cast<size_t>("MyNewEstimator")); // This is not a pooled string
+
+        MyFitEstimator                      estimator2(std::move(estimator1));
+
+        CHECK(strcmp(estimator2.Name, "MyNewEstimator") == 0);
+        CHECK(reinterpret_cast<size_t>(estimator2.Name) != reinterpret_cast<size_t>("MyNewEstimator")); // This is not a pooled string
+
+        CHECK(reinterpret_cast<size_t>(estimator1.Name) == reinterpret_cast<size_t>(estimator2.Name)); // Since the memory was moved, the string buffer should be the same
+    }
+}
+
 class MyTransformerEstimator : public Microsoft::Featurizer::TransformerEstimator<int, bool> {
 public:
     // ----------------------------------------------------------------------
@@ -240,6 +312,16 @@ public:
     // |  Public Methods
     MyTransformerEstimator(bool auto_complete, bool return_invalid_transformer) :
         Microsoft::Featurizer::TransformerEstimator<int, bool>("Name", CreateTestAnnotationMapsPtr(2)),
+        _return_invalid_transformer(return_invalid_transformer) {
+
+            if(auto_complete) {
+                begin_training();
+                complete_training();
+            }
+    }
+
+    MyTransformerEstimator(std::string name, bool auto_complete, bool return_invalid_transformer) :
+        Microsoft::Featurizer::TransformerEstimator<int, bool>(std::move(name), CreateTestAnnotationMapsPtr(2)),
         _return_invalid_transformer(return_invalid_transformer) {
 
             if(auto_complete) {
@@ -289,4 +371,36 @@ TEST_CASE("TransformerEstimator") {
     CHECK_THROWS_WITH(estimator.create_transformer(), Catch::Contains("should not be invoked on an estimator that has been used to create a"));
 
     CHECK_THROWS_WITH(MyTransformerEstimator(true, true).create_transformer(), "Invalid result");
+}
+
+TEST_CASE("TransformerEstimator - Movement and Names") {
+    AnnotationMapsPtr const                 pAllAnnotations(CreateTestAnnotationMapsPtr(2));
+
+    SECTION("Name Pointer") {
+        MyTransformerEstimator              estimator1(false, false);
+
+        CHECK(strcmp(estimator1.Name, "Name") == 0);
+        CHECK(reinterpret_cast<size_t>(estimator1.Name) == reinterpret_cast<size_t>("Name")); // strings are pooled at compilation time, therefore the pointer should be the same
+
+        MyTransformerEstimator              estimator2(std::move(estimator1));
+
+        CHECK(strcmp(estimator2.Name, "Name") == 0);
+        CHECK(reinterpret_cast<size_t>(estimator2.Name) == reinterpret_cast<size_t>("Name")); // strings are pooled at compilation time, therefore the pointer should be the same
+
+        CHECK(reinterpret_cast<size_t>(estimator1.Name) == reinterpret_cast<size_t>(estimator2.Name));
+    }
+
+    SECTION("Name Buffer") {
+        MyTransformerEstimator              estimator1(std::string("MyNewEstimator"), false, false);
+
+        CHECK(strcmp(estimator1.Name, "MyNewEstimator") == 0);
+        CHECK(reinterpret_cast<size_t>(estimator1.Name) != reinterpret_cast<size_t>("MyNewEstimator")); // This is not a pooled string
+
+        MyTransformerEstimator              estimator2(std::move(estimator1));
+
+        CHECK(strcmp(estimator2.Name, "MyNewEstimator") == 0);
+        CHECK(reinterpret_cast<size_t>(estimator2.Name) != reinterpret_cast<size_t>("MyNewEstimator")); // This is not a pooled string
+
+        CHECK(reinterpret_cast<size_t>(estimator1.Name) == reinterpret_cast<size_t>(estimator2.Name)); // Since the memory was moved, the string buffer should be the same
+    }
 }
