@@ -1414,57 +1414,60 @@ featurizers:
     num_output_columns: 1
     has_dynamic_output: true
     description: |-
-      Computes lags and leads for values. Works for general time series data sets.
+      Copying values according to lag or lead orders per grain. Works for general time series data sets.
       For sparse time series data sets, forward fill imputer will be applied so input time series would always be continuous
       and have a consistent time interval between rows.
 
-      Input type for this featurizer is a tuple of time point of current row, the grain column, the horizon and target column to lag or lead.
+      Input type for this featurizer is a tuple of time point of current row, the grain, the delta offset and target column to lag or lead.
 
-      We use "start offset" to refer max horizon because it marks the position where the data we want starts and minus lags for lead in this featurizer.
+      We use "delta offset" to refer max horizon because it should apply to all offset computations to find the data we want.
+
+      Lag offset is passed in as a vector of ints so multiple lag orders can be applied within one featurizer call. Negative lag offset means lead in this featurizer.
 
       C++-style pseudo signature:
-        template <typename T> vector<double> execute(std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, uint32, T> const &value);
+        template <typename T> vector<double> execute(std::tuple<std::chrono::system_clock::time_point const &, std::vector<std::string> const &, uint32 const &, T const &> const &value);
 
       Examples:
-          A simple example would be max horizon = 1 and we want to lag 1
-          +----------------+-------+------------------+-------------------+
-          |time(YYYY-MM-DD)| target| horizon_origin   | target_lag_1      |
-          +================+=======+==================+===================+
-          | 2017-01-01     | 8     | 2016-12-01       | NAN               |
-          +----------------+-------+------------------+-------------------+
-          | 2017-02-01     | 9     | 2017-01-01       | 8                 |
-          +----------------+-------+------------------+-------------------+
-          | 2017-03-01     | 10    | 2017-02-01       | 9                 |
-          +----------------+-------+------------------+-------------------+
-          | 2017-04-01     | 11    | 2017-03-01       | 11                |
-          +----------------+-------+------------------+-------------------+
+          Since this featurizer is copying values per grain, we just use one type of grain in examples.
+
+          A simple example would be delta offset = 1 and we want to lag 1
+          +----------------+-------+-------+-------------+-------------------+
+          |time(YYYY-MM-DD)| grain | target| delta_offset| target_lag_1      |
+          +================+=======+=======+=============+===================+
+          | 2017-01-01     |Walmart| 8     | 1           | NAN               |
+          +----------------+-------+-------+-------------+-------------------+
+          | 2017-02-01     |Walmart| 9     | 1           | 8                 |
+          +----------------+-------+-------+-------------+-------------------+
+          | 2017-03-01     |Walmart| 10    | 1           | 9                 |
+          +----------------+-------+-------+-------------+-------------------+
+          | 2017-04-01     |Walmart| 11    | 1           | 11                |
+          +----------------+-------+-------+-------------+-------------------+
           Values from the row above current row are copied.
 
-          A more complex example would be, assuming we have max horizon = 2 and we want to lag 2
-          +----------------+-------+------------------+-------------------+
-          |time(YYYY-MM-DD)| target| horizon_origin   | target_lag_2      |
-          +================+=======+==================+===================+
-          | 2017-01-01     | 8     | 2016-11-01       | NAN               |
-          +----------------+-------+------------------+-------------------+
-          | 2017-01-01     | 8     | 2016-12-01       | NAN               |
-          +----------------+-------+------------------+-------------------+
-          | 2017-02-01     | 9     | 2016-12-01       | NAN               |
-          +----------------+-------+------------------+-------------------+
-          | 2017-02-01     | 9     | 2017-01-01       | NAN               |
-          +----------------+-------+------------------+-------------------+
-          | 2017-03-01     | 10    | 2017-01-01       | NAN               |
-          +----------------+-------+------------------+-------------------+
-          | 2017-03-01     | 10    | 2017-02-01       | 8                 |
-          +----------------+-------+------------------+-------------------+
-          | 2017-04-01     | 11    | 2017-02-01       | 8                 |
-          +----------------+-------+------------------+-------------------+
-          | 2017-04-01     | 11    | 2017-03-01       | 10                |
-          +----------------+-------+------------------+-------------------+
-          Horizon origin column should be generated by MaxHorizonFeaturizer in the pipeline prior to LagLeadOperatorFeaturizer
+          A more complex example would be, assuming we have delta offset = 2 and we want to lag 2 and lag -2 (which is lead 2)
+          +----------------+-------+-------+-------------+-------------------+-------------------+
+          |time(YYYY-MM-DD)| grain | target| delta_offset| target_lag_2      | target_lead_2     |
+          +================+=======+=======+=============+===================+===================+
+          | 2017-01-01     |Walmart| 8     | 2           | NAN               | 9                 |
+          +----------------+-------+-------+-------------+-------------------+-------------------+
+          | 2017-01-01     |Walmart| 8     | 1           | NAN               | 10                |
+          +----------------+-------+-------+-------------+-------------------+-------------------+
+          | 2017-02-01     |Walmart| 9     | 2           | NAN               | 10                |
+          +----------------+-------+-------+-------------+-------------------+-------------------+
+          | 2017-02-01     |Walmart| 9     | 1           | NAN               | 11                |
+          +----------------+-------+-------+-------------+-------------------+-------------------+
+          | 2017-03-01     |Walmart| 10    | 2           | NAN               | 11                |
+          +----------------+-------+-------+-------------+-------------------+-------------------+
+          | 2017-03-01     |Walmart| 10    | 1           | 8                 | NAN               |
+          +----------------+-------+-------+-------------+-------------------+-------------------+
+          | 2017-04-01     |Walmart| 11    | 2           | 8                 | NAN               |
+          +----------------+-------+-------+-------------+-------------------+-------------------+
+          | 2017-04-01     |Walmart| 11    | 1           | 9                 | NAN               |
+          +----------------+-------+-------+-------------+-------------------+-------------------+
+          Delta offset column should be generated by MaxHorizonFeaturizer in the pipeline prior to LagLeadOperatorFeaturizer
           and if we want to lag k for the row with time t,
-          target_lag_k[t] = target[horizon_origin(t) - (k-1) * time_interval_between_rows]
+          target_lag_k[t] = target[date_time(t) - (delta_offset + k - 1) * time_interval_between_rows]
 
-          Note that we are passing in a vector of lag orders so the above two examples can be completed within in one call to the LagLeadOperatorFeaturizer
 
     templates:
       - name: T
@@ -1486,7 +1489,7 @@ featurizers:
 
     configuration_params:
       - type: uint32
-        name: start_offset
+        name: delta_offset
         is_optional: false
 
       - type: vector<int32>
