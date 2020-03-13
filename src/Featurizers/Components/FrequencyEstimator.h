@@ -15,7 +15,6 @@ namespace Featurizers {
 namespace Components {
 
 static constexpr char const * const         FrequencyEstimatorName("FrequencyEstimator");
-static constexpr char const * const         GrainFrequencyEstimatorName("GrainFrequencyEstimator");
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         FrequencyAnnotation
@@ -108,6 +107,8 @@ template <
 >
 using FrequencyEstimator                       = TrainingOnlyEstimatorImpl<Details::FrequencyTrainingOnlyPolicy, MaxNumTrainingItemsV>;
 
+// Normally we want the featurizer name at the top of the file, but GrainFeaturizers are just type defs, so we want the name next to it.
+static constexpr char const * const         GrainFrequencyEstimatorName("GrainFrequencyEstimator");
 template <
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
