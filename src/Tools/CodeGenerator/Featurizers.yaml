@@ -1414,17 +1414,14 @@ featurizers:
     num_output_columns: 1
     has_dynamic_output: true
     description: |-
-      Copying values according to lag or lead orders per grain. Works for general time series data sets.
-      For sparse time series data sets, forward fill imputer will be applied so input time series would always be continuous
-      and have a consistent time interval between rows.
+      Copying values from back or in the future per grain. Works for general time series data sets.
 
-      Input type for this featurizer is a tuple of time point of current row, the grain and target column to lag or lead.
+      Offsets are the lag or lead orders we use to find the row in the past or in the future. Positive offset means looking into the future and negative offset means looking back in this featurizer.
+      
+      Horizon is an unsigned int to mark the starting position to look for the data, ranging from 1 to N.
 
-      We use "delta offset" to refer max horizon because it should apply to all offset computations to find the data we want. Delta offset and lag or lead offsets should
-      be passed in during construction.
-      Lag offsets are passed in as a vector of ints so multiple lag orders can be applied within one featurizer call. Positive lag offset means looking into the future and negative lag offset means looking back in this featurizer.
-      Output type is matrix of double where rows are grouped by different lag or lead orders and columns are grouped by delta offset.
-
+      Horizon and offsets should be passed in during construction. Offsets are passed in as a vector of ints so multiple lag orders can be applied within one featurizer call. 
+      Output type is a matrix of double where rows are grouped by different offsets and columns are grouped by horizon.
 
       C++-style pseudo signature:
         template <typename T> matrix<double> execute(std::tuple<std::chrono::system_clock::time_point const &, std::vector<std::string> const &, T const &> const &value);
@@ -1432,34 +1429,34 @@ featurizers:
       Examples:
           Since this featurizer is copying values per grain, we just use one type of grain in the following examples.
 
-          A simple example would be delta offset = 1 and we want to lag [-1] (which means lag 1)
-          +----------------+-------+-------+-------------------+
-          |time(YYYY-MM-DD)| grain | target| target_lag_1      |
-          +================+=======+=======+===================+
-          | 2017-01-01     |Walmart| 8     | [[NAN]]           |
-          +----------------+-------+-------+-------------------+
-          | 2017-02-01     |Walmart| 9     | [[8]]             |
-          +----------------+-------+-------+-------------------+
-          | 2017-03-01     |Walmart| 10    | [[9]]             |
-          +----------------+-------+-------+-------------------+
-          | 2017-04-01     |Walmart| 11    | [[11]]            |
-          +----------------+-------+-------+-------------------+
+          A simple example would be delta offset = 1 and we have offsets as [-3, 1] (which means lag 3 and lead 1)
+          +----------------+-------+-------+---------------------+
+          |time(YYYY-MM-DD)| grain | target| target_lag_3_lead_1 |
+          +================+=======+=======+=====================+
+          | 2017-01-01     |Walmart| 8     | [[NAN], [  9]]      |
+          +----------------+-------+-------+---------------------+
+          | 2017-02-01     |Walmart| 9     | [[NAN], [ 10]]      |
+          +----------------+-------+-------+---------------------+
+          | 2017-03-01     |Walmart| 10    | [[NAN], [ 11]]      |
+          +----------------+-------+-------+---------------------+
+          | 2017-04-01     |Walmart| 11    | [[  8], [NAN]]      |
+          +----------------+-------+-------+---------------------+
           Values from the row above current row are copied.
 
-          A more complex example would be, assuming we have delta offset = 2 and we want to lag [-2, 2] (which means lag 2 and lead 2)
-          +----------------+-------+-------+--------------------------+
-          |time(YYYY-MM-DD)| grain | target|   target_lag_2_lead_2    |
-          +================+=======+=======+==========================+
-          | 2017-01-01     |Walmart| 8     | [[NAN, NAN], [  9,  10]] |
-          +----------------+-------+-------+--------------------------+
-          | 2017-02-01     |Walmart| 9     | [[NAN, NAN], [ 10,  11]] |
-          +----------------+-------+-------+--------------------------+
-          | 2017-03-01     |Walmart| 10    | [[NAN,   8], [ 11, NAN]] |
-          +----------------+-------+-------+--------------------------+
-          | 2017-04-01     |Walmart| 11    | [[  8,   9], [NAN, NAN]] |
-          +----------------+-------+-------+--------------------------+
-          Basically, if we want to lag k for the row with time t,
-          target_lag_k[t] = target[date_time(t) - (delta_offset + k - 1) * time_interval_between_rows]
+          A more complex example would be, assuming we have delta offset = 2 and we have offsets as [-2, 2, 1, -1] (which means lag 2, lead 2, lead 1 and lag 1)
+          +----------------+-------+-------+-------------------------------------------------+
+          |time(YYYY-MM-DD)| grain | target|        target_lag_2_lead_2_lead_1_lag_1         |
+          +================+=======+=======+=================================================+
+          | 2017-01-01     |Walmart| 8     | [[NAN, NAN], [  9,  10], [NAN, NAN], [ 8,   9]] |
+          +----------------+-------+-------+-------------------------------------------------+
+          | 2017-02-01     |Walmart| 9     | [[NAN, NAN], [ 10,  11], [NAN,   8], [ 9,  10]] |
+          +----------------+-------+-------+-------------------------------------------------+
+          | 2017-03-01     |Walmart| 10    | [[NAN,   8], [ 11, NAN], [  8,   9], [10,  11]] |
+          +----------------+-------+-------+-------------------------------------------------+
+          | 2017-04-01     |Walmart| 11    | [[  8,   9], [NAN, NAN], [  9,  10], [11, NAN]] |
+          +----------------+-------+-------+-------------------------------------------------+
+          Basically, if we have an offset of k for the row with time t,
+          target_lag_k[t] = target[date_time(t) - (delta_offset - k - 1) * time_interval_between_rows]
 
 
     templates:
@@ -1476,17 +1473,19 @@ featurizers:
           - float
           - double
 
+    # Output type should be changed to matrix<nonstd::optional<T>> and input should support all types
+    # after yaml file support nonstd::optional type
     type_mappings:
       - input_type: tuple<datetime, vector<string>, T>
         output_type: matrix<double>
 
     configuration_params:
       - type: uint32
-        name: delta_offset
+        name: horizon
         is_optional: false
 
-      - type: vector<int32>
-        name: lag_offsets
+      - type: vector<int64>
+        name: offsets
         is_optional: false
 
     status: Pending
