@@ -14,7 +14,7 @@ featurizers:
         template <typename T> std::vector<double> execute(std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, T> const &value);
 
         Examples:
-            A simple example would be maxHorizon = 1, window size = 2, and we want to take the mean.
+            A simple example would be horizon = 1, window size = 2, and we want to take the mean.
 
             +----------------+-----------+-------+-------------------+
             |time(YYYY-MM-DD)| grain     | target| target_mean       |
@@ -28,7 +28,7 @@ featurizers:
             | 2017-04-01     | A         | 11    | [5]               |
             +----------------+-----------+-------+-------------------+
 
-            A more complex example would be, assuming we have maxHorizon = 2, window size = 2, min window periods = 2, and we want the mean
+            A more complex example would be, assuming we have horizon = 2, window size = 2, min window periods = 2, and we want the mean
             +----------------+-----------+-------+-------------------+
             |time(YYYY-MM-DD)| grain     | target| target_max        |
             +================+===========+=======+===================+
@@ -59,7 +59,7 @@ featurizers:
       - input_type: tuple<datetime, vector<string>, T>
         output_type: vector<double>
         is_output_optional: false
-        description: A vector of size maxHorizon will always be output, but the individual elements could be NaN.
+        description: A vector of size horizon will always be output, but the individual elements could be NaN.
 
     custom_enums:
       - name: AnalyticalRollingWindowCalculation
@@ -72,11 +72,6 @@ featurizers:
         name: windowSize
         is_optional: false
         description: The maximum number of items in a window.
-
-      - type: uint8
-        name: minWindowCount
-        is_optional: false
-        description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned.
         
       - type: AnalyticalRollingWindowCalculation
         name: windowCalculation
@@ -84,9 +79,14 @@ featurizers:
         description: What calculation is going to be performed over the window data.
 
       - type: uint32
-        name: maxHorizon
+        name: horizon
         is_optional: false
-        description: The maximum horizon value. The size of the output vector will be equal to this value.
+        description: The horizon value. The size of the output vector will be equal to this value.
+
+      - type: uint8
+        name: minWindowCount
+        is_optional: true
+        description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
 
     status: Pending
 
@@ -1243,7 +1243,7 @@ featurizers:
         template <typename T> std::vector<T> execute(std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, T> const &value);
 
       Examples:
-          A simple example would be maxHorizon = 1, window size = 2, and we want to take the minimum.
+          A simple example would be horizon = 1, window size = 2, and we want to take the minimum.
 
           +----------------+-----------+-------+-------------------+
           |time(YYYY-MM-DD)| grain     | target| target_minimum    |
@@ -1257,7 +1257,7 @@ featurizers:
           | 2017-04-01     | A         | 11    | [4]               |
           +----------------+-----------+-------+-------------------+
 
-          A more complex example would be, assuming we have maxHorizon = 2, window size = 2, minWindowCount = 2, and we want the maximum value
+          A more complex example would be, assuming we have horizon = 2, window size = 2, minWindowCount = 2, and we want the maximum value
           +----------------+-----------+-------+-------------------+
           |time(YYYY-MM-DD)| grain     | target| target_max        |
           +================+===========+=======+===================+
@@ -1290,7 +1290,7 @@ featurizers:
       - input_type: tuple<datetime, vector<string>, T>
         output_type: vector<T>
         is_output_optional: false
-        description: A vector of size maxHorizon will always be output, but the individual elements could be NaN.
+        description: A vector of size horizon will always be output, but the individual elements could be NaN.
 
     custom_enums:
       - name: SimpleWindowCalculation
@@ -1304,20 +1304,20 @@ featurizers:
         is_optional: false
         description: The maximum number of items in a window.
 
-      - type: uint32
-        name: minWindowCount
-        is_optional: false
-        description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned.
-
       - type: SimpleRollingWindowCalculation
         name: windowCalculation
         is_optional: false
         description: What calculation is going to be performed over the window data.
 
       - type: uint32
-        name: maxHorizon
+        name: horizon
         is_optional: false
-        description: The maximum horizon value. The size of the output vector will be equal to this value.
+        description: The horizon value. The size of the output vector will be equal to this value.
+
+      - type: uint32
+        name: minWindowCount
+        is_optional: true
+        description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
 
     status: Pending
 
