@@ -1419,10 +1419,10 @@ featurizers:
       The Horizon represents the maximum value in a range [1, N], where each element in that range is a delta applied to each offset. The resulting matrix will be in the form:
 
       [
-      [value[N + offset[0]], value[N - 1 + offset[0]], ..., value[1 + offset[0]],
-      [value[N + offset[1]], value[N - 1 + offset[1]], ..., value[1 + offset[1]],
+      [value[offset[0] - N], value[offset[0] - (N - 1)], ..., value[offset[0] - 1],
+      [value[offset[1] - N], value[offset[1] - (N - 1)], ..., value[offset[1] - 1],
       ...
-      [value[N + offset[K - 1]], value[N - 1 + offset[K - 1]], ..., value[1 + offset[K - 1]]
+      [value[offset[K - 1] - N], value[offset[K - 1] - (N - 1)], ..., value[offset[K - 1] - 1]
       ]
 
       The resulting matrix size is K rows x N cols, where K is the number of offsets and N is the horizon.
