@@ -1416,9 +1416,17 @@ featurizers:
     description: |-
       Copying values from back or in the future per grain. Works for general time series data sets.
 
-      Offsets are the lag or lead orders we use to find the row in the past or in the future. Positive offset means looking into the future and negative offset means looking back in this featurizer.
-      
-      Horizon is an unsigned int to mark the starting position to look for the data, ranging from 1 to N.
+      The Horizon represents the maximum value in a range [1, N], where each element in that range is a delta applied to each offset. The resulting matrix will be in the form:
+
+      [
+      [value[1 + offset[K - 1]], value[2 + offset[K - 1]], ..., value[N + offset[K - 1]],
+      [value[1 + offset[K - 2]], value[2 + offset[K - 2]], ..., value[N + offset[K - 2]],
+      ...
+      [value[1 + offset[1]], value[2 + offset[1]], ..., value[N + offset[1]],
+      [value[1 + offset[0]], value[2 + offset[0]], ..., value[N + offset[0]]
+      ]
+
+      The resulting matrix size is K rows x N cols, where K is the number of offsets and N is the horizon.
 
       Horizon and offsets should be passed in during construction. Offsets are passed in as a vector of ints so multiple lag orders can be applied within one featurizer call. 
       Output type is a matrix of double where rows are grouped by different offsets and columns are grouped by horizon.
