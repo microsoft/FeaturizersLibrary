@@ -52,6 +52,7 @@ foreach(_test_name IN ITEMS
     RobustScalerFeaturizer_UnitTests
     SampleAddFeaturizer_UnitTest
     ShortGrainDropperFeaturizer_UnitTests
+    SimpleRollingWindowFeaturizer_UnitTest
     StandardScaleWrapperFeaturizer_UnitTest
     StringFeaturizer_UnitTest
     Structs_UnitTest
