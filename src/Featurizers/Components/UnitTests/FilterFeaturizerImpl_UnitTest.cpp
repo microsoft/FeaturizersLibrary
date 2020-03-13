@@ -2,6 +2,31 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License
 // ----------------------------------------------------------------------
+#include <ostream>
+#include <tuple>
+
+template <size_t IndexV, typename...Ts>
+void PrintTupleElement(std::ostream &os, std::tuple<Ts...> const &value, typename std::enable_if<IndexV + 1 == sizeof...(Ts)>::type * =nullptr) {
+    os << std::get<IndexV>(value);
+}
+
+template <size_t IndexV, typename... Ts>
+void PrintTupleElement(std::ostream &os, std::tuple<Ts...> const &value, typename std::enable_if<IndexV + 1 != sizeof...(Ts)>::type * =nullptr) {
+    os << std::get<IndexV>(value);
+    os << ",";
+    PrintTupleElement<IndexV + 1>(os, value);
+}
+
+template <typename... Ts>
+std::ostream& operator <<(std::ostream& os, std::tuple<Ts...> const &value) {
+    os << "<";
+
+    PrintTupleElement<0>(os, value);
+
+    os << ">";
+    return os;
+}
+
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -53,33 +78,40 @@ private:
 
 TEST_CASE("SimpleSumTransformer") {
     // ----------------------------------------------------------------------
+    using InputType                         = std::tuple<char const &, int const &>;
+
     using FilterTransformer =
         Components::FilterTransformer<
             SimpleSumTransformer,
-            std::tuple<char, int>,
+            InputType,
             1
         >;
 
-    using Results =                         std::vector<std::tuple<char, int, int>>;
+    using Results =                         std::vector<std::tuple<char const &, int const &, int>>;
     // ----------------------------------------------------------------------
 
     Results                                 results;
     auto const                              callback(
-        [&results](std::tuple<char, int, int> output) {
+        [&results](typename Results::value_type output) {
             results.emplace_back(std::move(output));
         }
     );
 
+    char const                              a('a');
+    char const                              b('b');
+    int const                               value10(10);
+    int const                               value20(20);
+
     SECTION("Default constructor") {
         FilterTransformer                   transformer;
 
-        transformer.execute(std::make_tuple('a', 10), callback);
-        transformer.execute(std::make_tuple('b', 20), callback);
+        transformer.execute(InputType(a, value10), callback);
+        transformer.execute(InputType(b, value20), callback);
 
         CHECK(
             results == Results{
-                typename Results::value_type('a', 10, 10),
-                typename Results::value_type('b', 20, 20)
+                typename Results::value_type(a, value10, 10),
+                typename Results::value_type(b, value20, 20)
             }
         );
     }
@@ -87,13 +119,13 @@ TEST_CASE("SimpleSumTransformer") {
     SECTION("Delta") {
         FilterTransformer                   transformer(100);
 
-        transformer.execute(std::make_tuple('a', 10), callback);
-        transformer.execute(std::make_tuple('b', 20), callback);
+        transformer.execute(InputType(a, value10), callback);
+        transformer.execute(InputType(b, value20), callback);
 
         CHECK(
             results == Results{
-                typename Results::value_type('a', 10, 110),
-                typename Results::value_type('b', 20, 120)
+                typename Results::value_type(a, value10, 110),
+                typename Results::value_type(b, value20, 120)
             }
         );
     }
@@ -104,7 +136,7 @@ TEST_CASE("SimpleSumTransformer - Serialization") {
     using FilterTransformer =
         Components::FilterTransformer<
             SimpleSumTransformer,
-            std::tuple<char, int>,
+            std::tuple<char const &, int const &>,
             1
         >;
 
@@ -152,14 +184,16 @@ private:
 
 TEST_CASE("TupleOutTransformer") {
     // ----------------------------------------------------------------------
+    using InputType                         = std::tuple<int const &, char const &>;
+
     using FilterTransformer =
         Components::FilterTransformer<
             TupleOutTransformer,
-            std::tuple<int, char>,
+            InputType,
             0
         >;
 
-    using Results                           = std::vector<std::tuple<int, char, int, int>>;
+    using Results                           = std::vector<std::tuple<int const &, char const &, int, int>>;
     // ----------------------------------------------------------------------
 
     Results                                 results;
@@ -169,26 +203,33 @@ TEST_CASE("TupleOutTransformer") {
         }
     );
 
+    char const                              a('a');
+    char const                              b('b');
+    char const                              c('c');
+    int const                               value10(10);
+    int const                               value20(20);
+    int const                               value30(30);
+
     FilterTransformer                       transformer;
 
-    transformer.execute(std::make_tuple(10, 'a'), callback);
-    transformer.execute(std::make_tuple(20, 'b'), callback);
-    transformer.execute(std::make_tuple(30, 'c'), callback);
+    transformer.execute(InputType(value10, a), callback);
+    transformer.execute(InputType(value20, b), callback);
+    transformer.execute(InputType(value30, c), callback);
 
     CHECK(
         results == Results{
-            typename Results::value_type(10, 'a', 10, 10),
-            typename Results::value_type(20, 'b', 20, 20),
-            typename Results::value_type(30, 'c', 30, 30)
+            typename Results::value_type(value10, a, 10, 10),
+            typename Results::value_type(value20, b, 20, 20),
+            typename Results::value_type(value30, c, 30, 30)
         }
     );
 }
 
-class TupleIdentityTransformer : public NS::StandardTransformer<std::tuple<char, int>, std::tuple<char, int>> {
+class TupleIdentityTransformer : public NS::StandardTransformer<std::tuple<char const &, int const &>, std::tuple<char, int>> {
 public:
     // ----------------------------------------------------------------------
     // |  Public Types
-    using BaseType                          = NS::StandardTransformer<std::tuple<char, int>, std::tuple<char, int>>;
+    using BaseType                          = NS::StandardTransformer<std::tuple<char const &, int const &>, std::tuple<char, int>>;
 
     // ----------------------------------------------------------------------
     // |  Public Methods
@@ -209,14 +250,16 @@ private:
 
 TEST_CASE("TupleIdentityTransformer") {
     // ----------------------------------------------------------------------
+    using InputType                         = std::tuple<int const &, int const &, char const &>;
+
     using FilterTransformer =
         Components::FilterTransformer<
             TupleIdentityTransformer,
-            std::tuple<int, int, char>,
+            InputType,
             2, 1
         >;
 
-    using Results                           = std::vector<std::tuple<int, int, char, char, int>>;
+    using Results                           = std::vector<std::tuple<int const &, int const &, char const &, char, int>>;
     // ----------------------------------------------------------------------
 
     Results                                 results;
@@ -226,17 +269,27 @@ TEST_CASE("TupleIdentityTransformer") {
         }
     );
 
+    char const                              a('a');
+    char const                              b('b');
+    char const                              c('c');
+    int const                               value10(10);
+    int const                               value20(20);
+    int const                               value30(30);
+    int const                               value40(40);
+    int const                               value50(50);
+    int const                               value60(60);
+
     FilterTransformer                       transformer;
 
-    transformer.execute(std::make_tuple(10, 20, 'a'), callback);
-    transformer.execute(std::make_tuple(30, 40, 'b'), callback);
-    transformer.execute(std::make_tuple(50, 60, 'c'), callback);
+    transformer.execute(InputType(value10, value20, a), callback);
+    transformer.execute(InputType(value30, value40, b), callback);
+    transformer.execute(InputType(value50, value60, c), callback);
 
     CHECK(
         results == Results{
-            typename Results::value_type(10, 20, 'a', 'a', 20),
-            typename Results::value_type(30, 40, 'b', 'b', 40),
-            typename Results::value_type(50, 60, 'c', 'c', 60)
+            typename Results::value_type(value10, value20, a, 'a', 20),
+            typename Results::value_type(value30, value40, b, 'b', 40),
+            typename Results::value_type(value50, value60, c, 'c', 60)
         }
     );
 }
@@ -277,10 +330,12 @@ private:
 
 TEST_CASE("SimpleEstimator") {
     // ----------------------------------------------------------------------
+    using InputType                         = std::tuple<char const &, int const &>;
+
     using FilterEstimator =
         Components::FilterEstimatorImpl<
             SimpleEstimator,
-            std::tuple<char, int>,
+            InputType,
             1
         >;
 
@@ -294,10 +349,10 @@ TEST_CASE("SimpleEstimator") {
         estimator.begin_training();
         CHECK(estimator.get_estimator().LastValue == 0);
 
-        estimator.fit(std::make_tuple('a', 10));
+        estimator.fit(InputType('a', 10));
         CHECK(estimator.get_estimator().LastValue == 10);
 
-        estimator.fit(std::make_tuple('b', 20));
+        estimator.fit(InputType('b', 20));
         CHECK(estimator.get_estimator().LastValue == 20);
     }
 
@@ -309,10 +364,10 @@ TEST_CASE("SimpleEstimator") {
         estimator.begin_training();
         CHECK(estimator.get_estimator().LastValue == 999);
 
-        estimator.fit(std::make_tuple('a', 10));
+        estimator.fit(InputType('a', 10));
         CHECK(estimator.get_estimator().LastValue == 10);
 
-        estimator.fit(std::make_tuple('b', 20));
+        estimator.fit(InputType('b', 20));
         CHECK(estimator.get_estimator().LastValue == 20);
     }
 }
@@ -373,15 +428,28 @@ private:
 
 TEST_CASE("SimpleSumTransformerEstimator") {
     // ----------------------------------------------------------------------
+    using InputType                         = std::tuple<int const &, char const &>;
+
     using FilterEstimator =
         Components::FilterEstimatorImpl<
             SimpleSumTransformerEstimator,
-            std::tuple<int, char>,
+            InputType,
             0
         >;
 
-    using Results                       = std::vector<std::tuple<int, char, int>>;
+    using Results                       = std::vector<std::tuple<int const &, char const &, int>>;
     // ----------------------------------------------------------------------
+
+    char const                              a('a');
+    char const                              b('b');
+    char const                              c('c');
+    char const                              d('d');
+    int const                               value10(10);
+    int const                               value20(20);
+    int const                               value100(100);
+    int const                               value200(200);
+    int const                               value300(300);
+    int const                               value400(400);
 
     // All transformations will be incremented by the sum of all values
     // encountered during training.
@@ -389,20 +457,20 @@ TEST_CASE("SimpleSumTransformerEstimator") {
         NS::TestHelpers::TransformerEstimatorTest(
             FilterEstimator(NS::CreateTestAnnotationMapsPtr(1)),
             {
-                std::make_tuple(10, 'a'),
-                std::make_tuple(20, 'b')
+                InputType(value10, a),
+                InputType(value20, b)
             },
             {
-                std::make_tuple(100, 'a'),
-                std::make_tuple(200, 'b'),
-                std::make_tuple(300, 'c'),
-                std::make_tuple(400, 'd')
+                InputType(value100, a),
+                InputType(value200, b),
+                InputType(value300, c),
+                InputType(value400, d)
             }
         ) == Results{
-            typename Results::value_type(100, 'a', 130),
-            typename Results::value_type(200, 'b', 230),
-            typename Results::value_type(300, 'c', 330),
-            typename Results::value_type(400, 'd', 430)
+            typename Results::value_type(value100, a, 130),
+            typename Results::value_type(value200, b, 230),
+            typename Results::value_type(value300, c, 330),
+            typename Results::value_type(value400, d, 430)
         }
     );
 }
@@ -450,43 +518,54 @@ private:
 
 TEST_CASE("TupleOutTransformerEstimator") {
     // ----------------------------------------------------------------------
+    using InputType                         = std::tuple<char const &, int const &>;
+
     using FilterEstimator =
         Components::FilterEstimatorImpl<
             TupleOutTransformerEstimator,
-            std::tuple<char, int>,
+            InputType,
             1
         >;
 
-    using Results                       = std::vector<std::tuple<char, int, int, int>>;
+    using Results                       = std::vector<std::tuple<char const &, int const &, int, int>>;
     // ----------------------------------------------------------------------
+
+    char const                              a('a');
+    char const                              b('b');
+    char const                              c('c');
+    char const                              d('d');
+    int const                               value100(100);
+    int const                               value200(200);
+    int const                               value300(300);
+    int const                               value400(400);
 
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             FilterEstimator(NS::CreateTestAnnotationMapsPtr(1)),
-            std::vector<std::tuple<char, int>>(),
+            std::vector<std::tuple<char const &, int const &>>(),
             {
-                std::make_tuple('a', 100),
-                std::make_tuple('b', 200),
-                std::make_tuple('c', 300),
-                std::make_tuple('d', 400)
+                InputType(a, value100),
+                InputType(b, value200),
+                InputType(c, value300),
+                InputType(d, value400)
             }
         ) == Results{
-            typename Results::value_type('a', 100, 100, 100),
-            typename Results::value_type('b', 200, 200, 200),
-            typename Results::value_type('c', 300, 300, 300),
-            typename Results::value_type('d', 400, 400, 400)
+            typename Results::value_type(a, value100, 100, 100),
+            typename Results::value_type(b, value200, 200, 200),
+            typename Results::value_type(c, value300, 300, 300),
+            typename Results::value_type(d, value400, 400, 400)
         }
     );
 }
 
-class TupleIdentityTransformerEstimator : public NS::TransformerEstimator<std::tuple<char, int>, std::tuple<char, int>> {
+class TupleIdentityTransformerEstimator : public NS::TransformerEstimator<std::tuple<char const &, int const &>, std::tuple<char, int>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = NS::TransformerEstimator<std::tuple<char, int>, std::tuple<char, int>>;
+    using BaseType                          = NS::TransformerEstimator<std::tuple<char const &, int const &>, std::tuple<char, int>>;
     using TransformerType                   = TupleIdentityTransformer;
 
     // ----------------------------------------------------------------------
@@ -522,31 +601,46 @@ private:
 
 TEST_CASE("TupleIdentityTransformerEstimator") {
     // ----------------------------------------------------------------------
+    using InputType                         = std::tuple<char const &, char const &, int const &>;
+
     using FilterEstimator =
         Components::FilterEstimatorImpl<
             TupleIdentityTransformerEstimator,
-            std::tuple<char, char, int>,
+            InputType,
             1, 2
         >;
 
-    using Results                       = std::vector<std::tuple<char, char, int, char, int>>;
+    using Results                       = std::vector<std::tuple<char const &, char const &, int const &, char, int>>;
     // ----------------------------------------------------------------------
+
+    char const                              a('a');
+    char const                              b('b');
+    char const                              c('c');
+    char const                              d('d');
+    char const                              e('e');
+    char const                              f('f');
+    char const                              g('g');
+    char const                              h('h');
+    int const                               value100(100);
+    int const                               value200(200);
+    int const                               value300(300);
+    int const                               value400(400);
 
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             FilterEstimator(NS::CreateTestAnnotationMapsPtr(1)),
-            std::vector<std::tuple<char, char, int>>(),
+            std::vector<std::tuple<char const &, char const &, int const &>>(),
             {
-                std::make_tuple('a', 'b', 100),
-                std::make_tuple('c', 'd', 200),
-                std::make_tuple('e', 'f', 300),
-                std::make_tuple('g', 'h', 400)
+                InputType(a, b, value100),
+                InputType(c, d, value200),
+                InputType(e, f, value300),
+                InputType(g, h, value400)
             }
         ) == Results{
-            typename Results::value_type('a', 'b', 100, 'b', 100),
-            typename Results::value_type('c', 'd', 200, 'd', 200),
-            typename Results::value_type('e', 'f', 300, 'f', 300),
-            typename Results::value_type('g', 'h', 400, 'h', 400)
+            typename Results::value_type(a, b, value100, 'b', 100),
+            typename Results::value_type(c, d, value200, 'd', 200),
+            typename Results::value_type(e, f, value300, 'f', 300),
+            typename Results::value_type(g, h, value400, 'h', 400)
         }
     );
 }
