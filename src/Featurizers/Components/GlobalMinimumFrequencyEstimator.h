@@ -77,7 +77,6 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    GlobalMinimumFrequencyTrainingOnlyPolicy(void);
 
     void fit(InputType const &input);
     GlobalMinimumFrequencyAnnotation complete_training(void);
@@ -163,10 +162,6 @@ GlobalMinimumFrequencyEstimator<MaxNumTrainingItemsV>::GlobalMinimumFrequencyEst
 // |  Details::GlobalMinimumFrequencyTrainingOnlyPolicy
 // |
 // ----------------------------------------------------------------------
-template <typename GlobalMinimumFrequencyEstimatorT, size_t MaxNumTrainingItemsV>
-Details::GlobalMinimumFrequencyTrainingOnlyPolicy<GlobalMinimumFrequencyEstimatorT, MaxNumTrainingItemsV>::GlobalMinimumFrequencyTrainingOnlyPolicy(void) {
-}
-
 template <typename GlobalMinimumFrequencyEstimatorT, size_t MaxNumTrainingItemsV>
 void Details::GlobalMinimumFrequencyTrainingOnlyPolicy<GlobalMinimumFrequencyEstimatorT, MaxNumTrainingItemsV>::fit(InputType const &) {
     throw std::runtime_error("This will never be called");

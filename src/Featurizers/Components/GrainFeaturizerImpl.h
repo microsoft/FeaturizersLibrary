@@ -384,6 +384,10 @@ private:
 ///                 being aware of grains, and then "wrapped" by this object
 ///                 in those scenarios where grain-specific state is required.
 ///
+///
+///                 Note that the name of this estimator will be:
+///                     "Grain" + EstimatorT::Name
+///
 ///                 Note that this using statement immediately forwards to
 ///                 a second implementation, as it isn't possible in C++
 ///                 to have a template that supports both default template
