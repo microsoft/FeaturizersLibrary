@@ -8,50 +8,38 @@ featurizers:
     description: |-
         Calculates data based on a rolling window. Currently supports mean. Works for general time series data sets.
         
-        Input type for this featurizer is a tuple of time point of current row, the grain columns, the horizon, and target column to find the value.
-
-        The rolling window calculations always start from the input time minus the horizon, and then move backwards in time. So if the start datetime
-        is 2017-01-01 (YYYY-MM-DD) with a horizon of 1, that last date in the window will be 2016-12-31 (YYYY-MM-DD).
+        Input type for this featurizer is a tuple of time point of current row, the grain columns, and target value column.
 
         C++-style pseudo signature:
-        template <typename T> double execute(std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, uint8, T> const &value);
+        template <typename T> std::vector<double> execute(std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, T> const &value);
 
         Examples:
-            A simple example would be horizon = 1, window size = 2, and we want to take the mean.
+            A simple example would be maxHorizon = 1, window size = 2, and we want to take the mean.
 
-            +----------------+-----------+-------+------------------+-------------------+
-            |time(YYYY-MM-DD)| grain     | target| horizon          | target_mean       |
-            +================+===========+=======+==================+===================+
-            | 2017-01-01     | A         | 10    | 1                | NAN               |
-            +----------------+-----------+-------+------------------+-------------------+
-            | 2017-02-01     | A         | 4     | 1                | 10                |
-            +----------------+-----------+-------+------------------+-------------------+
-            | 2017-03-01     | A         | 6     | 1                | 7                 |
-            +----------------+-----------+-------+------------------+-------------------+
-            | 2017-04-01     | A         | 11    | 1                | 5                 |
-            +----------------+-----------+-------+------------------+-------------------+
+            +----------------+-----------+-------+-------------------+
+            |time(YYYY-MM-DD)| grain     | target| target_mean       |
+            +================+===========+=======+===================+
+            | 2017-01-01     | A         | 10    | [NAN]             |
+            +----------------+-----------+-------+-------------------+
+            | 2017-02-01     | A         | 4     | [10]              |
+            +----------------+-----------+-------+-------------------+
+            | 2017-03-01     | A         | 6     | [7]               |
+            +----------------+-----------+-------+-------------------+
+            | 2017-04-01     | A         | 11    | [5]               |
+            +----------------+-----------+-------+-------------------+
 
-            A more complex example would be, assuming we have horizon = 2, window size = 2, min window periods = 2, and we want the mean
-            +----------------+-----------+-------+------------------+-------------------+
-            |time(YYYY-MM-DD)| grain     | target| horizon          | target_max        |
-            +================+===========+=======+==================+===================+
-            | 2017-01-01     | A         | 10    | 2                | NAN               |
-            +----------------+-----------+-------+------------------+-------------------+
-            | 2017-01-01     | A         | 10    | 1                | NAN               |
-            +----------------+-----------+-------+------------------+-------------------+
-            | 2017-02-01     | A         | 4     | 2                | NAN               |
-            +----------------+-----------+-------+------------------+-------------------+
-            | 2017-02-01     | A         | 4     | 1                | NAN               |
-            +----------------+-----------+-------+------------------+-------------------+
-            | 2017-03-01     | A         | 6     | 2                | NAN               |
-            +----------------+-----------+-------+------------------+-------------------+
-            | 2017-03-01     | A         | 6     | 1                | 7                 |
-            +----------------+-----------+-------+------------------+-------------------+
-            | 2017-04-01     | A         | 11    | 2                | 7                 |
-            +----------------+-----------+-------+------------------+-------------------+
-            | 2017-04-01     | A         | 11    | 1                | 5                 |
-            +----------------+-----------+-------+------------------+-------------------+
-            Horizon column should be generated by MaxHorizonFeaturizer in the pipeline prior to AnalyticalRollingWindowFeaturizer
+            A more complex example would be, assuming we have maxHorizon = 2, window size = 2, min window periods = 2, and we want the mean
+            +----------------+-----------+-------+-------------------+
+            |time(YYYY-MM-DD)| grain     | target| target_max        |
+            +================+===========+=======+===================+
+            | 2017-01-01     | A         | 10    | [NAN, NAN]        |
+            +----------------+-----------+-------+-------------------+
+            | 2017-02-01     | A         | 4     | [NAN, NAN]        |
+            +----------------+-----------+-------+-------------------+
+            | 2017-03-01     | A         | 6     | [NAN, 7]          |
+            +----------------+-----------+-------+-------------------+
+            | 2017-04-01     | A         | 11    | [7, 5]            |
+            +----------------+-----------+-------+-------------------+
 
     templates:
       - name: T
@@ -68,9 +56,10 @@ featurizers:
             - double
 
     type_mappings:
-      - input_type: tuple<datetime, vector<string>, uint8, T>
-        output_type: double
-        is_output_optional: true
+      - input_type: tuple<datetime, vector<string>, T>
+        output_type: vector<double>
+        is_output_optional: false
+        description: A vector of size maxHorizon will always be output, but the individual elements could be NaN.
 
     custom_enums:
       - name: AnalyticalRollingWindowCalculation
@@ -82,18 +71,22 @@ featurizers:
       - type: uint8
         name: windowSize
         is_optional: false
+        description: The maximum number of items in a window.
 
       - type: uint8
-        name: minWindowPeriods
+        name: minWindowCount
         is_optional: false
+        description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned.
         
       - type: AnalyticalRollingWindowCalculation
         name: windowCalculation
         is_optional: false
+        description: What calculation is going to be performed over the window data.
 
-      - type: uint8
+      - type: uint32
         name: maxHorizon
         is_optional: false
+        description: The maximum horizon value. The size of the output vector will be equal to this value.
 
     status: Pending
 
@@ -1244,50 +1237,38 @@ featurizers:
     description: |-
       Calculates data based on a rolling window. Currently supports minimum and maximum. Works for general time series data sets.
       
-      Input type for this featurizer is a tuple of time point of current row, the grain columns, the horizon, and target column to find the value.
-
-      The rolling window calculations always start from the input time minus the horizon, and then move backwards in time. So if the start datetime
-      is 2017-01-01 (YYYY-MM-DD) with a horizon of 1, that last date in the window will be 2016-12-31 (YYYY-MM-DD).
+      Input type for this featurizer is a tuple of time point of current row, the grain columns, and target column to find the value.
 
       C++-style pseudo signature:
-        template <typename T> double execute(std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, uint8, T> const &value);
+        template <typename T> std::vector<T> execute(std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, T> const &value);
 
       Examples:
-          A simple example would be horizon = 1, window size = 2, and we want to take the minimum.
+          A simple example would be maxHorizon = 1, window size = 2, and we want to take the minimum.
 
-          +----------------+-----------+-------+------------------+-------------------+
-          |time(YYYY-MM-DD)| grain     | target| horizon          | target_minimum    |
-          +================+===========+=======+==================+===================+
-          | 2017-01-01     | A         | 10    | 1                | NAN               |
-          +----------------+-----------+-------+------------------+-------------------+
-          | 2017-02-01     | A         | 4     | 1                | 10                |
-          +----------------+-----------+-------+------------------+-------------------+
-          | 2017-03-01     | A         | 6     | 1                | 4                 |
-          +----------------+-----------+-------+------------------+-------------------+
-          | 2017-04-01     | A         | 11    | 1                | 4                 |
-          +----------------+-----------+-------+------------------+-------------------+
+          +----------------+-----------+-------+-------------------+
+          |time(YYYY-MM-DD)| grain     | target| target_minimum    |
+          +================+===========+=======+===================+
+          | 2017-01-01     | A         | 10    | [NAN]             |
+          +----------------+-----------+-------+-------------------+
+          | 2017-02-01     | A         | 4     | [10]              |
+          +----------------+-----------+-------+-------------------+
+          | 2017-03-01     | A         | 6     | [4]               |
+          +----------------+-----------+-------+-------------------+
+          | 2017-04-01     | A         | 11    | [4]               |
+          +----------------+-----------+-------+-------------------+
 
-          A more complex example would be, assuming we have horizon = 2, window size = 2, min window periods = 2, and we want the maximum value
-          +----------------+-----------+-------+------------------+-------------------+
-          |time(YYYY-MM-DD)| grain     | target| horizon          | target_max        |
-          +================+===========+=======+==================+===================+
-          | 2017-01-01     | A         | 10    | 2                | NAN               |
-          +----------------+-----------+-------+------------------+-------------------+
-          | 2017-01-01     | A         | 10    | 1                | NAN               |
-          +----------------+-----------+-------+------------------+-------------------+
-          | 2017-02-01     | A         | 4     | 2                | NAN               |
-          +----------------+-----------+-------+------------------+-------------------+
-          | 2017-02-01     | A         | 4     | 1                | NAN               |
-          +----------------+-----------+-------+------------------+-------------------+
-          | 2017-03-01     | A         | 6     | 2                | NAN               |
-          +----------------+-----------+-------+------------------+-------------------+
-          | 2017-03-01     | A         | 6     | 1                | 10                |
-          +----------------+-----------+-------+------------------+-------------------+
-          | 2017-04-01     | A         | 11    | 2                | 10                |
-          +----------------+-----------+-------+------------------+-------------------+
-          | 2017-04-01     | A         | 11    | 1                | 6                 |
-          +----------------+-----------+-------+------------------+-------------------+
-          Horizon column should be generated by MaxHorizonFeaturizer in the pipeline prior to SimpleRollingWindowFeaturizer
+          A more complex example would be, assuming we have maxHorizon = 2, window size = 2, minWindowCount = 2, and we want the maximum value
+          +----------------+-----------+-------+-------------------+
+          |time(YYYY-MM-DD)| grain     | target| target_max        |
+          +================+===========+=======+===================+
+          | 2017-01-01     | A         | 10    | [NAN, NAN]        |
+          +----------------+-----------+-------+-------------------+
+          | 2017-02-01     | A         | 4     | [NAN, NAN]        |
+          +----------------+-----------+-------+-------------------+
+          | 2017-03-01     | A         | 6     | [NAN, 10]         |
+          +----------------+-----------+-------+-------------------+
+          | 2017-04-01     | A         | 11    | [10, 6]           |
+          +----------------+-----------+-------+-------------------+
 
     templates:
       - name: T
@@ -1306,9 +1287,10 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: tuple<datetime, vector<string>, uint8, T>
-        output_type: T
-        is_output_optional: true
+      - input_type: tuple<datetime, vector<string>, T>
+        output_type: vector<T>
+        is_output_optional: false
+        description: A vector of size maxHorizon will always be output, but the individual elements could be NaN.
 
     custom_enums:
       - name: SimpleWindowCalculation
@@ -1317,21 +1299,25 @@ featurizers:
         underlying_type: uint8
 
     configuration_params:
-      - type: uint8
+      - type: uint32
         name: windowSize
         is_optional: false
+        description: The maximum number of items in a window.
 
-      - type: uint8
-        name: minWindowPeriods
+      - type: uint32
+        name: minWindowCount
         is_optional: false
-      
+        description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned.
+
       - type: SimpleRollingWindowCalculation
         name: windowCalculation
         is_optional: false
+        description: What calculation is going to be performed over the window data.
 
-      - type: uint8
+      - type: uint32
         name: maxHorizon
         is_optional: false
+        description: The maximum horizon value. The size of the output vector will be equal to this value.
 
     status: Pending
 
