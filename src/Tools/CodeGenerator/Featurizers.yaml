@@ -1,5 +1,96 @@
 featurizers:
   # ----------------------------------------------------------------------
+  - name: AnalyticalRollingWindowFeaturizer
+    estimator_name: AnalyticalRollingWindowEstimator
+    release_version: 0.4.0
+    num_output_columns: 1
+    has_dynamic_output: false
+    description: |-
+        Calculates data based on a rolling window. Currently supports mean. Works for any data set that is already sorted.
+        
+        Input type for this featurizer is a tuple of the grain columns and target value column. It is assumed that the data is sorted in the correct order.
+
+        C++-style pseudo signature:
+        template <typename T> std::vector<double> execute(std::tuple<std::vector<std::string> const &, T const &> value);
+
+        Examples:
+            A simple example would be horizon = 1, window size = 2, and we want to take the mean.
+
+            +-----------+-------+-------------------+
+            | grain     | target| target_mean       |
+            +===========+=======+===================+
+            | A         | 10    | [NAN]             |
+            +-----------+-------+-------------------+
+            | A         | 4     | [10]              |
+            +-----------+-------+-------------------+
+            | A         | 6     | [7]               |
+            +-----------+-------+-------------------+
+            | A         | 11    | [5]               |
+            +-----------+-------+-------------------+
+
+            A more complex example would be, assuming we have horizon = 2, window size = 2, min window periods = 2, and we want the mean
+            +-----------+-------+-------------------+
+            | grain     | target| target_max        |
+            +===========+=======+===================+
+            | A         | 10    | [NAN, NAN]        |
+            +-----------+-------+-------------------+
+            | A         | 4     | [NAN, NAN]        |
+            +-----------+-------+-------------------+
+            | A         | 6     | [NAN, 7]          |
+            +-----------+-------+-------------------+
+            | A         | 11    | [7, 5]            |
+            +-----------+-------+-------------------+
+
+    templates:
+      - name: T
+        types:
+            - int8
+            - int16
+            - int32
+            - int64
+            - uint8
+            - uint16
+            - uint32
+            - uint64
+            - float
+            - double
+
+    type_mappings:
+      - input_type: tuple<vector<string>, T>
+        output_type: vector<double>
+        is_output_optional: false
+        description: A vector of size horizon will always be output, but the individual elements could be NaN.
+
+    custom_enums:
+      - name: AnalyticalRollingWindowCalculation
+        description: What calculation to use on the rolling window.
+        values: [Mean]
+        underlying_type: uint8
+
+    configuration_params:
+      - type: uint32
+        name: windowSize
+        is_optional: false
+        description: The maximum number of items in a window.
+        
+      - type: AnalyticalRollingWindowCalculation
+        name: windowCalculation
+        is_optional: false
+        description: What calculation is going to be performed over the window data.
+
+      - type: uint32
+        name: horizon
+        is_optional: false
+        description: The horizon value. The size of the output vector will be equal to this value.
+
+      - type: uint32
+        name: minWindowCount
+        is_optional: true
+        description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
+
+    status: Pending
+
+  # ----------------------------------------------------------------------
   - name: BackwardFillImputerFeaturizer
     estimator_name: BackwardFillImputerEstimator
     release_version: 0.4.0
@@ -1134,6 +1225,99 @@ featurizers:
       - type: uint8
         name: cv
         is_optional: true
+
+    status: Pending
+
+  # ----------------------------------------------------------------------
+  - name: SimpleRollingWindowFeaturizer
+    estimator_name: SimpleRollingWindowEstimator
+    release_version: 0.4.0
+    num_output_columns: 1
+    has_dynamic_output: false
+    description: |-
+      Calculates data based on a rolling window. Currently supports minimum and maximum. Works for any data set that is already sorted.
+      
+      Input type for this featurizer is a tuple of the grain columns and target column to find the value. It is assumed that the data is sorted in the correct order.
+
+      C++-style pseudo signature:
+        template <typename T> std::vector<T> execute(std::tuple<std::vector<std::string> const &, T const &> value);
+
+      Examples:
+          A simple example would be horizon = 1, window size = 2, and we want to take the minimum.
+
+          +-----------+-------+-------------------+
+          | grain     | target| target_minimum    |
+          +===========+=======+===================+
+          | A         | 10    | [NAN]             |
+          +-----------+-------+-------------------+
+          | A         | 4     | [10]              |
+          +-----------+-------+-------------------+
+          | A         | 6     | [4]               |
+          +-----------+-------+-------------------+
+          | A         | 11    | [4]               |
+          +-----------+-------+-------------------+
+
+          A more complex example would be, assuming we have horizon = 2, window size = 2, minWindowCount = 2, and we want the maximum value
+          +-----------+-------+-------------------+
+          | grain     | target| target_max        |
+          +===========+=======+===================+
+          | A         | 10    | [NAN, NAN]        |
+          +-----------+-------+-------------------+
+          | A         | 4     | [NAN, NAN]        |
+          +-----------+-------+-------------------+
+          | A         | 6     | [NAN, 10]         |
+          +-----------+-------+-------------------+
+          | A         | 11    | [10, 6]           |
+          +-----------+-------+-------------------+
+
+    templates:
+      - name: T
+        types:
+          - int8
+          - int16
+          - int32
+          - int64
+          - uint8
+          - uint16
+          - uint32
+          - uint64
+          - float
+          - double
+          - bool
+          - string
+
+    type_mappings:
+      - input_type: tuple<vector<string>, T>
+        output_type: vector<T>
+        is_output_optional: false
+        description: A vector of size horizon will always be output, but the individual elements could be NaN.
+
+    custom_enums:
+      - name: SimpleWindowCalculation
+        description: What calculation to use on the rolling window.
+        values: [Min, Max]
+        underlying_type: uint8
+
+    configuration_params:
+      - type: uint32
+        name: windowSize
+        is_optional: false
+        description: The maximum number of items in a window.
+
+      - type: SimpleRollingWindowCalculation
+        name: windowCalculation
+        is_optional: false
+        description: What calculation is going to be performed over the window data.
+
+      - type: uint32
+        name: horizon
+        is_optional: false
+        description: The horizon value. The size of the output vector will be equal to this value.
+
+      - type: uint32
+        name: minWindowCount
+        is_optional: true
+        description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
 
     status: Pending
 
