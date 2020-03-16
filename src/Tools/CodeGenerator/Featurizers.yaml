@@ -11,7 +11,7 @@ featurizers:
         Input type for this featurizer is a tuple of time point of current row, the grain columns, and target value column.
 
         C++-style pseudo signature:
-        template <typename T> std::vector<double> execute(std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, T> const &value);
+        template <typename T> std::vector<double> execute(std::tuple<std::vector<std::string> const &, T const &> value);
 
         Examples:
             A simple example would be horizon = 1, window size = 2, and we want to take the mean.
@@ -56,7 +56,7 @@ featurizers:
             - double
 
     type_mappings:
-      - input_type: tuple<datetime, vector<string>, T>
+      - input_type: tuple<vector<string>, T>
         output_type: vector<double>
         is_output_optional: false
         description: A vector of size horizon will always be output, but the individual elements could be NaN.
@@ -68,7 +68,7 @@ featurizers:
         underlying_type: uint8
 
     configuration_params:
-      - type: uint8
+      - type: uint32
         name: windowSize
         is_optional: false
         description: The maximum number of items in a window.
@@ -83,7 +83,7 @@ featurizers:
         is_optional: false
         description: The horizon value. The size of the output vector will be equal to this value.
 
-      - type: uint8
+      - type: uint32
         name: minWindowCount
         is_optional: true
         description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
@@ -1240,7 +1240,7 @@ featurizers:
       Input type for this featurizer is a tuple of time point of current row, the grain columns, and target column to find the value.
 
       C++-style pseudo signature:
-        template <typename T> std::vector<T> execute(std::tuple<std::chrono::system_clock::time_point, std::vector<std::string>, T> const &value);
+        template <typename T> std::vector<T> execute(std::tuple<std::vector<std::string> const &, T const &> value);
 
       Examples:
           A simple example would be horizon = 1, window size = 2, and we want to take the minimum.
@@ -1287,7 +1287,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: tuple<datetime, vector<string>, T>
+      - input_type: tuple<vector<string>, T>
         output_type: vector<T>
         is_output_optional: false
         description: A vector of size horizon will always be output, but the individual elements could be NaN.
