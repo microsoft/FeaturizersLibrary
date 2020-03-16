@@ -30,7 +30,7 @@ std::ostream& operator <<(std::ostream& os, std::tuple<Ts...> const &value) {
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "../FilterSinkFeaturizer.h"
+#include "../FilterDecoratorFeaturizer.h"
 
 #include "../../TestHelpers.h"
 #include "../../../Archive.h"
@@ -42,16 +42,16 @@ TEST_CASE("Single element transformer") {
     // ----------------------------------------------------------------------
     using InputType                         = std::tuple<int const &, char>;
 
-    using FilterSinkTransformer =
-        Components::FilterSinkTransformer<
+    using FilterDecoratorTransformer =
+        Components::FilterDecoratorTransformer<
             InputType,
             1
         >;
     // ----------------------------------------------------------------------
 
-    static_assert(std::is_same<typename FilterSinkTransformer::TransformedType, char>::value, "");
+    static_assert(std::is_same<typename FilterDecoratorTransformer::TransformedType, char>::value, "");
 
-    FilterSinkTransformer                   transformer;
+    FilterDecoratorTransformer              transformer;
 
     CHECK(transformer.execute(InputType(1, 'a')) == 'a');
     CHECK(transformer.execute(InputType(2, 'b')) == 'b');
@@ -61,16 +61,16 @@ TEST_CASE("Multi element transformer") {
     // ----------------------------------------------------------------------
     using InputType                         = std::tuple<int const &, int, char, char>;
 
-    using FilterSinkTransformer =
-        Components::FilterSinkTransformer<
+    using FilterDecoratorTransformer =
+        Components::FilterDecoratorTransformer<
             InputType,
             1, 3, 2
         >;
     // ----------------------------------------------------------------------
 
-    static_assert(std::is_same<typename FilterSinkTransformer::TransformedType, std::tuple<int, char, char>>::value, "");
+    static_assert(std::is_same<typename FilterDecoratorTransformer::TransformedType, std::tuple<int, char, char>>::value, "");
 
-    FilterSinkTransformer                   transformer;
+    FilterDecoratorTransformer              transformer;
 
     CHECK(transformer.execute(InputType(10, 20, 'a', 'b')) == std::make_tuple(20, 'b', 'a'));
     CHECK(transformer.execute(InputType(30, 40, 'c', 'd')) == std::make_tuple(40, 'd', 'c'));
@@ -80,18 +80,18 @@ TEST_CASE("Estimator") {
     // ----------------------------------------------------------------------
     using InputType                         = std::tuple<int const &, char, char>;
 
-    using FilterSinkEstimator =
-        Components::FilterSinkEstimator<
+    using FilterDecoratorEstimator =
+        Components::FilterDecoratorEstimator<
             InputType,
             2
         >;
 
-    using Results                           = std::vector<typename FilterSinkEstimator::TransformedType>;
+    using Results                           = std::vector<typename FilterDecoratorEstimator::TransformedType>;
     // ----------------------------------------------------------------------
 
-    FilterSinkEstimator                     estimator(NS::CreateTestAnnotationMapsPtr(1));
+    FilterDecoratorEstimator                estimator(NS::CreateTestAnnotationMapsPtr(1));
 
-    CHECK(strcmp(estimator.Name, "FilterSinkEstimator") == 0);
+    CHECK(strcmp(estimator.Name, "FilterDecoratorEstimator") == 0);
 
     CHECK(estimator.get_state() == NS::TrainingState::Pending);
 

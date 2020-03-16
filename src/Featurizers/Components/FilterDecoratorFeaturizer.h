@@ -15,14 +15,14 @@ namespace Featurizers {
 namespace Components {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         FilterSinkTransformer
+///  \class         FilterDecoratorTransformer
 ///  \brief         Tuple values can accumulate when multiple featurizers
 ///                 are run through a pipeline. This transformer will extract
 ///                 specific values from the input tuple, returning a subset of
 ///                 each input type.
 ///
 template <typename InputTupleT, size_t... FilterInputTupleIndexVs>
-class FilterSinkTransformer :
+class FilterDecoratorTransformer :
     public InferenceOnlyTransformerImpl<
         InputTupleT,
         typename Details::FilterFeaturizerTraits<InputTupleT, FilterInputTupleIndexVs...>::FilteredType
@@ -47,11 +47,11 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    FilterSinkTransformer(void) = default;
-    FilterSinkTransformer(Archive &ar);
-    ~FilterSinkTransformer(void) override = default;
+    FilterDecoratorTransformer(void) = default;
+    FilterDecoratorTransformer(Archive &ar);
+    ~FilterDecoratorTransformer(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FilterSinkTransformer);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FilterDecoratorTransformer);
 
 private:
     // ----------------------------------------------------------------------
@@ -65,14 +65,14 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         FilterSinkEstimator
+///  \class         FilterDecoratorEstimator
 ///  \brief         Estimator whose purpose in life is to create a
-///                 FilterSinkTransformer object (no training is required).
+///                 FilterDecoratorTransformer object (no training is required).
 ///
 template <typename InputTupleT, size_t... FilterInputTupleIndexVs>
-class FilterSinkEstimator :
+class FilterDecoratorEstimator :
     public InferenceOnlyEstimatorImpl<
-        FilterSinkTransformer<InputTupleT, FilterInputTupleIndexVs...>
+        FilterDecoratorTransformer<InputTupleT, FilterInputTupleIndexVs...>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -80,17 +80,17 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = InferenceOnlyEstimatorImpl<FilterSinkTransformer<InputTupleT, FilterInputTupleIndexVs...>>;
+    using BaseType                          = InferenceOnlyEstimatorImpl<FilterDecoratorTransformer<InputTupleT, FilterInputTupleIndexVs...>>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    FilterSinkEstimator(AnnotationMapsPtr pAllColumnAnnotations);
-    ~FilterSinkEstimator(void) override = default;
+    FilterDecoratorEstimator(AnnotationMapsPtr pAllColumnAnnotations);
+    ~FilterDecoratorEstimator(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FilterSinkEstimator);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FilterDecoratorEstimator);
 };
 
 // ----------------------------------------------------------------------
@@ -105,22 +105,22 @@ public:
 
 // ----------------------------------------------------------------------
 // |
-// |  FilterSinkTransformer
+// |  FilterDecoratorTransformer
 // |
 // ----------------------------------------------------------------------
 template <typename InputTupleT, size_t... FilterInputTupleIndexVs>
-FilterSinkTransformer<InputTupleT, FilterInputTupleIndexVs...>::FilterSinkTransformer(Archive &ar) :
+FilterDecoratorTransformer<InputTupleT, FilterInputTupleIndexVs...>::FilterDecoratorTransformer(Archive &ar) :
     BaseType(ar) {
 }
 
 // ----------------------------------------------------------------------
 // |
-// |  FilterSinkEstimator
+// |  FilterDecoratorEstimator
 // |
 // ----------------------------------------------------------------------
 template <typename InputTupleT, size_t... FilterInputTupleIndexVs>
-FilterSinkEstimator<InputTupleT, FilterInputTupleIndexVs...>::FilterSinkEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
-    BaseType("FilterSinkEstimator", std::move(pAllColumnAnnotations)) {
+FilterDecoratorEstimator<InputTupleT, FilterInputTupleIndexVs...>::FilterDecoratorEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+    BaseType("FilterDecoratorEstimator", std::move(pAllColumnAnnotations)) {
 }
 
 } // namespace Components
