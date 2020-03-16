@@ -57,6 +57,19 @@ class Plugin(PluginBase):
             for items in data:
                 assert items
 
+                for item in items:
+                    if item.input_type.endswith("?"):
+                        item.input_type = item.input_type[:-1]
+                        item.is_input_optional = True
+                    else:
+                        item.is_input_optional = False
+
+                    if item.output_type.endswith("?"):
+                        item.output_type = item.output_type[:-1]
+                        item.is_output_optional = True
+                    else:
+                        item.is_output_optional = False
+
                 # Ensure that the optional settings for input and output are consistent for all resolved items
                 assert all(
                     item.is_input_optional == items[0].is_input_optional for item in items
