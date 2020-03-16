@@ -15,6 +15,7 @@ function(Impl)
         ${_this_path}/../DocumentStatisticsEstimator.h
         ${_this_path}/../DocumentStatisticsEstimator.cpp
         ${_this_path}/../FilterFeaturizerImpl.h
+        ${_this_path}/../FilterDecoratorFeaturizer.h
         ${_this_path}/../GrainFeaturizerImpl.h
         ${_this_path}/../HistogramEstimator.h
         ${_this_path}/../ImputerTransformer.h
@@ -36,6 +37,7 @@ function(Impl)
         ${_this_path}/../VectorNormsEstimator.h
 
         ${_this_path}/../Details/EstimatorTraits.h
+        ${_this_path}/../Details/FilterTraits.h
         ${_this_path}/../Details/PipelineExecutionEstimatorImpl_details.h
     )
 
