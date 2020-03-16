@@ -2,31 +2,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License
 // ----------------------------------------------------------------------
-#include <ostream>
-#include <tuple>
-
-template <size_t IndexV, typename...Ts>
-void PrintTupleElement(std::ostream &os, std::tuple<Ts...> const &value, typename std::enable_if<IndexV + 1 == sizeof...(Ts)>::type * =nullptr) {
-    os << std::get<IndexV>(value);
-}
-
-template <size_t IndexV, typename... Ts>
-void PrintTupleElement(std::ostream &os, std::tuple<Ts...> const &value, typename std::enable_if<IndexV + 1 != sizeof...(Ts)>::type * =nullptr) {
-    os << std::get<IndexV>(value);
-    os << ",";
-    PrintTupleElement<IndexV + 1>(os, value);
-}
-
-template <typename... Ts>
-std::ostream& operator <<(std::ostream& os, std::tuple<Ts...> const &value) {
-    os << "<";
-
-    PrintTupleElement<0>(os, value);
-
-    os << ">";
-    return os;
-}
-
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 

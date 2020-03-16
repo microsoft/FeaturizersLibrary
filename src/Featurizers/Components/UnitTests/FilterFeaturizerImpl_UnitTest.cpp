@@ -2,31 +2,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License
 // ----------------------------------------------------------------------
-#include <ostream>
-#include <tuple>
-
-template <size_t IndexV, typename...Ts>
-void PrintTupleElement(std::ostream &os, std::tuple<Ts...> const &value, typename std::enable_if<IndexV + 1 == sizeof...(Ts)>::type * =nullptr) {
-    os << std::get<IndexV>(value);
-}
-
-template <size_t IndexV, typename... Ts>
-void PrintTupleElement(std::ostream &os, std::tuple<Ts...> const &value, typename std::enable_if<IndexV + 1 != sizeof...(Ts)>::type * =nullptr) {
-    os << std::get<IndexV>(value);
-    os << ",";
-    PrintTupleElement<IndexV + 1>(os, value);
-}
-
-template <typename... Ts>
-std::ostream& operator <<(std::ostream& os, std::tuple<Ts...> const &value) {
-    os << "<";
-
-    PrintTupleElement<0>(os, value);
-
-    os << ">";
-    return os;
-}
-
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -629,6 +604,55 @@ TEST_CASE("TupleIdentityTransformerEstimator") {
     CHECK(
         NS::TestHelpers::TransformerEstimatorTest(
             FilterEstimator(NS::CreateTestAnnotationMapsPtr(1)),
+            std::vector<std::tuple<char const &, char const &, int const &>>(),
+            {
+                InputType(a, b, value100),
+                InputType(c, d, value200),
+                InputType(e, f, value300),
+                InputType(g, h, value400)
+            }
+        ) == Results{
+            typename Results::value_type(a, b, value100, 'b', 100),
+            typename Results::value_type(c, d, value200, 'd', 200),
+            typename Results::value_type(e, f, value300, 'f', 300),
+            typename Results::value_type(g, h, value400, 'h', 400)
+        }
+    );
+}
+
+TEST_CASE("Move Test") {
+    // ----------------------------------------------------------------------
+    using InputType                         = std::tuple<char const &, char const &, int const &>;
+
+    using FilterEstimator =
+        Components::FilterEstimatorImpl<
+            TupleIdentityTransformerEstimator,
+            InputType,
+            1, 2
+        >;
+
+    using Results                       = std::vector<std::tuple<char const &, char const &, int const &, char, int>>;
+    // ----------------------------------------------------------------------
+
+    char const                              a('a');
+    char const                              b('b');
+    char const                              c('c');
+    char const                              d('d');
+    char const                              e('e');
+    char const                              f('f');
+    char const                              g('g');
+    char const                              h('h');
+    int const                               value100(100);
+    int const                               value200(200);
+    int const                               value300(300);
+    int const                               value400(400);
+
+    FilterEstimator                         estimator1(NS::CreateTestAnnotationMapsPtr(1));
+    FilterEstimator                         estimator2(std::move(estimator1));
+
+    CHECK(
+        NS::TestHelpers::TransformerEstimatorTest(
+            std::move(estimator2),
             std::vector<std::tuple<char const &, char const &, int const &>>(),
             {
                 InputType(a, b, value100),

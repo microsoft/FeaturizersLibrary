@@ -164,7 +164,13 @@ public:
 
     ~FilterEstimatorImplBase(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FilterEstimatorImplBase);
+    // Not using FEATURIZER_MOVE_CONSTRUCTOR_ONLY, as the move constructor needs
+    // a custom implementation due to the use of the reference member.
+    FilterEstimatorImplBase(FilterEstimatorImplBase && other);
+    FilterEstimatorImplBase(FilterEstimatorImplBase const &) = delete;
+
+    FilterEstimatorImplBase & operator =(FilterEstimatorImplBase &&) = delete;
+    FilterEstimatorImplBase & operator =(FilterEstimatorImplBase const &) = delete;
 
     EstimatorT const & get_estimator(void) const;
 
@@ -427,6 +433,13 @@ template <typename... EstimatorConstructorArgTs>
 Impl::FilterEstimatorImplBase<BaseT, EstimatorT, InputTupleT, FilterInputTupleIndexVs...>::FilterEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, EstimatorConstructorArgTs &&... args) :
     FilterEstimatorWrapper<EstimatorT>(pAllColumnAnnotations, std::forward<EstimatorConstructorArgTs>(args)...),
     BaseT(std::string("Filter") + this->WrappedEstimator.Name, pAllColumnAnnotations),
+    _estimator(this->WrappedEstimator) {
+}
+
+template <typename BaseT, typename EstimatorT, typename InputTupleT, size_t... FilterInputTupleIndexVs>
+Impl::FilterEstimatorImplBase<BaseT, EstimatorT, InputTupleT, FilterInputTupleIndexVs...>::FilterEstimatorImplBase(FilterEstimatorImplBase && other) :
+    FilterEstimatorWrapper<EstimatorT>(std::move(static_cast<FilterEstimatorWrapper<EstimatorT> &>(other))),
+    BaseT(std::move(static_cast<BaseT &>(other))),
     _estimator(this->WrappedEstimator) {
 }
 
