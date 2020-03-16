@@ -69,22 +69,18 @@ featurizers:
     configuration_params:
       - type: uint32
         name: windowSize
-        is_optional: false
         description: The maximum number of items in a window.
 
       - type: AnalyticalRollingWindowCalculation
         name: windowCalculation
-        is_optional: false
         description: What calculation is going to be performed over the window data.
 
       - type: uint32
         name: horizon
-        is_optional: false
         description: The horizon value. The size of the output vector will be equal to this value.
 
-      - type: uint32
+      - type: uint32?
         name: minWindowCount
-        is_optional: true
         description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
 
     status: Pending
@@ -1560,7 +1556,7 @@ featurizers:
 
       The resulting matrix size is K rows x N cols, where K is the number of offsets and N is the horizon.
 
-      Horizon and offsets should be passed in during construction. Offsets are passed in as a vector of ints so multiple lag orders can be applied within one featurizer call. 
+      Horizon and offsets should be passed in during construction. Offsets are passed in as a vector of ints so multiple lag orders can be applied within one featurizer call.
       Output type is a matrix of double where rows are grouped by different offsets and columns are grouped by horizon.
 
       C++-style pseudo signature:
@@ -1613,10 +1609,9 @@ featurizers:
           - float
           - double
 
-    # TODO: Output type should be changed to matrix<nonstd::optional<T>> and input should support all types after yaml file support nonstd::optional type
     type_mappings:
       - input_type: tuple<vector<string>, T>
-        output_type: matrix<double>
+        output_type: matrix<T?>
 
     configuration_params:
       - type: uint32
@@ -1624,7 +1619,6 @@ featurizers:
 
       - type: vector<int64>
         name: offsets
-        is_optional: false
 
     status: Pending
 
