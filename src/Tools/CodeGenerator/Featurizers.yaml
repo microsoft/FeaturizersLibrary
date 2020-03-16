@@ -139,8 +139,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: T
 
     status: Pending
@@ -194,8 +193,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: T
 
   # ----------------------------------------------------------------------
@@ -240,39 +238,30 @@ featurizers:
     configuration_params:
       - type: bool
         name: lower
-        is_optional: false
 
       - type: AnalyzerMethod
         name: analyzer
-        is_optional: false
 
       - type: string
         name: regexToken
-        is_optional: false
 
       - type: float
         name: maxDf
-        is_optional: false
 
       - type: float
         name: minDf
-        is_optional: false
 
-      - type: uint32
+      - type: uint32?
         name: topKTerms
-        is_optional: true
 
       - type: uint32
         name: ngramRangeMin
-        is_optional: false
 
       - type: uint32
         name: ngramRangeMax
-        is_optional: false
 
       - type: bool
         name: binary
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: DateTimeFeaturizer
@@ -318,13 +307,11 @@ featurizers:
         output_type: TimePoint
 
     configuration_params:
-      - type: string
+      - type: string?
         name: optionalCountryName
-        is_optional: true
 
-      - type: string
+      - type: string?
         name: optionalDataRootDir
-        is_optional: true
 
     custom_structs:
       - name: TimePoint
@@ -415,8 +402,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: T
 
     status: Pending
@@ -509,11 +495,9 @@ featurizers:
     configuration_params:
       - type: uint32
         name: hashingSeedVal
-        is_optional: false
 
       - type: uint32
         name: numCols
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: ImputationMarkerFeaturizer
@@ -553,8 +537,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: bool
 
   # ----------------------------------------------------------------------
@@ -683,7 +666,6 @@ featurizers:
     configuration_params:
       - type: bool
         name: suppressUnrecognizedErrors
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: MaxAbsScalerFeaturizer
@@ -806,8 +788,7 @@ featurizers:
           - double
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: double
 
   # ----------------------------------------------------------------------
@@ -850,12 +831,10 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: TIntegerOrNumeric
-        is_input_optional: true
+      - input_type: TIntegerOrNumeric?
         output_type: double
 
-      - input_type: TInputNoInterpolation
-        is_input_optional: true
+      - input_type: TInputNoInterpolation?
         output_type: TInputNoInterpolation
 
   # ----------------------------------------------------------------------
@@ -895,8 +874,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: T
 
     configuration_params:
@@ -983,8 +961,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: int8
 
   # ----------------------------------------------------------------------
@@ -1024,8 +1001,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: T
 
   # ----------------------------------------------------------------------
@@ -1111,7 +1087,6 @@ featurizers:
     configuration_params:
       - type: bool
         name: suppressUnrecognizedErrors
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: PCAFeaturizer
@@ -1181,15 +1156,12 @@ featurizers:
     configuration_params:
       - type: bool
         name: withCentering
-        is_optional: false
 
-      - type: float
+      - type: float?
         name: qRangeMin
-        is_optional: true
 
-      - type: float
+      - type: float?
         name: qRangeMax
-        is_optional: true
 
   # ----------------------------------------------------------------------
   - name: ShortGrainDropperFeaturizer
@@ -1212,19 +1184,15 @@ featurizers:
     configuration_params:
       - type: uint8
         name: windowSize
-        is_optional: false
 
       - type: vector<uint8>
         name: lags
-        is_optional: false
 
       - type: uint8
         name: maxHorizon
-        is_optional: false
 
-      - type: uint8
+      - type: uint8?
         name: cv
-        is_optional: true
 
     status: Pending
 
@@ -1366,11 +1334,9 @@ featurizers:
     configuration_params:
       - type: bool
         name: withMean
-        is_optional: false
 
       - type: bool
         name: withStd
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: StringFeaturizer
@@ -1411,7 +1377,6 @@ featurizers:
     configuration_params:
       - type: bool
         name: useEmptyStringsForNullValues
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: TfidfVectorizerFeaturizer
@@ -1472,43 +1437,33 @@ featurizers:
     configuration_params:
       - type: bool
         name: lowercase
-        is_optional: false
 
       - type: AnalyzerMethod
         name: analyzer
-        is_optional: false
 
       - type: string
         name: regexToken
-        is_optional: false
 
       - type: NormMethod
         name: norm
-        is_optional: false
 
       - type: TfidfPolicy
         name: policy
-        is_optional: false
 
       - type: float
         name: minDf
-        is_optional: false
 
       - type: float
         name: maxDf
-        is_optional: false
 
-      - type: uint32
+      - type: uint32?
         name: topKTerms
-        is_optional: true
 
       - type: uint32
         name: ngramRangeMin
-        is_optional: false
 
       - type: uint32
         name: ngramRangeMax
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: TimeSeriesImputerFeaturizer
@@ -1672,7 +1627,6 @@ featurizers:
     configuration_params:
       - type: uint32
         name: horizon
-        is_optional: false
 
       - type: vector<int64>
         name: offsets

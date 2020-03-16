@@ -10,7 +10,7 @@ import textwrap
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.SharedLibraryPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.SharedLibraryPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -18,7 +18,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 #  ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
-class _ScalarTypeInfoFactory(TypeInfoFactory):
+class _ScalarTypeInfo(TypeInfo):
     """Functionality common to all scalars"""
 
     # ----------------------------------------------------------------------
@@ -36,34 +36,32 @@ class _ScalarTypeInfoFactory(TypeInfoFactory):
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
-    def GetInputInfo(cls, arg_name, is_optional, invocation_template):
-        if is_optional:
-            input_type = "{} const *".format(cls.CType)
+    def GetInputInfo(self, arg_name, invocation_template):
+        if self.IsOptional:
+            input_type = "{} const *".format(self.CType)
             invocation_statement = invocation_template.format(
                 "{name} != nullptr ? *{name} : Microsoft::Featurizer::Traits<{cpp_type}>::CreateNullValue()".format(
                     name=arg_name,
-                    cpp_type=cls.CppType,
+                    cpp_type=self.CppType,
                 ),
             )
 
         else:
-            input_type = cls.CType
+            input_type = self.CType
             invocation_statement = invocation_template.format(arg_name)
 
-        return cls.Result(
+        return self.Result(
             ["/*in*/ {} {}".format(input_type, arg_name)],
             None,                           # No validation
             invocation_statement,
         )
 
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
-    def GetInputBufferInfo(cls, arg_name, is_optional, invocation_template):
-        if is_optional:
-            input_type = "{} const * const *".format(cls.CType)
+    def GetInputBufferInfo(self, arg_name, invocation_template):
+        if self.IsOptional:
+            input_type = "{} const * const *".format(self.CType)
 
             validation_suffix = textwrap.dedent(
                 """\
@@ -84,7 +82,7 @@ class _ScalarTypeInfoFactory(TypeInfoFactory):
                 """,
             ).format(
                 name=arg_name,
-                cpp_type=cls.CppType,
+                cpp_type=self.CppType,
             )
 
             invocation_statement = invocation_template.format(
@@ -94,7 +92,7 @@ class _ScalarTypeInfoFactory(TypeInfoFactory):
             )
 
         else:
-            input_type = "{} const *".format(cls.CType)
+            input_type = "{} const *".format(self.CType)
             validation_suffix = None
             invocation_statement = invocation_template.format(
                 "{name}_ptr, {name}_items".format(
@@ -102,7 +100,7 @@ class _ScalarTypeInfoFactory(TypeInfoFactory):
                 ),
             )
 
-        return cls.Result(
+        return self.Result(
             [
                 "/*in*/ {type} {name}_ptr".format(
                     type=input_type,
@@ -128,18 +126,17 @@ class _ScalarTypeInfoFactory(TypeInfoFactory):
         )
 
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
     def GetOutputInfo(
-        cls,
+        self,
         arg_name,
         result_name="result",
         is_struct_member=False,
     ):
-        return cls.Result(
+        return self.Result(
             [
                 "/*out*/ {}{} {}".format(
-                    cls.CType,
+                    self.CType,
                     "" if is_struct_member else " *",
                     arg_name,
                 ),
@@ -163,7 +160,7 @@ class _ScalarTypeInfoFactory(TypeInfoFactory):
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class Int8TypeInfoFactory(_ScalarTypeInfoFactory):
+class Int8TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("int8")
     CType                                   = Interface.DerivedProperty("int8_t")
     CppType                                 = Interface.DerivedProperty("std::int8_t")
@@ -171,7 +168,7 @@ class Int8TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class Int16TypeInfoFactory(_ScalarTypeInfoFactory):
+class Int16TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("int16")
     CType                                   = Interface.DerivedProperty("int16_t")
     CppType                                 = Interface.DerivedProperty("std::int16_t")
@@ -179,7 +176,7 @@ class Int16TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class Int32TypeInfoFactory(_ScalarTypeInfoFactory):
+class Int32TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("int32")
     CType                                   = Interface.DerivedProperty("int32_t")
     CppType                                 = Interface.DerivedProperty("std::int32_t")
@@ -187,7 +184,7 @@ class Int32TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class Int64TypeInfoFactory(_ScalarTypeInfoFactory):
+class Int64TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("int64")
     CType                                   = Interface.DerivedProperty("int64_t")
     CppType                                 = Interface.DerivedProperty("std::int64_t")
@@ -195,7 +192,7 @@ class Int64TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class UInt8TypeInfoFactory(_ScalarTypeInfoFactory):
+class UInt8TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("uint8")
     CType                                   = Interface.DerivedProperty("uint8_t")
     CppType                                 = Interface.DerivedProperty("std::uint8_t")
@@ -203,7 +200,7 @@ class UInt8TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class UInt16TypeInfoFactory(_ScalarTypeInfoFactory):
+class UInt16TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("uint16")
     CType                                   = Interface.DerivedProperty("uint16_t")
     CppType                                 = Interface.DerivedProperty("std::uint16_t")
@@ -211,7 +208,7 @@ class UInt16TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class UInt32TypeInfoFactory(_ScalarTypeInfoFactory):
+class UInt32TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("uint32")
     CType                                   = Interface.DerivedProperty("uint32_t")
     CppType                                 = Interface.DerivedProperty("std::uint32_t")
@@ -219,7 +216,7 @@ class UInt32TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class UInt64TypeInfoFactory(_ScalarTypeInfoFactory):
+class UInt64TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("uint64")
     CType                                   = Interface.DerivedProperty("uint64_t")
     CppType                                 = Interface.DerivedProperty("std::uint64_t")
@@ -227,7 +224,7 @@ class UInt64TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class FloatTypeInfoFactory(_ScalarTypeInfoFactory):
+class FloatTypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("float")
     CType                                   = Interface.DerivedProperty("float")
     CppType                                 = Interface.DerivedProperty("std::float_t")
@@ -235,7 +232,7 @@ class FloatTypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class DoubleTypeInfoFactory(_ScalarTypeInfoFactory):
+class DoubleTypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("double")
     CType                                   = Interface.DerivedProperty("double")
     CppType                                 = Interface.DerivedProperty("std::double_t")
@@ -243,7 +240,7 @@ class DoubleTypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class BoolTypeInfoFactory(_ScalarTypeInfoFactory):
+class BoolTypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("bool")
     CType                                   = Interface.DerivedProperty("bool")
     CppType                                 = Interface.DerivedProperty("bool")

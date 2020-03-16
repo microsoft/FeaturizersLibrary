@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the StringTypeInfoFactory object"""
+"""Contains the StringTypeInfo object"""
 
 import os
 import textwrap
@@ -10,7 +10,7 @@ import textwrap
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.SharedLibraryPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.SharedLibraryPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -19,7 +19,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class StringTypeInfoFactory(TypeInfoFactory):
+class StringTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     # |
     # |  Public Types
@@ -33,10 +33,9 @@ class StringTypeInfoFactory(TypeInfoFactory):
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
-    def GetInputInfo(cls, arg_name, is_optional, invocation_template):
-        if is_optional:
+    def GetInputInfo(self, arg_name, invocation_template):
+        if self.IsOptional:
             validation = ""
             invocation = invocation_template.format(
                 "{name} ? std::string({name}) : nonstd::optional<std::string>()".format(
@@ -50,17 +49,16 @@ class StringTypeInfoFactory(TypeInfoFactory):
             )
             invocation = invocation_template.format(arg_name)
 
-        return cls.Result(
+        return self.Result(
             ["/*in*/ char const *{}".format(arg_name)],
             validation,
             invocation,
         )
 
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
-    def GetInputBufferInfo(cls, arg_name, is_optional, invocation_template):
-        if is_optional:
+    def GetInputBufferInfo(self, arg_name, invocation_template):
+        if self.IsOptional:
             validation_suffix = textwrap.dedent(
                 """\
                 std::vector<nonstd::optional<std::string>> {name}_buffer;
@@ -104,7 +102,7 @@ class StringTypeInfoFactory(TypeInfoFactory):
                 name=arg_name,
             )
 
-        return cls.Result(
+        return self.Result(
             [
                 "/*in*/ char const * const * {name}_ptr".format(
                     name=arg_name,
@@ -133,15 +131,14 @@ class StringTypeInfoFactory(TypeInfoFactory):
         )
 
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
     def GetOutputInfo(
-        cls,
+        self,
         arg_name,
         result_name="result",
         is_struct_member=False,
     ):
-        return cls.Result(
+        return self.Result(
             [
                 "/*out*/ char const *{pointer} {name}_ptr".format(
                     name=arg_name,
@@ -184,13 +181,12 @@ class StringTypeInfoFactory(TypeInfoFactory):
         )
 
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
     def GetDestroyOutputInfo(
-        cls,
+        self,
         arg_name="result",
     ):
-        return cls.Result(
+        return self.Result(
             [
                 "/*in*/ char const *{name}_ptr".format(
                     name=arg_name,

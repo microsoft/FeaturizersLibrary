@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the TypeInfoFactory object"""
+"""Contains the TypeInfo object"""
 
 import os
 
@@ -15,7 +15,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 #  ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
-class TypeInfoFactory(Interface.Interface):
+class TypeInfo(Interface.Interface):
     """Creates constructs useful when generating code for a specific type"""
 
     # ----------------------------------------------------------------------
@@ -60,21 +60,21 @@ class TypeInfoFactory(Interface.Interface):
         self,
         custom_structs=None,
         custom_enums=None,
+        is_optional=False,
         member_type=None,
-        create_type_info_factory_func=None,
+        create_type_info_func=None,
     ):
-        # By default, custom structs are not used or preserved. Custom overridden
-        # factories may use this information.
-        pass
+        self.CustomStructs                  = custom_structs
+        self.CustomEnums                    = custom_enums
+        self.IsOptional                     = is_optional
 
     # ----------------------------------------------------------------------
     def __repr__(self):
         return CommonEnvironment.ObjectReprImpl(self)
 
     # ----------------------------------------------------------------------
-    @staticmethod
     @Interface.abstractmethod
-    def GetInputInfo(arg_name, is_optional, invocation_template):
+    def GetInputInfo(self, arg_name, invocation_template):
         """\
         Returns information about the type when used as an input argument.
 
@@ -84,9 +84,8 @@ class TypeInfoFactory(Interface.Interface):
         raise Exception("Abstract method")
 
     # ----------------------------------------------------------------------
-    @staticmethod
     @Interface.abstractmethod
-    def GetInputBufferInfo(arg_name, is_optional, invocation_template):
+    def GetInputBufferInfo(self, arg_name, invocation_template):
         """\
         Returns information about the type when used as a buffer input argument.
 
@@ -96,9 +95,9 @@ class TypeInfoFactory(Interface.Interface):
         raise Exception("Abstract method")
 
     # ----------------------------------------------------------------------
-    @staticmethod
     @Interface.abstractmethod
     def GetOutputInfo(
+        self,
         arg_name,
         result_name="result",
         is_struct_member=False,
@@ -111,9 +110,9 @@ class TypeInfoFactory(Interface.Interface):
         raise Exception("Abstract method")
 
     # ----------------------------------------------------------------------
-    @staticmethod
     @Interface.abstractmethod
     def GetDestroyOutputInfo(
+        self,
         arg_name="result",
     ):
         """\
