@@ -1414,7 +1414,7 @@ featurizers:
     num_output_columns: 1
     has_dynamic_output: true
     description: |-
-      Copying values from back or in the future per grain. Works for general time series data sets.
+      Copying values from prior or future per grain. Works for general time series data sets.
 
       The Horizon represents the maximum value in a range [1, N], where each element in that range is a delta applied to each offset. The resulting matrix will be in the form:
 
