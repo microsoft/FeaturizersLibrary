@@ -29,6 +29,7 @@ include(${_this_path}/../cmake/FeaturizersCode.cmake)
 enable_testing()
 
 foreach(_test_name IN ITEMS
+    AnalyticalRollingWindowFeaturizer_UnitTest
     BackwardFillImputerFeaturizer_UnitTest
     CatImputerFeaturizer_UnitTests
     CountVectorizerFeaturizer_UnitTests
@@ -52,7 +53,6 @@ foreach(_test_name IN ITEMS
     RobustScalerFeaturizer_UnitTests
     SampleAddFeaturizer_UnitTest
     ShortGrainDropperFeaturizer_UnitTests
-    SimpleRollingWindowFeaturizer_UnitTest
     StandardScaleWrapperFeaturizer_UnitTest
     StringFeaturizer_UnitTest
     Structs_UnitTest

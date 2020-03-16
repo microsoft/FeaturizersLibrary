@@ -4,5 +4,5 @@
 // ----------------------------------------------------------------------
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-#include "../../Featurizers/SimpleRollingWindowFeaturizer.h"
+#include "../../Featurizers/AnalyticalRollingWindowFeaturizer.h"
 #include "../TestHelpers.h"

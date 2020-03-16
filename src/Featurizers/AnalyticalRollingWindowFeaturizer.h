@@ -17,15 +17,15 @@ namespace Featurizers {
 
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         SimpleRollingWindowFeaturizer
-///  \brief         Creates the `SimpleRollingWindowTransformer` object.
+///  \class         AnalyticalRollingWindowFeaturizer
+///  \brief         Creates the `AnalyticalRollingWindowTransformer` object.
 ///
 template <
-    typename InputT,
+    typename InputT, #TODO: put this in the right format. Tuple of stuff.
     typename TransformedT=std::vector<InputT>,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-class SimpleRollingWindowEstimator :
+class AnalyticalRollingWindowEstimator :
     public Components::PipelineExecutionEstimatorImpl<
         Components::FilterEstimatorImpl<Components::GrainedFrequencyEstimator<MaxNumTrainingItemsV>, InputT, 1, 0>
     > {
@@ -45,10 +45,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    SimpleRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
-    ~SimpleRollingWindowEstimator(void) override = default;
+    AnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex);
+    ~AnalyticalRollingWindowEstimator(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SimpleRollingWindowEstimator);
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(AnalyticalRollingWindowEstimator);
 };
 
 // ----------------------------------------------------------------------
@@ -63,14 +63,14 @@ public:
 
 // ----------------------------------------------------------------------
 // |
-// |  SimpleRollingWindowEstimator
+// |  AnalyticalRollingWindowEstimator
 // |
 // ----------------------------------------------------------------------
 
 template <typename InputT, typename TransformedT, size_t MaxNumTrainingItemsV>
-SimpleRollingWindowEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::SimpleRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
+AnalyticalRollingWindowEstimator<InputT, TransformedT, MaxNumTrainingItemsV>::AnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex) :
     BaseType(
-        "SimpleRollingWindowEstimator",
+        "AnalyticalRollingWindowEstimator",
         pAllColumnAnnotations,
         [pAllColumnAnnotations, colIndex](void) { return Components::FilterEstimatorImpl<Components::GrainedFrequencyEstimator<MaxNumTrainingItemsV>, InputT, 1, 0>(std::move(pAllColumnAnnotations), std::move(colIndex)); }
     ) {
