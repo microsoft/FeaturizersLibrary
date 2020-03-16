@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the VectorTypeInfoFactory object"""
+"""Contains the SingleValueSparseVectorTypeInfo object"""
 
 import os
 import re
@@ -11,7 +11,7 @@ import textwrap
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.MLNetPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.MLNetPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -20,13 +20,13 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class VectorTypeInfoFactory(TypeInfoFactory):
+class SingleValueSparseVectorTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     # |
     # |  Public Properties
     # |
     # ----------------------------------------------------------------------
-    TypeName                                = Interface.DerivedProperty(re.compile(r"vector\<(?P<type>\S+)\>"))
+    TypeName                                = Interface.DerivedProperty(re.compile(r"single_value_sparse_vector\<(?P<type>\S+)\>"))
     CSharpType                              = Interface.DerivedProperty("TODO1")
     CSharpTypeName                          = Interface.DerivedProperty("TODO2")
 
@@ -37,26 +37,31 @@ class VectorTypeInfoFactory(TypeInfoFactory):
     # ----------------------------------------------------------------------
     def __init__(
         self,
-        custom_structs=None,
-        custom_enums=None,
+        *args,
         member_type=None,
-        create_type_info_factory_func=None,
+        create_type_info_func=None,
+        **kwargs
     ):
         if member_type is not None:
-            assert create_type_info_factory_func is not None
+            assert create_type_info_func is not None
+
+            super(SingleValueSparseVectorTypeInfo, self).__init__(*args, **kwargs)
 
             match = self.TypeName.match(member_type)
             assert match, member_type
 
             the_type = match.group("type")
 
-            type_info = create_type_info_factory_func(the_type)
+            type_info = create_type_info_func(the_type)
+
+            if type_info.IsOptional:
+                raise Exception("SingleValueSparseVector types do not currently support optional values ('{}')".format(the_type))
 
             self._type_info                 = type_info
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetNativeInputInfo(self, is_optional):
+    def GetNativeInputInfo(self):
         return self.Result(
             "TODO3: Parameter decl",
             "TODO4: Validation statements",
