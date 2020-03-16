@@ -599,7 +599,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_
                             ),
                             4,
                         ),
-                        type=enum_info.underlying_type.CType,
+                        type=enum_info.underlying_type_type_info.CType,
                     ),
                 )
 
@@ -1214,7 +1214,7 @@ class CData(object):
                 type_info = self._CreateTypeInfo(custom_enum.underlying_type)
                 assert type_info, custom_enum.underlying_type
 
-                custom_enum.underlying_type = type_info
+                custom_enum.underlying_type_type_info = type_info
 
             custom_enums[custom_enum.name] = custom_enum
 
@@ -1238,7 +1238,7 @@ class CData(object):
 
         for configuration_param in getattr(item, "configuration_params", []):
             if configuration_param.type in custom_enums:
-                tif = custom_enums[configuration_param.type].underlying_type
+                type_info = custom_enums[configuration_param.type].underlying_type_type_info
                 configuration_param.is_enum = True
 
             else:
@@ -1346,8 +1346,6 @@ class CData(object):
 
         if type_info_class is None:
             return None
-
-        print("BugBug", the_type, type_info_class)
 
         return type_info_class(
             *args,

@@ -40,7 +40,7 @@ struct TfidfVectorizerFeaturizer_EstimatorHandle {};
 struct TfidfVectorizerFeaturizer_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_CreateEstimator(/*in*/ bool lowercase, /*in*/ bool analyzer, /*in*/ char const *regexToken, /*in*/ char const *norm, /*in*/ char const *policy, /*in*/ float minDf, /*in*/ float maxDf, /*in*/ uint32_t const * topKTerms, /*in*/ uint32_t ngramRangeMin, /*in*/ uint32_t ngramRangeMax,/*out*/ TfidfVectorizerFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_CreateEstimator(/*in*/ bool lowercase, /*in*/ uint8_t analyzer, /*in*/ char const *regexToken, /*in*/ uint8_t norm, /*in*/ uint32_t policy, /*in*/ float minDf, /*in*/ float maxDf, /*in*/ uint32_t const * topKTerms, /*in*/ uint32_t ngramRangeMin, /*in*/ uint32_t ngramRangeMax,/*out*/ TfidfVectorizerFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_DestroyEstimator(/*in*/ TfidfVectorizerFeaturizer_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_GetState(/*in*/ TfidfVectorizerFeaturizer_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);

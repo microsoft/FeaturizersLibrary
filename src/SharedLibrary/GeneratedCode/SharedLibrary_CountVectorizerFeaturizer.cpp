@@ -28,7 +28,7 @@ extern "C" {
 /* |  CountVectorizerFeaturizer */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateEstimator(/*in*/ bool lower, /*in*/ bool analyzer, /*in*/ char const *regexToken, /*in*/ float maxDf, /*in*/ float minDf, /*in*/ uint32_t const * topKTerms, /*in*/ uint32_t ngramRangeMin, /*in*/ uint32_t ngramRangeMax, /*in*/ bool binary, /*out*/ CountVectorizerFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateEstimator(/*in*/ bool lower, /*in*/ uint8_t analyzer, /*in*/ char const *regexToken, /*in*/ float maxDf, /*in*/ float minDf, /*in*/ uint32_t const * topKTerms, /*in*/ uint32_t ngramRangeMin, /*in*/ uint32_t ngramRangeMax, /*in*/ bool binary, /*out*/ CountVectorizerFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 

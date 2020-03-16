@@ -28,7 +28,7 @@ extern "C" {
 /* |  TfidfVectorizerFeaturizer */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_CreateEstimator(/*in*/ bool lowercase, /*in*/ bool analyzer, /*in*/ char const *regexToken, /*in*/ char const *norm, /*in*/ char const *policy, /*in*/ float minDf, /*in*/ float maxDf, /*in*/ uint32_t const * topKTerms, /*in*/ uint32_t ngramRangeMin, /*in*/ uint32_t ngramRangeMax, /*out*/ TfidfVectorizerFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_CreateEstimator(/*in*/ bool lowercase, /*in*/ uint8_t analyzer, /*in*/ char const *regexToken, /*in*/ uint8_t norm, /*in*/ uint32_t policy, /*in*/ float minDf, /*in*/ float maxDf, /*in*/ uint32_t const * topKTerms, /*in*/ uint32_t ngramRangeMin, /*in*/ uint32_t ngramRangeMax, /*out*/ TfidfVectorizerFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -36,8 +36,6 @@ FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_CreateEstimator(/*in*/ boo
         *ppErrorInfo = nullptr;
 
         if(regexToken == nullptr) throw std::invalid_argument("'regexToken' is null");
-if(norm == nullptr) throw std::invalid_argument("'norm' is null");
-if(policy == nullptr) throw std::invalid_argument("'policy' is null");
         Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>* pEstimator = new Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , lowercase, static_cast<typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::AnalyzerMethod>(analyzer), regexToken, static_cast<typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::NormMethod>(norm), static_cast<typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::TfidfPolicy>(policy), minDf, maxDf, topKTerms != nullptr ? *topKTerms : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue(), ngramRangeMin, ngramRangeMax);
 
         pEstimator->begin_training();
