@@ -126,14 +126,14 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                 suffix = "_{}_".format(template)
                 type_desc = " <{}>".format(template)
                 cpp_template_suffix = "<{}>".format(
-                    type_info_data.InputTypeInfoFactory.CppType,
+                    type_info_data.InputTypeInfo.CppType,
                 )
             else:
                 suffix = "_"
                 type_desc = ""
                 cpp_template_suffix = ""
 
-            if type_info_data.ConfigurationParamTypeInfoFactories:
+            if type_info_data.ConfigurationParamTypeInfos:
                 constructor_template_params = ", typename... ConstructorArgTs"
                 constructor_params = ",\n    ConstructorArgTs &&... constructor_args"
                 constructor_args = "std::forward<ConstructorArgTs>(constructor_args)..., "
@@ -142,11 +142,8 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                 constructor_params = ""
                 constructor_args = ""
 
-            transform_input_args = type_info_data.InputTypeInfoFactory.GetTransformInputArgs(
-                is_input_optional=getattr(item, "is_input_optional", False),
-            )
-
-            output_statement_info = type_info_data.OutputTypeInfoFactory.GetOutputInfo()
+            transform_input_args = type_info_data.InputTypeInfo.GetTransformInputArgs()
+            output_statement_info = type_info_data.OutputTypeInfo.GetOutputInfo()
 
             inline_destroy_statement = "// No inline destroy statement"
             trailing_destroy_statement = "// No trailing destroy statement"
@@ -328,13 +325,10 @@ class TypeInfoData(object):
 
         for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
             if isinstance(custom_enum.underlying_type, six.string_types):
-                tif = self._GetTypeInfoClass(custom_enum.underlying_type)
-                assert tif, custom_enum.underlying_type
+                type_info = self._CreateTypeInfo(custom_enum.underlying_type)
+                assert type_info, custom_enum.underlying_type
 
-                custom_enum.underlying_type = tif(
-                    member_type=custom_enum.underlying_type,
-                    create_type_info_factory_func=self._GetTypeInfoClass,
-                )
+                custom_enum.underlying_type = type_info
 
             custom_enums[custom_enum.name] = custom_enum
 
@@ -345,72 +339,58 @@ class TypeInfoData(object):
             members = OrderedDict()
 
             for member in custom_struct.members:
-                tif = self._GetTypeInfoClass(member.type)
-                assert tif, member.type
+                type_info = self._CreateTypeInfo(member.type)
+                assert type_info, member.type
 
                 assert member.name not in members, member.name
-                members[member.name] = tif(
-                    member_type=member.type,
-                    create_type_info_factory_func=self._GetTypeInfoClass,
-                )
+                members[member.name] = type_info
 
             custom_structs[custom_struct.name] = members
 
-        # Create the configuration param factories
-        configuration_param_type_info_factories = []
+        # Create the configuration param type infos
+        configuration_param_type_infos = []
 
         for configuration_param in getattr(item, "configuration_params", []):
             if configuration_param.type in custom_enums:
-                tif = custom_enums[configuration_param.type].underlying_type
+                type_info = custom_enums[configuration_param.type].underlying_type
                 configuration_param.is_enum = True
 
             else:
-                tif = self._GetTypeInfoClass(configuration_param.type)
-                assert tif, configuration_param.type
-
-                tif = tif(
+                type_info = self._CreateTypeInfo(
+                    configuration_param.type,
                     custom_structs=custom_structs,
                     custom_enums=custom_enums,
-                    member_type=configuration_param.type,
-                    create_type_info_factory_func=self._GetTypeInfoClass,
                 )
+                assert type_info, configuration_param.type
 
-            configuration_param_type_info_factories.append(tif)
+            configuration_param_type_infos.append(type_info)
 
-        # Create the input factory
-        tif = self._GetTypeInfoClass(item.input_type)
-        assert tif, item.input_type
-
-        input_type_info_factory = tif(
+        input_type_info = self._CreateTypeInfo(
+            item.input_type,
             custom_structs=custom_structs,
             custom_enums=custom_enums,
-            member_type=item.input_type,
-            create_type_info_factory_func=self._GetTypeInfoClass,
         )
+        assert input_type_info, item.input_type
 
-        # Create the output factory
-        tif = self._GetTypeInfoClass(item.output_type)
-        assert tif, item.output_type
-
-        output_type_info_factory = tif(
+        output_type_info = self._CreateTypeInfo(
+            item.output_type,
             custom_structs=custom_structs,
             custom_enums=custom_enums,
-            member_type=item.output_type,
-            create_type_info_factory_func=self._GetTypeInfoClass,
         )
+        assert output_type_info, item.output_type
 
         # Commit the results
         self.CustomStructs                              = custom_structs
-        self.ConfigurationParamTypeInfoFactories        = configuration_param_type_info_factories
-        self.InputTypeInfoFactory                       = input_type_info_factory
-        self.OutputTypeInfoFactory                      = output_type_info_factory
+        self.ConfigurationParamTypeInfos                = configuration_param_type_infos
+        self.InputTypeInfo                              = input_type_info
+        self.OutputTypeInfo                             = output_type_info
 
     # ----------------------------------------------------------------------
     # |
     # |  Private Data
     # |
     # ----------------------------------------------------------------------
-    _type_info_factory_classes              = None
+    _type_info_classes                      = None
 
     # ----------------------------------------------------------------------
     # |
@@ -418,48 +398,67 @@ class TypeInfoData(object):
     # |
     # ----------------------------------------------------------------------
     @classmethod
-    def _GetTypeInfoClass(cls, the_type):
-        if cls._type_info_factory_classes is None:
-            from Plugins.SharedLibraryTestsPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
-            from Plugins.SharedLibraryTestsPluginImpl.MatrixTypeInfoFactory import MatrixTypeInfoFactory
-            from Plugins.SharedLibraryTestsPluginImpl import ScalarTypeInfoFactories
-            from Plugins.SharedLibraryTestsPluginImpl.SingleValueSparseVectorTypeInfoFactory import SingleValueSparseVectorTypeInfoFactory
-            from Plugins.SharedLibraryTestsPluginImpl.SparseVectorTypeInfoFactory import SparseVectorTypeInfoFactory
-            from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
-            from Plugins.SharedLibraryTestsPluginImpl import StructTypeInfoFactories
-            from Plugins.SharedLibraryTestsPluginImpl.VectorTypeInfoFactory import VectorTypeInfoFactory
+    def _CreateTypeInfo(cls, the_type, *args, **kwargs):
+        if cls._type_info_classes is None:
+            from Plugins.SharedLibraryTestsPluginImpl.DatetimeTypeInfo import DatetimeTypeInfo
+            from Plugins.SharedLibraryTestsPluginImpl.MatrixTypeInfo import MatrixTypeInfo
+            from Plugins.SharedLibraryTestsPluginImpl import ScalarTypeInfos
+            from Plugins.SharedLibraryTestsPluginImpl.SingleValueSparseVectorTypeInfo import SingleValueSparseVectorTypeInfo
+            from Plugins.SharedLibraryTestsPluginImpl.SparseVectorTypeInfo import SparseVectorTypeInfo
+            from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfo import StringTypeInfo
+            from Plugins.SharedLibraryTestsPluginImpl import StructTypeInfos
+            from Plugins.SharedLibraryTestsPluginImpl.VectorTypeInfo import VectorTypeInfo
 
-            type_info_factory_classes = [
-                DatetimeTypeInfoFactory,
-                MatrixTypeInfoFactory,
-                SingleValueSparseVectorTypeInfoFactory,
-                SparseVectorTypeInfoFactory,
-                StringTypeInfoFactory,
-                VectorTypeInfoFactory,
+            type_info_classes = [
+                DatetimeTypeInfo,
+                MatrixTypeInfo,
+                SingleValueSparseVectorTypeInfo,
+                SparseVectorTypeInfo,
+                StringTypeInfo,
+                VectorTypeInfo,
             ]
 
-            for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
+            for compound_module in [ScalarTypeInfos, StructTypeInfos]:
                 for obj_name in dir(compound_module):
                     if (
                         obj_name.startswith("_")
-                        or not obj_name.endswith("Factory")
-                        or obj_name == "TypeInfoFactory"
+                        or not obj_name.endswith("TypeInfo")
+                        or obj_name == "TypeInfo"
                     ):
                         continue
 
-                    type_info_factory_classes.append(getattr(compound_module, obj_name))
+                    type_info_classes.append(getattr(compound_module, obj_name))
 
-            # Associate the type info factories with the class rather than the instance
+            # Associate the type infos with the class rather than the instance
             # so that we only need to perform this initialization once.
-            cls._type_info_factory_classes = type_info_factory_classes
+            cls._type_info_classes = type_info_classes
 
-        for type_info_factory_class in cls._type_info_factory_classes:
-            if isinstance(type_info_factory_class.TypeName, six.string_types):
-                if type_info_factory_class.TypeName == the_type:
-                    return type_info_factory_class
+        is_optional = False
 
-            elif hasattr(type_info_factory_class.TypeName, "match"):
-                if type_info_factory_class.TypeName.match(the_type):
-                    return type_info_factory_class
+        if the_type.endswith("?"):
+            the_type = the_type[:-1]
+            is_optional = True
 
-        return None
+        type_info_class = None
+
+        for this_type_info_class in cls._type_info_classes:
+            if isinstance(this_type_info_class.TypeName, six.string_types):
+                if this_type_info_class.TypeName == the_type:
+                    type_info_class = this_type_info_class
+                    break
+
+            elif hasattr(this_type_info_class.TypeName, "match"):
+                if this_type_info_class.TypeName.match(the_type):
+                    type_info_class = this_type_info_class
+                    break
+
+        if type_info_class is None:
+            return None
+
+        return type_info_class(
+            *args,
+            member_type=the_type,
+            is_optional=is_optional,
+            create_type_info_func=cls._CreateTypeInfo,
+            **kwargs
+        )

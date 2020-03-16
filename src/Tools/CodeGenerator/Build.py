@@ -25,21 +25,21 @@ _PLUGINS                                    = [
     # BugBug     "OnnxRuntime",
     # BugBug     os.path.join(_script_dir, "..", "..", "GeneratedCode", "OnnxRuntime"),
     # BugBug ),
+    # BugBug: DONE (
+    # BugBug: DONE     "SharedLibrary",
+    # BugBug: DONE     os.path.join(_script_dir, "..", "..", "SharedLibrary", "GeneratedCode"),
+    # BugBug: DONE ),
     (
-        "SharedLibrary",
-        os.path.join(_script_dir, "..", "..", "SharedLibrary", "GeneratedCode"),
+        "SharedLibraryTests",
+        os.path.join(
+            _script_dir,
+            "..",
+            "..",
+            "SharedLibrary",
+            "IntegrationTests",
+            "GeneratedCode",
+        ),
     ),
-    # BugBug (
-    # BugBug     "SharedLibraryTests",
-    # BugBug     os.path.join(
-    # BugBug         _script_dir,
-    # BugBug         "..",
-    # BugBug         "..",
-    # BugBug         "SharedLibrary",
-    # BugBug         "IntegrationTests",
-    # BugBug         "GeneratedCode",
-    # BugBug     ),
-    # BugBug ),
 ]
 
 

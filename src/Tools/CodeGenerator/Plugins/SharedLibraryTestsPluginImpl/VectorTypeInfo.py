@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the VectorTypeInfoFactory object"""
+"""Contains the VectorTypeInfo object"""
 
 import os
 import re
@@ -11,7 +11,7 @@ import textwrap
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.SharedLibraryTestsPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.SharedLibraryTestsPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -20,7 +20,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class VectorTypeInfoFactory(TypeInfoFactory):
+class VectorTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     # |
     # |  Public Types
@@ -36,20 +36,27 @@ class VectorTypeInfoFactory(TypeInfoFactory):
     # ----------------------------------------------------------------------
     def __init__(
         self,
-        custom_structs=None,
-        custom_enums=None,
+        *args,
         member_type=None,
-        create_type_info_factory_func=None,
+        create_type_info_func=None,
+        **kwargs
     ):
         if member_type is not None:
-            assert create_type_info_factory_func is not None
+            assert create_type_info_func is not None
+
+            super(VectorTypeInfo, self).__init__(*args, **kwargs)
 
             match = self.TypeName.match(member_type)
             assert match, member_type
 
             the_type = match.group("type")
 
-            type_info = create_type_info_factory_func(the_type)
+            type_info = create_type_info_func(the_type)
+            if not hasattr(type_info, "CType"):
+                raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a vector".format(the_type))
+
+            if type_info.IsOptional:
+                raise Exception("Vector types do not currently support optional values ('{}')".format(the_type))
 
             self._type_info                 = type_info
 
@@ -57,10 +64,9 @@ class VectorTypeInfoFactory(TypeInfoFactory):
     @Interface.override
     def GetTransformInputArgs(
         self,
-        is_input_optional,
         input_name="input",
     ):
-        if is_input_optional:
+        if self.IsOptional:
             statement = "{input}.empty() ? nullptr : {input}.data(), {input}.empty() ? 0 : {input}.size()".format(
                 input=input_name,
                 type=self._type_info.CppType,

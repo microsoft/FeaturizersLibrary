@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the TypeInfoFactory object"""
+"""Contains the TypeInfo object"""
 
 import os
 
@@ -15,7 +15,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 #  ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
-class TypeInfoFactory(Interface.Interface):
+class TypeInfo(Interface.Interface):
     """Creates constructs that are useful when generating test code for a specific type"""
 
     # ----------------------------------------------------------------------
@@ -71,12 +71,13 @@ class TypeInfoFactory(Interface.Interface):
         self,
         custom_structs=None,
         custom_enums=None,
+        is_optional=False,
         member_type=None,
-        create_type_info_factory_func=None,
+        create_type_info_func=None,
     ):
-        # By default, custom structs are not used or preserved. Custom overridden
-        # factories may use this information.
-        pass
+        self.CustomStructs                  = custom_structs
+        self.CustomEnums                    = custom_enums
+        self.IsOptional                     = is_optional
 
     # ----------------------------------------------------------------------
     def __repr__(self):
@@ -92,10 +93,9 @@ class TypeInfoFactory(Interface.Interface):
         return None
 
     # ----------------------------------------------------------------------
-    @staticmethod
     @Interface.abstractmethod
     def GetTransformInputArgs(
-        is_input_optional,
+        self,
         input_name="input",
     ):
         """\
@@ -104,9 +104,9 @@ class TypeInfoFactory(Interface.Interface):
         raise Exception("Abstract method")
 
     # ----------------------------------------------------------------------
-    @staticmethod
     @Interface.abstractmethod
     def GetOutputInfo(
+        self,
         result_name="result",
     ):
         """\
