@@ -6,9 +6,9 @@ featurizers:
     num_output_columns: 1
     has_dynamic_output: false
     description: |-
-        Calculates data based on a rolling window. Currently supports mean. Works for general time series data sets.
+        Calculates data based on a rolling window. Currently supports mean. Works for any data set that is already sorted.
         
-        Input type for this featurizer is a tuple of time point of current row, the grain columns, and target value column.
+        Input type for this featurizer is a tuple of the grain columns and target value column. It is assumed that the data is sorted in the correct order.
 
         C++-style pseudo signature:
         template <typename T> std::vector<double> execute(std::tuple<std::vector<std::string> const &, T const &> value);
@@ -16,30 +16,30 @@ featurizers:
         Examples:
             A simple example would be horizon = 1, window size = 2, and we want to take the mean.
 
-            +----------------+-----------+-------+-------------------+
-            |time(YYYY-MM-DD)| grain     | target| target_mean       |
-            +================+===========+=======+===================+
-            | 2017-01-01     | A         | 10    | [NAN]             |
-            +----------------+-----------+-------+-------------------+
-            | 2017-02-01     | A         | 4     | [10]              |
-            +----------------+-----------+-------+-------------------+
-            | 2017-03-01     | A         | 6     | [7]               |
-            +----------------+-----------+-------+-------------------+
-            | 2017-04-01     | A         | 11    | [5]               |
-            +----------------+-----------+-------+-------------------+
+            +-----------+-------+-------------------+
+            | grain     | target| target_mean       |
+            +===========+=======+===================+
+            | A         | 10    | [NAN]             |
+            +-----------+-------+-------------------+
+            | A         | 4     | [10]              |
+            +-----------+-------+-------------------+
+            | A         | 6     | [7]               |
+            +-----------+-------+-------------------+
+            | A         | 11    | [5]               |
+            +-----------+-------+-------------------+
 
             A more complex example would be, assuming we have horizon = 2, window size = 2, min window periods = 2, and we want the mean
-            +----------------+-----------+-------+-------------------+
-            |time(YYYY-MM-DD)| grain     | target| target_max        |
-            +================+===========+=======+===================+
-            | 2017-01-01     | A         | 10    | [NAN, NAN]        |
-            +----------------+-----------+-------+-------------------+
-            | 2017-02-01     | A         | 4     | [NAN, NAN]        |
-            +----------------+-----------+-------+-------------------+
-            | 2017-03-01     | A         | 6     | [NAN, 7]          |
-            +----------------+-----------+-------+-------------------+
-            | 2017-04-01     | A         | 11    | [7, 5]            |
-            +----------------+-----------+-------+-------------------+
+            +-----------+-------+-------------------+
+            | grain     | target| target_max        |
+            +===========+=======+===================+
+            | A         | 10    | [NAN, NAN]        |
+            +-----------+-------+-------------------+
+            | A         | 4     | [NAN, NAN]        |
+            +-----------+-------+-------------------+
+            | A         | 6     | [NAN, 7]          |
+            +-----------+-------+-------------------+
+            | A         | 11    | [7, 5]            |
+            +-----------+-------+-------------------+
 
     templates:
       - name: T
@@ -1235,9 +1235,9 @@ featurizers:
     num_output_columns: 1
     has_dynamic_output: false
     description: |-
-      Calculates data based on a rolling window. Currently supports minimum and maximum. Works for general time series data sets.
+      Calculates data based on a rolling window. Currently supports minimum and maximum. Works for any data set that is already sorted.
       
-      Input type for this featurizer is a tuple of time point of current row, the grain columns, and target column to find the value.
+      Input type for this featurizer is a tuple of the grain columns and target column to find the value. It is assumed that the data is sorted in the correct order.
 
       C++-style pseudo signature:
         template <typename T> std::vector<T> execute(std::tuple<std::vector<std::string> const &, T const &> value);
@@ -1245,30 +1245,30 @@ featurizers:
       Examples:
           A simple example would be horizon = 1, window size = 2, and we want to take the minimum.
 
-          +----------------+-----------+-------+-------------------+
-          |time(YYYY-MM-DD)| grain     | target| target_minimum    |
-          +================+===========+=======+===================+
-          | 2017-01-01     | A         | 10    | [NAN]             |
-          +----------------+-----------+-------+-------------------+
-          | 2017-02-01     | A         | 4     | [10]              |
-          +----------------+-----------+-------+-------------------+
-          | 2017-03-01     | A         | 6     | [4]               |
-          +----------------+-----------+-------+-------------------+
-          | 2017-04-01     | A         | 11    | [4]               |
-          +----------------+-----------+-------+-------------------+
+          +-----------+-------+-------------------+
+          | grain     | target| target_minimum    |
+          +===========+=======+===================+
+          | A         | 10    | [NAN]             |
+          +-----------+-------+-------------------+
+          | A         | 4     | [10]              |
+          +-----------+-------+-------------------+
+          | A         | 6     | [4]               |
+          +-----------+-------+-------------------+
+          | A         | 11    | [4]               |
+          +-----------+-------+-------------------+
 
           A more complex example would be, assuming we have horizon = 2, window size = 2, minWindowCount = 2, and we want the maximum value
-          +----------------+-----------+-------+-------------------+
-          |time(YYYY-MM-DD)| grain     | target| target_max        |
-          +================+===========+=======+===================+
-          | 2017-01-01     | A         | 10    | [NAN, NAN]        |
-          +----------------+-----------+-------+-------------------+
-          | 2017-02-01     | A         | 4     | [NAN, NAN]        |
-          +----------------+-----------+-------+-------------------+
-          | 2017-03-01     | A         | 6     | [NAN, 10]         |
-          +----------------+-----------+-------+-------------------+
-          | 2017-04-01     | A         | 11    | [10, 6]           |
-          +----------------+-----------+-------+-------------------+
+          +-----------+-------+-------------------+
+          | grain     | target| target_max        |
+          +===========+=======+===================+
+          | A         | 10    | [NAN, NAN]        |
+          +-----------+-------+-------------------+
+          | A         | 4     | [NAN, NAN]        |
+          +-----------+-------+-------------------+
+          | A         | 6     | [NAN, 10]         |
+          +-----------+-------+-------------------+
+          | A         | 11    | [10, 6]           |
+          +-----------+-------+-------------------+
 
     templates:
       - name: T
