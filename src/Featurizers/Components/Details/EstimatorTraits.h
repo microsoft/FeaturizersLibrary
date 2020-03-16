@@ -11,18 +11,6 @@ namespace Components {
 namespace Details {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         IsTuple
-///  \brief         Contains a Value set to true if the incoming type is a tuple.
-///
-template <typename T>
-struct IsTuple : public std::false_type {
-};
-
-template <typename... ArgTs>
-struct IsTuple<std::tuple<ArgTs...>> : public std::true_type {
-};
-
-/////////////////////////////////////////////////////////////////////////
 ///  \class         HasHasCreatedTransformerMethodImpl
 ///  \brief         Base declaration to determine if a type has the method
 ///                 'has_created_transformer'.

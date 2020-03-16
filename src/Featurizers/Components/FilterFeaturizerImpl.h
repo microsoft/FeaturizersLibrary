@@ -4,114 +4,15 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include <tuple>
-
 #include "../../Featurizer.h"
+
 #include "Details/EstimatorTraits.h"
+#include "Details/FilterTraits.h"
 
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 namespace Components {
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         FilterFeaturizerTraits
-///  \brief         Traits common to all types of `Estimators` and `Transformers`
-///                 when used within Filter featurizer constructs.
-///
-template <
-    typename ChainedT,
-    typename InputTupleT,
-    size_t... FilterInputTupleIndexVs
->
-struct FilterFeaturizerTraits {
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    static_assert(Details::IsTuple<InputTupleT>::value, "'InputTupleT' must be a tuple");
-
-    // The first N elements in the tuple represent the original input data and must therefore be
-    // references. However, not all of the tuple elements must be references. For example, if this
-    // FilterFeaturizer is part of a pipeline with upstream FilterFeaturizers, the first elements
-    // associated with the original input will be references, but the latter elements will be the
-    // result of the transformer (and not references).
-    //
-    // This check isn't perfect, but hopefully enough to prevent unintentional bugs associated with
-    // unnecessary copies of incoming data.
-    static_assert(std::is_reference<typename std::tuple_element<0, InputTupleT>::type>::value, "The initial elements in 'InputTupleT' must be references");
-
-    using ChainedInputTypeReturnValue =
-        typename std::conditional<
-            sizeof...(FilterInputTupleIndexVs) != 1,
-            typename ChainedT::InputType,               // We need to create a new tuple to pass to the chained object
-            typename ChainedT::InputType const &        // We can extract a single value from the input tuple and pass it to the chained object
-        >::type;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-    static ChainedInputTypeReturnValue ToChainedInputType(InputTupleT const &input);
-
-private:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Methods
-    // |
-    // ----------------------------------------------------------------------
-    static ChainedInputTypeReturnValue ToChainedInputTypeImpl(InputTupleT const &input, std::true_type /*IsChainedInputTypeATuple*/);
-    static ChainedInputTypeReturnValue ToChainedInputTypeImpl(InputTupleT const &input, std::false_type /*IsChainedInputTypeATuple*/);
-};
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         FilterTransformerTraits
-///  \brief         Traits common to `TransformerEstimators` and `Transformers`
-///                 when used within Filter featurizer constructs.
-///
-template <
-    typename ChainedT,
-    typename InputTupleT,
-    size_t... FilterInputTupleIndexVs
->
-struct FilterTransformerTraits :
-    public FilterFeaturizerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>
-{
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Types
-    // |
-    // ----------------------------------------------------------------------
-    static constexpr bool const             IsChainedTransformedTypeATuple = Details::IsTuple<typename ChainedT::TransformedType>::value;
-
-    using ChainedTransformedTypeTuple =
-        typename std::conditional<
-            IsChainedTransformedTypeATuple,
-            typename ChainedT::TransformedType,
-            std::tuple<typename ChainedT::TransformedType>
-        >::type;
-
-    using TransformedType =
-        decltype(std::tuple_cat(std::declval<InputTupleT>(), std::declval<ChainedTransformedTypeTuple>()));
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-    static TransformedType ToTransformedType(InputTupleT const &input, typename ChainedT::TransformedType output);
-
-private:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Methods
-    // |
-    // ----------------------------------------------------------------------
-    static TransformedType ToTransformedTypeImpl(InputTupleT const &input, typename ChainedT::TransformedType output, std::true_type /*IsChainedTransformedTypeATuple*/);
-    static TransformedType ToTransformedTypeImpl(InputTupleT const &input, typename ChainedT::TransformedType output, std::false_type /*IsChainedTransformedTypeATuple*/);
-};
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         FilterTransformer
@@ -126,7 +27,7 @@ template <
 class FilterTransformer :
     public Transformer<
         InputTupleT,
-        typename FilterTransformerTraits<ChainedTransformerT, InputTupleT, FilterInputTupleIndexVs...>::TransformedType
+        typename Details::FilterTransformerTraits<ChainedTransformerT, InputTupleT, FilterInputTupleIndexVs...>::TransformedType
     > {
 public:
     // ----------------------------------------------------------------------
@@ -134,7 +35,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using TheseFilterTransformerTraits      = FilterTransformerTraits<ChainedTransformerT, InputTupleT, FilterInputTupleIndexVs...>;
+    using TheseFilterTransformerTraits      = Details::FilterTransformerTraits<ChainedTransformerT, InputTupleT, FilterInputTupleIndexVs...>;
 
     using BaseType =
         Transformer<
@@ -184,7 +85,7 @@ private:
     // ----------------------------------------------------------------------
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
         _pTransformer->execute(
-            TheseFilterTransformerTraits::ToChainedInputType(input),
+            TheseFilterTransformerTraits::ToFilteredType(input),
             [&input, &callback](typename ChainedTransformerT::TransformedType value) {
                 callback(TheseFilterTransformerTraits::ToTransformedType(input, std::move(value)));
             }
@@ -263,7 +164,13 @@ public:
 
     ~FilterEstimatorImplBase(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(FilterEstimatorImplBase);
+    // Not using FEATURIZER_MOVE_CONSTRUCTOR_ONLY, as the move constructor needs
+    // a custom implementation due to the use of the reference member.
+    FilterEstimatorImplBase(FilterEstimatorImplBase && other);
+    FilterEstimatorImplBase(FilterEstimatorImplBase const &) = delete;
+
+    FilterEstimatorImplBase & operator =(FilterEstimatorImplBase &&) = delete;
+    FilterEstimatorImplBase & operator =(FilterEstimatorImplBase const &) = delete;
 
     EstimatorT const & get_estimator(void) const;
 
@@ -326,7 +233,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using TheseFilterFeaturizerTraits       = FilterFeaturizerTraits<EstimatorT, InputTupleT, FilterInputTupleIndexVs...>;
+    using TheseFilterFeaturizerTraits       = Details::FilterFeaturizerTraits<InputTupleT, FilterInputTupleIndexVs...>;
 
     using BaseType =
         Impl::FilterEstimatorImplBase<
@@ -365,7 +272,7 @@ class FilterEstimatorImpl<
     FilterInputTupleIndexVs...
 > :
     public Impl::FilterEstimatorImplBase<
-        TransformerEstimator<InputTupleT, typename FilterTransformerTraits<EstimatorT, InputTupleT, FilterInputTupleIndexVs...>::TransformedType>,
+        TransformerEstimator<InputTupleT, typename Details::FilterTransformerTraits<EstimatorT, InputTupleT, FilterInputTupleIndexVs...>::TransformedType>,
         EstimatorT,
         InputTupleT,
         FilterInputTupleIndexVs...
@@ -376,7 +283,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using TheseFilterTransformerTraits      = FilterTransformerTraits<EstimatorT, InputTupleT, FilterInputTupleIndexVs...>;
+    using TheseFilterTransformerTraits      = Details::FilterTransformerTraits<EstimatorT, InputTupleT, FilterInputTupleIndexVs...>;
 
     using BaseType =
         Impl::FilterEstimatorImplBase<
@@ -462,85 +369,6 @@ using FilterEstimatorImpl =
 
 // ----------------------------------------------------------------------
 // |
-// |  FilterFeaturizerTraits
-// |
-// ----------------------------------------------------------------------
-template <typename ChainedT, typename InputTupleT, size_t... FilterInputTupleIndexVs>
-// static
-typename FilterFeaturizerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::ChainedInputTypeReturnValue
-FilterFeaturizerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::ToChainedInputType(InputTupleT const &input) {
-    return ToChainedInputTypeImpl(input, std::integral_constant<bool, sizeof...(FilterInputTupleIndexVs) != 1>());
-}
-
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-template <typename ChainedT, typename InputTupleT, size_t... FilterInputTupleIndexVs>
-// static
-typename FilterFeaturizerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::ChainedInputTypeReturnValue
-FilterFeaturizerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::ToChainedInputTypeImpl(InputTupleT const &input, std::true_type /*IsChainedInputTypeATuple*/) {
-    // ----------------------------------------------------------------------
-    using ChainedInputType                  = std::tuple<typename std::tuple_element<FilterInputTupleIndexVs, InputTupleT>::type...>;
-    // ----------------------------------------------------------------------
-
-    static_assert(std::is_same<ChainedInputType, typename ChainedT::InputType>::value, "Inputs should be consistent");
-
-    return ChainedInputType(std::get<FilterInputTupleIndexVs>(input)...);
-}
-
-namespace Details {
-
-template <size_t FilterIndexV>
-struct FilterFeaturizerImplExtractTupleIndex {
-    static constexpr size_t const           Value = FilterIndexV;
-};
-
-} // namespace Details
-
-template <typename ChainedT, typename InputTupleT, size_t... FilterInputTupleIndexVs>
-// static
-typename FilterFeaturizerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::ChainedInputTypeReturnValue
-FilterFeaturizerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::ToChainedInputTypeImpl(InputTupleT const &input, std::false_type /*IsChainedInputTypeATuple*/) {
-    // ----------------------------------------------------------------------
-    static constexpr size_t const           Index = Details::FilterFeaturizerImplExtractTupleIndex<FilterInputTupleIndexVs...>::Value;
-    // ----------------------------------------------------------------------
-
-    static_assert(Index < std::tuple_size<InputTupleT>::value, "Indexes must be smaller than the input tuple");
-
-    return std::get<Index>(input);
-}
-
-// ----------------------------------------------------------------------
-// |
-// |  FilterTransformerTraits
-// |
-// ----------------------------------------------------------------------
-template <typename ChainedT, typename InputTupleT, size_t... FilterInputTupleIndexVs>
-// static
-typename FilterTransformerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::TransformedType
-FilterTransformerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::ToTransformedType(InputTupleT const &input, typename ChainedT::TransformedType output) {
-    return ToTransformedTypeImpl(input, std::move(output), std::integral_constant<bool, IsChainedTransformedTypeATuple>());
-}
-
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-template <typename ChainedT, typename InputTupleT, size_t... FilterInputTupleIndexVs>
-// static
-typename FilterTransformerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::TransformedType
-FilterTransformerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::ToTransformedTypeImpl(InputTupleT const &input, typename ChainedT::TransformedType output, std::true_type /*IsChainedTransformedTypeATuple*/) {
-    return std::tuple_cat(input, std::move(output));
-}
-
-template <typename ChainedT, typename InputTupleT, size_t... FilterInputTupleIndexVs>
-// static
-typename FilterTransformerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::TransformedType
-FilterTransformerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::ToTransformedTypeImpl(InputTupleT const &input, typename ChainedT::TransformedType output, std::false_type /*IsChainedTransformedTypeATuple*/) {
-    return std::tuple_cat(input, std::make_tuple(std::move(output)));
-}
-
-// ----------------------------------------------------------------------
-// |
 // |  FilterTransformer
 // |
 // ----------------------------------------------------------------------
@@ -609,6 +437,13 @@ Impl::FilterEstimatorImplBase<BaseT, EstimatorT, InputTupleT, FilterInputTupleIn
 }
 
 template <typename BaseT, typename EstimatorT, typename InputTupleT, size_t... FilterInputTupleIndexVs>
+Impl::FilterEstimatorImplBase<BaseT, EstimatorT, InputTupleT, FilterInputTupleIndexVs...>::FilterEstimatorImplBase(FilterEstimatorImplBase && other) :
+    FilterEstimatorWrapper<EstimatorT>(std::move(static_cast<FilterEstimatorWrapper<EstimatorT> &>(other))),
+    BaseT(std::move(static_cast<BaseT &>(other))),
+    _estimator(this->WrappedEstimator) {
+}
+
+template <typename BaseT, typename EstimatorT, typename InputTupleT, size_t... FilterInputTupleIndexVs>
 EstimatorT const & Impl::FilterEstimatorImplBase<BaseT, EstimatorT, InputTupleT, FilterInputTupleIndexVs...>::get_estimator(void) const {
     return _estimator;
 }
@@ -631,13 +466,13 @@ bool Impl::FilterEstimatorImplBase<BaseT, EstimatorT, InputTupleT, FilterInputTu
 template <typename BaseT, typename EstimatorT, typename InputTupleT, size_t... FilterInputTupleIndexVs>
 FitResult Impl::FilterEstimatorImplBase<BaseT, EstimatorT, InputTupleT, FilterInputTupleIndexVs...>::fit_impl(typename BaseT::InputType const *pItems, size_t cItems) /*override*/ {
     // ----------------------------------------------------------------------
-    using TheseFilterFeaturizerTraits       = FilterFeaturizerTraits<EstimatorT, InputTupleT, FilterInputTupleIndexVs...>;
+    using TheseFilterFeaturizerTraits       = Details::FilterFeaturizerTraits<InputTupleT, FilterInputTupleIndexVs...>;
     // ----------------------------------------------------------------------
 
     typename BaseT::InputType const * const             pEnd(pItems + cItems);
 
     while(pItems != pEnd) {
-        FitResult                           result(_estimator.fit(TheseFilterFeaturizerTraits::ToChainedInputType(*pItems)));
+        FitResult                           result(_estimator.fit(TheseFilterFeaturizerTraits::ToFilteredType(*pItems)));
 
         if(result != FitResult::Continue)
             return result;
