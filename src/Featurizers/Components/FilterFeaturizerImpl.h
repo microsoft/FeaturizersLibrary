@@ -32,6 +32,16 @@ struct FilterFeaturizerTraits {
     // ----------------------------------------------------------------------
     static_assert(Details::IsTuple<InputTupleT>::value, "'InputTupleT' must be a tuple");
 
+    // The first N elements in the tuple represent the original input data and must therefore be
+    // references. However, not all of the tuple elements must be references. For example, if this
+    // FilterFeaturizer is part of a pipeline with upstream FilterFeaturizers, the first elements
+    // associated with the original input will be references, but the latter elements will be the
+    // result of the transformer (and not references).
+    //
+    // This check isn't perfect, but hopefully enough to prevent unintentional bugs associated with
+    // unnecessary copies of incoming data.
+    static_assert(std::is_reference<typename std::tuple_element<0, InputTupleT>::type>::value, "The initial elements in 'InputTupleT' must be references");
+
     using ChainedInputTypeReturnValue =
         typename std::conditional<
             sizeof...(FilterInputTupleIndexVs) != 1,
@@ -470,7 +480,7 @@ template <typename ChainedT, typename InputTupleT, size_t... FilterInputTupleInd
 typename FilterFeaturizerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::ChainedInputTypeReturnValue
 FilterFeaturizerTraits<ChainedT, InputTupleT, FilterInputTupleIndexVs...>::ToChainedInputTypeImpl(InputTupleT const &input, std::true_type /*IsChainedInputTypeATuple*/) {
     // ----------------------------------------------------------------------
-    using ChainedInputType                  = decltype(std::make_tuple(std::get<FilterInputTupleIndexVs>(input)...));
+    using ChainedInputType                  = std::tuple<typename std::tuple_element<FilterInputTupleIndexVs, InputTupleT>::type...>;
     // ----------------------------------------------------------------------
 
     static_assert(std::is_same<ChainedInputType, typename ChainedT::InputType>::value, "Inputs should be consistent");
@@ -612,6 +622,12 @@ bool Impl::FilterEstimatorImplBase<BaseT, EstimatorT, InputTupleT, FilterInputTu
     return _estimator.get_state() == TrainingState::Training;
 }
 
+// I don't understand why MSVC thinks that this is unreachable code
+#if (defined _MSC_VER)
+#   pragma warning(push)
+#   pragma warning(disable: 4702) // Unreachable code
+#endif
+
 template <typename BaseT, typename EstimatorT, typename InputTupleT, size_t... FilterInputTupleIndexVs>
 FitResult Impl::FilterEstimatorImplBase<BaseT, EstimatorT, InputTupleT, FilterInputTupleIndexVs...>::fit_impl(typename BaseT::InputType const *pItems, size_t cItems) /*override*/ {
     // ----------------------------------------------------------------------
@@ -621,14 +637,20 @@ FitResult Impl::FilterEstimatorImplBase<BaseT, EstimatorT, InputTupleT, FilterIn
     typename BaseT::InputType const * const             pEnd(pItems + cItems);
 
     while(pItems != pEnd) {
-        FitResult                           result(_estimator.fit(TheseFilterFeaturizerTraits::ToChainedInputType(*pItems++)));
+        FitResult                           result(_estimator.fit(TheseFilterFeaturizerTraits::ToChainedInputType(*pItems)));
 
         if(result != FitResult::Continue)
             return result;
+
+        ++pItems;
     }
 
     return FitResult::Continue;
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
 
 template <typename BaseT, typename EstimatorT, typename InputTupleT, size_t... FilterInputTupleIndexVs>
 void Impl::FilterEstimatorImplBase<BaseT, EstimatorT, InputTupleT, FilterInputTupleIndexVs...>::complete_training_impl(void) /*override*/ {
