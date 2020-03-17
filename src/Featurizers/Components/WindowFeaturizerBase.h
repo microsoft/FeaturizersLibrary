@@ -6,7 +6,6 @@
 
 #include <limits>
 
-#include "TrainingOnlyEstimatorImpl.h"
 #include "../../Traits.h"
 
 namespace Microsoft {
@@ -227,6 +226,7 @@ CircularIterator<T>::CircularIterator(T* t, size_t container_max_size, size_t ma
         throw std::invalid_argument("Cannot increment more than max_size times");
     }
 }
+
 // Pre-increment operator.
 template <class T>
 CircularIterator<T>& CircularIterator<T>::operator++ () {
@@ -296,7 +296,11 @@ CircularBuffer<T>::CircularBuffer(size_t max_size) : _max_size(max_size), _start
 }
 
 template <class T>
+<<<<<<< HEAD
 size_t CircularBuffer<T>::size() const {
+=======
+typename size_t CircularBuffer<T>::size() {
+>>>>>>> mostly working, just need grain
     return _data.size();
 }
 
