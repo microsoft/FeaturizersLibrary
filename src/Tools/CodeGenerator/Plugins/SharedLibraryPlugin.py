@@ -120,9 +120,9 @@ def _CreateInterfaceSubstitutionDict(item, c_data):
         cpp_templates = []
 
         if item.is_input_a_template:
-            cpp_templates.append(c_data.InputTypeInfoFactory.CppType)
+            cpp_templates.append(c_data.InputTypeInfo.CppType)
         if item.is_output_a_template:
-            cpp_templates.append(c_data.OutputTypeInfoFactory.CppType)
+            cpp_templates.append(c_data.OutputTypeInfo.CppType)
 
         assert cpp_templates
         cpp_templates = ", ".join(cpp_templates)
@@ -513,20 +513,15 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_
 
             construct_params = []
 
-            if c_data.ConfigurationParamTypeInfoFactories:
+            if c_data.ConfigurationParamTypeInfos:
                 for configuration_param, type_info in zip(
                     item.configuration_params,
-                    c_data.ConfigurationParamTypeInfoFactories,
+                    c_data.ConfigurationParamTypeInfos,
                 ):
-                    info = type_info.GetInputInfo(
-                        configuration_param.name,
-                        getattr(configuration_param, "is_optional", False),
-                        "",
-                    )
-
+                    info = type_info.GetInputInfo(configuration_param.name, "")
                     construct_params += info.ParameterDecl
 
-            delete_transformed_info = c_data.OutputTypeInfoFactory.GetDestroyOutputInfo()
+            delete_transformed_info = c_data.OutputTypeInfo.GetDestroyOutputInfo()
             if delete_transformed_info is not None:
                 delete_transformed_method = textwrap.dedent(
                     """\
@@ -604,7 +599,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_
                             ),
                             4,
                         ),
-                        type=enum_info.underlying_type.CType,
+                        type=enum_info.underlying_type_info.CType,
                     ),
                 )
 
@@ -660,21 +655,13 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_
                         ", ".join(construct_params),
                     ) if construct_params else "",
                     input_param=", ".join(
-                        c_data.InputTypeInfoFactory.GetInputInfo(
-                            "input",
-                            getattr(item, "is_input_optional", False),
-                            "",
-                        ).ParameterDecl,
+                        c_data.InputTypeInfo.GetInputInfo("input", "").ParameterDecl,
                     ),
                     input_buffer_param=", ".join(
-                        c_data.InputTypeInfoFactory.GetInputBufferInfo(
-                            "input",
-                            getattr(item, "is_input_optional", False),
-                            "",
-                        ).ParameterDecl,
+                        c_data.InputTypeInfo.GetInputBufferInfo("input", "").ParameterDecl,
                     ),
                     transform_output_param=", ".join(
-                        c_data.OutputTypeInfoFactory.GetOutputInfo("output").ParameterDecl,
+                        c_data.OutputTypeInfo.GetOutputInfo("output").ParameterDecl,
                     ),
                     delete_transformed_method=delete_transformed_method,
                     **d
@@ -780,10 +767,10 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
             construct_validation = []
             construct_args = []
 
-            if c_data.ConfigurationParamTypeInfoFactories:
+            if c_data.ConfigurationParamTypeInfos:
                 for configuration_param, type_info in zip(
                     item.configuration_params,
-                    c_data.ConfigurationParamTypeInfoFactories,
+                    c_data.ConfigurationParamTypeInfos,
                 ):
                     if getattr(configuration_param, "is_enum", False):
                         invocation_template = "static_cast<typename Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::{enum_name}>({{}})".format(
@@ -793,11 +780,7 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                     else:
                         invocation_template = "{}"
 
-                    info = type_info.GetInputInfo(
-                        configuration_param.name,
-                        getattr(configuration_param, "is_optional", False),
-                        invocation_template,
-                    )
+                    info = type_info.GetInputInfo(configuration_param.name, invocation_template)
 
                     construct_params += info.ParameterDecl
 
@@ -899,11 +882,7 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
             )
 
             # Fit
-            input_info = c_data.InputTypeInfoFactory.GetInputInfo(
-                "input",
-                getattr(item, "is_input_optional", False),
-                "*pFitResult = static_cast<unsigned char>(estimator.fit({}));",
-            )
+            input_info = c_data.InputTypeInfo.GetInputInfo("input","*pFitResult = static_cast<unsigned char>(estimator.fit({}));")
 
             f.write(
                 textwrap.dedent(
@@ -939,11 +918,7 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
             )
 
             # FitBuffer
-            input_info = c_data.InputTypeInfoFactory.GetInputBufferInfo(
-                "input",
-                getattr(item, "is_input_optional", False),
-                "*pFitResult = static_cast<unsigned char>(estimator.fit({}));",
-            )
+            input_info = c_data.InputTypeInfo.GetInputBufferInfo("input", "*pFitResult = static_cast<unsigned char>(estimator.fit({}));")
 
             f.write(
                 textwrap.dedent(
@@ -1114,13 +1089,8 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
             )
 
             # Transform
-            input_info = c_data.InputTypeInfoFactory.GetInputInfo(
-                "input",
-                getattr(item, "is_input_optional", False),
-                "auto result(transformer.execute({}));",
-            )
-
-            output_info = c_data.OutputTypeInfoFactory.GetOutputInfo("output")
+            input_info = c_data.InputTypeInfo.GetInputInfo("input", "auto result(transformer.execute({}));")
+            output_info = c_data.OutputTypeInfo.GetOutputInfo("output")
 
             f.write(
                 textwrap.dedent(
@@ -1168,7 +1138,7 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
             )
 
             # DestroyTransformedData (optional)
-            output_info = c_data.OutputTypeInfoFactory.GetDestroyOutputInfo()
+            output_info = c_data.OutputTypeInfo.GetDestroyOutputInfo()
             if output_info is not None:
                 f.write(
                     textwrap.dedent(
@@ -1241,13 +1211,10 @@ class CData(object):
 
         for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
             if isinstance(custom_enum.underlying_type, six.string_types):
-                tif = self._GetTypeInfoClass(custom_enum.underlying_type)
-                assert tif, custom_enum.underlying_type
+                type_info = self._CreateTypeInfo(custom_enum.underlying_type)
+                assert type_info, custom_enum.underlying_type
 
-                custom_enum.underlying_type = tif(
-                    member_type=custom_enum.underlying_type,
-                    create_type_info_factory_func=self._GetTypeInfoClass,
-                )
+                custom_enum.underlying_type_info = type_info
 
             custom_enums[custom_enum.name] = custom_enum
 
@@ -1258,66 +1225,52 @@ class CData(object):
             members = OrderedDict()
 
             for member in custom_struct.members:
-                tif = self._GetTypeInfoClass(member.type)
-                assert tif, member.type
+                type_info = self._CreateTypeInfo(member.type)
+                assert type_info, member.type
 
                 assert member.name not in members, member.name
-                members[member.name] = tif(
-                    member_type=member.type,
-                    create_type_info_factory_func=self._GetTypeInfoClass,
-                )
+                members[member.name] = type_info
 
             custom_structs[custom_struct.name] = members
 
-        # Create the configuration param factories
-        configuration_param_type_info_factories = []
+        # Create the configuration param type infos
+        configuration_param_type_infos = []
 
         for configuration_param in getattr(item, "configuration_params", []):
             if configuration_param.type in custom_enums:
-                tif = custom_enums[configuration_param.type].underlying_type
+                type_info = custom_enums[configuration_param.type].underlying_type_info
                 configuration_param.is_enum = True
 
             else:
-                tif = self._GetTypeInfoClass(configuration_param.type)
-                assert tif, configuration_param.type
-
-                tif = tif(
+                type_info = self._CreateTypeInfo(
+                    configuration_param.type,
                     custom_structs=custom_structs,
                     custom_enums=custom_enums,
-                    member_type=configuration_param.type,
-                    create_type_info_factory_func=self._GetTypeInfoClass,
                 )
+                assert type_info, configuration_param.type
 
-            configuration_param_type_info_factories.append(tif)
+            configuration_param_type_infos.append(type_info)
 
-        # Create the input factory
-        tif = self._GetTypeInfoClass(item.input_type)
-        assert tif, item.input_type
-
-        input_type_info_factory = tif(
+        input_type_info = self._CreateTypeInfo(
+            item.input_type,
             custom_structs=custom_structs,
             custom_enums=custom_enums,
-            member_type=item.input_type,
-            create_type_info_factory_func=self._GetTypeInfoClass,
         )
+        assert input_type_info, item.input_type
 
-        # Create the output factory
-        tif = self._GetTypeInfoClass(item.output_type)
-        assert tif, item.output_type
-
-        output_type_info_factory = tif(
+        output_type_info = self._CreateTypeInfo(
+            item.output_type,
             custom_structs=custom_structs,
             custom_enums=custom_enums,
-            member_type=item.output_type,
-            create_type_info_factory_func=self._GetTypeInfoClass,
         )
+        assert output_type_info, item.output_type
 
         # Commit the results
         self.CustomStructs                              = custom_structs
         self.CustomEnums                                = custom_enums
-        self.ConfigurationParamTypeInfoFactories        = configuration_param_type_info_factories
-        self.InputTypeInfoFactory                       = input_type_info_factory
-        self.OutputTypeInfoFactory                      = output_type_info_factory
+        self.ConfigurationParamTypeInfos                = configuration_param_type_infos
+        self.InputTypeInfo                              = input_type_info
+        self.OutputTypeInfo                             = output_type_info
 
     # ----------------------------------------------------------------------
     def __repr__(self):
@@ -1328,7 +1281,7 @@ class CData(object):
     # |  Private Data
     # |
     # ----------------------------------------------------------------------
-    _type_info_factory_classes              = None
+    _type_info_classes                      = None
 
     # ----------------------------------------------------------------------
     # |
@@ -1336,48 +1289,68 @@ class CData(object):
     # |
     # ----------------------------------------------------------------------
     @classmethod
-    def _GetTypeInfoClass(cls, the_type):
-        if cls._type_info_factory_classes is None:
-            from Plugins.SharedLibraryPluginImpl.DatetimeTypeInfoFactory import DateTimeTypeInfoFactory
-            from Plugins.SharedLibraryPluginImpl.MatrixTypeInfoFactory import MatrixTypeInfoFactory
-            from Plugins.SharedLibraryPluginImpl import ScalarTypeInfoFactories
-            from Plugins.SharedLibraryPluginImpl.SingleValueSparseVectorTypeInfoFactory import SingleValueSparseVectorTypeInfoFactory
-            from Plugins.SharedLibraryPluginImpl.SparseVectorTypeInfoFactory import SparseVectorTypeInfoFactory
-            from Plugins.SharedLibraryPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
-            from Plugins.SharedLibraryPluginImpl import StructTypeInfoFactories
-            from Plugins.SharedLibraryPluginImpl.VectorTypeInfoFactory import VectorTypeInfoFactory
+    def _CreateTypeInfo(cls, the_type, *args, **kwargs):
+        if cls._type_info_classes is None:
+            from Plugins.SharedLibraryPluginImpl.DatetimeTypeInfo import DateTimeTypeInfo
+            from Plugins.SharedLibraryPluginImpl.MatrixTypeInfo import MatrixTypeInfo
+            from Plugins.SharedLibraryPluginImpl import ScalarTypeInfos
+            from Plugins.SharedLibraryPluginImpl.SingleValueSparseVectorTypeInfo import SingleValueSparseVectorTypeInfo
+            from Plugins.SharedLibraryPluginImpl.SparseVectorTypeInfo import SparseVectorTypeInfo
+            from Plugins.SharedLibraryPluginImpl.StringTypeInfo import StringTypeInfo
+            from Plugins.SharedLibraryPluginImpl import StructTypeInfos
+            from Plugins.SharedLibraryPluginImpl.VectorTypeInfo import VectorTypeInfo
 
-            type_info_factory_classes = [
-                DateTimeTypeInfoFactory,
-                MatrixTypeInfoFactory,
-                SingleValueSparseVectorTypeInfoFactory,
-                SparseVectorTypeInfoFactory,
-                StringTypeInfoFactory,
-                VectorTypeInfoFactory,
+            type_info_classes = [
+                DateTimeTypeInfo,
+                MatrixTypeInfo,
+                SingleValueSparseVectorTypeInfo,
+                SparseVectorTypeInfo,
+                StringTypeInfo,
+                VectorTypeInfo,
             ]
 
-            for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
+            for compound_module in [ScalarTypeInfos, StructTypeInfos]:
                 for obj_name in dir(compound_module):
                     if (
                         obj_name.startswith("_")
-                        or not obj_name.endswith("Factory")
-                        or obj_name == "TypeInfoFactory"
+                        or not obj_name.endswith("TypeInfo")
+                        or obj_name == "TypeInfo"
                     ):
                         continue
 
-                    type_info_factory_classes.append(getattr(compound_module, obj_name))
+                    type_info_classes.append(getattr(compound_module, obj_name))
 
-            # Associate the type info factories with the class rather than the instance
+            # Associate the type infos with the class rather than the instance
             # so that we only need to perform this initialization once.
-            cls._type_info_factory_classes = type_info_factory_classes
+            cls._type_info_classes = type_info_classes
 
-        for type_info_factory_class in cls._type_info_factory_classes:
-            if isinstance(type_info_factory_class.TypeName, six.string_types):
-                if type_info_factory_class.TypeName == the_type:
-                    return type_info_factory_class
+        is_optional = False
 
-            elif hasattr(type_info_factory_class.TypeName, "match"):
-                if type_info_factory_class.TypeName.match(the_type):
-                    return type_info_factory_class
+        if the_type.endswith("?"):
+            the_type = the_type[:-1]
+            is_optional = True
 
-        return None
+        type_info_class = None
+
+        for this_type_info_class in cls._type_info_classes:
+            if isinstance(this_type_info_class.TypeName, six.string_types):
+                if this_type_info_class.TypeName == the_type:
+                    type_info_class = this_type_info_class
+                    break
+
+
+            elif hasattr(this_type_info_class.TypeName, "match"):
+                if this_type_info_class.TypeName.match(the_type):
+                    type_info_class = this_type_info_class
+                    break
+
+        if type_info_class is None:
+            return None
+
+        return type_info_class(
+            *args,
+            member_type=the_type,
+            is_optional=is_optional,
+            create_type_info_func=cls._CreateTypeInfo,
+            **kwargs
+        )

@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the DatetimeTypeInfoFactory object"""
+"""Contains the DatetimeTypeInfo object"""
 
 import os
 import textwrap
@@ -10,7 +10,7 @@ import textwrap
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.SharedLibraryTestsPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.SharedLibraryTestsPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -19,7 +19,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class DatetimeTypeInfoFactory(TypeInfoFactory):
+class DatetimeTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     # |
     # |  Public Types
@@ -36,10 +36,9 @@ class DatetimeTypeInfoFactory(TypeInfoFactory):
     @Interface.override
     def GetTransformInputArgs(
         self,
-        is_input_optional,
         input_name="input",
     ):
-        if is_input_optional:
+        if self.IsOptional:
             return "Microsoft::Featurizer::Traits<decltype({input_name})>::IsNull({input_name}) ? nullptr : CreateDateTimeParameter(*{input_name})".format(
                 input_name=input_name,
             )
