@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the DateTimeTypeInfoFactory object"""
+"""Contains the DateTimeTypeInfo object"""
 
 import os
 import textwrap
@@ -10,7 +10,7 @@ import textwrap
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.SharedLibraryPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.SharedLibraryPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -19,7 +19,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class DateTimeTypeInfoFactory(TypeInfoFactory):
+class DateTimeTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     # |
     # |  Public Types
@@ -33,15 +33,14 @@ class DateTimeTypeInfoFactory(TypeInfoFactory):
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
-    def GetInputInfo(cls, arg_name, is_optional, invocation_template):
-        if is_optional:
+    def GetInputInfo(self, arg_name, invocation_template):
+        if self.IsOptional:
             param_decorator = "const *"
             invocation = invocation_template.format(
                 "{name} ? CreateDateTime({name}) : nonstd::optional<{cpp_type}>()".format(
                     name=arg_name,
-                    cpp_type=cls.CppType,
+                    cpp_type=self.CppType,
                 ),
             )
         else:
@@ -52,7 +51,7 @@ class DateTimeTypeInfoFactory(TypeInfoFactory):
                 ),
             )
 
-        return cls.Result(
+        return self.Result(
             [
                 "/*in*/ DateTimeParameter {param_decorator}{name}".format(
                     name=arg_name,
@@ -64,10 +63,9 @@ class DateTimeTypeInfoFactory(TypeInfoFactory):
         )
 
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
-    def GetInputBufferInfo(cls, arg_name, is_optional, invocation_template):
-        if is_optional:
+    def GetInputBufferInfo(self, arg_name, invocation_template):
+        if self.IsOptional:
             param_decorator = "const *"
             validation_suffix = textwrap.dedent(
                 """\
@@ -88,7 +86,7 @@ class DateTimeTypeInfoFactory(TypeInfoFactory):
                 """,
             ).format(
                 name=arg_name,
-                cpp_type=cls.CppType,
+                cpp_type=self.CppType,
             )
 
         else:
@@ -112,10 +110,10 @@ class DateTimeTypeInfoFactory(TypeInfoFactory):
                 """,
             ).format(
                 name=arg_name,
-                cpp_type=cls.CppType,
+                cpp_type=self.CppType,
             )
 
-        return cls.Result(
+        return self.Result(
             [
                 "/*in*/ DateTimeParameter const * {param_decorator}{name}_ptr".format(
                     name=arg_name,
@@ -145,10 +143,9 @@ class DateTimeTypeInfoFactory(TypeInfoFactory):
         )
 
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
     def GetOutputInfo(
-        cls,
+        self,
         arg_name,
         result_name="result",
         is_struct_member=False,
@@ -156,10 +153,9 @@ class DateTimeTypeInfoFactory(TypeInfoFactory):
         raise NotImplemented("Not implemented yet")
 
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
     def GetDestroyOutputInfo(
-        cls,
+        self,
         arg_name="result",
     ):
         raise NotImplemented("Not implemented yet")

@@ -7,7 +7,7 @@ featurizers:
     has_dynamic_output: false
     description: |-
         Calculates data based on a rolling window. Currently supports mean. Works for any data set that is already sorted.
-        
+
         Input type for this featurizer is a tuple of the grain columns and target value column. It is assumed that the data is sorted in the correct order.
 
         C++-style pseudo signature:
@@ -57,8 +57,7 @@ featurizers:
 
     type_mappings:
       - input_type: tuple<vector<string>, T>
-        output_type: vector<double>
-        is_output_optional: false
+        output_type: vector<double?>
         description: A vector of size horizon will always be output, but the individual elements could be NaN.
 
     custom_enums:
@@ -70,22 +69,18 @@ featurizers:
     configuration_params:
       - type: uint32
         name: windowSize
-        is_optional: false
         description: The maximum number of items in a window.
-        
+
       - type: AnalyticalRollingWindowCalculation
         name: windowCalculation
-        is_optional: false
         description: What calculation is going to be performed over the window data.
 
       - type: uint32
         name: horizon
-        is_optional: false
         description: The horizon value. The size of the output vector will be equal to this value.
 
-      - type: uint32
+      - type: uint32?
         name: minWindowCount
-        is_optional: true
         description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
 
     status: Pending
@@ -139,8 +134,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: T
 
     status: Pending
@@ -194,8 +188,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: T
 
   # ----------------------------------------------------------------------
@@ -240,39 +233,30 @@ featurizers:
     configuration_params:
       - type: bool
         name: lower
-        is_optional: false
 
       - type: AnalyzerMethod
         name: analyzer
-        is_optional: false
 
       - type: string
         name: regexToken
-        is_optional: false
 
       - type: float
         name: maxDf
-        is_optional: false
 
       - type: float
         name: minDf
-        is_optional: false
 
-      - type: uint32
+      - type: uint32?
         name: topKTerms
-        is_optional: true
 
       - type: uint32
         name: ngramRangeMin
-        is_optional: false
 
       - type: uint32
         name: ngramRangeMax
-        is_optional: false
 
       - type: bool
         name: binary
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: DateTimeFeaturizer
@@ -318,13 +302,11 @@ featurizers:
         output_type: TimePoint
 
     configuration_params:
-      - type: string
+      - type: string?
         name: optionalCountryName
-        is_optional: true
 
-      - type: string
+      - type: string?
         name: optionalDataRootDir
-        is_optional: true
 
     custom_structs:
       - name: TimePoint
@@ -415,8 +397,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: T
 
     status: Pending
@@ -509,11 +490,9 @@ featurizers:
     configuration_params:
       - type: uint32
         name: hashingSeedVal
-        is_optional: false
 
       - type: uint32
         name: numCols
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: ImputationMarkerFeaturizer
@@ -553,8 +532,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: bool
 
   # ----------------------------------------------------------------------
@@ -683,7 +661,6 @@ featurizers:
     configuration_params:
       - type: bool
         name: suppressUnrecognizedErrors
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: MaxAbsScalerFeaturizer
@@ -806,8 +783,7 @@ featurizers:
           - double
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: double
 
   # ----------------------------------------------------------------------
@@ -850,12 +826,10 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: TIntegerOrNumeric
-        is_input_optional: true
+      - input_type: TIntegerOrNumeric?
         output_type: double
 
-      - input_type: TInputNoInterpolation
-        is_input_optional: true
+      - input_type: TInputNoInterpolation?
         output_type: TInputNoInterpolation
 
   # ----------------------------------------------------------------------
@@ -895,8 +869,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: T
 
     configuration_params:
@@ -983,8 +956,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: int8
 
   # ----------------------------------------------------------------------
@@ -1024,8 +996,7 @@ featurizers:
           - string
 
     type_mappings:
-      - input_type: T
-        is_input_optional: true
+      - input_type: T?
         output_type: T
 
   # ----------------------------------------------------------------------
@@ -1111,7 +1082,6 @@ featurizers:
     configuration_params:
       - type: bool
         name: suppressUnrecognizedErrors
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: PCAFeaturizer
@@ -1181,15 +1151,12 @@ featurizers:
     configuration_params:
       - type: bool
         name: withCentering
-        is_optional: false
 
-      - type: float
+      - type: float?
         name: qRangeMin
-        is_optional: true
 
-      - type: float
+      - type: float?
         name: qRangeMax
-        is_optional: true
 
   # ----------------------------------------------------------------------
   - name: ShortGrainDropperFeaturizer
@@ -1212,19 +1179,15 @@ featurizers:
     configuration_params:
       - type: uint8
         name: windowSize
-        is_optional: false
 
       - type: vector<uint8>
         name: lags
-        is_optional: false
 
       - type: uint8
         name: maxHorizon
-        is_optional: false
 
-      - type: uint8
+      - type: uint8?
         name: cv
-        is_optional: true
 
     status: Pending
 
@@ -1236,7 +1199,7 @@ featurizers:
     has_dynamic_output: false
     description: |-
       Calculates data based on a rolling window. Currently supports minimum and maximum. Works for any data set that is already sorted.
-      
+
       Input type for this featurizer is a tuple of the grain columns and target column to find the value. It is assumed that the data is sorted in the correct order.
 
       C++-style pseudo signature:
@@ -1288,8 +1251,7 @@ featurizers:
 
     type_mappings:
       - input_type: tuple<vector<string>, T>
-        output_type: vector<T>
-        is_output_optional: false
+        output_type: vector<T?>
         description: A vector of size horizon will always be output, but the individual elements could be NaN.
 
     custom_enums:
@@ -1301,22 +1263,18 @@ featurizers:
     configuration_params:
       - type: uint32
         name: windowSize
-        is_optional: false
         description: The maximum number of items in a window.
 
       - type: SimpleRollingWindowCalculation
         name: windowCalculation
-        is_optional: false
         description: What calculation is going to be performed over the window data.
 
       - type: uint32
         name: horizon
-        is_optional: false
         description: The horizon value. The size of the output vector will be equal to this value.
 
-      - type: uint32
+      - type: uint32?
         name: minWindowCount
-        is_optional: true
         description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
 
     status: Pending
@@ -1366,11 +1324,9 @@ featurizers:
     configuration_params:
       - type: bool
         name: withMean
-        is_optional: false
 
       - type: bool
         name: withStd
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: StringFeaturizer
@@ -1411,7 +1367,6 @@ featurizers:
     configuration_params:
       - type: bool
         name: useEmptyStringsForNullValues
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: TfidfVectorizerFeaturizer
@@ -1472,43 +1427,33 @@ featurizers:
     configuration_params:
       - type: bool
         name: lowercase
-        is_optional: false
 
       - type: AnalyzerMethod
         name: analyzer
-        is_optional: false
 
       - type: string
         name: regexToken
-        is_optional: false
 
       - type: NormMethod
         name: norm
-        is_optional: false
 
       - type: TfidfPolicy
         name: policy
-        is_optional: false
 
       - type: float
         name: minDf
-        is_optional: false
 
       - type: float
         name: maxDf
-        is_optional: false
 
-      - type: uint32
+      - type: uint32?
         name: topKTerms
-        is_optional: true
 
       - type: uint32
         name: ngramRangeMin
-        is_optional: false
 
       - type: uint32
         name: ngramRangeMax
-        is_optional: false
 
   # ----------------------------------------------------------------------
   - name: TimeSeriesImputerFeaturizer
@@ -1611,7 +1556,7 @@ featurizers:
 
       The resulting matrix size is K rows x N cols, where K is the number of offsets and N is the horizon.
 
-      Horizon and offsets should be passed in during construction. Offsets are passed in as a vector of ints so multiple lag orders can be applied within one featurizer call. 
+      Horizon and offsets should be passed in during construction. Offsets are passed in as a vector of ints so multiple lag orders can be applied within one featurizer call.
       Output type is a matrix of double where rows are grouped by different offsets and columns are grouped by horizon.
 
       C++-style pseudo signature:
@@ -1664,19 +1609,16 @@ featurizers:
           - float
           - double
 
-    # TODO: Output type should be changed to matrix<nonstd::optional<T>> and input should support all types after yaml file support nonstd::optional type
     type_mappings:
       - input_type: tuple<vector<string>, T>
-        output_type: matrix<double>
+        output_type: matrix<T?>
 
     configuration_params:
       - type: uint32
         name: horizon
-        is_optional: false
 
       - type: vector<int64>
         name: offsets
-        is_optional: false
 
     status: Pending
 

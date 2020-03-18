@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the SingleValueSparseVectorTypeInfoFactory object"""
+"""Contains the SparseVectorTypeInfo object"""
 
 import os
 import re
@@ -11,7 +11,7 @@ import textwrap
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.SharedLibraryTestsPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.SharedLibraryTestsPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -20,13 +20,13 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class SingleValueSparseVectorTypeInfoFactory(TypeInfoFactory):
+class SparseVectorTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     # |
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
-    TypeName                                = Interface.DerivedProperty(re.compile(r"single_value_sparse_vector\<(?P<type>\S+)\>"))
+    TypeName                                = Interface.DerivedProperty(re.compile(r"sparse_vector\<(?P<type>\S+)\>"))
     CppType                                 = Interface.DerivedProperty(None)
 
     # ----------------------------------------------------------------------
@@ -36,22 +36,27 @@ class SingleValueSparseVectorTypeInfoFactory(TypeInfoFactory):
     # ----------------------------------------------------------------------
     def __init__(
         self,
-        custom_structs=None,
-        custom_enums=None,
+        *args,
         member_type=None,
-        create_type_info_factory_func=None,
+        create_type_info_func=None,
+        **kwargs
     ):
         if member_type is not None:
-            assert create_type_info_factory_func is not None
+            assert create_type_info_func
+
+            super(SparseVectorTypeInfo, self).__init__(*args, **kwargs)
 
             match = self.TypeName.match(member_type)
             assert match, member_type
 
             the_type = match.group("type")
 
-            type_info = create_type_info_factory_func(the_type)
+            type_info = create_type_info_func(the_type)
             if not hasattr(type_info, "CType"):
-                raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a single_value_sparse_vector".format(the_type))
+                raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a sparse_vector".format(the_type))
+
+            if type_info.IsOptional:
+                raise Exception("SparseVector types do not currently support optional values ('{}')".format(the_type))
 
             self._type_info                 = type_info
 
@@ -59,7 +64,6 @@ class SingleValueSparseVectorTypeInfoFactory(TypeInfoFactory):
     @Interface.override
     def GetTransformInputArgs(
         self,
-        is_input_optional,
         input_name="input",
     ):
         raise NotImplementedError("This structure is only used during output")
@@ -71,31 +75,33 @@ class SingleValueSparseVectorTypeInfoFactory(TypeInfoFactory):
         result_name="result",
     ):
         return self.Result(
-            "Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<{}>".format(self._type_info.CppType),
+            "Microsoft::Featurizer::Featurizers::SparseVectorEncoding<{}>".format(self._type_info.CppType),
             textwrap.dedent(
                 """\
-                uint64_t {result}_numElements(0);
-                {type} {result}_value;
-                uint64_t {result}_index(0);
+                uint64_t numElements(0);
+                uint64_t numValues(0);
+                {type} * pValues(nullptr);
+                uint64_t *pIndexes(nullptr);
                 """,
             ).format(
                 type=self._type_info.CppType,
-                result=result_name,
             ),
-            "&{result}_numElements, &{result}_value, &{result}_index".format(
-                result=result_name,
-            ),
+            "&numElements, &numValues, &pValues, &pIndexes",
             textwrap.dedent(
                 """\
-                #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-                results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<{type}>({result}_numElements, {result}_value, {result}_index));
-                #else
-                results.emplace_back({result}_numElements, {result}_value, {result}_index);
-                #endif
-                """,
+                std::vector<typename Microsoft::Featurizer::Featurizers::SparseVectorEncoding<{type}>::ValueEncoding> encodings;
+                {type} const *pValue(pValues);
+                uint64_t const *pIndex(pIndexes);
+
+                while(numValues--) {{
+                    encodings.emplace_back(*pValue++, *pIndex++);
+                }}
+
+                results.emplace_back(numElements, std::move(encodings));
+                """
             ).format(
-                result=result_name,
-                type=self._type_info.CppType,
+                type=self._type_info.CppType
             ),
-            None,
+            "numElements, numValues, pValues, pIndexes",
+            destroy_inline=True,
         )

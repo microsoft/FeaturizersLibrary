@@ -613,8 +613,8 @@ def _GenerateTypeFactory(csharp_data_items):
                 \t\t\t\t}}
                 """.format(
                     "\t\t\t\telse " if index != 0 else "",
-                    item.InputTypeInfoFactory.CSharpType,
-                    item.InputTypeInfoFactory.CSharpTypeName,
+                    item.InputTypeInfo.CSharpType,
+                    item.InputTypeInfo.CSharpTypeName,
                 ),
             ),
         )
@@ -624,28 +624,28 @@ def _GenerateTypeFactory(csharp_data_items):
 
 def _GenerateSupportedTypes(csharp_data_items):
     return ", ".join(
-        "typeof({})".format(item.InputTypeInfoFactory.CSharpType)
+        "typeof({})".format(item.InputTypeInfo.CSharpType)
         for item in csharp_data_items
         if item != None
     )
 
 
 def _GenerateOptionalInputDeclaration(items):
-    if items[0] != None and items[0].is_input_optional:
+    if items[0] != None and items[0].input_type.endswith("?"):
         return ", bool treatDefaultAsNull = false"
     else:
         return ""
 
 
 def _GenerateOptionalInputOptionsConstructor(items):
-    if items[0] != None and items[0].is_input_optional:
+    if items[0] != None and items[0].input_type.endswith("?"):
         return "TreatDefaultAsNull = treatDefaultAsNull,"
     else:
         return ""
 
 
 def _GenerateOptionalInputOptionClassValues(items):
-    if items[0] != None and items[0].is_input_optional:
+    if items[0] != None and items[0].input_type.endswith("?"):
         return textwrap.dedent(
             """\
             [Argument(ArgumentType.AtMostOnce, HelpText = "If default value for the variable should be treated as null",
@@ -789,24 +789,18 @@ def _GenerateTypedColumns(
 
             #endregion
             """.format(
-                typeName=item.InputTypeInfoFactory.CSharpTypeName,
-                inputType=item.InputTypeInfoFactory.CSharpType,
-                outputType=item.OutputTypeInfoFactory.CSharpType,
+                typeName=item.InputTypeInfo.CSharpTypeName,
+                inputType=item.InputTypeInfo.CSharpType,
+                outputType=item.OutputTypeInfo.CSharpType,
                 featurizerName=featurizerName,
-                nativeFeaturizerType=item.InputTypeInfoFactory.TypeName,
-                nativeInputDeclaration=item.InputTypeInfoFactory.GetNativeInputInfo(
-                    item.IsInputOptional,
-                ).ParameterDecl,
-                nativeOutputDeclaration=item.OutputTypeInfoFactory.GetNativeOutputInfo().ParameterDecl,
-                inputConversion=item.InputTypeInfoFactory.GetNativeInputInfo(
-                    item.IsInputOptional,
-                ).InvocationStatement,
-                outputConversion=item.OutputTypeInfoFactory.GetNativeOutputInfo().InvocationStatement,
+                nativeFeaturizerType=item.InputTypeInfo.TypeName,
+                nativeInputDeclaration=item.InputTypeInfo.GetNativeInputInfo().ParameterDecl,
+                nativeOutputDeclaration=item.OutputTypeInfo.GetNativeOutputInfo().ParameterDecl,
+                inputConversion=item.InputTypeInfo.GetNativeInputInfo().InvocationStatement,
+                outputConversion=item.OutputTypeInfo.GetNativeOutputInfo().InvocationStatement,
                 transformerName=transformerName,
-                conversionEnd=item.InputTypeInfoFactory.GetNativeInputInfo(
-                    item.IsInputOptional,
-                ).ConversionEnd,
-                deleteTransformedData=item.OutputTypeInfoFactory.GetNativeOutputInfo(
+                conversionEnd=item.InputTypeInfo.GetNativeInputInfo().ConversionEnd,
+                deleteTransformedData=item.OutputTypeInfo.GetNativeOutputInfo(
                     featurizer_name=featurizerName,
                 ).DeleteTransformedData,
             ),
@@ -830,13 +824,10 @@ class CSharpData(object):
 
         for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
             if isinstance(custom_enum.underlying_type, six.string_types):
-                tif = self._GetTypeInfoClass(custom_enum.underlying_type)
-                assert tif, custom_enum.underlying_type
+                type_info = self._CreateTypeInfo(custom_enum.underlying_type)
+                assert type_info, custom_enum.underlying_type
 
-                custom_enum.underlying_type = tif(
-                    member_type=custom_enum.underlying_type,
-                    create_type_info_factory_func=self._GetTypeInfoClass,
-                )
+                custom_enum.underlying_type_info = type_info
 
             custom_enums[custom_enum.name] = custom_enum
 
@@ -847,74 +838,60 @@ class CSharpData(object):
             members = OrderedDict()
 
             for member in custom_struct.members:
-                tif = self._GetTypeInfoClass(member.type)
-                assert tif, member.type
+                type_info = self._CreateTypeInfo(member.type)
+                assert type_info, member.type
 
                 assert member.name not in members, member.name
-                members[member.name] = tif(
-                    member_type=member.type,
-                    create_type_info_factory_func=self._GetTypeInfoClass,
-                )
+                members[member.name] = type_info
 
             custom_structs[custom_struct.name] = members
 
-        # Create the configuration param factories
-        configuration_param_type_info_factories = []
+        # Create the configuration param type infos
+        configuration_param_type_infos = []
 
         for configuration_param in getattr(item, "configuration_params", []):
             if configuration_param.type in custom_enums:
-                tif = custom_enums[configuration_param.type].underlying_type
+                type_info = custom_enums[configuration_param.type].underlying_type_info
                 configuration_param.is_enum = True
 
             else:
-                tif = self._GetTypeInfoClass(configuration_param.type)
-                assert tif, configuration_param.type
-
-                tif = tif(
+                type_info = self._CreateTypeInfo(
+                    configuration_param.type,
                     custom_structs=custom_structs,
                     custom_enums=custom_enums,
-                    member_type=configuration_param.type,
-                    create_type_info_factory_func=self._GetTypeInfoClass,
                 )
+                assert type_info, configuration_param.type
 
-            configuration_param_type_info_factories.append(tif)
+            configuration_param_type_infos.append(type_info)
 
-        # Create the input factory
-        tif = self._GetTypeInfoClass(item.input_type)
-        assert tif, item.input_type
-
-        input_type_info_factory = tif(
+        input_type_info = self._CreateTypeInfo(
+            item.input_type,
             custom_structs=custom_structs,
             custom_enums=custom_enums,
-            member_type=item.input_type,
-            create_type_info_factory_func=self._GetTypeInfoClass,
         )
+        assert input_type_info, item.input_type
 
-        # Create the output factory
-        tif = self._GetTypeInfoClass(item.output_type)
-        if tif is None:
+        output_type_info = self._CreateTypeInfo(
+            item.output_type,
+            custom_structs=custom_structs,
+            custom_enums=custom_enums,
+        )
+        if output_type_info is None:
             raise Exception("'{}' is not a supported type".format(item.output_type))
-
-        output_type_info_factory = tif(
-            custom_structs=custom_structs,
-            custom_enums=custom_enums,
-            member_type=item.output_type,
-            create_type_info_factory_func=self._GetTypeInfoClass,
-        )
 
         # Commit the results
         self.CustomStructs                              = custom_structs
-        self.ConfigurationParamTypeInfoFactories        = configuration_param_type_info_factories
-        self.InputTypeInfoFactory                       = input_type_info_factory
-        self.OutputTypeInfoFactory                      = output_type_info_factory
-        self.IsInputOptional                            = item.is_input_optional
+        self.CustomEnums                                = custom_enums
+        self.ConfigurationParamTypeInfos                = configuration_param_type_infos
+        self.InputTypeInfo                              = input_type_info
+        self.OutputTypeInfo                             = output_type_info
 
     # ----------------------------------------------------------------------
     # |
     # |  Private Data
     # |
     # ----------------------------------------------------------------------
-    _type_info_factory_classes              = None
+    _type_info_classes                      = None
 
     # ----------------------------------------------------------------------
     # |
@@ -922,48 +899,67 @@ class CSharpData(object):
     # |
     # ----------------------------------------------------------------------
     @classmethod
-    def _GetTypeInfoClass(cls, the_type):
-        if cls._type_info_factory_classes is None:
-            from Plugins.MLNetPluginImpl.DatetimeTypeInfoFactory import DatetimeTypeInfoFactory
-            from Plugins.MLNetPluginImpl.MatrixTypeInfoFactory import MatrixTypeInfoFactory
-            from Plugins.MLNetPluginImpl import ScalarTypeInfoFactories
-            from Plugins.MLNetPluginImpl.SingleValueSparseVectorTypeInfoFactory import SingleValueSparseVectorTypeInfoFactory
-            from Plugins.MLNetPluginImpl.SparseVectorTypeInfoFactory import SparseVectorTypeInfoFactory
-            from Plugins.MLNetPluginImpl.StringTypeInfoFactory import StringTypeInfoFactory
-            from Plugins.MLNetPluginImpl import StructTypeInfoFactories
-            from Plugins.MLNetPluginImpl.VectorTypeInfoFactory import VectorTypeInfoFactory
+    def _CreateTypeInfo(cls, the_type, *args, **kwargs):
+        if cls._type_info_classes is None:
+            from Plugins.MLNetPluginImpl.DatetimeTypeInfo import DatetimeTypeInfo
+            from Plugins.MLNetPluginImpl.MatrixTypeInfo import MatrixTypeInfo
+            from Plugins.MLNetPluginImpl import ScalarTypeInfos
+            from Plugins.MLNetPluginImpl.SingleValueSparseVectorTypeInfo import SingleValueSparseVectorTypeInfo
+            from Plugins.MLNetPluginImpl.SparseVectorTypeInfo import SparseVectorTypeInfo
+            from Plugins.MLNetPluginImpl.StringTypeInfo import StringTypeInfo
+            from Plugins.MLNetPluginImpl import StructTypeInfos
+            from Plugins.MLNetPluginImpl.VectorTypeInfo import VectorTypeInfo
 
-            type_info_factory_classes = [
-                DatetimeTypeInfoFactory,
-                MatrixTypeInfoFactory,
-                SingleValueSparseVectorTypeInfoFactory,
-                SparseVectorTypeInfoFactory,
-                StringTypeInfoFactory,
-                VectorTypeInfoFactory,
+            type_info_classes = [
+                DatetimeTypeInfo,
+                MatrixTypeInfo,
+                SingleValueSparseVectorTypeInfo,
+                SparseVectorTypeInfo,
+                StringTypeInfo,
+                VectorTypeInfo,
             ]
 
-            for compound_module in [ScalarTypeInfoFactories, StructTypeInfoFactories]:
+            for compound_module in [ScalarTypeInfos, StructTypeInfos]:
                 for obj_name in dir(compound_module):
                     if (
                         obj_name.startswith("_")
-                        or not obj_name.endswith("Factory")
-                        or obj_name == "TypeInfoFactory"
+                        or not obj_name.endswith("TypeInfo")
+                        or obj_name == "TypeInfo"
                     ):
                         continue
 
-                    type_info_factory_classes.append(getattr(compound_module, obj_name))
+                    type_info_classes.append(getattr(compound_module, obj_name))
 
-            # Associate the type info factories with the class rather than the instance
+            # Associate the type infos with the class rather than the instance
             # so that we only need to perform this initialization once.
-            cls._type_info_factory_classes = type_info_factory_classes
+            cls._type_info_classes = type_info_classes
 
-        for type_info_factory_class in cls._type_info_factory_classes:
-            if isinstance(type_info_factory_class.TypeName, six.string_types):
-                if type_info_factory_class.TypeName == the_type:
-                    return type_info_factory_class
+        is_optional = False
 
-            elif hasattr(type_info_factory_class.TypeName, "match"):
-                if type_info_factory_class.TypeName.match(the_type):
-                    return type_info_factory_class
+        if the_type.endswith("?"):
+            the_type = the_type[:-1]
+            is_optional = True
 
-        return None
+        type_info_class = None
+
+        for this_type_info_class in cls._type_info_classes:
+            if isinstance(this_type_info_class.TypeName, six.string_types):
+                if this_type_info_class.TypeName == the_type:
+                    type_info_class = this_type_info_class
+                    break
+
+            elif hasattr(this_type_info_class.TypeName, "match"):
+                if this_type_info_class.TypeName.match(the_type):
+                    type_info_class = this_type_info_class
+                    break
+
+        if type_info_class is None:
+            return None
+
+        return type_info_class(
+            *args,
+            member_type=the_type,
+            is_optional=is_optional,
+            create_type_info_func=cls._CreateTypeInfo,
+            **kwargs
+        )

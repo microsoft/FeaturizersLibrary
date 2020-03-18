@@ -12,7 +12,7 @@ import six
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.SharedLibraryPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.SharedLibraryPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -20,7 +20,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 #  ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
-class _StructTypeInfoFactory(TypeInfoFactory):
+class _StructTypeInfo(TypeInfo):
     """Functionality common to all output structs"""
 
     # ----------------------------------------------------------------------
@@ -30,23 +30,28 @@ class _StructTypeInfoFactory(TypeInfoFactory):
     # ----------------------------------------------------------------------
     def __init__(
         self,
+        *args,
         custom_structs=None,
-        custom_enums=None,
-        member_type=None,
-        create_type_info_factory_func=None,
+        **kwargs,
     ):
         if custom_structs:
+            super(_StructTypeInfo, self).__init__(
+                *args,
+                custom_structs=custom_structs,
+                **kwargs
+            )
+
             assert self.TypeName in custom_structs, custom_structs
             self._member_info               = custom_structs[self.TypeName]
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetInputInfo(self, arg_name, is_optional, invocation_template):
+    def GetInputInfo(self, arg_name, invocation_template):
         raise Exception("'{}' is only used as a OutputType".format(self.TypeName))
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetInputBufferInfo(self, arg_name, is_optional, invocation_template):
+    def GetInputBufferInfo(self, arg_name, invocation_template):
         raise Exception("'{}' is only used as a OutputType".format(self.TypeName))
 
     # ----------------------------------------------------------------------
@@ -131,20 +136,6 @@ class _StructTypeInfoFactory(TypeInfoFactory):
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class TimePointTypeInfoFactory(_StructTypeInfoFactory):
+class TimePointTypeInfo(_StructTypeInfo):
     TypeName                                = Interface.DerivedProperty("TimePoint")
     CppType                                 = Interface.DerivedProperty("TimePoint")
-
-
-# ----------------------------------------------------------------------
-@Interface.staticderived
-class HashOneHotEncodingTypeInfoFactory(_StructTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("HashOneHotEncoding")
-    CppType                                 = Interface.DerivedProperty("HashOneHotEncoding")
-
-
-# ----------------------------------------------------------------------
-@Interface.staticderived
-class OneHotEncodingTypeInfoFactory(_StructTypeInfoFactory):
-    TypeName                                = Interface.DerivedProperty("OneHotEncoding")
-    CppType                                 = Interface.DerivedProperty("OneHotEncoding")

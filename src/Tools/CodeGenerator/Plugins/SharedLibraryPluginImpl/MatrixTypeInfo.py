@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the MatrixTypeInfoFactory object"""
+"""Contains the MatrixTypeInfo object"""
 
 import os
 import re
@@ -11,7 +11,7 @@ import textwrap
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.SharedLibraryPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.SharedLibraryPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -20,7 +20,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class MatrixTypeInfoFactory(TypeInfoFactory):
+class MatrixTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     # |
     # |  Public Types
@@ -36,22 +36,27 @@ class MatrixTypeInfoFactory(TypeInfoFactory):
     # ----------------------------------------------------------------------
     def __init__(
         self,
-        custom_structs=None,
-        custom_enums=None,
+        *args,
         member_type=None,
-        create_type_info_factory_func=None,
+        create_type_info_func=None,
+        **kwargs,
     ):
         if member_type is not None:
-            assert create_type_info_factory_func is not None
+            assert create_type_info_func is not None
+
+            super(MatrixTypeInfo, self).__init__(*args, **kwargs)
 
             match = self.TypeName.match(member_type)
             assert match, member_type
 
             the_type = match.group("type")
 
-            type_info = create_type_info_factory_func(the_type)
+            type_info = create_type_info_func(the_type)
             if not hasattr(type_info, "CType"):
                 raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a vector".format(the_type))
+
+            if type_info.IsOptional:
+                raise Exception("Matrix types do not currently support optional values ('{}')".format(the_type))
 
             self._type_info                 = type_info
 
@@ -59,12 +64,12 @@ class MatrixTypeInfoFactory(TypeInfoFactory):
             self._matrix_type               = "Eigen::MatrixX<{}>".format(self._type_info.CType);
             self._map_type                  = "Eigen::Map<{}>".format(self._matrix_type)
 
-            self.CppType = self._map_type
+            self.CppType                    = self._map_type
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetInputInfo(self, arg_name, is_optional, invocation_template):
-        if is_optional:
+    def GetInputInfo(self, arg_name, invocation_template):
+        if self.IsOptional:
             raise Exception("Optional matrix values are not supported")
 
         return self.Result(
@@ -96,8 +101,8 @@ class MatrixTypeInfoFactory(TypeInfoFactory):
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetInputBufferInfo(self, arg_name, is_optional, invocation_template):
-        if is_optional:
+    def GetInputBufferInfo(self, arg_name, invocation_template):
+        if self.IsOptional:
             raise Exception("Optional matrix values are not supported")
 
         return self.Result(

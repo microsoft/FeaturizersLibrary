@@ -10,7 +10,7 @@ import textwrap
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.MLNetPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.MLNetPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -18,17 +18,16 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 #  ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
-class _ScalarTypeInfoFactory(TypeInfoFactory):
+class _ScalarTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     # |
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
-    def GetNativeInputInfo(cls, is_optional):
-        if is_optional:
-            decl = "{}* input".format(cls.CSharpType)
+    def GetNativeInputInfo(self):
+        if self.IsOptional:
+            decl = "{}* input".format(self.CSharpType)
 
             invocation_statement = textwrap.dedent(
                 """\
@@ -38,50 +37,48 @@ class _ScalarTypeInfoFactory(TypeInfoFactory):
                 \t\t\t\t\telse
                     \t\t\t\t\tinteropInput = &input;
                 """,
-            ).format(cls.CSharpType)
+            ).format(self.CSharpType)
 
         else:
-            decl = "{} input".format(cls.CSharpType)
-            invocation_statement = "{} interopInput = input;".format(cls.CSharpType)
+            decl = "{} input".format(self.CSharpType)
+            invocation_statement = "{} interopInput = input;".format(self.CSharpType)
 
-        return cls.Result(decl, None, invocation_statement, "", "")
+        return self.Result(decl, None, invocation_statement, "", "")
 
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
     def GetNativeOutputInfo(
-        cls,
+        self,
         is_struct=False,
         featurizer_name="",
     ):
-        decl = "out {} interopOutput".format(cls.CSharpType)
-        invocation_statement = "{} output = interopOutput;".format(cls.CSharpType)
+        decl = "out {} interopOutput".format(self.CSharpType)
+        invocation_statement = "{} output = interopOutput;".format(self.CSharpType)
 
-        return cls.Result(decl, None, invocation_statement, "", "")
+        return self.Result(decl, None, invocation_statement, "", "")
 
 
 # ----------------------------------------------------------------------
-class _FloatingPointTypeInfoFactory(_ScalarTypeInfoFactory):
+class _FloatingPointTypeInfo(_ScalarTypeInfo):
 
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
-    def GetNativeInputInfo(cls, is_optional):
-        if is_optional:
-            decl = "{}* input".format(cls.TypeName)
-            invocation_statement = "{}* interopInput = &input;".format(cls.CSharpType)
+    def GetNativeInputInfo(self):
+        if self.IsOptional:
+            decl = "{}* input".format(self.TypeName)
+            invocation_statement = "{}* interopInput = &input;".format(self.CSharpType)
         else:
-            decl = "{} input".format(cls.TypeName)
-            invocation_statement = "{} interopInput = input;".format(cls.CSharpType)
+            decl = "{} input".format(self.TypeName)
+            invocation_statement = "{} interopInput = input;".format(self.CSharpType)
 
-        return cls.Result(decl, None, invocation_statement, "", "")
+        return self.Result(decl, None, invocation_statement, "", "")
 
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class Int8TypeInfoFactory(_ScalarTypeInfoFactory):
+class Int8TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("int8")
     CSharpType                              = Interface.DerivedProperty("sbyte")
     CSharpTypeName                          = Interface.DerivedProperty("Int8")
@@ -89,7 +86,7 @@ class Int8TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class Int16TypeInfoFactory(_ScalarTypeInfoFactory):
+class Int16TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("int16")
     CSharpType                              = Interface.DerivedProperty("short")
     CSharpTypeName                          = Interface.DerivedProperty("Int16")
@@ -97,7 +94,7 @@ class Int16TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class Int32TypeInfoFactory(_ScalarTypeInfoFactory):
+class Int32TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("int32")
     CSharpType                              = Interface.DerivedProperty("int")
     CSharpTypeName                          = Interface.DerivedProperty("Int32")
@@ -105,7 +102,7 @@ class Int32TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class Int64TypeInfoFactory(_ScalarTypeInfoFactory):
+class Int64TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("int64")
     CSharpType                              = Interface.DerivedProperty("long")
     CSharpTypeName                          = Interface.DerivedProperty("Int64")
@@ -113,7 +110,7 @@ class Int64TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class UInt8TypeInfoFactory(_ScalarTypeInfoFactory):
+class UInt8TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("uint8")
     CSharpType                              = Interface.DerivedProperty("byte")
     CSharpTypeName                          = Interface.DerivedProperty("UInt8")
@@ -121,7 +118,7 @@ class UInt8TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class UInt16TypeInfoFactory(_ScalarTypeInfoFactory):
+class UInt16TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("uint16")
     CSharpType                              = Interface.DerivedProperty("ushort")
     CSharpTypeName                          = Interface.DerivedProperty("UInt16")
@@ -129,7 +126,7 @@ class UInt16TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class UInt32TypeInfoFactory(_ScalarTypeInfoFactory):
+class UInt32TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("uint32")
     CSharpType                              = Interface.DerivedProperty("uint")
     CSharpTypeName                          = Interface.DerivedProperty("UInt32")
@@ -137,7 +134,7 @@ class UInt32TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class UInt64TypeInfoFactory(_ScalarTypeInfoFactory):
+class UInt64TypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("uint64")
     CSharpType                              = Interface.DerivedProperty("ulong")
     CSharpTypeName                          = Interface.DerivedProperty("UInt64")
@@ -145,7 +142,7 @@ class UInt64TypeInfoFactory(_ScalarTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class FloatTypeInfoFactory(_FloatingPointTypeInfoFactory):
+class FloatTypeInfo(_FloatingPointTypeInfo):
     TypeName                                = Interface.DerivedProperty("float")
     CSharpType                              = Interface.DerivedProperty("float")
     CSharpTypeName                          = Interface.DerivedProperty("Float")
@@ -153,7 +150,7 @@ class FloatTypeInfoFactory(_FloatingPointTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class DoubleTypeInfoFactory(_FloatingPointTypeInfoFactory):
+class DoubleTypeInfo(_FloatingPointTypeInfo):
     TypeName                                = Interface.DerivedProperty("double")
     CSharpType                              = Interface.DerivedProperty("double")
     CSharpTypeName                          = Interface.DerivedProperty("Double")
@@ -161,7 +158,7 @@ class DoubleTypeInfoFactory(_FloatingPointTypeInfoFactory):
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class BoolTypeInfoFactory(_ScalarTypeInfoFactory):
+class BoolTypeInfo(_ScalarTypeInfo):
     TypeName                                = Interface.DerivedProperty("bool")
     CSharpType                              = Interface.DerivedProperty("bool")
     CSharpTypeName                          = Interface.DerivedProperty("Bool")

@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the StringTypeInfoFactory object"""
+"""Contains the StringTypeInfo object"""
 
 import os
 import textwrap
@@ -10,7 +10,7 @@ import textwrap
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.MLNetPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.MLNetPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -19,7 +19,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class StringTypeInfoFactory(TypeInfoFactory):
+class StringTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     # |
     # |  Public Properties
@@ -34,17 +34,16 @@ class StringTypeInfoFactory(TypeInfoFactory):
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
-    def GetNativeInputInfo(cls, is_optional):
-        if is_optional:
+    def GetNativeInputInfo(self):
+        if self.IsOptional:
             invocation_statement = textwrap.dedent(
                 """\
                 var inputAsString = input.ToString();
                 \t\t\t\t\tfixed (byte* interopInput = (string.IsNullOrEmpty(inputAsString) && _parent._options.TreatDefaultAsNull) ? null : Encoding.UTF8.GetBytes(inputAsString + char.MinValue))
                 \t\t\t\t\t{{
                 """,
-            ).format(cls.CSharpType)
+            ).format(self.CSharpType)
 
         else:
             invocation_statement = textwrap.dedent(
@@ -53,21 +52,20 @@ class StringTypeInfoFactory(TypeInfoFactory):
                 fixed (byte* interopInput = Encoding.UTF8.GetBytes(inputAsString + char.MinValue))
                 {{
                 """,
-            ).format(cls.CSharpType)
+            ).format(self.CSharpType)
 
         decl = "byte* input"
 
-        return cls.Result(decl, None, invocation_statement, "}", "")
+        return self.Result(decl, None, invocation_statement, "}", "")
 
     # ----------------------------------------------------------------------
-    @classmethod
     @Interface.override
     def GetNativeOutputInfo(
-        cls,
+        self,
         is_struct=False,
         featurizer_name="",
     ):
-        decl = "out IntPtr interopOutput, out IntPtr outputSize".format(cls.CSharpType)
+        decl = "out IntPtr interopOutput, out IntPtr outputSize".format(self.CSharpType)
         invocation_statement = textwrap.dedent(
             """\
             if (outputSize.ToInt32() == 0)
@@ -80,7 +78,7 @@ class StringTypeInfoFactory(TypeInfoFactory):
                 \t\t\t\t\toutput = new ReadOnlyMemory<char>(Encoding.UTF8.GetString(buffer).ToArray());
             \t\t\t\t\t}}
             """,
-        ).format(cls.CSharpType)
+        ).format(self.CSharpType)
 
         delete_transformed_data = textwrap.dedent(
             """\
@@ -89,7 +87,7 @@ class StringTypeInfoFactory(TypeInfoFactory):
             """,
         ).format(featurizer_name)
 
-        return cls.Result(
+        return self.Result(
             decl,
             None,                           # No validation
             invocation_statement,

@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the MatrixTypeInfoFactory object"""
+"""Contains the MatrixTypeInfo object"""
 
 import os
 import re
@@ -11,7 +11,7 @@ import textwrap
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.MLNetPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.MLNetPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -20,7 +20,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class MatrixTypeInfoFactory(TypeInfoFactory):
+class MatrixTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     # |
     # |  Public Properties
@@ -37,26 +37,31 @@ class MatrixTypeInfoFactory(TypeInfoFactory):
     # ----------------------------------------------------------------------
     def __init__(
         self,
-        custom_structs=None,
-        custom_enums=None,
+        *args,
         member_type=None,
-        create_type_info_factory_func=None,
+        create_type_info_func=None,
+        **kwargs
     ):
         if member_type is not None:
-            assert create_type_info_factory_func is not None
+            assert create_type_info_func is not None
+
+            super(MatrixTypeInfo, self).__init__(*args, **kwargs)
 
             match = self.TypeName.match(member_type)
             assert match, member_type
 
             the_type = match.group("type")
 
-            type_info = create_type_info_factory_func(the_type)
+            type_info = create_type_info_func(the_type)
+
+            if type_info.IsOptional:
+                raise Exception("Matrix types do not currently support optional values ('{}')".format(the_type))
 
             self._type_info                 = type_info
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetNativeInputInfo(self, is_optional):
+    def GetNativeInputInfo(self):
         return self.Result(
             "TODO3: Parameter decl",
             "TODO4: Validation statements",

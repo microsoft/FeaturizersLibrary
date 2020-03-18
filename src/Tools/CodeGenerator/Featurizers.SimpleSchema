@@ -4,7 +4,6 @@
     [type string]
     [name string]
     [description Description]
-    [is_optional bool default="false" ?]
 
 <custom_structs *>:
     [name string]
@@ -78,7 +77,4 @@
         [description Description]
 
         [input_type string]
-        [is_input_optional bool default=false ?]
-
         [output_type string]
-        [is_output_optional bool default=false ?]
