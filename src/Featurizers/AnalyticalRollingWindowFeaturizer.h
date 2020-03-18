@@ -9,6 +9,7 @@
 #include "Components/InferenceOnlyFeaturizerImpl.h"
 #include "Components/WindowFeaturizerBase.h"
 #include "Components/GrainFeaturizerImpl.h"
+#include "../Featurizer.h"
 #include "../Traits.h"
 
 #include <vector>
@@ -17,7 +18,7 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
-static constexpr char const * const         AnalyticalRollingWindowTransformerName("AnalyticalRollingWindowTransformer");
+static constexpr char const * const         AnalyticalRollingWindowEstimatorName("AnalyticalRollingWindowEstimator");
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            AnalyticalRollingWindowCalculation
@@ -31,7 +32,7 @@ enum class AnalyticalRollingWindowCalculation : std::uint8_t {
 
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         RollingWindowTransformer
+///  \class         AnalyticalRollingWindowTransformer
 ///  \brief         RollingWindow class that is used for all analytical window computations.
 ///
 template <
@@ -47,13 +48,6 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType = Components::InferenceOnlyTransformerImpl<InputT, std::vector<double>>;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Members
-    // |
-    // ----------------------------------------------------------------------
-    static constexpr char const * const     Name = AnalyticalRollingWindowTransformerName;
 
     // ----------------------------------------------------------------------
     // |
@@ -126,18 +120,72 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////
-///  \typedef       AnalyticalRollingWindowEstimator
+///  \class         AnalyticalRollingWindowEstimator
 ///  \brief         Estimator that creates `AnalyticalRollingWindowTransformer`.
 ///
-template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
-using AnalyticalRollingWindowEstimator           = Components::InferenceOnlyEstimatorImpl<AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>>;
+template <
+    typename InputT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
+class AnalyticalRollingWindowEstimator :
+    public TransformerEstimator<InputT, std::vector<double>> {//<AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = TransformerEstimator<InputT, std::vector<double>>;
+    
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    AnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount = 1);
+    ~AnalyticalRollingWindowEstimator(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(AnalyticalRollingWindowEstimator);
+
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Members
+    // |
+    // ----------------------------------------------------------------------
+    std::uint32_t                           _windowSize;
+    std::uint32_t                           _horizon;
+    std::uint32_t                           _minWindowCount;
+    AnalyticalRollingWindowCalculation      _windowCalculation;
+
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    bool begin_training_impl(void) override;
+
+    // Note that like in the InferenceOnlyEstimator the following training methods aren't used, but need to be overridden as
+    // the base implementations are abstract. The noop definitions are below.
+    FitResult fit_impl(InputT const *pBuffer, size_t cBuffer) override;
+
+    void complete_training_impl(void) override;
+
+    // MSVC has problems when the definition for the func is separated from its declaration.
+    typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
+        return typename BaseType::TransformerUniquePtr(new AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>(_windowSize, _windowCalculation, _horizon, _minWindowCount));
+    }
+
+};
 
 /////////////////////////////////////////////////////////////////////////
 ///  \typedef       GrainedAnalyticalRollingWindowEstimator
 ///  \brief         GrainedTransformer that creates `AnalyticalRollingWindowEstimator`.
 ///
 // Normally we want the featurizer name at the top of the file, but GrainFeaturizers are just type defs, so we want the name next to it.
-static constexpr char const * const         AnalyticalRollingWindowEstimatorName("AnalyticalRollingWindowEstimator");
+//static constexpr char const * const         AnalyticalRollingWindowEstimatorName("AnalyticalRollingWindowEstimator");
 
 template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
 using GrainedAnalyticalRollingWindowEstimator = Components::GrainEstimatorImpl<std::vector<std::string>, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>;
@@ -214,6 +262,35 @@ void AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::save(Arch
     // Note that we aren't serializing working state
 }
 
+// ----------------------------------------------------------------------
+// |
+// |  AnalyticalRollingWindowEstimator
+// |
+// ----------------------------------------------------------------------
+template <typename InputT, size_t MaxNumTrainingItemsV>
+AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::AnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount) :
+    BaseType(AnalyticalRollingWindowEstimatorName, std::move(pAllColumnAnnotations)),
+    _windowSize(std::move(windowSize)),
+    _windowCalculation(std::move(windowCalculation)),
+    _horizon(std::move(horizon)),
+    _minWindowCount(std::move(minWindowCount))
+    {
+}
+
+template <typename InputT, size_t MaxNumTrainingItemsV>
+bool AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+    // Do not allow any further training
+    return false;
+}
+
+template <typename InputT, size_t MaxNumTrainingItemsV>
+FitResult AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::fit_impl(InputT const *, size_t) /*override*/ {
+    throw std::runtime_error("This should never be called as this class will not be used during training");
+}
+
+template <typename InputT, size_t MaxNumTrainingItemsV>
+void AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+}
 
 } // namespace Featurizers
 } // namespace Featurizer

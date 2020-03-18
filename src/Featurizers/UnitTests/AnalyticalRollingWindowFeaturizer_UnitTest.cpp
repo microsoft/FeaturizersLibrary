@@ -197,34 +197,47 @@ TEST_CASE("Mean - int32, window size 2, horizon 2, min window size 2") {
     CHECK(results[1] == 2.5);
 }
 
-TEST_CASE("Grained Mean - int32, window size 2, horizon 2, min window size 2") {
+TEST_CASE("Estimator Mean - int32, window size 2, horizon 2, min window size 2") {
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>        transformer(pAllColumnAnnotations, 0);
+    NS::Featurizers::AnalyticalRollingWindowEstimator<std::int32_t>                 estimator(pAllColumnAnnotations, 2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
+    estimator.begin_training();
+    estimator.complete_training();
+    auto transformer = estimator.create_transformer();
     //NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>               transformer(2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
+    
+    std::vector<std::vector<double>>   output;
+    auto const                              callback(
+        [&output](std::vector<double> value) {
+            output.emplace_back(std::move(value));
+        }
+    );
 
-    //auto results = transformer.execute(1);
+    //CHECK(*tra == transformer);
+
+    transformer->execute(1, callback);
+    auto results = output[0];
 
     // Since there are NaN values, cannot directly compare the vectors.
     // Correct result is {NaN, NaN}
-    // CHECK(results.size() == 2);
-    // CHECK(std::isnan(results[0]));
-    // CHECK(std::isnan(results[1]));
+    CHECK(results.size() == 2);
+    CHECK(std::isnan(results[0]));
+    CHECK(std::isnan(results[1]));
 
-    // results = transformer.execute(2);
+    // results = transformer->execute(2, callback);
 
     // // Correct result is now {NaN, NaN}
     // CHECK(results.size() == 2);
     // CHECK(std::isnan(results[0]));
     // CHECK(std::isnan(results[1]));
 
-    // results = transformer.execute(3);
+    // results = transformer->execute(3, callback);
 
     // // Correct result is now {NaN, 1.5}
     // CHECK(results.size() == 2);
     // CHECK(std::isnan(results[0]));
     // CHECK(results[1] == 1.5);
 
-    // results = transformer.execute(4);
+    // results = transformer->execute(4, callback);
 
     // // Correct result is now {1.5, 2.5}
     // CHECK(results.size() == 2);
