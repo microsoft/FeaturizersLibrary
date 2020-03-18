@@ -96,15 +96,16 @@ private:
             return;
         }
         Microsoft::Featurizer::RowMajMatrix<std::double_t> ret(_offsets.size(), _horizon);
-        for (std::uint32_t col = 0; col < _horizon; ++col) {
-            for (size_t row = 0; row < _offsets.size(); ++row) {
-                if ((_index - _numPending - (_horizon - 1 - col) + _offsets[row] < 0)) {
-                    ret(static_cast<long long>(row), col) = std::nan("");
+        for (size_t row = 0; row < _offsets.size(); ++row) {
+            // col ranges from _horizon - 1 to 0
+            for (std::uint32_t col = _horizon - 1; col < _horizon; --col) {
+                if ((_index - _numPending - col + _offsets[row] < 0)) {
+                    ret(static_cast<std::int64_t>(row), _horizon - 1 - col) = std::nan("");
                 }
                 else {
-                    ret(static_cast<long long>(row), col) = *std::get<0>(_buffer.range(
+                    ret(static_cast<std::int64_t>(row), _horizon - 1 - col) = *std::get<0>(_buffer.range(
                                                                                         1, 
-                                                                                        static_cast<size_t>(static_cast<long long>(_buffer.size() - _numPending - (_horizon - 1 - col)) + _offsets[row])
+                                                                                        static_cast<size_t>(static_cast<std::int64_t>(_buffer.size() - _numPending - col) + _offsets[row])
                                                                                       ));
                 }
             }
@@ -118,17 +119,18 @@ private:
         if (_numPending != 0) {
             while(_numPending) {
                 Microsoft::Featurizer::RowMajMatrix<std::double_t> ret(_offsets.size(), _horizon);
-                for (std::uint32_t col = 0; col < _horizon; ++col) {
-                    for (size_t row = 0; row < _offsets.size(); ++row) {
+                for (size_t row = 0; row < _offsets.size(); ++row) {
+                    // col ranges from _horizon - 1 to 0
+                    for (std::uint32_t col = _horizon - 1; col < _horizon; --col) {
                         if (
-                            (_index - _numPending - (_horizon - 1 - col) + _offsets[row] < 0) ||
-                            (_numPending <= _offsets[row] - (_horizon - 1 - col))) {
-                            ret(static_cast<long long>(row), col) = std::nan("");
+                            (_index - _numPending - col + _offsets[row] < 0) ||
+                            (_numPending <= _offsets[row] - col)) {
+                            ret(static_cast<std::int64_t>(row), _horizon - 1 - col) = std::nan("");
                         }
                         else {
-                            ret(static_cast<long long>(row), col) = *std::get<0>(_buffer.range(
+                            ret(static_cast<std::int64_t>(row), _horizon - 1 - col) = *std::get<0>(_buffer.range(
                                                                                                 1, 
-                                                                                                static_cast<size_t>(static_cast<long long>(_buffer.size() - _numPending - (_horizon - 1 - col)) + _offsets[row])
+                                                                                                static_cast<size_t>(static_cast<std::int64_t>(_buffer.size() - _numPending - col) + _offsets[row])
                                                                                               ));
                         }
                     }
