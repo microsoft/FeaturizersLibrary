@@ -135,6 +135,8 @@ namespace Components {
         // ----------------------------------------------------------------------
         CircularBuffer(size_t max_size);
 
+        size_t size();
+
         iterator begin();
 
         const_iterator begin() const;
@@ -291,6 +293,11 @@ CircularBuffer<T>::CircularBuffer(size_t max_size) : _max_size(max_size), _start
     }
 
     _data.reserve(_max_size);
+}
+
+template <class T>
+size_t CircularBuffer<T>::size() {
+    return _data.size();
 }
 
 template <class T>
