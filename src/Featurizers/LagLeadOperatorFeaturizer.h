@@ -18,12 +18,13 @@ namespace Featurizers {
 /////////////////////////////////////////////////////////////////////////
 ///  \class         LagLeadOperatorTransformer
 ///  \brief         Copy values from prior data or future data
+///                 Input type is a tuple of std::vector<std::string>, representing grains, and std::double_t, representing target column
 ///
 template <typename InputTupleT>
 class LagLeadOperatorTransformer :
     public Transformer<
         InputTupleT,
-        Microsoft::Featurizer::ColMajMatrix<std::double_t>
+        Microsoft::Featurizer::RowMajMatrix<std::double_t>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -36,7 +37,7 @@ public:
     using BaseType =
         Transformer<
             InputTupleT,
-            Microsoft::Featurizer::ColMajMatrix<std::double_t>
+            Microsoft::Featurizer::RowMajMatrix<std::double_t>
         >;
 
     // ----------------------------------------------------------------------
@@ -94,7 +95,7 @@ private:
             _buffer.push(std::get<1>(input));
             return;
         }
-        Microsoft::Featurizer::ColMajMatrix<std::double_t> ret(_offsets.size(), _horizon);
+        Microsoft::Featurizer::RowMajMatrix<std::double_t> ret(_offsets.size(), _horizon);
         for (std::uint32_t col = 0; col < _horizon; ++col) {
             for (size_t row = 0; row < _offsets.size(); ++row) {
                 if ((_index - _numPending - (_horizon - 1 - col) + _offsets[row] < 0)) {
@@ -116,7 +117,7 @@ private:
     void flush_impl(typename BaseType::CallbackFunction const & callback) override {
         if (_numPending != 0) {
             while(_numPending) {
-                Microsoft::Featurizer::ColMajMatrix<std::double_t> ret(_offsets.size(), _horizon);
+                Microsoft::Featurizer::RowMajMatrix<std::double_t> ret(_offsets.size(), _horizon);
                 for (std::uint32_t col = 0; col < _horizon; ++col) {
                     for (size_t row = 0; row < _offsets.size(); ++row) {
                         if (
