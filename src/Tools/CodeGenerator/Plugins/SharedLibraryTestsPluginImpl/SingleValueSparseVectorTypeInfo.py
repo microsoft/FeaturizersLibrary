@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License
 # ----------------------------------------------------------------------
-"""Contains the MatrixTypeInfoFactory object"""
+"""Contains the SingleValueSparseVectorTypeInfo object"""
 
 import os
 import re
@@ -11,7 +11,7 @@ import textwrap
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from Plugins.SharedLibraryTestsPluginImpl.TypeInfoFactory import TypeInfoFactory
+from Plugins.SharedLibraryTestsPluginImpl.TypeInfo import TypeInfo
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -20,13 +20,13 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 # ----------------------------------------------------------------------
 @Interface.staticderived
-class MatrixTypeInfoFactory(TypeInfoFactory):
+class SingleValueSparseVectorTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     # |
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
-    TypeName                                = Interface.DerivedProperty(re.compile(r"matrix\<(?P<type>\S+)\>"))
+    TypeName                                = Interface.DerivedProperty(re.compile(r"single_value_sparse_vector\<(?P<type>\S+)\>"))
     CppType                                 = Interface.DerivedProperty(None)
 
     # ----------------------------------------------------------------------
@@ -36,22 +36,27 @@ class MatrixTypeInfoFactory(TypeInfoFactory):
     # ----------------------------------------------------------------------
     def __init__(
         self,
-        custom_structs=None,
-        custom_enums=None,
+        *args,
         member_type=None,
-        create_type_info_factory_func=None,
+        create_type_info_func=None,
+        **kwargs
     ):
         if member_type is not None:
-            assert create_type_info_factory_func is not None
+            assert create_type_info_func is not None
+
+            super(SingleValueSparseVectorTypeInfo, self).__init__(*args, **kwargs)
 
             match = self.TypeName.match(member_type)
             assert match, member_type
 
             the_type = match.group("type")
 
-            type_info = create_type_info_factory_func(the_type)
+            type_info = create_type_info_func(the_type)
             if not hasattr(type_info, "CType"):
-                raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a vector".format(the_type))
+                raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a single_value_sparse_vector".format(the_type))
+
+            if type_info.IsOptional:
+                raise Exception("SingleValueSparseVector types do not currently support optional values ('{}')".format(the_type))
 
             self._type_info                 = type_info
 
@@ -59,12 +64,9 @@ class MatrixTypeInfoFactory(TypeInfoFactory):
     @Interface.override
     def GetTransformInputArgs(
         self,
-        is_input_optional,
         input_name="input",
     ):
-        return "static_cast<size_t>({name}.cols()), static_cast<size_t>({name}.rows()), {name}.data()".format(
-            name=input_name,
-        )
+        raise NotImplementedError("This structure is only used during output")
 
     # ----------------------------------------------------------------------
     @Interface.override
@@ -73,34 +75,31 @@ class MatrixTypeInfoFactory(TypeInfoFactory):
         result_name="result",
     ):
         return self.Result(
-            "Eigen::MatrixX<{}>".format(self._type_info.CppType),
+            "Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<{}>".format(self._type_info.CppType),
             textwrap.dedent(
                 """\
-                size_t {name}_cols(0);
-                size_t {name}_rows(0);
-                {type} * {name}_ptr(nullptr);
+                uint64_t {result}_numElements(0);
+                {type} {result}_value;
+                uint64_t {result}_index(0);
                 """,
             ).format(
                 type=self._type_info.CppType,
-                name=result_name,
+                result=result_name,
             ),
-            "&{name}_cols, &{name}_rows, &{name}_ptr".format(
-                name=result_name,
+            "&{result}_numElements, &{result}_value, &{result}_index".format(
+                result=result_name,
             ),
             textwrap.dedent(
                 """\
                 #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-                results.push_back(Eigen::Map<Eigen::MatrixX<{type}>>({name}_ptr, static_cast<Eigen::Index>({name}_cols), static_cast<Eigen::Index>({name}_rows)));
+                results.push_back(Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<{type}>({result}_numElements, {result}_value, {result}_index));
                 #else
-                results.emplace_back(Eigen::Map<Eigen::MatrixX<{type}>>({name}_ptr, static_cast<Eigen::Index>({name}_cols), static_cast<Eigen::Index>({name}_rows)));
+                results.emplace_back({result}_numElements, {result}_value, {result}_index);
                 #endif
                 """,
             ).format(
+                result=result_name,
                 type=self._type_info.CppType,
-                name=result_name,
             ),
-            "{name}_cols, {name}_rows, {name}_ptr".format(
-                name=result_name,
-            ),
-            destroy_inline=True,
+            None,
         )

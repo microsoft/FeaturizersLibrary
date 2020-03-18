@@ -279,8 +279,6 @@ def EntryPoint(
 
                         new_item.input_type = mapping.input_type
                         new_item.output_type = mapping.output_type
-                        new_item.is_input_optional = mapping.is_input_optional
-                        new_item.is_output_optional = mapping.is_output_optional
 
                         new_data.append([new_item])
 
@@ -334,8 +332,6 @@ def EntryPoint(
                                 template_type,
                                 mapping.output_type,
                             )
-                            new_item.is_input_optional = mapping.is_input_optional
-                            new_item.is_output_optional = mapping.is_output_optional
 
                             # This will end up copying one more time than needed, but I couldn't think of a better way for now.
                             new_data_items.append(copy.deepcopy(new_item))
@@ -379,26 +375,34 @@ def EntryPoint(
 
                     # ----------------------------------------------------------------------
 
+                    input_type = item.input_type
+                    if input_type.endswith("?"):
+                        input_type = input_type[:-1]
+
                     if (
-                        not IsSupportedType(item.input_type)
-                        and not IsCustomStructType(item.input_type)
-                        and not IsCustomEnumType(item.input_type)
+                        not IsSupportedType(input_type)
+                        and not IsCustomStructType(input_type)
+                        and not IsCustomEnumType(input_type)
                     ):
                         raise Exception(
                             "The input type '{}' defined in '{}' is not valid.".format(
-                                item.input_type,
+                                input_type,
                                 item.name,
                             ),
                         ) from None
 
+                    output_type = item.output_type
+                    if output_type.endswith("?"):
+                        output_type = output_type[:-1]
+
                     if (
-                        not IsSupportedType(item.output_type)
-                        and not IsCustomStructType(item.output_type)
-                        and not IsCustomEnumType(item.output_type)
+                        not IsSupportedType(output_type)
+                        and not IsCustomStructType(output_type)
+                        and not IsCustomEnumType(output_type)
                     ):
                         raise Exception(
                             "The output type '{}' defined in '{}' is not valid.".format(
-                                item.output_type,
+                                output_type,
                                 item.name,
                             ),
                         ) from None
