@@ -137,6 +137,8 @@ namespace Components {
 
         size_t size() const;
 
+        size_t capacity() const;
+
         iterator begin();
 
         const_iterator begin() const;
@@ -298,6 +300,11 @@ CircularBuffer<T>::CircularBuffer(size_t max_size) : _max_size(max_size), _start
 template <class T>
 size_t CircularBuffer<T>::size() const {
     return _data.size();
+}
+
+template <class T>
+size_t CircularBuffer<T>::capacity() const {
+    return _data.capacity();
 }
 
 template <class T>

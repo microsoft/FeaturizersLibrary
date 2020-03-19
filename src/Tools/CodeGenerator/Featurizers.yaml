@@ -28,7 +28,7 @@ featurizers:
             | A         | 11    | [5]               |
             +-----------+-------+-------------------+
 
-            A more complex example would be, assuming we have horizon = 2, window size = 2, min window periods = 2, and we want the mean
+            A more complex example would be, assuming we have horizon = 2, window size = 2, min window size = 2, and we want the mean
             +-----------+-------+-------------------+
             | grain     | target| target_max        |
             +===========+=======+===================+
@@ -80,7 +80,7 @@ featurizers:
         description: The horizon value. The size of the output vector will be equal to this value.
 
       - type: uint32?
-        name: minWindowCount
+        name: minWindowSize
         description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
 
     status: Pending
@@ -1220,7 +1220,7 @@ featurizers:
           | A         | 11    | [4]               |
           +-----------+-------+-------------------+
 
-          A more complex example would be, assuming we have horizon = 2, window size = 2, minWindowCount = 2, and we want the maximum value
+          A more complex example would be, assuming we have horizon = 2, window size = 2, minWindowSize = 2, and we want the maximum value
           +-----------+-------+-------------------+
           | grain     | target| target_max        |
           +===========+=======+===================+
@@ -1274,7 +1274,7 @@ featurizers:
         description: The horizon value. The size of the output vector will be equal to this value.
 
       - type: uint32?
-        name: minWindowCount
+        name: minWindowSize
         description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
 
     status: Pending
