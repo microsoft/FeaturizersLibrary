@@ -201,6 +201,30 @@ TEST_CASE("CircularBuffer - Size 0 buffer") {
     CHECK_THROWS_WITH(NS::Featurizers::Components::CircularBuffer<std::string>(0), "Max size cannot be zero");
 }
 
+TEST_CASE("CircularBuffer - Size") {
+    NS::Featurizers::Components::CircularBuffer<std::string> circ_buf(5);
+    // size should start with 0
+    CHECK(circ_buf.size() == 0);
+    // size would be incremented as data are pushed
+    circ_buf.push("1");
+    CHECK(circ_buf.size() == 1);
+    
+    circ_buf.push("2");
+    CHECK(circ_buf.size() == 2);
+    
+    circ_buf.push("3");
+    CHECK(circ_buf.size() == 3);
+    
+    circ_buf.push("4");
+    CHECK(circ_buf.size() == 4);
+    
+    circ_buf.push("5");
+    CHECK(circ_buf.size() == 5);
+    // size reaches the maximum of 5 and never changed
+    circ_buf.push("6");
+    CHECK(circ_buf.size() == 5);
+}
+
 TEST_CASE("CircularBuffer - Push") {
     NS::Featurizers::Components::CircularBuffer<std::string> circ_buf(5);
 
