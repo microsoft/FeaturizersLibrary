@@ -208,10 +208,13 @@ TEST_CASE("CircularBuffer - Size capacity full") {
     // size should start with 0
     CHECK(circ_buf.size() == 0);
     // buffer is not full
-    CHECK(!circ_buf.full());
+    CHECK(!circ_buf.is_full());
     // size would be incremented as data are pushed
     circ_buf.push("1");
     CHECK(circ_buf.size() == 1);
+    
+    // capacity remains the same after an element is pushed
+    CHECK(circ_buf.capacity() == 5);
     
     circ_buf.push("2");
     CHECK(circ_buf.size() == 2);
@@ -225,12 +228,15 @@ TEST_CASE("CircularBuffer - Size capacity full") {
     circ_buf.push("5");
     CHECK(circ_buf.size() == 5);
     // buffer is full
-    CHECK(circ_buf.full());
+    CHECK(circ_buf.is_full());
     // size reaches the maximum of 5 and never changed
     circ_buf.push("6");
     CHECK(circ_buf.size() == 5);
+
+    // capacity remains the same after more than 5 elements are pushed
+    CHECK(circ_buf.capacity() == 5);
     // buffer is full
-    CHECK(circ_buf.full());
+    CHECK(circ_buf.is_full());
 }
 
 TEST_CASE("CircularBuffer - Push") {

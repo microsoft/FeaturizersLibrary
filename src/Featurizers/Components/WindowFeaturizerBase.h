@@ -139,7 +139,7 @@ namespace Components {
 
         size_t capacity() const;
 
-        bool full() const;
+        bool is_full() const;
 
         iterator begin();
 
@@ -310,7 +310,7 @@ size_t CircularBuffer<T>::capacity() const {
 }
 
 template <class T>
-bool CircularBuffer<T>::full() const {
+bool CircularBuffer<T>::is_full() const {
     return size() == _max_size;
 }
 
