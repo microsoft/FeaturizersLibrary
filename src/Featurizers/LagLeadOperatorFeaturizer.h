@@ -20,10 +20,10 @@ namespace Featurizers {
 ///  \brief         Copy values from prior data or future data
 ///                 Input type is a tuple of std::vector<std::string>, representing grains, and std::double_t, representing target column
 ///
-template <typename InputTupleT>
+template <typename InputT>
 class LagLeadOperatorTransformer :
     public Transformer<
-        InputTupleT,
+        InputT,
         Microsoft::Featurizer::RowMajMatrix<std::double_t>
     > {
 public:
@@ -32,11 +32,10 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    static_assert(Components::Details::IsTuple<InputTupleT>::value, "'InputTupleT' must be a tuple");
 
     using BaseType =
         Transformer<
-            InputTupleT,
+            InputT,
             Microsoft::Featurizer::RowMajMatrix<std::double_t>
         >;
 
@@ -72,11 +71,10 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    Components::CircularBuffer<TargetType>  _buffer;
-    std::int64_t const                      _max_future_offset;
-    std::int64_t const                      _max_prior_offset;
     std::uint32_t const                     _horizon;
     std::vector<std::int64_t> const         _offsets;
+    Components::CircularBuffer<TargetType>  _buffer;
+    std::int64_t const                      _max_future_offset;
     std::int64_t                            _index;
     std::uint32_t                           _numPending;
     
@@ -92,25 +90,30 @@ private:
         if (_max_future_offset != 0 && _index <= _max_future_offset + _horizon - 1) {
             ++_index;
             ++_numPending;
-            _buffer.push(std::get<1>(input));
+            _buffer.push(input);
             return;
         }
         Microsoft::Featurizer::RowMajMatrix<std::double_t> ret(_offsets.size(), _horizon);
-        for (size_t row = 0; row < _offsets.size(); ++row) {
+        for (std::uint32_t row = 0; row < _offsets.size(); ++row) {
             // col ranges from _horizon - 1 to 0
             for (std::uint32_t col = _horizon - 1; col < _horizon; --col) {
                 if ((_index - _numPending - col + _offsets[row] < 0)) {
-                    ret(static_cast<std::int64_t>(row), _horizon - 1 - col) = std::nan("");
+                    ret(static_cast<std::int32_t>(row), static_cast<std::int32_t>(_horizon - 1 - col)) = std::nan("");
                 }
                 else {
-                    ret(static_cast<std::int64_t>(row), _horizon - 1 - col) = *std::get<0>(_buffer.range(
+                    if (_offsets[row] == 0 && col == 0) {
+                        ret(static_cast<std::int32_t>(row), static_cast<std::int32_t>(_horizon - 1 - col)) = input;
+                    }
+                    else {
+                        ret(static_cast<std::int32_t>(row), static_cast<std::int32_t>(_horizon - 1 - col)) = *std::get<0>(_buffer.range(
                                                                                         1, 
                                                                                         static_cast<size_t>(static_cast<std::int64_t>(_buffer.size() - _numPending - col) + _offsets[row])
                                                                                       ));
+                    }
                 }
             }
         }
-        _buffer.push(std::get<1>(input));
+        _buffer.push(input);
         ++_index;
         callback(ret);
     }
@@ -119,16 +122,16 @@ private:
         if (_numPending != 0) {
             while(_numPending) {
                 Microsoft::Featurizer::RowMajMatrix<std::double_t> ret(_offsets.size(), _horizon);
-                for (size_t row = 0; row < _offsets.size(); ++row) {
+                for (std::uint32_t row = 0; row < _offsets.size(); ++row) {
                     // col ranges from _horizon - 1 to 0
                     for (std::uint32_t col = _horizon - 1; col < _horizon; --col) {
                         if (
                             (_index - _numPending - col + _offsets[row] < 0) ||
                             (_numPending <= _offsets[row] - col)) {
-                            ret(static_cast<std::int64_t>(row), _horizon - 1 - col) = std::nan("");
+                            ret(static_cast<std::int32_t>(row), static_cast<std::int32_t>(_horizon - 1 - col)) = std::nan("");
                         }
                         else {
-                            ret(static_cast<std::int64_t>(row), _horizon - 1 - col) = *std::get<0>(_buffer.range(
+                            ret(static_cast<std::int32_t>(row), static_cast<std::int32_t>(_horizon - 1 - col)) = *std::get<0>(_buffer.range(
                                                                                                 1, 
                                                                                                 static_cast<size_t>(static_cast<std::int64_t>(_buffer.size() - _numPending - col) + _offsets[row])
                                                                                               ));
@@ -146,8 +149,8 @@ private:
 ///  \typedef       LagLeadOperatorEstimator
 ///  \brief         Estimator that creates `LagLeadOperatorTransformer`.
 ///
-template <typename InputTupleT>
-using LagLeadOperatorEstimator           = Components::InferenceOnlyEstimatorImpl<LagLeadOperatorTransformer<InputTupleT>>;
+template <typename InputT>
+using LagLeadOperatorEstimator           = Components::InferenceOnlyEstimatorImpl<LagLeadOperatorTransformer<InputT>>;
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -160,20 +163,15 @@ using LagLeadOperatorEstimator           = Components::InferenceOnlyEstimatorImp
 // ----------------------------------------------------------------------
 template <typename T>
 LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(std::uint32_t horizon, std::vector<std::int64_t> offsets) :
-    // if there are more than one offset provided, we need find the difference between max and min value to determine buffer size
-    // and if there's only one offset, we use the absolute value of it as the size
-    _buffer(Components::CircularBuffer<TargetType>(horizon +
-        (offsets.size() == 1 ? 
-        static_cast<size_t>(std::abs(offsets[0])) : 
-        static_cast<size_t>(*std::max_element(offsets.cbegin(),offsets.cend()) - *std::min_element(offsets.cbegin(),offsets.cend()))))
-    ),
-    _max_future_offset(std::move(
-        *std::max_element(offsets.cbegin(), offsets.cend()) > 0 ?  *std::max_element(offsets.cbegin(), offsets.cend()) : 0
+    _horizon(
+        std::move(
+            [&horizon](void) -> std::uint32_t & {
+                if (horizon == 0) {
+                    throw std::invalid_argument("Horizon cannot be 0!");
+                }
+                return horizon;
+            }()
     )),
-    _max_prior_offset(std::move(
-        *std::min_element(offsets.cbegin(), offsets.cend()) < 0 ?  -(*std::min_element(offsets.cbegin(), offsets.cend())) : 0
-    )),
-    _horizon(std::move(horizon)),
     _offsets(
         std::move(
             [&offsets](void) -> std::vector<std::int64_t> & {
@@ -184,6 +182,17 @@ LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(std::uint32_t horizon,
             }()
         )
     ),
+    // if there are more than one offset provided, we need find the difference between max and min value to determine buffer size
+    // and if there's only one offset, we use the absolute value of it as the size
+    _buffer(Components::CircularBuffer<TargetType>(
+        horizon +
+        (_offsets.size() == 1 ? 
+        static_cast<size_t>(std::abs(_offsets[0])) : 
+        static_cast<size_t>(*std::max_element(_offsets.cbegin(),_offsets.cend()) - *std::min_element(_offsets.cbegin(),_offsets.cend()))))
+    ),
+    _max_future_offset(std::move(
+        *std::max_element(_offsets.cbegin(), _offsets.cend()) > 0 ?  *std::max_element(_offsets.cbegin(), _offsets.cend()) : 0
+    )),
     _index(0),
     _numPending(0) {
 }
