@@ -135,7 +135,7 @@ namespace Components {
         // ----------------------------------------------------------------------
         CircularBuffer(size_t max_size);
 
-        size_t size(void) const;
+        size_t size() const;
 
         iterator begin();
 
