@@ -145,7 +145,7 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType                          = TransformerEstimator<InputT, std::vector<double>>;
-    
+    using TransformerType                   = AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>;
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
