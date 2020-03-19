@@ -67,13 +67,22 @@ public:
 private:
     // ----------------------------------------------------------------------
     // |
+    // |  Private Types
+    // |
+    // ----------------------------------------------------------------------
+    using OutputType = std::vector<double>;    
+
+    // ----------------------------------------------------------------------
+    // |
     // |  Private Members
     // |
     // ----------------------------------------------------------------------
+    // _windowSizes and _minWindowCount are int64 so that we can have the full positive range of the uint32 it comes
+    // in as but can still support negative numbers.
     Components::CircularBuffer<InputT>      _buffer;
-    std::uint32_t                           _windowSize;
+    std::int64_t                            _windowSize;
     std::uint32_t                           _horizon;
-    std::uint32_t                           _minWindowCount;
+    std::int64_t                            _minWindowCount;
     AnalyticalRollingWindowCalculation      _windowCalculation;
 
     // ----------------------------------------------------------------------
@@ -84,28 +93,28 @@ private:
 
     // MSVC runs into problems when the declaration and definition are separated
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-        std::vector<double>         results(_horizon);
+        OutputType         results(_horizon);
         
         _buffer.push(input);
         size_t bufferSize = _buffer.size();
 
         for (int i = _horizon; i > 0; i--){
-            // TODO: Fix casting here.
-            int elementsAvailableToUse(static_cast<int>(bufferSize) - i);
+            // We cast to int32 here because -1 is valid for the algorithm.
+            std::int32_t elementsAvailableToUse(static_cast<std::int32_t>(bufferSize) - i);
 
             // If we don't have enough elements then output NaN
-            if (elementsAvailableToUse < static_cast<int>(_minWindowCount)) {
-                results[_horizon - i] = std::nan("1");
+            if (elementsAvailableToUse < _minWindowCount) {
+                results[_horizon - i] = std::nan("");
 
             // If we have strictly less elements then the window size, but more then the minimum size
-            } else if (elementsAvailableToUse < static_cast<int>(_windowSize)) {
+            } else if (elementsAvailableToUse < _windowSize) {
                 const auto range = _buffer.range(_windowSize - elementsAvailableToUse);
                 auto start_iter = std::get<0>(range);
                 auto end_iter = std::get<1>(range);
 
                 results[_horizon - i] = Calculators::MeanCalculator<BaseType::InputType>::execute(start_iter, end_iter);
 
-            // More elements in the buffer than are needed in the window
+            // More elements are in the buffer than are needed in the window
             } else {
                 const auto range = _buffer.range(_windowSize, bufferSize - i - _windowSize);
                 auto start_iter = std::get<0>(range);
@@ -128,7 +137,7 @@ template <
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class AnalyticalRollingWindowEstimator :
-    public TransformerEstimator<InputT, std::vector<double>> {//<AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>> {
+    public TransformerEstimator<InputT, std::vector<double>> {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -185,7 +194,7 @@ private:
 ///  \brief         GrainedTransformer that creates `AnalyticalRollingWindowEstimator`.
 ///
 // Normally we want the featurizer name at the top of the file, but GrainFeaturizers are just type defs, so we want the name next to it.
-//static constexpr char const * const         AnalyticalRollingWindowEstimatorName("AnalyticalRollingWindowEstimator");
+static constexpr char const * const         GrainedAnalyticalRollingWindowEstimatorName("GrainAnalyticalRollingWindowEstimator");
 
 template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
 using GrainedAnalyticalRollingWindowEstimator = Components::GrainEstimatorImpl<std::vector<std::string>, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>;
@@ -226,10 +235,11 @@ AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::AnalyticalRoll
             if(majorVersion != 1 || minorVersion != 0)
                 throw std::runtime_error("Unsupported archive version");
 
-            std::uint32_t                       windowSize(Traits<std::uint32_t>::deserialize(ar));
+            // Because we know that windowSize and minWindowCount come in originally as uint32, this cast is always safe
+            std::uint32_t                       windowSize(static_cast<std::uint32_t>(Traits<std::int64_t>::deserialize(ar)));
             AnalyticalRollingWindowCalculation  windowCalculation(static_cast<AnalyticalRollingWindowCalculation>(Traits<std::uint8_t>::deserialize(ar)));
             std::uint32_t                       horizon(Traits<std::uint32_t>::deserialize(ar));
-            std::uint32_t                       minWindowCount(Traits<std::uint32_t>::deserialize(ar));
+            std::uint32_t                       minWindowCount(static_cast<std::uint32_t>(Traits<std::int64_t>::deserialize(ar)));
 
 
             return AnalyticalRollingWindowTransformer(std::move(windowSize), std::move(windowCalculation), std::move(horizon), std::move(minWindowCount));
@@ -254,10 +264,10 @@ void AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::save(Arch
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
-    Traits<std::uint32_t>::serialize(ar, _windowSize);
+    Traits<std::int64_t>::serialize(ar, _windowSize);
     Traits<std::uint8_t>::serialize(ar, static_cast<std::uint8_t>(_windowCalculation));
     Traits<std::uint32_t>::serialize(ar, _horizon);
-    Traits<std::uint32_t>::serialize(ar, _minWindowCount);
+    Traits<std::int64_t>::serialize(ar, _minWindowCount);
 
     // Note that we aren't serializing working state
 }

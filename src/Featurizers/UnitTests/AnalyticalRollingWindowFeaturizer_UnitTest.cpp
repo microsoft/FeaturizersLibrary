@@ -203,7 +203,6 @@ TEST_CASE("Estimator Mean - int32, window size 2, horizon 2, min window size 2")
     estimator.begin_training();
     estimator.complete_training();
     auto transformer = estimator.create_transformer();
-    //NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>               transformer(2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
     
     std::vector<std::vector<double>>   output;
     auto const                              callback(
@@ -211,8 +210,6 @@ TEST_CASE("Estimator Mean - int32, window size 2, horizon 2, min window size 2")
             output.emplace_back(std::move(value));
         }
     );
-
-    //CHECK(*tra == transformer);
 
     transformer->execute(1, callback);
     auto results = output[0];
@@ -223,26 +220,81 @@ TEST_CASE("Estimator Mean - int32, window size 2, horizon 2, min window size 2")
     CHECK(std::isnan(results[0]));
     CHECK(std::isnan(results[1]));
 
-    // results = transformer->execute(2, callback);
+    transformer->execute(2, callback);
+    results = output[1];
 
-    // // Correct result is now {NaN, NaN}
-    // CHECK(results.size() == 2);
+    // Correct result is now {NaN, NaN}
+    CHECK(results.size() == 2);
+    CHECK(std::isnan(results[0]));
+    CHECK(std::isnan(results[1]));
+
+    transformer->execute(3, callback);
+    results = output[2];
+
+    // Correct result is now {NaN, 1.5}
+    CHECK(results.size() == 2);
+    CHECK(std::isnan(results[0]));
+    CHECK(results[1] == 1.5);
+
+    transformer->execute(4, callback);
+    results = output[3]; 
+
+    // Correct result is now {1.5, 2.5}
+    CHECK(results.size() == 2);
+    CHECK(results[0] == 1.5);
+    CHECK(results[1] == 2.5);
+}
+
+TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {
+    // TODO: This test is not currently working. Leaving it in for now while we figure out how to handle grains.
+    
+    // Since we are doing the mean of one value and a horizon of one, the result should always be equal to the prior value passed into execute.
+    NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations,
+                                                                                        [] (NS::AnnotationMapsPtr pAllColumnAnnotationsParam) {
+                                                                                            return NS::Featurizers::AnalyticalRollingWindowEstimator<std::int32_t>(pAllColumnAnnotationsParam, 2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
+                                                                                        });
+
+    estimator.begin_training();
+    estimator.complete_training();
+    auto transformer = estimator.create_transformer();
+
+    std::vector<std::tuple<std::vector<std::string>,std::vector<double>>>   output;
+    auto const                              callback(
+        [&output](std::tuple<std::vector<std::string>,std::vector<double>> value) {
+            output.emplace_back(std::move(value));
+        }
+    );
+
+    // const std::vector<std::string> grain({"one"});
+    // const auto tup1 = std::make_tuple(grain, 1);
+
+    // transformer->execute(tup1, callback);
+    // auto results = output[0];
+    // int r = 4;
+    // r=r;
+    // // Since there are NaN values, cannot directly compare the vectors.
+    // // Correct result is {NaN}
+    // CHECK(results.size() == 1);
     // CHECK(std::isnan(results[0]));
-    // CHECK(std::isnan(results[1]));
 
-    // results = transformer->execute(3, callback);
+    // results = transformer.execute(2);
 
-    // // Correct result is now {NaN, 1.5}
-    // CHECK(results.size() == 2);
-    // CHECK(std::isnan(results[0]));
-    // CHECK(results[1] == 1.5);
+    // // Correct result is now {1}
+    // CHECK(results.size() == 1);
+    // CHECK(results[0] == 1.0);
 
-    // results = transformer->execute(4, callback);
+    // results = transformer.execute(3);
 
-    // // Correct result is now {1.5, 2.5}
-    // CHECK(results.size() == 2);
-    // CHECK(results[0] == 1.5);
-    // CHECK(results[1] == 2.5);
+    // // Correct result is now {2}
+    // CHECK(results.size() == 1);
+    // CHECK(results[0] == 2.0);
+
+    // results = transformer.execute(4);
+
+    // // Correct result is now {3}
+    // CHECK(results.size() == 1);
+    // CHECK(results[0] == 3.0);
 }
 
 TEST_CASE("Serialization/Deserialization") {
