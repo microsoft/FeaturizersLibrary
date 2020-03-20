@@ -18,13 +18,13 @@ namespace Featurizers {
 /////////////////////////////////////////////////////////////////////////
 ///  \class         LagLeadOperatorTransformer
 ///  \brief         Copy values from prior data or future data
-///                 Input type is a tuple of std::vector<std::string>, representing grains, and std::double_t, representing target column
+///                 Input type is a tuple of std::vector<std::string>, representing grains, and InputT, representing target column
 ///
 template <typename InputT>
 class LagLeadOperatorTransformer :
     public Transformer<
         InputT,
-        Microsoft::Featurizer::RowMajMatrix<std::double_t>
+        Microsoft::Featurizer::RowMajMatrix<nonstd::optional<InputT>>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -36,7 +36,7 @@ public:
     using BaseType =
         Transformer<
             InputT,
-            Microsoft::Featurizer::RowMajMatrix<std::double_t>
+            Microsoft::Featurizer::RowMajMatrix<nonstd::optional<InputT>>
         >;
 
     // ----------------------------------------------------------------------
@@ -63,8 +63,7 @@ private:
     // |
     // ----------------------------------------------------------------------
     using GrainType  = std::vector<std::string>;
-    // TODO: change target type to general types
-    using TargetType = std::double_t;
+    using TargetType = nonstd::optional<InputT>;
 
     // ----------------------------------------------------------------------
     // |
@@ -73,10 +72,9 @@ private:
     // ----------------------------------------------------------------------
     std::uint32_t const                     _horizon;
     std::vector<std::int64_t> const         _offsets;
-    Components::CircularBuffer<TargetType>  _buffer;
     std::int64_t const                      _max_future_offset;
-    std::int64_t                            _index;
-    std::uint32_t                           _numPending;
+    std::int64_t const                      _max_prior_offset;
+    Components::CircularBuffer<TargetType>  _buffer;
     
 
     // ----------------------------------------------------------------------
@@ -84,65 +82,20 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
-
     // MSVC runs into problems when the declaration and definition are separated
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-        if (_max_future_offset != 0 && _index <= _max_future_offset + _horizon - 1) {
-            ++_index;
-            ++_numPending;
-            _buffer.push(input);
-            return;
-        }
-        Microsoft::Featurizer::RowMajMatrix<std::double_t> ret(_offsets.size(), _horizon);
-        for (std::uint32_t row = 0; row < _offsets.size(); ++row) {
-            // col ranges from _horizon - 1 to 0
-            for (std::uint32_t col = _horizon - 1; col < _horizon; --col) {
-                if ((_index - _numPending - col + _offsets[row] < 0)) {
-                    ret(static_cast<std::int32_t>(row), static_cast<std::int32_t>(_horizon - 1 - col)) = std::nan("");
-                }
-                else {
-                    if (_offsets[row] == 0 && col == 0) {
-                        ret(static_cast<std::int32_t>(row), static_cast<std::int32_t>(_horizon - 1 - col)) = input;
-                    }
-                    else {
-                        ret(static_cast<std::int32_t>(row), static_cast<std::int32_t>(_horizon - 1 - col)) = *std::get<0>(_buffer.range(
-                                                                                        1, 
-                                                                                        static_cast<size_t>(static_cast<std::int64_t>(_buffer.size() - _numPending - col) + _offsets[row])
-                                                                                      ));
-                    }
-                }
-            }
-        }
-        _buffer.push(input);
-        ++_index;
-        callback(ret);
+        execute_helper(nonstd::optional<typename BaseType::InputType>(input), callback);
     }
 
     void flush_impl(typename BaseType::CallbackFunction const & callback) override {
-        if (_numPending != 0) {
-            while(_numPending) {
-                Microsoft::Featurizer::RowMajMatrix<std::double_t> ret(_offsets.size(), _horizon);
-                for (std::uint32_t row = 0; row < _offsets.size(); ++row) {
-                    // col ranges from _horizon - 1 to 0
-                    for (std::uint32_t col = _horizon - 1; col < _horizon; --col) {
-                        if (
-                            (_index - _numPending - col + _offsets[row] < 0) ||
-                            (_numPending <= _offsets[row] - col)) {
-                            ret(static_cast<std::int32_t>(row), static_cast<std::int32_t>(_horizon - 1 - col)) = std::nan("");
-                        }
-                        else {
-                            ret(static_cast<std::int32_t>(row), static_cast<std::int32_t>(_horizon - 1 - col)) = *std::get<0>(_buffer.range(
-                                                                                                1, 
-                                                                                                static_cast<size_t>(static_cast<std::int64_t>(_buffer.size() - _numPending - col) + _offsets[row])
-                                                                                              ));
-                        }
-                    }
-                }
-                callback(ret);
-                _numPending--;
-            }
+        std::int64_t _numPending = 0;
+        while (_numPending < _max_future_offset) {
+            execute_helper(Traits<nonstd::optional<InputT>>::CreateNullValue(), callback);
+            ++_numPending;
         }
     }
+
+    void execute_helper(nonstd::optional<typename BaseType::InputType> const &input, typename BaseType::CallbackFunction const &callback);
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -182,19 +135,24 @@ LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(std::uint32_t horizon,
             }()
         )
     ),
-    // if there are more than one offset provided, we need find the difference between max and min value to determine buffer size
-    // and if there's only one offset, we use the absolute value of it as the size
-    _buffer(Components::CircularBuffer<TargetType>(
-        horizon +
-        (_offsets.size() == 1 ? 
-        static_cast<size_t>(std::abs(_offsets[0])) : 
-        static_cast<size_t>(*std::max_element(_offsets.cbegin(),_offsets.cend()) - *std::min_element(_offsets.cbegin(),_offsets.cend()))))
-    ),
     _max_future_offset(std::move(
         *std::max_element(_offsets.cbegin(), _offsets.cend()) > 0 ?  *std::max_element(_offsets.cbegin(), _offsets.cend()) : 0
     )),
-    _index(0),
-    _numPending(0) {
+    _max_prior_offset(std::move(
+        *std::min_element(_offsets.cbegin(), _offsets.cend()) < 0 ?  *std::min_element(_offsets.cbegin(), _offsets.cend()) : 0
+    )),
+    // if there are more than one offset provided, we need find the difference between max and min value to determine buffer size
+    // and if there's only one offset, we use the absolute value of it as the size
+    _buffer(
+        _horizon + 
+        (_offsets.size() == 1 ? 
+        static_cast<size_t>(std::abs(_offsets[0])) : 
+        static_cast<size_t>(_max_future_offset-_max_prior_offset))
+    ) {
+        // prepopulate circular buffer with null values to imitate non-existing prior rows
+        for (std::int64_t i = 0; i < (static_cast<std::int64_t>(_horizon) - _max_prior_offset - 1); ++i) {
+            _buffer.push(Traits<nonstd::optional<T>>::CreateNullValue());
+        }
 }
 
 template <typename T>
@@ -239,6 +197,26 @@ void LagLeadOperatorTransformer<T>::save(Archive &ar) const /*override*/ {
     Traits<std::vector<std::int64_t>>::serialize(ar, _offsets);
 
     // Note that we aren't serializing working state
+}
+
+template <typename T>
+void LagLeadOperatorTransformer<T>::execute_helper(nonstd::optional<typename BaseType::InputType> const &input, typename BaseType::CallbackFunction const &callback) {
+    _buffer.push(input);
+    // until the circular buffer is full, we don't have enough data to generate output matrix
+    if (_buffer.is_full()) {
+        Microsoft::Featurizer::RowMajMatrix<nonstd::optional<T>> ret(_offsets.size(), _horizon);
+        for (std::uint32_t row = 0; row < _offsets.size(); ++row) {
+            // the circular buffer starts with the needed data for the _max_prior_offset
+            // so the difference between offsets[row] and _max_prior_offset is the position to find the data to copy
+            std::tuple<typename Components::CircularBuffer<TargetType>::iterator, typename Components::CircularBuffer<TargetType>::iterator> range = _buffer.range(_horizon, static_cast<size_t>(_offsets[row] - _max_prior_offset));
+            typename Components::CircularBuffer<TargetType>::iterator start_iter = std::get<0>(range);
+            for (std::int32_t col = 0; col < static_cast<std::int32_t>(_horizon); ++col) {
+                ret(static_cast<std::int32_t>(row), col) = *start_iter;
+                ++start_iter;
+            }
+        }
+        callback(ret);
+    }
 }
 
 } // namespace Featurizers
