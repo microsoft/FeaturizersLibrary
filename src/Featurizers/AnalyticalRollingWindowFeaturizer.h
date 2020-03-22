@@ -111,9 +111,9 @@ private:
                     startingOffset = offset - (_buffer.capacity() - bufferSize);
                 }
 
-                const std::tuple<Components::CircularBuffer<InputT>::iterator, Components::CircularBuffer<InputT>::iterator> range = _buffer.range(numElements, startingOffset);
-                const Components::CircularBuffer<InputT>::iterator start_iter = std::get<0>(range);
-                const Components::CircularBuffer<InputT>::iterator end_iter = std::get<1>(range);
+                const std::tuple<typename Components::CircularBuffer<InputT>::iterator, typename Components::CircularBuffer<InputT>::iterator> range = _buffer.range(numElements, startingOffset);
+                const typename Components::CircularBuffer<InputT>::iterator start_iter = std::get<0>(range);
+                const typename Components::CircularBuffer<InputT>::iterator end_iter = std::get<1>(range);
 
                 result = Calculators::MeanCalculator<BaseType::InputType>::execute(start_iter, end_iter);
 
@@ -144,6 +144,7 @@ public:
     // ----------------------------------------------------------------------
     using BaseType                          = TransformerEstimator<InputT, std::vector<double>>;
     using TransformerType                   = AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -188,14 +189,29 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////
-///  \typedef       GrainedAnalyticalRollingWindowEstimator
+///  \class       GrainedAnalyticalRollingWindowEstimator
 ///  \brief         GrainedTransformer that creates `AnalyticalRollingWindowEstimator`.
 ///
-// Normally we want the featurizer name at the top of the file, but GrainFeaturizers are just type defs, so we want the name next to it.
-static constexpr char const * const         GrainedAnalyticalRollingWindowEstimatorName("GrainAnalyticalRollingWindowEstimator");
 
 template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
-using GrainedAnalyticalRollingWindowEstimator = Components::GrainEstimatorImpl<std::vector<std::string>, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>;
+class GrainedAnalyticalRollingWindowEstimator :
+    public Components::GrainEstimatorImpl<std::vector<std::string>, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = Components::GrainEstimatorImpl<std::vector<std::string>, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>;
+    
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    GrainedAnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount = 1);
+    ~GrainedAnalyticalRollingWindowEstimator(void) override = default;
+};
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -299,6 +315,21 @@ FitResult AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::fit_im
 template <typename InputT, size_t MaxNumTrainingItemsV>
 void AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
 }
+
+// ----------------------------------------------------------------------
+// |
+// |  GrainedAnalyticalRollingWindowEstimator
+// |
+// ----------------------------------------------------------------------
+template <typename InputT, size_t MaxNumTrainingItemsV>
+GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount) :
+    BaseType(pAllColumnAnnotations,
+             [windowSize, windowCalculation, horizon, minWindowCount](AnnotationMapsPtr pAllColumnAnnotationsParam) {
+                 return AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), std::move(windowSize), std::move(windowCalculation), std::move(horizon), std::move(minWindowCount));
+             })
+    {
+}
+
 
 } // namespace Featurizers
 } // namespace Featurizer

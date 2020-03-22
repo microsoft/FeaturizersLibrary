@@ -1,7 +1,7 @@
 featurizers:
   # ----------------------------------------------------------------------
   - name: AnalyticalRollingWindowFeaturizer
-    estimator_name: AnalyticalRollingWindowEstimator
+    estimator_name: GrainedAnalyticalRollingWindowEstimator
     release_version: 0.4.0
     num_output_columns: 1
     has_dynamic_output: false
