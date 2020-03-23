@@ -23,7 +23,7 @@ namespace Featurizer {
 namespace Featurizers {
 
 static constexpr char const * const         AnalyticalRollingWindowEstimatorName("AnalyticalRollingWindowEstimator");
-static constexpr char const * const         GrainedAnalyticalRollingWindowEstimator("GrainedAnalyticalRollingWindowEstimator");
+static constexpr char const * const         GrainedAnalyticalRollingWindowEstimatorName("GrainedAnalyticalRollingWindowEstimator");
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            AnalyticalRollingWindowCalculation
@@ -149,7 +149,7 @@ template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_
 class GrainedAnalyticalRollingWindowEstimator :
     public Components::PipelineExecutionEstimatorImpl<
         Components::GrainEstimatorImpl<std::vector<std::string>, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
-        Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string>, InputT>, 1>
+        Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string>, std::vector<double>>, 1>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -160,7 +160,7 @@ public:
     using BaseType = 
         Components::PipelineExecutionEstimatorImpl<
             Components::GrainEstimatorImpl<std::vector<std::string>, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
-            Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string>, InputT>, 1>
+            Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string>, std::vector<double>>, 1>
         >;
     
     // ----------------------------------------------------------------------
@@ -168,6 +168,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
+    // MSVC has problems when the definition for the constructor is separated from its declaration.
     GrainedAnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount = 1);
     ~GrainedAnalyticalRollingWindowEstimator(void) override = default;
 };
@@ -284,29 +285,23 @@ void AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::complete_tr
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, size_t MaxNumTrainingItemsV>
-GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount) {}
-
-template <typename InputT, size_t MaxNumTrainingItemsV>
-GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount) {// {}:
-// GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount) :
-//     BaseType(
-//         GrainedAnalyticalRollingWindowEstimator,
-//         pAllColumnAnnotations,
-//         [pAllColumnAnnotations, windowSize, windowCalculation, horizon, minWindowCount] () {
-//             return Components::GrainEstimatorImpl<std::vector<std::string>, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>> (
-//                 pAllColumnAnnotations,
-//                 [windowSize, windowCalculation, horizon, minWindowCount](AnnotationMapsPtr pAllColumnAnnotationsParam) {
-//                     return AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), std::move(windowSize), std::move(windowCalculation), std::move(horizon), std::move(minWindowCount));
-//                 }
-//             )
-//         },
-//         [pAllColumnAnnotations]() {
-//             return Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string>, InputT>, 1>(std::move(pAllColumnAnnotations));
-//         }
-        
-//     ) {
+GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount) :
+    BaseType(
+        GrainedAnalyticalRollingWindowEstimator,
+        pAllColumnAnnotations,
+        [pAllColumnAnnotations, windowSize, windowCalculation, horizon, minWindowCount] () {
+            return Components::GrainEstimatorImpl<std::vector<std::string>, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>> (
+                pAllColumnAnnotations,
+                [windowSize, windowCalculation, horizon, minWindowCount](AnnotationMapsPtr pAllColumnAnnotationsParam) {
+                    return AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), std::move(windowSize), std::move(windowCalculation), std::move(horizon), std::move(minWindowCount));
+                }
+            );
+        },
+        [pAllColumnAnnotations]() {
+            return Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string> const &, std::vector<double> const &>, 1>(std::move(pAllColumnAnnotations));
+        }
+    ) {
 }
-
 
 } // namespace Featurizers
 } // namespace Featurizer
