@@ -17,6 +17,37 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 namespace Components {
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         CalculatorWrapperBase
+///  \brief         This is a wrapper to wrap a Calculator since there is no
+///                 base class for the calculator that doesn't need the super class.
+///                 This is what the RollingWindowTransformerBase take in its constructor.
+///
+
+template<typename OutputT>
+class CalculatorWrapperBase {
+public:
+    template <typename InputIteratorT>
+    virtual OutputT execute(InputIteratorT begin, InputIteratorT end);
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         CalculatorWrapper
+///  \brief         This extends the CalculatorWrapperBase but takes in the actual type of the
+///                 calculator. This allows the actual calculation to happen.
+///
+
+template<typename OutputT, typename CalculatorT>
+class CalculatorWrapper :
+    CalculatorWrapperBase<OutputT> {
+public:
+    template <typename InputIteratorT>
+    OutputT execute(InputIteratorT begin, InputIteratorT end) override;
+};
+
+
+
 /////////////////////////////////////////////////////////////////////////
 ///  \class         RollingWindowTransformerBase
 ///  \brief         RollingWindow class that is used for all analytical window computations.
@@ -153,6 +184,18 @@ template <typename InputT, typename OutputT, size_t MaxNumTrainingItemsV>
 bool RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::operator!=(RollingWindowTransformerBase const &other) const {
     return (*this == other) == false;
 }
+
+// ----------------------------------------------------------------------
+// |
+// |  CalculatorWrapper
+// |
+// ----------------------------------------------------------------------
+template<typename OutputT, typename CalculatorT>
+<typename InputIteratorT> 
+OutputT CalculatorWrapper<OutputT, CalculatorT>::execute(InputIteratorT begin, InputIteratorT end) /* override */ {
+    return CalculatorT::execute(begin, end);
+}
+
 
 } // namespace Components
 } // namespace Featurizers
