@@ -254,8 +254,6 @@ TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {
     NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, 1, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1);
 
     using GrainedInputType = std::tuple<GrainType const &, std::int32_t const &>;
-    //using TupleType = std::tuple<GrainType, std::int32_t>;
-
 
     const GrainType grain({"one"});
     const GrainedInputType tup1 = std::make_tuple(grain, 1);
@@ -295,6 +293,123 @@ TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {
     // Correct result is now {2}
     CHECK(results.size() == 1);
     CHECK(results[0] == 2.0);
+}
+
+TEST_CASE("Grained Mean - 1 grain, window size 2, horizon 2, min window size 2") {
+    NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, 2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
+
+    using GrainedInputType = std::tuple<GrainType const &, std::int32_t const &>;
+
+    const GrainType grain({"one"});
+    const GrainedInputType tup1 = std::make_tuple(grain, 1);
+    const std::vector<GrainedInputType> vec = {tup1};
+
+
+    NS::TestHelpers::Train(estimator, vec);
+    auto transformer = estimator.create_transformer();
+
+    std::vector<OutputType>   output;
+    auto const                              callback(
+        [&output](std::vector<double> value) {
+            output.emplace_back(std::move(value));
+        }
+    );
+
+    transformer->execute(tup1, callback);
+    OutputType results = output[0];
+
+    // Since there are NaN values, cannot directly compare the vectors.
+    // Correct result is {NaN, NaN}
+    CHECK(results.size() == 2);
+    CHECK(std::isnan(results[0]));
+    CHECK(std::isnan(results[1]));
+
+    const GrainedInputType tup2 = std::make_tuple(grain, 2);
+    transformer->execute(tup2, callback);
+    results = output[1];
+
+    // Correct result is now {NaN, NaN}
+    CHECK(results.size() == 2);
+    CHECK(std::isnan(results[0]));
+    CHECK(std::isnan(results[1]));
+
+    const GrainedInputType tup3 = std::make_tuple(grain, 3);
+    transformer->execute(tup3, callback);
+    results = output[2];
+
+    // Correct result is now {NaN, 1.5}
+    CHECK(results.size() == 2);
+    CHECK(std::isnan(results[0]));
+    CHECK(results[1] == 1.5);
+
+    const GrainedInputType tup4 = std::make_tuple(grain, 4);
+    transformer->execute(tup4, callback);
+    results = output[3]; 
+
+    // Correct result is now {1.5, 2.5}
+    CHECK(results.size() == 2);
+    CHECK(results[0] == 1.5);
+    CHECK(results[1] == 2.5);
+}
+
+TEST_CASE("Grained Mean - 2 grain, window size 2, horizon 2, min window size 1") {
+    NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, 2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2);
+
+    using GrainedInputType = std::tuple<GrainType, std::int32_t>;
+
+    const std::vector<std::string> grainOne({"one"});
+    const std::vector<std::string> grainTwo({"two"});
+    const GrainedInputType tup1 = std::make_tuple(grainOne, 1);
+    const GrainedInputType tup2 = std::make_tuple(grainTwo, 1);
+    const std::vector<std::tuple<std::vector<std::string> const &, std::int32_t const &>> vec = {tup1, tup2};
+
+
+    NS::TestHelpers::Train(estimator, vec);
+    auto transformer = estimator.create_transformer();
+
+    std::vector<OutputType>   output;
+    auto const                              callback(
+        [&output](std::vector<double> value) {
+            output.emplace_back(std::move(value));
+        }
+    );
+
+    transformer->execute(tup1, callback);
+    OutputType results = output[0];
+
+    // Since there are NaN values, cannot directly compare the vectors.
+    // Correct result is {NaN, NaN}
+    CHECK(results.size() == 2);
+    CHECK(std::isnan(results[0]));
+    CHECK(std::isnan(results[1]));
+
+    transformer->execute(tup2, callback);
+    results = output[1];
+
+    // Correct result is now {NaN, NaN}
+    CHECK(results.size() == 2);
+    CHECK(std::isnan(results[0]));
+    CHECK(std::isnan(results[1]));
+
+    const GrainedInputType tup3 = std::make_tuple(grainOne, 2);
+    transformer->execute(tup3, callback);
+    results = output[2];
+
+    // Correct result is now {NaN, 1}
+    CHECK(results.size() == 2);
+    CHECK(std::isnan(results[0]));
+    CHECK(results[1] == 1);
+
+    const GrainedInputType tup4 = std::make_tuple(grainTwo, 2);
+    transformer->execute(tup4, callback);
+    results = output[3]; 
+
+    // Correct result is now {NaN, 1}
+    CHECK(results.size() == 2);
+    CHECK(std::isnan(results[0]));
+    CHECK(results[1] == 1);
 }
 
 TEST_CASE("Serialization/Deserialization") {
