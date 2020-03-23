@@ -19,36 +19,6 @@ namespace Featurizers {
 namespace Components {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         CalculatorWrapperBase
-///  \brief         This is a wrapper to wrap a Calculator since there is no
-///                 base class for the calculator that doesn't need the super class.
-///                 This is what the RollingWindowTransformerBase take in its constructor.
-///
-
-template<typename OutputT>
-class CalculatorWrapperBase {
-public:
-    template <typename InputIteratorT>
-    virtual OutputT execute(InputIteratorT begin, InputIteratorT end);
-};
-
-/////////////////////////////////////////////////////////////////////////
-///  \class         CalculatorWrapper
-///  \brief         This extends the CalculatorWrapperBase but takes in the actual type of the
-///                 calculator. This allows the actual calculation to happen.
-///
-
-template<typename OutputT, typename CalculatorT>
-class CalculatorWrapper :
-    CalculatorWrapperBase<OutputT> {
-public:
-    template <typename InputIteratorT>
-    OutputT execute(InputIteratorT begin, InputIteratorT end) override;
-};
-
-
-
-/////////////////////////////////////////////////////////////////////////
 ///  \class         RollingWindowTransformerBase
 ///  \brief         RollingWindow class that is used for all analytical window computations.
 ///                 This class does not have an archive constructor or a save method as those need
@@ -68,13 +38,15 @@ public:
     // |
     // ----------------------------------------------------------------------
     using BaseType = Components::InferenceOnlyTransformerImpl<InputT, std::vector<OutputT>>;
+    using CalculatorFunctionInputType = typename Components::CircularBuffer<InputT>::iterator;
+    using CalculatorFunction = std::function<typename OutputT(typename CalculatorFunctionInputType, typename CalculatorFunctionInputType)>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    RollingWindowTransformerBase(std::uint32_t windowSize, std::unique_ptr<Calculators::CalculatorBase> calculator, std::uint32_t horizon, std::uint32_t minWindowSize) ;
+    RollingWindowTransformerBase(std::uint32_t windowSize, CalculatorFunction calculator, std::uint32_t horizon, std::uint32_t minWindowSize) ;
     ~RollingWindowTransformerBase(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RollingWindowTransformerBase);
@@ -100,7 +72,7 @@ private:
     // |
     // ----------------------------------------------------------------------
     Components::CircularBuffer<InputT>              _buffer;
-    const std::unique_ptr<CalculatorBase>           _calculator;
+    CalculatorFunction                              _calculator;
 
     // ----------------------------------------------------------------------
     // |
@@ -139,7 +111,7 @@ private:
                 const typename Components::CircularBuffer<InputT>::iterator start_iter = std::get<0>(range);
                 const typename Components::CircularBuffer<InputT>::iterator end_iter = std::get<1>(range);
 
-                result = _calculator->execute(start_iter, end_iter);
+                result = _calculator(start_iter, end_iter);
 
             }
 
@@ -166,9 +138,9 @@ private:
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename OutputT, size_t MaxNumTrainingItemsV>
-RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWindowTransformerBase(std::uint32_t windowSize, std::unique_ptr<CalculatorBase>, std::uint32_t horizon, std::uint32_t minWindowSize) :
+RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWindowTransformerBase(std::uint32_t windowSize, CalculatorFunction calculator, std::uint32_t horizon, std::uint32_t minWindowSize) :
     _windowSize(std::move(windowSize)),
-    _calculator(std::move(windowCalculation)),
+    _calculator(std::move(calculator)),
     _horizon(std::move(horizon)),
     _minWindowSize(std::move(minWindowSize)),
     _buffer(horizon + windowSize) {
@@ -177,25 +149,13 @@ RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWind
 
 template <typename InputT, typename OutputT, size_t MaxNumTrainingItemsV>
 bool RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::operator==(RollingWindowTransformerBase const &other) const {
-    return _windowSize  == other._windowSize && _windowCalculation == other._windowCalculation && _horizon == other._horizon && _minWindowSize == other._minWindowSize;
+    return _windowSize  == other._windowSize && _calculator == other._calculator && _horizon == other._horizon && _minWindowSize == other._minWindowSize;
 }
 
 template <typename InputT, typename OutputT, size_t MaxNumTrainingItemsV>
 bool RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::operator!=(RollingWindowTransformerBase const &other) const {
     return (*this == other) == false;
 }
-
-// ----------------------------------------------------------------------
-// |
-// |  CalculatorWrapper
-// |
-// ----------------------------------------------------------------------
-template<typename OutputT, typename CalculatorT>
-<typename InputIteratorT> 
-OutputT CalculatorWrapper<OutputT, CalculatorT>::execute(InputIteratorT begin, InputIteratorT end) /* override */ {
-    return CalculatorT::execute(begin, end);
-}
-
 
 } // namespace Components
 } // namespace Featurizers

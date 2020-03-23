@@ -178,9 +178,11 @@ public:
 // ----------------------------------------------------------------------
 template <typename InputT, size_t MaxNumTrainingItemsV>
 AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::AnalyticalRollingWindowTransformer(std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize) :
-    : BaseType(
+    BaseType(
         std::move(windowSize), 
-        std::make_unique<MeanCalculator>(),
+        [] (typename Components::CircularBuffer<InputT>::iterator begin, typename Components::CircularBuffer<InputT>::iterator end) {
+            return Calculators::MeanCalculator<InputT>::execute(begin, end);
+        },
         std::move(horizon),
         std::move(minWindowSize)),
         _windowCalculation(std::move(windowCalculation))
@@ -212,7 +214,7 @@ AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::AnalyticalRoll
 
 template <typename InputT, size_t MaxNumTrainingItemsV>
 bool AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::operator==(AnalyticalRollingWindowTransformer const &other) const {
-    return this._windowSize  == other._windowSize && this._windowCalculation == other._windowCalculation && this._horizon == other._horizon && this._minWindowSize == other._minWindowSize;
+    return this->_windowSize  == other._windowSize && this->_windowCalculation == other._windowCalculation && this->_horizon == other._horizon && this->_minWindowSize == other._minWindowSize;
 }
 
 template <typename InputT, size_t MaxNumTrainingItemsV>
@@ -227,10 +229,10 @@ void AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::save(Arch
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
-    Traits<std::uint32_t>::serialize(ar, this._windowSize);
+    Traits<std::uint32_t>::serialize(ar, this->_windowSize);
     Traits<std::uint8_t>::serialize(ar, static_cast<std::uint8_t>(_windowCalculation));
-    Traits<std::uint32_t>::serialize(ar, this._horizon);
-    Traits<std::uint32_t>::serialize(ar, this._minWindowSize);
+    Traits<std::uint32_t>::serialize(ar, this->_horizon);
+    Traits<std::uint32_t>::serialize(ar, this->_minWindowSize);
 
     // Note that we aren't serializing working state
 }
