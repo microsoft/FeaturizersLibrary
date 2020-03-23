@@ -371,7 +371,7 @@ TEST_CASE("Grained Mean - 2 grain, window size 2, horizon 2, min window size 1")
 
     std::vector<OutputType>   output;
     auto const                              callback(
-        [&output](std::vector<double> value) {
+        [&output](OutputType value) {
             output.emplace_back(std::move(value));
         }
     );

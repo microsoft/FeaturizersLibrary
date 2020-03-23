@@ -5,13 +5,17 @@
 #pragma once
 
 #include "../Archive.h"
-#include "Calculators/MaxCalculator.h"
-#include "Calculators/MinCalculator.h"
-#include "Components/InferenceOnlyFeaturizerImpl.h"
-#include "Components/WindowFeaturizerBase.h"
-#include "Components/GrainFeaturizerImpl.h"
 #include "../Featurizer.h"
 #include "../Traits.h"
+
+#include "Calculators/MaxCalculator.h"
+#include "Calculators/MinCalculator.h"
+#include "Components/FilterDecoratorFeaturizer.h"
+#include "Components/GrainFeaturizerImpl.h"
+#include "Components/InferenceOnlyFeaturizerImpl.h"
+#include "Components/PipelineExecutionEstimatorImpl.h"
+#include "Components/RollingWindowTransformerBase.h"
+#include "Components/WindowFeaturizerBase.h"
 
 #include <vector>
 
@@ -19,7 +23,13 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
+// Anonymous namespace for helper using statements
+namespace {
+    using GrainType = std::vector<std::string>;
+} // Anonymous namespace
+
 static constexpr char const * const         SimpleRollingWindowEstimatorName("SimpleRollingWindowEstimator");
+static constexpr char const * const         GrainedSimpleRollingWindowEstimatorName("GrainedSimpleRollingWindowEstimator");
 
 /////////////////////////////////////////////////////////////////////////
 ///  \fn            SimpleRollingWindowCalculation
@@ -42,21 +52,21 @@ template <
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class SimpleRollingWindowTransformer:
-    public Components::InferenceOnlyTransformerImpl<InputT, std::vector<typename Traits<InputT>::nullable_type>> {
+    public Components::RollingWindowTransformerBase<InputT, typename Traits<InputT>::nullable_type, MaxNumTrainingItemsV> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType = Components::InferenceOnlyTransformerImpl<InputT, std::vector<typename Traits<InputT>::nullable_type>>;
+    using BaseType = Components::RollingWindowTransformerBase<InputT, typename Traits<InputT>::nullable_type, MaxNumTrainingItemsV>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    SimpleRollingWindowTransformer(std::uint32_t windowSize, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount = 1) ;
+    SimpleRollingWindowTransformer(std::uint32_t windowSize, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize = 1);
     SimpleRollingWindowTransformer(Archive &ar);
     ~SimpleRollingWindowTransformer(void) override = default;
 
@@ -72,12 +82,6 @@ private:
     // |  Private Members
     // |
     // ----------------------------------------------------------------------
-    // _windowSizes and _minWindowCount are int64 so that we can have the full positive range of the uint32 it comes
-    // in as but can still support negative numbers.
-    Components::CircularBuffer<InputT>              _buffer;
-    const std::uint32_t                             _windowSize;
-    const std::uint32_t                             _horizon;
-    const std::uint32_t                             _minWindowSize;
     const SimpleRollingWindowCalculation            _windowCalculation;
 
     // ----------------------------------------------------------------------
@@ -85,51 +89,6 @@ private:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-
-    // MSVC runs into problems when the declaration and definition are separated
-    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-        typename BaseType::TransformedType         results(_horizon);
-        
-        _buffer.push(input);
-        size_t bufferSize = _buffer.size();
-
-        typename Traits<InputT>::nullable_type result;
-        size_t numElements;
-        size_t startingOffset;
-
-        for (std::uint32_t offset = 0; offset < _horizon; ++offset){
-
-            // If we don't have enough elements then output NaN
-            if ((_horizon - offset) + _minWindowSize > bufferSize) {
-                result = Traits<InputT>::CreateNullValue();
-
-            // If we have strictly less elements then the window size, but more then the minimum size
-            } else {
-                if (bufferSize - (_horizon - offset) < _windowSize) {
-                    numElements = bufferSize - (_horizon - offset); //asfd
-                    startingOffset = 0;
-                } else {
-                    numElements = _windowSize;
-                    startingOffset = offset - (_buffer.capacity() - bufferSize);
-                }
-
-                const std::tuple<typename Components::CircularBuffer<InputT>::iterator, typename Components::CircularBuffer<InputT>::iterator> range = _buffer.range(numElements, startingOffset);
-                const typename Components::CircularBuffer<InputT>::iterator start_iter = std::get<0>(range);
-                const typename Components::CircularBuffer<InputT>::iterator end_iter = std::get<1>(range);
-
-                // TODO: Need a better way to deal with this.
-                if (_windowCalculation == SimpleRollingWindowCalculation::Min) {
-                    result = Calculators::MinCalculator<BaseType::InputType>::execute(start_iter, end_iter);
-                } else if (_windowCalculation == SimpleRollingWindowCalculation::Max) {
-                    result = Calculators::MaxCalculator<BaseType::InputType>::execute(start_iter, end_iter);
-                }
-            }
-
-            results[offset] = result;
-        }
-
-        callback(results);
-    }
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -156,7 +115,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    SimpleRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount = 1);
+    SimpleRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize = 1);
     ~SimpleRollingWindowEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SimpleRollingWindowEstimator);
@@ -168,10 +127,10 @@ private:
     // |  Private Members
     // |
     // ----------------------------------------------------------------------
-    const std::uint32_t                           _windowSize;
-    const std::uint32_t                           _horizon;
-    const std::uint32_t                           _minWindowCount;
-    const SimpleRollingWindowCalculation      _windowCalculation;
+    const std::uint32_t                             _windowSize;
+    const std::uint32_t                             _horizon;
+    const std::uint32_t                             _minWindowSize;
+    const SimpleRollingWindowCalculation            _windowCalculation;
 
 
     // ----------------------------------------------------------------------
@@ -189,7 +148,7 @@ private:
 
     // MSVC has problems when the definition for the func is separated from its declaration.
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        return typename BaseType::TransformerUniquePtr(new SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>(_windowSize, _windowCalculation, _horizon, _minWindowCount));
+        return typename BaseType::TransformerUniquePtr(new SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>(_windowSize, _windowCalculation, _horizon, _minWindowSize));
     }
 
 };
@@ -201,21 +160,29 @@ private:
 
 template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
 class GrainedSimpleRollingWindowEstimator :
-    public Components::GrainEstimatorImpl<std::vector<std::string>, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>> {
+    public Components::PipelineExecutionEstimatorImpl<
+        Components::GrainEstimatorImpl<GrainType, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
+        Components::FilterDecoratorEstimator<std::tuple<GrainType const &, std::vector<typename Traits<InputT>::nullable_type>>, 1>
+    > {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = Components::GrainEstimatorImpl<std::vector<std::string>, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>;
+    using BaseType = 
+        Components::PipelineExecutionEstimatorImpl<
+            Components::GrainEstimatorImpl<GrainType, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
+            Components::FilterDecoratorEstimator<std::tuple<GrainType const &, std::vector<typename Traits<InputT>::nullable_type>>, 1>
+        >;
     
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    GrainedSimpleRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount = 1);
+    // MSVC has problems when the definition for the constructor is separated from its declaration.
+    GrainedSimpleRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize = 1);
     ~GrainedSimpleRollingWindowEstimator(void) override = default;
 };
 
@@ -235,12 +202,24 @@ public:
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, size_t MaxNumTrainingItemsV>
-SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::SimpleRollingWindowTransformer(std::uint32_t windowSize, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount) :
-    _windowSize(std::move(windowSize)),
-    _windowCalculation(std::move(windowCalculation)),
-    _horizon(std::move(horizon)),
-    _minWindowSize(std::move(minWindowCount)),
-    _buffer(horizon + windowSize) {
+SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::SimpleRollingWindowTransformer(std::uint32_t windowSize, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize) :
+    BaseType(
+        std::move(windowSize),
+        [windowCalculation] () -> typename BaseType::CalculatorFunction {
+            if (windowCalculation == SimpleRollingWindowCalculation::Min) {
+                return [] (typename Components::CircularBuffer<InputT>::iterator begin, typename Components::CircularBuffer<InputT>::iterator end) {
+                    return Calculators::MinCalculator<InputT>::execute(begin, end);
+                };
+            } else {
+                return [] (typename Components::CircularBuffer<InputT>::iterator begin, typename Components::CircularBuffer<InputT>::iterator end) {
+                    return Calculators::MaxCalculator<InputT>::execute(begin, end);
+                };
+            }
+        }(),
+        std::move(horizon),
+        std::move(minWindowSize)),
+        _windowCalculation(std::move(windowCalculation)) 
+    {
 
 }
 
@@ -258,17 +237,17 @@ SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::SimpleRollingWindo
             std::uint32_t                       windowSize(Traits<std::uint32_t>::deserialize(ar));
             SimpleRollingWindowCalculation  windowCalculation(static_cast<SimpleRollingWindowCalculation>(Traits<std::uint8_t>::deserialize(ar)));
             std::uint32_t                       horizon(Traits<std::uint32_t>::deserialize(ar));
-            std::uint32_t                       minWindowCount(Traits<std::uint32_t>::deserialize(ar));
+            std::uint32_t                       minWindowSize(Traits<std::uint32_t>::deserialize(ar));
 
 
-            return SimpleRollingWindowTransformer(std::move(windowSize), std::move(windowCalculation), std::move(horizon), std::move(minWindowCount));
+            return SimpleRollingWindowTransformer(std::move(windowSize), std::move(windowCalculation), std::move(horizon), std::move(minWindowSize));
         }()
     ) {
 }
 
 template <typename InputT, size_t MaxNumTrainingItemsV>
 bool SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::operator==(SimpleRollingWindowTransformer const &other) const {
-    return _windowSize  == other._windowSize && _windowCalculation == other._windowCalculation && _horizon == other._horizon && _minWindowSize == other._minWindowSize;
+    return this->_windowSize  == other._windowSize && this->_windowCalculation == other._windowCalculation && this->_horizon == other._horizon && this->_minWindowSize == other._minWindowSize;
 }
 
 template <typename InputT, size_t MaxNumTrainingItemsV>
@@ -283,10 +262,10 @@ void SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::save(Archive 
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
-    Traits<std::uint32_t>::serialize(ar, _windowSize);
+    Traits<std::uint32_t>::serialize(ar, this->_windowSize);
     Traits<std::uint8_t>::serialize(ar, static_cast<std::uint8_t>(_windowCalculation));
-    Traits<std::uint32_t>::serialize(ar, _horizon);
-    Traits<std::uint32_t>::serialize(ar, _minWindowSize);
+    Traits<std::uint32_t>::serialize(ar, this->_horizon);
+    Traits<std::uint32_t>::serialize(ar, this->_minWindowSize);
 
     // Note that we aren't serializing working state
 }
@@ -297,12 +276,12 @@ void SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::save(Archive 
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, size_t MaxNumTrainingItemsV>
-SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::SimpleRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount) :
+SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::SimpleRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize) :
     BaseType(SimpleRollingWindowEstimatorName, std::move(pAllColumnAnnotations)),
     _windowSize(std::move(windowSize)),
     _windowCalculation(std::move(windowCalculation)),
     _horizon(std::move(horizon)),
-    _minWindowCount(std::move(minWindowCount))
+    _minWindowSize(std::move(minWindowSize))
     {
 }
 
@@ -328,11 +307,21 @@ void SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::complete_traini
 // ----------------------------------------------------------------------
 template <typename InputT, size_t MaxNumTrainingItemsV>
 GrainedSimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedSimpleRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount) :
-    BaseType(pAllColumnAnnotations,
-             [windowSize, windowCalculation, horizon, minWindowCount](AnnotationMapsPtr pAllColumnAnnotationsParam) {
-                 return SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), std::move(windowSize), std::move(windowCalculation), std::move(horizon), std::move(minWindowCount));
-             })
-    {
+    BaseType(
+        GrainedSimpleRollingWindowEstimatorName,
+        pAllColumnAnnotations,
+        [pAllColumnAnnotations, windowSize, windowCalculation, horizon, minWindowCount] () {
+            return Components::GrainEstimatorImpl<GrainType, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>> (
+                pAllColumnAnnotations,
+                [windowSize, windowCalculation, horizon, minWindowCount](AnnotationMapsPtr pAllColumnAnnotationsParam) {
+                    return SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), std::move(windowSize), std::move(windowCalculation), std::move(horizon), std::move(minWindowCount));
+                }
+            );
+        },
+        [pAllColumnAnnotations]() {
+            return Components::FilterDecoratorEstimator<std::tuple<GrainType const &, std::vector<typename Traits<InputT>::nullable_type>>, 1>(std::move(pAllColumnAnnotations));
+        }
+    ) {
 }
 
 

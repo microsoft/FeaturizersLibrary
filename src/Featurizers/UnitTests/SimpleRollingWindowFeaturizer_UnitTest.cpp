@@ -252,26 +252,25 @@ TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedSimpleRollingWindowEstimator<InputType>      estimator(pAllColumnAnnotations, 1, NS::Featurizers::SimpleRollingWindowCalculation::Min, 1);
 
-    using GrainedInputType = std::tuple<GrainType const &, InputType const &>;
-
+    using GrainedInputType = std::tuple<GrainType, InputType>;
 
     const GrainType grain({"one"});
     const GrainedInputType tup1 = std::make_tuple(grain, 1);
-    const std::vector<GrainedInputType> vec = {tup1};
+    const std::vector<std::tuple<GrainType const &, InputType const &>> vec = {tup1};
 
 
     NS::TestHelpers::Train(estimator, vec);
     auto transformer = estimator.create_transformer();
 
-    std::vector<std::tuple<std::vector<std::string>, OutputType>>   output;
+    std::vector<OutputType>   output;
     auto const                              callback(
-        [&output](std::tuple<std::vector<std::string>, OutputType> value) {
+        [&output](OutputType value) {
             output.emplace_back(std::move(value));
         }
     );
 
     transformer->execute(tup1, callback);
-    OutputType results = std::get<1>(output[0]);
+    OutputType results = output[0];
     
     // Correct result is {NaN}
     CHECK(results.size() == 1);
@@ -280,7 +279,7 @@ TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
     const GrainedInputType tup2 = std::make_tuple(grain, 2);
 
     transformer->execute(tup2, callback);
-    results = std::get<1>(output[1]);
+    results = output[1];
 
     // Correct result is now {1}
     CHECK(results.size() == 1);
@@ -288,7 +287,7 @@ TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
 
     const GrainedInputType tup3 = std::make_tuple(grain, 3);
     transformer->execute(tup3, callback);
-    results = std::get<1>(output[2]);
+    results = output[2];
 
     // Correct result is now {2}
     CHECK(results.size() == 1);
