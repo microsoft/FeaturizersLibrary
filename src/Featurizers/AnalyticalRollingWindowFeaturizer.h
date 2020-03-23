@@ -7,8 +7,9 @@
 #include "../Archive.h"
 #include "Calculators/MeanCalculator.h"
 #include "Components/InferenceOnlyFeaturizerImpl.h"
-#include "Components/WindowFeaturizerBase.h"
 #include "Components/GrainFeaturizerImpl.h"
+#include "Components/RollingWindowTransformerBase.h"
+#include "Components/WindowFeaturizerBase.h"
 #include "../Featurizer.h"
 #include "../Traits.h"
 
@@ -40,21 +41,21 @@ template <
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class AnalyticalRollingWindowTransformer:
-    public Components::InferenceOnlyTransformerImpl<InputT, std::vector<double>> {
+    public Components::RollingWindowTransformerBase<InputT, double, MaxNumTrainingItemsV> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType = Components::InferenceOnlyTransformerImpl<InputT, std::vector<double>>;
+    using BaseType = Components::RollingWindowTransformerBase<InputT, double, MaxNumTrainingItemsV>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    AnalyticalRollingWindowTransformer(std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount = 1) ;
+    AnalyticalRollingWindowTransformer(std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize = 1) ;
     AnalyticalRollingWindowTransformer(Archive &ar);
     ~AnalyticalRollingWindowTransformer(void) override = default;
 
@@ -70,60 +71,7 @@ private:
     // |  Private Members
     // |
     // ----------------------------------------------------------------------
-    // _windowSizes and _minWindowCount are int64 so that we can have the full positive range of the uint32 it comes
-    // in as but can still support negative numbers.
-    Components::CircularBuffer<InputT>              _buffer;
-    const std::uint32_t                             _windowSize;
-    const std::uint32_t                             _horizon;
-    const std::uint32_t                             _minWindowSize;
     const AnalyticalRollingWindowCalculation        _windowCalculation;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
-
-    // MSVC runs into problems when the declaration and definition are separated
-    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-        typename BaseType::TransformedType         results(_horizon);
-        
-        _buffer.push(input);
-        size_t bufferSize = _buffer.size();
-
-        double result;
-        size_t numElements;
-        size_t startingOffset;
-
-        for (std::uint32_t offset = 0; offset < _horizon; ++offset){
-
-            // If we don't have enough elements then output NaN
-            if ((_horizon - offset) + _minWindowSize > bufferSize) {
-                result = Traits<double>::CreateNullValue();
-
-            // If we have strictly less elements then the window size, but more then the minimum size
-            } else {
-                if (bufferSize - (_horizon - offset) < _windowSize) {
-                    numElements = bufferSize - (_horizon - offset); //asfd
-                    startingOffset = 0;
-                } else {
-                    numElements = _windowSize;
-                    startingOffset = offset - (_buffer.capacity() - bufferSize);
-                }
-
-                const std::tuple<typename Components::CircularBuffer<InputT>::iterator, typename Components::CircularBuffer<InputT>::iterator> range = _buffer.range(numElements, startingOffset);
-                const typename Components::CircularBuffer<InputT>::iterator start_iter = std::get<0>(range);
-                const typename Components::CircularBuffer<InputT>::iterator end_iter = std::get<1>(range);
-
-                result = Calculators::MeanCalculator<BaseType::InputType>::execute(start_iter, end_iter);
-
-            }
-
-            results[offset] = result;
-        }
-
-        callback(results);
-    }
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -229,13 +177,14 @@ public:
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, size_t MaxNumTrainingItemsV>
-AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::AnalyticalRollingWindowTransformer(std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowCount) :
-    _windowSize(std::move(windowSize)),
-    _windowCalculation(std::move(windowCalculation)),
-    _horizon(std::move(horizon)),
-    _minWindowSize(std::move(minWindowCount)),
-    _buffer(horizon + windowSize) {
-
+AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::AnalyticalRollingWindowTransformer(std::uint32_t windowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize) :
+    : BaseType(
+        std::move(windowSize), 
+        std::make_unique<MeanCalculator>(),
+        std::move(horizon),
+        std::move(minWindowSize)),
+        _windowCalculation(std::move(windowCalculation))
+    {
 }
 
 template <typename InputT, size_t MaxNumTrainingItemsV>
@@ -263,7 +212,7 @@ AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::AnalyticalRoll
 
 template <typename InputT, size_t MaxNumTrainingItemsV>
 bool AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::operator==(AnalyticalRollingWindowTransformer const &other) const {
-    return _windowSize  == other._windowSize && _windowCalculation == other._windowCalculation && _horizon == other._horizon && _minWindowSize == other._minWindowSize;
+    return this._windowSize  == other._windowSize && this._windowCalculation == other._windowCalculation && this._horizon == other._horizon && this._minWindowSize == other._minWindowSize;
 }
 
 template <typename InputT, size_t MaxNumTrainingItemsV>
@@ -278,10 +227,10 @@ void AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::save(Arch
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
-    Traits<std::uint32_t>::serialize(ar, _windowSize);
+    Traits<std::uint32_t>::serialize(ar, this._windowSize);
     Traits<std::uint8_t>::serialize(ar, static_cast<std::uint8_t>(_windowCalculation));
-    Traits<std::uint32_t>::serialize(ar, _horizon);
-    Traits<std::uint32_t>::serialize(ar, _minWindowSize);
+    Traits<std::uint32_t>::serialize(ar, this._horizon);
+    Traits<std::uint32_t>::serialize(ar, this._minWindowSize);
 
     // Note that we aren't serializing working state
 }
