@@ -1560,7 +1560,7 @@ featurizers:
       Output type is a matrix of optional<T> where rows are grouped by different offsets and columns are grouped by horizon.
 
       C++-style pseudo signature:
-        template <typename T> matrix<T?> execute(std::vector<std::string> const &, T const &> const &value);
+        template <typename T> matrix<T?> execute(std::tuple<std::vector<std::string> const &, T const &> const &value);
 
       Examples:
           Since this featurizer is copying values per grain, we just use one type of grain in the following examples.
