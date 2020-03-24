@@ -6,8 +6,8 @@
 
 #include "../Archive.h"
 #include "Calculators/Calculators.h"
-#include "Components/InferenceOnlyFeaturizerImpl.h"
-#include "Components/WindowFeaturizerBase.h"
+#include "../Components/InferenceOnlyFeaturizerImpl.h"
+#include "../Components/WindowFeaturizerBase.h"
 #include "../Featurizer.h"
 #include "../Traits.h"
 
@@ -16,7 +16,7 @@
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
-namespace Components {
+namespace Base {
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class         RollingWindowTransformerBase
@@ -46,7 +46,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    RollingWindowTransformerBase(std::uint32_t windowSize, CalculatorFunction calculator, std::uint32_t horizon, std::uint32_t minWindowSize) ;
+    RollingWindowTransformerBase(std::uint32_t maxWindowSize, CalculatorFunction calculator, std::uint32_t horizon, std::uint32_t minWindowSize) ;
     ~RollingWindowTransformerBase(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RollingWindowTransformerBase);
@@ -61,9 +61,9 @@ protected:
     // |
     // ----------------------------------------------------------------------
     // These are protected so that the derived classes can use them for saving of state.
-    const std::uint32_t                             _windowSize;
-    const std::uint32_t                             _horizon;
+    const std::uint32_t                             _maxWindowSize;
     const std::uint32_t                             _minWindowSize;
+    const std::uint32_t                             _horizon;
 
 private:
     // ----------------------------------------------------------------------
@@ -71,8 +71,8 @@ private:
     // |  Private Members
     // |
     // ----------------------------------------------------------------------
-    Components::CircularBuffer<InputT>              _buffer;
     CalculatorFunction                              _calculator;
+    Components::CircularBuffer<InputT>              _buffer;
 
     // ----------------------------------------------------------------------
     // |
@@ -82,34 +82,33 @@ private:
 
     // MSVC runs into problems when the declaration and definition are separated
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-        typename BaseType::TransformedType         results(_horizon);
-        
         _buffer.push(input);
-        size_t bufferSize = _buffer.size();
+        const size_t bufferSize = _buffer.size();
 
-        OutputT result;
-        size_t numElements;
-        size_t startingOffset;
+        typename BaseType::TransformedType         results(_horizon);
 
         for (std::uint32_t offset = 0; offset < _horizon; ++offset){
+            OutputT result;
+            size_t numElements;
+            size_t startingOffset;
 
             // If we don't have enough elements then output NaN
-            if ((_horizon - offset) + _minWindowSize > bufferSize) {
+            if (bufferSize < _horizon - offset + _minWindowSize) {
                 result = Traits<OutputT>::CreateNullValue();
 
-            // If we have strictly less elements then the window size, but more then the minimum size
             } else {
-                if (bufferSize - (_horizon - offset) < _windowSize) {
-                    numElements = bufferSize - (_horizon - offset); //asfd
+                // If we have strictly less elements then the window size, but more then the minimum size
+                if (bufferSize < _maxWindowSize + _horizon - offset) { ///bufferSize - (_horizon - offset) < _maxWindowSize)
+                    numElements = bufferSize - (_horizon - offset);
                     startingOffset = 0;
                 } else {
-                    numElements = _windowSize;
+                    numElements = _maxWindowSize;
                     startingOffset = offset - (_buffer.capacity() - bufferSize);
                 }
 
-                const std::tuple<typename Components::CircularBuffer<InputT>::iterator, typename Components::CircularBuffer<InputT>::iterator> range = _buffer.range(numElements, startingOffset);
-                const typename Components::CircularBuffer<InputT>::iterator start_iter = std::get<0>(range);
-                const typename Components::CircularBuffer<InputT>::iterator end_iter = std::get<1>(range);
+                const std::tuple<typename Components::CircularBuffer<InputT>::iterator, typename Components::CircularBuffer<InputT>::iterator> range(_buffer.range(numElements, startingOffset));
+                const typename Components::CircularBuffer<InputT>::iterator start_iter(std::get<0>(range));
+                const typename Components::CircularBuffer<InputT>::iterator end_iter(std::get<1>(range));
 
                 result = _calculator(start_iter, end_iter);
 
@@ -138,14 +137,14 @@ private:
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename OutputT, size_t MaxNumTrainingItemsV>
-RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWindowTransformerBase(std::uint32_t windowSize, CalculatorFunction calculator, std::uint32_t horizon, std::uint32_t minWindowSize) :
-    _windowSize(
+RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWindowTransformerBase(std::uint32_t maxWindowSize, CalculatorFunction calculator, std::uint32_t horizon, std::uint32_t minWindowSize) :
+    _maxWindowSize(
         std::move(
-            [this, &windowSize]() -> std::uint32_t & {
-                if(windowSize < 1)
-                    throw std::invalid_argument("windowSize");
+            [this, &maxWindowSize]() -> std::uint32_t & {
+                if(maxWindowSize < 1)
+                    throw std::invalid_argument("maxWindowSize");
 
-                return windowSize;
+                return maxWindowSize;
             }()
         )),
     _calculator(std::move(calculator)),
@@ -169,13 +168,13 @@ RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWind
             }()
         )
     ),
-    _buffer(horizon + windowSize) {
+    _buffer(horizon + maxWindowSize) {
 
 }
 
 template <typename InputT, typename OutputT, size_t MaxNumTrainingItemsV>
 bool RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::operator==(RollingWindowTransformerBase const &other) const {
-    return _windowSize  == other._windowSize && _calculator == other._calculator && _horizon == other._horizon && _minWindowSize == other._minWindowSize;
+    return _maxWindowSize  == other._maxWindowSize && _calculator == other._calculator && _horizon == other._horizon && _minWindowSize == other._minWindowSize;
 }
 
 template <typename InputT, typename OutputT, size_t MaxNumTrainingItemsV>

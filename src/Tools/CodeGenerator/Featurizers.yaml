@@ -68,7 +68,7 @@ featurizers:
 
     configuration_params:
       - type: uint32
-        name: windowSize
+        name: maxWindowSize
         description: The maximum number of items in a window.
 
       - type: AnalyticalRollingWindowCalculation
@@ -1262,7 +1262,7 @@ featurizers:
 
     configuration_params:
       - type: uint32
-        name: windowSize
+        name: maxWindowSize
         description: The maximum number of items in a window.
 
       - type: SimpleRollingWindowCalculation
