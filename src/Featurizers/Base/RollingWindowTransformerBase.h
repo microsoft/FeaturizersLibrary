@@ -38,6 +38,7 @@ public:
     using BaseType = Components::InferenceOnlyTransformerImpl<InputT, std::vector<OutputT>>;
     using CalculatorFunctionInputType = typename Components::CircularBuffer<InputT>::iterator;
     using CalculatorFunction = std::function<OutputT(CalculatorFunctionInputType, CalculatorFunctionInputType)>;
+    using CallbackFunction                  = typename BaseType::CallbackFunction;
 
     // ----------------------------------------------------------------------
     // |
@@ -74,7 +75,7 @@ private:
 
     // ----------------------------------------------------------------------
     // |
-    // |  Public Methods
+    // |  Private Methods
     // |
     // ----------------------------------------------------------------------
 
@@ -118,6 +119,8 @@ private:
 
         callback(results);
     }
+
+    void flush_impl(CallbackFunction const &callback) override;
 };
 
 // ----------------------------------------------------------------------
@@ -182,6 +185,12 @@ bool RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::operat
 template <typename InputT, typename OutputT, size_t MaxNumTrainingItemsV>
 bool RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::operator!=(RollingWindowTransformerBase const &other) const {
     return (*this == other) == false;
+}
+
+template <typename InputT, typename OutputT, size_t MaxNumTrainingItemsV>
+void RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::flush_impl(CallbackFunction const &) /*override*/ {
+    /// The only state to clear is the buffer and no rows to return.
+    _buffer.clear();
 }
 
 } // namespace Components

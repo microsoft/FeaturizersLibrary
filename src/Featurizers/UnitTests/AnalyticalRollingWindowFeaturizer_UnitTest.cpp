@@ -276,3 +276,28 @@ TEST_CASE("Invalid Constructor Args") {
         Catch::Contains("minWindowSize must be smaller than maxWindowSize")
     );
 }
+
+TEST_CASE("Flush test") {
+    
+    std::vector<OutputType>   output;
+    auto const                              callback(
+        [&output](OutputType value) {
+            output.emplace_back(std::move(value));
+        }
+    );
+    
+    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 1);
+
+    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
+
+    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(2), {1}));
+
+    // Call flush. The next 2 calls with the same values from before the flush should return the same values.
+    // Flush should also return no values.
+    transformer.flush(callback);
+    CHECK(output.size() == 0);
+    
+    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
+
+    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(2), {1}));
+}
