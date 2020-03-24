@@ -293,12 +293,12 @@ bool CircularIterator<T>::at_end() const {
 // ----------------------------------------------------------------------
 
 template <class T>
-CircularBuffer<T>::CircularBuffer(size_t max_size) : _max_size(max_size), _start_offset(0) {
+CircularBuffer<T>::CircularBuffer(size_t max_size) : _max_size(max_size) {
     if (_max_size == 0) {
         throw std::invalid_argument("Max size cannot be zero");
     }
 
-    _data.reserve(_max_size);
+    clear();
 }
 
 template <class T>
