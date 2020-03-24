@@ -14,7 +14,7 @@ using OutputType = NS::Featurizers::AnalyticalRollingWindowTransformer<std::int3
 TEST_CASE("Mean - int32, window size 1, horizon 1") {
     // Since we are doing the mean of one value and a horizon of one, the result should always be equal to the prior value passed into execute.
     
-    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(1, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1);
+    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 1);
 
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
 
@@ -26,7 +26,7 @@ TEST_CASE("Mean - int32, window size 1, horizon 1") {
 }
 
 TEST_CASE("Mean - int32, window size 2, horizon 1") {    
-    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1);
+    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 2);
 
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
 
@@ -40,7 +40,7 @@ TEST_CASE("Mean - int32, window size 2, horizon 1") {
 }
 
 TEST_CASE("Mean - int32, window size 2, horizon 1, min window size 2") {    
-    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 2);
+    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 2, 2);
 
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
 
@@ -52,7 +52,7 @@ TEST_CASE("Mean - int32, window size 2, horizon 1, min window size 2") {
 }
 
 TEST_CASE("Mean - int32, window size 1, horizon 2") {
-    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(1, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2);
+    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 1);
 
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan(""), std::nan("")}));
 
@@ -65,7 +65,7 @@ TEST_CASE("Mean - int32, window size 1, horizon 2") {
 }
 
 TEST_CASE("Mean - int32, window size 2, horizon 2") {
-    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2);
+    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
 
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan(""), std::nan("")}));
 
@@ -77,7 +77,7 @@ TEST_CASE("Mean - int32, window size 2, horizon 2") {
 }
 
 TEST_CASE("Mean - int32, window size 2, horizon 2, min window size 2") {
-    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
+    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2, 2);
 
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan(""), std::nan("")}));
 
@@ -90,7 +90,7 @@ TEST_CASE("Mean - int32, window size 2, horizon 2, min window size 2") {
 
 TEST_CASE("Estimator Mean - int32, window size 2, horizon 2, min window size 2") {
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::AnalyticalRollingWindowEstimator<std::int32_t>                 estimator(pAllColumnAnnotations, 2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
+    NS::Featurizers::AnalyticalRollingWindowEstimator<std::int32_t>                 estimator(pAllColumnAnnotations, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2, 2);
     estimator.begin_training();
     estimator.complete_training();
     auto transformer = estimator.create_transformer();
@@ -119,7 +119,7 @@ using GrainType = std::vector<std::string>;
 
 TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {    
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, 1, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1);
+    NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 1);
 
     using GrainedInputType = std::tuple<GrainType, std::int32_t>;
 
@@ -153,7 +153,7 @@ TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {
 
 TEST_CASE("Grained Mean - 1 grain, window size 2, horizon 2, min window size 2") {
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, 2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
+    NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2, 2);
 
     using GrainedInputType = std::tuple<GrainType, std::int32_t>;
 
@@ -190,7 +190,7 @@ TEST_CASE("Grained Mean - 1 grain, window size 2, horizon 2, min window size 2")
 
 TEST_CASE("Grained Mean - 2 grain, window size 2, horizon 2, min window size 1") {
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, 2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2);
+    NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
 
     using GrainedInputType = std::tuple<GrainType, std::int32_t>;
 
@@ -230,7 +230,7 @@ TEST_CASE("Grained Mean - 2 grain, window size 2, horizon 2, min window size 1")
 }
 
 TEST_CASE("Serialization/Deserialization") {
-    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>       transformer(2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
+    NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>       transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2, 2);
     NS::Archive                                                 out;
 
     transformer.save(out);
@@ -257,22 +257,22 @@ TEST_CASE("Serialization Version Error") {
 
 TEST_CASE("Invalid Constructor Args") {
     CHECK_THROWS_WITH(
-        NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>(0, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1),
+        NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 0),
         Catch::Contains("maxWindowSize")
     );
 
     CHECK_THROWS_WITH(
-        NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>(1, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 0),
+        NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 0, 1),
         Catch::Contains("horizon")
     );
 
     CHECK_THROWS_WITH(
-        NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>(1, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 0),
+        NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 1, 0),
         Catch::Contains("minWindowSize")
     );
 
     CHECK_THROWS_WITH(
-        NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>(1, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 2),
+        NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 1, 2),
         Catch::Contains("minWindowSize must be smaller than maxWindowSize")
     );
 }

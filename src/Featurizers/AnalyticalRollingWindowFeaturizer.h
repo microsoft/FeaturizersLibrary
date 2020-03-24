@@ -59,7 +59,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    AnalyticalRollingWindowTransformer(std::uint32_t maxWindowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize = 1) ;
+    AnalyticalRollingWindowTransformer(AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t maxWindowSize, std::uint32_t minWindowSize = 1) ;
     AnalyticalRollingWindowTransformer(Archive &ar);
     ~AnalyticalRollingWindowTransformer(void) override = default;
 
@@ -102,7 +102,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    AnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t maxWindowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize = 1);
+    AnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t maxWindowSize, std::uint32_t minWindowSize = 1);
     ~AnalyticalRollingWindowEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(AnalyticalRollingWindowEstimator);
@@ -114,11 +114,10 @@ private:
     // |  Private Members
     // |
     // ----------------------------------------------------------------------
-    const std::uint32_t                           _maxWindowSize;
-    const std::uint32_t                           _horizon;
-    const std::uint32_t                           _minWindowSize;
     const AnalyticalRollingWindowCalculation      _windowCalculation;
-
+    const std::uint32_t                           _horizon;
+    const std::uint32_t                           _maxWindowSize;
+    const std::uint32_t                           _minWindowSize;
 
     // ----------------------------------------------------------------------
     // |
@@ -135,7 +134,7 @@ private:
 
     // MSVC has problems when the definition for the func is separated from its declaration.
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        return typename BaseType::TransformerUniquePtr(new AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>(_maxWindowSize, _windowCalculation, _horizon, _minWindowSize));
+        return typename BaseType::TransformerUniquePtr(new AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>(_windowCalculation, _horizon, _maxWindowSize, _minWindowSize));
     }
 
 };
@@ -170,7 +169,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    GrainedAnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t maxWindowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize = 1);
+    GrainedAnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t maxWindowSize, std::uint32_t minWindowSize = 1);
     ~GrainedAnalyticalRollingWindowEstimator(void) override = default;
 };
 
@@ -190,13 +189,13 @@ public:
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, size_t MaxNumTrainingItemsV>
-AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::AnalyticalRollingWindowTransformer(std::uint32_t maxWindowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize) :
+AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::AnalyticalRollingWindowTransformer(AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t maxWindowSize, std::uint32_t minWindowSize) :
     BaseType(
-        std::move(maxWindowSize), 
         [] (typename Components::CircularBuffer<InputT>::iterator begin, typename Components::CircularBuffer<InputT>::iterator end) {
             return Calculators::MeanCalculator<InputT>::execute(begin, end);
         },
         std::move(horizon),
+        std::move(maxWindowSize), 
         std::move(minWindowSize)),
         _windowCalculation(std::move(windowCalculation))
     {
@@ -213,13 +212,13 @@ AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::AnalyticalRoll
             if(majorVersion != 1 || minorVersion != 0)
                 throw std::runtime_error("Unsupported archive version");
 
-            std::uint32_t                       maxWindowSize(Traits<std::uint32_t>::deserialize(ar));
             AnalyticalRollingWindowCalculation  windowCalculation(static_cast<AnalyticalRollingWindowCalculation>(Traits<typename std::underlying_type<AnalyticalRollingWindowCalculation>::type>::deserialize(ar)));
             std::uint32_t                       horizon(Traits<std::uint32_t>::deserialize(ar));
+            std::uint32_t                       maxWindowSize(Traits<std::uint32_t>::deserialize(ar));
             std::uint32_t                       minWindowSize(Traits<std::uint32_t>::deserialize(ar));
 
 
-            return AnalyticalRollingWindowTransformer(std::move(maxWindowSize), std::move(windowCalculation), std::move(horizon), std::move(minWindowSize));
+            return AnalyticalRollingWindowTransformer(std::move(windowCalculation), std::move(horizon), std::move(maxWindowSize), std::move(minWindowSize));
         }()
     ) {
 }
@@ -241,9 +240,9 @@ void AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::save(Arch
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
-    Traits<std::uint32_t>::serialize(ar, this->_maxWindowSize);
     Traits<std::uint8_t>::serialize(ar, static_cast<std::uint8_t>(_windowCalculation));
     Traits<std::uint32_t>::serialize(ar, this->_horizon);
+    Traits<std::uint32_t>::serialize(ar, this->_maxWindowSize);
     Traits<std::uint32_t>::serialize(ar, this->_minWindowSize);
 
     // Note that we aren't serializing working state
@@ -255,8 +254,18 @@ void AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::save(Arch
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, size_t MaxNumTrainingItemsV>
-AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::AnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t maxWindowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize) :
+AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::AnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t maxWindowSize, std::uint32_t minWindowSize) :
     BaseType(AnalyticalRollingWindowEstimatorName, std::move(pAllColumnAnnotations)),
+    _horizon(
+        std::move(
+            [&horizon]() -> std::uint32_t & {
+                if(horizon < 1)
+                    throw std::invalid_argument("horizon");
+
+                return horizon;
+            }()
+        )
+    ),
     _maxWindowSize(
         std::move(
             [&maxWindowSize]() -> std::uint32_t & {
@@ -264,16 +273,6 @@ AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::AnalyticalRollin
                     throw std::invalid_argument("maxWindowSize");
 
                 return maxWindowSize;
-            }()
-        )
-    ),
-     _horizon(
-        std::move(
-            [&horizon]() -> std::uint32_t & {
-                if(horizon < 1)
-                    throw std::invalid_argument("horizon");
-
-                return horizon;
             }()
         )
     ),
@@ -314,7 +313,7 @@ void AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::complete_tr
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, size_t MaxNumTrainingItemsV>
-GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t maxWindowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize) :
+GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t maxWindowSize, std::uint32_t minWindowSize) :
     BaseType(
         GrainedAnalyticalRollingWindowEstimatorName,
         pAllColumnAnnotations,
@@ -322,7 +321,7 @@ GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAn
             return Components::GrainEstimatorImpl<GrainType, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>> (
                 pAllColumnAnnotations,
                 [maxWindowSize, windowCalculation, horizon, minWindowSize](AnnotationMapsPtr pAllColumnAnnotationsParam) {
-                    return AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), std::move(maxWindowSize), std::move(windowCalculation), std::move(horizon), std::move(minWindowSize));
+                    return AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), std::move(windowCalculation), std::move(horizon), std::move(maxWindowSize), std::move(minWindowSize));
                 }
             );
         },

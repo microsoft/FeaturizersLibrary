@@ -16,7 +16,7 @@ using VectorMemberType = NS::Traits<InputType>::nullable_type;
 
 TEST_CASE("Min - int32, window size 1, horizon 1") {
     
-    NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(1, NS::Featurizers::SimpleRollingWindowCalculation::Min, 1);
+    NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 1);
     
 
     OutputType results = transformer.execute(1);
@@ -46,7 +46,7 @@ TEST_CASE("Min - int32, window size 1, horizon 1") {
 }
 
 TEST_CASE("Min - int32, window size 2, horizon 1") {    
-    NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(2, NS::Featurizers::SimpleRollingWindowCalculation::Min, 1);
+    NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 2);
 
     OutputType results = transformer.execute(1);
 
@@ -72,8 +72,8 @@ TEST_CASE("Min - int32, window size 2, horizon 1") {
     CHECK(results[0] == 2);
 }
 
-TEST_CASE("Min - int32, window size 2, horizon 1, min window size 2") {    
-    NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(2, NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 2);
+TEST_CASE("Max - int32, window size 2, horizon 1, min window size 2") {    
+    NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(NS::Featurizers::SimpleRollingWindowCalculation::Max, 1, 2, 2);
 
     OutputType results = transformer.execute(1);
 
@@ -91,16 +91,16 @@ TEST_CASE("Min - int32, window size 2, horizon 1, min window size 2") {
     results = transformer.execute(3);
 
     CHECK(results.size() == 1);
-    CHECK(results[0] == 1);
+    CHECK(results[0] == 2);
 
     results = transformer.execute(4);
 
     CHECK(results.size() == 1);
-    CHECK(results[0] == 2);
+    CHECK(results[0] == 3);
 }
 
-TEST_CASE("Min - int32, window size 1, horizon 2") {
-    NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(1, NS::Featurizers::SimpleRollingWindowCalculation::Min, 2);
+TEST_CASE("Max - int32, window size 1, horizon 2") {
+    NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(NS::Featurizers::SimpleRollingWindowCalculation::Max, 2, 1);
 
     OutputType results = transformer.execute(1);
 
@@ -133,7 +133,7 @@ TEST_CASE("Min - int32, window size 1, horizon 2") {
 }
 
 TEST_CASE("Min - int32, window size 2, horizon 2") {
-    NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(2, NS::Featurizers::SimpleRollingWindowCalculation::Min, 2);
+    NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(NS::Featurizers::SimpleRollingWindowCalculation::Min, 2, 2);
 
     OutputType results = transformer.execute(1);
 
@@ -166,7 +166,7 @@ TEST_CASE("Min - int32, window size 2, horizon 2") {
 }
 
 TEST_CASE("Min - int32, window size 2, horizon 2, min window size 2") {
-    NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(2, NS::Featurizers::SimpleRollingWindowCalculation::Min, 2, 2);
+    NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(NS::Featurizers::SimpleRollingWindowCalculation::Min, 2, 2, 2);
 
     OutputType results = transformer.execute(1);
 
@@ -200,7 +200,7 @@ TEST_CASE("Min - int32, window size 2, horizon 2, min window size 2") {
 
 TEST_CASE("Estimator Min - int32, window size 2, horizon 2, min window size 2") {
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::SimpleRollingWindowEstimator<InputType>                 estimator(pAllColumnAnnotations, 2, NS::Featurizers::SimpleRollingWindowCalculation::Min, 2, 2);
+    NS::Featurizers::SimpleRollingWindowEstimator<InputType>                 estimator(pAllColumnAnnotations, NS::Featurizers::SimpleRollingWindowCalculation::Min, 2, 2, 2);
     estimator.begin_training();
     estimator.complete_training();
     auto transformer = estimator.create_transformer();
@@ -250,7 +250,7 @@ using GrainType = std::vector<std::string>;
 
 TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {    
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    NS::Featurizers::GrainedSimpleRollingWindowEstimator<InputType>      estimator(pAllColumnAnnotations, 1, NS::Featurizers::SimpleRollingWindowCalculation::Min, 1);
+    NS::Featurizers::GrainedSimpleRollingWindowEstimator<InputType>      estimator(pAllColumnAnnotations, NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 1);
 
     using GrainedInputType = std::tuple<GrainType, InputType>;
 
@@ -295,7 +295,7 @@ TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
 }
 
 TEST_CASE("Serialization/Deserialization") {
-    NS::Featurizers::SimpleRollingWindowTransformer<std::int32_t>       transformer(2, NS::Featurizers::SimpleRollingWindowCalculation::Min, 2, 2);
+    NS::Featurizers::SimpleRollingWindowTransformer<std::int32_t>       transformer(NS::Featurizers::SimpleRollingWindowCalculation::Min, 2, 2, 2);
     NS::Archive                                                 out;
 
     transformer.save(out);
@@ -322,22 +322,22 @@ TEST_CASE("Serialization Version Error") {
 
 TEST_CASE("Invalid Constructor Args") {
     CHECK_THROWS_WITH(
-        NS::Featurizers::SimpleRollingWindowTransformer<std::int32_t>(0, NS::Featurizers::SimpleRollingWindowCalculation::Min, 1),
+        NS::Featurizers::SimpleRollingWindowTransformer<std::int32_t>(NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 0),
         Catch::Contains("maxWindowSize")
     );
 
     CHECK_THROWS_WITH(
-        NS::Featurizers::SimpleRollingWindowTransformer<std::int32_t>(1, NS::Featurizers::SimpleRollingWindowCalculation::Min, 0),
+        NS::Featurizers::SimpleRollingWindowTransformer<std::int32_t>(NS::Featurizers::SimpleRollingWindowCalculation::Min, 0, 1),
         Catch::Contains("horizon")
     );
 
     CHECK_THROWS_WITH(
-        NS::Featurizers::SimpleRollingWindowTransformer<std::int32_t>(1, NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 0),
+        NS::Featurizers::SimpleRollingWindowTransformer<std::int32_t>(NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 1, 0),
         Catch::Contains("minWindowSize")
     );
 
     CHECK_THROWS_WITH(
-        NS::Featurizers::SimpleRollingWindowTransformer<std::int32_t>(1, NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 2),
+        NS::Featurizers::SimpleRollingWindowTransformer<std::int32_t>(NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 1, 2),
         Catch::Contains("minWindowSize must be smaller than maxWindowSize")
     );
 }

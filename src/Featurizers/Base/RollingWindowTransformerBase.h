@@ -44,7 +44,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    RollingWindowTransformerBase(std::uint32_t maxWindowSize, CalculatorFunction calculator, std::uint32_t horizon, std::uint32_t minWindowSize) ;
+    RollingWindowTransformerBase(CalculatorFunction calculator, std::uint32_t horizon, std::uint32_t maxWindowSize, std::uint32_t minWindowSize) ;
     ~RollingWindowTransformerBase(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(RollingWindowTransformerBase);
@@ -59,9 +59,9 @@ protected:
     // |
     // ----------------------------------------------------------------------
     // These are protected so that the derived classes can use them for saving of state.
+    const std::uint32_t                             _horizon;
     const std::uint32_t                             _maxWindowSize;
     const std::uint32_t                             _minWindowSize;
-    const std::uint32_t                             _horizon;
 
 private:
     // ----------------------------------------------------------------------
@@ -136,7 +136,17 @@ private:
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, typename OutputT, size_t MaxNumTrainingItemsV>
-RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWindowTransformerBase(std::uint32_t maxWindowSize, CalculatorFunction calculator, std::uint32_t horizon, std::uint32_t minWindowSize) :
+RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWindowTransformerBase(CalculatorFunction calculator, std::uint32_t horizon, std::uint32_t maxWindowSize,  std::uint32_t minWindowSize) :
+    _horizon(
+        std::move(
+            [&horizon]() -> std::uint32_t & {
+                if(horizon < 1)
+                    throw std::invalid_argument("horizon");
+
+                return horizon;
+            }()
+        )
+    ),
     _maxWindowSize(
         std::move(
             [&maxWindowSize]() -> std::uint32_t & {
@@ -156,16 +166,6 @@ RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWind
                     throw std::invalid_argument("minWindowSize must be smaller than maxWindowSize");
 
                 return minWindowSize;
-            }()
-        )
-    ),
-    _horizon(
-        std::move(
-            [&horizon]() -> std::uint32_t & {
-                if(horizon < 1)
-                    throw std::invalid_argument("horizon");
-
-                return horizon;
             }()
         )
     ),
