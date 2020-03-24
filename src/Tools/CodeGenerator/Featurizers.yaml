@@ -1193,7 +1193,7 @@ featurizers:
 
   # ----------------------------------------------------------------------
   - name: SimpleRollingWindowFeaturizer
-    estimator_name: SimpleRollingWindowEstimator
+    estimator_name: GrainedSimpleRollingWindowEstimator
     release_version: 0.4.0
     num_output_columns: 1
     has_dynamic_output: false
