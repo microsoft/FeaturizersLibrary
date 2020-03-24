@@ -278,10 +278,37 @@ void SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::save(Archive 
 template <typename InputT, size_t MaxNumTrainingItemsV>
 SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::SimpleRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t windowSize, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize) :
     BaseType(SimpleRollingWindowEstimatorName, std::move(pAllColumnAnnotations)),
-    _windowSize(std::move(windowSize)),
+    _windowSize(
+        std::move(
+            [this, &windowSize]() -> std::uint32_t & {
+                if(windowSize < 1)
+                    throw std::invalid_argument("windowSize");
+
+                return windowSize;
+            }()
+        )
+    ),
     _windowCalculation(std::move(windowCalculation)),
-    _horizon(std::move(horizon)),
-    _minWindowSize(std::move(minWindowSize))
+    _horizon(
+        std::move(
+            [this, &horizon]() -> std::uint32_t & {
+                if(horizon < 1)
+                    throw std::invalid_argument("horizon");
+
+                return horizon;
+            }()
+        )
+    ),
+    _minWindowSize(
+        std::move(
+            [this, &minWindowSize]() -> std::uint32_t & {
+                if(minWindowSize < 1)
+                    throw std::invalid_argument("minWindowSize");
+
+                return minWindowSize;
+            }()
+        )
+    )
     {
 }
 

@@ -139,10 +139,36 @@ private:
 // ----------------------------------------------------------------------
 template <typename InputT, typename OutputT, size_t MaxNumTrainingItemsV>
 RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWindowTransformerBase(std::uint32_t windowSize, CalculatorFunction calculator, std::uint32_t horizon, std::uint32_t minWindowSize) :
-    _windowSize(std::move(windowSize)),
+    _windowSize(
+        std::move(
+            [this, &windowSize]() -> std::uint32_t & {
+                if(windowSize < 1)
+                    throw std::invalid_argument("windowSize");
+
+                return windowSize;
+            }()
+        )),
     _calculator(std::move(calculator)),
-    _horizon(std::move(horizon)),
-    _minWindowSize(std::move(minWindowSize)),
+    _horizon(
+        std::move(
+            [this, &horizon]() -> std::uint32_t & {
+                if(horizon < 1)
+                    throw std::invalid_argument("horizon");
+
+                return horizon;
+            }()
+        )
+    ),
+    _minWindowSize(
+        std::move(
+            [this, &minWindowSize]() -> std::uint32_t & {
+                if(minWindowSize < 1)
+                    throw std::invalid_argument("minWindowSize");
+
+                return minWindowSize;
+            }()
+        )
+    ),
     _buffer(horizon + windowSize) {
 
 }
