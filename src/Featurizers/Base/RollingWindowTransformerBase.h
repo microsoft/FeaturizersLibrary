@@ -87,15 +87,16 @@ private:
 
         for (std::uint32_t offset = 0; offset < _horizon; ++offset){
             OutputT result;
-            size_t numElements;
-            size_t startingOffset;
-
+            
             // If we don't have enough elements then output NaN
             if (bufferSize < _horizon - offset + _minWindowSize) {
                 result = Traits<OutputT>::CreateNullValue();
 
             } else {
                 // If we have strictly less elements then the window size, but more then the minimum size
+                size_t numElements;
+                size_t startingOffset;
+
                 if (bufferSize < _maxWindowSize + _horizon - offset) { ///bufferSize - (_horizon - offset) < _maxWindowSize)
                     numElements = bufferSize - (_horizon - offset);
                     startingOffset = 0;
@@ -148,9 +149,11 @@ RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWind
     ),
     _minWindowSize(
         std::move(
-            [&minWindowSize]() -> std::uint32_t & {
+            [this, &minWindowSize]() -> std::uint32_t & {
                 if(minWindowSize < 1)
                     throw std::invalid_argument("minWindowSize");
+                if(minWindowSize > this->_maxWindowSize)
+                    throw std::invalid_argument("minWindowSize must be smaller than maxWindowSize");
 
                 return minWindowSize;
             }()

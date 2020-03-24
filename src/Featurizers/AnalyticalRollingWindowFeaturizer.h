@@ -170,7 +170,6 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    // MSVC has problems when the definition for the constructor is separated from its declaration.
     GrainedAnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t maxWindowSize, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t minWindowSize = 1);
     ~GrainedAnalyticalRollingWindowEstimator(void) override = default;
 };
@@ -214,9 +213,8 @@ AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::AnalyticalRoll
             if(majorVersion != 1 || minorVersion != 0)
                 throw std::runtime_error("Unsupported archive version");
 
-            // Because we know that maxWindowSize and minWindowSize come in originally as uint32, this cast is always safe
             std::uint32_t                       maxWindowSize(Traits<std::uint32_t>::deserialize(ar));
-            AnalyticalRollingWindowCalculation  windowCalculation(static_cast<AnalyticalRollingWindowCalculation>(Traits<std::uint8_t>::deserialize(ar)));
+            AnalyticalRollingWindowCalculation  windowCalculation(static_cast<AnalyticalRollingWindowCalculation>(Traits<typename std::underlying_type<AnalyticalRollingWindowCalculation>::type>::deserialize(ar)));
             std::uint32_t                       horizon(Traits<std::uint32_t>::deserialize(ar));
             std::uint32_t                       minWindowSize(Traits<std::uint32_t>::deserialize(ar));
 
@@ -281,9 +279,11 @@ AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::AnalyticalRollin
     ),
     _minWindowSize(
         std::move(
-            [&minWindowSize]() -> std::uint32_t & {
+            [this, &minWindowSize]() -> std::uint32_t & {
                 if(minWindowSize < 1)
                     throw std::invalid_argument("minWindowSize");
+                if(minWindowSize > this->_maxWindowSize)
+                    throw std::invalid_argument("minWindowSize must be smaller than maxWindowSize");
 
                 return minWindowSize;
             }()

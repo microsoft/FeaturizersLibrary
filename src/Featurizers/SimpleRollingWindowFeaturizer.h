@@ -235,7 +235,7 @@ SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::SimpleRollingWindo
                 throw std::runtime_error("Unsupported archive version");
 
             std::uint32_t                       maxWindowSize(Traits<std::uint32_t>::deserialize(ar));
-            SimpleRollingWindowCalculation  windowCalculation(static_cast<SimpleRollingWindowCalculation>(Traits<std::uint8_t>::deserialize(ar)));
+            SimpleRollingWindowCalculation  windowCalculation(static_cast<SimpleRollingWindowCalculation>(Traits<typename std::underlying_type<SimpleRollingWindowCalculation>::type>::deserialize(ar)));
             std::uint32_t                       horizon(Traits<std::uint32_t>::deserialize(ar));
             std::uint32_t                       minWindowSize(Traits<std::uint32_t>::deserialize(ar));
 
@@ -300,9 +300,11 @@ SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::SimpleRollingWindowE
     ),
     _minWindowSize(
         std::move(
-            [&minWindowSize]() -> std::uint32_t & {
+            [this, &minWindowSize]() -> std::uint32_t & {
                 if(minWindowSize < 1)
                     throw std::invalid_argument("minWindowSize");
+                if(minWindowSize > this->_maxWindowSize)
+                    throw std::invalid_argument("minWindowSize must be smaller than maxWindowSize");
 
                 return minWindowSize;
             }()

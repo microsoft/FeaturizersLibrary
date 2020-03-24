@@ -254,3 +254,25 @@ TEST_CASE("Serialization Version Error") {
         Catch::Contains("Unsupported archive version")
     );
 }
+
+TEST_CASE("Invalid Constructor Args") {
+    CHECK_THROWS_WITH(
+        NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>(0, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1),
+        Catch::Contains("maxWindowSize")
+    );
+
+    CHECK_THROWS_WITH(
+        NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>(1, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 0),
+        Catch::Contains("horizon")
+    );
+
+    CHECK_THROWS_WITH(
+        NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>(1, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 0),
+        Catch::Contains("minWindowSize")
+    );
+
+    CHECK_THROWS_WITH(
+        NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>(1, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 2),
+        Catch::Contains("minWindowSize must be smaller than maxWindowSize")
+    );
+}
