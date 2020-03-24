@@ -431,3 +431,49 @@ TEST_CASE("CircularBuffer - range with offset") {
     // when n and offset are not out of bound
     CHECK(++(++start_iter3) == end_iter3);
 }
+
+TEST_CASE("CircularBuffer - clear") {
+    NS::Featurizers::Components::CircularBuffer<std::int16_t> circ_buf(5);
+    
+    // Add some dummy data
+    circ_buf.push(1);
+    circ_buf.push(2);
+    CHECK(circ_buf.size() == 2);
+
+    // Make sure after clear the size is correct
+    circ_buf.clear();
+    CHECK(circ_buf.size() == 0);
+
+    // Make sure start/end iters are correct after clear
+    auto start_iter = circ_buf.begin();
+    auto end_iter = circ_buf.end();
+    CHECK(start_iter == end_iter);
+    CHECK(circ_buf.capacity() == 5);
+
+    // Add one item and make sure start offset is correct.
+    circ_buf.push(1);
+    auto start_iter2 = circ_buf.begin();
+    CHECK(*start_iter2 == 1);
+
+    // Add till the size is full and make sure capacity is still the same.
+    circ_buf.push(2);
+    circ_buf.push(3);
+    circ_buf.push(4);
+    circ_buf.push(5);
+    circ_buf.push(6);
+    CHECK(circ_buf.size() == 5);
+
+    // Make sure size is correct after final clear.
+    circ_buf.clear();
+    CHECK(circ_buf.size() == 0);
+
+    // Make sure start/end iters are correct after clear
+    auto start_iter3 = circ_buf.begin();
+    auto end_iter3 = circ_buf.end();
+    CHECK(start_iter3 == end_iter3);
+
+    // One more time add one item and make sure the start offset is correct.
+    circ_buf.push(1);
+    auto start_iter4 = circ_buf.begin();
+    CHECK(*start_iter4 == 1);
+}

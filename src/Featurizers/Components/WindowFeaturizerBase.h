@@ -135,6 +135,8 @@ namespace Components {
         // ----------------------------------------------------------------------
         CircularBuffer(size_t max_size);
 
+        void clear();
+
         size_t size() const;
 
         size_t capacity() const;
@@ -293,11 +295,23 @@ bool CircularIterator<T>::at_end() const {
 // ----------------------------------------------------------------------
 
 template <class T>
-CircularBuffer<T>::CircularBuffer(size_t max_size) : _max_size(max_size), _start_offset(0) {
+CircularBuffer<T>::CircularBuffer(size_t max_size) : _max_size(max_size) {
     if (_max_size == 0) {
         throw std::invalid_argument("Max size cannot be zero");
     }
 
+    clear();
+}
+
+template <class T>
+void CircularBuffer<T>::clear() {
+    _data.clear();
+
+    // Make sure that the start offset is back to 0;
+    _start_offset = 0;
+    
+    // The c++ reference says "the vector capacity is not guaranteed to change due to calling this function."
+    // Since the capacity may change, calling reserve again just to make sure we still have the correct size.
     _data.reserve(_max_size);
 }
 
@@ -308,7 +322,7 @@ size_t CircularBuffer<T>::size() const {
 
 template <class T>
 size_t CircularBuffer<T>::capacity() const {
-    return _max_size;
+    return _data.capacity();
 }
 
 template <class T>
