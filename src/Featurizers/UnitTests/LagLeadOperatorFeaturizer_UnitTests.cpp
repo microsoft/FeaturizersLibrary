@@ -5,6 +5,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
+#include "../../3rdParty/optional.h"
 #include "../LagLeadOperatorFeaturizer.h"
 #include "../TestHelpers.h"
 
@@ -15,20 +16,6 @@ namespace NS = Microsoft::Featurizer;
 #   pragma clang diagnostic ignored "-Wfloat-equal"
 #endif
 
-TEST_CASE("Invalid constructor horizon") {
-    using InputType = std::int16_t;
-    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    CHECK_THROWS_WITH(NS::Featurizers::LagLeadOperatorEstimator<InputType>(pAllColumnAnnotations, 0, {-1}), "Horizon cannot be 0!");
-    CHECK_THROWS_WITH(NS::Featurizers::GrainedLagLeadOperatorEstimator<InputType>(pAllColumnAnnotations, 0, {-1}), "Horizon cannot be 0!");
-}
-
-TEST_CASE("Invalid constructor offset") {
-    using InputType = std::int16_t;
-    std::vector<std::int64_t> offset{};
-    NS::AnnotationMapsPtr pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
-    CHECK_THROWS_WITH(NS::Featurizers::LagLeadOperatorEstimator<InputType>(pAllColumnAnnotations, 1, offset), "Offsets is empty!");
-    CHECK_THROWS_WITH(NS::Featurizers::GrainedLagLeadOperatorEstimator<InputType>(pAllColumnAnnotations, 1, offset), "Offsets is empty!");
-}
 TEST_CASE("Invalid transformer constructor parameter") {
     using InputType = std::int16_t;
     CHECK_THROWS_WITH(NS::Featurizers::LagLeadOperatorTransformer<InputType>(0, {-1}), "Horizon cannot be 0!");

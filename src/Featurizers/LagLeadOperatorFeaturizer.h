@@ -226,14 +226,14 @@ LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(std::uint32_t horizon,
                 if (offsets.size() == 0) {
                     throw std::invalid_argument("Offsets is empty!");
                 }
-                return std::min(*std::min_element(offsets.cbegin(), offsets.cend()), 0ll);
+                return *std::min_element(offsets.cbegin(), offsets.cend()) < 0 ? *std::min_element(offsets.cbegin(), offsets.cend()) : 0;
             }()
         )
     ),
     _offsets(
         std::move(
             [&offsets](void) -> std::vector<std::int64_t> & {
-                std::int64_t min = std::min(*std::min_element(offsets.cbegin(), offsets.cend()), 0ll);
+                std::int64_t min = *std::min_element(offsets.cbegin(), offsets.cend()) < 0 ? *std::min_element(offsets.cbegin(), offsets.cend()) : 0;
                 for (auto it = offsets.begin(); it != offsets.end(); it++) {
                     *it -= min;
                 }
