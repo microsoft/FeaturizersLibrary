@@ -280,7 +280,7 @@ SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::SimpleRollingWindowE
     BaseType(SimpleRollingWindowEstimatorName, std::move(pAllColumnAnnotations)),
     _maxWindowSize(
         std::move(
-            [this, &maxWindowSize]() -> std::uint32_t & {
+            [&maxWindowSize]() -> std::uint32_t & {
                 if(maxWindowSize < 1)
                     throw std::invalid_argument("maxWindowSize");
 
@@ -288,10 +288,9 @@ SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::SimpleRollingWindowE
             }()
         )
     ),
-    _windowCalculation(std::move(windowCalculation)),
     _horizon(
         std::move(
-            [this, &horizon]() -> std::uint32_t & {
+            [&horizon]() -> std::uint32_t & {
                 if(horizon < 1)
                     throw std::invalid_argument("horizon");
 
@@ -301,14 +300,15 @@ SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::SimpleRollingWindowE
     ),
     _minWindowSize(
         std::move(
-            [this, &minWindowSize]() -> std::uint32_t & {
+            [&minWindowSize]() -> std::uint32_t & {
                 if(minWindowSize < 1)
                     throw std::invalid_argument("minWindowSize");
 
                 return minWindowSize;
             }()
         )
-    )
+    ),
+    _windowCalculation(std::move(windowCalculation))
     {
 }
 

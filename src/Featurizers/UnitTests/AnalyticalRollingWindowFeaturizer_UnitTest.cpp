@@ -16,187 +16,76 @@ TEST_CASE("Mean - int32, window size 1, horizon 1") {
     
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(1, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1);
 
-    OutputType results = transformer.execute(1);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")});
 
-    // Since there are NaN values, cannot directly compare the vectors.
-    // Correct result is {NaN}
-    CHECK(results.size() == 1);
-    CHECK(std::isnan(results[0]));
+    NS::TestHelpers::FuzzyCheck(transformer.execute(2), {1});
 
-    results = transformer.execute(2);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(3), {2});
 
-    // Correct result is now {1}
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 1.0);
-
-    results = transformer.execute(3);
-
-    // Correct result is now {2}
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 2.0);
-
-    results = transformer.execute(4);
-
-    // Correct result is now {3}
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 3.0);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(4), {3});
 }
 
 TEST_CASE("Mean - int32, window size 2, horizon 1") {    
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1);
 
-    OutputType results = transformer.execute(1);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")});
 
-    // Since there are NaN values, cannot directly compare the vectors.
-    // Correct result is {NaN}
-    CHECK(results.size() == 1);
-    CHECK(std::isnan(results[0]));
+    NS::TestHelpers::FuzzyCheck(transformer.execute(2), {1});
 
-    results = transformer.execute(2);
-
-    // Correct result is now {1}
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 1.0);
-
-    results = transformer.execute(3);
-
-    // Correct result is now {1.5} because the mean of 1 + 2 is 1.5
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 1.5);
-
-    results = transformer.execute(4);
+     // Correct result is now {1.5} because the mean of 1 + 2 is 1.5
+    NS::TestHelpers::FuzzyCheck(transformer.execute(3), {1.5});
 
     // Correct result is now {2.5} because the mean of 2 + 3 is 2.5
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 2.5);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(4), {2.5});
 }
 
 TEST_CASE("Mean - int32, window size 2, horizon 1, min window size 2") {    
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 2);
 
-    OutputType results = transformer.execute(1);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")});
 
-    // Since there are NaN values, cannot directly compare the vectors.
-    // Correct result is {NaN}
-    CHECK(results.size() == 1);
-    CHECK(std::isnan(results[0]));
+    NS::TestHelpers::FuzzyCheck(transformer.execute(2), {std::nan("")});
 
-    results = transformer.execute(2);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(3), {1.5});
 
-    // Correct result is still {NaN} due to min window size of 2
-    CHECK(results.size() == 1);
-    CHECK(std::isnan(results[0]));
-
-    results = transformer.execute(3);
-
-    // Correct result is now {1.5} because the mean of 1 + 2 is 1.5
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 1.5);
-
-    results = transformer.execute(4);
-
-    // Correct result is now {2.5} because the mean of 2 + 3 is 2.5
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 2.5);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(4), {2.5});
 }
 
 TEST_CASE("Mean - int32, window size 1, horizon 2") {
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(1, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2);
 
-    OutputType results = transformer.execute(1);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan(""), std::nan("")});
 
-    // Since there are NaN values, cannot directly compare the vectors.
-    // Correct result is {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(std::isnan(results[1]));
+    NS::TestHelpers::FuzzyCheck(transformer.execute(2), {std::nan(""), 1.0});
 
-    results = transformer.execute(2);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(3), {1.0, 2.0});
 
-    // Correct result is now {NaN, 1}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(results[1] == 1.0);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(4), {2.0, 3.0});
 
-    results = transformer.execute(3);
-
-    // Correct result is now {1, 2}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 1.0);
-    CHECK(results[1] == 2.0);
-
-    results = transformer.execute(4);
-
-    // Correct result is now {2, 3}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 2.0);
-    CHECK(results[1] == 3.0);
 }
 
 TEST_CASE("Mean - int32, window size 2, horizon 2") {
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2);
 
-    OutputType results = transformer.execute(1);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan(""), std::nan("")});
 
-    // Since there are NaN values, cannot directly compare the vectors.
-    // Correct result is {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(std::isnan(results[1]));
+    NS::TestHelpers::FuzzyCheck(transformer.execute(2), {std::nan(""), 1.0});
 
-    results = transformer.execute(2);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(3), {1.0, 1.5});
 
-    // Correct result is now {NaN, 1}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(results[1] == 1.0);
-
-    results = transformer.execute(3);
-
-    // Correct result is now {1, 1.5}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 1.0);
-    CHECK(results[1] == 1.5);
-
-    results = transformer.execute(4);
-
-    // Correct result is now {1.5, 2.5}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 1.5);
-    CHECK(results[1] == 2.5);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(3), {1.5, 2.5});
 }
 
 TEST_CASE("Mean - int32, window size 2, horizon 2, min window size 2") {
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(2, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
 
-    OutputType results = transformer.execute(1);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan(""), std::nan("")});
 
-    // Since there are NaN values, cannot directly compare the vectors.
-    // Correct result is {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(std::isnan(results[1]));
+    NS::TestHelpers::FuzzyCheck(transformer.execute(2), {std::nan(""), std::nan("")});
 
-    results = transformer.execute(2);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(3), {std::nan(""), 1.5});
 
-    // Correct result is now {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(std::isnan(results[1]));
-
-    results = transformer.execute(3);
-
-    // Correct result is now {NaN, 1.5}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(results[1] == 1.5);
-
-    results = transformer.execute(4);
-
-    // Correct result is now {1.5, 2.5}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 1.5);
-    CHECK(results[1] == 2.5);
+    NS::TestHelpers::FuzzyCheck(transformer.execute(4), {1.5, 2.5});
 }
 
 TEST_CASE("Estimator Mean - int32, window size 2, horizon 2, min window size 2") {
@@ -214,37 +103,16 @@ TEST_CASE("Estimator Mean - int32, window size 2, horizon 2, min window size 2")
     );
 
     transformer->execute(1, callback);
-    OutputType results = output[0];
-
-    // Since there are NaN values, cannot directly compare the vectors.
-    // Correct result is {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(std::isnan(results[1]));
+    NS::TestHelpers::FuzzyCheck(output[0], {std::nan(""), std::nan("")});
 
     transformer->execute(2, callback);
-    results = output[1];
-
-    // Correct result is now {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(std::isnan(results[1]));
+    NS::TestHelpers::FuzzyCheck(output[1], {std::nan(""), std::nan("")});
 
     transformer->execute(3, callback);
-    results = output[2];
-
-    // Correct result is now {NaN, 1.5}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(results[1] == 1.5);
+    NS::TestHelpers::FuzzyCheck(output[2], {std::nan(""), 1.5});
 
     transformer->execute(4, callback);
-    results = output[3]; 
-
-    // Correct result is now {1.5, 2.5}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 1.5);
-    CHECK(results[1] == 2.5);
+    NS::TestHelpers::FuzzyCheck(output[3], {1.5, 2.5});
 }
 
 using GrainType = std::vector<std::string>;
@@ -271,28 +139,16 @@ TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {
     );
 
     transformer->execute(tup1, callback);
-    OutputType results = output[0];
-    
-    // Correct result is {NaN}
-    CHECK(results.size() == 1);
-    CHECK(std::isnan(results[0]));
+    NS::TestHelpers::FuzzyCheck(output[0], {std::nan("")});
 
     const GrainedInputType tup2 = std::make_tuple(grain, 2);
 
     transformer->execute(tup2, callback);
-    results = output[1];
-
-    // Correct result is now {1}
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 1.0);
+    NS::TestHelpers::FuzzyCheck(output[1], {1.0});
 
     const GrainedInputType tup3 = std::make_tuple(grain, 3);
     transformer->execute(tup3, callback);
-    results = output[2];
-
-    // Correct result is now {2}
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 2.0);
+    NS::TestHelpers::FuzzyCheck(output[2], {2.0});
 }
 
 TEST_CASE("Grained Mean - 1 grain, window size 2, horizon 2, min window size 2") {
@@ -317,40 +173,19 @@ TEST_CASE("Grained Mean - 1 grain, window size 2, horizon 2, min window size 2")
     );
 
     transformer->execute(tup1, callback);
-    OutputType results = output[0];
-
-    // Since there are NaN values, cannot directly compare the vectors.
-    // Correct result is {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(std::isnan(results[1]));
+    NS::TestHelpers::FuzzyCheck(output[0], {std::nan(""), std::nan("")});
 
     const GrainedInputType tup2 = std::make_tuple(grain, 2);
     transformer->execute(tup2, callback);
-    results = output[1];
-
-    // Correct result is now {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(std::isnan(results[1]));
+    NS::TestHelpers::FuzzyCheck(output[1], {std::nan(""), std::nan("")});
 
     const GrainedInputType tup3 = std::make_tuple(grain, 3);
     transformer->execute(tup3, callback);
-    results = output[2];
-
-    // Correct result is now {NaN, 1.5}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(results[1] == 1.5);
+    NS::TestHelpers::FuzzyCheck(output[2], {std::nan(""), 1.5});
 
     const GrainedInputType tup4 = std::make_tuple(grain, 4);
     transformer->execute(tup4, callback);
-    results = output[3]; 
-
-    // Correct result is now {1.5, 2.5}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 1.5);
-    CHECK(results[1] == 2.5);
+    NS::TestHelpers::FuzzyCheck(output[3], {1.5, 2.5});
 }
 
 TEST_CASE("Grained Mean - 2 grain, window size 2, horizon 2, min window size 1") {
@@ -377,39 +212,21 @@ TEST_CASE("Grained Mean - 2 grain, window size 2, horizon 2, min window size 1")
     );
 
     transformer->execute(tup1, callback);
-    OutputType results = output[0];
+    NS::TestHelpers::FuzzyCheck(output[0], {std::nan(""), std::nan("")});
 
-    // Since there are NaN values, cannot directly compare the vectors.
-    // Correct result is {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(std::isnan(results[1]));
 
     transformer->execute(tup2, callback);
-    results = output[1];
+    NS::TestHelpers::FuzzyCheck(output[1], {std::nan(""), std::nan("")});
 
-    // Correct result is now {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(std::isnan(results[1]));
 
     const GrainedInputType tup3 = std::make_tuple(grainOne, 2);
     transformer->execute(tup3, callback);
-    results = output[2];
+    NS::TestHelpers::FuzzyCheck(output[2], {std::nan(""), 1});
 
-    // Correct result is now {NaN, 1}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(results[1] == 1);
 
     const GrainedInputType tup4 = std::make_tuple(grainTwo, 2);
     transformer->execute(tup4, callback);
-    results = output[3]; 
-
-    // Correct result is now {NaN, 1}
-    CHECK(results.size() == 2);
-    CHECK(std::isnan(results[0]));
-    CHECK(results[1] == 1);
+    NS::TestHelpers::FuzzyCheck(output[3], {std::nan(""), 1});
 }
 
 TEST_CASE("Serialization/Deserialization") {

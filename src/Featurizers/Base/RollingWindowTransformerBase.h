@@ -4,11 +4,10 @@
 // ----------------------------------------------------------------------
 #pragma once
 
-#include "Calculators/Calculators.h"
 #include "../Components/InferenceOnlyFeaturizerImpl.h"
 #include "../Components/WindowFeaturizerBase.h"
-#include "../Featurizer.h"
-#include "../Traits.h"
+#include "../../Featurizer.h"
+#include "../../Traits.h"
 
 #include <vector>
 
@@ -38,7 +37,7 @@ public:
     // ----------------------------------------------------------------------
     using BaseType = Components::InferenceOnlyTransformerImpl<InputT, std::vector<OutputT>>;
     using CalculatorFunctionInputType = typename Components::CircularBuffer<InputT>::iterator;
-    using CalculatorFunction = std::function<typename OutputT(typename CalculatorFunctionInputType, typename CalculatorFunctionInputType)>;
+    using CalculatorFunction = std::function<OutputT(CalculatorFunctionInputType, CalculatorFunctionInputType)>;
 
     // ----------------------------------------------------------------------
     // |
@@ -139,27 +138,17 @@ template <typename InputT, typename OutputT, size_t MaxNumTrainingItemsV>
 RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWindowTransformerBase(std::uint32_t maxWindowSize, CalculatorFunction calculator, std::uint32_t horizon, std::uint32_t minWindowSize) :
     _maxWindowSize(
         std::move(
-            [this, &maxWindowSize]() -> std::uint32_t & {
+            [&maxWindowSize]() -> std::uint32_t & {
                 if(maxWindowSize < 1)
                     throw std::invalid_argument("maxWindowSize");
 
                 return maxWindowSize;
             }()
-        )),
-    _calculator(std::move(calculator)),
-    _horizon(
-        std::move(
-            [this, &horizon]() -> std::uint32_t & {
-                if(horizon < 1)
-                    throw std::invalid_argument("horizon");
-
-                return horizon;
-            }()
         )
     ),
     _minWindowSize(
         std::move(
-            [this, &minWindowSize]() -> std::uint32_t & {
+            [&minWindowSize]() -> std::uint32_t & {
                 if(minWindowSize < 1)
                     throw std::invalid_argument("minWindowSize");
 
@@ -167,6 +156,17 @@ RollingWindowTransformerBase<InputT, OutputT, MaxNumTrainingItemsV>::RollingWind
             }()
         )
     ),
+    _horizon(
+        std::move(
+            [&horizon]() -> std::uint32_t & {
+                if(horizon < 1)
+                    throw std::invalid_argument("horizon");
+
+                return horizon;
+            }()
+        )
+    ),
+    _calculator(std::move(calculator)),
     _buffer(horizon + maxWindowSize) {
 
 }
