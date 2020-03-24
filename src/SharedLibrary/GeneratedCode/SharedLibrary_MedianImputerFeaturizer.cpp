@@ -43,7 +43,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_CreateEstimator(/*out*/
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MedianImputerFeaturizer_int8_EstimatorHandle*>(index);
 
-
     
         return true;
     }
@@ -130,11 +129,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_Fit(/*in*/ MedianImpute
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int8_t>::CreateNullValue()));
     
@@ -146,7 +143,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_Fit(/*in*/ MedianImpute
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_FitBuffer(/*in*/ MedianImputerFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_FitBuffer(/*in*/ MedianImputerFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -156,8 +153,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_FitBuffer(/*in*/ Median
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -165,9 +160,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_FitBuffer(/*in*/ Median
 
         input_buffer.reserve(input_items);
 
-        std::int8_t const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
+        while(input_buffer.size() < input_items) {
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int8_t>::CreateNullValue());
         #else
@@ -240,12 +233,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_CreateTransformerFromEs
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MedianImputerFeaturizer_int8_TransformerHandle*>(index);
@@ -258,7 +248,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_CreateTransformerFromEs
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MedianImputerFeaturizer_int8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ MedianImputerFeaturizer_int8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -297,7 +287,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_DestroyTransformer(/*in
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -308,7 +297,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_DestroyTransformer(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_int8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_int8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -350,17 +339,65 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_Transform(/*in*/ Median
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
+        
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int8_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int8_t>::CreateNullValue()));
 
         // Output
         *output = result;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_Flush(/*in*/ MedianImputerFeaturizer_int8_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new double[result.size()];
+        *output_items = result.size();
+
+        double * output_item(*output_item_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+            *output_item = result_item;
+            ++output_item;
+        }
     
         return true;
     }
@@ -389,7 +426,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_CreateEstimator(/*out*
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MedianImputerFeaturizer_int16_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -477,11 +513,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_Fit(/*in*/ MedianImput
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int16_t>::CreateNullValue()));
     
@@ -493,7 +527,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_Fit(/*in*/ MedianImput
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_FitBuffer(/*in*/ MedianImputerFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_FitBuffer(/*in*/ MedianImputerFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -503,8 +537,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_FitBuffer(/*in*/ Media
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -512,9 +544,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_FitBuffer(/*in*/ Media
 
         input_buffer.reserve(input_items);
 
-        std::int16_t const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
+        while(input_buffer.size() < input_items) {
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int16_t>::CreateNullValue());
         #else
@@ -587,12 +617,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_CreateTransformerFromE
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MedianImputerFeaturizer_int16_TransformerHandle*>(index);
@@ -605,7 +632,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_CreateTransformerFromE
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MedianImputerFeaturizer_int16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ MedianImputerFeaturizer_int16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -644,7 +671,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_DestroyTransformer(/*i
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -655,7 +681,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_DestroyTransformer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_int16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_int16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -697,17 +723,65 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_Transform(/*in*/ Media
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
+        
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int16_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int16_t>::CreateNullValue()));
 
         // Output
         *output = result;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_Flush(/*in*/ MedianImputerFeaturizer_int16_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new double[result.size()];
+        *output_items = result.size();
+
+        double * output_item(*output_item_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+            *output_item = result_item;
+            ++output_item;
+        }
     
         return true;
     }
@@ -736,7 +810,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_CreateEstimator(/*out*
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MedianImputerFeaturizer_int32_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -824,11 +897,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_Fit(/*in*/ MedianImput
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int32_t>::CreateNullValue()));
     
@@ -840,7 +911,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_Fit(/*in*/ MedianImput
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_FitBuffer(/*in*/ MedianImputerFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_FitBuffer(/*in*/ MedianImputerFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -850,8 +921,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_FitBuffer(/*in*/ Media
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -859,9 +928,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_FitBuffer(/*in*/ Media
 
         input_buffer.reserve(input_items);
 
-        std::int32_t const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
+        while(input_buffer.size() < input_items) {
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int32_t>::CreateNullValue());
         #else
@@ -934,12 +1001,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_CreateTransformerFromE
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MedianImputerFeaturizer_int32_TransformerHandle*>(index);
@@ -952,7 +1016,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_CreateTransformerFromE
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MedianImputerFeaturizer_int32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ MedianImputerFeaturizer_int32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -991,7 +1055,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_DestroyTransformer(/*i
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -1002,7 +1065,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_DestroyTransformer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_int32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_int32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1044,17 +1107,65 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_Transform(/*in*/ Media
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
+        
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int32_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int32_t>::CreateNullValue()));
 
         // Output
         *output = result;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_Flush(/*in*/ MedianImputerFeaturizer_int32_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new double[result.size()];
+        *output_items = result.size();
+
+        double * output_item(*output_item_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+            *output_item = result_item;
+            ++output_item;
+        }
     
         return true;
     }
@@ -1083,7 +1194,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_CreateEstimator(/*out*
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MedianImputerFeaturizer_int64_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -1171,11 +1281,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_Fit(/*in*/ MedianImput
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int64_t>::CreateNullValue()));
     
@@ -1187,7 +1295,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_Fit(/*in*/ MedianImput
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_FitBuffer(/*in*/ MedianImputerFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_FitBuffer(/*in*/ MedianImputerFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1197,8 +1305,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_FitBuffer(/*in*/ Media
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -1206,9 +1312,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_FitBuffer(/*in*/ Media
 
         input_buffer.reserve(input_items);
 
-        std::int64_t const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
+        while(input_buffer.size() < input_items) {
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::int64_t>::CreateNullValue());
         #else
@@ -1281,12 +1385,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_CreateTransformerFromE
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MedianImputerFeaturizer_int64_TransformerHandle*>(index);
@@ -1299,7 +1400,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_CreateTransformerFromE
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MedianImputerFeaturizer_int64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ MedianImputerFeaturizer_int64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1338,7 +1439,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_DestroyTransformer(/*i
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -1349,7 +1449,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_DestroyTransformer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_int64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_int64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1391,17 +1491,65 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_Transform(/*in*/ Media
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
+        
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int64_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int64_t>::CreateNullValue()));
 
         // Output
         *output = result;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_Flush(/*in*/ MedianImputerFeaturizer_int64_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new double[result.size()];
+        *output_items = result.size();
+
+        double * output_item(*output_item_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+            *output_item = result_item;
+            ++output_item;
+        }
     
         return true;
     }
@@ -1430,7 +1578,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_CreateEstimator(/*out*
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MedianImputerFeaturizer_uint8_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -1518,11 +1665,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_Fit(/*in*/ MedianImput
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint8_t>::CreateNullValue()));
     
@@ -1534,7 +1679,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_Fit(/*in*/ MedianImput
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_FitBuffer(/*in*/ MedianImputerFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_FitBuffer(/*in*/ MedianImputerFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1544,8 +1689,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_FitBuffer(/*in*/ Media
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -1553,9 +1696,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_FitBuffer(/*in*/ Media
 
         input_buffer.reserve(input_items);
 
-        std::uint8_t const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
+        while(input_buffer.size() < input_items) {
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint8_t>::CreateNullValue());
         #else
@@ -1628,12 +1769,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_CreateTransformerFromE
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MedianImputerFeaturizer_uint8_TransformerHandle*>(index);
@@ -1646,7 +1784,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_CreateTransformerFromE
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MedianImputerFeaturizer_uint8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ MedianImputerFeaturizer_uint8_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1685,7 +1823,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_DestroyTransformer(/*i
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -1696,7 +1833,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_DestroyTransformer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1738,17 +1875,65 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_Transform(/*in*/ Media
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
+        
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint8_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint8_t>::CreateNullValue()));
 
         // Output
         *output = result;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_Flush(/*in*/ MedianImputerFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new double[result.size()];
+        *output_items = result.size();
+
+        double * output_item(*output_item_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+            *output_item = result_item;
+            ++output_item;
+        }
     
         return true;
     }
@@ -1777,7 +1962,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_CreateEstimator(/*out
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MedianImputerFeaturizer_uint16_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -1865,11 +2049,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_Fit(/*in*/ MedianImpu
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint16_t>::CreateNullValue()));
     
@@ -1881,7 +2063,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_Fit(/*in*/ MedianImpu
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_FitBuffer(/*in*/ MedianImputerFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_FitBuffer(/*in*/ MedianImputerFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1891,8 +2073,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_FitBuffer(/*in*/ Medi
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -1900,9 +2080,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_FitBuffer(/*in*/ Medi
 
         input_buffer.reserve(input_items);
 
-        std::uint16_t const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
+        while(input_buffer.size() < input_items) {
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint16_t>::CreateNullValue());
         #else
@@ -1975,12 +2153,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_CreateTransformerFrom
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MedianImputerFeaturizer_uint16_TransformerHandle*>(index);
@@ -1993,7 +2168,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MedianImputerFeaturizer_uint16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ MedianImputerFeaturizer_uint16_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2032,7 +2207,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_DestroyTransformer(/*
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -2043,7 +2217,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_DestroyTransformer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2085,17 +2259,65 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_Transform(/*in*/ Medi
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
+        
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint16_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint16_t>::CreateNullValue()));
 
         // Output
         *output = result;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_Flush(/*in*/ MedianImputerFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new double[result.size()];
+        *output_items = result.size();
+
+        double * output_item(*output_item_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+            *output_item = result_item;
+            ++output_item;
+        }
     
         return true;
     }
@@ -2124,7 +2346,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_CreateEstimator(/*out
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MedianImputerFeaturizer_uint32_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -2212,11 +2433,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_Fit(/*in*/ MedianImpu
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue()));
     
@@ -2228,7 +2447,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_Fit(/*in*/ MedianImpu
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_FitBuffer(/*in*/ MedianImputerFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_FitBuffer(/*in*/ MedianImputerFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2238,8 +2457,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_FitBuffer(/*in*/ Medi
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -2247,9 +2464,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_FitBuffer(/*in*/ Medi
 
         input_buffer.reserve(input_items);
 
-        std::uint32_t const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
+        while(input_buffer.size() < input_items) {
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue());
         #else
@@ -2322,12 +2537,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_CreateTransformerFrom
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MedianImputerFeaturizer_uint32_TransformerHandle*>(index);
@@ -2340,7 +2552,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MedianImputerFeaturizer_uint32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ MedianImputerFeaturizer_uint32_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2379,7 +2591,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_DestroyTransformer(/*
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -2390,7 +2601,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_DestroyTransformer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2432,17 +2643,65 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_Transform(/*in*/ Medi
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
+        
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue()));
 
         // Output
         *output = result;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_Flush(/*in*/ MedianImputerFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new double[result.size()];
+        *output_items = result.size();
+
+        double * output_item(*output_item_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+            *output_item = result_item;
+            ++output_item;
+        }
     
         return true;
     }
@@ -2471,7 +2730,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_CreateEstimator(/*out
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MedianImputerFeaturizer_uint64_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -2559,11 +2817,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_Fit(/*in*/ MedianImpu
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint64_t>::CreateNullValue()));
     
@@ -2575,7 +2831,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_Fit(/*in*/ MedianImpu
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_FitBuffer(/*in*/ MedianImputerFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_FitBuffer(/*in*/ MedianImputerFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2585,8 +2841,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_FitBuffer(/*in*/ Medi
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -2594,9 +2848,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_FitBuffer(/*in*/ Medi
 
         input_buffer.reserve(input_items);
 
-        std::uint64_t const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
+        while(input_buffer.size() < input_items) {
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::uint64_t>::CreateNullValue());
         #else
@@ -2669,12 +2921,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_CreateTransformerFrom
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MedianImputerFeaturizer_uint64_TransformerHandle*>(index);
@@ -2687,7 +2936,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MedianImputerFeaturizer_uint64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ MedianImputerFeaturizer_uint64_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2726,7 +2975,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_DestroyTransformer(/*
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -2737,7 +2985,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_DestroyTransformer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2779,17 +3027,65 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_Transform(/*in*/ Medi
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
+        
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint64_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint64_t>::CreateNullValue()));
 
         // Output
         *output = result;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_Flush(/*in*/ MedianImputerFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new double[result.size()];
+        *output_items = result.size();
+
+        double * output_item(*output_item_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+            *output_item = result_item;
+            ++output_item;
+        }
     
         return true;
     }
@@ -2818,7 +3114,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_CreateEstimator(/*out*
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MedianImputerFeaturizer_float_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -2906,11 +3201,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_Fit(/*in*/ MedianImput
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
     
@@ -2922,7 +3215,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_Fit(/*in*/ MedianImput
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_FitBuffer(/*in*/ MedianImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_FitBuffer(/*in*/ MedianImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2932,29 +3225,12 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_FitBuffer(/*in*/ Media
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Microsoft::Featurizer::Traits<std::float_t>::nullable_type> input_buffer;
-
-        input_buffer.reserve(input_items);
-
-        std::float_t const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
-        #else
-            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
-        #endif
-            ++input_ptr;
-        }
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
         return true;
     }
@@ -3016,12 +3292,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_CreateTransformerFromE
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MedianImputerFeaturizer_float_TransformerHandle*>(index);
@@ -3034,7 +3307,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_CreateTransformerFromE
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MedianImputerFeaturizer_float_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ MedianImputerFeaturizer_float_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3073,7 +3346,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_DestroyTransformer(/*i
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -3084,7 +3356,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_DestroyTransformer(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_float_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_float_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3126,17 +3398,65 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_Transform(/*in*/ Media
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
+        
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
 
         // Output
         *output = result;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_Flush(/*in*/ MedianImputerFeaturizer_float_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new double[result.size()];
+        *output_items = result.size();
+
+        double * output_item(*output_item_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+            *output_item = result_item;
+            ++output_item;
+        }
     
         return true;
     }
@@ -3165,7 +3485,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_CreateEstimator(/*out
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MedianImputerFeaturizer_double_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -3253,11 +3572,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_Fit(/*in*/ MedianImpu
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
     
@@ -3269,7 +3586,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_Fit(/*in*/ MedianImpu
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_FitBuffer(/*in*/ MedianImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_FitBuffer(/*in*/ MedianImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3279,29 +3596,12 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_FitBuffer(/*in*/ Medi
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Microsoft::Featurizer::Traits<std::double_t>::nullable_type> input_buffer;
-
-        input_buffer.reserve(input_items);
-
-        std::double_t const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-            input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue());
-        #else
-            input_buffer.emplace_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue());
-        #endif
-            ++input_ptr;
-        }
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input_ptr, input_items));
     
         return true;
     }
@@ -3363,12 +3663,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_CreateTransformerFrom
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MedianImputerFeaturizer_double_TransformerHandle*>(index);
@@ -3381,7 +3678,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MedianImputerFeaturizer_double_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ MedianImputerFeaturizer_double_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3420,7 +3717,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_DestroyTransformer(/*
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -3431,7 +3727,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_DestroyTransformer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_double_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_double_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3473,17 +3769,65 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_Transform(/*in*/ Medi
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
+        
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
 
         // Output
         *output = result;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_Flush(/*in*/ MedianImputerFeaturizer_double_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new double[result.size()];
+        *output_items = result.size();
+
+        double * output_item(*output_item_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+            *output_item = result_item;
+            ++output_item;
+        }
     
         return true;
     }
@@ -3512,7 +3856,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_CreateEstimator(/*out*/
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MedianImputerFeaturizer_bool_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -3600,11 +3943,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_Fit(/*in*/ MedianImpute
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<bool>::CreateNullValue()));
     
@@ -3616,7 +3957,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_Fit(/*in*/ MedianImpute
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_FitBuffer(/*in*/ MedianImputerFeaturizer_bool_EstimatorHandle *pHandle, /*in*/ bool const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_FitBuffer(/*in*/ MedianImputerFeaturizer_bool_EstimatorHandle *pHandle, /*in*/ bool const * const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3626,8 +3967,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_FitBuffer(/*in*/ Median
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -3635,9 +3974,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_FitBuffer(/*in*/ Median
 
         input_buffer.reserve(input_items);
 
-        bool const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
+        while(input_buffer.size() < input_items) {
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? **input_ptr : Microsoft::Featurizer::Traits<bool>::CreateNullValue());
         #else
@@ -3710,12 +4047,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_CreateTransformerFromEs
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MedianImputerFeaturizer_bool_TransformerHandle*>(index);
@@ -3728,7 +4062,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_CreateTransformerFromEs
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MedianImputerFeaturizer_bool_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ MedianImputerFeaturizer_bool_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3767,7 +4101,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_DestroyTransformer(/*in
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -3778,7 +4111,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_DestroyTransformer(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_bool_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_bool_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3820,17 +4153,65 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_Transform(/*in*/ Median
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
+        
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<bool>::CreateNullValue()));
+        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<bool>::CreateNullValue()));
 
         // Output
         *output = result;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_Flush(/*in*/ MedianImputerFeaturizer_bool_TransformerHandle *pHandle, /*out*/ bool ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.push_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new bool[result.size()];
+        *output_items = result.size();
+
+        bool * output_item(*output_item_ptr);
+
+        for(bool result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+            *output_item = result_item;
+            ++output_item;
+        }
     
         return true;
     }
@@ -3859,7 +4240,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_CreateEstimator(/*out
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<MedianImputerFeaturizer_string_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -3937,7 +4317,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_IsTrainingComplete(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Fit(/*in*/ MedianImputerFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const *input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Fit(/*in*/ MedianImputerFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3947,11 +4327,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Fit(/*in*/ MedianImpu
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input ? std::string(input) : nonstd::optional<std::string>()));
     
@@ -3963,7 +4341,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Fit(/*in*/ MedianImpu
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_FitBuffer(/*in*/ MedianImputerFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_FitBuffer(/*in*/ MedianImputerFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const * const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3973,8 +4351,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_FitBuffer(/*in*/ Medi
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -3982,9 +4358,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_FitBuffer(/*in*/ Medi
 
         input_buffer.reserve(input_items);
 
-        char const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
+        while(input_buffer.size() < input_items) {
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
             input_buffer.push_back(*input_ptr ? *input_ptr : nonstd::optional<std::string>());
         #else
@@ -4057,12 +4431,9 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_CreateTransformerFrom
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<MedianImputerFeaturizer_string_TransformerHandle*>(index);
@@ -4075,7 +4446,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_CreateTransformerFrom
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ MedianImputerFeaturizer_string_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ MedianImputerFeaturizer_string_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -4114,7 +4485,6 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_DestroyTransformer(/*
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -4125,7 +4495,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_DestroyTransformer(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_string_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_CreateTransformerSaveData(/*in*/ MedianImputerFeaturizer_string_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -4158,7 +4528,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Transform(/*in*/ MedianImputerFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ char const ** output_ptr, /*out*/ std::size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Transform(/*in*/ MedianImputerFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const * input, /*out*/ char const ** output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -4167,20 +4537,19 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Transform(/*in*/ Medi
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
-        if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
-        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+        
+        if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input ? std::string(input) : nonstd::optional<std::string>()));
+        TransformedType result(transformer.execute(input ? std::string(input) : nonstd::optional<std::string>()));
 
         // Output
         if(result.empty()) {
-            *output_ptr = nullptr;
-            *output_items = 0;
+            *output = nullptr;
         }
         else {
             char * string_buffer(new char[result.size() + 1]);
@@ -4188,8 +4557,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Transform(/*in*/ Medi
             std::copy(result.begin(), result.end(), string_buffer);
             string_buffer[result.size()] = 0;
 
-            *output_ptr = string_buffer;
-            *output_items = result.size();
+            *output = string_buffer;
         }
     
         return true;
@@ -4200,18 +4568,76 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Transform(/*in*/ Medi
     }
 }
 
-FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_DestroyTransformedData(/*in*/ char const *result_ptr, /*in*/ std::size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Flush(/*in*/ MedianImputerFeaturizer_string_TransformerHandle *pHandle, /*out*/ char const *** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("Invalid buffer");
-        if(result_ptr != nullptr && result_items == 0) throw std::invalid_argument("Invalid buffer");
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        if(result_ptr)
-            delete [] result_ptr;
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new char const *[result.size()];
+        *output_items = result.size();
+
+        char const ** output_item(*output_item_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+            if(result_item.empty()) {
+                *output_item = nullptr;
+            }
+            else {
+                char * string_buffer(new char[result_item.size() + 1]);
+
+                std::copy(result_item.begin(), result_item.end(), string_buffer);
+                string_buffer[result_item.size()] = 0;
+
+                *output_item = string_buffer;
+            }
+
+            ++output_item;
+        }
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_DestroyTransformedData(/*out*/ char const * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        // No validation
+
+        if(result)
+            delete [] result;
     
         return true;
     }

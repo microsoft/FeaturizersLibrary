@@ -53,10 +53,7 @@ class DateTimeTypeInfo(TypeInfo):
 
         return self.Result(
             [
-                "/*in*/ DateTimeParameter {param_decorator}{name}".format(
-                    name=arg_name,
-                    param_decorator=param_decorator,
-                ),
+                self.Type("DateTimeParameter {}".format(param_decorator), arg_name),
             ],
             "", # No validation
             invocation,
@@ -73,9 +70,7 @@ class DateTimeTypeInfo(TypeInfo):
 
                 {name}_buffer.reserve({name}_items};
 
-                DateTimeParameter const * const * const {name}_end({name}_ptr + {name}_items);
-
-                while({name}_ptr != {name}_end) {{
+                while({name}_buffer.size() < {name}_items) {{
                 #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
                     {name}_buffer.push_back(*{name}_ptr ? CreateDateTime(**{name}_ptr) : nonstd::optional<{cpp_type}>());
                 #else
@@ -88,6 +83,8 @@ class DateTimeTypeInfo(TypeInfo):
                 name=arg_name,
                 cpp_type=self.CppType,
             )
+
+            buffer_type = "std::vector<nonstd::optional<{}>>".format(self.CppType)
 
         else:
             param_decorator = ""
@@ -113,15 +110,12 @@ class DateTimeTypeInfo(TypeInfo):
                 cpp_type=self.CppType,
             )
 
+            buffer_type = "std::vector<{}>".format(self.CppType)
+
         return self.Result(
             [
-                "/*in*/ DateTimeParameter const * {param_decorator}{name}_ptr".format(
-                    name=arg_name,
-                    param_decorator=param_decorator,
-                ),
-                "/*in*/ std::size_t {name}_items".format(
-                    name=arg_name,
-                ),
+                self.Type("DateTimeParameter const * {}".format(param_decorator), "{}_ptr".format(arg_name)),
+                self.Type("size_t", "{}_items".format(arg_name)),
             ],
             textwrap.dedent(
                 """\
@@ -140,6 +134,7 @@ class DateTimeTypeInfo(TypeInfo):
                     name=arg_name,
                 ),
             ),
+            input_buffer_type=self.Type(buffer_type, "{}_buffer".format(arg_name)),
         )
 
     # ----------------------------------------------------------------------
@@ -148,7 +143,7 @@ class DateTimeTypeInfo(TypeInfo):
         self,
         arg_name,
         result_name="result",
-        is_struct_member=False,
+        suppress_pointer=False,
     ):
         raise NotImplemented("Not implemented yet")
 

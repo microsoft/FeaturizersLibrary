@@ -42,22 +42,22 @@ class VectorTypeInfo(TypeInfo):
         create_type_info_func=None,
         **kwargs
     ):
-        if member_type is not None:
-            assert create_type_info_func is not None
+        if member_type is None:
+            return
 
-            super(VectorTypeInfo, self).__init__(*args, **kwargs)
+        assert create_type_info_func is not None
 
-            match = self.TypeName.match(member_type)
-            assert match, member_type
+        super(VectorTypeInfo, self).__init__(*args, **kwargs)
 
-            the_type = match.group("type")
+        match = self.TypeName.match(member_type)
+        assert match, member_type
 
-            type_info = create_type_info_func(the_type)
+        the_type = match.group("type")
 
-            if type_info.IsOptional:
-                raise Exception("Vector types do not currently support optional values ('{}')".format(the_type))
+        type_info = create_type_info_func(the_type)
+        assert type_info, the_type
 
-            self._type_info                 = type_info
+        self._type_info                 = type_info
 
     # ----------------------------------------------------------------------
     @Interface.override

@@ -908,6 +908,8 @@ class CSharpData(object):
             from Plugins.MLNetPluginImpl.SparseVectorTypeInfo import SparseVectorTypeInfo
             from Plugins.MLNetPluginImpl.StringTypeInfo import StringTypeInfo
             from Plugins.MLNetPluginImpl import StructTypeInfos
+            from Plugins.MLNetPluginImpl.TupleTypeInfo import TupleTypeInfo
+            from Plugins.MLNetPluginImpl.UniqueIdTypeInfo import UniqueIdTypeInfo
             from Plugins.MLNetPluginImpl.VectorTypeInfo import VectorTypeInfo
 
             type_info_classes = [
@@ -916,6 +918,8 @@ class CSharpData(object):
                 SingleValueSparseVectorTypeInfo,
                 SparseVectorTypeInfo,
                 StringTypeInfo,
+                TupleTypeInfo,
+                UniqueIdTypeInfo,
                 VectorTypeInfo,
             ]
 

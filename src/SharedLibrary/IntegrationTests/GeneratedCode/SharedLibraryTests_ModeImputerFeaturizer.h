@@ -1226,9 +1226,8 @@ void ModeImputerFeaturizer_string_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(ModeImputerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(ModeImputerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -1238,7 +1237,7 @@ void ModeImputerFeaturizer_string_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(ModeImputerFeaturizer_string_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(ModeImputerFeaturizer_string_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 

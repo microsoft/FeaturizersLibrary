@@ -8,6 +8,8 @@ import os
 import re
 import textwrap
 
+import six
+
 import CommonEnvironment
 from CommonEnvironment import Interface
 
@@ -41,24 +43,26 @@ class VectorTypeInfo(TypeInfo):
         create_type_info_func=None,
         **kwargs
     ):
-        if member_type is not None:
-            assert create_type_info_func is not None
+        if member_type is None:
+            return
 
-            super(VectorTypeInfo, self).__init__(*args, **kwargs)
+        assert create_type_info_func is not None
 
-            match = self.TypeName.match(member_type)
-            assert match, member_type
+        super(VectorTypeInfo, self).__init__(*args, **kwargs)
 
-            the_type = match.group("type")
+        match = self.TypeName.match(member_type)
+        assert match, member_type
 
-            type_info = create_type_info_func(the_type)
-            if not hasattr(type_info, "CType"):
-                raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a vector".format(the_type))
+        the_type = match.group("type")
 
-            if type_info.IsOptional:
-                raise Exception("Vector types do not currently support optional values ('{}')".format(the_type))
+        type_info = create_type_info_func(the_type)
+        assert type_info, the_type
 
-            self._type_info                 = type_info
+        # The content is expressed by a range of pointers
+        self._type_info             = type_info
+        self.CppType                = "std::tuple<{type} const *, {type} const *>".format(
+            type=self._type_info.CppType,
+        )
 
     # ----------------------------------------------------------------------
     @Interface.override
@@ -89,28 +93,28 @@ class VectorTypeInfo(TypeInfo):
             textwrap.dedent(
                 """\
                 {type} * {result_name}_ptr(nullptr);
-                std::size_t {result_name}_elements(0);
+                std::size_t {result_name}_items(0);
                 """,
             ).format(
                 type=self._type_info.CppType,
                 result_name=result_name,
             ),
-            "&{result_name}_ptr, &{result_name}_elements".format(
+            "&{result_name}_ptr, &{result_name}_items".format(
                 result_name=result_name,
             ),
             textwrap.dedent(
                 """\
                 #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-                results.push_back(std::vector<{type}>({result_name}_ptr, {result_name}_ptr + {result_name}_elements));
+                results.push_back(std::vector<{type}>({result_name}_ptr, {result_name}_ptr + {result_name}_items));
                 #else
-                results.emplace_back(std::vector<{type}>({result_name}_ptr, {result_name}_ptr + {result_name}_elements));
+                results.emplace_back(std::vector<{type}>({result_name}_ptr, {result_name}_ptr + {result_name}_items));
                 #endif
                 """,
             ).format(
                 type=self._type_info.CppType,
                 result_name=result_name,
             ),
-            "{result_name}_ptr, {result_name}_elements".format(
+            "{result_name}_ptr, {result_name}_items".format(
                 result_name=result_name,
             ),
             destroy_inline=True,

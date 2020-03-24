@@ -94,9 +94,8 @@ void StringFeaturizer_int8_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(StringFeaturizer_int8_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int8_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -106,7 +105,7 @@ void StringFeaturizer_int8_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_int8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int8_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -202,9 +201,8 @@ void StringFeaturizer_int16_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(StringFeaturizer_int16_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int16_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -214,7 +212,7 @@ void StringFeaturizer_int16_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_int16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int16_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -310,9 +308,8 @@ void StringFeaturizer_int32_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(StringFeaturizer_int32_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int32_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -322,7 +319,7 @@ void StringFeaturizer_int32_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_int32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int32_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -418,9 +415,8 @@ void StringFeaturizer_int64_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(StringFeaturizer_int64_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int64_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -430,7 +426,7 @@ void StringFeaturizer_int64_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_int64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int64_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -526,9 +522,8 @@ void StringFeaturizer_uint8_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(StringFeaturizer_uint8_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint8_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -538,7 +533,7 @@ void StringFeaturizer_uint8_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_uint8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint8_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -634,9 +629,8 @@ void StringFeaturizer_uint16_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(StringFeaturizer_uint16_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint16_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -646,7 +640,7 @@ void StringFeaturizer_uint16_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_uint16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint16_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -742,9 +736,8 @@ void StringFeaturizer_uint32_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(StringFeaturizer_uint32_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint32_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -754,7 +747,7 @@ void StringFeaturizer_uint32_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_uint32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint32_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -850,9 +843,8 @@ void StringFeaturizer_uint64_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(StringFeaturizer_uint64_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint64_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -862,7 +854,7 @@ void StringFeaturizer_uint64_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_uint64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint64_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -958,9 +950,8 @@ void StringFeaturizer_float_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(StringFeaturizer_float_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_float_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -970,7 +961,7 @@ void StringFeaturizer_float_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_float_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_float_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1066,9 +1057,8 @@ void StringFeaturizer_double_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(StringFeaturizer_double_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_double_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -1078,7 +1068,7 @@ void StringFeaturizer_double_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_double_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_double_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1174,9 +1164,8 @@ void StringFeaturizer_bool_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(StringFeaturizer_bool_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_bool_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -1186,7 +1175,7 @@ void StringFeaturizer_bool_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_bool_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_bool_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1282,9 +1271,8 @@ void StringFeaturizer_string_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(StringFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
@@ -1294,7 +1282,7 @@ void StringFeaturizer_string_Test(
         #endif
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_string_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(StringFeaturizer_string_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 

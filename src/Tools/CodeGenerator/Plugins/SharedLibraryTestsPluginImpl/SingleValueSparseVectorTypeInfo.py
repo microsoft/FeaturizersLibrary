@@ -41,24 +41,26 @@ class SingleValueSparseVectorTypeInfo(TypeInfo):
         create_type_info_func=None,
         **kwargs
     ):
-        if member_type is not None:
-            assert create_type_info_func is not None
+        if member_type is None:
+            return
 
-            super(SingleValueSparseVectorTypeInfo, self).__init__(*args, **kwargs)
+        assert create_type_info_func is not None
 
-            match = self.TypeName.match(member_type)
-            assert match, member_type
+        super(SingleValueSparseVectorTypeInfo, self).__init__(*args, **kwargs)
 
-            the_type = match.group("type")
+        match = self.TypeName.match(member_type)
+        assert match, member_type
 
-            type_info = create_type_info_func(the_type)
-            if not hasattr(type_info, "CType"):
-                raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a single_value_sparse_vector".format(the_type))
+        the_type = match.group("type")
 
-            if type_info.IsOptional:
-                raise Exception("SingleValueSparseVector types do not currently support optional values ('{}')".format(the_type))
+        type_info = create_type_info_func(the_type)
+        if not hasattr(type_info, "CType"):
+            raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a single_value_sparse_vector".format(the_type))
 
-            self._type_info                 = type_info
+        if type_info.IsOptional:
+            raise Exception("SingleValueSparseVector types do not currently support optional values ('{}')".format(the_type))
+
+        self._type_info                 = type_info
 
     # ----------------------------------------------------------------------
     @Interface.override

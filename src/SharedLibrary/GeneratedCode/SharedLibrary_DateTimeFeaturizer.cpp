@@ -28,7 +28,7 @@ extern "C" {
 /* |  DateTimeFeaturizer */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateEstimator(/*in*/ char const *optionalCountryName, /*in*/ char const *optionalDataRootDir, /*out*/ DateTimeFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateEstimator(/*in*/ char const * optionalCountryName, /*in*/ char const * optionalDataRootDir, /*out*/ DateTimeFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -42,7 +42,6 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateEstimator(/*in*/ char const
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<DateTimeFeaturizer_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -120,7 +119,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_IsTrainingComplete(/*in*/ DateTim
     }
 }
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Fit(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*in*/ DateTimeParameter input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Fit(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*in*/ DateTimeParameter  input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -130,11 +129,9 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Fit(/*in*/ DateTimeFeaturizer_Est
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         // No validation
 
         Microsoft::Featurizer::Featurizers::DateTimeEstimator & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::DateTimeEstimator>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(CreateDateTime(input)));
     
@@ -146,7 +143,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Fit(/*in*/ DateTimeFeaturizer_Est
     }
 }
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_FitBuffer(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*in*/ DateTimeParameter const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_FitBuffer(/*in*/ DateTimeFeaturizer_EstimatorHandle *pHandle, /*in*/ DateTimeParameter const *  input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -155,8 +152,6 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_FitBuffer(/*in*/ DateTimeFeaturiz
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
-
-
 
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
@@ -240,12 +235,9 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerFromEstimator(/*
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::DateTimeEstimator & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::DateTimeEstimator>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<DateTimeFeaturizer_TransformerHandle*>(index);
@@ -258,7 +250,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerFromEstimator(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ DateTimeFeaturizer_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ DateTimeFeaturizer_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -297,7 +289,6 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyTransformer(/*in*/ DateTim
         Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -308,7 +299,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyTransformer(/*in*/ DateTim
     }
 }
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerSaveData(/*in*/ DateTimeFeaturizer_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerSaveData(/*in*/ DateTimeFeaturizer_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -341,7 +332,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_CreateTransformerSaveData(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturizer_TransformerHandle *pHandle, /*in*/ DateTimeParameter input, /*out via struct*/ TimePoint * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturizer_TransformerHandle *pHandle, /*in*/ DateTimeParameter  input, /*out*/ TimePoint * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -350,14 +341,15 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturiz
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
-        // No input validation
+        
         if(output == nullptr) throw std::invalid_argument("'output' is null");
 
         Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformedType;
+
         // Input
-        auto result(transformer.execute(CreateDateTime(input)));
+        TransformedType result(transformer.execute(CreateDateTime(input)));
 
         // Output
         output->year = result.year;
@@ -377,8 +369,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturiz
         output->weekIso = result.weekIso;
         output->yearIso = result.yearIso;
         if(result.monthLabel.empty()) {
-            output->monthLabel_ptr = nullptr;
-            output->monthLabel_items = 0;
+            output->monthLabel = nullptr;
         }
         else {
             char * string_buffer(new char[result.monthLabel.size() + 1]);
@@ -386,13 +377,11 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturiz
             std::copy(result.monthLabel.begin(), result.monthLabel.end(), string_buffer);
             string_buffer[result.monthLabel.size()] = 0;
 
-            output->monthLabel_ptr = string_buffer;
-            output->monthLabel_items = result.monthLabel.size();
+            output->monthLabel = string_buffer;
         }
 
         if(result.amPmLabel.empty()) {
-            output->amPmLabel_ptr = nullptr;
-            output->amPmLabel_items = 0;
+            output->amPmLabel = nullptr;
         }
         else {
             char * string_buffer(new char[result.amPmLabel.size() + 1]);
@@ -400,13 +389,11 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturiz
             std::copy(result.amPmLabel.begin(), result.amPmLabel.end(), string_buffer);
             string_buffer[result.amPmLabel.size()] = 0;
 
-            output->amPmLabel_ptr = string_buffer;
-            output->amPmLabel_items = result.amPmLabel.size();
+            output->amPmLabel = string_buffer;
         }
 
         if(result.dayOfWeekLabel.empty()) {
-            output->dayOfWeekLabel_ptr = nullptr;
-            output->dayOfWeekLabel_items = 0;
+            output->dayOfWeekLabel = nullptr;
         }
         else {
             char * string_buffer(new char[result.dayOfWeekLabel.size() + 1]);
@@ -414,13 +401,11 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturiz
             std::copy(result.dayOfWeekLabel.begin(), result.dayOfWeekLabel.end(), string_buffer);
             string_buffer[result.dayOfWeekLabel.size()] = 0;
 
-            output->dayOfWeekLabel_ptr = string_buffer;
-            output->dayOfWeekLabel_items = result.dayOfWeekLabel.size();
+            output->dayOfWeekLabel = string_buffer;
         }
 
         if(result.holidayName.empty()) {
-            output->holidayName_ptr = nullptr;
-            output->holidayName_items = 0;
+            output->holidayName = nullptr;
         }
         else {
             char * string_buffer(new char[result.holidayName.size() + 1]);
@@ -428,8 +413,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturiz
             std::copy(result.holidayName.begin(), result.holidayName.end(), string_buffer);
             string_buffer[result.holidayName.size()] = 0;
 
-            output->holidayName_ptr = string_buffer;
-            output->holidayName_items = result.holidayName.size();
+            output->holidayName = string_buffer;
         }
 
         output->isPaidTimeOff = result.isPaidTimeOff;
@@ -442,7 +426,118 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturiz
     }
 }
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyTransformedData(/*in*/ TimePoint * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Flush(/*in*/ DateTimeFeaturizer_TransformerHandle *pHandle, /*out*/ TimePoint ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_ptr = new TimePoint[result.size()];
+        *output_items = result.size();
+
+        TimePoint * output_item(*output_item_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+            output_item->year = result_item.year;
+            output_item->month = result_item.month;
+            output_item->day = result_item.day;
+            output_item->hour = result_item.hour;
+            output_item->minute = result_item.minute;
+            output_item->second = result_item.second;
+            output_item->amPm = result_item.amPm;
+            output_item->hour12 = result_item.hour12;
+            output_item->dayOfWeek = result_item.dayOfWeek;
+            output_item->dayOfQuarter = result_item.dayOfQuarter;
+            output_item->dayOfYear = result_item.dayOfYear;
+            output_item->weekOfMonth = result_item.weekOfMonth;
+            output_item->quarterOfYear = result_item.quarterOfYear;
+            output_item->halfOfYear = result_item.halfOfYear;
+            output_item->weekIso = result_item.weekIso;
+            output_item->yearIso = result_item.yearIso;
+            if(result_item.monthLabel.empty()) {
+                output_item->monthLabel = nullptr;
+            }
+            else {
+                char * string_buffer(new char[result_item.monthLabel.size() + 1]);
+
+                std::copy(result_item.monthLabel.begin(), result_item.monthLabel.end(), string_buffer);
+                string_buffer[result_item.monthLabel.size()] = 0;
+
+                output_item->monthLabel = string_buffer;
+            }
+
+            if(result_item.amPmLabel.empty()) {
+                output_item->amPmLabel = nullptr;
+            }
+            else {
+                char * string_buffer(new char[result_item.amPmLabel.size() + 1]);
+
+                std::copy(result_item.amPmLabel.begin(), result_item.amPmLabel.end(), string_buffer);
+                string_buffer[result_item.amPmLabel.size()] = 0;
+
+                output_item->amPmLabel = string_buffer;
+            }
+
+            if(result_item.dayOfWeekLabel.empty()) {
+                output_item->dayOfWeekLabel = nullptr;
+            }
+            else {
+                char * string_buffer(new char[result_item.dayOfWeekLabel.size() + 1]);
+
+                std::copy(result_item.dayOfWeekLabel.begin(), result_item.dayOfWeekLabel.end(), string_buffer);
+                string_buffer[result_item.dayOfWeekLabel.size()] = 0;
+
+                output_item->dayOfWeekLabel = string_buffer;
+            }
+
+            if(result_item.holidayName.empty()) {
+                output_item->holidayName = nullptr;
+            }
+            else {
+                char * string_buffer(new char[result_item.holidayName.size() + 1]);
+
+                std::copy(result_item.holidayName.begin(), result_item.holidayName.end(), string_buffer);
+                string_buffer[result_item.holidayName.size()] = 0;
+
+                output_item->holidayName = string_buffer;
+            }
+
+            output_item->isPaidTimeOff = result_item.isPaidTimeOff;
+            ++output_item;
+        }
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyTransformedData(/*out*/ TimePoint * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -450,29 +545,18 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyTransformedData(/*in*/ Tim
         *ppErrorInfo = nullptr;
 
         if(result == nullptr) throw std::invalid_argument("'result' is null");
-        if(result->monthLabel_ptr == nullptr && result->monthLabel_items != 0) throw std::invalid_argument("Invalid buffer");
-        if(result->monthLabel_ptr != nullptr && result->monthLabel_items == 0) throw std::invalid_argument("Invalid buffer");
 
-        if(result->amPmLabel_ptr == nullptr && result->amPmLabel_items != 0) throw std::invalid_argument("Invalid buffer");
-        if(result->amPmLabel_ptr != nullptr && result->amPmLabel_items == 0) throw std::invalid_argument("Invalid buffer");
+        if(result->monthLabel)
+            delete [] result->monthLabel;
 
-        if(result->dayOfWeekLabel_ptr == nullptr && result->dayOfWeekLabel_items != 0) throw std::invalid_argument("Invalid buffer");
-        if(result->dayOfWeekLabel_ptr != nullptr && result->dayOfWeekLabel_items == 0) throw std::invalid_argument("Invalid buffer");
+        if(result->amPmLabel)
+            delete [] result->amPmLabel;
 
-        if(result->holidayName_ptr == nullptr && result->holidayName_items != 0) throw std::invalid_argument("Invalid buffer");
-        if(result->holidayName_ptr != nullptr && result->holidayName_items == 0) throw std::invalid_argument("Invalid buffer");
+        if(result->dayOfWeekLabel)
+            delete [] result->dayOfWeekLabel;
 
-        if(result->monthLabel_ptr)
-            delete [] result->monthLabel_ptr;
-
-        if(result->amPmLabel_ptr)
-            delete [] result->amPmLabel_ptr;
-
-        if(result->dayOfWeekLabel_ptr)
-            delete [] result->dayOfWeekLabel_ptr;
-
-        if(result->holidayName_ptr)
-            delete [] result->holidayName_ptr;
+        if(result->holidayName)
+            delete [] result->holidayName;
     
         return true;
     }

@@ -120,9 +120,18 @@ def _CreateInterfaceSubstitutionDict(item, c_data):
         cpp_templates = []
 
         if item.is_input_a_template:
-            cpp_templates.append(c_data.InputTypeInfo.CppType)
+            cpp_templates.append(
+                c_data.InputTypeInfo.GetCppTemplateSuffix(
+                    getattr(item, "input_type_template_mapping", {}),
+                ),
+            )
+
         if item.is_output_a_template:
-            cpp_templates.append(c_data.OutputTypeInfo.CppType)
+            cpp_templates.append(
+                c_data.OutputTypeInfo.GetCppTemplateSuffix(
+                    getattr(item, "output_type_template_mapping", {}),
+                ),
+            )
 
         assert cpp_templates
         cpp_templates = ", ".join(cpp_templates)
@@ -199,10 +208,10 @@ def _GenerateCommonFiles(open_file_func, output_dir, output_stream):
 
                 struct ErrorInfoHandle {};
 
-                FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr, /*out*/ std::size_t *output_items);
-                FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr, /*in*/ std::size_t input_items);
+                FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr, /*out*/ size_t *output_items);
+                FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr, /*in*/ size_t input_items);
                 FEATURIZER_LIBRARY_API bool DestroyErrorInfo(/*in*/ ErrorInfoHandle *pHandle);
-                FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
+                FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
                 FEATURIZER_LIBRARY_API_PACK_PREFIX;
 
@@ -314,7 +323,7 @@ def _GenerateCommonFiles(open_file_func, output_dir, output_stream):
 
                 extern "C" {
 
-                FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr, /*out*/ std::size_t *output_items) {
+                FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr, /*out*/ size_t *output_items) {
                     if(pHandle == nullptr || output_ptr == nullptr || output_items == nullptr)
                         return false;
 
@@ -331,7 +340,7 @@ def _GenerateCommonFiles(open_file_func, output_dir, output_stream):
                     return true;
                 }
 
-                FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr, /*in*/ std::size_t input_items) {
+                FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr, /*in*/ size_t input_items) {
                     if(input_ptr == nullptr || input_items == 0)
                         return false;
 
@@ -355,7 +364,7 @@ def _GenerateCommonFiles(open_file_func, output_dir, output_stream):
                     return true;
                 }
 
-                FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+                FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
                     if(ppErrorInfo == nullptr)
                         return false;
 
@@ -519,7 +528,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_
                     c_data.ConfigurationParamTypeInfos,
                 ):
                     info = type_info.GetInputInfo(configuration_param.name, "")
-                    construct_params += info.ParameterDecl
+                    construct_params += ["/*in*/ {} {}".format(p.Type, p.Name) for p in info.Parameters]
 
             delete_transformed_info = c_data.OutputTypeInfo.GetDestroyOutputInfo()
             if delete_transformed_info is not None:
@@ -528,7 +537,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_
                     FEATURIZER_LIBRARY_API bool {name}{suffix}DestroyTransformedData({parameters}, /*out*/ ErrorInfoHandle **ppErrorInfo);
                     """,
                 ).format(
-                    parameters=", ".join(delete_transformed_info.ParameterDecl),
+                    parameters=", ".join(["/*in*/ {} {}".format(p.Type, p.Name) for p in delete_transformed_info.Parameters]),
                     **d
                 )
             else:
@@ -541,10 +550,12 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_
                 members = []
 
                 for struct_member_name, struct_member in six.iteritems(struct_members):
-                    members += struct_member.GetOutputInfo(
-                        struct_member_name,
-                        is_struct_member=True,
-                    ).ParameterDecl
+                    members += [
+                        "/*out*/ {} {}".format(p.Type, p.Name) for p in struct_member.GetOutputInfo(
+                            struct_member_name,
+                            suppress_pointer=True,
+                        ).Parameters
+                    ]
 
                 custom_structs.append(
                     textwrap.dedent(
@@ -621,6 +632,13 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_
                 )
                 wrote_custom_data = True
 
+            flush_output_param = ", ".join(["/*out*/ {} {}".format(p.Type, p.Name) for p in c_data.DynamicOutputTypeInfo.GetOutputInfo("output").Parameters])
+
+            if item.has_dynamic_output:
+                transform_output_param = flush_output_param
+            else:
+                transform_output_param = ", ".join(["/*out*/ {} {}".format(p.Type, p.Name) for p in c_data.OutputTypeInfo.GetOutputInfo("output").Parameters])
+
             f.write(
                 textwrap.dedent(
                     """\
@@ -642,12 +660,13 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_
 
                     /* Inference Methods */
                     FEATURIZER_LIBRARY_API bool {name}{suffix}CreateTransformerFromEstimator(/*in*/ {name}{suffix}EstimatorHandle *pEstimatorHandle, /*out*/ {name}{suffix}TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
-                    FEATURIZER_LIBRARY_API bool {name}{suffix}CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ {name}{suffix}TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+                    FEATURIZER_LIBRARY_API bool {name}{suffix}CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ {name}{suffix}TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
                     FEATURIZER_LIBRARY_API bool {name}{suffix}DestroyTransformer(/*in*/ {name}{suffix}TransformerHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-                    FEATURIZER_LIBRARY_API bool {name}{suffix}CreateTransformerSaveData(/*in*/ {name}{suffix}TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
+                    FEATURIZER_LIBRARY_API bool {name}{suffix}CreateTransformerSaveData(/*in*/ {name}{suffix}TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
                     FEATURIZER_LIBRARY_API bool {name}{suffix}Transform(/*in*/ {name}{suffix}TransformerHandle *pHandle, {input_param}, {transform_output_param}, /*out*/ ErrorInfoHandle **ppErrorInfo);
+                    FEATURIZER_LIBRARY_API bool {name}{suffix}Flush(/*in*/ {name}{suffix}TransformerHandle *pHandle, {flush_output_param}, /*out*/ ErrorInfoHandle **ppErrorInfo);
                     {delete_transformed_method}
                     """,
                 ).format(
@@ -655,14 +674,13 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_
                         ", ".join(construct_params),
                     ) if construct_params else "",
                     input_param=", ".join(
-                        c_data.InputTypeInfo.GetInputInfo("input", "").ParameterDecl,
+                        ["/*in*/ {} {}".format(p.Type, p.Name) for p in c_data.InputTypeInfo.GetInputInfo("input", "").Parameters],
                     ),
                     input_buffer_param=", ".join(
-                        c_data.InputTypeInfo.GetInputBufferInfo("input", "").ParameterDecl,
+                        ["/*in*/ {} {}".format(p.Type, p.Name) for p in c_data.InputTypeInfo.GetInputBufferInfo("input", "").Parameters],
                     ),
-                    transform_output_param=", ".join(
-                        c_data.OutputTypeInfo.GetOutputInfo("output").ParameterDecl,
-                    ),
+                    transform_output_param=transform_output_param,
+                    flush_output_param=flush_output_param,
                     delete_transformed_method=delete_transformed_method,
                     **d
                 )
@@ -782,7 +800,7 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
 
                     info = type_info.GetInputInfo(configuration_param.name, invocation_template)
 
-                    construct_params += info.ParameterDecl
+                    construct_params += ["/*in*/ {} {}".format(p.Type, p.Name) for p in info.Parameters]
 
                     if info.ValidationStatements:
                         construct_validation.append(info.ValidationStatements)
@@ -802,7 +820,6 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                             size_t index(g_pointerTable.Add(pEstimator));
                             *ppHandle = reinterpret_cast<{name}{suffix}EstimatorHandle*>(index);
 
-
                         {method_suffix}
                     }}
 
@@ -811,9 +828,12 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                     params="{}, ".format(
                         ", ".join(construct_params),
                     ) if construct_params else "",
-                    validation="// No validation" if not construct_validation else "\n".join(
-                        construct_validation,
-                    ).strip(),
+                    validation=StringHelpers.LeftJustify(
+                        "// No validation" if not construct_validation else "\n".join(
+                            construct_validation,
+                        ).strip(),
+                        8,
+                    ),
                     col_index=", 0" if item.creates_annotations else "",
                     args=", {}".format(
                         ", ".join(construct_args),
@@ -892,11 +912,9 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
                             if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
                             {validation}
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
-
 
                             {statement}
                         {method_suffix}
@@ -904,7 +922,7 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
 
                     """,
                 ).format(
-                    param=", ".join(input_info.ParameterDecl),
+                    param=", ".join(["/*in*/ {} {}".format(p.Type, p.Name) for p in input_info.Parameters]),
                     validation="// No validation" if not input_info.ValidationStatements else StringHelpers.LeftJustify(
                         input_info.ValidationStatements.strip(),
                         8,
@@ -928,8 +946,6 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
                             if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
                             {validation}
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
@@ -940,7 +956,7 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
 
                     """,
                 ).format(
-                    param=", ".join(input_info.ParameterDecl),
+                    param=", ".join(["/*in*/ {} {}".format(p.Type, p.Name) for p in input_info.Parameters]),
                     validation="// No validation" if not input_info.ValidationStatements else StringHelpers.LeftJustify(
                         input_info.ValidationStatements.strip(),
                         8,
@@ -998,12 +1014,9 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                             if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
                             if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType*>(estimator.create_transformer().release());
-
 
                             size_t index = g_pointerTable.Add(pTransformer);
                             *ppTransformerHandle = reinterpret_cast<{name}{suffix}TransformerHandle*>(index);
@@ -1018,7 +1031,7 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
             f.write(
                 textwrap.dedent(
                     """\
-                    FEATURIZER_LIBRARY_API bool {name}{suffix}CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ {name}{suffix}TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
+                    FEATURIZER_LIBRARY_API bool {name}{suffix}CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ {name}{suffix}TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
                         {method_prefix}
                             if(pBuffer == nullptr) throw std::invalid_argument("'pBuffer' is null");
                             if(cBufferSize == 0) throw std::invalid_argument("'cBufferSize' is 0");
@@ -1049,7 +1062,6 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(index);
                             g_pointerTable.Remove(index);
 
-
                             delete pTransformer;
                         {method_suffix}
                     }}
@@ -1062,7 +1074,7 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
             f.write(
                 textwrap.dedent(
                     """\
-                    FEATURIZER_LIBRARY_API bool {name}{suffix}CreateTransformerSaveData(/*in*/ {name}{suffix}TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
+                    FEATURIZER_LIBRARY_API bool {name}{suffix}CreateTransformerSaveData(/*in*/ {name}{suffix}TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
                         {method_prefix}
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
                             if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
@@ -1088,10 +1100,37 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                 ).format(**d)
             )
 
-            # Transform
-            input_info = c_data.InputTypeInfo.GetInputInfo("input", "auto result(transformer.execute({}));")
-            output_info = c_data.OutputTypeInfo.GetOutputInfo("output")
+            # Transform and Flush logic
+            dynamic_output_info = c_data.DynamicOutputTypeInfo.GetOutputInfo("output")
 
+            # Older compilers don't support emplace_back for bool vector types
+            callback_statement = textwrap.dedent(
+                """\
+                std::vector<TransformedType> result;
+
+                auto const callback(
+                    [&result](TransformedType value) {{
+                        result.{emplace_method}(std::move(value));
+                    }}
+                );
+                """,
+            ).format(
+                emplace_method="push_back" if c_data.OutputTypeInfo.TypeName == "bool" else "emplace_back",
+            )
+
+            if item.has_dynamic_output:
+                transform_input_info = c_data.InputTypeInfo.GetInputInfo("input", "transformer.execute({}, callback);")
+                transform_callback_statement = callback_statement
+
+                output_info = dynamic_output_info
+
+            else:
+                transform_input_info = c_data.InputTypeInfo.GetInputInfo("input", "TransformedType result(transformer.execute({}));")
+                transform_callback_statement = ""
+
+                output_info = c_data.OutputTypeInfo.GetOutputInfo("output")
+
+            # Transform
             f.write(
                 textwrap.dedent(
                     """\
@@ -1099,14 +1138,15 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                         {method_prefix}
                             if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-
                             {input_validation}
                             {output_validation}
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+                            using TransformedType = typename Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformedType;
+
                             // Input
-                            {input_statement}
+                            {transform_callback_statement}{input_statement}
 
                             // Output
                             {output_statement}
@@ -1115,18 +1155,19 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
 
                     """,
                 ).format(
-                    input_param=", ".join(input_info.ParameterDecl),
-                    output_param=", ".join(output_info.ParameterDecl),
+                    input_param=", ".join(["/*in*/ {} {}".format(p.Type, p.Name) for p in transform_input_info.Parameters]),
+                    output_param=", ".join(["/*out*/ {} {}".format(p.Type, p.Name) for p in output_info.Parameters]),
                     input_validation="// No input validation" if not input_info.ValidationStatements else StringHelpers.LeftJustify(
-                        input_info.ValidationStatements.strip(),
+                        (transform_input_info.ValidationStatements or "").strip(),
                         8,
                     ),
                     output_validation="// No output validation" if not output_info.ValidationStatements else StringHelpers.LeftJustify(
                         output_info.ValidationStatements.strip(),
                         8,
                     ),
+                    transform_callback_statement="{}\n\n        ".format(StringHelpers.LeftJustify(transform_callback_statement.rstrip(), 8)) if transform_callback_statement else "",
                     input_statement=StringHelpers.LeftJustify(
-                        input_info.InvocationStatements.strip(),
+                        transform_input_info.InvocationStatements.strip(),
                         8,
                     ),
                     output_statement=StringHelpers.LeftJustify(
@@ -1135,6 +1176,39 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                     ),
                     **d
                 )
+            )
+
+            # Flush
+            f.write(
+                textwrap.dedent(
+                    """\
+                    FEATURIZER_LIBRARY_API bool {name}{suffix}Flush(/*in*/ {name}{suffix}TransformerHandle *pHandle, {output_param}, /*out*/ ErrorInfoHandle **ppErrorInfo) {{
+                        {method_prefix}
+                            if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+                            {output_validation}
+
+                            Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+                            using TransformedType = typename Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformedType;
+
+                            {callback_statement}
+
+                            transformer.flush(callback);
+
+                            // Output
+                            {output_statement}
+                        {method_suffix}
+                    }}
+
+                    """,
+                ).format(
+                    output_param=", ".join(["/*out*/ {} {}".format(p.Type, p.Name) for p in dynamic_output_info.Parameters]),
+                    output_validation=StringHelpers.LeftJustify(dynamic_output_info.ValidationStatements.strip(), 8),
+                    callback_statement=StringHelpers.LeftJustify(callback_statement.rstrip(), 8),
+                    output_statement=StringHelpers.LeftJustify(dynamic_output_info.InvocationStatements.strip(), 8),
+                    **d
+                ),
             )
 
             # DestroyTransformedData (optional)
@@ -1153,7 +1227,7 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
 
                         """,
                     ).format(
-                        param=", ".join(output_info.ParameterDecl),
+                        param=", ".join(["/*out*/ {} {}".format(p.Type, p.Name) for p in output_info.Parameters]),
                         validation="// No validation" if not output_info.ValidationStatements else StringHelpers.LeftJustify(
                             output_info.ValidationStatements.strip(),
                             8,
@@ -1211,7 +1285,7 @@ class CData(object):
 
         for custom_enum in itertools.chain(global_custom_enums, getattr(item, "custom_enums", [])):
             if isinstance(custom_enum.underlying_type, six.string_types):
-                type_info = self._CreateTypeInfo(custom_enum.underlying_type)
+                type_info = self.CreateTypeInfo(custom_enum.underlying_type)
                 assert type_info, custom_enum.underlying_type
 
                 custom_enum.underlying_type_info = type_info
@@ -1225,7 +1299,7 @@ class CData(object):
             members = OrderedDict()
 
             for member in custom_struct.members:
-                type_info = self._CreateTypeInfo(member.type)
+                type_info = self.CreateTypeInfo(member.type)
                 assert type_info, member.type
 
                 assert member.name not in members, member.name
@@ -1242,7 +1316,7 @@ class CData(object):
                 configuration_param.is_enum = True
 
             else:
-                type_info = self._CreateTypeInfo(
+                type_info = self.CreateTypeInfo(
                     configuration_param.type,
                     custom_structs=custom_structs,
                     custom_enums=custom_enums,
@@ -1251,19 +1325,25 @@ class CData(object):
 
             configuration_param_type_infos.append(type_info)
 
-        input_type_info = self._CreateTypeInfo(
+        input_type_info = self.CreateTypeInfo(
             item.input_type,
             custom_structs=custom_structs,
             custom_enums=custom_enums,
         )
         assert input_type_info, item.input_type
 
-        output_type_info = self._CreateTypeInfo(
+        output_type_info = self.CreateTypeInfo(
             item.output_type,
             custom_structs=custom_structs,
             custom_enums=custom_enums,
         )
         assert output_type_info, item.output_type
+
+        dynamic_output_type_info = self.CreateTypeInfo(
+            "vector<{}>".format(item.output_type),
+            custom_structs=custom_structs,
+            custom_enums=custom_enums,
+        )
 
         # Commit the results
         self.CustomStructs                              = custom_structs
@@ -1271,25 +1351,15 @@ class CData(object):
         self.ConfigurationParamTypeInfos                = configuration_param_type_infos
         self.InputTypeInfo                              = input_type_info
         self.OutputTypeInfo                             = output_type_info
+        self.DynamicOutputTypeInfo                      = dynamic_output_type_info
 
     # ----------------------------------------------------------------------
     def __repr__(self):
         return CommonEnvironment.ObjectReprImpl(self)
 
     # ----------------------------------------------------------------------
-    # |
-    # |  Private Data
-    # |
-    # ----------------------------------------------------------------------
-    _type_info_classes                      = None
-
-    # ----------------------------------------------------------------------
-    # |
-    # |  Private Methods
-    # |
-    # ----------------------------------------------------------------------
     @classmethod
-    def _CreateTypeInfo(cls, the_type, *args, **kwargs):
+    def CreateTypeInfo(cls, the_type, *args, **kwargs):
         if cls._type_info_classes is None:
             from Plugins.SharedLibraryPluginImpl.DatetimeTypeInfo import DateTimeTypeInfo
             from Plugins.SharedLibraryPluginImpl.MatrixTypeInfo import MatrixTypeInfo
@@ -1298,6 +1368,8 @@ class CData(object):
             from Plugins.SharedLibraryPluginImpl.SparseVectorTypeInfo import SparseVectorTypeInfo
             from Plugins.SharedLibraryPluginImpl.StringTypeInfo import StringTypeInfo
             from Plugins.SharedLibraryPluginImpl import StructTypeInfos
+            from Plugins.SharedLibraryPluginImpl.TupleTypeInfo import TupleTypeInfo
+            from Plugins.SharedLibraryPluginImpl.UniqueIdTypeInfo import UniqueIdTypeInfo
             from Plugins.SharedLibraryPluginImpl.VectorTypeInfo import VectorTypeInfo
 
             type_info_classes = [
@@ -1306,6 +1378,8 @@ class CData(object):
                 SingleValueSparseVectorTypeInfo,
                 SparseVectorTypeInfo,
                 StringTypeInfo,
+                TupleTypeInfo,
+                UniqueIdTypeInfo,
                 VectorTypeInfo,
             ]
 
@@ -1338,7 +1412,6 @@ class CData(object):
                     type_info_class = this_type_info_class
                     break
 
-
             elif hasattr(this_type_info_class.TypeName, "match"):
                 if this_type_info_class.TypeName.match(the_type):
                     type_info_class = this_type_info_class
@@ -1351,6 +1424,13 @@ class CData(object):
             *args,
             member_type=the_type,
             is_optional=is_optional,
-            create_type_info_func=cls._CreateTypeInfo,
+            create_type_info_func=lambda this_type, these_args=args, these_kwargs=kwargs: cls.CreateTypeInfo(this_type, *these_args, **these_kwargs),
             **kwargs
         )
+
+    # ----------------------------------------------------------------------
+    # |
+    # |  Private Data
+    # |
+    # ----------------------------------------------------------------------
+    _type_info_classes                      = None

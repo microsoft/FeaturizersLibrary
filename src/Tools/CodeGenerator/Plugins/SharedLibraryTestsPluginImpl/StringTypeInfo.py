@@ -56,12 +56,11 @@ class StringTypeInfo(TypeInfo):
             textwrap.dedent(
                 """\
                 char const * {result_name}_ptr(nullptr);
-                std::size_t {result_name}_items(0);
                 """,
             ).format(
                 result_name=result_name,
             ),
-            "&{result_name}_ptr, &{result_name}_items".format(
+            "&{result_name}_ptr".format(
                 result_name=result_name,
             ),
             textwrap.dedent(
@@ -75,7 +74,7 @@ class StringTypeInfo(TypeInfo):
             ).format(
                 result=result_name,
             ),
-            "{result_name}_ptr, {result_name}_items".format(
+            "{result_name}_ptr".format(
                 result_name=result_name,
             ),
             destroy_inline=True,

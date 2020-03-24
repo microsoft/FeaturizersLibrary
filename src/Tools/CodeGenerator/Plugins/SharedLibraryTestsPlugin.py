@@ -407,6 +407,8 @@ class TypeInfoData(object):
             from Plugins.SharedLibraryTestsPluginImpl.SparseVectorTypeInfo import SparseVectorTypeInfo
             from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfo import StringTypeInfo
             from Plugins.SharedLibraryTestsPluginImpl import StructTypeInfos
+            from Plugins.SharedLibraryTestsPluginImpl.TupleTypeInfo import TupleTypeInfo
+            from Plugins.SharedLibraryTestsPluginImpl.UniqueIdTypeInfo import UniqueIdTypeInfo
             from Plugins.SharedLibraryTestsPluginImpl.VectorTypeInfo import VectorTypeInfo
 
             type_info_classes = [
@@ -415,6 +417,8 @@ class TypeInfoData(object):
                 SingleValueSparseVectorTypeInfo,
                 SparseVectorTypeInfo,
                 StringTypeInfo,
+                TupleTypeInfo,
+                UniqueIdTypeInfo,
                 VectorTypeInfo,
             ]
 
