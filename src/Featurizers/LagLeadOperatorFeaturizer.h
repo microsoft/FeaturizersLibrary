@@ -15,16 +15,19 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
+static constexpr char const * const         LagLeadOperatorEstimatorName("LagLeadOperatorEstimator");
+static constexpr char const * const         GrainedLagLeadOperatorEstimatorName("GrainedLagLeadOperatorEstimator");
+
 /////////////////////////////////////////////////////////////////////////
 ///  \class         LagLeadOperatorTransformer
 ///  \brief         Copy values from prior data or future data
-///                 Input type is a tuple of std::vector<std::string>, representing grains, and InputT, representing target column
+///                 Input type is InputT, representing target column
 ///
 template <typename InputT>
 class LagLeadOperatorTransformer :
     public Transformer<
         InputT,
-        Microsoft::Featurizer::RowMajMatrix<nonstd::optional<InputT>>
+        Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -32,11 +35,12 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
+    using TransformedTargetType = typename Microsoft::Featurizer::Traits<InputT>::nullable_type;
 
     using BaseType =
         Transformer<
             InputT,
-            Microsoft::Featurizer::RowMajMatrix<nonstd::optional<InputT>>
+            Microsoft::Featurizer::RowMajMatrix<TransformedTargetType>
         >;
 
     // ----------------------------------------------------------------------
@@ -57,24 +61,16 @@ public:
     void save(Archive &ar) const override;
 
 private:
-    // ----------------------------------------------------------------------
-    // |
-    // |  Private Types
-    // |
-    // ----------------------------------------------------------------------
-    using GrainType  = std::vector<std::string>;
-    using TargetType = nonstd::optional<InputT>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    std::uint32_t const                     _horizon;
-    std::vector<std::int64_t> const         _offsets;
-    std::int64_t const                      _max_future_offset;
-    std::int64_t const                      _max_prior_offset;
-    Components::CircularBuffer<TargetType>  _buffer;
+    std::uint32_t const                                _horizon;
+    std::int64_t const                                 _offset_delta;
+    std::vector<std::int64_t> const                    _offsets;
+    Components::CircularBuffer<TransformedTargetType>  _buffer;
     
 
     // ----------------------------------------------------------------------
@@ -84,26 +80,119 @@ private:
     // ----------------------------------------------------------------------
     // MSVC runs into problems when the declaration and definition are separated
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-        execute_helper(nonstd::optional<typename BaseType::InputType>(input), callback);
+        execute_helper(TransformedTargetType(input), callback);
     }
 
     void flush_impl(typename BaseType::CallbackFunction const & callback) override {
-        std::int64_t _numPending = 0;
-        while (_numPending < _max_future_offset) {
-            execute_helper(Traits<nonstd::optional<InputT>>::CreateNullValue(), callback);
-            ++_numPending;
+        std::int64_t numPending = 0;
+        std::int64_t max_future((_offset_delta + *std::max_element(_offsets.cbegin(), _offsets.cend())) > 0 ? (_offset_delta + *std::max_element(_offsets.cbegin(), _offsets.cend())) : 0);
+
+        while (numPending < max_future) {
+            execute_helper(Traits<TransformedTargetType>::CreateNullValue(), callback);
+            ++numPending;
+        }
+        // after flush is called, this transfomer should be reset to its starting state
+        _buffer.clear();
+        for (std::int64_t i = 0; i < (static_cast<std::int64_t>(_horizon) - _offset_delta - 1); ++i) {
+            _buffer.push(Traits<TransformedTargetType>::CreateNullValue());
         }
     }
 
-    void execute_helper(nonstd::optional<typename BaseType::InputType> const &input, typename BaseType::CallbackFunction const &callback);
+    void execute_helper(TransformedTargetType const &input, typename BaseType::CallbackFunction const &callback);
 };
 
 /////////////////////////////////////////////////////////////////////////
-///  \typedef       LagLeadOperatorEstimator
+///  \class         LagLeadOperatorEstimator
 ///  \brief         Estimator that creates `LagLeadOperatorTransformer`.
 ///
-template <typename InputT>
-using LagLeadOperatorEstimator           = Components::InferenceOnlyEstimatorImpl<LagLeadOperatorTransformer<InputT>>;
+template <
+    typename InputT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
+class LagLeadOperatorEstimator :
+    public TransformerEstimator<InputT, Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>> {
+
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = TransformerEstimator<InputT, Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>;
+    using TransformerType                   = LagLeadOperatorTransformer<InputT>;
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    LagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> offsets);
+
+    ~LagLeadOperatorEstimator(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(LagLeadOperatorEstimator);
+
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Members
+    // |
+    // ----------------------------------------------------------------------
+    std::uint32_t             const                    _horizon;
+    std::vector<std::int64_t> const                    _offsets;
+
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    bool begin_training_impl(void) override;
+
+    // Note that like in the InferenceOnlyEstimator the following training methods aren't used, but need to be overridden as
+    // the base implementations are abstract. The noop definitions are below.
+    FitResult fit_impl(InputT const *pBuffer, size_t cBuffer) override;
+
+    void complete_training_impl(void) override;
+
+    // MSVC has problems when the definition for the func is separated from its declaration.
+    typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
+        return typename BaseType::TransformerUniquePtr(new LagLeadOperatorTransformer<InputT>(_horizon, _offsets));
+    }
+
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class       GrainedLagLeadOperatorEstimator
+///  \brief       GrainedTransformer that creates `LagLeadOperatorEstimator`.
+///
+
+template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
+class GrainedLagLeadOperatorEstimator :
+    public Components::PipelineExecutionEstimatorImpl<
+        Components::GrainEstimatorImpl<std::vector<std::string>, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>>,
+        Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string> const &, Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>, 1>
+    > {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType = 
+        Components::PipelineExecutionEstimatorImpl<
+            Components::GrainEstimatorImpl<std::vector<std::string>, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>>,
+            Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string> const &, Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>, 1>
+        >;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> offsets);
+    ~GrainedLagLeadOperatorEstimator(void) override = default;
+};
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -113,6 +202,12 @@ using LagLeadOperatorEstimator           = Components::InferenceOnlyEstimatorImp
 // |
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+
+// ----------------------------------------------------------------------
+// |
+// |  LagLeadOperatorTransformer
+// |
 // ----------------------------------------------------------------------
 template <typename T>
 LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(std::uint32_t horizon, std::vector<std::int64_t> offsets) :
@@ -125,33 +220,43 @@ LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(std::uint32_t horizon,
                 return horizon;
             }()
     )),
+    _offset_delta(
+        std::move(
+            [&offsets](void) -> std::int64_t {
+                if (offsets.size() == 0) {
+                    throw std::invalid_argument("Offsets is empty!");
+                }
+                return std::min(*std::min_element(offsets.cbegin(), offsets.cend()), 0ll);
+            }()
+        )
+    ),
     _offsets(
         std::move(
             [&offsets](void) -> std::vector<std::int64_t> & {
-                if (offsets.size() == 0) {
-                    throw std::invalid_argument("Offsets is empty!");
+                std::int64_t min = std::min(*std::min_element(offsets.cbegin(), offsets.cend()), 0ll);
+                for (auto it = offsets.begin(); it != offsets.end(); it++) {
+                    *it -= min;
                 }
                 return offsets;
             }()
         )
     ),
-    _max_future_offset(std::move(
-        *std::max_element(_offsets.cbegin(), _offsets.cend()) > 0 ?  *std::max_element(_offsets.cbegin(), _offsets.cend()) : 0
-    )),
-    _max_prior_offset(std::move(
-        *std::min_element(_offsets.cbegin(), _offsets.cend()) < 0 ?  *std::min_element(_offsets.cbegin(), _offsets.cend()) : 0
-    )),
-    // if there are more than one offset provided, we need find the difference between max and min value to determine buffer size
-    // and if there's only one offset, we use the absolute value of it as the size
+    // if there's only one offset, we use the absolute value of it plus horizon as the size
+    // otherwise we need to check if the minimum offset is negative:
+    // if it is, the buffer size is the absolute value of minimum offset plus horizon
+    // if it's not, the buffer size is the difference between min and max of offsets, which is already calculated in the offsets calibration so we can use max_element directly
     _buffer(
         _horizon + 
         (_offsets.size() == 1 ? 
-        static_cast<size_t>(std::abs(_offsets[0])) : 
-        static_cast<size_t>(_max_future_offset-_max_prior_offset))
+        static_cast<size_t>(std::abs(_offsets[0] + _offset_delta)) : 
+        static_cast<size_t>(
+            *std::max_element(_offsets.cbegin(), _offsets.cend()) + _offset_delta < 0 ? 
+            std::abs(_offset_delta) : 
+            *std::max_element(_offsets.cbegin(), _offsets.cend())))
     ) {
         // prepopulate circular buffer with null values to imitate non-existing prior rows
-        for (std::int64_t i = 0; i < (static_cast<std::int64_t>(_horizon) - _max_prior_offset - 1); ++i) {
-            _buffer.push(Traits<nonstd::optional<T>>::CreateNullValue());
+        for (std::int64_t i = 0; i < (static_cast<std::int64_t>(_horizon) - _offset_delta - 1); ++i) {
+            _buffer.push(Traits<TransformedTargetType>::CreateNullValue());
         }
 }
 
@@ -177,7 +282,7 @@ LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(Archive &ar) :
 
 template <typename T>
 bool LagLeadOperatorTransformer<T>::operator==(LagLeadOperatorTransformer const &other) const {
-    return this->_horizon == other._horizon
+    return this->_horizon == other._horizon && this->_offset_delta == other._offset_delta
             && this->_offsets == other._offsets;
 }
 
@@ -194,30 +299,112 @@ void LagLeadOperatorTransformer<T>::save(Archive &ar) const /*override*/ {
 
     // Data
     Traits<std::uint32_t>::serialize(ar, _horizon);
-    Traits<std::vector<std::int64_t>>::serialize(ar, _offsets);
+
+    // reset _offsets to its input version
+    std::vector<std::int64_t> offsets(_offsets);
+    for (auto it = offsets.begin(); it != offsets.end(); it++) {
+        *it += _offset_delta;
+    }
+    Traits<std::vector<std::int64_t>>::serialize(ar, offsets);
 
     // Note that we aren't serializing working state
 }
 
 template <typename T>
-void LagLeadOperatorTransformer<T>::execute_helper(nonstd::optional<typename BaseType::InputType> const &input, typename BaseType::CallbackFunction const &callback) {
+void LagLeadOperatorTransformer<T>::execute_helper(TransformedTargetType const &input, typename BaseType::CallbackFunction const &callback) {
     _buffer.push(input);
     // until the circular buffer is full, we don't have enough data to generate output matrix
-    if (_buffer.is_full()) {
-        Microsoft::Featurizer::RowMajMatrix<nonstd::optional<T>> ret(_offsets.size(), _horizon);
-        for (std::uint32_t row = 0; row < _offsets.size(); ++row) {
-            // the circular buffer starts with the needed data for the _max_prior_offset
-            // so the difference between offsets[row] and _max_prior_offset is the position to find the data to copy
-            std::tuple<typename Components::CircularBuffer<TargetType>::iterator, typename Components::CircularBuffer<TargetType>::iterator> range = _buffer.range(_horizon, static_cast<size_t>(_offsets[row] - _max_prior_offset));
-            typename Components::CircularBuffer<TargetType>::iterator start_iter = std::get<0>(range);
-            for (std::int32_t col = 0; col < static_cast<std::int32_t>(_horizon); ++col) {
-                ret(static_cast<std::int32_t>(row), col) = *start_iter;
-                ++start_iter;
-            }
-        }
-        callback(ret);
+    if (!_buffer.is_full()) {
+        return;
     }
+    typename BaseType::TransformedType ret(_offsets.size(), _horizon);
+    
+    for (std::uint32_t row = 0; row < _offsets.size(); ++row) {
+        std::tuple<typename Components::CircularBuffer<TransformedTargetType>::iterator, typename Components::CircularBuffer<TransformedTargetType>::iterator> range{_buffer.range(_horizon, static_cast<size_t>(_offsets[row]))};
+        typename Components::CircularBuffer<TransformedTargetType>::iterator start_iter = std::get<0>(range);
+
+        for (std::int32_t col = 0; col < static_cast<std::int32_t>(_horizon); ++col) {
+            ret(static_cast<std::int32_t>(row), col) = *start_iter;
+            ++start_iter;
+        }
+    }
+
+    callback(std::move(ret));
 }
+
+
+// ----------------------------------------------------------------------
+// |
+// |  LagLeadOperatorEstimator
+// |
+// ----------------------------------------------------------------------
+
+template <typename InputT, size_t MaxNumTrainingItemsV>
+LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::LagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> offsets) :
+    BaseType(LagLeadOperatorEstimatorName, std::move(pAllColumnAnnotations)),
+    _horizon(
+        std::move(
+            [&horizon](void) -> std::uint32_t & {
+                if (horizon == 0) {
+                    throw std::invalid_argument("Horizon cannot be 0!");
+                }
+                return horizon;
+            }()
+        )
+    ),
+    _offsets(
+        std::move(
+            [&offsets](void) -> std::vector<std::int64_t> & {
+                if (offsets.size() == 0) {
+                    throw std::invalid_argument("Offsets is empty!");
+                }
+                return offsets;
+            }()
+        )
+    ) {
+}
+
+template <typename InputT, size_t MaxNumTrainingItemsV>
+bool LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+    // Do not allow any further training
+    return false;
+}
+
+template <typename InputT, size_t MaxNumTrainingItemsV>
+FitResult LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::fit_impl(InputT const *, size_t) /*override*/ {
+    throw std::runtime_error("This should never be called as this class will not be used during training");
+}
+
+template <typename InputT, size_t MaxNumTrainingItemsV>
+void LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+}
+
+
+// ----------------------------------------------------------------------
+// |
+// |  GrainedLagLeadOperatorEstimator
+// |
+// ----------------------------------------------------------------------
+
+template <typename InputT, size_t MaxNumTrainingItemsV>
+GrainedLagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> offsets) :
+    BaseType(
+        GrainedLagLeadOperatorEstimatorName,
+        pAllColumnAnnotations,
+        [pAllColumnAnnotations, horizon, offsets] () {
+            return Components::GrainEstimatorImpl<std::vector<std::string>, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>, MaxNumTrainingItemsV>(
+                pAllColumnAnnotations,
+                [horizon, offsets](AnnotationMapsPtr pAllColumnAnnotationsParam) {
+                    return LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), std::move(horizon), std::move(offsets));
+                }
+            );
+        },
+        [pAllColumnAnnotations]() {
+            return Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string> const &, Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>, 1>(std::move(pAllColumnAnnotations));
+        }
+    ) {
+}
+
 
 } // namespace Featurizers
 } // namespace Featurizer
