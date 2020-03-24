@@ -425,6 +425,7 @@ TEST_CASE("CircularBuffer - clear") {
     auto start_iter = circ_buf.begin();
     auto end_iter = circ_buf.end();
     CHECK(start_iter == end_iter);
+    CHECK(circ_buf.capacity() == 5);
 
     // Add one item and make sure start offset is correct.
     circ_buf.push(1);

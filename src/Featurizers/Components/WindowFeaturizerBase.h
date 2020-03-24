@@ -320,7 +320,7 @@ size_t CircularBuffer<T>::size() const {
 
 template <class T>
 size_t CircularBuffer<T>::capacity() const {
-    return _max_size;
+    return _data.capacity();
 }
 
 template <class T>
