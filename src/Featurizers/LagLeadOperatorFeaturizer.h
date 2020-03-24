@@ -48,7 +48,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    LagLeadOperatorTransformer(std::uint32_t horizon, std::vector<std::int64_t> offsets);
+    LagLeadOperatorTransformer(std::uint32_t horizon, std::vector<std::int64_t> deltas);
     LagLeadOperatorTransformer(Archive &ar);
 
     ~LagLeadOperatorTransformer(void) override = default;
@@ -69,7 +69,7 @@ private:
     // ----------------------------------------------------------------------
     std::uint32_t const                                _horizon;
     std::int64_t const                                 _offset_delta;
-    std::vector<std::int64_t> const                    _offsets;
+    std::vector<std::uint32_t> const                   _offsets;
     Components::CircularBuffer<TransformedTargetType>  _buffer;
     
 
@@ -84,21 +84,22 @@ private:
     }
 
     void flush_impl(typename BaseType::CallbackFunction const & callback) override {
-        std::int64_t numPending = 0;
-        std::int64_t max_future((_offset_delta + *std::max_element(_offsets.cbegin(), _offsets.cend())) > 0 ? (_offset_delta + *std::max_element(_offsets.cbegin(), _offsets.cend())) : 0);
-
+        std::int64_t numPending(0);
+        std::int64_t max_future(_offset_delta + std::max(static_cast<std::int64_t>(*std::max_element(_offsets.cbegin(), _offsets.cend())), static_cast<std::int64_t>(0)));
+        
+        // more null values are pushed in to ensure we get all results for every input received
         while (numPending < max_future) {
             execute_helper(Traits<TransformedTargetType>::CreateNullValue(), callback);
             ++numPending;
         }
         // after flush is called, this transfomer should be reset to its starting state
         _buffer.clear();
-        for (std::int64_t i = 0; i < (static_cast<std::int64_t>(_horizon) - _offset_delta - 1); ++i) {
-            _buffer.push(Traits<TransformedTargetType>::CreateNullValue());
-        }
+        
+        prepopulate();
     }
 
     void execute_helper(TransformedTargetType const &input, typename BaseType::CallbackFunction const &callback);
+    void prepopulate();
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -125,7 +126,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    LagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> offsets);
+    LagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> deltas);
 
     ~LagLeadOperatorEstimator(void) override = default;
 
@@ -139,7 +140,7 @@ private:
     // |
     // ----------------------------------------------------------------------
     std::uint32_t             const                    _horizon;
-    std::vector<std::int64_t> const                    _offsets;
+    std::vector<std::int64_t> const                    _deltas;
 
 
     // ----------------------------------------------------------------------
@@ -157,7 +158,7 @@ private:
 
     // MSVC has problems when the definition for the func is separated from its declaration.
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        return typename BaseType::TransformerUniquePtr(new LagLeadOperatorTransformer<InputT>(_horizon, _offsets));
+        return typename BaseType::TransformerUniquePtr(new LagLeadOperatorTransformer<InputT>(_horizon, _deltas));
     }
 
 };
@@ -190,7 +191,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> offsets);
+    GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> deltas);
     ~GrainedLagLeadOperatorEstimator(void) override = default;
 };
 
@@ -210,7 +211,7 @@ public:
 // |
 // ----------------------------------------------------------------------
 template <typename T>
-LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(std::uint32_t horizon, std::vector<std::int64_t> offsets) :
+LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(std::uint32_t horizon, std::vector<std::int64_t> deltas) :
     _horizon(
         std::move(
             [&horizon](void) -> std::uint32_t & {
@@ -220,45 +221,49 @@ LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(std::uint32_t horizon,
                 return horizon;
             }()
     )),
+    // if minimum of delta is less than 0, _offset_delta is the minimum of delta,
+    // otherwise it's 0
     _offset_delta(
         std::move(
-            [&offsets](void) -> std::int64_t {
-                if (offsets.size() == 0) {
-                    throw std::invalid_argument("Offsets is empty!");
+            [&deltas](void) -> std::int64_t {
+                if (deltas.size() == 0) {
+                    throw std::invalid_argument("Lag lead orders is empty!");
                 }
-                return *std::min_element(offsets.cbegin(), offsets.cend()) < 0 ? *std::min_element(offsets.cbegin(), offsets.cend()) : 0;
+                return std::min(*std::min_element(deltas.cbegin(), deltas.cend()), static_cast<std::int64_t>(0));
             }()
         )
     ),
-    // calibrate offsets to minimum offset = 0
+    // calibrate deltas with minimum set to 0
     _offsets(
         std::move(
-            [&offsets](void) -> std::vector<std::int64_t> & {
-                std::int64_t min = *std::min_element(offsets.cbegin(), offsets.cend()) < 0 ? *std::min_element(offsets.cbegin(), offsets.cend()) : 0;
-                for (auto it = offsets.begin(); it != offsets.end(); it++) {
-                    *it -= min;
+            [&deltas](void) -> std::vector<std::uint32_t> {
+                std::vector<std::uint32_t> ret;
+                std::int64_t min(std::min(*std::min_element(deltas.cbegin(), deltas.cend()), static_cast<std::int64_t>(0)));
+                for (auto it = deltas.begin(); it != deltas.end(); it++) {
+                    ret.emplace_back(static_cast<std::uint32_t>(*it - min));
                 }
-                return offsets;
+                return ret;
             }()
         )
     ),
-    // if there's only one offset, we use the absolute value of it plus horizon as the size
-    // otherwise we need to check if the minimum offset is negative:
-    // if it is, the buffer size is the absolute value of minimum offset plus horizon
-    // if it's not, the buffer size is the difference between min and max of offsets, which is already calculated in the offsets calibration so we can use max_element directly
+    // if there's only one delta, we use the absolute value of it plus horizon as the size
+    // otherwise we need to check if the minimum delta is negative:
+    // if it is, the buffer size is the absolute value of minimum delta plus horizon
+    // if it's not, the buffer size is the difference between min and max of deltas, which is already calculated in the delta calibration so we can use max_element directly
     _buffer(
         _horizon + 
-        (_offsets.size() == 1 ? 
-        static_cast<size_t>(std::abs(_offsets[0] + _offset_delta)) : 
-        static_cast<size_t>(
-            *std::max_element(_offsets.cbegin(), _offsets.cend()) + _offset_delta < 0 ? 
-            std::abs(_offset_delta) : 
-            *std::max_element(_offsets.cbegin(), _offsets.cend())))
+        [=](void) -> size_t {
+            if (_offsets.size() == 1) {
+                return static_cast<size_t>(std::abs(_offsets[0] + _offset_delta));
+            }
+            else {
+                std::uint32_t max(*std::max_element(_offsets.cbegin(), _offsets.cend()));
+                return static_cast<size_t>(max + _offset_delta < 0 ? std::abs(_offset_delta) : max);
+            }
+        } ()
     ) {
         // prepopulate circular buffer with null values to imitate non-existing prior rows
-        for (std::int64_t i = 0; i < (static_cast<std::int64_t>(_horizon) - _offset_delta - 1); ++i) {
-            _buffer.push(Traits<TransformedTargetType>::CreateNullValue());
-        }
+        prepopulate();
 }
 
 template <typename T>
@@ -274,9 +279,9 @@ LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(Archive &ar) :
 
             // Data
             std::uint32_t horizon = Traits<std::uint32_t>::deserialize(ar);
-            std::vector<std::int64_t> offsets = Traits<std::vector<std::int64_t>>::deserialize(ar);
+            std::vector<std::int64_t> deltas = Traits<std::vector<std::int64_t>>::deserialize(ar);
             
-            return LagLeadOperatorTransformer(std::move(horizon), std::move(offsets));
+            return LagLeadOperatorTransformer(std::move(horizon), std::move(deltas));
         }()
     ) {
 }
@@ -301,12 +306,12 @@ void LagLeadOperatorTransformer<T>::save(Archive &ar) const /*override*/ {
     // Data
     Traits<std::uint32_t>::serialize(ar, _horizon);
 
-    // reset _offsets to its input version
-    std::vector<std::int64_t> offsets(_offsets);
-    for (auto it = offsets.begin(); it != offsets.end(); it++) {
-        *it += _offset_delta;
+    // reset _offsets to delta
+    std::vector<std::int64_t> deltas;
+    for (auto it = _offsets.begin(); it != _offsets.end(); it++) {
+        deltas.emplace_back(*it + _offset_delta);
     }
-    Traits<std::vector<std::int64_t>>::serialize(ar, offsets);
+    Traits<std::vector<std::int64_t>>::serialize(ar, deltas);
 
     // Note that we aren't serializing working state
 }
@@ -321,7 +326,7 @@ void LagLeadOperatorTransformer<T>::execute_helper(TransformedTargetType const &
     typename BaseType::TransformedType ret(_offsets.size(), _horizon);
     
     for (std::uint32_t row = 0; row < _offsets.size(); ++row) {
-        std::tuple<typename Components::CircularBuffer<TransformedTargetType>::iterator, typename Components::CircularBuffer<TransformedTargetType>::iterator> range{_buffer.range(_horizon, static_cast<size_t>(_offsets[row]))};
+        std::tuple<typename Components::CircularBuffer<TransformedTargetType>::iterator, typename Components::CircularBuffer<TransformedTargetType>::iterator> range{_buffer.range(_horizon, _offsets[row])};
         typename Components::CircularBuffer<TransformedTargetType>::iterator start_iter = std::get<0>(range);
 
         for (std::int32_t col = 0; col < static_cast<std::int32_t>(_horizon); ++col) {
@@ -333,6 +338,12 @@ void LagLeadOperatorTransformer<T>::execute_helper(TransformedTargetType const &
     callback(std::move(ret));
 }
 
+template <typename T>
+void LagLeadOperatorTransformer<T>::prepopulate() {
+    for (std::int64_t i = 0; i < (static_cast<std::int64_t>(_horizon) - _offset_delta - 1); ++i) {
+        _buffer.push(Traits<TransformedTargetType>::CreateNullValue());
+    }
+}
 
 // ----------------------------------------------------------------------
 // |
@@ -341,7 +352,7 @@ void LagLeadOperatorTransformer<T>::execute_helper(TransformedTargetType const &
 // ----------------------------------------------------------------------
 
 template <typename InputT, size_t MaxNumTrainingItemsV>
-LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::LagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> offsets) :
+LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::LagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> deltas) :
     BaseType(LagLeadOperatorEstimatorName, std::move(pAllColumnAnnotations)),
     _horizon(
         std::move(
@@ -353,13 +364,13 @@ LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::LagLeadOperatorEstimator
             }()
         )
     ),
-    _offsets(
+    _deltas(
         std::move(
-            [&offsets](void) -> std::vector<std::int64_t> & {
-                if (offsets.size() == 0) {
-                    throw std::invalid_argument("Offsets is empty!");
+            [&deltas](void) -> std::vector<std::int64_t> & {
+                if (deltas.size() == 0) {
+                    throw std::invalid_argument("Lag lead orders is empty!");
                 }
-                return offsets;
+                return deltas;
             }()
         )
     ) {
@@ -388,15 +399,15 @@ void LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::complete_training_i
 // ----------------------------------------------------------------------
 
 template <typename InputT, size_t MaxNumTrainingItemsV>
-GrainedLagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> offsets) :
+GrainedLagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> deltas) :
     BaseType(
         GrainedLagLeadOperatorEstimatorName,
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, horizon, offsets] () {
+        [pAllColumnAnnotations, horizon, deltas] () {
             return Components::GrainEstimatorImpl<std::vector<std::string>, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>, MaxNumTrainingItemsV>(
                 pAllColumnAnnotations,
-                [horizon, offsets](AnnotationMapsPtr pAllColumnAnnotationsParam) {
-                    return LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), std::move(horizon), std::move(offsets));
+                [horizon, deltas](AnnotationMapsPtr pAllColumnAnnotationsParam) {
+                    return LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), std::move(horizon), std::move(deltas));
                 }
             );
         },
