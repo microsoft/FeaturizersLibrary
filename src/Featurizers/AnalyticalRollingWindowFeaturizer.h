@@ -256,6 +256,7 @@ void AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::save(Arch
 template <typename InputT, size_t MaxNumTrainingItemsV>
 AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::AnalyticalRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, AnalyticalRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t maxWindowSize, std::uint32_t minWindowSize) :
     BaseType(AnalyticalRollingWindowEstimatorName, std::move(pAllColumnAnnotations)),
+    _windowCalculation(std::move(windowCalculation)),
     _horizon(
         std::move(
             [&horizon]() -> std::uint32_t & {
@@ -287,8 +288,7 @@ AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::AnalyticalRollin
                 return minWindowSize;
             }()
         )
-    ),
-    _windowCalculation(std::move(windowCalculation))
+    )
     {
 }
 

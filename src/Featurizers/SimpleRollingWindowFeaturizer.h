@@ -23,11 +23,6 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
-// Anonymous namespace for helper using statements
-namespace {
-    using GrainType = std::vector<std::string>;
-} // Anonymous namespace
-
 static constexpr char const * const         SimpleRollingWindowEstimatorName("SimpleRollingWindowEstimator");
 static constexpr char const * const         GrainedSimpleRollingWindowEstimatorName("GrainedSimpleRollingWindowEstimator");
 
@@ -161,8 +156,8 @@ private:
 template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
 class GrainedSimpleRollingWindowEstimator :
     public Components::PipelineExecutionEstimatorImpl<
-        Components::GrainEstimatorImpl<GrainType, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
-        Components::FilterDecoratorEstimator<std::tuple<GrainType const &, std::vector<typename Traits<InputT>::nullable_type>>, 1>
+        Components::GrainEstimatorImpl<std::vector<std::string>, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
+        Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string> const &, std::vector<typename Traits<InputT>::nullable_type>>, 1>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -170,6 +165,8 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
+    using GrainType = std::vector<std::string>;
+
     using BaseType = 
         Components::PipelineExecutionEstimatorImpl<
             Components::GrainEstimatorImpl<GrainType, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
