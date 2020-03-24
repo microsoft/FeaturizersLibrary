@@ -157,8 +157,6 @@ namespace Components {
 
         void push (T value);
 
-        void clear();
-
         // provide a pair of begin and end iterator for the n elements requested
         std::tuple<iterator, iterator> range(size_t n, size_t offset=0);
 
@@ -358,12 +356,6 @@ typename CircularBuffer<T>::const_iterator CircularBuffer<T>::end() const {
 template <class T>
 typename CircularBuffer<T>::const_iterator CircularBuffer<T>::cend() const {
     return end_impl<const_iterator>();
-}
-
-template <class T>
-void CircularBuffer<T>::clear () {
-    _start_offset = 0;
-    _data.clear();
 }
 
 template <class T>
