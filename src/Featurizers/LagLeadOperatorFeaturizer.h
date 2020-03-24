@@ -230,6 +230,7 @@ LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(std::uint32_t horizon,
             }()
         )
     ),
+    // calibrate offsets to minimum offset = 0
     _offsets(
         std::move(
             [&offsets](void) -> std::vector<std::int64_t> & {
