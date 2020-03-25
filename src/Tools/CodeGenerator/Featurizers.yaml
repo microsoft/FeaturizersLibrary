@@ -1603,7 +1603,7 @@ featurizers:
           # TODO - uint64
           - float
           - double
-          # BugBug: string
+          # TODO: string
 
     type_mappings:
       - input_type: tuple<vector<string>, T>
