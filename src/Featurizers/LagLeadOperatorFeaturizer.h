@@ -61,17 +61,15 @@ public:
     void save(Archive &ar) const override;
 
 private:
-
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    std::uint32_t const                                _horizon;
-    std::int64_t const                                 _offset_delta;
+    std::uint32_t              const                   _horizon;
+    std::int64_t               const                   _offset_delta;
     std::vector<std::uint32_t> const                   _offsets;
     Components::CircularBuffer<TransformedTargetType>  _buffer;
-    
 
     // ----------------------------------------------------------------------
     // |
@@ -84,22 +82,25 @@ private:
     }
 
     void flush_impl(typename BaseType::CallbackFunction const & callback) override {
-        std::int64_t numPending(0);
-        std::int64_t max_future(_offset_delta + std::max(static_cast<std::int64_t>(*std::max_element(_offsets.cbegin(), _offsets.cend())), static_cast<std::int64_t>(0)));
-        
-        // more null values are pushed in to ensure we get all results for every input received
-        while (numPending < max_future) {
-            execute_helper(Traits<TransformedTargetType>::CreateNullValue(), callback);
-            ++numPending;
+        std::int64_t max_future_delta(_offset_delta + static_cast<std::int64_t>(*std::max_element(_offsets.cbegin(), _offsets.cend())));
+        bool const has_future_delta(max_future_delta > 0);
+
+        if (has_future_delta) {
+            // more null values are pushed in to ensure we get all results for every input received
+            while (max_future_delta--) {
+                execute_helper(Traits<TransformedTargetType>::CreateNullValue(), callback);
+            }
         }
+
         // after flush is called, this transfomer should be reset to its starting state
         _buffer.clear();
-        
-        prepopulate();
+
+        init_buffer();
     }
 
     void execute_helper(TransformedTargetType const &input, typename BaseType::CallbackFunction const &callback);
-    void prepopulate();
+
+    void init_buffer();
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -112,7 +113,6 @@ template <
 >
 class LagLeadOperatorEstimator :
     public TransformerEstimator<InputT, Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>> {
-
 public:
     // ----------------------------------------------------------------------
     // |
@@ -132,7 +132,6 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(LagLeadOperatorEstimator);
 
-
 private:
     // ----------------------------------------------------------------------
     // |
@@ -141,7 +140,6 @@ private:
     // ----------------------------------------------------------------------
     std::uint32_t             const                    _horizon;
     std::vector<std::int64_t> const                    _deltas;
-
 
     // ----------------------------------------------------------------------
     // |
@@ -160,31 +158,22 @@ private:
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
         return typename BaseType::TransformerUniquePtr(new LagLeadOperatorTransformer<InputT>(_horizon, _deltas));
     }
-
 };
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class       GrainedLagLeadOperatorEstimator
 ///  \brief       GrainedTransformer that creates `LagLeadOperatorEstimator`.
 ///
-
 template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
 class GrainedLagLeadOperatorEstimator :
-    public Components::PipelineExecutionEstimatorImpl<
-        Components::GrainEstimatorImpl<std::vector<std::string>, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>>,
-        Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string> const &, Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>, 1>
-    > {
+    public Components::GrainEstimatorImpl<std::vector<std::string>, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType = 
-        Components::PipelineExecutionEstimatorImpl<
-            Components::GrainEstimatorImpl<std::vector<std::string>, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>>,
-            Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string> const &, Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>, 1>
-        >;
+    using BaseType = Components::GrainEstimatorImpl<std::vector<std::string>, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>>;
 
     // ----------------------------------------------------------------------
     // |
@@ -193,6 +182,8 @@ public:
     // ----------------------------------------------------------------------
     GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> deltas);
     ~GrainedLagLeadOperatorEstimator(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GrainedLagLeadOperatorEstimator);
 };
 
 // ----------------------------------------------------------------------
@@ -221,49 +212,54 @@ LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(std::uint32_t horizon,
                 return horizon;
             }()
     )),
-    // if minimum of delta is less than 0, _offset_delta is the minimum of delta,
-    // otherwise it's 0
+    // value applied to each delta so that we can produce indices to a 0-based buffer
     _offset_delta(
+        // TODO: change it to positive
         std::move(
             [&deltas](void) -> std::int64_t {
                 if (deltas.size() == 0) {
                     throw std::invalid_argument("Lag lead orders is empty!");
                 }
+                // if all deltas are positive, the offset_delta should be 0 because deltas are already the indices to the 0-based buffer
                 return std::min(*std::min_element(deltas.cbegin(), deltas.cend()), static_cast<std::int64_t>(0));
             }()
         )
     ),
-    // calibrate deltas with minimum set to 0
+    // apply offset_delta to deltas to get indices to the 0-based buffer
     _offsets(
         std::move(
-            [&deltas](void) -> std::vector<std::uint32_t> {
+            [this, &deltas](void) -> std::vector<std::uint32_t> {
                 std::vector<std::uint32_t> ret;
-                std::int64_t min(std::min(*std::min_element(deltas.cbegin(), deltas.cend()), static_cast<std::int64_t>(0)));
-                for (auto it = deltas.begin(); it != deltas.end(); it++) {
-                    ret.emplace_back(static_cast<std::uint32_t>(*it - min));
+                ret.reserve(deltas.size());
+
+                for (std::int64_t const & delta : deltas) {
+                    ret.emplace_back(static_cast<std::uint32_t>(delta - _offset_delta));
                 }
+
                 return ret;
             }()
         )
     ),
-    // if there's only one delta, we use the absolute value of it plus horizon as the size
-    // otherwise we need to check if the minimum delta is negative:
-    // if it is, the buffer size is the absolute value of minimum delta plus horizon
-    // if it's not, the buffer size is the difference between min and max of deltas, which is already calculated in the delta calibration so we can use max_element directly
+    //
     _buffer(
-        _horizon + 
-        [=](void) -> size_t {
-            if (_offsets.size() == 1) {
-                return static_cast<size_t>(std::abs(_offsets[0] + _offset_delta));
+        _horizon +
+        [this](void) -> size_t {
+            // largest value of indices
+            std::uint32_t const max_delta(*std::max_element(deltas.cbegin(), deltas.cend()));
+            std::uint32_t const min_delta(*std::min_element(deltas.cbegin(), deltas.cend()));
+
+            if (max_delta < 0) {
+                return -min_delta;
             }
-            else {
-                std::uint32_t max(*std::max_element(_offsets.cbegin(), _offsets.cend()));
-                return static_cast<size_t>(max + _offset_delta < 0 ? std::abs(_offset_delta) : max);
+            else if (min_delta >= 0) {
+                return max_delta;
             }
+            // some are in the past, some are in the future
+            return max_delta - min_delta;
         } ()
     ) {
-        // prepopulate circular buffer with null values to imitate non-existing prior rows
-        prepopulate();
+        // init_buffer circular buffer with null values to imitate non-existing prior rows
+        init_buffer();
 }
 
 template <typename T>
@@ -280,7 +276,7 @@ LagLeadOperatorTransformer<T>::LagLeadOperatorTransformer(Archive &ar) :
             // Data
             std::uint32_t horizon = Traits<std::uint32_t>::deserialize(ar);
             std::vector<std::int64_t> deltas = Traits<std::vector<std::int64_t>>::deserialize(ar);
-            
+
             return LagLeadOperatorTransformer(std::move(horizon), std::move(deltas));
         }()
     ) {
@@ -324,9 +320,9 @@ void LagLeadOperatorTransformer<T>::execute_helper(TransformedTargetType const &
         return;
     }
     typename BaseType::TransformedType ret(_offsets.size(), _horizon);
-    
-    for (std::uint32_t row = 0; row < _offsets.size(); ++row) {
-        std::tuple<typename Components::CircularBuffer<TransformedTargetType>::iterator, typename Components::CircularBuffer<TransformedTargetType>::iterator> range{_buffer.range(_horizon, _offsets[row])};
+
+    for (std::uint32_t row = 0; row < _offsets.size(); ++row) {                                                                                                                              1, 3  0, 2 0  [*, *, *]
+        std::tuple<typename Components::CircularBuffer<TransformedTargetType>::iterator, typename Components::CircularBuffer<TransformedTargetType>::iterator> range{_buffer.range(_horizon, _deltas[row] - delta_offset)};
         typename Components::CircularBuffer<TransformedTargetType>::iterator start_iter = std::get<0>(range);
 
         for (std::int32_t col = 0; col < static_cast<std::int32_t>(_horizon); ++col) {
@@ -339,7 +335,9 @@ void LagLeadOperatorTransformer<T>::execute_helper(TransformedTargetType const &
 }
 
 template <typename T>
-void LagLeadOperatorTransformer<T>::prepopulate() {
+void LagLeadOperatorTransformer<T>::init_buffer() {
+    min
+
     for (std::int64_t i = 0; i < (static_cast<std::int64_t>(_horizon) - _offset_delta - 1); ++i) {
         _buffer.push(Traits<TransformedTargetType>::CreateNullValue());
     }
@@ -401,18 +399,9 @@ void LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::complete_training_i
 template <typename InputT, size_t MaxNumTrainingItemsV>
 GrainedLagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> deltas) :
     BaseType(
-        GrainedLagLeadOperatorEstimatorName,
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, horizon, deltas] () {
-            return Components::GrainEstimatorImpl<std::vector<std::string>, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>, MaxNumTrainingItemsV>(
-                pAllColumnAnnotations,
-                [horizon, deltas](AnnotationMapsPtr pAllColumnAnnotationsParam) {
-                    return LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), std::move(horizon), std::move(deltas));
-                }
-            );
-        },
-        [pAllColumnAnnotations]() {
-            return Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string> const &, Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>, 1>(std::move(pAllColumnAnnotations));
+        [horizon, deltas](AnnotationMapsPtr pAllColumnAnnotationsParam) {
+            return LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), horizon, deltas);
         }
     ) {
 }

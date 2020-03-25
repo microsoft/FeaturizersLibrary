@@ -16,6 +16,10 @@ namespace NS = Microsoft::Featurizer;
 #   pragma clang diagnostic ignored "-Wfloat-equal"
 #endif
 
+TEST_CASE("Invalid test") {
+    NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    CHECK_THROWS(NS::Featurizers::GrainedLagLeadOperatorEstimator<std::int16_t>(pAllColumnAnnotations, 0, {1, 2}));
+}
 
 TEST_CASE("Invalid transformer constructor parameter") {
     using InputType = std::int16_t;
@@ -230,7 +234,7 @@ TEST_CASE("Transformer Test - horizon 3, lead 2 lead 2") {
     transformer.execute(13, callback);
     transformer.execute(14, callback);
     transformer.execute(15, callback);
-    
+
     // before flush is called, there are 4 elements in ret
     CHECK(ret.size() == 4);
     transformer.flush(callback);
@@ -297,7 +301,7 @@ TEST_CASE("Transformer Test - horizon 1, lead 1 lead 2") {
     transformer.execute(15, callback);
     transformer.execute(16, callback);
     transformer.execute(17, callback);
-    
+
     // before flush is called, there are 6 elements in ret
     CHECK(ret.size() == 6);
     transformer.flush(callback);
@@ -340,7 +344,7 @@ TEST_CASE("Transformer Test - horizon 1, lag 1 lead 1") {
     // before flush is called, there are 4 elements in ret
     CHECK(ret.size() == 4);
     transformer.flush(callback);
-    
+
     CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[0](0,0)));
     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[0](1,0)) == 11);
     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[1](0,0)) == 10);
@@ -608,12 +612,12 @@ TEST_CASE("Estimator Test - horizon 2, lag 3 lag 2 lead 1 lead 3") {
     CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[5](3,1)));
 }
 
-TEST_CASE("Grained Estimator Test - 1 grain, horizon 2, lead 1 lead 2") {    
+TEST_CASE("Grained Estimator Test - 1 grain, horizon 2, lead 1 lead 2") {
     using InputType = std::int32_t;
     using GrainType = std::vector<std::string>;
     using OutputMatrixDataType = NS::Traits<InputType>::nullable_type;
-    using TransformedType = NS::RowMajMatrix<OutputMatrixDataType>;
-    NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    using TransformedType = std::tuple<std::vector<std::string>, NS::RowMajMatrix<OutputMatrixDataType>>;
+    NS::AnnotationMapsPtr                                            pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedLagLeadOperatorEstimator<InputType>      estimator(pAllColumnAnnotations, 2, {1, 2});
 
     using GrainedInputType = std::tuple<GrainType, InputType>;
@@ -639,30 +643,33 @@ TEST_CASE("Grained Estimator Test - 1 grain, horizon 2, lead 1 lead 2") {
     // before flush is called, there is 1 element in ret
     CHECK(ret.size() == 1);
     transformer->flush(callback);
-    
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[0](0,0)) == 10);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[0](0,1)) == 11);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[0](1,0)) == 11);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[0](1,1)) == 12);
 
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[1](0,0)) == 11);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[1](0,1)) == 12);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[1](1,0)) == 12);
-    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[1](1,1)));
-    
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[2](0,0)) == 12);
-    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[2](0,1)));
-    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[2](1,0)));
-    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[2](1,1)));
+    CHECK(std::get<0>(ret[0])[0] == "one");
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(0,0)) == 10);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(0,1)) == 11);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(1,0)) == 11);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(1,1)) == 12);
+
+    CHECK(std::get<0>(ret[1])[0] == "one");
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[1])(0,0)) == 11);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[1])(0,1)) == 12);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[1])(1,0)) == 12);
+    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[1])(1,1)));
+
+    CHECK(std::get<0>(ret[2])[0] == "one");
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[2])(0,0)) == 12);
+    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[2])(0,1)));
+    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[2])(1,0)));
+    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[2])(1,1)));
 }
 
 
-TEST_CASE("Grained Estimator - 2 grain, horizon 2, lead 1 lead 2") {    
+TEST_CASE("Grained Estimator - 2 grain, horizon 2, lead 1 lead 2") {
     using InputType = std::int64_t;
     using GrainType = std::vector<std::string>;
     using OutputMatrixDataType = NS::Traits<InputType>::nullable_type;
-    using TransformedType = NS::RowMajMatrix<OutputMatrixDataType>;
-    NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+    using TransformedType = std::tuple<std::vector<std::string>, NS::RowMajMatrix<OutputMatrixDataType>>;
+    NS::AnnotationMapsPtr                                            pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedLagLeadOperatorEstimator<InputType>      estimator(pAllColumnAnnotations, 2, {1, 2});
 
     using GrainedInputType = std::tuple<GrainType, InputType>;
@@ -701,38 +708,124 @@ TEST_CASE("Grained Estimator - 2 grain, horizon 2, lead 1 lead 2") {
     // before flush is called, there are 4 elements in ret since the execute call for tup1, tup2, tup3 will add 3 more elements in ret
     CHECK(ret.size() == 4);
     transformer->flush(callback);
-    
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[0](0,0)) == 10);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[0](0,1)) == 11);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[0](1,0)) == 11);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[0](1,1)) == 12);
 
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[1](0,0)) == 11);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[1](0,1)) == 12);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[1](1,0)) == 12);
-    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[1](1,1)));
-    
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[2](0,0)) == 12);
-    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[2](0,1)));
-    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[2](1,0)));
-    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[2](1,1)));
+    CHECK(std::get<0>(ret[0])[0] == "one");
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(0,0)) == 10);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(0,1)) == 11);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(1,0)) == 11);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(1,1)) == 12);
 
-    
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[3](0,0)) == 20);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[3](0,1)) == 21);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[3](1,0)) == 21);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[3](1,1)) == 22);
+    CHECK(std::get<0>(ret[1])[0] == "one");
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[1])(0,0)) == 11);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[1])(0,1)) == 12);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[1])(1,0)) == 12);
+    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[1])(1,1)));
 
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[4](0,0)) == 21);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[4](0,1)) == 22);
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[4](1,0)) == 22);
-    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[4](1,1)));
-    
-    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[5](0,0)) == 22);
-    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[5](0,1)));
-    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[5](1,0)));
-    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(ret[5](1,1)));
+    CHECK(std::get<0>(ret[2])[0] == "one");
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[2])(0,0)) == 12);
+    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[2])(0,1)));
+    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[2])(1,0)));
+    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[2])(1,1)));
+
+
+    CHECK(std::get<0>(ret[3])[0] == "two");
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[3])(0,0)) == 20);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[3])(0,1)) == 21);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[3])(1,0)) == 21);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[3])(1,1)) == 22);
+
+    CHECK(std::get<0>(ret[4])[0] == "two");
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[4])(0,0)) == 21);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[4])(0,1)) == 22);
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[4])(1,0)) == 22);
+    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[4])(1,1)));
+
+    CHECK(std::get<0>(ret[5])[0] == "two");
+    CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[5])(0,0)) == 22);
+    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[5])(0,1)));
+    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[5])(1,0)));
+    CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[5])(1,1)));
 }
+
+// TEST_CASE("Grained Estimator - interleave 2 grain, horizon 2, lead 1 lead 2") {
+//     using InputType = std::int64_t;
+//     using GrainType = std::vector<std::string>;
+//     using OutputMatrixDataType = NS::Traits<InputType>::nullable_type;
+//     using TransformedType = std::tuple<std::vector<std::string>, NS::RowMajMatrix<OutputMatrixDataType>>;
+//     NS::AnnotationMapsPtr                                            pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+//     NS::Featurizers::GrainedLagLeadOperatorEstimator<InputType>      estimator(pAllColumnAnnotations, 2, {1, 2});
+
+//     using GrainedInputType = std::tuple<GrainType, InputType>;
+
+//     const GrainType grain1({"one"});
+//     const GrainType grain2({"two"});
+
+//     const GrainedInputType tup1 = std::make_tuple(grain1, static_cast<InputType>(10));
+//     const GrainedInputType tup2 = std::make_tuple(grain2, static_cast<InputType>(20));
+//     const GrainedInputType tup3 = std::make_tuple(grain1, static_cast<InputType>(11));
+
+//     const GrainedInputType tup4 = std::make_tuple(grain2, static_cast<InputType>(21));
+//     const GrainedInputType tup5 = std::make_tuple(grain1, static_cast<InputType>(12));
+//     const GrainedInputType tup6 = std::make_tuple(grain2, static_cast<InputType>(22));
+
+//     NS::TestHelpers::Train(estimator, NS::TestHelpers::make_vector<std::tuple<GrainType const &, InputType const &>>(tup1, tup2, tup3, tup4, tup5, tup6));
+//     auto transformer = estimator.create_transformer();
+
+//     std::vector<TransformedType> ret;
+//     auto const              callback(
+//         [&ret](TransformedType value) {
+//             ret.emplace_back(value);
+//         }
+//     );
+//     transformer->execute(tup1, callback);
+//     transformer->execute(tup2, callback);
+//     transformer->execute(tup3, callback);
+//     transformer->execute(tup4, callback);
+//     transformer->execute(tup5, callback);
+//     transformer->execute(tup6, callback);
+
+//     // before flush is called, there are 4 elements in ret since the execute call for tup1, tup2, tup3 will add 3 more elements in ret
+//     CHECK(ret.size() == 4);
+//     transformer->flush(callback);
+
+//     CHECK(std::get<0>(ret[0])[0] == "one");
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(0,0)) == 10);
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(0,1)) == 11);
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(1,0)) == 11);
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(1,1)) == 12);
+
+//     CHECK(std::get<0>(ret[1])[0] == "two");
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[1])(0,0)) == 20);
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[1])(0,1)) == 21);
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[1])(1,0)) == 21);
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[1])(1,1)) == 22);
+
+//     CHECK(std::get<0>(ret[2])[0] == "one");
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[2])(0,0)) == 11);
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[2])(0,1)) == 12);
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[2])(1,0)) == 12);
+//     CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[2])(1,1)));
+
+
+
+//     CHECK(std::get<0>(ret[3])[0] == "one");
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[3])(0,0)) == 21);
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[3])(0,1)) == 22);
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[3])(1,0)) == 22);
+//     CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[3])(1,1)));
+
+//     CHECK(std::get<0>(ret[4])[0] == "two");
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[4])(0,0)) == 12);
+//     CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[4])(0,1)));
+//     CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[4])(1,0)));
+//     CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[4])(1,1)));
+
+//     CHECK(std::get<0>(ret[5])[0] == "two");
+//     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[5])(0,0)) == 22);
+//     CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[5])(0,1)));
+//     CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[5])(1,0)));
+//     CHECK(NS::Traits<OutputMatrixDataType>::IsNull(std::get<1>(ret[5])(1,1)));
+// }
 
 TEST_CASE("Serialization") {
     using InputType = std::double_t;
