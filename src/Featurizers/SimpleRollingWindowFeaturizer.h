@@ -340,7 +340,7 @@ GrainedSimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedSimple
             return Components::GrainEstimatorImpl<GrainType, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>> (
                 pAllColumnAnnotations,
                 [maxWindowSize, windowCalculation, horizon, minWindowCount](AnnotationMapsPtr pAllColumnAnnotationsParam) {
-                    return SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), std::move(windowCalculation), std::move(horizon), std::move(maxWindowSize), std::move(minWindowCount));
+                    return SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), windowCalculation, horizon, maxWindowSize, minWindowCount);
                 }
             );
         },
