@@ -55,21 +55,17 @@ class _ScalarTypeInfo(TypeInfo):
         self,
         result_name="result",
     ):
+        if self.TypeName == "bool":
+            # vector<bool> doesn't support `emplace_back` on older compilers
+            statement = "results.push_back({});".format(result_name)
+        else:
+            statement = "results.emplace_back(std::move({}));".format(result_name)
+
         return self.Result(
             self.CppType,
             "{} {};".format(self.CppType, result_name),
             "&{}".format(result_name),
-            textwrap.dedent(
-                """\
-                #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-                results.push_back(std::move({result}));
-                #else
-                results.emplace_back(std::move({result}));
-                #endif
-                """,
-            ).format(
-                result=result_name,
-            ),
+            statement,
         )
 
 

@@ -97,11 +97,7 @@ void NumericalizeFeaturizer_int8_Test(
         REQUIRE(NumericalizeFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -200,11 +196,7 @@ void NumericalizeFeaturizer_uint8_Test(
         REQUIRE(NumericalizeFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -303,11 +295,7 @@ void NumericalizeFeaturizer_int16_Test(
         REQUIRE(NumericalizeFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -406,11 +394,7 @@ void NumericalizeFeaturizer_uint16_Test(
         REQUIRE(NumericalizeFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -509,11 +493,7 @@ void NumericalizeFeaturizer_int32_Test(
         REQUIRE(NumericalizeFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -612,11 +592,7 @@ void NumericalizeFeaturizer_uint32_Test(
         REQUIRE(NumericalizeFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -715,11 +691,7 @@ void NumericalizeFeaturizer_int64_Test(
         REQUIRE(NumericalizeFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -818,11 +790,7 @@ void NumericalizeFeaturizer_uint64_Test(
         REQUIRE(NumericalizeFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -921,11 +889,7 @@ void NumericalizeFeaturizer_float_Test(
         REQUIRE(NumericalizeFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -1024,11 +988,7 @@ void NumericalizeFeaturizer_double_Test(
         REQUIRE(NumericalizeFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -1121,17 +1081,13 @@ void NumericalizeFeaturizer_bool_Test(
 
     results.reserve(inference_input.size());
 
-    for(auto const & input : inference_input) {
+    for(bool input : inference_input) {
         std::double_t result;
 
         REQUIRE(NumericalizeFeaturizer_bool_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -1230,11 +1186,7 @@ void NumericalizeFeaturizer_string_Test(
         REQUIRE(NumericalizeFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 

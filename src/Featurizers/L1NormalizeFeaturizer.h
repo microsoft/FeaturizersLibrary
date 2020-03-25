@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Base/NormalizeFeaturizer.h"
+
 namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {

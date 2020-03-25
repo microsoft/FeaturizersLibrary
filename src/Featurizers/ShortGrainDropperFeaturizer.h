@@ -81,12 +81,13 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
+    template <typename LagInputIteratorT>
     ShortGrainDropperEstimator(
         AnnotationMapsPtr pAllColumnAnnotations,
         size_t colIndex,
         std::uint8_t windowSize,
         //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
-        std::vector<std::uint8_t> lags,
+        std::tuple<LagInputIteratorT, LagInputIteratorT> lags,
         //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
         std::uint8_t maxHorizon,
         //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
@@ -163,11 +164,12 @@ private:
 // |
 // ----------------------------------------------------------------------
 template <size_t MaxNumTrainingItemsV>
+template <typename LagInputIteratorT>
 ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(
     AnnotationMapsPtr pAllColumnAnnotations,
     size_t colIndex,
     std::uint8_t windowSize,
-    std::vector<std::uint8_t> lags,
+    std::tuple<LagInputIteratorT, LagInputIteratorT> lags,
     std::uint8_t maxHorizon,
     nonstd::optional<std::uint8_t> cv
 ) :
@@ -181,16 +183,18 @@ ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(
     ),
     _minPoints(
         [&windowSize, &lags, &maxHorizon, &cv](void) -> std::uint16_t {
+            static_assert(std::is_same<typename std::iterator_traits<LagInputIteratorT>::value_type, std::uint8_t>::value, "'LagInputIteratorT' must point to an uint8");
+
             //it appears automl tests show that
             //windowSize can be 0
             //lags could contain 0s
             //maxHorizon may not be 0, not sure currently
             //cv may not be 0, not sure currently
-            if (lags.size() == 0)
+            if (std::distance(std::get<0>(lags), std::get<1>(lags)) == 0)
                 throw std::invalid_argument("lags");
             if (!cv.has_value())
-                return (maxHorizon + std::max(windowSize, *std::max_element(lags.cbegin(), lags.cend())) + 1);
-            return (2*maxHorizon + static_cast<std::uint8_t>(*cv) + std::max(windowSize, *std::max_element(lags.cbegin(), lags.cend())) + 1);
+                return (maxHorizon + std::max(windowSize, *std::max_element(std::get<0>(lags), std::get<1>(lags))) + 1);
+            return (2*maxHorizon + static_cast<std::uint8_t>(*cv) + std::max(windowSize, *std::max_element(std::get<0>(lags), std::get<1>(lags))) + 1);
         }()
     ) {
 }

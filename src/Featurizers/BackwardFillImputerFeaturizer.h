@@ -133,7 +133,25 @@ private:
 ///  \brief         Estimator that creates `BackwardFillImputerTransformer`
 ///
 template <typename T>
-using BackwardFillImputerEstimator          = Components::InferenceOnlyEstimatorImpl<BackwardFillImputerTransformer<T>>;
+class BackwardFillImputerEstimator : public Components::InferenceOnlyEstimatorImpl<BackwardFillImputerTransformer<T>> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = Components::InferenceOnlyEstimatorImpl<BackwardFillImputerTransformer<T>>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    BackwardFillImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations);
+    ~BackwardFillImputerEstimator(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(BackwardFillImputerEstimator);
+};
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -143,6 +161,12 @@ using BackwardFillImputerEstimator          = Components::InferenceOnlyEstimator
 // |
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+
+// ----------------------------------------------------------------------
+// |
+// |  BackwardFillImputerTransformer
+// |
 // ----------------------------------------------------------------------
 template <typename T>
 BackwardFillImputerTransformer<T>::BackwardFillImputerTransformer(void) :
@@ -225,6 +249,16 @@ bool BackwardFillImputerTransformer<T>::operator==(BackwardFillImputerTransforme
 #   pragma clang diagnostic pop
 #endif
 
+}
+
+// ----------------------------------------------------------------------
+// |
+// |  BackwardFillImputerTransformer
+// |
+// ----------------------------------------------------------------------
+template <typename T>
+BackwardFillImputerEstimator<T>::BackwardFillImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+    BaseType("BackwardFillImputerEstimator", std::move(pAllColumnAnnotations)) {
 }
 
 } // namespace Featurizers

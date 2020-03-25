@@ -120,7 +120,25 @@ private:
 ///  \brief         Estimator that creates `ForwardFillImputerTransformer`.
 ///
 template <typename T>
-using ForwardFillImputerEstimator           = Components::InferenceOnlyEstimatorImpl<ForwardFillImputerTransformer<T>>;
+class ForwardFillImputerEstimator : public Components::InferenceOnlyEstimatorImpl<ForwardFillImputerTransformer<T>> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = Components::InferenceOnlyEstimatorImpl<ForwardFillImputerTransformer<T>>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    ForwardFillImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations);
+    ~ForwardFillImputerEstimator(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(ForwardFillImputerEstimator);
+};
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -130,6 +148,12 @@ using ForwardFillImputerEstimator           = Components::InferenceOnlyEstimator
 // |
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+
+// ----------------------------------------------------------------------
+// |
+// |  ForwardFillImputerTransformer
+// |
 // ----------------------------------------------------------------------
 template <typename T>
 ForwardFillImputerTransformer<T>::ForwardFillImputerTransformer(T defaultValue) :
@@ -202,6 +226,16 @@ void ForwardFillImputerTransformer<T>::save(Archive &ar) const /*override*/ {
     Traits<NullableType>::serialize(ar, _defaultValue);
 
     // Note that we aren't serializing working state
+}
+
+// ----------------------------------------------------------------------
+// |
+// |  ForwardFillImputerEstimator
+// |
+// ----------------------------------------------------------------------
+template <typename T>
+ForwardFillImputerEstimator<T>::ForwardFillImputerEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+    BaseType("ForwardFillImputerEstimator", std::move(pAllColumnAnnotations)) {
 }
 
 } // namespace Featurizers

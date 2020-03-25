@@ -29,32 +29,38 @@ include(${_this_path}/../cmake/Featurizers.cmake)
 enable_testing()
 
 foreach(_test_name IN ITEMS
-    SharedLibrary_CatImputerFeaturizer_IntegrationTest
-    SharedLibrary_CountVecFeaturizer_IntegrationTest
-    SharedLibrary_DateTimeFeaturizer_IntegrationTest
-    SharedLibrary_FromStringFeaturizer_IntegrationTest
-    SharedLibrary_HOHVFeaturizer_IntegrationTest
-    SharedLibrary_IMFeaturizer_IntegrationTest
-    SharedLibrary_L1NormalizeFeaturizer_IntegrationTest
-    SharedLibrary_L2NormalizeFeaturizer_IntegrationTest
-    SharedLibrary_LEFeaturizer_IntegrationTest
-    SharedLibrary_MASFeaturizer_IntegrationTest
-    SharedLibrary_MNormalizeFeaturizer_IntegrationTest
-    SharedLibrary_MDFeaturizer_IntegrationTest
-    SharedLibrary_MeanIFeaturizer_IntegrationTest
-    SharedLibrary_MedianIFeaturizer_IntegrationTest
-    SharedLibrary_MMIFeaturizer_IntegrationTest
-    SharedLibrary_MMSFeaturizer_IntegrationTest
-    SharedLibrary_ModeIFeaturizer_IntegrationTest
-    SharedLibrary_NumericalizeFeaturizer_IntegrationTest
-    SharedLibrary_OHEFeaturizer_IntegrationTest
-    SharedLibrary_PCAFeaturizer_IntegrationTest
-    SharedLibrary_RSFeaturizer_IntegrationTest
-    SharedLibrary_SSWFeaturizer_IntegrationTest
-    SharedLibrary_StringFeaturizer_IntegrationTest
-    SharedLibrary_TfidfVecFeaturizer_IntegrationTest
-    SharedLibrary_TruncatedSVDFeaturizer_IntegrationTest
-    SharedLibrary_TSIFeaturizer_IntegrationTest
+    # TODO: Needs impl: SharedLibrary_AnalyticalRollingWindow_IntegrationTest
+    # TODO: Needs impl: SharedLibrary_BackwardFillImputer_IntegrationTest
+    SharedLibrary_CatImputer_IntegrationTest
+    SharedLibrary_CountVectorizer_IntegrationTest
+    SharedLibrary_DateTime_IntegrationTest
+    # TODO: Needs impl: SharedLibrary_ForwardFillImputer_IntegrationTest
+    SharedLibrary_FromString_IntegrationTest
+    SharedLibrary_HashOneHotVectorizer_IntegrationTest
+    SharedLibrary_ImputationMarker_IntegrationTest
+    SharedLibrary_L1Normalize_IntegrationTest
+    SharedLibrary_L2Normalize_IntegrationTest
+    SharedLibrary_LabelEncoder_IntegrationTest
+    # TODO: Not available yet SharedLibrary_LagLeadOperator_IntegrationTest
+    SharedLibrary_MaxAbsScaler_IntegrationTest
+    SharedLibrary_MaxNormalize_IntegrationTest
+    SharedLibrary_MeanImputer_IntegrationTest
+    SharedLibrary_MedianImputer_IntegrationTest
+    SharedLibrary_MinMaxImputer_IntegrationTest
+    SharedLibrary_MinMaxScaler_IntegrationTest
+    SharedLibrary_MissingDummies_IntegrationTest
+    SharedLibrary_ModeImputer_IntegrationTest
+    SharedLibrary_Numericalize_IntegrationTest
+    SharedLibrary_OneHotEncoder_IntegrationTest
+    SharedLibrary_PCA_IntegrationTest
+    SharedLibrary_RobustScaler_IntegrationTest
+    # TODO: Needs impl: SharedLibrary_ShortGrainDropper_IntegrationTest
+    # TODO: Needs impl: SharedLibrary_SimpleRollingWindow_IntegrationTest
+    SharedLibrary_StandardScaleWrapper_IntegrationTest
+    SharedLibrary_String_IntegrationTest
+    SharedLibrary_TfidfVectorizer_IntegrationTest
+    SharedLibrary_TimeSeriesImputer_IntegrationTest
+    SharedLibrary_TruncatedSVD_IntegrationTest
 )
     add_executable(${_test_name} ${_test_name}.cpp)
 
