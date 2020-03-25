@@ -1557,10 +1557,10 @@ featurizers:
       The resulting matrix size is K rows x N cols, where K is the number of offsets and N is the horizon.
 
       Horizon and offsets should be passed in during construction. Offsets are passed in as a vector of ints so multiple lag orders can be applied within one featurizer call.
-      Output type is a matrix of double where rows are grouped by different offsets and columns are grouped by horizon.
+      Output type is a tuple of vector of string, which representing grains and a matrix. The matrix is of optional<T> where rows are grouped by different offsets and columns are grouped by horizon.
 
       C++-style pseudo signature:
-        template <typename T> matrix<double> execute(std::vector<std::string> const &, T const &> const &value);
+        template <typename T> tuple<vector<string>,matrix<T?>> execute(std::vector<std::string> const &, T const &> const &value);
 
       Examples:
           Since this featurizer is copying values per grain, we just use one type of grain in the following examples.
@@ -1611,7 +1611,7 @@ featurizers:
 
     type_mappings:
       - input_type: tuple<vector<string>, T>
-        output_type: matrix<T?>
+        output_type: tuple<vector<string>,matrix<T?>>
 
     configuration_params:
       - type: uint32
