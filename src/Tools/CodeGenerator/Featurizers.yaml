@@ -1606,8 +1606,8 @@ featurizers:
           # TODO: string
 
     type_mappings:
-      - input_type: tuple<vector<string>, T>
-        output_type: tuple<vector<string>,matrix<T?>>
+      - input_type: tuple<unique_id, T>
+        output_type: tuple<unique_id, matrix<T?>>
 
     configuration_params:
       - type: uint32
