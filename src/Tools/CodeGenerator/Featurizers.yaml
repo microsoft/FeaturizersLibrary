@@ -1,7 +1,7 @@
 featurizers:
   # ----------------------------------------------------------------------
   - name: AnalyticalRollingWindowFeaturizer
-    estimator_name: AnalyticalRollingWindowEstimator
+    estimator_name: GrainedAnalyticalRollingWindowEstimator
     release_version: 0.4.0
     num_output_columns: 1
     has_dynamic_output: false
@@ -14,7 +14,7 @@ featurizers:
         template <typename T> std::vector<double> execute(std::tuple<std::vector<std::string> const &, T const &> value);
 
         Examples:
-            A simple example would be horizon = 1, window size = 2, and we want to take the mean.
+            A simple example would be horizon = 1, maxWindowSize = 2, and we want to take the mean.
 
             +-----------+-------+-------------------+
             | grain     | target| target_mean       |
@@ -28,7 +28,7 @@ featurizers:
             | A         | 11    | [5]               |
             +-----------+-------+-------------------+
 
-            A more complex example would be, assuming we have horizon = 2, window size = 2, min window periods = 2, and we want the mean
+            A more complex example would be, assuming we have horizon = 2, maxWindowSize = 2, min window size = 2, and we want the mean
             +-----------+-------+-------------------+
             | grain     | target| target_max        |
             +===========+=======+===================+
@@ -67,10 +67,6 @@ featurizers:
         underlying_type: uint8
 
     configuration_params:
-      - type: uint32
-        name: windowSize
-        description: The maximum number of items in a window.
-
       - type: AnalyticalRollingWindowCalculation
         name: windowCalculation
         description: What calculation is going to be performed over the window data.
@@ -79,8 +75,12 @@ featurizers:
         name: horizon
         description: The horizon value. The size of the output vector will be equal to this value.
 
+      - type: uint32
+        name: maxWindowSize
+        description: The maximum number of items in a window.
+
       - type: uint32?
-        name: minWindowCount
+        name: minWindowSize
         description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
 
     status: Pending
@@ -1193,7 +1193,7 @@ featurizers:
 
   # ----------------------------------------------------------------------
   - name: SimpleRollingWindowFeaturizer
-    estimator_name: SimpleRollingWindowEstimator
+    estimator_name: GrainedSimpleRollingWindowEstimator
     release_version: 0.4.0
     num_output_columns: 1
     has_dynamic_output: false
@@ -1206,7 +1206,7 @@ featurizers:
         template <typename T> std::vector<T> execute(std::tuple<std::vector<std::string> const &, T const &> value);
 
       Examples:
-          A simple example would be horizon = 1, window size = 2, and we want to take the minimum.
+          A simple example would be horizon = 1, maxWindowSize = 2, and we want to take the minimum.
 
           +-----------+-------+-------------------+
           | grain     | target| target_minimum    |
@@ -1220,7 +1220,7 @@ featurizers:
           | A         | 11    | [4]               |
           +-----------+-------+-------------------+
 
-          A more complex example would be, assuming we have horizon = 2, window size = 2, minWindowCount = 2, and we want the maximum value
+          A more complex example would be, assuming we have horizon = 2, maxWindowSize = 2, minWindowSize = 2, and we want the maximum value
           +-----------+-------+-------------------+
           | grain     | target| target_max        |
           +===========+=======+===================+
@@ -1261,10 +1261,6 @@ featurizers:
         underlying_type: uint8
 
     configuration_params:
-      - type: uint32
-        name: windowSize
-        description: The maximum number of items in a window.
-
       - type: SimpleRollingWindowCalculation
         name: windowCalculation
         description: What calculation is going to be performed over the window data.
@@ -1273,8 +1269,12 @@ featurizers:
         name: horizon
         description: The horizon value. The size of the output vector will be equal to this value.
 
+      - type: uint32
+        name: maxWindowSize
+        description: The maximum number of items in a window.
+
       - type: uint32?
-        name: minWindowCount
+        name: minWindowSize
         description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
 
     status: Pending

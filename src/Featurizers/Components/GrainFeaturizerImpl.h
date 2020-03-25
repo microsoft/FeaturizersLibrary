@@ -63,7 +63,7 @@ struct GrainFeaturizerTraits {
     static_assert(std::is_reference<typename EstimatorT::InputType>::value == false, "'EstimatorT::InputType' must not be a reference");
 
     using InputType                         = std::tuple<GrainT const &, typename EstimatorT::InputType const &>;
-    using TransformedType                   = std::tuple<GrainT, typename Details::EstimatorOutputType<EstimatorT>::type>;
+    using TransformedType                   = std::tuple<GrainT const &, typename Details::EstimatorOutputType<EstimatorT>::type>;
 };
 
 /////////////////////////////////////////////////////////////////////////
