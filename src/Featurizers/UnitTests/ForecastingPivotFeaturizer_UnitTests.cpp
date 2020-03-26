@@ -136,14 +136,14 @@ TEST_CASE("Two matrixes of string") {
 }
 
 TEST_CASE("Transformer serialization") {
-    NS::Featurizers::ForecastingPivotTransformer<int>         original;
+    NS::Featurizers::ForecastingPivotTransformer<int>   original;
     NS::Archive                                         out;
 
     original.save(out);
 
     NS::Archive                                         in(out.commit());
 
-    NS::Featurizers::ForecastingPivotTransformer<int>         other(in);
+    NS::Featurizers::ForecastingPivotTransformer<int>   other(in);
 
     CHECK(other == original);
 }
