@@ -41,30 +41,34 @@ class MatrixTypeInfo(TypeInfo):
         create_type_info_func=None,
         **kwargs,
     ):
-        if member_type is not None:
-            assert create_type_info_func is not None
+        if member_type is None:
+            return
 
-            super(MatrixTypeInfo, self).__init__(*args, **kwargs)
+        assert create_type_info_func is not None
 
-            match = self.TypeName.match(member_type)
-            assert match, member_type
+        super(MatrixTypeInfo, self).__init__(*args, **kwargs)
 
-            the_type = match.group("type")
+        match = self.TypeName.match(member_type)
+        assert match, member_type
 
-            type_info = create_type_info_func(the_type)
-            if not hasattr(type_info, "CType"):
-                raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a vector".format(the_type))
+        the_type = match.group("type")
 
-            if type_info.IsOptional:
+        type_info = create_type_info_func(the_type)
+        if not hasattr(type_info, "CType"):
+            raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a vector".format(the_type))
+
+        if type_info.IsOptional:
+            # Support optional floats and doubles, as the optionality is built directly into the type itself
+            if type_info.CType not in ["float", "double"]:
                 raise Exception("Matrix types do not currently support optional values ('{}')".format(the_type))
 
-            self._type_info                 = type_info
+        self._type_info                 = type_info
 
-            # Override the CppType property with this type info
-            self._matrix_type               = "Eigen::MatrixX<{}>".format(self._type_info.CType);
-            self._map_type                  = "Eigen::Map<{}>".format(self._matrix_type)
+        # Override the CppType property with this type info
+        self._matrix_type               = "Eigen::MatrixX<{}>".format(self._type_info.CppType);
+        self._map_type                  = "Eigen::Map<{}>".format(self._matrix_type)
 
-            self.CppType                    = self._map_type
+        self.CppType                    = self._map_type
 
     # ----------------------------------------------------------------------
     @Interface.override
@@ -74,12 +78,9 @@ class MatrixTypeInfo(TypeInfo):
 
         return self.Result(
             [
-                "/*in*/ size_t {}_cols".format(arg_name),
-                "/*in*/ size_t {}_rows".format(arg_name),
-                "/*in*/ {type} const * {name}_ptr".format(
-                    type=self._type_info.CType,
-                    name=arg_name,
-                ),
+                self.Type("size_t", "{}_cols".format(arg_name)),
+                self.Type("size_t", "{}_rows".format(arg_name)),
+                self.Type("{} const *".format(self._type_info.CType), "{}_ptr".format(arg_name)),
             ],
             textwrap.dedent(
                 """\
@@ -107,28 +108,23 @@ class MatrixTypeInfo(TypeInfo):
 
         return self.Result(
             [
-                "/*in*/ size_t {}_cols".format(arg_name),
-                "/*in*/ size_t {}_rows".format(arg_name),
-                "/*in*/ {type} const **{name}_values_ptr".format(
-                    type=self._type_info.CType,
-                    name=arg_name,
-                ),
-                "/*in*/ size_t {}_elements".format(arg_name),
+                self.Type("size_t", "{}_cols".format(arg_name)),
+                self.Type("size_t", "{}_rows".format(arg_name)),
+                self.Type("{} const **".format(self._type_info.CType), "{}_values_ptr".format(arg_name)),
+                self.Type("size_t", "{}_items".format(arg_name)),
             ],
             textwrap.dedent(
                 """\
                 if({name}_cols == 0) throw std::invalid_argument("'{name}_cols' is 0");
                 if({name}_rows == 0) throw std::invalid_argument("'{name}_rows' is 0");
                 if({name}_values_ptr == nullptr) throw std::invalid_argument("'{name}_values_ptr' is null");
-                if({name}_elements == 0) throw std::invalid_argument("'{name}_elements' is 0");
+                if({name}_items == 0) throw std::invalid_argument("'{name}_items' is 0");
 
                 std::vector<{map_type}> {name}_buffer;
 
-                {name}_buffer.reserve({name}_elements);
+                {name}_buffer.reserve({name}_items);
 
-                {type} const * const * const {name}_values_end({name}_values_ptr + {name}_elements);
-
-                while({name}_values_ptr != {name}_values_end) {{
+                while({name}_buffer.size() < {name}_items) {{
                 #if (defined __apple_build_verion__)
                     {name}_buffer.push_back({map_type}(const_cast<{type} *>(*{name}_values_ptr), static_cast<Eigen::Index>({name}_rows), static_cast<Eigen::Index>({name}_cols)));
                 #else
@@ -148,6 +144,7 @@ class MatrixTypeInfo(TypeInfo):
                     name=arg_name,
                 ),
             ),
+            input_buffer_type=self.Type("std::vector<{}>".format(self._map_type), "{}_buffer".format(arg_name)),
         )
 
     # ----------------------------------------------------------------------
@@ -156,16 +153,13 @@ class MatrixTypeInfo(TypeInfo):
         self,
         arg_name,
         result_name="result",
-        is_struct_member=False,
+        suppress_pointer=False,
     ):
         return self.Result(
             [
-                "/*out*/ size_t *{}_cols".format(arg_name),
-                "/*out*/ size_t *{}_rows".format(arg_name),
-                "/*out*/ {type} **{name}_ptr".format(
-                    type=self._type_info.CType,
-                    name=arg_name,
-                ),
+                self.Type("size_t *", "{}_cols".format(arg_name)),
+                self.Type("size_t *", "{}_rows".format(arg_name)),
+                self.Type("{} **".format(self._type_info.CType), "{}_ptr".format(arg_name)),
             ],
             textwrap.dedent(
                 """\
@@ -196,7 +190,7 @@ class MatrixTypeInfo(TypeInfo):
                 name=arg_name,
                 type=self._type_info.CType,
                 result_name=result_name,
-                pointer="" if is_struct_member else "*",
+                pointer="" if suppress_pointer else "*",
             ),
         )
 
@@ -208,12 +202,9 @@ class MatrixTypeInfo(TypeInfo):
     ):
         return self.Result(
             [
-                "/*in*/ size_t {}_cols".format(arg_name),
-                "/*in*/ size_t {}_rows".format(arg_name),
-                "/*in*/ {type} *{name}_ptr".format(
-                    type=self._type_info.CType,
-                    name=arg_name,
-                ),
+                self.Type("size_t", "{}_cols".format(arg_name)),
+                self.Type("size_t", "{}_rows".format(arg_name)),
+                self.Type("{} *".format(self._type_info.CType), "{}_ptr".format(arg_name)),
             ],
             textwrap.dedent(
                 """\

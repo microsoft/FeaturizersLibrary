@@ -64,6 +64,10 @@ function(Impl)
         ${_featurizers_this_path}/../SharedLibrary_TimeSeriesImputerFeaturizer.h
         ${_featurizers_this_path}/../SharedLibrary_TimeSeriesImputerFeaturizer.cpp
 
+        # TODO: Not available yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_AnalyticalRollingWindowFeaturizer.h
+        # TODO: Not available yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_AnalyticalRollingWindowFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_BackwardFillImputerFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_BackwardFillImputerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_CatImputerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_CatImputerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_Common.cpp
@@ -73,6 +77,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_CountVectorizerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ForwardFillImputerFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ForwardFillImputerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_FromStringFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_FromStringFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_HashOneHotVectorizerFeaturizer.cpp
@@ -85,6 +91,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_L2NormalizeFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.h
+        # TODO: Not available yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LagLeadOperatorFeaturizer.h
+        # TODO: Not available yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LagLeadOperatorFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxNormalizeFeaturizer.cpp
@@ -111,6 +119,10 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PointerTable.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalerFeaturizer.h
+        # TODO: Not implemented yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ShortGrainDropperFeaturizer.h
+        # TODO: Not implemented yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ShortGrainDropperFeaturizer.cpp
+        # TODO: Not available yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_SimpleRollingWindowFeaturizer.h
+        # TODO: Not available yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_SimpleRollingWindowFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StringFeaturizer.cpp

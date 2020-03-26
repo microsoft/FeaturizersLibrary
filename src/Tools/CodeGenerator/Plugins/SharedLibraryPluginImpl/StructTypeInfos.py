@@ -31,18 +31,24 @@ class _StructTypeInfo(TypeInfo):
     def __init__(
         self,
         *args,
+        member_type=None,
         custom_structs=None,
         **kwargs,
     ):
-        if custom_structs:
-            super(_StructTypeInfo, self).__init__(
-                *args,
-                custom_structs=custom_structs,
-                **kwargs
-            )
+        if member_type is None:
+            return
 
-            assert self.TypeName in custom_structs, custom_structs
-            self._member_info               = custom_structs[self.TypeName]
+        assert custom_structs is not None
+
+        super(_StructTypeInfo, self).__init__(
+            *args,
+            member_type=member_type,
+            custom_structs=custom_structs,
+            **kwargs
+        )
+
+        assert self.TypeName in custom_structs, (self.TypeName, custom_structs)
+        self._member_info               = custom_structs[self.TypeName]
 
     # ----------------------------------------------------------------------
     @Interface.override
@@ -60,7 +66,7 @@ class _StructTypeInfo(TypeInfo):
         self,
         arg_name,
         result_name="result",
-        is_struct_member=False,
+        suppress_pointer=False,
     ):
         member_statements = []
 
@@ -69,21 +75,23 @@ class _StructTypeInfo(TypeInfo):
                 member_tif.GetOutputInfo(
                     "{}{}{}".format(
                         arg_name,
-                        "." if is_struct_member else "->",
+                        "." if suppress_pointer else "->",
                         member_name,
                     ),
                     "{}.{}".format(result_name, member_name),
-                    is_struct_member=True,
+                    suppress_pointer=True,
                 ).InvocationStatements,
             )
 
         return self.Result(
             [
-                "/*out via struct*/ {}{} {}".format(
-                    self.TypeName,
-                    "" if is_struct_member else " *",
+                self.Type(
+                    "{}{}".format(
+                        self.TypeName,
+                        "" if suppress_pointer else " *",
+                    ),
                     arg_name,
-                )
+                ),
             ],
             """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
                 name=arg_name,
@@ -118,7 +126,7 @@ class _StructTypeInfo(TypeInfo):
             )
 
         return self.Result(
-            ["/*in*/ {} * {}".format(self.TypeName, arg_name)],
+            [self.Type("{} *".format(self.TypeName), arg_name)],
             textwrap.dedent(
                 """\
                 if({name} == nullptr) throw std::invalid_argument("'{name}' is null");

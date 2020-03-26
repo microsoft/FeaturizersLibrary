@@ -66,7 +66,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_IsValidCountry(/*in*/ char const 
     }
 }
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_GetSupportedCountries(/*in*/ char const *optionalDataRootDir, /*out*/ StringBuffer ** ppStringBuffers, /*out*/ std::size_t * pNumStringBuffers, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_GetSupportedCountries(/*in*/ char const *optionalDataRootDir, /*out*/ char const * const ** ppStringBuffers, /*out*/ std::size_t * pNumStringBuffers, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -91,14 +91,14 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_GetSupportedCountries(/*in*/ char
                 delete [] pData;
             }
 
-            static void StringBufferDeleter(StringBuffer *pData) {
-                delete [] pData;
-            }
+            static void StringsDeleter(char const ** pStrings) {
+                delete [] pStrings;
+            };
         };
 
         using StringUniquePtr               = std::unique_ptr<char, void (*)(char *)>;
         using StringUniquePtrs              = std::vector<std::pair<StringUniquePtr, size_t>>;
-        using StringBufferUniquePtr         = std::unique_ptr<StringBuffer, void (*)(StringBuffer *)>;
+        using StringsUniquePtr              = std::unique_ptr<char const *, void (*)(char const **)>;
         // ----------------------------------------------------------------------
 
         // Create the strings
@@ -115,20 +115,19 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_GetSupportedCountries(/*in*/ char
         }
 
         // Create the string buffer and assign the strings
-        StringBufferUniquePtr               pStringBuffers(new StringBuffer[countries.size()], Internal::StringBufferDeleter);
-        StringBuffer *                      pStringBuffersPtr(pStringBuffers.get());
+        StringsUniquePtr                    pStrings(new char const *[countries.size()], Internal::StringsDeleter);
+        char const **                       pStringsPtr(pStrings.get());
 
         for(auto const & rawInfo : rawStringInfo) {
-            pStringBuffersPtr->pString = std::get<0>(rawInfo).get();
-            pStringBuffersPtr->cCharacters = std::get<1>(rawInfo);
-            ++pStringBuffersPtr;
+            *pStringsPtr = std::get<0>(rawInfo).get();
+            ++pStringsPtr;
         }
 
         // If here, all memory was successfully allocated and we can release all pointers
         for(auto & rawInfo : rawStringInfo)
             std::get<0>(rawInfo).release();
 
-        *ppStringBuffers = pStringBuffers.release();
+        *ppStringBuffers = pStrings.release();
         *pNumStringBuffers = countries.size();
 
         return true;
@@ -139,7 +138,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_GetSupportedCountries(/*in*/ char
     }
 }
 
-FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyStringBuffers(/*in*/ StringBuffer *pStringBuffer, /*in*/ std::size_t numStringBuffers, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyStringBuffers(/*in*/ char const * const * pStringBuffer, /*in*/ std::size_t numStringBuffers, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -152,13 +151,13 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyStringBuffers(/*in*/ Strin
         if(pStringBuffer == nullptr)
             return true;
 
-        StringBuffer const *                ptr(pStringBuffer);
-        StringBuffer const * const          pEnd(ptr + numStringBuffers);
+        char const * const *                ptr(pStringBuffer);
+        char const * const * const          pEnd(ptr + numStringBuffers);
 
         while(ptr != pEnd) {
-            if(ptr->pString == nullptr || ptr->cCharacters == 0) throw std::invalid_argument("Invalid string element");
+            if(*ptr == nullptr) throw std::invalid_argument("Invalid string element");
 
-            delete [] ptr->pString;
+            delete [] *ptr;
             ++ptr;
         }
 

@@ -98,11 +98,7 @@ void DateTimeFeaturizer_Test(
         REQUIRE(DateTimeFeaturizer_Transform(pTransformerHandle, CreateDateTimeParameter(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(result);
-        #else
         results.emplace_back(result);
-        #endif
         // No inline destroy statement
     }
 

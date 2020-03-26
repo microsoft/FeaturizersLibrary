@@ -120,7 +120,7 @@ class TypeVisitor(Interface.Interface):
 
         func, expected_num_template_args = container_info
 
-        template_args = cls._GetTemplateArgs(match.group("template"))
+        template_args = GetTemplateArgs(match.group("template"))
         if len(template_args) != expected_num_template_args:
             raise Exception(
                 "'{}' was expected to have {} template arg(s)".format(
@@ -235,49 +235,48 @@ class TypeVisitor(Interface.Interface):
 
     # TODO: Tensor
 
-    # ----------------------------------------------------------------------
-    # ----------------------------------------------------------------------
-    # ----------------------------------------------------------------------
-    @staticmethod
-    def _GetTemplateArgs(template):
-        # Get the template args delimited by comma. Take into account nested pairing tokens.
-        bracket_count = 0
-        brace_count = 0
-        paren_count = 0
-        template_count = 0
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+def GetTemplateArgs(template):
+    # Get the template args delimited by comma. Take into account nested pairing tokens.
+    bracket_count = 0
+    brace_count = 0
+    paren_count = 0
+    template_count = 0
 
-        template_args = []
-        prev_index = 0
+    template_args = []
+    prev_index = 0
 
-        for index, char in enumerate(template):
-            if char == "[":
-                bracket_count += 1
-            elif char == "]":
-                assert bracket_count
-                bracket_count -= 1
-            elif char == "{":
-                brace_count += 1
-            elif char == "}":
-                assert brace_count
-                brace_count -= 1
-            elif char == "(":
-                paren_count += 1
-            elif char == ")":
-                assert paren_count
-                paren_count -= 1
-            elif char == "<":
-                template_count += 1
-            elif char == ">":
-                assert template_count
-                template_count -= 1
-            elif char == ",":
-                if bracket_count or brace_count or paren_count or template_count:
-                    continue
+    for index, char in enumerate(template):
+        if char == "[":
+            bracket_count += 1
+        elif char == "]":
+            assert bracket_count
+            bracket_count -= 1
+        elif char == "{":
+            brace_count += 1
+        elif char == "}":
+            assert brace_count
+            brace_count -= 1
+        elif char == "(":
+            paren_count += 1
+        elif char == ")":
+            assert paren_count
+            paren_count -= 1
+        elif char == "<":
+            template_count += 1
+        elif char == ">":
+            assert template_count
+            template_count -= 1
+        elif char == ",":
+            if bracket_count or brace_count or paren_count or template_count:
+                continue
 
-                template_args.append(template[prev_index:index].strip())
-                prev_index = index + 1
+            template_args.append(template[prev_index:index].strip())
+            prev_index = index + 1
 
-        if prev_index < len(template):
-            template_args.append(template[prev_index:])
+    if prev_index < len(template):
+        template_args.append(template[prev_index:].strip())
 
-        return template_args
+    return template_args

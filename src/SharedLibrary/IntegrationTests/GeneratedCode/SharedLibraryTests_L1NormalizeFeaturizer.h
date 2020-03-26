@@ -93,19 +93,15 @@ void L1NormalizeFeaturizer_int8_Test(
 
     for(auto const & input : inference_input) {
         std::double_t * result_ptr(nullptr);
-        std::size_t result_elements(0);
+        std::size_t result_items(0);
 
-        REQUIRE(L1NormalizeFeaturizer_int8_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int8_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #else
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #endif
+        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_int8_DestroyTransformedData(result_ptr, result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -200,19 +196,15 @@ void L1NormalizeFeaturizer_int16_Test(
 
     for(auto const & input : inference_input) {
         std::double_t * result_ptr(nullptr);
-        std::size_t result_elements(0);
+        std::size_t result_items(0);
 
-        REQUIRE(L1NormalizeFeaturizer_int16_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int16_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #else
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #endif
+        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_int16_DestroyTransformedData(result_ptr, result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -307,19 +299,15 @@ void L1NormalizeFeaturizer_int32_Test(
 
     for(auto const & input : inference_input) {
         std::double_t * result_ptr(nullptr);
-        std::size_t result_elements(0);
+        std::size_t result_items(0);
 
-        REQUIRE(L1NormalizeFeaturizer_int32_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int32_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #else
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #endif
+        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_int32_DestroyTransformedData(result_ptr, result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -414,19 +402,15 @@ void L1NormalizeFeaturizer_int64_Test(
 
     for(auto const & input : inference_input) {
         std::double_t * result_ptr(nullptr);
-        std::size_t result_elements(0);
+        std::size_t result_items(0);
 
-        REQUIRE(L1NormalizeFeaturizer_int64_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int64_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #else
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #endif
+        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_int64_DestroyTransformedData(result_ptr, result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -521,19 +505,15 @@ void L1NormalizeFeaturizer_uint8_Test(
 
     for(auto const & input : inference_input) {
         std::double_t * result_ptr(nullptr);
-        std::size_t result_elements(0);
+        std::size_t result_items(0);
 
-        REQUIRE(L1NormalizeFeaturizer_uint8_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint8_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #else
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #endif
+        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_uint8_DestroyTransformedData(result_ptr, result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -628,19 +608,15 @@ void L1NormalizeFeaturizer_uint16_Test(
 
     for(auto const & input : inference_input) {
         std::double_t * result_ptr(nullptr);
-        std::size_t result_elements(0);
+        std::size_t result_items(0);
 
-        REQUIRE(L1NormalizeFeaturizer_uint16_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint16_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #else
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #endif
+        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_uint16_DestroyTransformedData(result_ptr, result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -735,19 +711,15 @@ void L1NormalizeFeaturizer_uint32_Test(
 
     for(auto const & input : inference_input) {
         std::double_t * result_ptr(nullptr);
-        std::size_t result_elements(0);
+        std::size_t result_items(0);
 
-        REQUIRE(L1NormalizeFeaturizer_uint32_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint32_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #else
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #endif
+        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_uint32_DestroyTransformedData(result_ptr, result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -842,19 +814,15 @@ void L1NormalizeFeaturizer_uint64_Test(
 
     for(auto const & input : inference_input) {
         std::double_t * result_ptr(nullptr);
-        std::size_t result_elements(0);
+        std::size_t result_items(0);
 
-        REQUIRE(L1NormalizeFeaturizer_uint64_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint64_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #else
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #endif
+        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_uint64_DestroyTransformedData(result_ptr, result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -949,19 +917,15 @@ void L1NormalizeFeaturizer_float_Test(
 
     for(auto const & input : inference_input) {
         std::double_t * result_ptr(nullptr);
-        std::size_t result_elements(0);
+        std::size_t result_items(0);
 
-        REQUIRE(L1NormalizeFeaturizer_float_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_float_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #else
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #endif
+        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_float_DestroyTransformedData(result_ptr, result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_float_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1056,19 +1020,15 @@ void L1NormalizeFeaturizer_double_Test(
 
     for(auto const & input : inference_input) {
         std::double_t * result_ptr(nullptr);
-        std::size_t result_elements(0);
+        std::size_t result_items(0);
 
-        REQUIRE(L1NormalizeFeaturizer_double_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_double_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #else
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_elements));
-        #endif
+        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_double_DestroyTransformedData(result_ptr, result_elements, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_double_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
