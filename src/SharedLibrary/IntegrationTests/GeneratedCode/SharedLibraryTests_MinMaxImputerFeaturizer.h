@@ -98,11 +98,7 @@ void MinMaxImputerFeaturizer_int8_Test(
         REQUIRE(MinMaxImputerFeaturizer_int8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -202,11 +198,7 @@ void MinMaxImputerFeaturizer_int16_Test(
         REQUIRE(MinMaxImputerFeaturizer_int16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -306,11 +298,7 @@ void MinMaxImputerFeaturizer_int32_Test(
         REQUIRE(MinMaxImputerFeaturizer_int32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -410,11 +398,7 @@ void MinMaxImputerFeaturizer_int64_Test(
         REQUIRE(MinMaxImputerFeaturizer_int64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -514,11 +498,7 @@ void MinMaxImputerFeaturizer_uint8_Test(
         REQUIRE(MinMaxImputerFeaturizer_uint8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -618,11 +598,7 @@ void MinMaxImputerFeaturizer_uint16_Test(
         REQUIRE(MinMaxImputerFeaturizer_uint16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -722,11 +698,7 @@ void MinMaxImputerFeaturizer_uint32_Test(
         REQUIRE(MinMaxImputerFeaturizer_uint32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -826,11 +798,7 @@ void MinMaxImputerFeaturizer_uint64_Test(
         REQUIRE(MinMaxImputerFeaturizer_uint64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -930,11 +898,7 @@ void MinMaxImputerFeaturizer_float_Test(
         REQUIRE(MinMaxImputerFeaturizer_float_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -1034,11 +998,7 @@ void MinMaxImputerFeaturizer_double_Test(
         REQUIRE(MinMaxImputerFeaturizer_double_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
         results.emplace_back(std::move(result));
-        #endif
         // No inline destroy statement
     }
 
@@ -1132,17 +1092,13 @@ void MinMaxImputerFeaturizer_bool_Test(
 
     results.reserve(inference_input.size());
 
-    for(auto const & input : inference_input) {
+    for(bool input : inference_input) {
         bool result;
 
         REQUIRE(MinMaxImputerFeaturizer_bool_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(std::move(result));
-        #else
-        results.emplace_back(std::move(result));
-        #endif
+        results.push_back(result);
         // No inline destroy statement
     }
 
@@ -1238,19 +1194,14 @@ void MinMaxImputerFeaturizer_string_Test(
 
     for(auto const & input : inference_input) {
         char const * result_ptr(nullptr);
-        std::size_t result_items(0);
 
-        REQUIRE(MinMaxImputerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(MinMaxImputerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(result_ptr ? std::string(result_ptr) : std::string());
-        #else
         results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
-        #endif
         
         // Destroy the contents
-        REQUIRE(MinMaxImputerFeaturizer_string_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(MinMaxImputerFeaturizer_string_DestroyTransformedData(result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 

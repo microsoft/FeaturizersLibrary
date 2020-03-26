@@ -20,7 +20,7 @@ void TestImpl(std::vector<std::vector<std::vector<std::string>>> trainingBatches
               nonstd::optional<std::uint8_t> cv){
 
     using SGDEstimator = NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>;
-    SGDEstimator                                        estimator(NS::CreateTestAnnotationMapsPtr(1), 0, windowSize, lags, maxHorizon, cv);
+    SGDEstimator                                        estimator(NS::CreateTestAnnotationMapsPtr(1), 0, windowSize, std::make_tuple(lags.begin(), lags.end()), maxHorizon, cv);
 
     NS::TestHelpers::Train<SGDEstimator, std::vector<std::string>>(estimator, trainingBatches);
     SGDEstimator::TransformerUniquePtr                  pTransformer(estimator.create_transformer());
@@ -48,8 +48,8 @@ TEST_CASE("Invalid Transformer/Estimator") {
     std::uint8_t maxHorizon = 1;
     nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
 
-    CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 2, windowSize, lags, maxHorizon, cv), "colIndex");
-    CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, windowSize, lags, maxHorizon, cv), "lags");
+    CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 2, windowSize, std::make_tuple(lags.begin(), lags.end()), maxHorizon, cv), "colIndex");
+    CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, windowSize, std::make_tuple(lags.begin(), lags.end()), maxHorizon, cv), "lags");
 }
 
 TEST_CASE("Standard Test") {

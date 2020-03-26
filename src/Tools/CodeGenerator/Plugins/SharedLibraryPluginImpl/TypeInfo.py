@@ -5,6 +5,7 @@
 """Contains the TypeInfo object"""
 
 import os
+import re
 
 import CommonEnvironment
 from CommonEnvironment import Interface
@@ -23,14 +24,32 @@ class TypeInfo(Interface.Interface):
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
+    class Type(object):
+        # ----------------------------------------------------------------------
+        def __init__(self, type, name):
+            self.Type                       = type
+            self.Name                       = name
+
+        # ----------------------------------------------------------------------
+        def __repr__(self):
+            return CommonEnvironment.ObjectReprImpl(self)
+
+    # ----------------------------------------------------------------------
     class Result(object):
         """Result information about a type when it is used in various scenarios."""
 
         # ----------------------------------------------------------------------
-        def __init__(self, parameter_decl, validation_statements, invocation_statements):
-            self.ParameterDecl              = parameter_decl
+        def __init__(
+            self,
+            parameters,
+            validation_statements,
+            invocation_statements,
+            input_buffer_type=None,
+        ):
+            self.Parameters                 = parameters
             self.ValidationStatements       = validation_statements
             self.InvocationStatements       = invocation_statements
+            self.InputBufferType            = input_buffer_type
 
         # ----------------------------------------------------------------------
         def __repr__(self):
@@ -73,6 +92,11 @@ class TypeInfo(Interface.Interface):
         return CommonEnvironment.ObjectReprImpl(self)
 
     # ----------------------------------------------------------------------
+    @Interface.extensionmethod
+    def GetCppTemplateSuffix(self, template_mapping):
+        return self.CppType
+
+    # ----------------------------------------------------------------------
     @Interface.abstractmethod
     def GetInputInfo(self, arg_name, invocation_template):
         """\
@@ -100,7 +124,7 @@ class TypeInfo(Interface.Interface):
         self,
         arg_name,
         result_name="result",
-        is_struct_member=False,
+        suppress_pointer=False,
     ):
         """\
         Returns information about the type when used as an output argument.
@@ -122,3 +146,36 @@ class TypeInfo(Interface.Interface):
         Return `None` if no explicit destruction functionality is required.
         """
         raise Exception("Abstract method")
+
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+
+    # Some types generate complicated buffers to store incoming data while
+    # others simply provide the pointer and items. Handle both scenarios by
+    # generating the content with an easily-recognizable string; extract
+    # the content within the string for later use, and then remove it from
+    # the invocation contents.
+    _InvocationTemplate                     = "*****{}*****"
+
+    # ----------------------------------------------------------------------
+    _invocation_statement_regex             = re.compile(
+        r"\*\*\*\*\*(?P<content>.+)\*\*\*\*\*",
+        re.DOTALL | re.MULTILINE,
+    )
+
+    @classmethod
+    def _ExtractDecoratedInvocationStatements(cls, invocation_statements):
+        """\
+        Returns a decorated invocation statement and tuple containing invocation instructions
+        """
+
+        match = cls._invocation_statement_regex.search(invocation_statements)
+        assert match, invocation_statements
+
+        invocation_tuple = [item.strip() for item in match.group("content").split(",")]
+        assert len(invocation_tuple) == 2, invocation_tuple
+
+        invocation_statements = invocation_statements[:match.start()].rstrip()
+
+        return invocation_statements, invocation_tuple

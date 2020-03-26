@@ -42,22 +42,26 @@ class MatrixTypeInfo(TypeInfo):
         create_type_info_func=None,
         **kwargs
     ):
-        if member_type is not None:
-            assert create_type_info_func is not None
+        if member_type is None:
+            return
 
-            super(MatrixTypeInfo, self).__init__(*args, **kwargs)
+        assert create_type_info_func is not None
 
-            match = self.TypeName.match(member_type)
-            assert match, member_type
+        super(MatrixTypeInfo, self).__init__(*args, **kwargs)
 
-            the_type = match.group("type")
+        match = self.TypeName.match(member_type)
+        assert match, member_type
 
-            type_info = create_type_info_func(the_type)
+        the_type = match.group("type")
 
-            if type_info.IsOptional:
+        type_info = create_type_info_func(the_type)
+
+        if type_info.IsOptional:
+            # Support optional floats and doubles, as the optionality is built directly into the type itself
+            if type_info.TypeName not in ["float", "double"]:
                 raise Exception("Matrix types do not currently support optional values ('{}')".format(the_type))
 
-            self._type_info                 = type_info
+        self._type_info                 = type_info
 
     # ----------------------------------------------------------------------
     @Interface.override

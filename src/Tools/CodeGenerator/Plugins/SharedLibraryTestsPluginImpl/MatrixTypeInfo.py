@@ -41,24 +41,34 @@ class MatrixTypeInfo(TypeInfo):
         create_type_info_func=None,
         **kwargs,
     ):
-        if member_type is not None:
-            assert create_type_info_func is not None
+        if member_type is None:
+            return
 
-            super(MatrixTypeInfo, self).__init__(*args, **kwargs)
+        assert create_type_info_func is not None
 
-            match = self.TypeName.match(member_type)
-            assert match, member_type
+        super(MatrixTypeInfo, self).__init__(*args, **kwargs)
 
-            the_type = match.group("type")
+        match = self.TypeName.match(member_type)
+        assert match, member_type
 
-            type_info = create_type_info_func(the_type)
-            if not hasattr(type_info, "CType"):
-                raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a vector".format(the_type))
+        the_type = match.group("type")
 
-            if type_info.IsOptional:
+        type_info = create_type_info_func(the_type)
+        if not hasattr(type_info, "CType"):
+            raise Exception("'{}' is a type that can't be directly expressed in C and therefore cannot be used with a vector".format(the_type))
+
+        if type_info.IsOptional:
+            # Support optional floats and doubles, as the optionality is built directly into the type itself
+            if type_info.CType not in ["float", "double"]:
                 raise Exception("Matrix types do not currently support optional values ('{}')".format(the_type))
 
-            self._type_info                 = type_info
+        self._type_info                 = type_info
+
+        # Override the CppType property with this type info
+        self._matrix_type               = "Eigen::MatrixX<{}>".format(self._type_info.CppType);
+        self._map_type                  = "Eigen::Map<{}>".format(self._matrix_type)
+
+        self.CppType                    = self._map_type
 
     # ----------------------------------------------------------------------
     @Interface.override
@@ -96,11 +106,7 @@ class MatrixTypeInfo(TypeInfo):
             ),
             textwrap.dedent(
                 """\
-                #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-                results.push_back(Eigen::Map<Eigen::MatrixX<{type}>>({name}_ptr, static_cast<Eigen::Index>({name}_cols), static_cast<Eigen::Index>({name}_rows)));
-                #else
                 results.emplace_back(Eigen::Map<Eigen::MatrixX<{type}>>({name}_ptr, static_cast<Eigen::Index>({name}_cols), static_cast<Eigen::Index>({name}_rows)));
-                #endif
                 """,
             ).format(
                 type=self._type_info.CppType,

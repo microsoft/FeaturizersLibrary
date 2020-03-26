@@ -4,7 +4,6 @@ featurizers:
     estimator_name: GrainedAnalyticalRollingWindowEstimator
     release_version: 0.4.0
     num_output_columns: 1
-    has_dynamic_output: false
     description: |-
         Calculates data based on a rolling window. Currently supports mean. Works for any data set that is already sorted.
 
@@ -56,7 +55,7 @@ featurizers:
             - double
 
     type_mappings:
-      - input_type: tuple<vector<string>, T>
+      - input_type: tuple<unique_id, T>
         output_type: vector<double?>
         description: A vector of size horizon will always be output, but the individual elements could be NaN.
 
@@ -136,8 +135,6 @@ featurizers:
     type_mappings:
       - input_type: T?
         output_type: T
-
-    status: Pending
 
   # ----------------------------------------------------------------------
   - name: CatImputerFeaturizer
@@ -501,8 +498,6 @@ featurizers:
     type_mappings:
       - input_type: T?
         output_type: T
-
-    status: Pending
 
   # ----------------------------------------------------------------------
   - name: FromStringFeaturizer
@@ -1274,8 +1269,10 @@ featurizers:
       Examples:
         todo:
 
+    featurizer_is_a_template: true
+
     type_mappings:
-      - input_type: vector<string>
+      - input_type: unique_id
         output_type: bool
 
     configuration_params:
@@ -1298,7 +1295,6 @@ featurizers:
     estimator_name: GrainedSimpleRollingWindowEstimator
     release_version: 0.4.0
     num_output_columns: 1
-    has_dynamic_output: false
     description: |-
       Calculates data based on a rolling window. Currently supports minimum and maximum. Works for any data set that is already sorted.
 
@@ -1346,18 +1342,18 @@ featurizers:
           - uint16
           - uint32
           - uint64
+          - bool
           - float
           - double
-          - bool
           - string
 
     type_mappings:
-      - input_type: tuple<vector<string>, T>
+      - input_type: tuple<unique_id, T>
         output_type: vector<T?>
         description: A vector of size horizon will always be output, but the individual elements could be NaN.
 
     custom_enums:
-      - name: SimpleWindowCalculation
+      - name: SimpleRollingWindowCalculation
         description: What calculation to use on the rolling window.
         values: [Min, Max]
         underlying_type: uint8
@@ -1700,20 +1696,21 @@ featurizers:
     templates:
       - name: T
         types:
-          - int8
-          - int16
-          - int32
-          - int64
-          - uint8
-          - uint16
-          - uint32
-          - uint64
+          # TODO - int8
+          # TODO - int16
+          # TODO - int32
+          # TODO - int64
+          # TODO - uint8
+          # TODO - uint16
+          # TODO - uint32
+          # TODO - uint64
           - float
           - double
+          # TODO: string
 
     type_mappings:
-      - input_type: tuple<vector<string>, T>
-        output_type: tuple<vector<string>,matrix<T?>>
+      - input_type: tuple<unique_id, T>
+        output_type: tuple<unique_id, matrix<T?>>
 
     configuration_params:
       - type: uint32

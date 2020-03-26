@@ -28,7 +28,7 @@ extern "C" {
 /* |  CountVectorizerFeaturizer */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateEstimator(/*in*/ bool lower, /*in*/ uint8_t analyzer, /*in*/ char const *regexToken, /*in*/ float maxDf, /*in*/ float minDf, /*in*/ uint32_t const * topKTerms, /*in*/ uint32_t ngramRangeMin, /*in*/ uint32_t ngramRangeMax, /*in*/ bool binary, /*out*/ CountVectorizerFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateEstimator(/*in*/ bool lower, /*in*/ uint8_t analyzer, /*in*/ char const * regexToken, /*in*/ float maxDf, /*in*/ float minDf, /*in*/ uint32_t const * topKTerms, /*in*/ uint32_t ngramRangeMin, /*in*/ uint32_t ngramRangeMax, /*in*/ bool binary, /*out*/ CountVectorizerFeaturizer_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -42,7 +42,6 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateEstimator(/*in*/ boo
 
         size_t index(g_pointerTable.Add(pEstimator));
         *ppHandle = reinterpret_cast<CountVectorizerFeaturizer_EstimatorHandle*>(index);
-
 
     
         return true;
@@ -120,7 +119,7 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_IsTrainingComplete(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Fit(/*in*/ CountVectorizerFeaturizer_EstimatorHandle *pHandle, /*in*/ char const *input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Fit(/*in*/ CountVectorizerFeaturizer_EstimatorHandle *pHandle, /*in*/ char const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -130,11 +129,9 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Fit(/*in*/ CountVectorizer
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
         if(input == nullptr) throw std::invalid_argument("'input' is null");
 
         Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<>>(reinterpret_cast<size_t>(pHandle)));
-
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
@@ -146,7 +143,7 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Fit(/*in*/ CountVectorizer
     }
 }
 
-FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_FitBuffer(/*in*/ CountVectorizerFeaturizer_EstimatorHandle *pHandle, /*in*/ char const * const * input_ptr, /*in*/ std::size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_FitBuffer(/*in*/ CountVectorizerFeaturizer_EstimatorHandle *pHandle, /*in*/ char const * const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -156,8 +153,6 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_FitBuffer(/*in*/ CountVect
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-
-
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -165,14 +160,8 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_FitBuffer(/*in*/ CountVect
 
         input_buffer.reserve(input_items);
 
-        char const * const * const input_end(input_ptr + input_items);
-
-        while(input_ptr != input_end) {
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-            input_buffer.push_back(*input_ptr);
-        #else
+        while(input_buffer.size() < input_items) {
             input_buffer.emplace_back(*input_ptr);
-        #endif
             ++input_ptr;
         }
 
@@ -240,12 +229,9 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateTransformerFromEstim
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-
-
         Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
         Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<>::TransformerType*>(estimator.create_transformer().release());
-
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<CountVectorizerFeaturizer_TransformerHandle*>(index);
@@ -258,7 +244,7 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateTransformerFromEstim
     }
 }
 
-FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ std::size_t cBufferSize, /*out*/ CountVectorizerFeaturizer_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateTransformerFromSavedData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ CountVectorizerFeaturizer_TransformerHandle **ppTransformerHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -297,7 +283,6 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_DestroyTransformer(/*in*/ 
         Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
-
         delete pTransformer;
     
         return true;
@@ -308,7 +293,7 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_DestroyTransformer(/*in*/ 
     }
 }
 
-FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateTransformerSaveData(/*in*/ CountVectorizerFeaturizer_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ std::size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateTransformerSaveData(/*in*/ CountVectorizerFeaturizer_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -341,7 +326,7 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_CreateTransformerSaveData(
     }
 }
 
-FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Transform(/*in*/ CountVectorizerFeaturizer_TransformerHandle *pHandle, /*in*/ char const *input, /*out*/ uint64_t * output_numElements, /*out*/ uint64_t * output_numValues, /*out*/ uint32_t **output_values, /*out*/ uint64_t **output_indexes, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Transform(/*in*/ CountVectorizerFeaturizer_TransformerHandle *pHandle, /*in*/ char const * input, /*out*/ uint64_t * output_numElements, /*out*/ uint64_t * output_numValues, /*out*/ uint32_t ** output_values, /*out*/ uint64_t ** output_indexes, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -349,7 +334,6 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Transform(/*in*/ CountVect
         *ppErrorInfo = nullptr;
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
-
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
         if(output_numElements == nullptr) throw std::invalid_argument("'output_numElements' is null");
@@ -359,8 +343,10 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Transform(/*in*/ CountVect
 
         Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<>::TransformedType;
+
         // Input
-        auto result(transformer.execute(input));
+        TransformedType result(transformer.execute(input));
 
         // Output
         std::unique_ptr<std::uint32_t []> pValues(new std::uint32_t [result.Values.size()]);
@@ -388,7 +374,86 @@ FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Transform(/*in*/ CountVect
     }
 }
 
-FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_DestroyTransformedData(/*in*/ uint64_t result_numElements, /*in*/ uint64_t result_numValues, /*in*/ uint32_t const * result_values, /*in*/ uint64_t const * result_indexes, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_Flush(/*in*/ CountVectorizerFeaturizer_TransformerHandle *pHandle, /*out*/ uint64_t ** output_item_numElements_ptr, /*out*/ uint64_t ** output_item_numValues_ptr, /*out*/ uint32_t *** output_item_values_ptr, /*out*/ uint64_t *** output_item_indexes_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
+
+        if(output_item_numElements_ptr == nullptr) throw std::invalid_argument("'output_item_numElements_ptr' is null");
+        if(output_item_numValues_ptr == nullptr) throw std::invalid_argument("'output_item_numValues_ptr' is null");
+        if(output_item_values_ptr == nullptr) throw std::invalid_argument("'output_item_values_ptr' is null");
+        if(output_item_indexes_ptr == nullptr) throw std::invalid_argument("'output_item_indexes_ptr' is null");
+        if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
+
+        Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::CountVectorizerEstimator<>::TransformedType;
+
+        std::vector<TransformedType> result;
+
+        auto const callback(
+            [&result](TransformedType value) {
+                result.emplace_back(std::move(value));
+            }
+        );
+
+        transformer.flush(callback);
+
+        // Output
+        // TODO: There are potential memory leaks if allocation fails
+        *output_item_numElements_ptr = new uint64_t[result.size()];
+        *output_item_numValues_ptr = new uint64_t[result.size()];
+        *output_item_values_ptr = new uint32_t *[result.size()];
+        *output_item_indexes_ptr = new uint64_t *[result.size()];
+        *output_items = result.size();
+
+        uint64_t * output_item_numElements(*output_item_numElements_ptr);
+        uint64_t * output_item_numValues(*output_item_numValues_ptr);
+        uint32_t ** output_item_values(*output_item_values_ptr);
+        uint64_t ** output_item_indexes(*output_item_indexes_ptr);
+
+        for(auto const & result_item : result) {
+            if(output_item_numElements == nullptr) throw std::invalid_argument("'output_item_numElements' is null");
+            if(output_item_numValues == nullptr) throw std::invalid_argument("'output_item_numValues' is null");
+            if(output_item_values == nullptr) throw std::invalid_argument("'output_item_values' is null");
+            if(output_item_indexes == nullptr) throw std::invalid_argument("'output_item_indexes' is null");
+
+            std::unique_ptr<std::uint32_t []> pValues(new std::uint32_t [result_item.Values.size()]);
+            std::unique_ptr<uint64_t []> pIndexes(new uint64_t [result_item.Values.size()]);
+
+            std::uint32_t * pValue(pValues.get());
+            uint64_t * pIndex(pIndexes.get());
+
+            for(auto const & encoding : result_item.Values) {
+                *pValue++ = encoding.Value;
+                *pIndex++ = encoding.Index;
+            }
+
+            *output_item_numElements = result_item.NumElements;
+            *output_item_numValues = result_item.Values.size();
+
+            *output_item_values = pValues.release();
+            *output_item_indexes = pIndexes.release();
+
+            ++output_item_numElements;
+            ++output_item_numValues;
+            ++output_item_values;
+            ++output_item_indexes;
+        }
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool CountVectorizerFeaturizer_DestroyTransformedData(/*out*/ uint64_t result_numElements, /*out*/ uint64_t result_numValues, /*out*/ uint32_t const * result_values, /*out*/ uint64_t const * result_indexes, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 

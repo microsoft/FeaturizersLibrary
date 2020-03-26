@@ -52,7 +52,7 @@ class _ScalarTypeInfo(TypeInfo):
             invocation_statement = invocation_template.format(arg_name)
 
         return self.Result(
-            ["/*in*/ {} {}".format(input_type, arg_name)],
+            [self.Type(input_type, arg_name)],
             None,                           # No validation
             invocation_statement,
         )
@@ -60,7 +60,7 @@ class _ScalarTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     @Interface.override
     def GetInputBufferInfo(self, arg_name, invocation_template):
-        if self.IsOptional:
+        if self.IsOptional and self.CType not in ["double", "float"]:
             input_type = "{} const * const *".format(self.CType)
 
             validation_suffix = textwrap.dedent(
@@ -69,14 +69,8 @@ class _ScalarTypeInfo(TypeInfo):
 
                 {name}_buffer.reserve({name}_items);
 
-                {cpp_type} const * const * const {name}_end({name}_ptr + {name}_items);
-
-                while({name}_ptr != {name}_end) {{
-                #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-                    {name}_buffer.push_back(*{name}_ptr ? **{name}_ptr : Microsoft::Featurizer::Traits<{cpp_type}>::CreateNullValue());
-                #else
+                while({name}_buffer.size() < {name}_items) {{
                     {name}_buffer.emplace_back(*{name}_ptr ? **{name}_ptr : Microsoft::Featurizer::Traits<{cpp_type}>::CreateNullValue());
-                #endif
                     ++{name}_ptr;
                 }}
                 """,
@@ -91,6 +85,11 @@ class _ScalarTypeInfo(TypeInfo):
                 ),
             )
 
+            buffer_type = self.Type(
+                "std::vector<Microsoft::Featurizer::Traits<{}>::nullable_type>".format(self.CppType),
+                "{}_buffer".format(arg_name),
+            )
+
         else:
             input_type = "{} const *".format(self.CType)
             validation_suffix = None
@@ -100,15 +99,15 @@ class _ScalarTypeInfo(TypeInfo):
                 ),
             )
 
+            buffer_type = self.Type(
+                "{} const *".format(self.CType),
+                "{}_ptr".format(arg_name),
+            )
+
         return self.Result(
             [
-                "/*in*/ {type} {name}_ptr".format(
-                    type=input_type,
-                    name=arg_name,
-                ),
-                "/*in*/ std::size_t {name}_items".format(
-                    name=arg_name,
-                ),
+                self.Type(input_type, "{}_ptr".format(arg_name)),
+                self.Type("size_t", "{}_items".format(arg_name)),
             ],
             textwrap.dedent(
                 """\
@@ -123,6 +122,7 @@ class _ScalarTypeInfo(TypeInfo):
                 ) if validation_suffix else "",
             ),
             invocation_statement,
+            input_buffer_type=buffer_type,
         )
 
     # ----------------------------------------------------------------------
@@ -131,20 +131,22 @@ class _ScalarTypeInfo(TypeInfo):
         self,
         arg_name,
         result_name="result",
-        is_struct_member=False,
+        suppress_pointer=False,
     ):
         return self.Result(
             [
-                "/*out*/ {}{} {}".format(
-                    self.CType,
-                    "" if is_struct_member else " *",
+                self.Type(
+                    "{}{}".format(
+                        self.CType,
+                        "" if suppress_pointer else " *",
+                    ),
                     arg_name,
                 ),
             ],
             """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
                 name=arg_name,
             ),
-            "{}{} = {};".format("" if is_struct_member else "*", arg_name, result_name),
+            "{}{} = {};".format("" if suppress_pointer else "*", arg_name, result_name),
         )
 
     # ----------------------------------------------------------------------
