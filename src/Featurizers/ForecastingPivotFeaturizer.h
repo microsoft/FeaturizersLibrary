@@ -66,7 +66,7 @@ private:
     // MSVC runs into problems when the declaration and definition are separated
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
         if (input.empty()) {
-            throw std::invalid_argument("No input is given for ForecastingPivotFeaturizer!");
+            return;
         }
         
         std::vector<typename Microsoft::Featurizer::Traits<InputT>::nullable_type> ret;

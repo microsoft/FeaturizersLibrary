@@ -16,21 +16,6 @@ namespace NS = Microsoft::Featurizer;
 #   pragma clang diagnostic ignored "-Wfloat-equal"
 #endif
 
-TEST_CASE("Invalid transformer input") {
-    using InputType       = std::double_t;
-    using NullableType    = NS::Traits<InputType>::nullable_type;
-    using TransformedType = std::vector<NullableType>;
-
-    std::vector<TransformedType> ret;
-    auto const              callback(
-        [&ret](TransformedType value) {
-            ret.emplace_back(value);
-        }
-    );
-    
-    CHECK_THROWS_WITH(NS::Featurizers::ForecastingPivotTransformer<InputType>().execute({}, callback), "No input is given for ForecastingPivotFeaturizer!");
-}
-
 TEST_CASE("One matrix of double") {
     using InputType       = std::double_t;
     using NullableType    = NS::Traits<InputType>::nullable_type;
