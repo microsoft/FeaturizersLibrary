@@ -22,7 +22,7 @@ TEST_CASE("Standard - int64") {
             if(tp1.year != 2025) return false;
             if(tp1.month != 6) return false;
             if(tp1.day != 30) return false;
-            if(strcmp(tp1.monthLabel_ptr, "June") != 0) return false;
+            if(strcmp(tp1.monthLabel, "June") != 0) return false;
 
             // Second value
             TimePoint const &               tp2(args[1]);
@@ -30,7 +30,7 @@ TEST_CASE("Standard - int64") {
             if(tp2.year != 1976) return false;
             if(tp2.month != 11) return false;
             if(tp2.day != 17) return false;
-            if(strcmp(tp2.monthLabel_ptr, "November") != 0) return false;
+            if(strcmp(tp2.monthLabel, "November") != 0) return false;
 
             return true;
         },
@@ -56,7 +56,7 @@ TEST_CASE("Standard - string") {
             if(tp1.hour != 10) return false;
             if(tp1.minute != 23) return false;
             if(tp1.second != 1) return false;
-            if(strcmp(tp1.monthLabel_ptr, "June") != 0) return false;
+            if(strcmp(tp1.monthLabel, "June") != 0) return false;
 
             // Second value
             TimePoint const &               tp2(args[1]);
@@ -67,7 +67,7 @@ TEST_CASE("Standard - string") {
             if(tp2.hour != 21) return false;
             if(tp2.minute != 22) return false;
             if(tp2.second != 23) return false;
-            if(strcmp(tp2.monthLabel_ptr, "November") != 0) return false;
+            if(strcmp(tp2.monthLabel, "November") != 0) return false;
 
             return true;
         },
@@ -103,7 +103,7 @@ TEST_CASE("IsValidCountry") {
 
 TEST_CASE("GetSupportedCountries") {
     ErrorInfoHandle *                       pErrorInfo(nullptr);
-    StringBuffer *                          pStringBuffers(nullptr);
+    char const * const *                    pStringBuffers(nullptr);
     size_t                                  numStringBuffers;
 
     CHECK(DateTimeFeaturizer_GetSupportedCountries(nullptr, &pStringBuffers, &numStringBuffers, &pErrorInfo));
@@ -112,8 +112,8 @@ TEST_CASE("GetSupportedCountries") {
     REQUIRE(numStringBuffers != 0);
 
     // Spot check a few of the values
-    CHECK(strcmp(pStringBuffers->pString, "Argentina") == 0);
-    CHECK(strcmp((pStringBuffers + numStringBuffers - 1)->pString, "Wales") == 0);
+    CHECK(strcmp(*pStringBuffers, "Argentina") == 0);
+    CHECK(strcmp(*(pStringBuffers + numStringBuffers - 1), "Wales") == 0);
 
     CHECK(DateTimeFeaturizer_DestroyStringBuffers(pStringBuffers, numStringBuffers, &pErrorInfo));
     CHECK(pErrorInfo == nullptr);

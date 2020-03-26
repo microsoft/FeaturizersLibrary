@@ -33,6 +33,19 @@ class StringTypeInfo(TypeInfo):
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
+    def __init__(
+        self,
+        *args,
+        member_type=None,
+        create_type_info_func=None,
+        **kwargs
+    ):
+        if member_type is None:
+            return
+
+        super(StringTypeInfo, self).__init__(*args, **kwargs)
+
+    # ----------------------------------------------------------------------
     @Interface.override
     def GetInputInfo(self, arg_name, invocation_template):
         if self.IsOptional:
@@ -50,7 +63,7 @@ class StringTypeInfo(TypeInfo):
             invocation = invocation_template.format(arg_name)
 
         return self.Result(
-            ["/*in*/ char const *{}".format(arg_name)],
+            [self.Type("char const *", arg_name)],
             validation,
             invocation,
         )
@@ -59,57 +72,49 @@ class StringTypeInfo(TypeInfo):
     @Interface.override
     def GetInputBufferInfo(self, arg_name, invocation_template):
         if self.IsOptional:
+            buffer_type = "std::vector<nonstd::optional<std::string>>"
+
             validation_suffix = textwrap.dedent(
                 """\
-                std::vector<nonstd::optional<std::string>> {name}_buffer;
+                {buffer_type} {name}_buffer;
 
                 {name}_buffer.reserve({name}_items);
 
-                char const * const * const {name}_end({name}_ptr + {name}_items);
-
-                while({name}_ptr != {name}_end) {{
-                #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-                    {name}_buffer.push_back(*{name}_ptr ? *{name}_ptr : nonstd::optional<std::string>());
-                #else
+                while({name}_buffer.size() < {name}_items) {{
                     {name}_buffer.emplace_back(*{name}_ptr ? *{name}_ptr : nonstd::optional<std::string>());
-                #endif
                     ++{name}_ptr;
                 }}
                 """,
             ).format(
                 name=arg_name,
+                buffer_type=buffer_type,
             )
 
         else:
+            # In theory, this could be `std::vector<char const *>`, however there is a lot of code that
+            # expects std::string-like functionality. This is an area of potential optimization in the future.
+            buffer_type = "std::vector<std::string>"
+
             validation_suffix = textwrap.dedent(
                 """\
-                std::vector<std::string> {name}_buffer;
+                {buffer_type} {name}_buffer;
 
                 {name}_buffer.reserve({name}_items);
 
-                char const * const * const {name}_end({name}_ptr + {name}_items);
-
-                while({name}_ptr != {name}_end) {{
-                #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-                    {name}_buffer.push_back(*{name}_ptr);
-                #else
+                while({name}_buffer.size() < {name}_items) {{
                     {name}_buffer.emplace_back(*{name}_ptr);
-                #endif
                     ++{name}_ptr;
                 }}
                 """,
             ).format(
                 name=arg_name,
+                buffer_type=buffer_type,
             )
 
         return self.Result(
             [
-                "/*in*/ char const * const * {name}_ptr".format(
-                    name=arg_name,
-                ),
-                "/*in*/ std::size_t {name}_items".format(
-                    name=arg_name,
-                ),
+                self.Type("char const * const *", "{}_ptr".format(arg_name)),
+                self.Type("size_t", "{}_items".format(arg_name)),
             ],
             textwrap.dedent(
                 """\
@@ -128,6 +133,7 @@ class StringTypeInfo(TypeInfo):
                     name=arg_name,
                 ),
             ),
+            input_buffer_type=self.Type(buffer_type, "{}_buffer".format(arg_name)),
         )
 
     # ----------------------------------------------------------------------
@@ -136,23 +142,13 @@ class StringTypeInfo(TypeInfo):
         self,
         arg_name,
         result_name="result",
-        is_struct_member=False,
+        suppress_pointer=False,
     ):
         return self.Result(
-            [
-                "/*out*/ char const *{pointer} {name}_ptr".format(
-                    name=arg_name,
-                    pointer="" if is_struct_member else "*",
-                ),
-                "/*out*/ std::size_t{pointer} {name}_items".format(
-                    name=arg_name,
-                    pointer="" if is_struct_member else " *",
-                ),
-            ],
+            [self.Type("char const *{}".format("" if suppress_pointer else "*"), arg_name),],
             textwrap.dedent(
                 """\
-                if({name}_ptr == nullptr) throw std::invalid_argument("'{name}_ptr' is null");
-                if({name}_items == nullptr) throw std::invalid_argument("'{name}_items' is null");
+                if({name} == nullptr) throw std::invalid_argument("'{name}' is null");
                 """,
             ).format(
                 name=arg_name,
@@ -160,8 +156,7 @@ class StringTypeInfo(TypeInfo):
             textwrap.dedent(
                 """\
                 if({result_name}.empty()) {{
-                    {pointer}{name}_ptr = nullptr;
-                    {pointer}{name}_items = 0;
+                    {pointer}{name} = nullptr;
                 }}
                 else {{
                     char * string_buffer(new char[{result_name}.size() + 1]);
@@ -169,14 +164,13 @@ class StringTypeInfo(TypeInfo):
                     std::copy({result_name}.begin(), {result_name}.end(), string_buffer);
                     string_buffer[{result_name}.size()] = 0;
 
-                    {pointer}{name}_ptr = string_buffer;
-                    {pointer}{name}_items = {result_name}.size();
+                    {pointer}{name} = string_buffer;
                 }}
                 """,
             ).format(
                 name=arg_name,
                 result_name=result_name,
-                pointer="" if is_struct_member else "*",
+                pointer="" if suppress_pointer else "*",
             ),
         )
 
@@ -187,26 +181,12 @@ class StringTypeInfo(TypeInfo):
         arg_name="result",
     ):
         return self.Result(
-            [
-                "/*in*/ char const *{name}_ptr".format(
-                    name=arg_name,
-                ),
-                "/*in*/ std::size_t {name}_items".format(
-                    name=arg_name,
-                ),
-            ],
+            [self.Type("char const *", arg_name)],
+            "",
             textwrap.dedent(
                 """\
-                if({name}_ptr == nullptr && {name}_items != 0) throw std::invalid_argument("Invalid buffer");
-                if({name}_ptr != nullptr && {name}_items == 0) throw std::invalid_argument("Invalid buffer");
-                """,
-            ).format(
-                name=arg_name,
-            ),
-            textwrap.dedent(
-                """\
-                if({name}_ptr)
-                    delete [] {name}_ptr;
+                if({name})
+                    delete [] {name};
                 """,
             ).format(
                 name=arg_name,

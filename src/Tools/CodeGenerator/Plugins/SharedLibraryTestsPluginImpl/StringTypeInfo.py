@@ -56,26 +56,21 @@ class StringTypeInfo(TypeInfo):
             textwrap.dedent(
                 """\
                 char const * {result_name}_ptr(nullptr);
-                std::size_t {result_name}_items(0);
                 """,
             ).format(
                 result_name=result_name,
             ),
-            "&{result_name}_ptr, &{result_name}_items".format(
+            "&{result_name}_ptr".format(
                 result_name=result_name,
             ),
             textwrap.dedent(
                 """\
-                #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-                results.push_back({result}_ptr ? std::string({result}_ptr) : std::string());
-                #else
                 results.emplace_back({result}_ptr ? std::string({result}_ptr) : std::string());
-                #endif
                 """,
             ).format(
                 result=result_name,
             ),
-            "{result_name}_ptr, {result_name}_items".format(
+            "{result_name}_ptr".format(
                 result_name=result_name,
             ),
             destroy_inline=True,

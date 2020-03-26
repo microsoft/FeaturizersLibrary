@@ -99,10 +99,12 @@ SUPPORTED_TYPES                             = set(
         "string",
         "bool",
         "datetime",
+        "unique_id",
         re.compile(r"matrix\<\S+\>"),
         re.compile(r"vector\<\S+\>"),
         re.compile(r"sparse_vector\<\S+\>"),
         re.compile(r"single_value_sparse_vector\<\S+\>"),
+        re.compile(r"tuple<.+>"),
     ],
 )
 
@@ -324,14 +326,21 @@ def EntryPoint(
                             if not regex.search(mapping.input_type) and not regex.search(mapping.output_type):
                                 continue
 
-                            new_item.input_type = regex.sub(
-                                template_type,
-                                mapping.input_type,
-                            )
-                            new_item.output_type = regex.sub(
-                                template_type,
-                                mapping.output_type,
-                            )
+                            new_item.input_type = regex.sub(template_type, mapping.input_type)
+                            if new_item.input_type != mapping.input_type:
+                                new_item.input_type_template_mapping = OrderedDict(
+                                    [
+                                        (template_type, template.name),
+                                    ],
+                                )
+
+                            new_item.output_type = regex.sub(template_type, mapping.output_type)
+                            if new_item.output_type != mapping.output_type:
+                                new_item.output_type_template_mapping = OrderedDict(
+                                    [
+                                        (template_type, template.name),
+                                    ],
+                                )
 
                             # This will end up copying one more time than needed, but I couldn't think of a better way for now.
                             new_data_items.append(copy.deepcopy(new_item))

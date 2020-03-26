@@ -99,11 +99,7 @@ void PCAFeaturizer_float_Test(
         REQUIRE(PCAFeaturizer_float_Transform(pTransformerHandle, static_cast<size_t>(input.cols()), static_cast<size_t>(input.rows()), input.data(), &result_cols, &result_rows, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(Eigen::Map<Eigen::MatrixX<std::float_t>>(result_ptr, static_cast<Eigen::Index>(result_cols), static_cast<Eigen::Index>(result_rows)));
-        #else
         results.emplace_back(Eigen::Map<Eigen::MatrixX<std::float_t>>(result_ptr, static_cast<Eigen::Index>(result_cols), static_cast<Eigen::Index>(result_rows)));
-        #endif
         
         // Destroy the contents
         REQUIRE(PCAFeaturizer_float_DestroyTransformedData(result_cols, result_rows, result_ptr, &pErrorInfo));
@@ -207,11 +203,7 @@ void PCAFeaturizer_double_Test(
         REQUIRE(PCAFeaturizer_double_Transform(pTransformerHandle, static_cast<size_t>(input.cols()), static_cast<size_t>(input.rows()), input.data(), &result_cols, &result_rows, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        #if (defined __apple_build_version__ || defined __GNUC__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)))
-        results.push_back(Eigen::Map<Eigen::MatrixX<std::double_t>>(result_ptr, static_cast<Eigen::Index>(result_cols), static_cast<Eigen::Index>(result_rows)));
-        #else
         results.emplace_back(Eigen::Map<Eigen::MatrixX<std::double_t>>(result_ptr, static_cast<Eigen::Index>(result_cols), static_cast<Eigen::Index>(result_rows)));
-        #endif
         
         // Destroy the contents
         REQUIRE(PCAFeaturizer_double_DestroyTransformedData(result_cols, result_rows, result_ptr, &pErrorInfo));

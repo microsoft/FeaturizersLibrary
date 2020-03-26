@@ -176,6 +176,12 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                         args=output_statement_info.DestroyArgs,
                     )
 
+            if type_info_data.InputTypeInfo.TypeName == "bool":
+                # vector<bool> isn't actually a bool, so we can't take a direct reference to it
+                for_loop = "for(bool input : inference_input)"
+            else:
+                for_loop = "for(auto const & input : inference_input)"
+
             f.write(
                 textwrap.dedent(
                     """\
@@ -259,7 +265,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
 
                         results.reserve(inference_input.size());
 
-                        for(auto const & input : inference_input) {{
+                        {for_loop} {{
                             {transform_vars}
 
                             REQUIRE({name}{suffix}Transform(pTransformerHandle, {transform_input_args}, {transform_output_args}, &pErrorInfo));
@@ -288,6 +294,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                     constructor_params=constructor_params,
                     constructor_args=constructor_args,
                     fit_input_args=transform_input_args,
+                    for_loop=for_loop,
                     transform_vars=StringHelpers.LeftJustify(
                         output_statement_info.TransformVars.rstrip(),
                         8,
@@ -407,6 +414,8 @@ class TypeInfoData(object):
             from Plugins.SharedLibraryTestsPluginImpl.SparseVectorTypeInfo import SparseVectorTypeInfo
             from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfo import StringTypeInfo
             from Plugins.SharedLibraryTestsPluginImpl import StructTypeInfos
+            from Plugins.SharedLibraryTestsPluginImpl.TupleTypeInfo import TupleTypeInfo
+            from Plugins.SharedLibraryTestsPluginImpl.UniqueIdTypeInfo import UniqueIdTypeInfo
             from Plugins.SharedLibraryTestsPluginImpl.VectorTypeInfo import VectorTypeInfo
 
             type_info_classes = [
@@ -415,6 +424,8 @@ class TypeInfoData(object):
                 SingleValueSparseVectorTypeInfo,
                 SparseVectorTypeInfo,
                 StringTypeInfo,
+                TupleTypeInfo,
+                UniqueIdTypeInfo,
                 VectorTypeInfo,
             ]
 
