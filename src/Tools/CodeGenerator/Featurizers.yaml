@@ -1255,7 +1255,7 @@ featurizers:
         description: A vector of size horizon will always be output, but the individual elements could be NaN.
 
     custom_enums:
-      - name: SimpleWindowCalculation
+      - name: SimpleRollingWindowCalculation
         description: What calculation to use on the rolling window.
         values: [Min, Max]
         underlying_type: uint8
