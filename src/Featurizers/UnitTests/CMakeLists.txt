@@ -39,6 +39,7 @@ foreach(_test_name IN ITEMS
     HashOneHotVectorizerFeaturizer_UnitTests
     ImputationMarkerFeaturizer_UnitTests
     LabelEncoderFeaturizer_UnitTests
+    LagLeadOperatorFeaturizer_UnitTests
     MaxAbsScalerFeaturizer_UnitTests
     MeanImputerFeaturizer_UnitTest
     MedianImputerFeaturizer_UnitTest
