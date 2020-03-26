@@ -96,7 +96,7 @@ class VectorTypeInfo(TypeInfo):
                 std::size_t {result_name}_items(0);
                 """,
             ).format(
-                type=self._type_info.CppType,
+                type=getattr(self._type_info, "CType", self._type_info.CppType),
                 result_name=result_name,
             ),
             "&{result_name}_ptr, &{result_name}_items".format(

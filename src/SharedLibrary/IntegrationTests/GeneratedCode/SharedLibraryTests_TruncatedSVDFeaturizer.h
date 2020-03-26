@@ -65,7 +65,6 @@ void TruncatedSVDFeaturizer_float_Test(
     TruncatedSVDFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -114,7 +113,6 @@ void TruncatedSVDFeaturizer_float_Test(
     REQUIRE(TruncatedSVDFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  TruncatedSVDFeaturizer <double> */
 template <typename VectorInputT>
@@ -169,7 +167,6 @@ void TruncatedSVDFeaturizer_double_Test(
     TruncatedSVDFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -218,4 +215,3 @@ void TruncatedSVDFeaturizer_double_Test(
     REQUIRE(TruncatedSVDFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

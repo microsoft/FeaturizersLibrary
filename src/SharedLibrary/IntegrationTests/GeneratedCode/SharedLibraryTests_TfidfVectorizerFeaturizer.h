@@ -66,7 +66,6 @@ void TfidfVectorizerFeaturizer_Test(
     TfidfVectorizerFeaturizer_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -124,4 +123,3 @@ void TfidfVectorizerFeaturizer_Test(
     REQUIRE(TfidfVectorizerFeaturizer_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

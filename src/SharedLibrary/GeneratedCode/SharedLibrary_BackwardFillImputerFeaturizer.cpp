@@ -422,6 +422,29 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_Flush(/*in*/ Back
     }
 }
 
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_DestroyTransformedData(/*out*/ int8_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+
+
+        if(result_items == 0)
+            return true;
+
+        delete [] result_ptr;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
 /* |  BackwardFillImputerFeaturizer <int16> */
@@ -812,6 +835,29 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_Flush(/*in*/ Bac
             *output_item = result_item;
             ++output_item;
         }
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_DestroyTransformedData(/*out*/ int16_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+
+
+        if(result_items == 0)
+            return true;
+
+        delete [] result_ptr;
     
         return true;
     }
@@ -1220,6 +1266,29 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_Flush(/*in*/ Bac
     }
 }
 
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_DestroyTransformedData(/*out*/ int32_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+
+
+        if(result_items == 0)
+            return true;
+
+        delete [] result_ptr;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
 /* |  BackwardFillImputerFeaturizer <int64> */
@@ -1610,6 +1679,29 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_Flush(/*in*/ Bac
             *output_item = result_item;
             ++output_item;
         }
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_DestroyTransformedData(/*out*/ int64_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+
+
+        if(result_items == 0)
+            return true;
+
+        delete [] result_ptr;
     
         return true;
     }
@@ -2018,6 +2110,29 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_Flush(/*in*/ Bac
     }
 }
 
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_DestroyTransformedData(/*out*/ uint8_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+
+
+        if(result_items == 0)
+            return true;
+
+        delete [] result_ptr;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
 /* |  BackwardFillImputerFeaturizer <uint16> */
@@ -2408,6 +2523,29 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_Flush(/*in*/ Ba
             *output_item = result_item;
             ++output_item;
         }
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_DestroyTransformedData(/*out*/ uint16_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+
+
+        if(result_items == 0)
+            return true;
+
+        delete [] result_ptr;
     
         return true;
     }
@@ -2816,6 +2954,29 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_Flush(/*in*/ Ba
     }
 }
 
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_DestroyTransformedData(/*out*/ uint32_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+
+
+        if(result_items == 0)
+            return true;
+
+        delete [] result_ptr;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
 /* |  BackwardFillImputerFeaturizer <uint64> */
@@ -3215,6 +3376,29 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_Flush(/*in*/ Ba
     }
 }
 
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_DestroyTransformedData(/*out*/ uint64_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+
+
+        if(result_items == 0)
+            return true;
+
+        delete [] result_ptr;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
 /* |  BackwardFillImputerFeaturizer <float> */
@@ -3596,6 +3780,29 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Flush(/*in*/ Bac
             *output_item = result_item;
             ++output_item;
         }
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_DestroyTransformedData(/*out*/ float const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+
+
+        if(result_items == 0)
+            return true;
+
+        delete [] result_ptr;
     
         return true;
     }
@@ -3995,6 +4202,29 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Flush(/*in*/ Ba
     }
 }
 
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+
+
+        if(result_items == 0)
+            return true;
+
+        delete [] result_ptr;
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
 /* ---------------------------------------------------------------------- */
 /* |                                                                      */
 /* |  BackwardFillImputerFeaturizer <bool> */
@@ -4385,6 +4615,29 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_Flush(/*in*/ Back
             *output_item = result_item;
             ++output_item;
         }
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_DestroyTransformedData(/*out*/ bool const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+
+
+        if(result_items == 0)
+            return true;
+
+        delete [] result_ptr;
     
         return true;
     }
@@ -4817,17 +5070,31 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_Flush(/*in*/ Ba
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_DestroyTransformedData(/*out*/ char const * result, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_DestroyTransformedData(/*out*/ char const * const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        // No validation
+        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
 
-        if(result)
-            delete [] result;
+
+        if(result_items == 0)
+            return true;
+
+        char const * const * result_ptr_item(result_ptr);
+
+        for(size_t ctr=0; ctr < result_items; ++ctr) {
+            char const * result_item(*result_ptr_item);
+
+            if(result_item)
+                delete [] result_item;
+
+            ++result_ptr_item;
+        }
+
+        delete [] result_ptr;
     
         return true;
     }

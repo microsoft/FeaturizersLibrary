@@ -65,7 +65,6 @@ void MedianImputerFeaturizer_int8_Test(
     MedianImputerFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -109,7 +108,6 @@ void MedianImputerFeaturizer_int8_Test(
     REQUIRE(MedianImputerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MedianImputerFeaturizer <int16> */
 template <typename VectorInputT>
@@ -164,7 +162,6 @@ void MedianImputerFeaturizer_int16_Test(
     MedianImputerFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -208,7 +205,6 @@ void MedianImputerFeaturizer_int16_Test(
     REQUIRE(MedianImputerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MedianImputerFeaturizer <int32> */
 template <typename VectorInputT>
@@ -263,7 +259,6 @@ void MedianImputerFeaturizer_int32_Test(
     MedianImputerFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -307,7 +302,6 @@ void MedianImputerFeaturizer_int32_Test(
     REQUIRE(MedianImputerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MedianImputerFeaturizer <int64> */
 template <typename VectorInputT>
@@ -362,7 +356,6 @@ void MedianImputerFeaturizer_int64_Test(
     MedianImputerFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -406,7 +399,6 @@ void MedianImputerFeaturizer_int64_Test(
     REQUIRE(MedianImputerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MedianImputerFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -461,7 +453,6 @@ void MedianImputerFeaturizer_uint8_Test(
     MedianImputerFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -505,7 +496,6 @@ void MedianImputerFeaturizer_uint8_Test(
     REQUIRE(MedianImputerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MedianImputerFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -560,7 +550,6 @@ void MedianImputerFeaturizer_uint16_Test(
     MedianImputerFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -604,7 +593,6 @@ void MedianImputerFeaturizer_uint16_Test(
     REQUIRE(MedianImputerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MedianImputerFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -659,7 +647,6 @@ void MedianImputerFeaturizer_uint32_Test(
     MedianImputerFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -703,7 +690,6 @@ void MedianImputerFeaturizer_uint32_Test(
     REQUIRE(MedianImputerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MedianImputerFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -758,7 +744,6 @@ void MedianImputerFeaturizer_uint64_Test(
     MedianImputerFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -802,7 +787,6 @@ void MedianImputerFeaturizer_uint64_Test(
     REQUIRE(MedianImputerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MedianImputerFeaturizer <float> */
 template <typename VectorInputT>
@@ -857,7 +841,6 @@ void MedianImputerFeaturizer_float_Test(
     MedianImputerFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -901,7 +884,6 @@ void MedianImputerFeaturizer_float_Test(
     REQUIRE(MedianImputerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MedianImputerFeaturizer <double> */
 template <typename VectorInputT>
@@ -956,7 +938,6 @@ void MedianImputerFeaturizer_double_Test(
     MedianImputerFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1000,7 +981,6 @@ void MedianImputerFeaturizer_double_Test(
     REQUIRE(MedianImputerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MedianImputerFeaturizer <bool> */
 template <typename VectorInputT>
@@ -1055,7 +1035,6 @@ void MedianImputerFeaturizer_bool_Test(
     MedianImputerFeaturizer_bool_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1099,7 +1078,6 @@ void MedianImputerFeaturizer_bool_Test(
     REQUIRE(MedianImputerFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MedianImputerFeaturizer <string> */
 template <typename VectorInputT>
@@ -1154,7 +1132,6 @@ void MedianImputerFeaturizer_string_Test(
     MedianImputerFeaturizer_string_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1201,4 +1178,3 @@ void MedianImputerFeaturizer_string_Test(
     REQUIRE(MedianImputerFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

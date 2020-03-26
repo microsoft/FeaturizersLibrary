@@ -66,7 +66,6 @@ void HashOneHotVectorizerFeaturizer_int8_Test(
     HashOneHotVectorizerFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -112,7 +111,6 @@ void HashOneHotVectorizerFeaturizer_int8_Test(
     REQUIRE(HashOneHotVectorizerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -168,7 +166,6 @@ void HashOneHotVectorizerFeaturizer_int16_Test(
     HashOneHotVectorizerFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -214,7 +211,6 @@ void HashOneHotVectorizerFeaturizer_int16_Test(
     REQUIRE(HashOneHotVectorizerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -270,7 +266,6 @@ void HashOneHotVectorizerFeaturizer_int32_Test(
     HashOneHotVectorizerFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -316,7 +311,6 @@ void HashOneHotVectorizerFeaturizer_int32_Test(
     REQUIRE(HashOneHotVectorizerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -372,7 +366,6 @@ void HashOneHotVectorizerFeaturizer_int64_Test(
     HashOneHotVectorizerFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -418,7 +411,6 @@ void HashOneHotVectorizerFeaturizer_int64_Test(
     REQUIRE(HashOneHotVectorizerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -474,7 +466,6 @@ void HashOneHotVectorizerFeaturizer_uint8_Test(
     HashOneHotVectorizerFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -520,7 +511,6 @@ void HashOneHotVectorizerFeaturizer_uint8_Test(
     REQUIRE(HashOneHotVectorizerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -576,7 +566,6 @@ void HashOneHotVectorizerFeaturizer_uint16_Test(
     HashOneHotVectorizerFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -622,7 +611,6 @@ void HashOneHotVectorizerFeaturizer_uint16_Test(
     REQUIRE(HashOneHotVectorizerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -678,7 +666,6 @@ void HashOneHotVectorizerFeaturizer_uint32_Test(
     HashOneHotVectorizerFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -724,7 +711,6 @@ void HashOneHotVectorizerFeaturizer_uint32_Test(
     REQUIRE(HashOneHotVectorizerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -780,7 +766,6 @@ void HashOneHotVectorizerFeaturizer_uint64_Test(
     HashOneHotVectorizerFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -826,7 +811,6 @@ void HashOneHotVectorizerFeaturizer_uint64_Test(
     REQUIRE(HashOneHotVectorizerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -882,7 +866,6 @@ void HashOneHotVectorizerFeaturizer_float_Test(
     HashOneHotVectorizerFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -928,7 +911,6 @@ void HashOneHotVectorizerFeaturizer_float_Test(
     REQUIRE(HashOneHotVectorizerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -984,7 +966,6 @@ void HashOneHotVectorizerFeaturizer_double_Test(
     HashOneHotVectorizerFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1030,7 +1011,6 @@ void HashOneHotVectorizerFeaturizer_double_Test(
     REQUIRE(HashOneHotVectorizerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <bool> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1086,7 +1066,6 @@ void HashOneHotVectorizerFeaturizer_bool_Test(
     HashOneHotVectorizerFeaturizer_bool_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1132,7 +1111,6 @@ void HashOneHotVectorizerFeaturizer_bool_Test(
     REQUIRE(HashOneHotVectorizerFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  HashOneHotVectorizerFeaturizer <string> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1188,7 +1166,6 @@ void HashOneHotVectorizerFeaturizer_string_Test(
     HashOneHotVectorizerFeaturizer_string_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1234,4 +1211,3 @@ void HashOneHotVectorizerFeaturizer_string_Test(
     REQUIRE(HashOneHotVectorizerFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

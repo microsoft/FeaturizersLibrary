@@ -33,6 +33,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_CreateTransformer
 
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_Transform(/*in*/ BackwardFillImputerFeaturizer_int8_TransformerHandle *pHandle, /*in*/ int8_t const * input, /*out*/ int8_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_Flush(/*in*/ BackwardFillImputerFeaturizer_int8_TransformerHandle *pHandle, /*out*/ int8_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_DestroyTransformedData(/*in*/ int8_t const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <int16> */
@@ -59,6 +60,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_CreateTransforme
 
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_Transform(/*in*/ BackwardFillImputerFeaturizer_int16_TransformerHandle *pHandle, /*in*/ int16_t const * input, /*out*/ int16_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_Flush(/*in*/ BackwardFillImputerFeaturizer_int16_TransformerHandle *pHandle, /*out*/ int16_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_DestroyTransformedData(/*in*/ int16_t const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <int32> */
@@ -85,6 +87,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_CreateTransforme
 
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_Transform(/*in*/ BackwardFillImputerFeaturizer_int32_TransformerHandle *pHandle, /*in*/ int32_t const * input, /*out*/ int32_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_Flush(/*in*/ BackwardFillImputerFeaturizer_int32_TransformerHandle *pHandle, /*out*/ int32_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_DestroyTransformedData(/*in*/ int32_t const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <int64> */
@@ -111,6 +114,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_CreateTransforme
 
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_Transform(/*in*/ BackwardFillImputerFeaturizer_int64_TransformerHandle *pHandle, /*in*/ int64_t const * input, /*out*/ int64_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_Flush(/*in*/ BackwardFillImputerFeaturizer_int64_TransformerHandle *pHandle, /*out*/ int64_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_DestroyTransformedData(/*in*/ int64_t const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <uint8> */
@@ -137,6 +141,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_CreateTransforme
 
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_Transform(/*in*/ BackwardFillImputerFeaturizer_uint8_TransformerHandle *pHandle, /*in*/ uint8_t const * input, /*out*/ uint8_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_Flush(/*in*/ BackwardFillImputerFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ uint8_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_DestroyTransformedData(/*in*/ uint8_t const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <uint16> */
@@ -163,6 +168,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_CreateTransform
 
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_Transform(/*in*/ BackwardFillImputerFeaturizer_uint16_TransformerHandle *pHandle, /*in*/ uint16_t const * input, /*out*/ uint16_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_Flush(/*in*/ BackwardFillImputerFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ uint16_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_DestroyTransformedData(/*in*/ uint16_t const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <uint32> */
@@ -189,6 +195,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_CreateTransform
 
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_Transform(/*in*/ BackwardFillImputerFeaturizer_uint32_TransformerHandle *pHandle, /*in*/ uint32_t const * input, /*out*/ uint32_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_Flush(/*in*/ BackwardFillImputerFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ uint32_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_DestroyTransformedData(/*in*/ uint32_t const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <uint64> */
@@ -215,6 +222,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_CreateTransform
 
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_Transform(/*in*/ BackwardFillImputerFeaturizer_uint64_TransformerHandle *pHandle, /*in*/ uint64_t const * input, /*out*/ uint64_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_Flush(/*in*/ BackwardFillImputerFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ uint64_t ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_DestroyTransformedData(/*in*/ uint64_t const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <float> */
@@ -241,6 +249,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_CreateTransforme
 
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Transform(/*in*/ BackwardFillImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ float ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Flush(/*in*/ BackwardFillImputerFeaturizer_float_TransformerHandle *pHandle, /*out*/ float ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_DestroyTransformedData(/*in*/ float const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <double> */
@@ -267,6 +276,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_CreateTransform
 
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Transform(/*in*/ BackwardFillImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Flush(/*in*/ BackwardFillImputerFeaturizer_double_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <bool> */
@@ -293,6 +303,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_CreateTransformer
 
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_Transform(/*in*/ BackwardFillImputerFeaturizer_bool_TransformerHandle *pHandle, /*in*/ bool const * input, /*out*/ bool ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_Flush(/*in*/ BackwardFillImputerFeaturizer_bool_TransformerHandle *pHandle, /*out*/ bool ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_DestroyTransformedData(/*in*/ bool const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <string> */
@@ -319,6 +330,6 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_CreateTransform
 
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_Transform(/*in*/ BackwardFillImputerFeaturizer_string_TransformerHandle *pHandle, /*in*/ char const * input, /*out*/ char const *** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_Flush(/*in*/ BackwardFillImputerFeaturizer_string_TransformerHandle *pHandle, /*out*/ char const *** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_DestroyTransformedData(/*in*/ char const * result, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_DestroyTransformedData(/*in*/ char const * const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 } // extern "C"

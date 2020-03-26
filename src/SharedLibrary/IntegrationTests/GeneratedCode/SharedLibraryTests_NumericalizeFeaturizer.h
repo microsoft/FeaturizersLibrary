@@ -65,7 +65,6 @@ void NumericalizeFeaturizer_int8_Test(
     NumericalizeFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -109,7 +108,6 @@ void NumericalizeFeaturizer_int8_Test(
     REQUIRE(NumericalizeFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  NumericalizeFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -164,7 +162,6 @@ void NumericalizeFeaturizer_uint8_Test(
     NumericalizeFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -208,7 +205,6 @@ void NumericalizeFeaturizer_uint8_Test(
     REQUIRE(NumericalizeFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  NumericalizeFeaturizer <int16> */
 template <typename VectorInputT>
@@ -263,7 +259,6 @@ void NumericalizeFeaturizer_int16_Test(
     NumericalizeFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -307,7 +302,6 @@ void NumericalizeFeaturizer_int16_Test(
     REQUIRE(NumericalizeFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  NumericalizeFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -362,7 +356,6 @@ void NumericalizeFeaturizer_uint16_Test(
     NumericalizeFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -406,7 +399,6 @@ void NumericalizeFeaturizer_uint16_Test(
     REQUIRE(NumericalizeFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  NumericalizeFeaturizer <int32> */
 template <typename VectorInputT>
@@ -461,7 +453,6 @@ void NumericalizeFeaturizer_int32_Test(
     NumericalizeFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -505,7 +496,6 @@ void NumericalizeFeaturizer_int32_Test(
     REQUIRE(NumericalizeFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  NumericalizeFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -560,7 +550,6 @@ void NumericalizeFeaturizer_uint32_Test(
     NumericalizeFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -604,7 +593,6 @@ void NumericalizeFeaturizer_uint32_Test(
     REQUIRE(NumericalizeFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  NumericalizeFeaturizer <int64> */
 template <typename VectorInputT>
@@ -659,7 +647,6 @@ void NumericalizeFeaturizer_int64_Test(
     NumericalizeFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -703,7 +690,6 @@ void NumericalizeFeaturizer_int64_Test(
     REQUIRE(NumericalizeFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  NumericalizeFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -758,7 +744,6 @@ void NumericalizeFeaturizer_uint64_Test(
     NumericalizeFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -802,7 +787,6 @@ void NumericalizeFeaturizer_uint64_Test(
     REQUIRE(NumericalizeFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  NumericalizeFeaturizer <float> */
 template <typename VectorInputT>
@@ -857,7 +841,6 @@ void NumericalizeFeaturizer_float_Test(
     NumericalizeFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -901,7 +884,6 @@ void NumericalizeFeaturizer_float_Test(
     REQUIRE(NumericalizeFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  NumericalizeFeaturizer <double> */
 template <typename VectorInputT>
@@ -956,7 +938,6 @@ void NumericalizeFeaturizer_double_Test(
     NumericalizeFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1000,7 +981,6 @@ void NumericalizeFeaturizer_double_Test(
     REQUIRE(NumericalizeFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  NumericalizeFeaturizer <bool> */
 template <typename VectorInputT>
@@ -1055,7 +1035,6 @@ void NumericalizeFeaturizer_bool_Test(
     NumericalizeFeaturizer_bool_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1099,7 +1078,6 @@ void NumericalizeFeaturizer_bool_Test(
     REQUIRE(NumericalizeFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  NumericalizeFeaturizer <string> */
 template <typename VectorInputT>
@@ -1154,7 +1132,6 @@ void NumericalizeFeaturizer_string_Test(
     NumericalizeFeaturizer_string_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1198,4 +1175,3 @@ void NumericalizeFeaturizer_string_Test(
     REQUIRE(NumericalizeFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
