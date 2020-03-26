@@ -14,13 +14,13 @@ namespace NS = Microsoft::Featurizer;
 void TestImpl(std::vector<std::vector<std::vector<std::string>>> trainingBatches,
               std::vector<std::vector<std::string>> inferencingInput,
               std::vector<bool> inferencingOutput,
-              std::uint8_t windowSize,
-              std::vector<std::uint8_t> lags,
-              std::uint8_t maxHorizon,
-              nonstd::optional<std::uint8_t> cv){
+              std::uint32_t maxWindowSize,
+              std::vector<std::uint32_t> lags,
+              std::uint32_t horizon,
+              nonstd::optional<std::uint32_t> crossValidation){
 
     using SGDEstimator = NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>;
-    SGDEstimator                                        estimator(NS::CreateTestAnnotationMapsPtr(1), 0, windowSize, std::make_tuple(lags.begin(), lags.end()), maxHorizon, cv);
+    SGDEstimator                                        estimator(NS::CreateTestAnnotationMapsPtr(1), 0, maxWindowSize, std::make_tuple(lags.begin(), lags.end()), horizon, crossValidation);
 
     NS::TestHelpers::Train<SGDEstimator, std::vector<std::string>>(estimator, trainingBatches);
     SGDEstimator::TransformerUniquePtr                  pTransformer(estimator.create_transformer());
@@ -43,13 +43,13 @@ void TestImpl(std::vector<std::vector<std::vector<std::string>>> trainingBatches
 
 TEST_CASE("Invalid Transformer/Estimator") {
     //parameter setting
-    std::uint8_t windowSize = 0;
-    std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>();
-    std::uint8_t maxHorizon = 1;
-    nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
+    std::uint32_t maxWindowSize = 0;
+    std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>();
+    std::uint32_t horizon = 1;
+    nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
-    CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 2, windowSize, std::make_tuple(lags.begin(), lags.end()), maxHorizon, cv), "colIndex");
-    CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, windowSize, std::make_tuple(lags.begin(), lags.end()), maxHorizon, cv), "lags");
+    CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 2, maxWindowSize, std::make_tuple(lags.begin(), lags.end()), horizon, crossValidation), "colIndex");
+    CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, maxWindowSize, std::make_tuple(lags.begin(), lags.end()), horizon, crossValidation), "lags");
 }
 
 TEST_CASE("Standard Test") {
@@ -92,19 +92,19 @@ TEST_CASE("Standard Test") {
     };
 
     //parameter setting
-    std::uint8_t windowSize = 0;
-    std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-    std::uint8_t maxHorizon = 1;
-    nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
+    std::uint32_t maxWindowSize = 0;
+    std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+    std::uint32_t horizon = 1;
+    nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
     TestImpl(
         trainingBatches,
         inferencingInput,
         inferencingOutput,
-        windowSize,
+        maxWindowSize,
         lags,
-        maxHorizon,
-        cv
+        horizon,
+        crossValidation
     );
 }
 
@@ -138,12 +138,12 @@ TEST_CASE("Standard Test_Parameter Combination") {
         NS::TestHelpers::make_vector<std::string>("a", "g")
     );
 
-    SECTION("windowSize=1/lags=[0,1]/maxHorizon=1/no cv") {
+    SECTION("maxWindowSize=1/lags=[0,1]/horizon=1/no crossValidation") {
         //parameter setting
-        std::uint8_t windowSize = 1;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t maxWindowSize = 1;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::uint32_t horizon = 1;
+        nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -158,19 +158,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=0/lags=[0,1]/maxHorizon=1/no cv") {
+    SECTION("maxWindowSize=0/lags=[0,1]/horizon=1/no crossValidation") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t maxWindowSize = 0;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::uint32_t horizon = 1;
+        nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -185,19 +185,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=1/lags=[0,0]/maxHorizon=1/no cv") {
+    SECTION("maxWindowSize=1/lags=[0,0]/horizon=1/no crossValidation") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t maxWindowSize = 0;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::uint32_t horizon = 1;
+        nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -212,19 +212,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=0/lags=[0,0]/maxHorizon=1/no cv") {
+    SECTION("maxWindowSize=0/lags=[0,0]/horizon=1/no crossValidation") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t maxWindowSize = 0;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::uint32_t horizon = 1;
+        nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -239,19 +239,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=1/lags=[0,1]/maxHorizon=0/no cv") {
+    SECTION("maxWindowSize=1/lags=[0,1]/horizon=0/no crossValidation") {
         //parameter setting
-        std::uint8_t windowSize = 1;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t maxWindowSize = 1;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::uint32_t horizon = 0;
+        nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -266,19 +266,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=0/lags=[0,1]/maxHorizon=0/no cv") {
+    SECTION("maxWindowSize=0/lags=[0,1]/horizon=0/no crossValidation") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t maxWindowSize = 0;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::uint32_t horizon = 0;
+        nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -293,19 +293,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=1/lags=[0,0]/maxHorizon=0/no cv") {
+    SECTION("maxWindowSize=1/lags=[0,0]/horizon=0/no crossValidation") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t maxWindowSize = 0;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::uint32_t horizon = 0;
+        nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -320,19 +320,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=0/lags=[0,0]/maxHorizon=0/no cv") {
+    SECTION("maxWindowSize=0/lags=[0,0]/horizon=0/no crossValidation") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t maxWindowSize = 0;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::uint32_t horizon = 0;
+        nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -347,19 +347,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=1/lags=[0,1]/maxHorizon=1/cv=1") {
+    SECTION("maxWindowSize=1/lags=[0,1]/horizon=1/crossValidation=1") {
         //parameter setting
-        std::uint8_t windowSize = 1;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
+        std::uint32_t maxWindowSize = 1;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::uint32_t horizon = 1;
+        nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
         std::vector<bool> inferencingOutput = {
             true,
@@ -374,19 +374,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=0/lags=[0,1]/maxHorizon=1/cv=1") {
+    SECTION("maxWindowSize=0/lags=[0,1]/horizon=1/crossValidation=1") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
+        std::uint32_t maxWindowSize = 0;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::uint32_t horizon = 1;
+        nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
         std::vector<bool> inferencingOutput = {
             true,
@@ -401,19 +401,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=1/lags=[0,0]/maxHorizon=1/cv=1") {
+    SECTION("maxWindowSize=1/lags=[0,0]/horizon=1/crossValidation=1") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
+        std::uint32_t maxWindowSize = 0;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::uint32_t horizon = 1;
+        nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -428,19 +428,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=0/lags=[0,0]/maxHorizon=1/cv=1") {
+    SECTION("maxWindowSize=0/lags=[0,0]/horizon=1/crossValidation=1") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
+        std::uint32_t maxWindowSize = 0;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::uint32_t horizon = 1;
+        nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -455,19 +455,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=1/lags=[0,1]/maxHorizon=0/cv=1") {
+    SECTION("maxWindowSize=1/lags=[0,1]/horizon=0/crossValidation=1") {
         //parameter setting
-        std::uint8_t windowSize = 1;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
+        std::uint32_t maxWindowSize = 1;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::uint32_t horizon = 0;
+        nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -482,19 +482,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=0/lags=[0,1]/maxHorizon=0/cv=1") {
+    SECTION("maxWindowSize=0/lags=[0,1]/horizon=0/crossValidation=1") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
+        std::uint32_t maxWindowSize = 0;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::uint32_t horizon = 0;
+        nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -509,19 +509,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=1/lags=[0,0]/maxHorizon=0/cv=1") {
+    SECTION("maxWindowSize=1/lags=[0,0]/horizon=0/crossValidation=1") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
+        std::uint32_t maxWindowSize = 0;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::uint32_t horizon = 0;
+        nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -536,19 +536,19 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 
-    SECTION("windowSize=0/lags=[0,0]/maxHorizon=0/cv=1") {
+    SECTION("maxWindowSize=0/lags=[0,0]/horizon=0/crossValidation=1") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
+        std::uint32_t maxWindowSize = 0;
+        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::uint32_t horizon = 0;
+        nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -563,10 +563,10 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
+            maxWindowSize,
             lags,
-            maxHorizon,
-            cv
+            horizon,
+            crossValidation
         );
     }
 }

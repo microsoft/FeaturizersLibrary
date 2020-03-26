@@ -85,13 +85,13 @@ public:
     ShortGrainDropperEstimator(
         AnnotationMapsPtr pAllColumnAnnotations,
         size_t colIndex,
-        std::uint8_t windowSize,
+        std::uint32_t maxWindowSize,
         //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
         std::tuple<LagInputIteratorT, LagInputIteratorT> lags,
         //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
-        std::uint8_t maxHorizon,
+        std::uint32_t horizon,
         //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
-        nonstd::optional<std::uint8_t> cv
+        nonstd::optional<std::uint32_t> crossValidation
         //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
     );
     ~ShortGrainDropperEstimator(void) override = default;
@@ -112,7 +112,7 @@ private:
     // |
     // ----------------------------------------------------------------------
     size_t const                            _colIndex;
-    std::uint16_t const                     _minPoints;
+    std::uint32_t const                     _minPoints;
     GrainsSet                               _grainsToDrop;
     GrainsMap                               _groupByGrains;
 
@@ -168,10 +168,10 @@ template <typename LagInputIteratorT>
 ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(
     AnnotationMapsPtr pAllColumnAnnotations,
     size_t colIndex,
-    std::uint8_t windowSize,
+    std::uint32_t maxWindowSize,
     std::tuple<LagInputIteratorT, LagInputIteratorT> lags,
-    std::uint8_t maxHorizon,
-    nonstd::optional<std::uint8_t> cv
+    std::uint32_t horizon,
+    nonstd::optional<std::uint32_t> crossValidation
 ) :
     BaseType("ShortGrainDropperEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
@@ -182,8 +182,8 @@ ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(
         }()
     ),
     _minPoints(
-        [&windowSize, &lags, &maxHorizon, &cv](void) -> std::uint16_t {
-            static_assert(std::is_same<typename std::iterator_traits<LagInputIteratorT>::value_type, std::uint8_t>::value, "'LagInputIteratorT' must point to an uint8");
+        [&maxWindowSize, &lags, &horizon, &crossValidation](void) -> std::uint32_t {
+            static_assert(std::is_same<typename std::iterator_traits<LagInputIteratorT>::value_type, std::uint32_t>::value, "'LagInputIteratorT' must point to an uint8");
 
             //it appears automl tests show that
             //windowSize can be 0
@@ -192,9 +192,9 @@ ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(
             //cv may not be 0, not sure currently
             if (std::distance(std::get<0>(lags), std::get<1>(lags)) == 0)
                 throw std::invalid_argument("lags");
-            if (!cv.has_value())
-                return (maxHorizon + std::max(windowSize, *std::max_element(std::get<0>(lags), std::get<1>(lags))) + 1);
-            return (2*maxHorizon + static_cast<std::uint8_t>(*cv) + std::max(windowSize, *std::max_element(std::get<0>(lags), std::get<1>(lags))) + 1);
+            if (!crossValidation.has_value())
+                return (horizon + std::max(maxWindowSize, *std::max_element(std::get<0>(lags), std::get<1>(lags))) + 1);
+            return (2*horizon + *crossValidation + std::max(maxWindowSize, *std::max_element(std::get<0>(lags), std::get<1>(lags))) + 1);
         }()
     ) {
 }
