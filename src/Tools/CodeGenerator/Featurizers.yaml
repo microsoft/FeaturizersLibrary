@@ -356,7 +356,7 @@ featurizers:
 
   # ----------------------------------------------------------------------
   - name: ForecastingPivotFeaturizer
-    estimator_name: GrainedForecastingPivotEstimator
+    estimator_name: ForecastingPivotEstimator
     release_version: 0.4.0
     num_output_columns: 1
     description: |-
