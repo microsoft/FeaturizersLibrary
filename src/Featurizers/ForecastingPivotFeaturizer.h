@@ -80,9 +80,7 @@ private:
                 // all matrixes must have the same column number
                 assert(matrix.cols() == col_size);
 
-                Eigen::Index const row_size(matrix.rows());
-
-                for (Eigen::Index row = 0; row < row_size; ++row) {
+                for (Eigen::Index row = 0; row < matrix.rows(); ++row) {
                     if (Traits<NullableType>::IsNull(matrix(row, col))) {
                         has_nan = true;
                         break;
