@@ -103,7 +103,7 @@ TEST_CASE("IsValidCountry") {
 
 TEST_CASE("GetSupportedCountries") {
     ErrorInfoHandle *                       pErrorInfo(nullptr);
-    StringBuffer *                          pStringBuffers(nullptr);
+    char const * const *                    pStringBuffers(nullptr);
     size_t                                  numStringBuffers;
 
     CHECK(DateTimeFeaturizer_GetSupportedCountries(nullptr, &pStringBuffers, &numStringBuffers, &pErrorInfo));
@@ -112,8 +112,8 @@ TEST_CASE("GetSupportedCountries") {
     REQUIRE(numStringBuffers != 0);
 
     // Spot check a few of the values
-    CHECK(strcmp(pStringBuffers->pString, "Argentina") == 0);
-    CHECK(strcmp((pStringBuffers + numStringBuffers - 1)->pString, "Wales") == 0);
+    CHECK(strcmp(*pStringBuffers, "Argentina") == 0);
+    CHECK(strcmp(*(pStringBuffers + numStringBuffers - 1), "Wales") == 0);
 
     CHECK(DateTimeFeaturizer_DestroyStringBuffers(pStringBuffers, numStringBuffers, &pErrorInfo));
     CHECK(pErrorInfo == nullptr);
