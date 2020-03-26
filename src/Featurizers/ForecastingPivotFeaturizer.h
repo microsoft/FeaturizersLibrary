@@ -75,7 +75,7 @@ private:
         for (Eigen::Index col = 0; col < col_size; ++col) {
             bool has_nan(false);
 
-            // if any nans is found in the current column across all matrixes, this column doesn't have any output rows
+            // if any nans is found in the current column across all matrixes, this column is omitted
             for (MatrixType const & matrix : input) {
                 // all matrixes must have the same column number
                 assert(matrix.cols() == col_size);
