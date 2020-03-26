@@ -1243,6 +1243,7 @@ featurizers:
           - bool
           - float
           - double
+          - string
 
     type_mappings:
       - input_type: tuple<unique_id, T>
