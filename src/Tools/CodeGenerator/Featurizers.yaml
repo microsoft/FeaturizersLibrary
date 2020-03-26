@@ -355,6 +355,107 @@ featurizers:
             name: isPaidTimeOff
 
   # ----------------------------------------------------------------------
+  - name: ForecastingPivotFeaturizer
+    estimator_name: GrainedForecastingPivotEstimator
+    release_version: 0.4.0
+    num_output_columns: 1
+    description: |-
+        Similar to an Excel pivot table, this featurizer will expand values in the given output
+        where all "linked" values are not null/empty. "linked" means that all values in the same
+        column across all matrixes are not null/empty.
+
+        All rows across all matrixes must have the same length / same number of columns.
+
+        Better explained through examples, see below for a more detailed explaination of the
+        functionality.
+
+        C++-style pseudo signature:
+        std::vector<double> execute(std::vector<Eigen::Matrix<double>> const &);
+        std::vector<std::optional<std::string>> execute(std::vector<Eigen::Matrix<std::optional<std::string>>> const &);
+
+        Examples:
+          Given results produced by the RollingWindow- and LagLead-Transformers...
+
+          +-------+--------------------------------+--------------------------------+
+          | Index |     Rolling Window Results     |        Lag Lead Results        |
+          +=======+================================+================================+
+          | 0     | [ [na, na, na] ]               | [ [na, na, na], [na, na, na] ] |
+          +-------+--------------------------------+--------------------------------+
+          | 1     | [ [1, 2, 3] ]                  | [ [na, na, na], [na, na, na] ] |
+          +-------+--------------------------------+--------------------------------+
+          | 2     | [ [1, 2, 3] ]                  | [ [na, na, na], [na, na, na] ] |
+          +-------+--------------------------------+--------------------------------+
+          | 3     | [ [1, 2, 3] ]                  | [ [A, B, C], [na, na, na] ]    |
+          +-------+--------------------------------+--------------------------------+
+          | 4     | [ [1, 2, 3] ]                  | [ [A, B, C], [D, na, na] ]     |
+          +-------+--------------------------------+--------------------------------+
+          | 5     | [ [1, 2, 3] ]                  | [ [A, B, C], [D, na, F] ]      |
+          +-------+--------------------------------+--------------------------------+
+
+          Results:
+
+            4: 1, A, D
+            5: 1, A, D
+            5: 3, C, F
+
+          A more thourough description below uses the following notation:
+
+            RW: Rolling Window Results
+            LL: Lag Lead Results
+
+            RW[row_index][col_index]
+            LL[row_index][col_index]
+
+            Using this notation for input index 5, we see:
+
+              RW[0][0] == 1       LL[0][0] == A
+              RW[0][1] == 2       LL[0][1] == B
+                                  LL[1][0] == D
+                                  LL[1][1] == na
+                                  LL[1][2] == F
+
+            For input at index N:
+
+              0:
+                RW[0][0] == na, LL[0][0] == na, LL[1][0] == na;   na's found, nothing to output
+                RW[0][1] == na, LL[0][1] == na, LL[1][1] == na;   na's found, nothing to output
+                RW[0][2] == na, LL[0][2] == na, LL[1][2] == na;   na's found, nothing to output
+
+              ...
+
+              4:
+                RW[0][0] == 1, LL[0][0] == A, LL[1][0] == D;      no na's found - OUTPUT GENERATED (1, A, D)
+                RW[0][1] == 2, LL[0][1] == B, LL[1][1] == na;     na's found, nothing to output
+                RW[0][2] == 3, LL[0][2] == C, LL[1][2] == na;     na's found, nothing to output
+
+              5:
+                RW[0][0] == 1, LL[0][0] == A, LL[1][0] == D;      no na's found - OUTPUT GENERATED (1, A, D)
+                RW[0][1] == 2, LL[0][1] == B, LL[1][1] == na;     na's found, nothing to output
+                RW[0][2] == 3, LL[0][2] == C, LL[1][2] == F;      no na's found - OUTPUT GENERATED (3, C, F)
+
+    templates:
+      - name: T
+        types:
+            - int8
+            - int16
+            - int32
+            - int64
+            - uint8
+            - uint16
+            - uint32
+            - uint64
+            - float
+            - double
+            - bool
+            - string
+
+    type_mappings:
+      - input_type: vector<matrix<T?>>
+        output_type: vector<T?>
+
+    status: Pending
+
+  # ----------------------------------------------------------------------
   - name: ForwardFillImputerFeaturizer
     estimator_name: ForwardFillImputerEstimator
     release_version: 0.4.0
