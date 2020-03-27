@@ -16,10 +16,31 @@ namespace NS = Microsoft::Featurizer;
 #   pragma clang diagnostic ignored "-Wfloat-equal"
 #endif
 
+TEST_CASE("Invalid execute argument") {
+    using InputType       = std::double_t;
+    using NullableType    = NS::Traits<InputType>::nullable_type;
+    using TransformedType = std::vector<InputType>;
+    using MatrixType      = NS::RowMajMatrix<NullableType>;
+
+    MatrixType matrix1(3, 4);
+    MatrixType matrix2(2, 3);
+
+    std::vector<TransformedType> ret;
+    auto const              callback(
+        [&ret](TransformedType value) {
+            ret.emplace_back(value);
+        }
+    );
+    
+    CHECK_THROWS_WITH(NS::Featurizers::ForecastingPivotTransformer<InputType>().execute({}, callback), "There's no input matrix passed in!");
+    CHECK_THROWS_WITH(NS::Featurizers::ForecastingPivotTransformer<InputType>().execute(NS::TestHelpers::make_vector<MatrixType>(matrix1, matrix2), callback), "All input matrixes should have the same number of columns!");
+}
+
+
 TEST_CASE("One matrix of double") {
     using InputType       = std::double_t;
     using NullableType    = NS::Traits<InputType>::nullable_type;
-    using TransformedType = std::vector<NullableType>;
+    using TransformedType = std::vector<InputType>;
     using MatrixType      = NS::RowMajMatrix<NullableType>;
 
     MatrixType                                  matrix(3, 4);
@@ -59,7 +80,7 @@ TEST_CASE("One matrix of double") {
 TEST_CASE("Two matrixes of string") {
     using InputType       = std::string;
     using NullableType    = NS::Traits<InputType>::nullable_type;
-    using TransformedType = std::vector<NullableType>;
+    using TransformedType = std::vector<InputType>;
     using MatrixType      = NS::RowMajMatrix<NullableType>;
 
     MatrixType                                  matrix1(3, 4);
