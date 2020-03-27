@@ -65,7 +65,6 @@ void PCAFeaturizer_float_Test(
     PCAFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -114,7 +113,6 @@ void PCAFeaturizer_float_Test(
     REQUIRE(PCAFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  PCAFeaturizer <double> */
 template <typename VectorInputT>
@@ -169,7 +167,6 @@ void PCAFeaturizer_double_Test(
     PCAFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -218,4 +215,3 @@ void PCAFeaturizer_double_Test(
     REQUIRE(PCAFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

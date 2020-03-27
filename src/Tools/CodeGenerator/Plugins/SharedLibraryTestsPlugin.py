@@ -143,45 +143,15 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                 constructor_args = ""
 
             transform_input_args = type_info_data.InputTypeInfo.GetTransformInputArgs()
-            output_statement_info = type_info_data.OutputTypeInfo.GetOutputInfo()
 
-            inline_destroy_statement = "// No inline destroy statement"
-            trailing_destroy_statement = "// No trailing destroy statement"
-
-            if output_statement_info.DestroyArgs:
-                if output_statement_info.DestroyInline:
-                    inline_destroy_statement = textwrap.dedent(
-                        """\
-
-                        // Destroy the contents
-                        REQUIRE({name}{suffix}DestroyTransformedData({args}, &pErrorInfo));
-                        REQUIRE(pErrorInfo == nullptr);
-                        """,
-                    ).format(
-                        name=item.name,
-                        suffix=suffix,
-                        args=output_statement_info.DestroyArgs,
-                    )
-                else:
-                    trailing_destroy_statement = textwrap.dedent(
-                        """\
-                        for(auto & result: results) {{
-                            REQUIRE({name}{suffix}DestroyTransformedData({args}, &pErrorInfo));
-                            REQUIRE(pErrorInfo == nullptr);
-                        }}
-                        """,
-                    ).format(
-                        name=item.name,
-                        suffix=suffix,
-                        args=output_statement_info.DestroyArgs,
-                    )
-
-            if type_info_data.InputTypeInfo.TypeName == "bool":
-                # vector<bool> isn't actually a bool, so we can't take a direct reference to it
-                for_loop = "for(bool input : inference_input)"
+            if item.has_dynamic_output:
+                output_statement_info = type_info_data.DynamicOutputTypeInfo.GetOutputInfo()
+                flush = ",\n    bool flush=true"
             else:
-                for_loop = "for(auto const & input : inference_input)"
+                output_statement_info = type_info_data.OutputTypeInfo.GetOutputInfo()
+                flush = ""
 
+            # Write the training statements
             f.write(
                 textwrap.dedent(
                     """\
@@ -191,7 +161,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                     void {name}{suffix}Test(
                         std::vector<VectorInputT> const &training_input,
                         std::vector<VectorInputT> const &inference_input,
-                        std::function<bool (std::vector<{vector_result_type}> const &)> const &verify_func{constructor_params}
+                        std::function<bool (std::vector<{vector_result_type}> const &)> const &verify_func{constructor_params}{flush}
                     ) {{
                         ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -239,7 +209,6 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                         {name}{suffix}CompleteTraining(pEstimatorHandle, &pErrorInfo);
                         REQUIRE(pErrorInfo == nullptr);
 
-
                         // Once here, training should be complete
                         {{
                             bool is_complete(false);
@@ -260,20 +229,158 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                         REQUIRE({name}{suffix}DestroyEstimator(pEstimatorHandle, &pErrorInfo));
                         REQUIRE(pErrorInfo == nullptr);
 
-                        // Inference
-                        std::vector<{vector_result_type}> results;
+                    """,
+                ).format(
+                    name=item.name,
+                    type_desc=type_desc,
+                    suffix=suffix,
+                    vector_result_type=output_statement_info.VectorResultType,
+                    constructor_template_params=constructor_template_params,
+                    constructor_params=constructor_params,
+                    flush=flush,
+                    constructor_args=constructor_args,
+                    fit_input_args=transform_input_args,
+                ),
+            )
 
-                        results.reserve(inference_input.size());
+            # Write the inferencing statements
+            if type_info_data.InputTypeInfo.TypeName == "bool":
+                # vector<bool> isn't actually a bool, so we can't take a direct reference to it
+                for_loop = "for(bool input : inference_input)"
+            else:
+                for_loop = "for(auto const & input : inference_input)"
 
-                        {for_loop} {{
-                            {transform_vars}
+            inline_destroy_statement = "// No inline destroy statement"
+            trailing_destroy_statement = "// No trailing destroy statement"
 
-                            REQUIRE({name}{suffix}Transform(pTransformerHandle, {transform_input_args}, {transform_output_args}, &pErrorInfo));
+            if output_statement_info.DestroyArgs:
+                if output_statement_info.DestroyInline:
+                    inline_destroy_statement = textwrap.dedent(
+                        """\
+
+                        // Destroy the contents
+                        REQUIRE({name}{suffix}DestroyTransformedData({args}, &pErrorInfo));
+                        REQUIRE(pErrorInfo == nullptr);
+                        """,
+                    ).format(
+                        name=item.name,
+                        suffix=suffix,
+                        args=output_statement_info.DestroyArgs,
+                    )
+                else:
+                    trailing_destroy_statement = textwrap.dedent(
+                        """\
+                        for(auto & result: results) {{
+                            REQUIRE({name}{suffix}DestroyTransformedData({args}, &pErrorInfo));
                             REQUIRE(pErrorInfo == nullptr);
-
-                            {transform_statement}
-                            {inline_destroy_statement}
                         }}
+                        """,
+                    ).format(
+                        name=item.name,
+                        suffix=suffix,
+                        args=output_statement_info.DestroyArgs,
+                    )
+
+            if item.has_dynamic_output:
+                f.write(
+                    StringHelpers.LeftJustify(
+                        textwrap.dedent(
+                            """\
+                            // Inference
+                            std::vector<{vector_result_type}> results;
+
+                            {for_loop} {{
+                                {transform_vars}
+
+                                REQUIRE({name}{suffix}Transform(pTransformerHandle, {transform_input_args}, {transform_output_args}, &pErrorInfo));
+                                REQUIRE(pErrorInfo == nullptr);
+
+                                {transform_statement}
+                                {inline_destroy_statement}
+                            }}
+
+                            if(flush) {{
+                                {transform_vars}
+
+                                REQUIRE({name}{suffix}Flush(pTransformerHandle, {transform_output_args}, &pErrorInfo));
+                                REQUIRE(pErrorInfo == nullptr);
+
+                                {transform_statement}
+                                {inline_destroy_statement}
+                            }}
+                            """,
+                        ).format(
+                            name=item.name,
+                            suffix=suffix,
+                            vector_result_type=output_statement_info.VectorResultType,
+                            for_loop=for_loop,
+                            transform_vars=StringHelpers.LeftJustify(
+                                output_statement_info.TransformVars.rstrip(),
+                                4,
+                            ),
+                            transform_input_args=transform_input_args,
+                            transform_output_args=output_statement_info.TransformOutputVars,
+                            transform_statement=StringHelpers.LeftJustify(
+                                output_statement_info.AppendResultStatement.rstrip(),
+                                4,
+                            ),
+                            inline_destroy_statement=StringHelpers.LeftJustify(
+                                inline_destroy_statement.rstrip(),
+                                4,
+                            ),
+                        ),
+                        4,
+                        skip_first_line=False,
+                    ),
+                )
+            else:
+                f.write(
+                    StringHelpers.LeftJustify(
+                        textwrap.dedent(
+                            """\
+                            // Inference
+                            std::vector<{vector_result_type}> results;
+
+                            results.reserve(inference_input.size());
+
+                            {for_loop} {{
+                                {transform_vars}
+
+                                REQUIRE({name}{suffix}Transform(pTransformerHandle, {transform_input_args}, {transform_output_args}, &pErrorInfo));
+                                REQUIRE(pErrorInfo == nullptr);
+
+                                {transform_statement}
+                                {inline_destroy_statement}
+                            }}
+                            """,
+                        ).format(
+                            name=item.name,
+                            suffix=suffix,
+                            vector_result_type=output_statement_info.VectorResultType,
+                            for_loop=for_loop,
+                            transform_vars=StringHelpers.LeftJustify(
+                                output_statement_info.TransformVars.rstrip(),
+                                4,
+                            ),
+                            transform_input_args=transform_input_args,
+                            transform_output_args=output_statement_info.TransformOutputVars,
+                            transform_statement=StringHelpers.LeftJustify(
+                                output_statement_info.AppendResultStatement.rstrip(),
+                                4,
+                            ),
+                            inline_destroy_statement=StringHelpers.LeftJustify(
+                                inline_destroy_statement.rstrip(),
+                                4,
+                            ),
+                        ),
+                        4,
+                        skip_first_line=False,
+                    ),
+                )
+
+            f.write(
+                textwrap.dedent(
+                    """\
 
                         REQUIRE(verify_func(results));
 
@@ -283,32 +390,10 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                         REQUIRE({name}{suffix}DestroyTransformer(pTransformerHandle, &pErrorInfo));
                         REQUIRE(pErrorInfo == nullptr);
                     }}
-
                     """,
                 ).format(
                     name=item.name,
-                    type_desc=type_desc,
                     suffix=suffix,
-                    vector_result_type=output_statement_info.VectorResultType,
-                    constructor_template_params=constructor_template_params,
-                    constructor_params=constructor_params,
-                    constructor_args=constructor_args,
-                    fit_input_args=transform_input_args,
-                    for_loop=for_loop,
-                    transform_vars=StringHelpers.LeftJustify(
-                        output_statement_info.TransformVars.rstrip(),
-                        8,
-                    ),
-                    transform_input_args=transform_input_args,
-                    transform_output_args=output_statement_info.TransformOutputVars,
-                    transform_statement=StringHelpers.LeftJustify(
-                        output_statement_info.AppendResultStatement.rstrip(),
-                        8,
-                    ),
-                    inline_destroy_statement=StringHelpers.LeftJustify(
-                        inline_destroy_statement.rstrip(),
-                        8,
-                    ),
                     trailing_destroy_statement=StringHelpers.LeftJustify(
                         trailing_destroy_statement.rstrip(),
                         4,
@@ -386,11 +471,18 @@ class TypeInfoData(object):
         )
         assert output_type_info, item.output_type
 
+        dynamic_output_info = self._CreateTypeInfo(
+            "vector<{}>".format(item.output_type),
+            custom_structs=custom_structs,
+            custom_enums=custom_enums,
+        )
+
         # Commit the results
-        self.CustomStructs                              = custom_structs
-        self.ConfigurationParamTypeInfos                = configuration_param_type_infos
-        self.InputTypeInfo                              = input_type_info
-        self.OutputTypeInfo                             = output_type_info
+        self.CustomStructs                  = custom_structs
+        self.ConfigurationParamTypeInfos    = configuration_param_type_infos
+        self.InputTypeInfo                  = input_type_info
+        self.OutputTypeInfo                 = output_type_info
+        self.DynamicOutputTypeInfo          = dynamic_output_info
 
     # ----------------------------------------------------------------------
     # |

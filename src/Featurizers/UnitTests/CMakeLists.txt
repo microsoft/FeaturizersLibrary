@@ -34,6 +34,7 @@ foreach(_test_name IN ITEMS
     CatImputerFeaturizer_UnitTests
     CountVectorizerFeaturizer_UnitTests
     DateTimeFeaturizer_UnitTests
+    ForecastingPivotFeaturizer_UnitTests
     ForwardFillImputerFeaturizer_UnitTest
     FromStringFeaturizer_UnitTest
     HashOneHotVectorizerFeaturizer_UnitTests

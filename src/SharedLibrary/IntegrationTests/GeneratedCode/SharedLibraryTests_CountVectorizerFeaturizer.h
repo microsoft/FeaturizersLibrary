@@ -66,7 +66,6 @@ void CountVectorizerFeaturizer_Test(
     CountVectorizerFeaturizer_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -124,4 +123,3 @@ void CountVectorizerFeaturizer_Test(
     REQUIRE(CountVectorizerFeaturizer_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
