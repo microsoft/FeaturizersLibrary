@@ -66,7 +66,6 @@ void StandardScaleWrapperFeaturizer_int8_Test(
     StandardScaleWrapperFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -110,7 +109,6 @@ void StandardScaleWrapperFeaturizer_int8_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -166,7 +164,6 @@ void StandardScaleWrapperFeaturizer_int16_Test(
     StandardScaleWrapperFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -210,7 +207,6 @@ void StandardScaleWrapperFeaturizer_int16_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -266,7 +262,6 @@ void StandardScaleWrapperFeaturizer_int32_Test(
     StandardScaleWrapperFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -310,7 +305,6 @@ void StandardScaleWrapperFeaturizer_int32_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -366,7 +360,6 @@ void StandardScaleWrapperFeaturizer_int64_Test(
     StandardScaleWrapperFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -410,7 +403,6 @@ void StandardScaleWrapperFeaturizer_int64_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -466,7 +458,6 @@ void StandardScaleWrapperFeaturizer_uint8_Test(
     StandardScaleWrapperFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -510,7 +501,6 @@ void StandardScaleWrapperFeaturizer_uint8_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -566,7 +556,6 @@ void StandardScaleWrapperFeaturizer_uint16_Test(
     StandardScaleWrapperFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -610,7 +599,6 @@ void StandardScaleWrapperFeaturizer_uint16_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -666,7 +654,6 @@ void StandardScaleWrapperFeaturizer_uint32_Test(
     StandardScaleWrapperFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -710,7 +697,6 @@ void StandardScaleWrapperFeaturizer_uint32_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -766,7 +752,6 @@ void StandardScaleWrapperFeaturizer_uint64_Test(
     StandardScaleWrapperFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -810,7 +795,6 @@ void StandardScaleWrapperFeaturizer_uint64_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -866,7 +850,6 @@ void StandardScaleWrapperFeaturizer_float_Test(
     StandardScaleWrapperFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -910,7 +893,6 @@ void StandardScaleWrapperFeaturizer_float_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -966,7 +948,6 @@ void StandardScaleWrapperFeaturizer_double_Test(
     StandardScaleWrapperFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1010,4 +991,3 @@ void StandardScaleWrapperFeaturizer_double_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

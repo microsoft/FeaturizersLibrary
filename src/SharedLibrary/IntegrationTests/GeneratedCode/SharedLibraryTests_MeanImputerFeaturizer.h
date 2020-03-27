@@ -65,7 +65,6 @@ void MeanImputerFeaturizer_int8_Test(
     MeanImputerFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -109,7 +108,6 @@ void MeanImputerFeaturizer_int8_Test(
     REQUIRE(MeanImputerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MeanImputerFeaturizer <int16> */
 template <typename VectorInputT>
@@ -164,7 +162,6 @@ void MeanImputerFeaturizer_int16_Test(
     MeanImputerFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -208,7 +205,6 @@ void MeanImputerFeaturizer_int16_Test(
     REQUIRE(MeanImputerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MeanImputerFeaturizer <int32> */
 template <typename VectorInputT>
@@ -263,7 +259,6 @@ void MeanImputerFeaturizer_int32_Test(
     MeanImputerFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -307,7 +302,6 @@ void MeanImputerFeaturizer_int32_Test(
     REQUIRE(MeanImputerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MeanImputerFeaturizer <int64> */
 template <typename VectorInputT>
@@ -362,7 +356,6 @@ void MeanImputerFeaturizer_int64_Test(
     MeanImputerFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -406,7 +399,6 @@ void MeanImputerFeaturizer_int64_Test(
     REQUIRE(MeanImputerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MeanImputerFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -461,7 +453,6 @@ void MeanImputerFeaturizer_uint8_Test(
     MeanImputerFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -505,7 +496,6 @@ void MeanImputerFeaturizer_uint8_Test(
     REQUIRE(MeanImputerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MeanImputerFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -560,7 +550,6 @@ void MeanImputerFeaturizer_uint16_Test(
     MeanImputerFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -604,7 +593,6 @@ void MeanImputerFeaturizer_uint16_Test(
     REQUIRE(MeanImputerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MeanImputerFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -659,7 +647,6 @@ void MeanImputerFeaturizer_uint32_Test(
     MeanImputerFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -703,7 +690,6 @@ void MeanImputerFeaturizer_uint32_Test(
     REQUIRE(MeanImputerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MeanImputerFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -758,7 +744,6 @@ void MeanImputerFeaturizer_uint64_Test(
     MeanImputerFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -802,7 +787,6 @@ void MeanImputerFeaturizer_uint64_Test(
     REQUIRE(MeanImputerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MeanImputerFeaturizer <float> */
 template <typename VectorInputT>
@@ -857,7 +841,6 @@ void MeanImputerFeaturizer_float_Test(
     MeanImputerFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -901,7 +884,6 @@ void MeanImputerFeaturizer_float_Test(
     REQUIRE(MeanImputerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MeanImputerFeaturizer <double> */
 template <typename VectorInputT>
@@ -956,7 +938,6 @@ void MeanImputerFeaturizer_double_Test(
     MeanImputerFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1000,4 +981,3 @@ void MeanImputerFeaturizer_double_Test(
     REQUIRE(MeanImputerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

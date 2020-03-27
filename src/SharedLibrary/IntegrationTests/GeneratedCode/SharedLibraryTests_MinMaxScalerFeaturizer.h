@@ -65,7 +65,6 @@ void MinMaxScalerFeaturizer_int8_Test(
     MinMaxScalerFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -109,7 +108,6 @@ void MinMaxScalerFeaturizer_int8_Test(
     REQUIRE(MinMaxScalerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxScalerFeaturizer <int16> */
 template <typename VectorInputT>
@@ -164,7 +162,6 @@ void MinMaxScalerFeaturizer_int16_Test(
     MinMaxScalerFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -208,7 +205,6 @@ void MinMaxScalerFeaturizer_int16_Test(
     REQUIRE(MinMaxScalerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxScalerFeaturizer <int32> */
 template <typename VectorInputT>
@@ -263,7 +259,6 @@ void MinMaxScalerFeaturizer_int32_Test(
     MinMaxScalerFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -307,7 +302,6 @@ void MinMaxScalerFeaturizer_int32_Test(
     REQUIRE(MinMaxScalerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxScalerFeaturizer <int64> */
 template <typename VectorInputT>
@@ -362,7 +356,6 @@ void MinMaxScalerFeaturizer_int64_Test(
     MinMaxScalerFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -406,7 +399,6 @@ void MinMaxScalerFeaturizer_int64_Test(
     REQUIRE(MinMaxScalerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxScalerFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -461,7 +453,6 @@ void MinMaxScalerFeaturizer_uint8_Test(
     MinMaxScalerFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -505,7 +496,6 @@ void MinMaxScalerFeaturizer_uint8_Test(
     REQUIRE(MinMaxScalerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxScalerFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -560,7 +550,6 @@ void MinMaxScalerFeaturizer_uint16_Test(
     MinMaxScalerFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -604,7 +593,6 @@ void MinMaxScalerFeaturizer_uint16_Test(
     REQUIRE(MinMaxScalerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxScalerFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -659,7 +647,6 @@ void MinMaxScalerFeaturizer_uint32_Test(
     MinMaxScalerFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -703,7 +690,6 @@ void MinMaxScalerFeaturizer_uint32_Test(
     REQUIRE(MinMaxScalerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxScalerFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -758,7 +744,6 @@ void MinMaxScalerFeaturizer_uint64_Test(
     MinMaxScalerFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -802,7 +787,6 @@ void MinMaxScalerFeaturizer_uint64_Test(
     REQUIRE(MinMaxScalerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxScalerFeaturizer <float> */
 template <typename VectorInputT>
@@ -857,7 +841,6 @@ void MinMaxScalerFeaturizer_float_Test(
     MinMaxScalerFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -901,7 +884,6 @@ void MinMaxScalerFeaturizer_float_Test(
     REQUIRE(MinMaxScalerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxScalerFeaturizer <double> */
 template <typename VectorInputT>
@@ -956,7 +938,6 @@ void MinMaxScalerFeaturizer_double_Test(
     MinMaxScalerFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1000,4 +981,3 @@ void MinMaxScalerFeaturizer_double_Test(
     REQUIRE(MinMaxScalerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

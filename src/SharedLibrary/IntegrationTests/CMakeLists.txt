@@ -30,11 +30,11 @@ enable_testing()
 
 foreach(_test_name IN ITEMS
     # TODO: Needs impl: SharedLibrary_AnalyticalRollingWindow_IntegrationTest
-    # TODO: Needs impl: SharedLibrary_BackwardFillImputer_IntegrationTest
+    SharedLibrary_BackwardFillImputer_IntegrationTest
     SharedLibrary_CatImputer_IntegrationTest
     SharedLibrary_CountVectorizer_IntegrationTest
     SharedLibrary_DateTime_IntegrationTest
-    # TODO: Needs impl: SharedLibrary_ForwardFillImputer_IntegrationTest
+    SharedLibrary_ForwardFillImputer_IntegrationTest
     SharedLibrary_FromString_IntegrationTest
     SharedLibrary_HashOneHotVectorizer_IntegrationTest
     SharedLibrary_ImputationMarker_IntegrationTest

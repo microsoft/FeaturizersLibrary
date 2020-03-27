@@ -208,8 +208,8 @@ def _GenerateCommonFiles(open_file_func, output_dir, output_stream):
 
                 struct ErrorInfoHandle {};
 
-                FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr, /*out*/ size_t *output_items);
-                FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr, /*in*/ size_t input_items);
+                FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr);
+                FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr);
                 FEATURIZER_LIBRARY_API bool DestroyErrorInfo(/*in*/ ErrorInfoHandle *pHandle);
                 FEATURIZER_LIBRARY_API bool DestroyTransformerSaveData(/*in*/ unsigned char const *pBuffer, /*in*/ size_t cBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -323,8 +323,8 @@ def _GenerateCommonFiles(open_file_func, output_dir, output_stream):
 
                 extern "C" {
 
-                FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr, /*out*/ size_t *output_items) {
-                    if(pHandle == nullptr || output_ptr == nullptr || output_items == nullptr)
+                FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr) {
+                    if(pHandle == nullptr || output_ptr == nullptr)
                         return false;
 
                     std::string const & str(*g_pointerTable.Get<std::string>(reinterpret_cast<size_t>(pHandle)));
@@ -335,16 +335,13 @@ def _GenerateCommonFiles(open_file_func, output_dir, output_stream):
                     string_buffer[str.size()] = 0;
 
                     *output_ptr = string_buffer;
-                    *output_items = str.size();
 
                     return true;
                 }
 
-                FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr, /*in*/ size_t input_items) {
-                    if(input_ptr == nullptr || input_items == 0)
-                        return false;
-
-                    delete [] input_ptr;
+                FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr) {
+                    if(input_ptr != nullptr)
+                        delete [] input_ptr;
 
                     return true;
                 }
@@ -530,7 +527,11 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, c_data_items, output_
                     info = type_info.GetInputInfo(configuration_param.name, "")
                     construct_params += ["/*in*/ {} {}".format(p.Type, p.Name) for p in info.Parameters]
 
-            delete_transformed_info = c_data.OutputTypeInfo.GetDestroyOutputInfo()
+            if item.has_dynamic_output:
+                delete_transformed_info = c_data.DynamicOutputTypeInfo.GetDestroyOutputInfo()
+            else:
+                delete_transformed_info = c_data.OutputTypeInfo.GetDestroyOutputInfo()
+
             if delete_transformed_info is not None:
                 delete_transformed_method = textwrap.dedent(
                     """\
@@ -1212,7 +1213,11 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
             )
 
             # DestroyTransformedData (optional)
-            output_info = c_data.OutputTypeInfo.GetDestroyOutputInfo()
+            if item.has_dynamic_output:
+                output_info = c_data.DynamicOutputTypeInfo.GetDestroyOutputInfo()
+            else:
+                output_info = c_data.OutputTypeInfo.GetDestroyOutputInfo()
+
             if output_info is not None:
                 f.write(
                     textwrap.dedent(
@@ -1346,12 +1351,12 @@ class CData(object):
         )
 
         # Commit the results
-        self.CustomStructs                              = custom_structs
-        self.CustomEnums                                = custom_enums
-        self.ConfigurationParamTypeInfos                = configuration_param_type_infos
-        self.InputTypeInfo                              = input_type_info
-        self.OutputTypeInfo                             = output_type_info
-        self.DynamicOutputTypeInfo                      = dynamic_output_type_info
+        self.CustomStructs                  = custom_structs
+        self.CustomEnums                    = custom_enums
+        self.ConfigurationParamTypeInfos    = configuration_param_type_infos
+        self.InputTypeInfo                  = input_type_info
+        self.OutputTypeInfo                 = output_type_info
+        self.DynamicOutputTypeInfo          = dynamic_output_type_info
 
     # ----------------------------------------------------------------------
     def __repr__(self):
