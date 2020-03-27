@@ -66,7 +66,6 @@ void RobustScalerFeaturizer_int8_Test(
     RobustScalerFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -110,7 +109,6 @@ void RobustScalerFeaturizer_int8_Test(
     REQUIRE(RobustScalerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -166,7 +164,6 @@ void RobustScalerFeaturizer_int16_Test(
     RobustScalerFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -210,7 +207,6 @@ void RobustScalerFeaturizer_int16_Test(
     REQUIRE(RobustScalerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -266,7 +262,6 @@ void RobustScalerFeaturizer_uint8_Test(
     RobustScalerFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -310,7 +305,6 @@ void RobustScalerFeaturizer_uint8_Test(
     REQUIRE(RobustScalerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -366,7 +360,6 @@ void RobustScalerFeaturizer_uint16_Test(
     RobustScalerFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -410,7 +403,6 @@ void RobustScalerFeaturizer_uint16_Test(
     REQUIRE(RobustScalerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -466,7 +458,6 @@ void RobustScalerFeaturizer_float_Test(
     RobustScalerFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -510,7 +501,6 @@ void RobustScalerFeaturizer_float_Test(
     REQUIRE(RobustScalerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -566,7 +556,6 @@ void RobustScalerFeaturizer_int32_Test(
     RobustScalerFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -610,7 +599,6 @@ void RobustScalerFeaturizer_int32_Test(
     REQUIRE(RobustScalerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -666,7 +654,6 @@ void RobustScalerFeaturizer_int64_Test(
     RobustScalerFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -710,7 +697,6 @@ void RobustScalerFeaturizer_int64_Test(
     REQUIRE(RobustScalerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -766,7 +752,6 @@ void RobustScalerFeaturizer_uint32_Test(
     RobustScalerFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -810,7 +795,6 @@ void RobustScalerFeaturizer_uint32_Test(
     REQUIRE(RobustScalerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -866,7 +850,6 @@ void RobustScalerFeaturizer_uint64_Test(
     RobustScalerFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -910,7 +893,6 @@ void RobustScalerFeaturizer_uint64_Test(
     REQUIRE(RobustScalerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -966,7 +948,6 @@ void RobustScalerFeaturizer_double_Test(
     RobustScalerFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1010,4 +991,3 @@ void RobustScalerFeaturizer_double_Test(
     REQUIRE(RobustScalerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

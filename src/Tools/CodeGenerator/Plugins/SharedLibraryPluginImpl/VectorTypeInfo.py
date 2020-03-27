@@ -341,7 +341,6 @@ class VectorTypeInfo(TypeInfo):
             validation_statements = textwrap.dedent(
                 """\
                 if({ptr} == nullptr && {size} != 0) throw std::invalid_argument("'{size}' is not 0");
-                if({ptr} != nullptr && {size} == 0) throw std::invalid_argument("'{size}' is 0");
                 """,
             ).format(
                 ptr=pointer_parameters[0].Name,

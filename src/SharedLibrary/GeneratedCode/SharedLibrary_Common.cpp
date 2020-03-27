@@ -16,8 +16,8 @@ ErrorInfoHandle* CreateErrorInfo(std::exception const &ex);
 
 extern "C" {
 
-FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr, /*out*/ size_t *output_items) {
-    if(pHandle == nullptr || output_ptr == nullptr || output_items == nullptr)
+FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, /*out*/ char const **output_ptr) {
+    if(pHandle == nullptr || output_ptr == nullptr)
         return false;
 
     std::string const & str(*g_pointerTable.Get<std::string>(reinterpret_cast<size_t>(pHandle)));
@@ -28,16 +28,13 @@ FEATURIZER_LIBRARY_API bool GetErrorInfoString(/*in*/ ErrorInfoHandle *pHandle, 
     string_buffer[str.size()] = 0;
 
     *output_ptr = string_buffer;
-    *output_items = str.size();
 
     return true;
 }
 
-FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr, /*in*/ size_t input_items) {
-    if(input_ptr == nullptr || input_items == 0)
-        return false;
-
-    delete [] input_ptr;
+FEATURIZER_LIBRARY_API bool DestroyErrorInfoString(/*in*/ char const *input_ptr) {
+    if(input_ptr != nullptr)
+        delete [] input_ptr;
 
     return true;
 }

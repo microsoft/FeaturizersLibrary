@@ -451,7 +451,6 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_DestroyTransformedData(/
         *ppErrorInfo = nullptr;
 
         if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
-        if(result_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
 
 
         if(result_items == 0)
@@ -895,7 +894,6 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_DestroyTransformedData(
         *ppErrorInfo = nullptr;
 
         if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
-        if(result_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
 
 
         if(result_items == 0)
@@ -1339,7 +1337,6 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_DestroyTransformedData(
         *ppErrorInfo = nullptr;
 
         if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
-        if(result_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
 
 
         if(result_items == 0)
@@ -1783,7 +1780,6 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_DestroyTransformedData(
         *ppErrorInfo = nullptr;
 
         if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
-        if(result_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
 
 
         if(result_items == 0)
@@ -2227,7 +2223,6 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_DestroyTransformedData(
         *ppErrorInfo = nullptr;
 
         if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
-        if(result_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
 
 
         if(result_items == 0)
@@ -2671,7 +2666,6 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_DestroyTransformedData
         *ppErrorInfo = nullptr;
 
         if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
-        if(result_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
 
 
         if(result_items == 0)
@@ -3115,7 +3109,6 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_DestroyTransformedData
         *ppErrorInfo = nullptr;
 
         if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
-        if(result_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
 
 
         if(result_items == 0)
@@ -3559,7 +3552,6 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_DestroyTransformedData
         *ppErrorInfo = nullptr;
 
         if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
-        if(result_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
 
 
         if(result_items == 0)
@@ -4003,7 +3995,6 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_DestroyTransformedData(
         *ppErrorInfo = nullptr;
 
         if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
-        if(result_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
 
 
         if(result_items == 0)
@@ -4447,7 +4438,6 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_DestroyTransformedData
         *ppErrorInfo = nullptr;
 
         if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
-        if(result_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
 
 
         if(result_items == 0)

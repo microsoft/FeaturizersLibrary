@@ -27,6 +27,7 @@ class StringTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     TypeName                                = Interface.DerivedProperty("string")
     CppType                                 = Interface.DerivedProperty("std::string")
+    CType                                   = "char const *"
 
     # ----------------------------------------------------------------------
     # |
