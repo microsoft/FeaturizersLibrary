@@ -80,14 +80,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    template <typename LagInputIteratorT>
     ShortGrainDropperEstimator(
         AnnotationMapsPtr pAllColumnAnnotations,
         size_t colIndex,
-        std::uint32_t maxWindowSize,
-        std::tuple<LagInputIteratorT, LagInputIteratorT> lags,
-        std::uint32_t horizon,
-        nonstd::optional<std::uint32_t> crossValidation
+        std::uint32_t minPoints
     );
     ~ShortGrainDropperEstimator(void) override = default;
 
@@ -159,14 +155,10 @@ private:
 // |
 // ----------------------------------------------------------------------
 template <size_t MaxNumTrainingItemsV>
-template <typename LagInputIteratorT>
 ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(
     AnnotationMapsPtr pAllColumnAnnotations,
     size_t colIndex,
-    std::uint32_t maxWindowSize,
-    std::tuple<LagInputIteratorT, LagInputIteratorT> lags,
-    std::uint32_t horizon,
-    nonstd::optional<std::uint32_t> crossValidation
+    std::uint32_t minPoints
 ) :
     BaseType("ShortGrainDropperEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
@@ -177,19 +169,10 @@ ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(
         }()
     ),
     _minPoints(
-        [&maxWindowSize, &lags, &horizon, &crossValidation](void) -> std::uint32_t {
-            static_assert(std::is_same<typename std::iterator_traits<LagInputIteratorT>::value_type, std::int32_t>::value, "'LagInputIteratorT' must point to an uint8");
-
-            if (std::distance(std::get<0>(lags), std::get<1>(lags)) == 0)
-                throw std::invalid_argument("lags");
-            //Get the maximum absolute value from lags
-            std::uint32_t maxAbsLag = static_cast<std::uint32_t>(-*std::min_element(std::get<0>(lags), std::get<1>(lags)));
-            //Get the bigger value from maxWinsowSize and maxAbsSize
-            std::uint32_t biggerVal = std::max(maxWindowSize, maxAbsLag);
-            //The folling part directly adopts the logic from automl repo in calculating the minPoints
-            if (!crossValidation.has_value())
-                return (horizon + biggerVal + 1);
-            return (2*horizon + *crossValidation + biggerVal + 1);
+        [&minPoints](void) -> std::uint32_t & {
+            if(minPoints == 0)
+                throw std::invalid_argument("minPoints");
+            return minPoints;
         }()
     ) {
 }
