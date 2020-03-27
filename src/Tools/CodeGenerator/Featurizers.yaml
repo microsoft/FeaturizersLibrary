@@ -1279,7 +1279,7 @@ featurizers:
       - type: uint32
         name: maxWindowSize
 
-      - type: vector<uint32>
+      - type: vector<int32>
         name: lags
 
       - type: uint32

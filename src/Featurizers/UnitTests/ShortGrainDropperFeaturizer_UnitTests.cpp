@@ -15,7 +15,7 @@ void TestImpl(std::vector<std::vector<std::vector<std::string>>> trainingBatches
               std::vector<std::vector<std::string>> inferencingInput,
               std::vector<bool> inferencingOutput,
               std::uint32_t maxWindowSize,
-              std::vector<std::uint32_t> lags,
+              std::vector<std::int32_t> lags,
               std::uint32_t horizon,
               nonstd::optional<std::uint32_t> crossValidation){
 
@@ -44,7 +44,7 @@ void TestImpl(std::vector<std::vector<std::vector<std::string>>> trainingBatches
 TEST_CASE("Invalid Transformer/Estimator") {
     //parameter setting
     std::uint32_t maxWindowSize = 0;
-    std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>();
+    std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>();
     std::uint32_t horizon = 1;
     nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
@@ -93,7 +93,7 @@ TEST_CASE("Standard Test") {
 
     //parameter setting
     std::uint32_t maxWindowSize = 0;
-    std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+    std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(0));
     std::uint32_t horizon = 1;
     nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
@@ -141,7 +141,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=1/lags=[0,1]/horizon=1/no crossValidation") {
         //parameter setting
         std::uint32_t maxWindowSize = 1;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(-1));
         std::uint32_t horizon = 1;
         nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
@@ -168,7 +168,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=0/lags=[0,1]/horizon=1/no crossValidation") {
         //parameter setting
         std::uint32_t maxWindowSize = 0;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(-1));
         std::uint32_t horizon = 1;
         nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
@@ -195,7 +195,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=1/lags=[0,0]/horizon=1/no crossValidation") {
         //parameter setting
         std::uint32_t maxWindowSize = 0;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(0));
         std::uint32_t horizon = 1;
         nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
@@ -222,7 +222,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=0/lags=[0,0]/horizon=1/no crossValidation") {
         //parameter setting
         std::uint32_t maxWindowSize = 0;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(0));
         std::uint32_t horizon = 1;
         nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
@@ -249,7 +249,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=1/lags=[0,1]/horizon=0/no crossValidation") {
         //parameter setting
         std::uint32_t maxWindowSize = 1;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(-1));
         std::uint32_t horizon = 0;
         nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
@@ -276,7 +276,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=0/lags=[0,1]/horizon=0/no crossValidation") {
         //parameter setting
         std::uint32_t maxWindowSize = 0;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(-1));
         std::uint32_t horizon = 0;
         nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
@@ -303,7 +303,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=1/lags=[0,0]/horizon=0/no crossValidation") {
         //parameter setting
         std::uint32_t maxWindowSize = 0;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(0));
         std::uint32_t horizon = 0;
         nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
@@ -330,7 +330,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=0/lags=[0,0]/horizon=0/no crossValidation") {
         //parameter setting
         std::uint32_t maxWindowSize = 0;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(0));
         std::uint32_t horizon = 0;
         nonstd::optional<std::uint32_t> crossValidation = nonstd::optional<std::uint32_t>();
 
@@ -357,7 +357,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=1/lags=[0,1]/horizon=1/crossValidation=1") {
         //parameter setting
         std::uint32_t maxWindowSize = 1;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(-1));
         std::uint32_t horizon = 1;
         nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
@@ -384,7 +384,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=0/lags=[0,1]/horizon=1/crossValidation=1") {
         //parameter setting
         std::uint32_t maxWindowSize = 0;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(-1));
         std::uint32_t horizon = 1;
         nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
@@ -411,7 +411,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=1/lags=[0,0]/horizon=1/crossValidation=1") {
         //parameter setting
         std::uint32_t maxWindowSize = 0;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(0));
         std::uint32_t horizon = 1;
         nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
@@ -438,7 +438,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=0/lags=[0,0]/horizon=1/crossValidation=1") {
         //parameter setting
         std::uint32_t maxWindowSize = 0;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(0));
         std::uint32_t horizon = 1;
         nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
@@ -465,7 +465,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=1/lags=[0,1]/horizon=0/crossValidation=1") {
         //parameter setting
         std::uint32_t maxWindowSize = 1;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(-1));
         std::uint32_t horizon = 0;
         nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
@@ -492,7 +492,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=0/lags=[0,1]/horizon=0/crossValidation=1") {
         //parameter setting
         std::uint32_t maxWindowSize = 0;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(1));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(-1));
         std::uint32_t horizon = 0;
         nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
@@ -519,7 +519,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=1/lags=[0,0]/horizon=0/crossValidation=1") {
         //parameter setting
         std::uint32_t maxWindowSize = 0;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(0));
         std::uint32_t horizon = 0;
         nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 
@@ -546,7 +546,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
     SECTION("maxWindowSize=0/lags=[0,0]/horizon=0/crossValidation=1") {
         //parameter setting
         std::uint32_t maxWindowSize = 0;
-        std::vector<std::uint32_t> lags = NS::TestHelpers::make_vector<std::uint32_t>(static_cast<std::uint32_t>(0), static_cast<std::uint32_t>(0));
+        std::vector<std::int32_t> lags = NS::TestHelpers::make_vector<std::int32_t>(static_cast<std::int32_t>(0), static_cast<std::int32_t>(0));
         std::uint32_t horizon = 0;
         nonstd::optional<std::uint32_t> crossValidation = static_cast<std::uint32_t>(1);
 

@@ -60,9 +60,8 @@ private:
 /////////////////////////////////////////////////////////////////////////
 ///  \class         ShortGrainDropperEstimator
 ///  \brief         Estimator to determine which grain to drop given the
-///                 threshod minPoints calculated by windowSize, lags,
-///                 maxHorizon and cv.
-///                 todo: more comments will add here later
+///                 threshod minPoints calculated by maxWindowSize, lags,
+///                 horizon and crossValidation
 ///
 template <
     size_t MaxNumTrainingItemsV = std::numeric_limits<size_t>::max()
@@ -86,13 +85,9 @@ public:
         AnnotationMapsPtr pAllColumnAnnotations,
         size_t colIndex,
         std::uint32_t maxWindowSize,
-        //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
         std::tuple<LagInputIteratorT, LagInputIteratorT> lags,
-        //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
         std::uint32_t horizon,
-        //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
         nonstd::optional<std::uint32_t> crossValidation
-        //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
     );
     ~ShortGrainDropperEstimator(void) override = default;
 
@@ -183,18 +178,18 @@ ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(
     ),
     _minPoints(
         [&maxWindowSize, &lags, &horizon, &crossValidation](void) -> std::uint32_t {
-            static_assert(std::is_same<typename std::iterator_traits<LagInputIteratorT>::value_type, std::uint32_t>::value, "'LagInputIteratorT' must point to an uint8");
+            static_assert(std::is_same<typename std::iterator_traits<LagInputIteratorT>::value_type, std::int32_t>::value, "'LagInputIteratorT' must point to an uint8");
 
-            //it appears automl tests show that
-            //windowSize can be 0
-            //lags could contain 0s
-            //maxHorizon may not be 0, not sure currently
-            //cv may not be 0, not sure currently
             if (std::distance(std::get<0>(lags), std::get<1>(lags)) == 0)
                 throw std::invalid_argument("lags");
+            //Get the maximum absolute value from lags
+            std::uint32_t maxAbsLag = static_cast<std::uint32_t>(-*std::min_element(std::get<0>(lags), std::get<1>(lags)));
+            //Get the bigger value from maxWinsowSize and maxAbsSize
+            std::uint32_t biggerVal = std::max(maxWindowSize, maxAbsLag);
+            //The folling part directly adopts the logic from automl repo in calculating the minPoints
             if (!crossValidation.has_value())
-                return (horizon + std::max(maxWindowSize, *std::max_element(std::get<0>(lags), std::get<1>(lags))) + 1);
-            return (2*horizon + *crossValidation + std::max(maxWindowSize, *std::max_element(std::get<0>(lags), std::get<1>(lags))) + 1);
+                return (horizon + biggerVal + 1);
+            return (2*horizon + *crossValidation + biggerVal + 1);
         }()
     ) {
 }
