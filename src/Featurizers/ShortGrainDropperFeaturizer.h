@@ -60,8 +60,7 @@ private:
 /////////////////////////////////////////////////////////////////////////
 ///  \class         ShortGrainDropperEstimator
 ///  \brief         Estimator to determine which grain to drop given the
-///                 threshod minPoints calculated by maxWindowSize, lags,
-///                 horizon and crossValidation
+///                 threshod minPoints
 ///
 template <
     size_t MaxNumTrainingItemsV = std::numeric_limits<size_t>::max()
