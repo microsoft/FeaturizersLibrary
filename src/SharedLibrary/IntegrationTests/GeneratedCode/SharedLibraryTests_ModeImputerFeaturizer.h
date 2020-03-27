@@ -65,7 +65,6 @@ void ModeImputerFeaturizer_int8_Test(
     ModeImputerFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -109,7 +108,6 @@ void ModeImputerFeaturizer_int8_Test(
     REQUIRE(ModeImputerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <int16> */
 template <typename VectorInputT>
@@ -164,7 +162,6 @@ void ModeImputerFeaturizer_int16_Test(
     ModeImputerFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -208,7 +205,6 @@ void ModeImputerFeaturizer_int16_Test(
     REQUIRE(ModeImputerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <int32> */
 template <typename VectorInputT>
@@ -263,7 +259,6 @@ void ModeImputerFeaturizer_int32_Test(
     ModeImputerFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -307,7 +302,6 @@ void ModeImputerFeaturizer_int32_Test(
     REQUIRE(ModeImputerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <int64> */
 template <typename VectorInputT>
@@ -362,7 +356,6 @@ void ModeImputerFeaturizer_int64_Test(
     ModeImputerFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -406,7 +399,6 @@ void ModeImputerFeaturizer_int64_Test(
     REQUIRE(ModeImputerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -461,7 +453,6 @@ void ModeImputerFeaturizer_uint8_Test(
     ModeImputerFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -505,7 +496,6 @@ void ModeImputerFeaturizer_uint8_Test(
     REQUIRE(ModeImputerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -560,7 +550,6 @@ void ModeImputerFeaturizer_uint16_Test(
     ModeImputerFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -604,7 +593,6 @@ void ModeImputerFeaturizer_uint16_Test(
     REQUIRE(ModeImputerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -659,7 +647,6 @@ void ModeImputerFeaturizer_uint32_Test(
     ModeImputerFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -703,7 +690,6 @@ void ModeImputerFeaturizer_uint32_Test(
     REQUIRE(ModeImputerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -758,7 +744,6 @@ void ModeImputerFeaturizer_uint64_Test(
     ModeImputerFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -802,7 +787,6 @@ void ModeImputerFeaturizer_uint64_Test(
     REQUIRE(ModeImputerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <float> */
 template <typename VectorInputT>
@@ -857,7 +841,6 @@ void ModeImputerFeaturizer_float_Test(
     ModeImputerFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -901,7 +884,6 @@ void ModeImputerFeaturizer_float_Test(
     REQUIRE(ModeImputerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <double> */
 template <typename VectorInputT>
@@ -956,7 +938,6 @@ void ModeImputerFeaturizer_double_Test(
     ModeImputerFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1000,7 +981,6 @@ void ModeImputerFeaturizer_double_Test(
     REQUIRE(ModeImputerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <bool> */
 template <typename VectorInputT>
@@ -1055,7 +1035,6 @@ void ModeImputerFeaturizer_bool_Test(
     ModeImputerFeaturizer_bool_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1099,7 +1078,6 @@ void ModeImputerFeaturizer_bool_Test(
     REQUIRE(ModeImputerFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <string> */
 template <typename VectorInputT>
@@ -1154,7 +1132,6 @@ void ModeImputerFeaturizer_string_Test(
     ModeImputerFeaturizer_string_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1201,4 +1178,3 @@ void ModeImputerFeaturizer_string_Test(
     REQUIRE(ModeImputerFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

@@ -66,7 +66,6 @@ void DateTimeFeaturizer_Test(
     DateTimeFeaturizer_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -113,4 +112,3 @@ void DateTimeFeaturizer_Test(
     REQUIRE(DateTimeFeaturizer_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

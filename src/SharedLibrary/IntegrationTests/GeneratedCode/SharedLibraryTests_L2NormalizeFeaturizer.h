@@ -65,7 +65,6 @@ void L2NormalizeFeaturizer_int8_Test(
     L2NormalizeFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -92,7 +91,7 @@ void L2NormalizeFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t * result_ptr(nullptr);
+        double * result_ptr(nullptr);
         std::size_t result_items(0);
 
         REQUIRE(L2NormalizeFeaturizer_int8_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
@@ -113,7 +112,6 @@ void L2NormalizeFeaturizer_int8_Test(
     REQUIRE(L2NormalizeFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <int16> */
 template <typename VectorInputT>
@@ -168,7 +166,6 @@ void L2NormalizeFeaturizer_int16_Test(
     L2NormalizeFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -195,7 +192,7 @@ void L2NormalizeFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t * result_ptr(nullptr);
+        double * result_ptr(nullptr);
         std::size_t result_items(0);
 
         REQUIRE(L2NormalizeFeaturizer_int16_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
@@ -216,7 +213,6 @@ void L2NormalizeFeaturizer_int16_Test(
     REQUIRE(L2NormalizeFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <int32> */
 template <typename VectorInputT>
@@ -271,7 +267,6 @@ void L2NormalizeFeaturizer_int32_Test(
     L2NormalizeFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -298,7 +293,7 @@ void L2NormalizeFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t * result_ptr(nullptr);
+        double * result_ptr(nullptr);
         std::size_t result_items(0);
 
         REQUIRE(L2NormalizeFeaturizer_int32_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
@@ -319,7 +314,6 @@ void L2NormalizeFeaturizer_int32_Test(
     REQUIRE(L2NormalizeFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <int64> */
 template <typename VectorInputT>
@@ -374,7 +368,6 @@ void L2NormalizeFeaturizer_int64_Test(
     L2NormalizeFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -401,7 +394,7 @@ void L2NormalizeFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t * result_ptr(nullptr);
+        double * result_ptr(nullptr);
         std::size_t result_items(0);
 
         REQUIRE(L2NormalizeFeaturizer_int64_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
@@ -422,7 +415,6 @@ void L2NormalizeFeaturizer_int64_Test(
     REQUIRE(L2NormalizeFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -477,7 +469,6 @@ void L2NormalizeFeaturizer_uint8_Test(
     L2NormalizeFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -504,7 +495,7 @@ void L2NormalizeFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t * result_ptr(nullptr);
+        double * result_ptr(nullptr);
         std::size_t result_items(0);
 
         REQUIRE(L2NormalizeFeaturizer_uint8_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
@@ -525,7 +516,6 @@ void L2NormalizeFeaturizer_uint8_Test(
     REQUIRE(L2NormalizeFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -580,7 +570,6 @@ void L2NormalizeFeaturizer_uint16_Test(
     L2NormalizeFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -607,7 +596,7 @@ void L2NormalizeFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t * result_ptr(nullptr);
+        double * result_ptr(nullptr);
         std::size_t result_items(0);
 
         REQUIRE(L2NormalizeFeaturizer_uint16_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
@@ -628,7 +617,6 @@ void L2NormalizeFeaturizer_uint16_Test(
     REQUIRE(L2NormalizeFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -683,7 +671,6 @@ void L2NormalizeFeaturizer_uint32_Test(
     L2NormalizeFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -710,7 +697,7 @@ void L2NormalizeFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t * result_ptr(nullptr);
+        double * result_ptr(nullptr);
         std::size_t result_items(0);
 
         REQUIRE(L2NormalizeFeaturizer_uint32_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
@@ -731,7 +718,6 @@ void L2NormalizeFeaturizer_uint32_Test(
     REQUIRE(L2NormalizeFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -786,7 +772,6 @@ void L2NormalizeFeaturizer_uint64_Test(
     L2NormalizeFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -813,7 +798,7 @@ void L2NormalizeFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t * result_ptr(nullptr);
+        double * result_ptr(nullptr);
         std::size_t result_items(0);
 
         REQUIRE(L2NormalizeFeaturizer_uint64_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
@@ -834,7 +819,6 @@ void L2NormalizeFeaturizer_uint64_Test(
     REQUIRE(L2NormalizeFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <float> */
 template <typename VectorInputT>
@@ -889,7 +873,6 @@ void L2NormalizeFeaturizer_float_Test(
     L2NormalizeFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -916,7 +899,7 @@ void L2NormalizeFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t * result_ptr(nullptr);
+        double * result_ptr(nullptr);
         std::size_t result_items(0);
 
         REQUIRE(L2NormalizeFeaturizer_float_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
@@ -937,7 +920,6 @@ void L2NormalizeFeaturizer_float_Test(
     REQUIRE(L2NormalizeFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <double> */
 template <typename VectorInputT>
@@ -992,7 +974,6 @@ void L2NormalizeFeaturizer_double_Test(
     L2NormalizeFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1019,7 +1000,7 @@ void L2NormalizeFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t * result_ptr(nullptr);
+        double * result_ptr(nullptr);
         std::size_t result_items(0);
 
         REQUIRE(L2NormalizeFeaturizer_double_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
@@ -1040,4 +1021,3 @@ void L2NormalizeFeaturizer_double_Test(
     REQUIRE(L2NormalizeFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

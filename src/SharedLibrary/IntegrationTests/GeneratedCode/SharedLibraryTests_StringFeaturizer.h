@@ -66,7 +66,6 @@ void StringFeaturizer_int8_Test(
     StringFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -113,7 +112,6 @@ void StringFeaturizer_int8_Test(
     REQUIRE(StringFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -169,7 +167,6 @@ void StringFeaturizer_int16_Test(
     StringFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -216,7 +213,6 @@ void StringFeaturizer_int16_Test(
     REQUIRE(StringFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -272,7 +268,6 @@ void StringFeaturizer_int32_Test(
     StringFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -319,7 +314,6 @@ void StringFeaturizer_int32_Test(
     REQUIRE(StringFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -375,7 +369,6 @@ void StringFeaturizer_int64_Test(
     StringFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -422,7 +415,6 @@ void StringFeaturizer_int64_Test(
     REQUIRE(StringFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -478,7 +470,6 @@ void StringFeaturizer_uint8_Test(
     StringFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -525,7 +516,6 @@ void StringFeaturizer_uint8_Test(
     REQUIRE(StringFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -581,7 +571,6 @@ void StringFeaturizer_uint16_Test(
     StringFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -628,7 +617,6 @@ void StringFeaturizer_uint16_Test(
     REQUIRE(StringFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -684,7 +672,6 @@ void StringFeaturizer_uint32_Test(
     StringFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -731,7 +718,6 @@ void StringFeaturizer_uint32_Test(
     REQUIRE(StringFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -787,7 +773,6 @@ void StringFeaturizer_uint64_Test(
     StringFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -834,7 +819,6 @@ void StringFeaturizer_uint64_Test(
     REQUIRE(StringFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -890,7 +874,6 @@ void StringFeaturizer_float_Test(
     StringFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -937,7 +920,6 @@ void StringFeaturizer_float_Test(
     REQUIRE(StringFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -993,7 +975,6 @@ void StringFeaturizer_double_Test(
     StringFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1040,7 +1021,6 @@ void StringFeaturizer_double_Test(
     REQUIRE(StringFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <bool> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1096,7 +1076,6 @@ void StringFeaturizer_bool_Test(
     StringFeaturizer_bool_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1143,7 +1122,6 @@ void StringFeaturizer_bool_Test(
     REQUIRE(StringFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <string> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1199,7 +1177,6 @@ void StringFeaturizer_string_Test(
     StringFeaturizer_string_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1246,4 +1223,3 @@ void StringFeaturizer_string_Test(
     REQUIRE(StringFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-

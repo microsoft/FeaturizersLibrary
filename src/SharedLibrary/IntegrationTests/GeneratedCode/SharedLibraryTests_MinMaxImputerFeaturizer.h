@@ -66,7 +66,6 @@ void MinMaxImputerFeaturizer_int8_Test(
     MinMaxImputerFeaturizer_int8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -110,7 +109,6 @@ void MinMaxImputerFeaturizer_int8_Test(
     REQUIRE(MinMaxImputerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -166,7 +164,6 @@ void MinMaxImputerFeaturizer_int16_Test(
     MinMaxImputerFeaturizer_int16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -210,7 +207,6 @@ void MinMaxImputerFeaturizer_int16_Test(
     REQUIRE(MinMaxImputerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -266,7 +262,6 @@ void MinMaxImputerFeaturizer_int32_Test(
     MinMaxImputerFeaturizer_int32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -310,7 +305,6 @@ void MinMaxImputerFeaturizer_int32_Test(
     REQUIRE(MinMaxImputerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -366,7 +360,6 @@ void MinMaxImputerFeaturizer_int64_Test(
     MinMaxImputerFeaturizer_int64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -410,7 +403,6 @@ void MinMaxImputerFeaturizer_int64_Test(
     REQUIRE(MinMaxImputerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -466,7 +458,6 @@ void MinMaxImputerFeaturizer_uint8_Test(
     MinMaxImputerFeaturizer_uint8_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -510,7 +501,6 @@ void MinMaxImputerFeaturizer_uint8_Test(
     REQUIRE(MinMaxImputerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -566,7 +556,6 @@ void MinMaxImputerFeaturizer_uint16_Test(
     MinMaxImputerFeaturizer_uint16_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -610,7 +599,6 @@ void MinMaxImputerFeaturizer_uint16_Test(
     REQUIRE(MinMaxImputerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -666,7 +654,6 @@ void MinMaxImputerFeaturizer_uint32_Test(
     MinMaxImputerFeaturizer_uint32_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -710,7 +697,6 @@ void MinMaxImputerFeaturizer_uint32_Test(
     REQUIRE(MinMaxImputerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -766,7 +752,6 @@ void MinMaxImputerFeaturizer_uint64_Test(
     MinMaxImputerFeaturizer_uint64_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -810,7 +795,6 @@ void MinMaxImputerFeaturizer_uint64_Test(
     REQUIRE(MinMaxImputerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -866,7 +850,6 @@ void MinMaxImputerFeaturizer_float_Test(
     MinMaxImputerFeaturizer_float_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -910,7 +893,6 @@ void MinMaxImputerFeaturizer_float_Test(
     REQUIRE(MinMaxImputerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -966,7 +948,6 @@ void MinMaxImputerFeaturizer_double_Test(
     MinMaxImputerFeaturizer_double_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1010,7 +991,6 @@ void MinMaxImputerFeaturizer_double_Test(
     REQUIRE(MinMaxImputerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <bool> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1066,7 +1046,6 @@ void MinMaxImputerFeaturizer_bool_Test(
     MinMaxImputerFeaturizer_bool_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1110,7 +1089,6 @@ void MinMaxImputerFeaturizer_bool_Test(
     REQUIRE(MinMaxImputerFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <string> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1166,7 +1144,6 @@ void MinMaxImputerFeaturizer_string_Test(
     MinMaxImputerFeaturizer_string_CompleteTraining(pEstimatorHandle, &pErrorInfo);
     REQUIRE(pErrorInfo == nullptr);
 
-
     // Once here, training should be complete
     {
         bool is_complete(false);
@@ -1213,4 +1190,3 @@ void MinMaxImputerFeaturizer_string_Test(
     REQUIRE(MinMaxImputerFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
-
