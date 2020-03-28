@@ -100,13 +100,20 @@ public:
     using GrainTransformerTypeUniquePtr     = std::unique_ptr<GrainTransformerType>;
     using TransformerMap                    = std::map<GrainT, GrainTransformerTypeUniquePtr>;
 
+    using CreateTransformerFunc             = std::function<GrainTransformerTypeUniquePtr (GrainT const &)>;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    GrainTransformer(TransformerMap transformers);
-    GrainTransformer(Archive &ar);
+
+    // The `createFunc` is invoked (if available) when a grain is encountered during
+    // prediction time that wasn't seen during training.
+    GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc=CreateTransformerFunc());
+    GrainTransformer(CreateTransformerFunc createFunc);
+
+    GrainTransformer(Archive &ar, CreateTransformerFunc createFunc=CreateTransformerFunc());
 
     ~GrainTransformer(void) override = default;
 
@@ -120,6 +127,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
+    CreateTransformerFunc const             _createFunc;
     TransformerMap                          _transformers;
 
     // ----------------------------------------------------------------------
@@ -134,13 +142,19 @@ private:
         GrainTransformerType &              transformer(
             [this, &grain](void) -> GrainTransformerType & {
 
-                typename TransformerMap::iterator const                     iter(_transformers.find(grain));
+                typename TransformerMap::iterator const                     iter(
+                    [this, &grain]() {
+                        typename TransformerMap::iterator const             i(_transformers.find(grain));
 
-                if(iter == _transformers.end())
-                    throw std::runtime_error("Grain not found");
+                        if(i != _transformers.end())
+                            return i;
 
-                // TODO: Add support for a "default transformer" that (if provided during construction)
-                //       is cloned when a grain isn't found.
+                        if(!_createFunc)
+                            throw std::runtime_error("Grain not found");
+
+                        return _transformers.emplace(grain, _createFunc(grain)).first;
+                    }()
+                );
 
                 assert(iter->second);
                 return *iter->second;
@@ -436,7 +450,22 @@ GrainEstimatorAnnotation<GrainT>::GrainEstimatorAnnotation(AnnotationMap annotat
 // |
 // ----------------------------------------------------------------------
 template <typename GrainT, typename EstimatorT>
-GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transformers) :
+GrainTransformer<GrainT, EstimatorT>::GrainTransformer(CreateTransformerFunc createFunc) :
+    _createFunc(
+        std::move(
+            [&createFunc]() -> CreateTransformerFunc & {
+                if(!createFunc)
+                    throw std::invalid_argument("`createFunc` is empty");
+
+                return createFunc;
+            }()
+        )
+    ) {
+}
+
+template <typename GrainT, typename EstimatorT>
+GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc/*=CreateTransformerFunc()*/) :
+    _createFunc(std::move(createFunc)),
     _transformers(
         std::move(
             [&transformers](void) -> TransformerMap & {
@@ -450,14 +479,10 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transforme
 }
 
 template <typename GrainT, typename EstimatorT>
-GrainTransformer<GrainT, EstimatorT>::GrainTransformer(Archive &ar) :
+GrainTransformer<GrainT, EstimatorT>::GrainTransformer(Archive &ar, CreateTransformerFunc createFunc/*=CreateTransformerFunc()*/) :
     GrainTransformer(
-        [&ar](void) -> TransformerMap {
+        [&ar, &createFunc](void) {
             std::uint64_t                   cElements(Traits<std::uint64_t>::deserialize(ar));
-
-            if(cElements == 0)
-                throw std::runtime_error("Invalid elements");
-
             TransformerMap                  transformers;
 
             while(cElements--) {
@@ -470,7 +495,17 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(Archive &ar) :
                     throw std::runtime_error("Invalid insertion");
             }
 
-            return transformers;
+            if(transformers.empty()) {
+                if(!createFunc)
+                    throw std::runtime_error("A `createFunc` must be provided when there aren't any transformers in the transformer map");
+
+                return GrainTransformer(std::move(createFunc));
+            }
+
+            if(createFunc)
+                return GrainTransformer(std::move(transformers), std::move(createFunc));
+
+            return GrainTransformer(std::move(transformers));
         }()
     ) {
 }
