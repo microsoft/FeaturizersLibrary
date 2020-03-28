@@ -94,7 +94,6 @@ private:
     // |  Private Types
     // |
     // ----------------------------------------------------------------------
-    using GrainsSet                         = ShortGrainDropperTransformer::GrainsSet;
     using GrainsMap                         = std::unordered_map<std::vector<std::string>, std::uint32_t, Microsoft::Featurizer::ContainerHash<std::vector<std::string>>>;
     // ----------------------------------------------------------------------
     // |
@@ -103,7 +102,6 @@ private:
     // ----------------------------------------------------------------------
     size_t const                            _colIndex;
     std::uint32_t const                     _minPoints;
-    GrainsSet                               _grainsToDrop;
     GrainsMap                               _groupByGrains;
 
     // ----------------------------------------------------------------------
@@ -134,7 +132,17 @@ private:
 
     // MSVC has problems when the definition is separate from the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        return typename BaseType::TransformerUniquePtr(new TransformerType(std::move(_grainsToDrop)));
+
+        ShortGrainDropperTransformer::GrainsSet grainsToDrop;
+
+        for (GrainsMap::value_type const & groupByGrainsElement : _groupByGrains) {
+            if (groupByGrainsElement.second <= _minPoints)
+                grainsToDrop.emplace(std::move(groupByGrainsElement.first));
+        }
+        //clear _groupByGrains
+        _groupByGrains = {};
+
+        return typename BaseType::TransformerUniquePtr(new TransformerType(std::move(grainsToDrop)));
     }
 };
 
@@ -186,12 +194,6 @@ bool ShortGrainDropperEstimator<MaxNumTrainingItemsV>::begin_training_impl(void)
 
 template <size_t MaxNumTrainingItemsV>
 void ShortGrainDropperEstimator<MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
-    for (GrainsMap::value_type const & groupByGrainsElement : _groupByGrains) {
-        if (groupByGrainsElement.second <= _minPoints)
-            _grainsToDrop.emplace(std::move(groupByGrainsElement.first));
-    }
-    //clear _groupByGrains
-    _groupByGrains = {};
 }
 
 } // namespace Featurizers
