@@ -60,7 +60,7 @@ class _StructTypeInfo(TypeInfo):
     ):
         return self.Result(
             self.TypeName,
-            "{} {};".format(self.TypeName, result_name),
+            [self.Type(self.TypeName, result_name)],
             "&{}".format(result_name),
             textwrap.dedent(
                 """\

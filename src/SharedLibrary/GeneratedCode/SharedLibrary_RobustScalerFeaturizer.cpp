@@ -5,6 +5,7 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_RobustScalerFeaturizer.h"
+#include "SharedLibrary_Common.hpp"
 #include "SharedLibrary_PointerTable.h"
 
 #include "Archive.h"
@@ -28,7 +29,7 @@ extern "C" {
 /* |  RobustScalerFeaturizer <int8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int8_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalerFeaturizer_int8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int8_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalerFeaturizer_int8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -36,7 +37,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int8_CreateEstimator(/*in*/ b
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int8_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int8_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int8_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int8_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin, qRangeMax);
 
         pEstimator->begin_training();
 
@@ -399,7 +400,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int8_Flush(/*in*/ RobustScale
 /* |  RobustScalerFeaturizer <int16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int16_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalerFeaturizer_int16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int16_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalerFeaturizer_int16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -407,7 +408,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int16_CreateEstimator(/*in*/ 
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int16_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int16_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int16_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int16_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin, qRangeMax);
 
         pEstimator->begin_training();
 
@@ -770,7 +771,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int16_Flush(/*in*/ RobustScal
 /* |  RobustScalerFeaturizer <uint8> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint8_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalerFeaturizer_uint8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint8_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalerFeaturizer_uint8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -778,7 +779,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint8_CreateEstimator(/*in*/ 
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint8_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint8_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint8_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint8_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin, qRangeMax);
 
         pEstimator->begin_training();
 
@@ -1141,7 +1142,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint8_Flush(/*in*/ RobustScal
 /* |  RobustScalerFeaturizer <uint16> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint16_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalerFeaturizer_uint16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint16_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalerFeaturizer_uint16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1149,7 +1150,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint16_CreateEstimator(/*in*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint16_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint16_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint16_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint16_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin, qRangeMax);
 
         pEstimator->begin_training();
 
@@ -1512,7 +1513,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint16_Flush(/*in*/ RobustSca
 /* |  RobustScalerFeaturizer <float> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_float_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalerFeaturizer_float_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_float_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalerFeaturizer_float_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1520,7 +1521,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_float_CreateEstimator(/*in*/ 
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::float_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::float_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::float_t, std::float_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::float_t, std::float_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin, qRangeMax);
 
         pEstimator->begin_training();
 
@@ -1883,7 +1884,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_float_Flush(/*in*/ RobustScal
 /* |  RobustScalerFeaturizer <int32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int32_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalerFeaturizer_int32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int32_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalerFeaturizer_int32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1891,7 +1892,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int32_CreateEstimator(/*in*/ 
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int32_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int32_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int32_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int32_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin, qRangeMax);
 
         pEstimator->begin_training();
 
@@ -2254,7 +2255,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int32_Flush(/*in*/ RobustScal
 /* |  RobustScalerFeaturizer <int64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int64_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalerFeaturizer_int64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int64_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalerFeaturizer_int64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2262,7 +2263,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int64_CreateEstimator(/*in*/ 
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int64_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int64_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int64_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int64_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin, qRangeMax);
 
         pEstimator->begin_training();
 
@@ -2625,7 +2626,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int64_Flush(/*in*/ RobustScal
 /* |  RobustScalerFeaturizer <uint32> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint32_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalerFeaturizer_uint32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint32_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalerFeaturizer_uint32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2633,7 +2634,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint32_CreateEstimator(/*in*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint32_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint32_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint32_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint32_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin, qRangeMax);
 
         pEstimator->begin_training();
 
@@ -2996,7 +2997,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint32_Flush(/*in*/ RobustSca
 /* |  RobustScalerFeaturizer <uint64> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint64_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalerFeaturizer_uint64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint64_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalerFeaturizer_uint64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3004,7 +3005,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint64_CreateEstimator(/*in*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint64_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint64_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint64_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint64_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin, qRangeMax);
 
         pEstimator->begin_training();
 
@@ -3367,7 +3368,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint64_Flush(/*in*/ RobustSca
 /* |  RobustScalerFeaturizer <double> */
 /* |                                                                      */
 /* ---------------------------------------------------------------------- */
-FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_double_CreateEstimator(/*in*/ bool withCentering, /*in*/ float const * qRangeMin, /*in*/ float const * qRangeMax, /*out*/ RobustScalerFeaturizer_double_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_double_CreateEstimator(/*in*/ bool withCentering, /*in*/ float qRangeMin, /*in*/ float qRangeMax, /*out*/ RobustScalerFeaturizer_double_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3375,7 +3376,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_double_CreateEstimator(/*in*/
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::double_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::double_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin != nullptr ? *qRangeMin : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), qRangeMax != nullptr ? *qRangeMax : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue());
+        Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::double_t, std::double_t>* pEstimator = new Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::double_t, std::double_t>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , withCentering, qRangeMin, qRangeMax);
 
         pEstimator->begin_training();
 

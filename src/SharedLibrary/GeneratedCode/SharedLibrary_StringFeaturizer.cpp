@@ -5,6 +5,7 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_StringFeaturizer.h"
+#include "SharedLibrary_Common.hpp"
 #include "SharedLibrary_PointerTable.h"
 
 #include "Archive.h"
@@ -4676,7 +4677,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_Fit(/*in*/ StringFeaturizer_
 
         Microsoft::Featurizer::Featurizers::StringEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::StringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -4886,7 +4887,7 @@ FEATURIZER_LIBRARY_API bool StringFeaturizer_string_Transform(/*in*/ StringFeatu
         using TransformedType = typename Microsoft::Featurizer::Featurizers::StringEstimator<std::string>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         if(result.empty()) {

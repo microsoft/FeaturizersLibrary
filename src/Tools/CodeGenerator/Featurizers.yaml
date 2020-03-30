@@ -5,6 +5,7 @@ featurizers:
     release_version: 0.4.0
     num_output_columns: 1
     transformer_maintains_state: true
+    creates_annotations: false
     description: |-
         Calculates data based on a rolling window. Currently supports mean. Works for any data set that is already sorted.
 
@@ -1384,6 +1385,7 @@ featurizers:
     release_version: 0.4.0
     num_output_columns: 1
     transformer_maintains_state: true
+    creates_annotations: false
     description: |-
       Calculates data based on a rolling window. Currently supports minimum and maximum. Works for any data set that is already sorted.
 
@@ -1431,7 +1433,6 @@ featurizers:
           - uint16
           - uint32
           - uint64
-          - bool
           - float
           - double
           - string
@@ -1460,11 +1461,10 @@ featurizers:
         name: maxWindowSize
         description: The maximum number of items in a window.
 
-      - type: uint32?
+      - type: uint32
         name: minWindowSize
+        default_value: 1
         description: The minimum number of elements that must be in an window to perform the calculation. If there is less, NaN will be returned. Defaults to 1.
-
-    status: Pending
 
   # ----------------------------------------------------------------------
   - name: StandardScaleWrapperFeaturizer

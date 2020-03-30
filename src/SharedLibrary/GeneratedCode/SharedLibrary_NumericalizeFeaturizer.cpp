@@ -5,6 +5,7 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_NumericalizeFeaturizer.h"
+#include "SharedLibrary_Common.hpp"
 #include "SharedLibrary_PointerTable.h"
 
 #include "Archive.h"
@@ -4214,7 +4215,7 @@ FEATURIZER_LIBRARY_API bool NumericalizeFeaturizer_string_Fit(/*in*/ Numericaliz
 
         Microsoft::Featurizer::Featurizers::NumericalizeEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::NumericalizeEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -4424,7 +4425,7 @@ FEATURIZER_LIBRARY_API bool NumericalizeFeaturizer_string_Transform(/*in*/ Numer
         using TransformedType = typename Microsoft::Featurizer::Featurizers::NumericalizeEstimator<std::string>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;

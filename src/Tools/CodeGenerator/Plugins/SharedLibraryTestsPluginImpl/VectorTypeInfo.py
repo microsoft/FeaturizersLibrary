@@ -88,30 +88,57 @@ class VectorTypeInfo(TypeInfo):
         self,
         result_name="result",
     ):
-        return self.Result(
-            "std::vector<{}>".format(self._type_info.CppType),
-            textwrap.dedent(
+        result = self._type_info.GetOutputInfo(result_name)
+        assert len(result.TransformVars) == 1, result.TransformVars
+
+        parameters = [self.Type("{}*".format(p.Type), "{}_ptr".format(p.Name)) for p in result.TransformVars]
+        parameters.append(self.Type("size_t", "{}_items".format(result_name)))
+
+        assert len(parameters) == 2, parameters
+
+        if "nonstd::optional" in result.VectorResultType:
+
+
+            statements = textwrap.dedent(
                 """\
-                {type} * {result_name}_ptr(nullptr);
-                std::size_t {result_name}_items(0);
+                // Convert the pointers into optional values
+                {{
+                    std::vector<{type}> temp;
+
+                    temp.reserve({parameter1_name});
+
+                    for({parameter0_type}ptr = {parameter0_name}; ptr != {parameter0_name} + {parameter1_name}; ++ptr) {{
+                        if(*ptr != nullptr)
+                            temp.emplace_back(std::move(**ptr));
+                        else
+                            temp.emplace_back({type}());
+                    }}
+
+                    results.emplace_back(std::move(temp));
+                }}
                 """,
             ).format(
-                type=getattr(self._type_info, "CType", self._type_info.CppType),
                 result_name=result_name,
-            ),
-            "&{result_name}_ptr, &{result_name}_items".format(
-                result_name=result_name,
-            ),
-            textwrap.dedent(
+                type=result.VectorResultType,
+                parameter0_type=parameters[0].Type,
+                parameter0_name=parameters[0].Name,
+                parameter1_name=parameters[1].Name,
+            )
+        else:
+            statements = textwrap.dedent(
                 """\
                 results.emplace_back(std::vector<{type}>({result_name}_ptr, {result_name}_ptr + {result_name}_items));
                 """,
             ).format(
-                type=self._type_info.CppType,
+                type=result.VectorResultType,
                 result_name=result_name,
-            ),
-            "{result_name}_ptr, {result_name}_items".format(
-                result_name=result_name,
-            ),
+            )
+
+        return self.Result(
+            "std::vector<{}>".format(result.VectorResultType),
+            parameters,
+            ", ".join(["&{}".format(p.Name) for p in parameters]),
+            statements,
+            "{}, {}".format(parameters[0].Name, parameters[1].Name),
             destroy_inline=True,
         )

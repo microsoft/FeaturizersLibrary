@@ -91,9 +91,9 @@ void TruncatedSVDFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        size_t result_cols(0);
-        size_t result_rows(0);
-        std::float_t * result_ptr(nullptr);
+        size_t result_cols;
+        size_t result_rows;
+        std::float_t * result_ptr;
 
         REQUIRE(TruncatedSVDFeaturizer_float_Transform(pTransformerHandle, static_cast<size_t>(input.cols()), static_cast<size_t>(input.rows()), input.data(), &result_cols, &result_rows, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -193,9 +193,9 @@ void TruncatedSVDFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        size_t result_cols(0);
-        size_t result_rows(0);
-        std::double_t * result_ptr(nullptr);
+        size_t result_cols;
+        size_t result_rows;
+        std::double_t * result_ptr;
 
         REQUIRE(TruncatedSVDFeaturizer_double_Transform(pTransformerHandle, static_cast<size_t>(input.cols()), static_cast<size_t>(input.rows()), input.data(), &result_cols, &result_rows, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);

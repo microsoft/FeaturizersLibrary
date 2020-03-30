@@ -4,6 +4,7 @@
     [type string]
     [name string]
     [description Description]
+    [default_value (int|number|string) ?]
 
 <custom_structs *>:
     [name string]

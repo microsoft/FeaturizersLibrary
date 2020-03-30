@@ -50,8 +50,11 @@ void Train(EstimatorT &estimator, std::vector<std::vector<InputT>> const &inputB
     estimator.begin_training();
 
     typename Batches::const_iterator        iter(inputBatches.begin());
+    bool                                    wasTrained(false);
 
     while(estimator.get_state() == NS::TrainingState::Training) {
+        wasTrained = true;
+
         if(estimator.fit(iter->data(), iter->size()) == NS::FitResult::Reset) {
             iter = inputBatches.begin();
             continue;
@@ -64,6 +67,8 @@ void Train(EstimatorT &estimator, std::vector<std::vector<InputT>> const &inputB
             iter = inputBatches.begin();
         }
     }
+
+    CHECK(wasTrained);
 
     estimator.complete_training();
 }

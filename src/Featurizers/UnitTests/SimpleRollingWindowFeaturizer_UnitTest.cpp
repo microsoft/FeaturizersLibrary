@@ -15,9 +15,8 @@ using OutputType = NS::Featurizers::SimpleRollingWindowTransformer<InputType>::T
 using VectorMemberType = NS::Traits<InputType>::nullable_type;
 
 TEST_CASE("Min - int32, window size 1, horizon 1") {
-    
+
     NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 1);
-    
 
     OutputType results = transformer.execute(1);
 
@@ -45,7 +44,7 @@ TEST_CASE("Min - int32, window size 1, horizon 1") {
     CHECK(results[0] == 3);
 }
 
-TEST_CASE("Min - int32, window size 2, horizon 1") {    
+TEST_CASE("Min - int32, window size 2, horizon 1") {
     NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 2);
 
     OutputType results = transformer.execute(1);
@@ -72,7 +71,7 @@ TEST_CASE("Min - int32, window size 2, horizon 1") {
     CHECK(results[0] == 2);
 }
 
-TEST_CASE("Max - int32, window size 2, horizon 1, min window size 2") {    
+TEST_CASE("Max - int32, window size 2, horizon 1, min window size 2") {
     NS::Featurizers::SimpleRollingWindowTransformer<InputType>                transformer(NS::Featurizers::SimpleRollingWindowCalculation::Max, 1, 2, 2);
 
     OutputType results = transformer.execute(1);
@@ -204,7 +203,7 @@ TEST_CASE("Estimator Min - int32, window size 2, horizon 2, min window size 2") 
     estimator.begin_training();
     estimator.complete_training();
     auto transformer = estimator.create_transformer();
-    
+
     std::vector<OutputType>   output;
     auto const                              callback(
         [&output](OutputType value) {
@@ -238,7 +237,7 @@ TEST_CASE("Estimator Min - int32, window size 2, horizon 2, min window size 2") 
     CHECK(results[1] == 1);
 
     transformer->execute(4, callback);
-    results = output[3]; 
+    results = output[3];
 
     // Correct result is now {1, 2}
     CHECK(results.size() == 2);
@@ -248,18 +247,21 @@ TEST_CASE("Estimator Min - int32, window size 2, horizon 2, min window size 2") 
 
 using GrainType = std::vector<std::string>;
 
-TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {    
+TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedSimpleRollingWindowEstimator<InputType>      estimator(pAllColumnAnnotations, NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 1);
 
     using GrainedInputType = std::tuple<GrainType, InputType>;
 
     const GrainType grain({"one"});
-    const GrainedInputType tup1 = std::make_tuple(grain, 1);
-    const std::vector<std::tuple<GrainType const &, InputType const &>> vec = {tup1};
+    const GrainedInputType tup1(std::make_tuple(grain, 1));
 
+    estimator.begin_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Finished);
 
-    NS::TestHelpers::Train(estimator, vec);
+    estimator.complete_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Completed);
+
     auto transformer = estimator.create_transformer();
 
     std::vector<OutputType>   output;
@@ -271,7 +273,7 @@ TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
 
     transformer->execute(tup1, callback);
     OutputType results = output[0];
-    
+
     // Correct result is {NaN}
     CHECK(results.size() == 1);
     CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
@@ -343,14 +345,14 @@ TEST_CASE("Invalid Constructor Args") {
 }
 
 TEST_CASE("Flush test") {
-    
+
     std::vector<OutputType>   output;
     auto const                              callback(
         [&output](OutputType value) {
             output.emplace_back(std::move(value));
         }
     );
-    
+
     NS::Featurizers::SimpleRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 1);
 
     OutputType results = transformer.execute(1);
@@ -367,7 +369,7 @@ TEST_CASE("Flush test") {
     // Flush should also return no values.
     transformer.flush(callback);
     CHECK(output.size() == 0);
-    
+
     results = transformer.execute(1);
 
     CHECK(results.size() == 1);

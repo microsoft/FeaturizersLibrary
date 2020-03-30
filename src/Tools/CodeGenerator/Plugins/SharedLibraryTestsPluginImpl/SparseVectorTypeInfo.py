@@ -78,32 +78,33 @@ class SparseVectorTypeInfo(TypeInfo):
     ):
         return self.Result(
             "Microsoft::Featurizer::Featurizers::SparseVectorEncoding<{}>".format(self._type_info.CppType),
-            textwrap.dedent(
-                """\
-                uint64_t numElements(0);
-                uint64_t numValues(0);
-                {type} * pValues(nullptr);
-                uint64_t *pIndexes(nullptr);
-                """,
-            ).format(
-                type=self._type_info.CppType,
+            [
+                self.Type("uint64_t", "{}_numElements".format(result_name)),
+                self.Type("uint64_t", "{}_numValues".format(result_name)),
+                self.Type(self._type_info.CppType, "{}_values".format(result_name)),
+                self.Type("uint64_t", "{}_indexes".format(result_name)),
+            ],
+            "&{name}_numElements, &{name}_numValues, &{name}_values, &{name}_indexes".format(
+                name=result_name,
             ),
-            "&numElements, &numValues, &pValues, &pIndexes",
             textwrap.dedent(
                 """\
                 std::vector<typename Microsoft::Featurizer::Featurizers::SparseVectorEncoding<{type}>::ValueEncoding> encodings;
-                {type} const *pValue(pValues);
-                uint64_t const *pIndex(pIndexes);
+                {type} const *pValue({name}_values);
+                uint64_t const *pIndex({name}_indexes);
 
-                while(numValues--) {{
+                while({name}_numValues--) {{
                     encodings.emplace_back(*pValue++, *pIndex++);
                 }}
 
-                results.emplace_back(numElements, std::move(encodings));
+                results.emplace_back({name}_numElements, std::move(encodings));
                 """
             ).format(
-                type=self._type_info.CppType
+                type=self._type_info.CppType,
+                name=result_name,
             ),
-            "numElements, numValues, pValues, pIndexes",
+            "{name}_numElements, {name}_numValues, {name}_values, {name}_indexes".format(
+                name=result_name,
+            ),
             destroy_inline=True,
         )

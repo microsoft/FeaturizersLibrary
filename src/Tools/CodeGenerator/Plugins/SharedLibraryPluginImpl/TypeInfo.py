@@ -94,6 +94,7 @@ class TypeInfo(Interface.Interface):
     # ----------------------------------------------------------------------
     @Interface.extensionmethod
     def GetCppTemplateSuffix(self, template_mapping):
+        """Return the type to use when this type is used as a template"""
         return self.CppType
 
     # ----------------------------------------------------------------------

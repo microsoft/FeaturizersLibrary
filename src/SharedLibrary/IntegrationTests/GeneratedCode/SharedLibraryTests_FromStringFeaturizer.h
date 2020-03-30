@@ -1158,7 +1158,7 @@ void FromStringFeaturizer_string_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(FromStringFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);

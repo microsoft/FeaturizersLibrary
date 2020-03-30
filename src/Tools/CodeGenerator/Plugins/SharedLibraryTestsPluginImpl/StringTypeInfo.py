@@ -52,25 +52,24 @@ class StringTypeInfo(TypeInfo):
         self,
         result_name="result",
     ):
+        if self.IsOptional:
+            vector_type = "nonstd::optional<std::string>"
+            statement = "results.emplace_back({result}_ptr ? std::string({result}_ptr) : nonstd::optional<std::string>());".format(
+                result=result_name,
+            )
+        else:
+            vector_type = "std::string"
+            statement = "results.emplace_back({result}_ptr ? std::string({result}_ptr) : std::string());".format(
+                result=result_name,
+            )
+
         return self.Result(
-            "std::string",
-            textwrap.dedent(
-                """\
-                char const * {result_name}_ptr(nullptr);
-                """,
-            ).format(
-                result_name=result_name,
-            ),
+            vector_type,
+            [self.Type("char const *", "{}_ptr".format(result_name))],
             "&{result_name}_ptr".format(
                 result_name=result_name,
             ),
-            textwrap.dedent(
-                """\
-                results.emplace_back({result}_ptr ? std::string({result}_ptr) : std::string());
-                """,
-            ).format(
-                result=result_name,
-            ),
+            statement,
             "{result_name}_ptr".format(
                 result_name=result_name,
             ),

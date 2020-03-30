@@ -92,7 +92,7 @@ void StringFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_int8_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -193,7 +193,7 @@ void StringFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_int16_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -294,7 +294,7 @@ void StringFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_int32_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -395,7 +395,7 @@ void StringFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_int64_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -496,7 +496,7 @@ void StringFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_uint8_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -597,7 +597,7 @@ void StringFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_uint16_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -698,7 +698,7 @@ void StringFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_uint32_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -799,7 +799,7 @@ void StringFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_uint64_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -900,7 +900,7 @@ void StringFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_float_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1001,7 +1001,7 @@ void StringFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_double_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1102,7 +1102,7 @@ void StringFeaturizer_bool_Test(
     results.reserve(inference_input.size());
 
     for(bool input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_bool_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1203,7 +1203,7 @@ void StringFeaturizer_string_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);

@@ -5,6 +5,7 @@
 """Contains the UniqueIdTypeInfo object"""
 
 import os
+import textwrap
 
 import CommonEnvironment
 from CommonEnvironment import Interface
@@ -33,7 +34,24 @@ class UniqueIdTypeInfo(TypeInfo):
         self,
         input_name="input",
     ):
-        raise NotImplementedError("Not implemented yet")
+        return (
+            "{name}_buffer.data(), {name}_buffer.size()".format(
+                name=input_name,
+            ),
+            textwrap.dedent(
+                """\
+                std::vector<char const *> {name}_buffer;
+
+                {name}_buffer.reserve({name}.size());
+
+                for(std::string const &value : {name})
+                    {name}_buffer.emplace_back(value.c_str());
+
+                """,
+            ).format(
+                name=input_name,
+            ),
+        )
 
     # ----------------------------------------------------------------------
     @Interface.override
@@ -41,4 +59,11 @@ class UniqueIdTypeInfo(TypeInfo):
         self,
         result_name="result",
     ):
-        raise NotImplementedError("Output support for UniqueIds is not currently supported")
+        return self.Result(
+            "BugBug100",
+            [self.Type("BugBug200.0", "BugBug200.1")],
+            "BugBug300",
+            "BugBug400",
+            "BugBug500",
+            destroy_inline=True,
+        )

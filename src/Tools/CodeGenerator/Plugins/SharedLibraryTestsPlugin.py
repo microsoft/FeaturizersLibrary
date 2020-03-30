@@ -142,7 +142,11 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                 constructor_params = ""
                 constructor_args = ""
 
+            fit_prefix_statements = ""
+
             transform_input_args = type_info_data.InputTypeInfo.GetTransformInputArgs()
+            if isinstance(transform_input_args, tuple):
+                transform_input_args, fit_prefix_statements = transform_input_args
 
             if item.has_dynamic_output:
                 output_statement_info = type_info_data.DynamicOutputTypeInfo.GetOutputInfo()
@@ -188,7 +192,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                                 FitResult result(0);
                                 auto const & input(*iter);
 
-                                REQUIRE({name}{suffix}Fit(pEstimatorHandle, {fit_input_args}, &result, &pErrorInfo));
+                                {fit_prefix_statements}REQUIRE({name}{suffix}Fit(pEstimatorHandle, {fit_input_args}, &result, &pErrorInfo));
                                 REQUIRE(pErrorInfo == nullptr);
 
                                 if(result == ResetAndContinue) {{
@@ -240,6 +244,12 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                     flush=flush,
                     constructor_args=constructor_args,
                     fit_input_args=transform_input_args,
+                    fit_prefix_statements="" if not fit_prefix_statements else "{}\n\n            ".format(
+                        StringHelpers.LeftJustify(
+                            fit_prefix_statements.rstrip(),
+                            12,
+                        ),
+                    ),
                 ),
             )
 
@@ -290,7 +300,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                             std::vector<{vector_result_type}> results;
 
                             {for_loop} {{
-                                {transform_vars}
+                                {transform_prefix_statements}{transform_vars}
 
                                 REQUIRE({name}{suffix}Transform(pTransformerHandle, {transform_input_args}, {transform_output_args}, &pErrorInfo));
                                 REQUIRE(pErrorInfo == nullptr);
@@ -314,8 +324,19 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                             suffix=suffix,
                             vector_result_type=output_statement_info.VectorResultType,
                             for_loop=for_loop,
+                            transform_prefix_statements="" if not fit_prefix_statements else "{}\n\n    ".format(
+                                StringHelpers.LeftJustify(
+                                    fit_prefix_statements,
+                                    4,
+                                ).rstrip(),
+                            ),
                             transform_vars=StringHelpers.LeftJustify(
-                                output_statement_info.TransformVars.rstrip(),
+                                "\n".join(
+                                    [
+                                        "{} {};".format(var.Type, var.Name)
+                                        for var in output_statement_info.TransformVars
+                                    ]
+                                ),
                                 4,
                             ),
                             transform_input_args=transform_input_args,
@@ -344,7 +365,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                             results.reserve(inference_input.size());
 
                             {for_loop} {{
-                                {transform_vars}
+                                {transform_prefix_statements}{transform_vars}
 
                                 REQUIRE({name}{suffix}Transform(pTransformerHandle, {transform_input_args}, {transform_output_args}, &pErrorInfo));
                                 REQUIRE(pErrorInfo == nullptr);
@@ -358,8 +379,19 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                             suffix=suffix,
                             vector_result_type=output_statement_info.VectorResultType,
                             for_loop=for_loop,
+                            transform_prefix_statements="" if not fit_prefix_statements else "{}\n\n    ".format(
+                                StringHelpers.LeftJustify(
+                                    fit_prefix_statements,
+                                    4,
+                                ).rstrip(),
+                            ),
                             transform_vars=StringHelpers.LeftJustify(
-                                output_statement_info.TransformVars.rstrip(),
+                                "\n".join(
+                                    [
+                                        "{} {};".format(var.Type, var.Name)
+                                        for var in output_statement_info.TransformVars
+                                    ]
+                                ),
                                 4,
                             ),
                             transform_input_args=transform_input_args,

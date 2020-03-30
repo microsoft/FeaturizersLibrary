@@ -5,6 +5,7 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_MinMaxImputerFeaturizer.h"
+#include "SharedLibrary_Common.hpp"
 #include "SharedLibrary_PointerTable.h"
 
 #include "Archive.h"
@@ -3159,7 +3160,7 @@ FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_float_IsTrainingComplete(/*i
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_float_Fit(/*in*/ MinMaxImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_float_Fit(/*in*/ MinMaxImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3173,7 +3174,7 @@ FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_float_Fit(/*in*/ MinMaxImput
 
         Microsoft::Featurizer::Featurizers::MinMaxImputerEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxImputerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
         return true;
     }
@@ -3357,7 +3358,7 @@ FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_float_CreateTransformerSaveD
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_float_Transform(/*in*/ MinMaxImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_float_Transform(/*in*/ MinMaxImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3374,7 +3375,7 @@ FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_float_Transform(/*in*/ MinMa
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MinMaxImputerEstimator<std::float_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input));
 
         // Output
         *output = result;
@@ -3530,7 +3531,7 @@ FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_double_IsTrainingComplete(/*
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_double_Fit(/*in*/ MinMaxImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_double_Fit(/*in*/ MinMaxImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3544,7 +3545,7 @@ FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_double_Fit(/*in*/ MinMaxImpu
 
         Microsoft::Featurizer::Featurizers::MinMaxImputerEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MinMaxImputerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
         return true;
     }
@@ -3728,7 +3729,7 @@ FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_double_CreateTransformerSave
     }
 }
 
-FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_double_Transform(/*in*/ MinMaxImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_double_Transform(/*in*/ MinMaxImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3745,7 +3746,7 @@ FEATURIZER_LIBRARY_API bool MinMaxImputerFeaturizer_double_Transform(/*in*/ MinM
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MinMaxImputerEstimator<std::double_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input));
 
         // Output
         *output = result;

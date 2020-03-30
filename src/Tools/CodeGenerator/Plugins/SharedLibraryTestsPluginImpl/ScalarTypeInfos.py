@@ -36,12 +36,26 @@ class _ScalarTypeInfo(TypeInfo):
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
+    def __init__(
+        self,
+        *args,
+        member_type=None,
+        **kwargs
+    ):
+        if member_type is None:
+            return
+
+        super(_ScalarTypeInfo, self).__init__(*args, **kwargs)
+
+        self.RequiresOptionalType           = self.IsOptional and self.TypeName not in ["float", "double"]
+
+    # ----------------------------------------------------------------------
     @Interface.override
     def GetTransformInputArgs(
         self,
         input_name="input",
     ):
-        if self.IsOptional:
+        if self.RequiresOptionalType:
             return "Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<{cpp_type}>::nullable_type>::IsNull({input_name}) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<{cpp_type}>::nullable_type>::GetNullableValue({input_name})".format(
                 cpp_type=self.CppType,
                 input_name=input_name,
@@ -55,15 +69,26 @@ class _ScalarTypeInfo(TypeInfo):
         self,
         result_name="result",
     ):
-        if self.TypeName == "bool":
-            # vector<bool> doesn't support `emplace_back` on older compilers
-            statement = "results.push_back({});".format(result_name)
+        if self.RequiresOptionalType:
+            vector_type = "nonstd::optional<{}>".format(self.CppType)
+            local_type = "{} *".format(self.CppType)
+            statement = "results.emplace_back({name} ? std::move(*{name}) : nonstd::optional<{type}>()".format(
+                type=self.CppType,
+                name=result_name,
+            )
         else:
-            statement = "results.emplace_back(std::move({}));".format(result_name)
+            vector_type = self.CppType
+            local_type = self.CppType
+
+            if self.TypeName == "bool":
+                # vector<bool> doesn't support `emplace_back` on older compilers
+                statement = "results.push_back({});".format(result_name)
+            else:
+                statement = "results.emplace_back(std::move({}));".format(result_name)
 
         return self.Result(
-            self.CppType,
-            "{} {};".format(self.CppType, result_name),
+            vector_type,
+            [self.Type(local_type, result_name)],
             "&{}".format(result_name),
             statement,
         )

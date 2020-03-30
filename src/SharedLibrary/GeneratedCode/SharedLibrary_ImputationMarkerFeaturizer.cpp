@@ -5,6 +5,7 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_ImputationMarkerFeaturizer.h"
+#include "SharedLibrary_Common.hpp"
 #include "SharedLibrary_PointerTable.h"
 
 #include "Archive.h"
@@ -3159,7 +3160,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_IsTrainingComplete(
     }
 }
 
-FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Fit(/*in*/ ImputationMarkerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Fit(/*in*/ ImputationMarkerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3173,7 +3174,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Fit(/*in*/ Imputati
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
         return true;
     }
@@ -3357,7 +3358,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_CreateTransformerSa
     }
 }
 
-FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Transform(/*in*/ ImputationMarkerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Transform(/*in*/ ImputationMarkerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3374,7 +3375,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Transform(/*in*/ Im
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input));
 
         // Output
         *output = result;
@@ -3530,7 +3531,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_IsTrainingComplete
     }
 }
 
-FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Fit(/*in*/ ImputationMarkerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Fit(/*in*/ ImputationMarkerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3544,7 +3545,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Fit(/*in*/ Imputat
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
         return true;
     }
@@ -3728,7 +3729,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_CreateTransformerS
     }
 }
 
-FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Transform(/*in*/ ImputationMarkerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Transform(/*in*/ ImputationMarkerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3745,7 +3746,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Transform(/*in*/ I
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input));
 
         // Output
         *output = result;

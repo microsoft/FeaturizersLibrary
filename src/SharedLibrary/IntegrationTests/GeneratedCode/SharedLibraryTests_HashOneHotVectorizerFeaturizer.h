@@ -92,9 +92,9 @@ void HashOneHotVectorizerFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements(0);
+        uint64_t result_numElements;
         std::uint8_t result_value;
-        uint64_t result_index(0);
+        uint64_t result_index;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_int8_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -192,9 +192,9 @@ void HashOneHotVectorizerFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements(0);
+        uint64_t result_numElements;
         std::uint8_t result_value;
-        uint64_t result_index(0);
+        uint64_t result_index;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_int16_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -292,9 +292,9 @@ void HashOneHotVectorizerFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements(0);
+        uint64_t result_numElements;
         std::uint8_t result_value;
-        uint64_t result_index(0);
+        uint64_t result_index;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_int32_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -392,9 +392,9 @@ void HashOneHotVectorizerFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements(0);
+        uint64_t result_numElements;
         std::uint8_t result_value;
-        uint64_t result_index(0);
+        uint64_t result_index;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_int64_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -492,9 +492,9 @@ void HashOneHotVectorizerFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements(0);
+        uint64_t result_numElements;
         std::uint8_t result_value;
-        uint64_t result_index(0);
+        uint64_t result_index;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_uint8_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -592,9 +592,9 @@ void HashOneHotVectorizerFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements(0);
+        uint64_t result_numElements;
         std::uint8_t result_value;
-        uint64_t result_index(0);
+        uint64_t result_index;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_uint16_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -692,9 +692,9 @@ void HashOneHotVectorizerFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements(0);
+        uint64_t result_numElements;
         std::uint8_t result_value;
-        uint64_t result_index(0);
+        uint64_t result_index;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_uint32_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -792,9 +792,9 @@ void HashOneHotVectorizerFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements(0);
+        uint64_t result_numElements;
         std::uint8_t result_value;
-        uint64_t result_index(0);
+        uint64_t result_index;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_uint64_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -892,9 +892,9 @@ void HashOneHotVectorizerFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements(0);
+        uint64_t result_numElements;
         std::uint8_t result_value;
-        uint64_t result_index(0);
+        uint64_t result_index;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_float_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -992,9 +992,9 @@ void HashOneHotVectorizerFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements(0);
+        uint64_t result_numElements;
         std::uint8_t result_value;
-        uint64_t result_index(0);
+        uint64_t result_index;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_double_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1092,9 +1092,9 @@ void HashOneHotVectorizerFeaturizer_bool_Test(
     results.reserve(inference_input.size());
 
     for(bool input : inference_input) {
-        uint64_t result_numElements(0);
+        uint64_t result_numElements;
         std::uint8_t result_value;
-        uint64_t result_index(0);
+        uint64_t result_index;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_bool_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1192,9 +1192,9 @@ void HashOneHotVectorizerFeaturizer_string_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements(0);
+        uint64_t result_numElements;
         std::uint8_t result_value;
-        uint64_t result_index(0);
+        uint64_t result_index;
 
         REQUIRE(HashOneHotVectorizerFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_numElements, &result_value, &result_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);

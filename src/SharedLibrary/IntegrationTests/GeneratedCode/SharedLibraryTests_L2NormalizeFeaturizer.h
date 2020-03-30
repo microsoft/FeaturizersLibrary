@@ -91,8 +91,8 @@ void L2NormalizeFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::double_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(L2NormalizeFeaturizer_int8_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -192,8 +192,8 @@ void L2NormalizeFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::double_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(L2NormalizeFeaturizer_int16_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -293,8 +293,8 @@ void L2NormalizeFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::double_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(L2NormalizeFeaturizer_int32_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -394,8 +394,8 @@ void L2NormalizeFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::double_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(L2NormalizeFeaturizer_int64_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -495,8 +495,8 @@ void L2NormalizeFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::double_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(L2NormalizeFeaturizer_uint8_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -596,8 +596,8 @@ void L2NormalizeFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::double_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(L2NormalizeFeaturizer_uint16_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -697,8 +697,8 @@ void L2NormalizeFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::double_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(L2NormalizeFeaturizer_uint32_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -798,8 +798,8 @@ void L2NormalizeFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::double_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(L2NormalizeFeaturizer_uint64_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -899,8 +899,8 @@ void L2NormalizeFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::double_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(L2NormalizeFeaturizer_float_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1000,8 +1000,8 @@ void L2NormalizeFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        double * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::double_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(L2NormalizeFeaturizer_double_Transform(pTransformerHandle, input.data(), input.size(), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
