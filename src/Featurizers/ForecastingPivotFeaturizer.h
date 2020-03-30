@@ -21,7 +21,7 @@ namespace Featurizers {
 template <typename InputT>
 class ForecastingPivotTransformer :
     public Components::InferenceOnlyTransformerImpl<
-        typename std::vector<Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>,
+        typename std::vector<Eigen::Map<const Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>>,
         std::vector<InputT>
     > {
 public:
@@ -34,7 +34,7 @@ public:
 
     using BaseType =
         Components::InferenceOnlyTransformerImpl<
-            typename std::vector<Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>,
+            typename std::vector<Eigen::Map<const Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>>,
             std::vector<InputT>
         >;
 
@@ -57,7 +57,7 @@ private:
     // |
     // ----------------------------------------------------------------------
     using NullableType                      = typename Microsoft::Featurizer::Traits<InputT>::nullable_type;
-    using MatrixType                        = Microsoft::Featurizer::RowMajMatrix<NullableType>;
+    using MatrixType                        = Eigen::Map<const Microsoft::Featurizer::RowMajMatrix<NullableType>>;
 
     // ----------------------------------------------------------------------
     // |
@@ -70,7 +70,7 @@ private:
         if (input.empty()) {
             throw std::invalid_argument("There's no input matrix passed in!");
         }
-        
+
         Eigen::Index const col_size(input[0].cols());
 
         for (Eigen::Index col = 0; col < col_size; ++col) {
