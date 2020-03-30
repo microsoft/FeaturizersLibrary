@@ -14,13 +14,10 @@ namespace NS = Microsoft::Featurizer;
 void TestImpl(std::vector<std::vector<std::vector<std::string>>> trainingBatches,
               std::vector<std::vector<std::string>> inferencingInput,
               std::vector<bool> inferencingOutput,
-              std::uint8_t windowSize,
-              std::vector<std::uint8_t> lags,
-              std::uint8_t maxHorizon,
-              nonstd::optional<std::uint8_t> cv){
+              std::uint32_t minPoints){
 
     using SGDEstimator = NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>;
-    SGDEstimator                                        estimator(NS::CreateTestAnnotationMapsPtr(1), 0, windowSize, std::make_tuple(lags.begin(), lags.end()), maxHorizon, cv);
+    SGDEstimator                                        estimator(NS::CreateTestAnnotationMapsPtr(1), 0, minPoints);
 
     NS::TestHelpers::Train<SGDEstimator, std::vector<std::string>>(estimator, trainingBatches);
     SGDEstimator::TransformerUniquePtr                  pTransformer(estimator.create_transformer());
@@ -42,70 +39,8 @@ void TestImpl(std::vector<std::vector<std::vector<std::string>>> trainingBatches
 }
 
 TEST_CASE("Invalid Transformer/Estimator") {
-    //parameter setting
-    std::uint8_t windowSize = 0;
-    std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>();
-    std::uint8_t maxHorizon = 1;
-    nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
-
-    CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 2, windowSize, std::make_tuple(lags.begin(), lags.end()), maxHorizon, cv), "colIndex");
-    CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, windowSize, std::make_tuple(lags.begin(), lags.end()), maxHorizon, cv), "lags");
-}
-
-TEST_CASE("Standard Test") {
-    std::vector<std::vector<std::vector<std::string>>> trainingBatches = NS::TestHelpers::make_vector<std::vector<std::vector<std::string>>>(
-        NS::TestHelpers::make_vector<std::vector<std::string>>(
-            NS::TestHelpers::make_vector<std::string>("a", "b"),
-            NS::TestHelpers::make_vector<std::string>("a", "b"),
-            NS::TestHelpers::make_vector<std::string>("a", "b"),
-            NS::TestHelpers::make_vector<std::string>("a", "b"),
-            NS::TestHelpers::make_vector<std::string>("a", "b"),
-            NS::TestHelpers::make_vector<std::string>("a", "c"),
-            NS::TestHelpers::make_vector<std::string>("a", "c"),
-            NS::TestHelpers::make_vector<std::string>("a", "c"),
-            NS::TestHelpers::make_vector<std::string>("a", "c"),
-            NS::TestHelpers::make_vector<std::string>("a", "d"),
-            NS::TestHelpers::make_vector<std::string>("a", "d"),
-            NS::TestHelpers::make_vector<std::string>("a", "d"),
-            NS::TestHelpers::make_vector<std::string>("a", "e"),
-            NS::TestHelpers::make_vector<std::string>("a", "e"),
-            NS::TestHelpers::make_vector<std::string>("a", "f")
-        )
-    );
-
-    std::vector<std::vector<std::string>> inferencingInput = NS::TestHelpers::make_vector<std::vector<std::string>>(
-        NS::TestHelpers::make_vector<std::string>("a", "b"),
-        NS::TestHelpers::make_vector<std::string>("a", "c"),
-        NS::TestHelpers::make_vector<std::string>("a", "d"),
-        NS::TestHelpers::make_vector<std::string>("a", "e"),
-        NS::TestHelpers::make_vector<std::string>("a", "f"),
-        NS::TestHelpers::make_vector<std::string>("a", "g")
-    );
-
-    std::vector<bool> inferencingOutput = {
-        false,
-        true,
-        true,
-        true,
-        true,
-        false
-    };
-
-    //parameter setting
-    std::uint8_t windowSize = 0;
-    std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-    std::uint8_t maxHorizon = 1;
-    nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
-
-    TestImpl(
-        trainingBatches,
-        inferencingInput,
-        inferencingOutput,
-        windowSize,
-        lags,
-        maxHorizon,
-        cv
-    );
+    CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 2, 1), "colIndex");
+    CHECK_THROWS_WITH(NS::Featurizers::ShortGrainDropperEstimator<std::numeric_limits<size_t>::max()>(NS::CreateTestAnnotationMapsPtr(1), 0, 0), "minPoints");
 }
 
 TEST_CASE("Standard Test_Parameter Combination") {
@@ -138,16 +73,13 @@ TEST_CASE("Standard Test_Parameter Combination") {
         NS::TestHelpers::make_vector<std::string>("a", "g")
     );
 
-    SECTION("windowSize=1/lags=[0,1]/maxHorizon=1/no cv") {
+    SECTION("minPoints = 5") {
         //parameter setting
-        std::uint8_t windowSize = 1;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t minPoints = 5;
 
         std::vector<bool> inferencingOutput = {
-            false,
-            false,
+            true,
+            true,
             true,
             true,
             true,
@@ -158,23 +90,17 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
+            minPoints
         );
     }
 
-    SECTION("windowSize=0/lags=[0,1]/maxHorizon=1/no cv") {
+    SECTION("minPoints = 4") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t minPoints = 4;
 
         std::vector<bool> inferencingOutput = {
             false,
-            false,
+            true,
             true,
             true,
             true,
@@ -185,24 +111,18 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
+            minPoints
         );
     }
 
-    SECTION("windowSize=1/lags=[0,0]/maxHorizon=1/no cv") {
+    SECTION("minPoints = 3") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t minPoints = 3;
 
         std::vector<bool> inferencingOutput = {
             false,
             false,
-            false,
+            true,
             true,
             true,
             false
@@ -212,19 +132,13 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
+            minPoints
         );
     }
 
-    SECTION("windowSize=0/lags=[0,0]/maxHorizon=1/no cv") {
+    SECTION("minPoints = 2") {
         //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t minPoints = 2;
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -239,73 +153,13 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
+            minPoints
         );
     }
 
-    SECTION("windowSize=1/lags=[0,1]/maxHorizon=0/no cv") {
+    SECTION("minPoints = 1") {
         //parameter setting
-        std::uint8_t windowSize = 1;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
-
-        std::vector<bool> inferencingOutput = {
-            false,
-            false,
-            false,
-            true,
-            true,
-            false
-        };
-
-        TestImpl(
-            trainingBatches,
-            inferencingInput,
-            inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
-        );
-    }
-
-    SECTION("windowSize=0/lags=[0,1]/maxHorizon=0/no cv") {
-        //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
-
-        std::vector<bool> inferencingOutput = {
-            false,
-            false,
-            false,
-            true,
-            true,
-            false
-        };
-
-        TestImpl(
-            trainingBatches,
-            inferencingInput,
-            inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
-        );
-    }
-
-    SECTION("windowSize=1/lags=[0,0]/maxHorizon=0/no cv") {
-        //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
+        std::uint32_t minPoints = 1;
 
         std::vector<bool> inferencingOutput = {
             false,
@@ -320,253 +174,7 @@ TEST_CASE("Standard Test_Parameter Combination") {
             trainingBatches,
             inferencingInput,
             inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
-        );
-    }
-
-    SECTION("windowSize=0/lags=[0,0]/maxHorizon=0/no cv") {
-        //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = nonstd::optional<std::uint8_t>();
-
-        std::vector<bool> inferencingOutput = {
-            false,
-            false,
-            false,
-            false,
-            true,
-            false
-        };
-
-        TestImpl(
-            trainingBatches,
-            inferencingInput,
-            inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
-        );
-    }
-
-    SECTION("windowSize=1/lags=[0,1]/maxHorizon=1/cv=1") {
-        //parameter setting
-        std::uint8_t windowSize = 1;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
-
-        std::vector<bool> inferencingOutput = {
-            true,
-            true,
-            true,
-            true,
-            true,
-            false
-        };
-
-        TestImpl(
-            trainingBatches,
-            inferencingInput,
-            inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
-        );
-    }
-
-    SECTION("windowSize=0/lags=[0,1]/maxHorizon=1/cv=1") {
-        //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
-
-        std::vector<bool> inferencingOutput = {
-            true,
-            true,
-            true,
-            true,
-            true,
-            false
-        };
-
-        TestImpl(
-            trainingBatches,
-            inferencingInput,
-            inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
-        );
-    }
-
-    SECTION("windowSize=1/lags=[0,0]/maxHorizon=1/cv=1") {
-        //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
-
-        std::vector<bool> inferencingOutput = {
-            false,
-            true,
-            true,
-            true,
-            true,
-            false
-        };
-
-        TestImpl(
-            trainingBatches,
-            inferencingInput,
-            inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
-        );
-    }
-
-    SECTION("windowSize=0/lags=[0,0]/maxHorizon=1/cv=1") {
-        //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 1;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
-
-        std::vector<bool> inferencingOutput = {
-            false,
-            true,
-            true,
-            true,
-            true,
-            false
-        };
-
-        TestImpl(
-            trainingBatches,
-            inferencingInput,
-            inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
-        );
-    }
-
-    SECTION("windowSize=1/lags=[0,1]/maxHorizon=0/cv=1") {
-        //parameter setting
-        std::uint8_t windowSize = 1;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
-
-        std::vector<bool> inferencingOutput = {
-            false,
-            false,
-            true,
-            true,
-            true,
-            false
-        };
-
-        TestImpl(
-            trainingBatches,
-            inferencingInput,
-            inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
-        );
-    }
-
-    SECTION("windowSize=0/lags=[0,1]/maxHorizon=0/cv=1") {
-        //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(1));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
-
-        std::vector<bool> inferencingOutput = {
-            false,
-            false,
-            true,
-            true,
-            true,
-            false
-        };
-
-        TestImpl(
-            trainingBatches,
-            inferencingInput,
-            inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
-        );
-    }
-
-    SECTION("windowSize=1/lags=[0,0]/maxHorizon=0/cv=1") {
-        //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
-
-        std::vector<bool> inferencingOutput = {
-            false,
-            false,
-            false,
-            true,
-            true,
-            false
-        };
-
-        TestImpl(
-            trainingBatches,
-            inferencingInput,
-            inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
-        );
-    }
-
-    SECTION("windowSize=0/lags=[0,0]/maxHorizon=0/cv=1") {
-        //parameter setting
-        std::uint8_t windowSize = 0;
-        std::vector<std::uint8_t> lags = NS::TestHelpers::make_vector<std::uint8_t>(static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(0));
-        std::uint8_t maxHorizon = 0;
-        nonstd::optional<std::uint8_t> cv = static_cast<std::uint8_t>(1);
-
-        std::vector<bool> inferencingOutput = {
-            false,
-            false,
-            false,
-            true,
-            true,
-            false
-        };
-
-        TestImpl(
-            trainingBatches,
-            inferencingInput,
-            inferencingOutput,
-            windowSize,
-            lags,
-            maxHorizon,
-            cv
+            minPoints
         );
     }
 }
