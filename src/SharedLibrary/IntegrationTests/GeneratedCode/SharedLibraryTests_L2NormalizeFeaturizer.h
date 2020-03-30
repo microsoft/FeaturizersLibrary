@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <int8> */
 template <typename VectorInputT>
@@ -112,6 +123,7 @@ void L2NormalizeFeaturizer_int8_Test(
     REQUIRE(L2NormalizeFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <int16> */
 template <typename VectorInputT>
@@ -213,6 +225,7 @@ void L2NormalizeFeaturizer_int16_Test(
     REQUIRE(L2NormalizeFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <int32> */
 template <typename VectorInputT>
@@ -314,6 +327,7 @@ void L2NormalizeFeaturizer_int32_Test(
     REQUIRE(L2NormalizeFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <int64> */
 template <typename VectorInputT>
@@ -415,6 +429,7 @@ void L2NormalizeFeaturizer_int64_Test(
     REQUIRE(L2NormalizeFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -516,6 +531,7 @@ void L2NormalizeFeaturizer_uint8_Test(
     REQUIRE(L2NormalizeFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -617,6 +633,7 @@ void L2NormalizeFeaturizer_uint16_Test(
     REQUIRE(L2NormalizeFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -718,6 +735,7 @@ void L2NormalizeFeaturizer_uint32_Test(
     REQUIRE(L2NormalizeFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -819,6 +837,7 @@ void L2NormalizeFeaturizer_uint64_Test(
     REQUIRE(L2NormalizeFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <float> */
 template <typename VectorInputT>
@@ -920,6 +939,7 @@ void L2NormalizeFeaturizer_float_Test(
     REQUIRE(L2NormalizeFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  L2NormalizeFeaturizer <double> */
 template <typename VectorInputT>
@@ -1021,3 +1041,7 @@ void L2NormalizeFeaturizer_double_Test(
     REQUIRE(L2NormalizeFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

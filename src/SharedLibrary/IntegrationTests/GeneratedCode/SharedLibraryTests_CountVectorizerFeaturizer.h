@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  CountVectorizerFeaturizer */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -94,8 +105,8 @@ void CountVectorizerFeaturizer_Test(
     for(auto const & input : inference_input) {
         uint64_t result_numElements;
         uint64_t result_numValues;
-        std::uint32_t result_values;
-        uint64_t result_indexes;
+        std::uint32_t * result_values;
+        uint64_t * result_indexes;
 
         REQUIRE(CountVectorizerFeaturizer_Transform(pTransformerHandle, input.c_str(), &result_numElements, &result_numValues, &result_values, &result_indexes, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -123,3 +134,7 @@ void CountVectorizerFeaturizer_Test(
     REQUIRE(CountVectorizerFeaturizer_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

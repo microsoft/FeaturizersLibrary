@@ -114,6 +114,17 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
 
                 #include "SharedLibrary_Common.hpp"
 
+                #if (defined _MSC_VER)
+                #   pragma warning(push)
+
+                    // I don't know why MSVC thinks that there is unreachable
+                    // code in these methods during release builds.
+                #   pragma warning(disable: 4702) // Unreachable code
+
+                #   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+                #   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+                #endif
+
                 """,
             ).format(
                 name=items[0].name,
@@ -422,6 +433,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                         REQUIRE({name}{suffix}DestroyTransformer(pTransformerHandle, &pErrorInfo));
                         REQUIRE(pErrorInfo == nullptr);
                     }}
+
                     """,
                 ).format(
                     name=item.name,
@@ -432,6 +444,16 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                     ),
                 ),
             )
+
+        f.write(
+            textwrap.dedent(
+                """\
+                #if (defined _MSC_VER)
+                #   pragma warning(pop)
+                #endif
+                """,
+            ),
+        )
 
 
 # ----------------------------------------------------------------------

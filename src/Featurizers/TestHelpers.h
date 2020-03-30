@@ -49,26 +49,29 @@ void Train(EstimatorT &estimator, std::vector<std::vector<InputT>> const &inputB
 
     estimator.begin_training();
 
-    typename Batches::const_iterator        iter(inputBatches.begin());
-    bool                                    wasTrained(false);
+    if(inputBatches.empty() == false) {
+        typename Batches::const_iterator    iter(inputBatches.begin());
+        bool                                wasTrained(false);
 
-    while(estimator.get_state() == NS::TrainingState::Training) {
-        wasTrained = true;
+        while(estimator.get_state() == NS::TrainingState::Training) {
+            wasTrained = true;
 
-        if(estimator.fit(iter->data(), iter->size()) == NS::FitResult::Reset) {
-            iter = inputBatches.begin();
-            continue;
+            if(estimator.fit(iter->data(), iter->size()) == NS::FitResult::Reset) {
+                iter = inputBatches.begin();
+                continue;
+            }
+
+            ++iter;
+            if(iter == inputBatches.end()) {
+                estimator.on_data_completed();
+
+                iter = inputBatches.begin();
+            }
         }
 
-        ++iter;
-        if(iter == inputBatches.end()) {
-            estimator.on_data_completed();
-
-            iter = inputBatches.begin();
-        }
+        if(estimator.get_state() != NS::TrainingState::Finished)
+            CHECK(wasTrained);
     }
-
-    CHECK(wasTrained);
 
     estimator.complete_training();
 }
@@ -118,7 +121,7 @@ std::vector<typename EstimatorT::TransformedType> TransformerEstimatorTest(
 ) {
     return TransformerEstimatorTest(
         std::move(estimator),
-        make_vector<std::vector<typename EstimatorT::InputType>>(inputBatch),
+        inputBatch.empty() ? std::vector<std::vector<typename EstimatorT::InputType>>() : make_vector<std::vector<typename EstimatorT::InputType>>(inputBatch),
         data
     );
 }

@@ -29,7 +29,7 @@ include(${_this_path}/../cmake/Featurizers.cmake)
 enable_testing()
 
 foreach(_test_name IN ITEMS
-    # TODO: Needs impl: SharedLibrary_AnalyticalRollingWindow_IntegrationTest
+    SharedLibrary_AnalyticalRollingWindow_IntegrationTest
     SharedLibrary_BackwardFillImputer_IntegrationTest
     SharedLibrary_CatImputer_IntegrationTest
     SharedLibrary_CountVectorizer_IntegrationTest

@@ -81,8 +81,8 @@ class SparseVectorTypeInfo(TypeInfo):
             [
                 self.Type("uint64_t", "{}_numElements".format(result_name)),
                 self.Type("uint64_t", "{}_numValues".format(result_name)),
-                self.Type(self._type_info.CppType, "{}_values".format(result_name)),
-                self.Type("uint64_t", "{}_indexes".format(result_name)),
+                self.Type("{} *".format(self._type_info.CppType), "{}_values".format(result_name)),
+                self.Type("uint64_t *", "{}_indexes".format(result_name)),
             ],
             "&{name}_numElements, &{name}_numValues, &{name}_values, &{name}_indexes".format(
                 name=result_name,

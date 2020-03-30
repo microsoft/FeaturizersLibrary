@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <int8> */
 template <typename VectorInputT>
@@ -108,6 +119,7 @@ void ModeImputerFeaturizer_int8_Test(
     REQUIRE(ModeImputerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <int16> */
 template <typename VectorInputT>
@@ -205,6 +217,7 @@ void ModeImputerFeaturizer_int16_Test(
     REQUIRE(ModeImputerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <int32> */
 template <typename VectorInputT>
@@ -302,6 +315,7 @@ void ModeImputerFeaturizer_int32_Test(
     REQUIRE(ModeImputerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <int64> */
 template <typename VectorInputT>
@@ -399,6 +413,7 @@ void ModeImputerFeaturizer_int64_Test(
     REQUIRE(ModeImputerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -496,6 +511,7 @@ void ModeImputerFeaturizer_uint8_Test(
     REQUIRE(ModeImputerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -593,6 +609,7 @@ void ModeImputerFeaturizer_uint16_Test(
     REQUIRE(ModeImputerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -690,6 +707,7 @@ void ModeImputerFeaturizer_uint32_Test(
     REQUIRE(ModeImputerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -787,6 +805,7 @@ void ModeImputerFeaturizer_uint64_Test(
     REQUIRE(ModeImputerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <float> */
 template <typename VectorInputT>
@@ -884,6 +903,7 @@ void ModeImputerFeaturizer_float_Test(
     REQUIRE(ModeImputerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <double> */
 template <typename VectorInputT>
@@ -981,6 +1001,7 @@ void ModeImputerFeaturizer_double_Test(
     REQUIRE(ModeImputerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <bool> */
 template <typename VectorInputT>
@@ -1078,6 +1099,7 @@ void ModeImputerFeaturizer_bool_Test(
     REQUIRE(ModeImputerFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ModeImputerFeaturizer <string> */
 template <typename VectorInputT>
@@ -1178,3 +1200,7 @@ void ModeImputerFeaturizer_string_Test(
     REQUIRE(ModeImputerFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

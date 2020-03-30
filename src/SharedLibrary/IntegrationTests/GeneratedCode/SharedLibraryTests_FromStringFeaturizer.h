@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <int8> */
 template <typename VectorInputT>
@@ -108,6 +119,7 @@ void FromStringFeaturizer_int8_Test(
     REQUIRE(FromStringFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <int16> */
 template <typename VectorInputT>
@@ -205,6 +217,7 @@ void FromStringFeaturizer_int16_Test(
     REQUIRE(FromStringFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <int32> */
 template <typename VectorInputT>
@@ -302,6 +315,7 @@ void FromStringFeaturizer_int32_Test(
     REQUIRE(FromStringFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <int64> */
 template <typename VectorInputT>
@@ -399,6 +413,7 @@ void FromStringFeaturizer_int64_Test(
     REQUIRE(FromStringFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -496,6 +511,7 @@ void FromStringFeaturizer_uint8_Test(
     REQUIRE(FromStringFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -593,6 +609,7 @@ void FromStringFeaturizer_uint16_Test(
     REQUIRE(FromStringFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -690,6 +707,7 @@ void FromStringFeaturizer_uint32_Test(
     REQUIRE(FromStringFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -787,6 +805,7 @@ void FromStringFeaturizer_uint64_Test(
     REQUIRE(FromStringFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <float> */
 template <typename VectorInputT>
@@ -884,6 +903,7 @@ void FromStringFeaturizer_float_Test(
     REQUIRE(FromStringFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <double> */
 template <typename VectorInputT>
@@ -981,6 +1001,7 @@ void FromStringFeaturizer_double_Test(
     REQUIRE(FromStringFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <bool> */
 template <typename VectorInputT>
@@ -1078,6 +1099,7 @@ void FromStringFeaturizer_bool_Test(
     REQUIRE(FromStringFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <string> */
 template <typename VectorInputT>
@@ -1178,3 +1200,7 @@ void FromStringFeaturizer_string_Test(
     REQUIRE(FromStringFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

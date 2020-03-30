@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <int8> */
 template <typename VectorInputT>
@@ -112,6 +123,7 @@ void MaxNormalizeFeaturizer_int8_Test(
     REQUIRE(MaxNormalizeFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <int16> */
 template <typename VectorInputT>
@@ -213,6 +225,7 @@ void MaxNormalizeFeaturizer_int16_Test(
     REQUIRE(MaxNormalizeFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <int32> */
 template <typename VectorInputT>
@@ -314,6 +327,7 @@ void MaxNormalizeFeaturizer_int32_Test(
     REQUIRE(MaxNormalizeFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <int64> */
 template <typename VectorInputT>
@@ -415,6 +429,7 @@ void MaxNormalizeFeaturizer_int64_Test(
     REQUIRE(MaxNormalizeFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -516,6 +531,7 @@ void MaxNormalizeFeaturizer_uint8_Test(
     REQUIRE(MaxNormalizeFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -617,6 +633,7 @@ void MaxNormalizeFeaturizer_uint16_Test(
     REQUIRE(MaxNormalizeFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -718,6 +735,7 @@ void MaxNormalizeFeaturizer_uint32_Test(
     REQUIRE(MaxNormalizeFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -819,6 +837,7 @@ void MaxNormalizeFeaturizer_uint64_Test(
     REQUIRE(MaxNormalizeFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <float> */
 template <typename VectorInputT>
@@ -920,6 +939,7 @@ void MaxNormalizeFeaturizer_float_Test(
     REQUIRE(MaxNormalizeFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <double> */
 template <typename VectorInputT>
@@ -1021,3 +1041,7 @@ void MaxNormalizeFeaturizer_double_Test(
     REQUIRE(MaxNormalizeFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

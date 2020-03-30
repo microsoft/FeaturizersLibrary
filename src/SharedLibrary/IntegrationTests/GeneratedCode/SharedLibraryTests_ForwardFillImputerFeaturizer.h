@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  ForwardFillImputerFeaturizer <int8> */
 template <typename VectorInputT>
@@ -108,6 +119,7 @@ void ForwardFillImputerFeaturizer_int8_Test(
     REQUIRE(ForwardFillImputerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ForwardFillImputerFeaturizer <int16> */
 template <typename VectorInputT>
@@ -205,6 +217,7 @@ void ForwardFillImputerFeaturizer_int16_Test(
     REQUIRE(ForwardFillImputerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ForwardFillImputerFeaturizer <int32> */
 template <typename VectorInputT>
@@ -302,6 +315,7 @@ void ForwardFillImputerFeaturizer_int32_Test(
     REQUIRE(ForwardFillImputerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ForwardFillImputerFeaturizer <int64> */
 template <typename VectorInputT>
@@ -399,6 +413,7 @@ void ForwardFillImputerFeaturizer_int64_Test(
     REQUIRE(ForwardFillImputerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ForwardFillImputerFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -496,6 +511,7 @@ void ForwardFillImputerFeaturizer_uint8_Test(
     REQUIRE(ForwardFillImputerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ForwardFillImputerFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -593,6 +609,7 @@ void ForwardFillImputerFeaturizer_uint16_Test(
     REQUIRE(ForwardFillImputerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ForwardFillImputerFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -690,6 +707,7 @@ void ForwardFillImputerFeaturizer_uint32_Test(
     REQUIRE(ForwardFillImputerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ForwardFillImputerFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -787,6 +805,7 @@ void ForwardFillImputerFeaturizer_uint64_Test(
     REQUIRE(ForwardFillImputerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ForwardFillImputerFeaturizer <float> */
 template <typename VectorInputT>
@@ -884,6 +903,7 @@ void ForwardFillImputerFeaturizer_float_Test(
     REQUIRE(ForwardFillImputerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ForwardFillImputerFeaturizer <double> */
 template <typename VectorInputT>
@@ -981,6 +1001,7 @@ void ForwardFillImputerFeaturizer_double_Test(
     REQUIRE(ForwardFillImputerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ForwardFillImputerFeaturizer <bool> */
 template <typename VectorInputT>
@@ -1078,6 +1099,7 @@ void ForwardFillImputerFeaturizer_bool_Test(
     REQUIRE(ForwardFillImputerFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  ForwardFillImputerFeaturizer <string> */
 template <typename VectorInputT>
@@ -1178,3 +1200,7 @@ void ForwardFillImputerFeaturizer_string_Test(
     REQUIRE(ForwardFillImputerFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

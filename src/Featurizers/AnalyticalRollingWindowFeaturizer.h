@@ -35,7 +35,6 @@ enum class AnalyticalRollingWindowCalculation : std::uint8_t {
     Mean = 1
 };
 
-
 /////////////////////////////////////////////////////////////////////////
 ///  \class         AnalyticalRollingWindowTransformer
 ///  \brief         RollingWindow class that is used for all analytical window computations.
@@ -107,7 +106,6 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(AnalyticalRollingWindowEstimator);
 
-
 private:
     // ----------------------------------------------------------------------
     // |
@@ -136,14 +134,12 @@ private:
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
         return typename BaseType::TransformerUniquePtr(new AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>(_windowCalculation, _horizon, _maxWindowSize, _minWindowSize));
     }
-
 };
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class       GrainedAnalyticalRollingWindowEstimator
 ///  \brief         GrainedTransformer that creates `AnalyticalRollingWindowEstimator`.
 ///
-
 template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
 class GrainedAnalyticalRollingWindowEstimator :
     public Components::PipelineExecutionEstimatorImpl<
@@ -158,12 +154,16 @@ public:
     // ----------------------------------------------------------------------
     using GrainType = std::vector<std::string>;
 
-    using BaseType = 
+    using BaseType =
         Components::PipelineExecutionEstimatorImpl<
             Components::GrainEstimatorImpl<GrainType, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
             Components::FilterDecoratorEstimator<std::tuple<GrainType const &, std::vector<double>>, 1>
         >;
-    
+
+    // This is used by the code generator when generating code that invokes this
+    // object's constructor.
+    using AnalyticalRollingWindowCalculation            = Microsoft::Featurizer::Featurizers::AnalyticalRollingWindowCalculation;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -195,7 +195,7 @@ AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::AnalyticalRoll
             return Calculators::MeanCalculator<InputT>::execute(begin, end);
         },
         std::move(horizon),
-        std::move(maxWindowSize), 
+        std::move(maxWindowSize),
         std::move(minWindowSize)),
         _windowCalculation(std::move(windowCalculation))
     {
@@ -317,12 +317,29 @@ GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAn
     BaseType(
         GrainedAnalyticalRollingWindowEstimatorName,
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, maxWindowSize, windowCalculation, horizon, minWindowSize] () {
+        [pAllColumnAnnotations, windowCalculation, horizon, maxWindowSize, minWindowSize] () {
             return Components::GrainEstimatorImpl<GrainType, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>> (
                 pAllColumnAnnotations,
-                [maxWindowSize, windowCalculation, horizon, minWindowSize](AnnotationMapsPtr pAllColumnAnnotationsParam) {
-                    return AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), windowCalculation, horizon, maxWindowSize, minWindowSize);
-                }
+                [windowCalculation, horizon, maxWindowSize, minWindowSize](AnnotationMapsPtr pAllColumnAnnotationsParam) {
+                    return AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(
+                        std::move(pAllColumnAnnotationsParam),
+                        windowCalculation,
+                        horizon,
+                        maxWindowSize,
+                        minWindowSize
+                    );
+                },
+                [windowCalculation, horizon, maxWindowSize, minWindowSize](GrainType const &) {
+                    return typename AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::TransformerUniquePtr(
+                        new AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>(
+                            windowCalculation,
+                            horizon,
+                            maxWindowSize,
+                            minWindowSize
+                        )
+                    );
+                },
+                true // isTrainingOnlyEstimator
             );
         },
         [pAllColumnAnnotations]() {

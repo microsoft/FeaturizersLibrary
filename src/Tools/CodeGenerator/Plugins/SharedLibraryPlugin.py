@@ -735,11 +735,15 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
 
                 extern "C" {{
 
-                // I don't know why MSVC thinks that there is unreachable
-                // code in these methods during release builds.
                 #if (defined _MSC_VER)
                 #   pragma warning(push)
+
+                    // I don't know why MSVC thinks that there is unreachable
+                    // code in these methods during release builds.
                 #   pragma warning(disable: 4702) // Unreachable code
+
+                #   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+                #   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
                 #endif
 
                 """,

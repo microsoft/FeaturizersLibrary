@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <int8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -109,6 +120,7 @@ void MinMaxImputerFeaturizer_int8_Test(
     REQUIRE(MinMaxImputerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -207,6 +219,7 @@ void MinMaxImputerFeaturizer_int16_Test(
     REQUIRE(MinMaxImputerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -305,6 +318,7 @@ void MinMaxImputerFeaturizer_int32_Test(
     REQUIRE(MinMaxImputerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -403,6 +417,7 @@ void MinMaxImputerFeaturizer_int64_Test(
     REQUIRE(MinMaxImputerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -501,6 +516,7 @@ void MinMaxImputerFeaturizer_uint8_Test(
     REQUIRE(MinMaxImputerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -599,6 +615,7 @@ void MinMaxImputerFeaturizer_uint16_Test(
     REQUIRE(MinMaxImputerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -697,6 +714,7 @@ void MinMaxImputerFeaturizer_uint32_Test(
     REQUIRE(MinMaxImputerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -795,6 +813,7 @@ void MinMaxImputerFeaturizer_uint64_Test(
     REQUIRE(MinMaxImputerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -893,6 +912,7 @@ void MinMaxImputerFeaturizer_float_Test(
     REQUIRE(MinMaxImputerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -991,6 +1011,7 @@ void MinMaxImputerFeaturizer_double_Test(
     REQUIRE(MinMaxImputerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <bool> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1089,6 +1110,7 @@ void MinMaxImputerFeaturizer_bool_Test(
     REQUIRE(MinMaxImputerFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MinMaxImputerFeaturizer <string> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1190,3 +1212,7 @@ void MinMaxImputerFeaturizer_string_Test(
     REQUIRE(MinMaxImputerFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

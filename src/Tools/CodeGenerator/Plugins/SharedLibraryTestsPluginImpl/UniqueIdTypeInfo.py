@@ -60,10 +60,10 @@ class UniqueIdTypeInfo(TypeInfo):
         result_name="result",
     ):
         return self.Result(
-            "BugBug100",
-            [self.Type("BugBug200.0", "BugBug200.1")],
-            "BugBug300",
-            "BugBug400",
-            "BugBug500",
+            "TODO100",
+            [self.Type("TODO200.0", "TODO200.1")],
+            "TODO300",
+            "TODO400",
+            "TODO500",
             destroy_inline=True,
         )

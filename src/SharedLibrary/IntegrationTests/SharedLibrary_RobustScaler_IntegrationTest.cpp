@@ -45,8 +45,8 @@ TEST_CASE("standard-int8-float_t") {
             return FuzzyCheck(args, std::vector<std::float_t>{-1.0, -0.5, 0.0, 0.5, 1.0});
         },
         true,
-        &qMin,
-        &qMax
+        qMin,
+        qMax
     );
 }
 
@@ -73,8 +73,8 @@ TEST_CASE("standard-int32-double") {
             return FuzzyCheck(args, std::vector<std::double_t>{-1.0, -0.5, 0.0, 0.5, 1.0});
         },
         true,
-        &qMin,
-        &qMax
+        qMin,
+        qMax
     );
 }
 

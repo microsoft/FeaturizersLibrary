@@ -104,10 +104,10 @@ class TupleTypeInfo(TypeInfo):
         result_name="result",
     ):
         return self.Result(
-            "BugBug1",
-            [self.Type("BugBug2,1", "BugBug2.2")],
-            "BugBug3",
-            "BugBug4",
-            "BugBug5",
+            "TODO1",
+            [self.Type("TODO2,1", "TODO2.2")],
+            "TODO3",
+            "TODO4",
+            "TODO5",
             destroy_inline=True,
         )

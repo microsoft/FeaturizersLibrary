@@ -64,8 +64,8 @@ function(Impl)
         ${_featurizers_this_path}/../SharedLibrary_TimeSeriesImputerFeaturizer.h
         ${_featurizers_this_path}/../SharedLibrary_TimeSeriesImputerFeaturizer.cpp
 
-        # TODO: Not available yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_AnalyticalRollingWindowFeaturizer.h
-        # TODO: Not available yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_AnalyticalRollingWindowFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_AnalyticalRollingWindowFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_AnalyticalRollingWindowFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_BackwardFillImputerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_BackwardFillImputerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_CatImputerFeaturizer.h

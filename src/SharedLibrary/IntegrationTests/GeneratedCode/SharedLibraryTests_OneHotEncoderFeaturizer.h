@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <int8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -111,6 +122,7 @@ void OneHotEncoderFeaturizer_int8_Test(
     REQUIRE(OneHotEncoderFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -211,6 +223,7 @@ void OneHotEncoderFeaturizer_int16_Test(
     REQUIRE(OneHotEncoderFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -311,6 +324,7 @@ void OneHotEncoderFeaturizer_int32_Test(
     REQUIRE(OneHotEncoderFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -411,6 +425,7 @@ void OneHotEncoderFeaturizer_int64_Test(
     REQUIRE(OneHotEncoderFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -511,6 +526,7 @@ void OneHotEncoderFeaturizer_uint8_Test(
     REQUIRE(OneHotEncoderFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -611,6 +627,7 @@ void OneHotEncoderFeaturizer_uint16_Test(
     REQUIRE(OneHotEncoderFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -711,6 +728,7 @@ void OneHotEncoderFeaturizer_uint32_Test(
     REQUIRE(OneHotEncoderFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -811,6 +829,7 @@ void OneHotEncoderFeaturizer_uint64_Test(
     REQUIRE(OneHotEncoderFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -911,6 +930,7 @@ void OneHotEncoderFeaturizer_float_Test(
     REQUIRE(OneHotEncoderFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1011,6 +1031,7 @@ void OneHotEncoderFeaturizer_double_Test(
     REQUIRE(OneHotEncoderFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <bool> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1111,6 +1132,7 @@ void OneHotEncoderFeaturizer_bool_Test(
     REQUIRE(OneHotEncoderFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  OneHotEncoderFeaturizer <string> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1211,3 +1233,7 @@ void OneHotEncoderFeaturizer_string_Test(
     REQUIRE(OneHotEncoderFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

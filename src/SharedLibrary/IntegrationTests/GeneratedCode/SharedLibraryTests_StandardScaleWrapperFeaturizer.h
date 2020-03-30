@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <int8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -109,6 +120,7 @@ void StandardScaleWrapperFeaturizer_int8_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -207,6 +219,7 @@ void StandardScaleWrapperFeaturizer_int16_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -305,6 +318,7 @@ void StandardScaleWrapperFeaturizer_int32_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -403,6 +417,7 @@ void StandardScaleWrapperFeaturizer_int64_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -501,6 +516,7 @@ void StandardScaleWrapperFeaturizer_uint8_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -599,6 +615,7 @@ void StandardScaleWrapperFeaturizer_uint16_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -697,6 +714,7 @@ void StandardScaleWrapperFeaturizer_uint32_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -795,6 +813,7 @@ void StandardScaleWrapperFeaturizer_uint64_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -893,6 +912,7 @@ void StandardScaleWrapperFeaturizer_float_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StandardScaleWrapperFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -991,3 +1011,7 @@ void StandardScaleWrapperFeaturizer_double_Test(
     REQUIRE(StandardScaleWrapperFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

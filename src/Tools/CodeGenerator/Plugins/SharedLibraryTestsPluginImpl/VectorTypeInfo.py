@@ -97,8 +97,6 @@ class VectorTypeInfo(TypeInfo):
         assert len(parameters) == 2, parameters
 
         if "nonstd::optional" in result.VectorResultType:
-
-
             statements = textwrap.dedent(
                 """\
                 // Convert the pointers into optional values
@@ -127,11 +125,12 @@ class VectorTypeInfo(TypeInfo):
         else:
             statements = textwrap.dedent(
                 """\
-                results.emplace_back(std::vector<{type}>({result_name}_ptr, {result_name}_ptr + {result_name}_items));
+                results.emplace_back(std::vector<{type}>({parameter0_name}, {parameter0_name} + {parameter1_name}));
                 """,
             ).format(
                 type=result.VectorResultType,
-                result_name=result_name,
+                parameter0_name=parameters[0].Name,
+                parameter1_name=parameters[1].Name,
             )
 
         return self.Result(
