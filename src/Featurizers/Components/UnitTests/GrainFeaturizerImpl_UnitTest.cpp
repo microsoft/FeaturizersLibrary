@@ -626,6 +626,59 @@ TEST_CASE("Estimator - limited individual training items") {
     }
 }
 
+TEST_CASE("Estimator - no training items") {
+    // ----------------------------------------------------------------------
+    using Estimator                         = Components::GrainEstimatorImpl<std::string, DeltaEstimator>;
+    // ----------------------------------------------------------------------
+
+    SECTION("No transformer creation func") {
+        Estimator                           estimator(NS::CreateTestAnnotationMapsPtr(1));
+
+        estimator.begin_training();
+        estimator.complete_training();
+
+        CHECK_THROWS_WITH(
+            estimator.create_transformer(),
+            "`_createTransformerFunc` must be provided when no grains were encountered during training"
+        );
+    }
+
+    SECTION("With transformer creation func") {
+        Estimator                           estimator(
+            NS::CreateTestAnnotationMapsPtr(1),
+            [](std::string const &) {
+                return typename Estimator::TransformerType::GrainTransformerTypeUniquePtr(new DeltaTransformer(0));
+            }
+        );
+
+        estimator.begin_training();
+        CHECK(estimator.get_state() == NS::TrainingState::Training);
+
+        estimator.complete_training();
+        CHECK(estimator.get_state() == NS::TrainingState::Completed);
+
+        estimator.create_transformer();
+    }
+
+    SECTION("With transformer creation func, no training required") {
+        Estimator                           estimator(
+            NS::CreateTestAnnotationMapsPtr(1),
+            [](std::string const &) {
+                return typename Estimator::TransformerType::GrainTransformerTypeUniquePtr(new DeltaTransformer(0));
+            },
+            true // isTrainingOnlyEstimator
+        );
+
+        estimator.begin_training();
+        CHECK(estimator.get_state() == NS::TrainingState::Finished);
+
+        estimator.complete_training();
+        CHECK(estimator.get_state() == NS::TrainingState::Completed);
+
+        estimator.create_transformer();
+    }
+}
+
 template <typename TransformerT>
 void Execute(TransformerT &transformer, std::string const &grain, std::uint64_t const &input, std::uint64_t expected) {
     transformer.execute(
@@ -775,7 +828,7 @@ TEST_CASE("GrainTransformer - deserialization errors") {
 
         CHECK_THROWS_WITH(
             GrainTransformer(inArchive),
-            "Invalid elements"
+            "A `createFunc` must be provided when there aren't any transformers in the transformer map"
         );
     }
 
@@ -833,4 +886,95 @@ TEST_CASE("GrainEstimatorImpl - construct errors") {
         GrainEstimator(NS::CreateTestAnnotationMapsPtr(1), typename GrainEstimator::CreateEstimatorFunc()),
         "createFunc"
     );
+    CHECK_THROWS_WITH(
+        GrainEstimator(NS::CreateTestAnnotationMapsPtr(1), typename GrainEstimator::CreateTransformerFunc()),
+        "createTransformerFunc"
+    );
+    CHECK_THROWS_WITH(
+        GrainEstimator(
+            NS::CreateTestAnnotationMapsPtr(1),
+            [](NS::AnnotationMapsPtr pAnnotationMaps) {
+                return DeltaEstimator(std::move(pAnnotationMaps));
+            },
+            typename GrainEstimator::CreateTransformerFunc()
+        ),
+        "createTransformerFunc"
+    );
+}
+
+TEST_CASE("Transformer - construct errors") {
+    // ----------------------------------------------------------------------
+    using GrainTransformer                  = Components::GrainTransformer<int, DeltaEstimator>;
+    // ----------------------------------------------------------------------
+
+    CHECK_THROWS_WITH(
+        GrainTransformer(typename GrainTransformer::CreateTransformerFunc()),
+        "`createFunc` is empty"
+    );
+}
+
+TEST_CASE("Transformer without training") {
+    // ----------------------------------------------------------------------
+    using GrainTransformer                  = Components::GrainTransformer<std::string, DeltaEstimator>;
+    // ----------------------------------------------------------------------
+
+    GrainTransformer                        transformer(
+        [](std::string const &grain) {
+            return typename GrainTransformer::GrainTransformerTypeUniquePtr(new DeltaTransformer(static_cast<uint64_t>(atoi(grain.c_str()) * 100)));
+        }
+    );
+
+    std::string const                       grain1("1");
+    std::string const                       grain2("2");
+    std::uint64_t const                     value10(10);
+    std::uint64_t const                     value20(20);
+
+    Execute(transformer, grain1, value10, 110);
+    Execute(transformer, grain1, value20, 120);
+
+    Execute(transformer, grain2, value10, 210);
+    Execute(transformer, grain1, value20, 120);
+
+    Execute(transformer, grain2, value10, 210);
+}
+
+TEST_CASE("Deserialization of Transformer without training") {
+    // ----------------------------------------------------------------------
+    using GrainTransformer                  = Components::GrainTransformer<std::string, DeltaEstimator>;
+    // ----------------------------------------------------------------------
+
+    GrainTransformer                        transformer1(
+        [](std::string const &grain) {
+            return typename GrainTransformer::GrainTransformerTypeUniquePtr(new DeltaTransformer(static_cast<uint64_t>(atoi(grain.c_str()) * 100)));
+        }
+    );
+
+    NS::Archive                             out;
+
+    transformer1.save(out);
+
+    NS::Archive                             in(out.commit());
+
+    SECTION("Deserialize without a custom functor") {
+        CHECK_THROWS_WITH(
+            GrainTransformer(in),
+            "A `createFunc` must be provided when there aren't any transformers in the transformer map"
+        );
+    }
+
+    SECTION("Deserialize with a custom functor") {
+        GrainTransformer                    transformer2(
+            in,
+            [](std::string const &) {
+                return typename GrainTransformer::GrainTransformerTypeUniquePtr(new DeltaTransformer(1000));
+            }
+        );
+
+        std::string const                   grain1("1");
+        std::string const                   grain2("2");
+        std::uint64_t const                 value10(10);
+
+        Execute(transformer2, grain1, value10, 1010);
+        Execute(transformer2, grain2, value10, 1010);
+    }
 }
