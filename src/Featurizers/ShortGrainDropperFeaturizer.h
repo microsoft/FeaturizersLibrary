@@ -60,9 +60,7 @@ private:
 /////////////////////////////////////////////////////////////////////////
 ///  \class         ShortGrainDropperEstimator
 ///  \brief         Estimator to determine which grain to drop given the
-///                 threshod minPoints calculated by windowSize, lags,
-///                 maxHorizon and cv.
-///                 todo: more comments will add here later
+///                 threshod minPoints
 ///
 template <
     size_t MaxNumTrainingItemsV = std::numeric_limits<size_t>::max()
@@ -81,18 +79,10 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    template <typename LagInputIteratorT>
     ShortGrainDropperEstimator(
         AnnotationMapsPtr pAllColumnAnnotations,
         size_t colIndex,
-        std::uint8_t windowSize,
-        //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
-        std::tuple<LagInputIteratorT, LagInputIteratorT> lags,
-        //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
-        std::uint8_t maxHorizon,
-        //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
-        nonstd::optional<std::uint8_t> cv
-        //todo: possible name change and add commments, after sync with other Timeseries related Featurizers
+        std::uint32_t minPoints
     );
     ~ShortGrainDropperEstimator(void) override = default;
 
@@ -104,7 +94,6 @@ private:
     // |  Private Types
     // |
     // ----------------------------------------------------------------------
-    using GrainsSet                         = ShortGrainDropperTransformer::GrainsSet;
     using GrainsMap                         = std::unordered_map<std::vector<std::string>, std::uint32_t, Microsoft::Featurizer::ContainerHash<std::vector<std::string>>>;
     // ----------------------------------------------------------------------
     // |
@@ -112,8 +101,7 @@ private:
     // |
     // ----------------------------------------------------------------------
     size_t const                            _colIndex;
-    std::uint16_t const                     _minPoints;
-    GrainsSet                               _grainsToDrop;
+    std::uint32_t const                     _minPoints;
     GrainsMap                               _groupByGrains;
 
     // ----------------------------------------------------------------------
@@ -144,7 +132,17 @@ private:
 
     // MSVC has problems when the definition is separate from the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
-        return typename BaseType::TransformerUniquePtr(new TransformerType(std::move(_grainsToDrop)));
+
+        ShortGrainDropperTransformer::GrainsSet grainsToDrop;
+
+        for (GrainsMap::value_type const & groupByGrainsElement : _groupByGrains) {
+            if (groupByGrainsElement.second <= _minPoints)
+                grainsToDrop.emplace(std::move(groupByGrainsElement.first));
+        }
+        //clear _groupByGrains
+        _groupByGrains = {};
+
+        return typename BaseType::TransformerUniquePtr(new TransformerType(std::move(grainsToDrop)));
     }
 };
 
@@ -164,14 +162,10 @@ private:
 // |
 // ----------------------------------------------------------------------
 template <size_t MaxNumTrainingItemsV>
-template <typename LagInputIteratorT>
 ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(
     AnnotationMapsPtr pAllColumnAnnotations,
     size_t colIndex,
-    std::uint8_t windowSize,
-    std::tuple<LagInputIteratorT, LagInputIteratorT> lags,
-    std::uint8_t maxHorizon,
-    nonstd::optional<std::uint8_t> cv
+    std::uint32_t minPoints
 ) :
     BaseType("ShortGrainDropperEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
@@ -182,19 +176,10 @@ ShortGrainDropperEstimator<MaxNumTrainingItemsV>::ShortGrainDropperEstimator(
         }()
     ),
     _minPoints(
-        [&windowSize, &lags, &maxHorizon, &cv](void) -> std::uint16_t {
-            static_assert(std::is_same<typename std::iterator_traits<LagInputIteratorT>::value_type, std::uint8_t>::value, "'LagInputIteratorT' must point to an uint8");
-
-            //it appears automl tests show that
-            //windowSize can be 0
-            //lags could contain 0s
-            //maxHorizon may not be 0, not sure currently
-            //cv may not be 0, not sure currently
-            if (std::distance(std::get<0>(lags), std::get<1>(lags)) == 0)
-                throw std::invalid_argument("lags");
-            if (!cv.has_value())
-                return (maxHorizon + std::max(windowSize, *std::max_element(std::get<0>(lags), std::get<1>(lags))) + 1);
-            return (2*maxHorizon + static_cast<std::uint8_t>(*cv) + std::max(windowSize, *std::max_element(std::get<0>(lags), std::get<1>(lags))) + 1);
+        [&minPoints](void) -> std::uint32_t & {
+            if(minPoints == 0)
+                throw std::invalid_argument("minPoints");
+            return minPoints;
         }()
     ) {
 }
@@ -209,12 +194,6 @@ bool ShortGrainDropperEstimator<MaxNumTrainingItemsV>::begin_training_impl(void)
 
 template <size_t MaxNumTrainingItemsV>
 void ShortGrainDropperEstimator<MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
-    for (GrainsMap::value_type const & groupByGrainsElement : _groupByGrains) {
-        if (groupByGrainsElement.second <= _minPoints)
-            _grainsToDrop.emplace(std::move(groupByGrainsElement.first));
-    }
-    //clear _groupByGrains
-    _groupByGrains = {};
 }
 
 } // namespace Featurizers

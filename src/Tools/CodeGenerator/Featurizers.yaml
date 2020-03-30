@@ -1364,17 +1364,17 @@ featurizers:
         output_type: bool
 
     configuration_params:
-      - type: uint8
-        name: windowSize
+      - type: uint32
+        name: maxWindowSize
 
-      - type: vector<uint8>
+      - type: vector<int32>
         name: lags
 
-      - type: uint8
-        name: maxHorizon
+      - type: uint32
+        name: horizon
 
-      - type: uint8?
-        name: cv
+      - type: uint32?
+        name: crossValidation
 
     status: Pending
 
