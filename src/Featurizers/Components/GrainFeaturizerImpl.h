@@ -430,7 +430,7 @@ private:
 
         if(transformers.empty()) {
             if(!_createTransformerFunc)
-                throw std::runtime_error("`_createTransformerFunc` must be provided when no grains where encountered during training");
+                throw std::runtime_error("`_createTransformerFunc` must be provided when no grains were encountered during training");
 
             return typename BaseType::TransformerUniquePtr(new TransformerType(_createTransformerFunc));
         }

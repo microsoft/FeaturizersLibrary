@@ -639,7 +639,7 @@ TEST_CASE("Estimator - no training items") {
 
         CHECK_THROWS_WITH(
             estimator.create_transformer(),
-            "`_createTransformerFunc` must be provided when no grains where encountered during training"
+            "`_createTransformerFunc` must be provided when no grains were encountered during training"
         );
     }
 
