@@ -652,7 +652,29 @@ TEST_CASE("Estimator - no training items") {
         );
 
         estimator.begin_training();
+        CHECK(estimator.get_state() == NS::TrainingState::Training);
+
         estimator.complete_training();
+        CHECK(estimator.get_state() == NS::TrainingState::Completed);
+
+        estimator.create_transformer();
+    }
+
+    SECTION("With transformer creation func, no training required") {
+        Estimator                           estimator(
+            NS::CreateTestAnnotationMapsPtr(1),
+            [](std::string const &) {
+                return typename Estimator::TransformerType::GrainTransformerTypeUniquePtr(new DeltaTransformer(0));
+            },
+            true // isTrainingOnlyEstimator
+        );
+
+        estimator.begin_training();
+        CHECK(estimator.get_state() == NS::TrainingState::Finished);
+
+        estimator.complete_training();
+        CHECK(estimator.get_state() == NS::TrainingState::Completed);
+
         estimator.create_transformer();
     }
 }

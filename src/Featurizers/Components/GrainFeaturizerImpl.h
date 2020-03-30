@@ -213,8 +213,8 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations);
-    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc);
+    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, bool isTrainingOnlyEstimator);
+    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc, bool isTrainingOnlyEstimator);
 
     ~GrainEstimatorImplBase(void) override = default;
 
@@ -229,11 +229,7 @@ protected:
     // |  Protected Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorMap =
-        std::map<
-            GrainT,
-            EstimatorT
-        >;
+    using EstimatorMap                      = std::map<GrainT, EstimatorT>;
 
     // ----------------------------------------------------------------------
     // |
@@ -253,6 +249,7 @@ private:
     // invoking _createFunc.
     AnnotationMapsPtr const                 _pAllColumnAnnotations;
     CreateEstimatorFunc const               _createFunc;
+    bool const                              _isTrainingOnlyEstimator;
 
     size_t                                  _cRemainingTrainingItems;
 
@@ -307,12 +304,20 @@ public:
             MaxNumTrainingItemsV
         >;
 
+    using CreateEstimatorFunc               = typename BaseType::CreateEstimatorFunc;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    using BaseType::BaseType;
+    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations) :
+        BaseType(std::move(pAllColumnAnnotations), false) {
+    }
+
+    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc) :
+        BaseType(std::move(pAllColumnAnnotations), std::move(createFunc), false) {
+    }
 
     ~GrainEstimatorImpl(void) override = default;
 
@@ -370,11 +375,11 @@ public:
     // |
     // ----------------------------------------------------------------------
     GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations) :
-        BaseType(std::move(pAllColumnAnnotations)) {
+        BaseType(std::move(pAllColumnAnnotations), false) {
     }
 
-    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateTransformerFunc createTransformerFunc) :
-        BaseType(std::move(pAllColumnAnnotations)),
+    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateTransformerFunc createTransformerFunc, bool isTrainingOnlyEstimator=false) :
+        BaseType(std::move(pAllColumnAnnotations), isTrainingOnlyEstimator),
         _createTransformerFunc(
             std::move(
                 [&createTransformerFunc](void) -> CreateTransformerFunc & {
@@ -388,11 +393,11 @@ public:
     }
 
     GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createEstimatorFunc) :
-        BaseType(std::move(pAllColumnAnnotations), std::move(createEstimatorFunc)) {
+        BaseType(std::move(pAllColumnAnnotations), std::move(createEstimatorFunc), false) {
     }
 
-    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createEstimatorFunc, CreateTransformerFunc createTransformerFunc) :
-        BaseType(std::move(pAllColumnAnnotations), std::move(createEstimatorFunc)),
+    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createEstimatorFunc, CreateTransformerFunc createTransformerFunc, bool isTrainingOnlyEstimator=false) :
+        BaseType(std::move(pAllColumnAnnotations), std::move(createEstimatorFunc), isTrainingOnlyEstimator),
         _createTransformerFunc(
             std::move(
                 [&createTransformerFunc](void) -> CreateTransformerFunc & {
@@ -580,17 +585,18 @@ void GrainTransformer<GrainT, EstimatorT>::save(Archive &ar) const /*override*/ 
 // |
 // ----------------------------------------------------------------------
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations) :
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, bool isTrainingOnlyEstimator) :
     GrainEstimatorImplBase(
         std::move(pAllColumnAnnotations),
         [](AnnotationMapsPtr pAllColumnAnnotationsParam) {
             return EstimatorT(std::move(pAllColumnAnnotationsParam));
-        }
+        },
+        std::move(isTrainingOnlyEstimator)
     ) {
 }
 
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc) :
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc, bool isTrainingOnlyEstimator) :
     BaseT(
         [pAllColumnAnnotations, &createFunc](void) -> std::string {
             if(!createFunc)
@@ -608,6 +614,7 @@ Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::G
     ),
     _pAllColumnAnnotations(pAllColumnAnnotations),
     _createFunc(std::move(createFunc)), // Note that createFunc has been validated when creating the Estimator name in the call to BaseT's constructor above
+    _isTrainingOnlyEstimator(std::move(isTrainingOnlyEstimator)),
     _cRemainingTrainingItems(MaxNumTrainingItemsV) {
 }
 
@@ -633,7 +640,7 @@ Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::g
 // ----------------------------------------------------------------------
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
 bool Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
-    return _cRemainingTrainingItems != 0;
+    return _isTrainingOnlyEstimator == false && _cRemainingTrainingItems != 0;
 }
 
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
