@@ -619,12 +619,12 @@ TEST_CASE("Grained Estimator Test - 1 grain, horizon 2, lead 1 lead 2") {
     NS::AnnotationMapsPtr                                            pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedLagLeadOperatorEstimator<InputType>      estimator(pAllColumnAnnotations, 2, {1, 2});
 
-    using GrainedInputType = std::tuple<GrainType, InputType>;
+    using GrainedInputType = std::tuple<GrainType const &, InputType const &>;
 
     const GrainType grain({"one"});
-    const GrainedInputType tup1 = std::make_tuple(grain, static_cast<InputType>(10));
-    const GrainedInputType tup2 = std::make_tuple(grain, static_cast<InputType>(11));
-    const GrainedInputType tup3 = std::make_tuple(grain, static_cast<InputType>(12));
+    const GrainedInputType tup1(grain, static_cast<InputType>(10));
+    const GrainedInputType tup2(grain, static_cast<InputType>(11));
+    const GrainedInputType tup3(grain, static_cast<InputType>(12));
     
     NS::TestHelpers::Train(estimator, NS::TestHelpers::make_vector<std::tuple<GrainType const &, InputType const &>>(tup1, tup2, tup3));
 
@@ -671,17 +671,17 @@ TEST_CASE("Grained Estimator - 2 grain, horizon 2, lead 1 lead 2") {
     NS::AnnotationMapsPtr                                            pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedLagLeadOperatorEstimator<InputType>      estimator(pAllColumnAnnotations, 2, {1, 2});
 
-    using GrainedInputType = std::tuple<GrainType, InputType>;
+    using GrainedInputType = std::tuple<GrainType const &, InputType const &>;
 
     const GrainType grain1({"one"});
-    const GrainedInputType tup1 = std::make_tuple(grain1, static_cast<InputType>(10));
-    const GrainedInputType tup2 = std::make_tuple(grain1, static_cast<InputType>(11));
-    const GrainedInputType tup3 = std::make_tuple(grain1, static_cast<InputType>(12));
+    const GrainedInputType tup1(grain1, static_cast<InputType>(10));
+    const GrainedInputType tup2(grain1, static_cast<InputType>(11));
+    const GrainedInputType tup3(grain1, static_cast<InputType>(12));
 
     const GrainType grain2({"two"});
-    const GrainedInputType tup4 = std::make_tuple(grain2, static_cast<InputType>(20));
-    const GrainedInputType tup5 = std::make_tuple(grain2, static_cast<InputType>(21));
-    const GrainedInputType tup6 = std::make_tuple(grain2, static_cast<InputType>(22));
+    const GrainedInputType tup4(grain2, static_cast<InputType>(20));
+    const GrainedInputType tup5(grain2, static_cast<InputType>(21));
+    const GrainedInputType tup6(grain2, static_cast<InputType>(22));
 
     NS::TestHelpers::Train(estimator, NS::TestHelpers::make_vector<std::tuple<GrainType const &, InputType const &>>(tup1, tup2, tup3, tup4, tup5, tup6));
     auto transformer = estimator.create_transformer();
