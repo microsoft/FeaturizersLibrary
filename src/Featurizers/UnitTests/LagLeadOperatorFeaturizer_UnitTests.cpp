@@ -619,7 +619,7 @@ TEST_CASE("Grained Estimator Test - 1 grain, horizon 2, lead 1 lead 2") {
     NS::AnnotationMapsPtr                                            pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedLagLeadOperatorEstimator<InputType>      estimator(pAllColumnAnnotations, 2, {1, 2});
 
-    using GrainedInputType = std::tuple<GrainType const &, InputType const &>;
+    using GrainedInputType = typename NS::Featurizers::GrainedLagLeadOperatorEstimator<InputType>::InputType;
 
     const GrainType grain({"one"});
     const InputType value1(static_cast<InputType>(10));
@@ -674,7 +674,7 @@ TEST_CASE("Grained Estimator - 2 grain, horizon 2, lead 1 lead 2") {
     NS::AnnotationMapsPtr                                            pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedLagLeadOperatorEstimator<InputType>      estimator(pAllColumnAnnotations, 2, {1, 2});
 
-    using GrainedInputType = std::tuple<GrainType const &, InputType const &>;
+    using GrainedInputType = typename NS::Featurizers::GrainedLagLeadOperatorEstimator<InputType>::InputType;
 
     const GrainType grain1({"one"});
     const InputType value1(static_cast<InputType>(10));

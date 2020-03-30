@@ -252,7 +252,7 @@ TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedSimpleRollingWindowEstimator<InputType>      estimator(pAllColumnAnnotations, NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 1);
 
-    using GrainedInputType = std::tuple<GrainType const &, InputType const &>;
+    using GrainedInputType = typename NS::Featurizers::GrainedSimpleRollingWindowEstimator<InputType>::InputType;
 
     const GrainType grain({"one"});
     const InputType value1(1);

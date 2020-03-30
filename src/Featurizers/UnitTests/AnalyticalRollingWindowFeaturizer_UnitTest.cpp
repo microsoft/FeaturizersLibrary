@@ -121,7 +121,7 @@ TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 1);
 
-    using GrainedInputType = std::tuple<GrainType const &, std::int32_t const &>;
+    using GrainedInputType = typename NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>::InputType;
 
     const GrainType grain({"one"});
     const std::int32_t value1(1);
@@ -158,7 +158,7 @@ TEST_CASE("Grained Mean - 1 grain, window size 2, horizon 2, min window size 2")
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2, 2);
 
-    using GrainedInputType = std::tuple<GrainType const &, std::int32_t const &>;
+    using GrainedInputType = typename NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>::InputType;
 
     const GrainType grain({"one"});
     const std::int32_t value1(1);
@@ -199,7 +199,7 @@ TEST_CASE("Grained Mean - 2 grain, window size 2, horizon 2, min window size 1")
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
 
-    using GrainedInputType = std::tuple<GrainType const &, std::int32_t const &>;
+    using GrainedInputType = typename NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>::InputType;
 
     const GrainType grainOne({"one"});
     const GrainType grainTwo({"two"});
