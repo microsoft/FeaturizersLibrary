@@ -626,6 +626,37 @@ TEST_CASE("Estimator - limited individual training items") {
     }
 }
 
+TEST_CASE("Estimator - no training items") {
+    // ----------------------------------------------------------------------
+    using Estimator                         = Components::GrainEstimatorImpl<std::string, DeltaEstimator>;
+    // ----------------------------------------------------------------------
+
+    SECTION("No transformer creation func") {
+        Estimator                           estimator(NS::CreateTestAnnotationMapsPtr(1));
+
+        estimator.begin_training();
+        estimator.complete_training();
+
+        CHECK_THROWS_WITH(
+            estimator.create_transformer(),
+            "`_createTransformerFunc` must be provided when no grains where encountered during training"
+        );
+    }
+
+    SECTION("With transformer creation func") {
+        Estimator                           estimator(
+            NS::CreateTestAnnotationMapsPtr(1),
+            [](std::string const &) {
+                return typename Estimator::TransformerType::GrainTransformerTypeUniquePtr(new DeltaTransformer(0));
+            }
+        );
+
+        estimator.begin_training();
+        estimator.complete_training();
+        estimator.create_transformer();
+    }
+}
+
 template <typename TransformerT>
 void Execute(TransformerT &transformer, std::string const &grain, std::uint64_t const &input, std::uint64_t expected) {
     transformer.execute(
@@ -832,6 +863,20 @@ TEST_CASE("GrainEstimatorImpl - construct errors") {
     CHECK_THROWS_WITH(
         GrainEstimator(NS::CreateTestAnnotationMapsPtr(1), typename GrainEstimator::CreateEstimatorFunc()),
         "createFunc"
+    );
+    CHECK_THROWS_WITH(
+        GrainEstimator(NS::CreateTestAnnotationMapsPtr(1), typename GrainEstimator::CreateTransformerFunc()),
+        "createTransformerFunc"
+    );
+    CHECK_THROWS_WITH(
+        GrainEstimator(
+            NS::CreateTestAnnotationMapsPtr(1),
+            [](NS::AnnotationMapsPtr pAnnotationMaps) {
+                return DeltaEstimator(std::move(pAnnotationMaps));
+            },
+            typename GrainEstimator::CreateTransformerFunc()
+        ),
+        "createTransformerFunc"
     );
 }
 
