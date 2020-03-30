@@ -100,13 +100,20 @@ public:
     using GrainTransformerTypeUniquePtr     = std::unique_ptr<GrainTransformerType>;
     using TransformerMap                    = std::map<GrainT, GrainTransformerTypeUniquePtr>;
 
+    using CreateTransformerFunc             = std::function<GrainTransformerTypeUniquePtr (GrainT const &)>;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    GrainTransformer(TransformerMap transformers);
-    GrainTransformer(Archive &ar);
+
+    // The `createFunc` is invoked (if available) when a grain is encountered during
+    // prediction time that wasn't seen during training.
+    GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc=CreateTransformerFunc());
+    GrainTransformer(CreateTransformerFunc createFunc);
+
+    GrainTransformer(Archive &ar, CreateTransformerFunc createFunc=CreateTransformerFunc());
 
     ~GrainTransformer(void) override = default;
 
@@ -120,6 +127,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
+    CreateTransformerFunc const             _createFunc;
     TransformerMap                          _transformers;
 
     // ----------------------------------------------------------------------
@@ -134,13 +142,19 @@ private:
         GrainTransformerType &              transformer(
             [this, &grain](void) -> GrainTransformerType & {
 
-                typename TransformerMap::iterator const                     iter(_transformers.find(grain));
+                typename TransformerMap::iterator const                     iter(
+                    [this, &grain]() {
+                        typename TransformerMap::iterator const             i(_transformers.find(grain));
 
-                if(iter == _transformers.end())
-                    throw std::runtime_error("Grain not found");
+                        if(i != _transformers.end())
+                            return i;
 
-                // TODO: Add support for a "default transformer" that (if provided during construction)
-                //       is cloned when a grain isn't found.
+                        if(!_createFunc)
+                            throw std::runtime_error("Grain not found");
+
+                        return _transformers.emplace(grain, _createFunc(grain)).first;
+                    }()
+                );
 
                 assert(iter->second);
                 return *iter->second;
@@ -199,8 +213,8 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations);
-    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc);
+    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, bool isTrainingOnlyEstimator);
+    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc, bool isTrainingOnlyEstimator);
 
     ~GrainEstimatorImplBase(void) override = default;
 
@@ -215,11 +229,7 @@ protected:
     // |  Protected Types
     // |
     // ----------------------------------------------------------------------
-    using EstimatorMap =
-        std::map<
-            GrainT,
-            EstimatorT
-        >;
+    using EstimatorMap                      = std::map<GrainT, EstimatorT>;
 
     // ----------------------------------------------------------------------
     // |
@@ -239,6 +249,7 @@ private:
     // invoking _createFunc.
     AnnotationMapsPtr const                 _pAllColumnAnnotations;
     CreateEstimatorFunc const               _createFunc;
+    bool const                              _isTrainingOnlyEstimator;
 
     size_t                                  _cRemainingTrainingItems;
 
@@ -293,12 +304,20 @@ public:
             MaxNumTrainingItemsV
         >;
 
+    using CreateEstimatorFunc               = typename BaseType::CreateEstimatorFunc;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    using BaseType::BaseType;
+    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations) :
+        BaseType(std::move(pAllColumnAnnotations), false) {
+    }
+
+    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc) :
+        BaseType(std::move(pAllColumnAnnotations), std::move(createFunc), false) {
+    }
 
     ~GrainEstimatorImpl(void) override = default;
 
@@ -347,18 +366,62 @@ public:
 
     using TransformerType                   = GrainTransformer<GrainT, EstimatorT>;
 
+    using CreateEstimatorFunc               = typename BaseType::CreateEstimatorFunc;
+    using CreateTransformerFunc             = typename TransformerType::CreateTransformerFunc;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    using BaseType::BaseType;
+    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations) :
+        BaseType(std::move(pAllColumnAnnotations), false) {
+    }
+
+    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateTransformerFunc createTransformerFunc, bool isTrainingOnlyEstimator=false) :
+        BaseType(std::move(pAllColumnAnnotations), isTrainingOnlyEstimator),
+        _createTransformerFunc(
+            std::move(
+                [&createTransformerFunc](void) -> CreateTransformerFunc & {
+                    if(!createTransformerFunc)
+                        throw std::invalid_argument("createTransformerFunc");
+
+                    return createTransformerFunc;
+                }()
+            )
+        ) {
+    }
+
+    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createEstimatorFunc) :
+        BaseType(std::move(pAllColumnAnnotations), std::move(createEstimatorFunc), false) {
+    }
+
+    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createEstimatorFunc, CreateTransformerFunc createTransformerFunc, bool isTrainingOnlyEstimator=false) :
+        BaseType(std::move(pAllColumnAnnotations), std::move(createEstimatorFunc), isTrainingOnlyEstimator),
+        _createTransformerFunc(
+            std::move(
+                [&createTransformerFunc](void) -> CreateTransformerFunc & {
+                    if(!createTransformerFunc)
+                        throw std::invalid_argument("createTransformerFunc");
+
+                    return createTransformerFunc;
+                }()
+            )
+        ) {
+    }
 
     ~GrainEstimatorImpl(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GrainEstimatorImpl);
 
 private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+    CreateTransformerFunc const             _createTransformerFunc;
+
     // ----------------------------------------------------------------------
     // |
     // |  Private Methods
@@ -369,6 +432,16 @@ private:
 
         for(auto & kvp: this->_estimators)
             transformers.emplace(std::make_pair(kvp.first, kvp.second.create_transformer()));
+
+        if(transformers.empty()) {
+            if(!_createTransformerFunc)
+                throw std::runtime_error("`_createTransformerFunc` must be provided when no grains were encountered during training");
+
+            return typename BaseType::TransformerUniquePtr(new TransformerType(_createTransformerFunc));
+        }
+
+        if(_createTransformerFunc)
+            return typename BaseType::TransformerUniquePtr(new TransformerType(std::move(transformers), _createTransformerFunc));
 
         return typename BaseType::TransformerUniquePtr(new TransformerType(std::move(transformers)));
     }
@@ -436,7 +509,22 @@ GrainEstimatorAnnotation<GrainT>::GrainEstimatorAnnotation(AnnotationMap annotat
 // |
 // ----------------------------------------------------------------------
 template <typename GrainT, typename EstimatorT>
-GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transformers) :
+GrainTransformer<GrainT, EstimatorT>::GrainTransformer(CreateTransformerFunc createFunc) :
+    _createFunc(
+        std::move(
+            [&createFunc]() -> CreateTransformerFunc & {
+                if(!createFunc)
+                    throw std::invalid_argument("`createFunc` is empty");
+
+                return createFunc;
+            }()
+        )
+    ) {
+}
+
+template <typename GrainT, typename EstimatorT>
+GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc/*=CreateTransformerFunc()*/) :
+    _createFunc(std::move(createFunc)),
     _transformers(
         std::move(
             [&transformers](void) -> TransformerMap & {
@@ -450,14 +538,10 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transforme
 }
 
 template <typename GrainT, typename EstimatorT>
-GrainTransformer<GrainT, EstimatorT>::GrainTransformer(Archive &ar) :
+GrainTransformer<GrainT, EstimatorT>::GrainTransformer(Archive &ar, CreateTransformerFunc createFunc/*=CreateTransformerFunc()*/) :
     GrainTransformer(
-        [&ar](void) -> TransformerMap {
+        [&ar, &createFunc](void) {
             std::uint64_t                   cElements(Traits<std::uint64_t>::deserialize(ar));
-
-            if(cElements == 0)
-                throw std::runtime_error("Invalid elements");
-
             TransformerMap                  transformers;
 
             while(cElements--) {
@@ -470,7 +554,17 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(Archive &ar) :
                     throw std::runtime_error("Invalid insertion");
             }
 
-            return transformers;
+            if(transformers.empty()) {
+                if(!createFunc)
+                    throw std::runtime_error("A `createFunc` must be provided when there aren't any transformers in the transformer map");
+
+                return GrainTransformer(std::move(createFunc));
+            }
+
+            if(createFunc)
+                return GrainTransformer(std::move(transformers), std::move(createFunc));
+
+            return GrainTransformer(std::move(transformers));
         }()
     ) {
 }
@@ -491,17 +585,18 @@ void GrainTransformer<GrainT, EstimatorT>::save(Archive &ar) const /*override*/ 
 // |
 // ----------------------------------------------------------------------
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations) :
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, bool isTrainingOnlyEstimator) :
     GrainEstimatorImplBase(
         std::move(pAllColumnAnnotations),
         [](AnnotationMapsPtr pAllColumnAnnotationsParam) {
             return EstimatorT(std::move(pAllColumnAnnotationsParam));
-        }
+        },
+        std::move(isTrainingOnlyEstimator)
     ) {
 }
 
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc) :
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc, bool isTrainingOnlyEstimator) :
     BaseT(
         [pAllColumnAnnotations, &createFunc](void) -> std::string {
             if(!createFunc)
@@ -519,6 +614,7 @@ Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::G
     ),
     _pAllColumnAnnotations(pAllColumnAnnotations),
     _createFunc(std::move(createFunc)), // Note that createFunc has been validated when creating the Estimator name in the call to BaseT's constructor above
+    _isTrainingOnlyEstimator(std::move(isTrainingOnlyEstimator)),
     _cRemainingTrainingItems(MaxNumTrainingItemsV) {
 }
 
@@ -544,7 +640,7 @@ Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::g
 // ----------------------------------------------------------------------
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
 bool Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
-    return _cRemainingTrainingItems != 0;
+    return _isTrainingOnlyEstimator == false && _cRemainingTrainingItems != 0;
 }
 
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
