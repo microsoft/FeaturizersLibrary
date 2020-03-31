@@ -114,6 +114,17 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
 
                 #include "SharedLibrary_Common.hpp"
 
+                #if (defined _MSC_VER)
+                #   pragma warning(push)
+
+                    // I don't know why MSVC thinks that there is unreachable
+                    // code in these methods during release builds.
+                #   pragma warning(disable: 4702) // Unreachable code
+
+                #   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+                #   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+                #endif
+
                 """,
             ).format(
                 name=items[0].name,
@@ -142,7 +153,11 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                 constructor_params = ""
                 constructor_args = ""
 
+            fit_prefix_statements = ""
+
             transform_input_args = type_info_data.InputTypeInfo.GetTransformInputArgs()
+            if isinstance(transform_input_args, tuple):
+                transform_input_args, fit_prefix_statements = transform_input_args
 
             if item.has_dynamic_output:
                 output_statement_info = type_info_data.DynamicOutputTypeInfo.GetOutputInfo()
@@ -188,7 +203,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                                 FitResult result(0);
                                 auto const & input(*iter);
 
-                                REQUIRE({name}{suffix}Fit(pEstimatorHandle, {fit_input_args}, &result, &pErrorInfo));
+                                {fit_prefix_statements}REQUIRE({name}{suffix}Fit(pEstimatorHandle, {fit_input_args}, &result, &pErrorInfo));
                                 REQUIRE(pErrorInfo == nullptr);
 
                                 if(result == ResetAndContinue) {{
@@ -240,6 +255,12 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                     flush=flush,
                     constructor_args=constructor_args,
                     fit_input_args=transform_input_args,
+                    fit_prefix_statements="" if not fit_prefix_statements else "{}\n\n            ".format(
+                        StringHelpers.LeftJustify(
+                            fit_prefix_statements.rstrip(),
+                            12,
+                        ),
+                    ),
                 ),
             )
 
@@ -290,7 +311,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                             std::vector<{vector_result_type}> results;
 
                             {for_loop} {{
-                                {transform_vars}
+                                {transform_prefix_statements}{transform_vars}
 
                                 REQUIRE({name}{suffix}Transform(pTransformerHandle, {transform_input_args}, {transform_output_args}, &pErrorInfo));
                                 REQUIRE(pErrorInfo == nullptr);
@@ -314,8 +335,19 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                             suffix=suffix,
                             vector_result_type=output_statement_info.VectorResultType,
                             for_loop=for_loop,
+                            transform_prefix_statements="" if not fit_prefix_statements else "{}\n\n    ".format(
+                                StringHelpers.LeftJustify(
+                                    fit_prefix_statements,
+                                    4,
+                                ).rstrip(),
+                            ),
                             transform_vars=StringHelpers.LeftJustify(
-                                output_statement_info.TransformVars.rstrip(),
+                                "\n".join(
+                                    [
+                                        "{} {};".format(var.Type, var.Name)
+                                        for var in output_statement_info.TransformVars
+                                    ]
+                                ),
                                 4,
                             ),
                             transform_input_args=transform_input_args,
@@ -344,7 +376,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                             results.reserve(inference_input.size());
 
                             {for_loop} {{
-                                {transform_vars}
+                                {transform_prefix_statements}{transform_vars}
 
                                 REQUIRE({name}{suffix}Transform(pTransformerHandle, {transform_input_args}, {transform_output_args}, &pErrorInfo));
                                 REQUIRE(pErrorInfo == nullptr);
@@ -358,8 +390,19 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                             suffix=suffix,
                             vector_result_type=output_statement_info.VectorResultType,
                             for_loop=for_loop,
+                            transform_prefix_statements="" if not fit_prefix_statements else "{}\n\n    ".format(
+                                StringHelpers.LeftJustify(
+                                    fit_prefix_statements,
+                                    4,
+                                ).rstrip(),
+                            ),
                             transform_vars=StringHelpers.LeftJustify(
-                                output_statement_info.TransformVars.rstrip(),
+                                "\n".join(
+                                    [
+                                        "{} {};".format(var.Type, var.Name)
+                                        for var in output_statement_info.TransformVars
+                                    ]
+                                ),
                                 4,
                             ),
                             transform_input_args=transform_input_args,
@@ -390,6 +433,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                         REQUIRE({name}{suffix}DestroyTransformer(pTransformerHandle, &pErrorInfo));
                         REQUIRE(pErrorInfo == nullptr);
                     }}
+
                     """,
                 ).format(
                     name=item.name,
@@ -400,6 +444,16 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                     ),
                 ),
             )
+
+        f.write(
+            textwrap.dedent(
+                """\
+                #if (defined _MSC_VER)
+                #   pragma warning(pop)
+                #endif
+                """,
+            ),
+        )
 
 
 # ----------------------------------------------------------------------

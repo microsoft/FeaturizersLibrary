@@ -91,16 +91,11 @@ class MatrixTypeInfo(TypeInfo):
     ):
         return self.Result(
             "Eigen::MatrixX<{}>".format(self._type_info.CppType),
-            textwrap.dedent(
-                """\
-                size_t {name}_cols(0);
-                size_t {name}_rows(0);
-                {type} * {name}_ptr(nullptr);
-                """,
-            ).format(
-                type=self._type_info.CppType,
-                name=result_name,
-            ),
+            [
+                self.Type("size_t", "{}_cols".format(result_name)),
+                self.Type("size_t", "{}_rows".format(result_name)),
+                self.Type("{} *".format(self._type_info.CppType), "{}_ptr".format(result_name)),
+            ],
             "&{name}_cols, &{name}_rows, &{name}_ptr".format(
                 name=result_name,
             ),

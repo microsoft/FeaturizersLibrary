@@ -414,7 +414,18 @@ def _GenerateCommonFiles(open_file_func, output_dir, output_stream):
                 // ----------------------------------------------------------------------
                 #pragma once
 
+                #include <string>
+                #include <tuple>
+
                 #include "SharedLibrary_Common.h"
+
+                template <typename T>
+                struct make_tuple_elements_const_references {};
+
+                template <typename... Ts>
+                struct make_tuple_elements_const_references<std::tuple<Ts...>> {
+                    using type              = std::tuple<typename std::add_lvalue_reference<typename std::add_const<Ts>::type>::type...>;
+                };
 
                 DateTimeParameter CreateDateTimeParameter(int64_t const &value);
                 DateTimeParameter CreateDateTimeParameter(std::string const &value);
@@ -712,6 +723,7 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                 #define DLL_EXPORT_COMPILE
 
                 #include "SharedLibrary_{name}.h"
+                #include "SharedLibrary_Common.hpp"
                 #include "SharedLibrary_PointerTable.h"
 
                 #include "Archive.h"
@@ -723,11 +735,15 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
 
                 extern "C" {{
 
-                // I don't know why MSVC thinks that there is unreachable
-                // code in these methods during release builds.
                 #if (defined _MSC_VER)
                 #   pragma warning(push)
+
+                    // I don't know why MSVC thinks that there is unreachable
+                    // code in these methods during release builds.
                 #   pragma warning(disable: 4702) // Unreachable code
+
+                #   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+                #   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
                 #endif
 
                 """,

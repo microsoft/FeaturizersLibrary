@@ -5,6 +5,7 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_ModeImputerFeaturizer.h"
+#include "SharedLibrary_Common.hpp"
 #include "SharedLibrary_PointerTable.h"
 
 #include "Archive.h"
@@ -16,11 +17,15 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
-// I don't know why MSVC thinks that there is unreachable
-// code in these methods during release builds.
 #if (defined _MSC_VER)
 #   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
 #   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
 #endif
 
 /* ---------------------------------------------------------------------- */
@@ -3159,7 +3164,7 @@ FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_IsTrainingComplete(/*in*
     }
 }
 
-FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_Fit(/*in*/ ModeImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_Fit(/*in*/ ModeImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3173,7 +3178,7 @@ FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_Fit(/*in*/ ModeImputerFe
 
         Microsoft::Featurizer::Featurizers::ModeImputerEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ModeImputerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
         return true;
     }
@@ -3357,7 +3362,7 @@ FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_CreateTransformerSaveDat
     }
 }
 
-FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_Transform(/*in*/ ModeImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_Transform(/*in*/ ModeImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3374,7 +3379,7 @@ FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_Transform(/*in*/ ModeImp
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ModeImputerEstimator<std::float_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input));
 
         // Output
         *output = result;
@@ -3530,7 +3535,7 @@ FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_IsTrainingComplete(/*in
     }
 }
 
-FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_Fit(/*in*/ ModeImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_Fit(/*in*/ ModeImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3544,7 +3549,7 @@ FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_Fit(/*in*/ ModeImputerF
 
         Microsoft::Featurizer::Featurizers::ModeImputerEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ModeImputerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
         return true;
     }
@@ -3728,7 +3733,7 @@ FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_CreateTransformerSaveDa
     }
 }
 
-FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_Transform(/*in*/ ModeImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_Transform(/*in*/ ModeImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3745,7 +3750,7 @@ FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_Transform(/*in*/ ModeIm
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ModeImputerEstimator<std::double_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input));
 
         // Output
         *output = result;

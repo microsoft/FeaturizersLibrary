@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -92,7 +103,7 @@ void StringFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_int8_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -112,6 +123,7 @@ void StringFeaturizer_int8_Test(
     REQUIRE(StringFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -193,7 +205,7 @@ void StringFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_int16_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -213,6 +225,7 @@ void StringFeaturizer_int16_Test(
     REQUIRE(StringFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -294,7 +307,7 @@ void StringFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_int32_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -314,6 +327,7 @@ void StringFeaturizer_int32_Test(
     REQUIRE(StringFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -395,7 +409,7 @@ void StringFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_int64_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -415,6 +429,7 @@ void StringFeaturizer_int64_Test(
     REQUIRE(StringFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -496,7 +511,7 @@ void StringFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_uint8_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -516,6 +531,7 @@ void StringFeaturizer_uint8_Test(
     REQUIRE(StringFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -597,7 +613,7 @@ void StringFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_uint16_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -617,6 +633,7 @@ void StringFeaturizer_uint16_Test(
     REQUIRE(StringFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -698,7 +715,7 @@ void StringFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_uint32_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -718,6 +735,7 @@ void StringFeaturizer_uint32_Test(
     REQUIRE(StringFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -799,7 +817,7 @@ void StringFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_uint64_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -819,6 +837,7 @@ void StringFeaturizer_uint64_Test(
     REQUIRE(StringFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -900,7 +919,7 @@ void StringFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_float_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -920,6 +939,7 @@ void StringFeaturizer_float_Test(
     REQUIRE(StringFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1001,7 +1021,7 @@ void StringFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_double_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1021,6 +1041,7 @@ void StringFeaturizer_double_Test(
     REQUIRE(StringFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <bool> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1102,7 +1123,7 @@ void StringFeaturizer_bool_Test(
     results.reserve(inference_input.size());
 
     for(bool input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_bool_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1122,6 +1143,7 @@ void StringFeaturizer_bool_Test(
     REQUIRE(StringFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  StringFeaturizer <string> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1203,7 +1225,7 @@ void StringFeaturizer_string_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr(nullptr);
+        char const * result_ptr;
 
         REQUIRE(StringFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1223,3 +1245,7 @@ void StringFeaturizer_string_Test(
     REQUIRE(StringFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

@@ -6,6 +6,7 @@
 
 import os
 import re
+import textwrap
 
 import CommonEnvironment
 from CommonEnvironment import Interface
@@ -73,7 +74,28 @@ class TupleTypeInfo(TypeInfo):
         self,
         input_name="input",
     ):
-        raise NotImplementedError("Not implemented yet")
+        parameters = []
+        prefix_statements = []
+
+        for index, type_info in enumerate(self._type_infos):
+            result = type_info.GetTransformInputArgs("{}{}".format(input_name, index))
+
+            these_prefix_statements = "auto const & {name}{index}(std::get<{index}>({name}));".format(
+                name=input_name,
+                index=index,
+            )
+
+            if isinstance(result, tuple):
+                these_prefix_statements += "\n\n{}\n".format(result[1].rstrip())
+                result = result[0]
+
+            parameters.append(result)
+            prefix_statements.append(these_prefix_statements)
+
+        return (
+            ", ".join(parameters),
+            "\n".join(prefix_statements),
+        )
 
     # ----------------------------------------------------------------------
     @Interface.override
@@ -81,4 +103,11 @@ class TupleTypeInfo(TypeInfo):
         self,
         result_name="result",
     ):
-        raise NotImplementedError("Tuples are only used during input; use custom structures for output")
+        return self.Result(
+            "TODO1",
+            [self.Type("TODO2,1", "TODO2.2")],
+            "TODO3",
+            "TODO4",
+            "TODO5",
+            destroy_inline=True,
+        )

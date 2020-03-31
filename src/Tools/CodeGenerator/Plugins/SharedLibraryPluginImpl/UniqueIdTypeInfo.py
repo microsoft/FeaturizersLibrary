@@ -79,7 +79,7 @@ class UniqueIdTypeInfo(TypeInfo):
 
                 std::vector<std::string> {name}_buffer;
 
-                {name}_buffer.resize({name}_items);
+                {name}_buffer.reserve({name}_items);
 
                 while({name}_buffer.size() < {name}_items) {{
                     {name}_buffer.emplace_back(*{name}_ptr);

@@ -5,6 +5,7 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_TfidfVectorizerFeaturizer.h"
+#include "SharedLibrary_Common.hpp"
 #include "SharedLibrary_PointerTable.h"
 
 #include "Archive.h"
@@ -16,11 +17,15 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
-// I don't know why MSVC thinks that there is unreachable
-// code in these methods during release builds.
 #if (defined _MSC_VER)
 #   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
 #   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
 #endif
 
 /* ---------------------------------------------------------------------- */
@@ -36,7 +41,7 @@ FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_CreateEstimator(/*in*/ boo
         *ppErrorInfo = nullptr;
 
         if(regexToken == nullptr) throw std::invalid_argument("'regexToken' is null");
-        Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>* pEstimator = new Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , lowercase, static_cast<typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::AnalyzerMethod>(analyzer), regexToken, static_cast<typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::NormMethod>(norm), static_cast<typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::TfidfPolicy>(policy), minDf, maxDf, topKTerms != nullptr ? *topKTerms : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue(), ngramRangeMin, ngramRangeMax);
+        Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>* pEstimator = new Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 , lowercase, static_cast<typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::AnalyzerMethod>(analyzer), std::string(regexToken), static_cast<typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::NormMethod>(norm), static_cast<typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::TfidfPolicy>(policy), minDf, maxDf, topKTerms != nullptr ? *topKTerms : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue(), ngramRangeMin, ngramRangeMax);
 
         pEstimator->begin_training();
 
@@ -133,7 +138,7 @@ FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_Fit(/*in*/ TfidfVectorizer
 
         Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -346,7 +351,7 @@ FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_Transform(/*in*/ TfidfVect
         using TransformedType = typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         std::unique_ptr<std::float_t []> pValues(new std::float_t [result.Values.size()]);

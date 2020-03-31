@@ -227,7 +227,7 @@ FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_DestroyEstimator(/*in*/ 
 
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_GetState(/*in*/ ModeImputerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_IsTrainingComplete(/*in*/ ModeImputerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_Fit(/*in*/ ModeImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_Fit(/*in*/ ModeImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_FitBuffer(/*in*/ ModeImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_OnDataCompleted(/*in*/ ModeImputerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_CompleteTraining(/*in*/ ModeImputerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -239,7 +239,7 @@ FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_DestroyTransformer(/*in*
 
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_CreateTransformerSaveData(/*in*/ ModeImputerFeaturizer_float_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_Transform(/*in*/ ModeImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_Transform(/*in*/ ModeImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_float_Flush(/*in*/ ModeImputerFeaturizer_float_TransformerHandle *pHandle, /*out*/ float ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
@@ -253,7 +253,7 @@ FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_DestroyEstimator(/*in*/
 
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_GetState(/*in*/ ModeImputerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_IsTrainingComplete(/*in*/ ModeImputerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_Fit(/*in*/ ModeImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_Fit(/*in*/ ModeImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_FitBuffer(/*in*/ ModeImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_OnDataCompleted(/*in*/ ModeImputerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_CompleteTraining(/*in*/ ModeImputerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -265,7 +265,7 @@ FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_DestroyTransformer(/*in
 
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_CreateTransformerSaveData(/*in*/ ModeImputerFeaturizer_double_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_Transform(/*in*/ ModeImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_Transform(/*in*/ ModeImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ModeImputerFeaturizer_double_Flush(/*in*/ ModeImputerFeaturizer_double_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */

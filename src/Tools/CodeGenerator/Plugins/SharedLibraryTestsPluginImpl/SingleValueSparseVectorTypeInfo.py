@@ -78,16 +78,11 @@ class SingleValueSparseVectorTypeInfo(TypeInfo):
     ):
         return self.Result(
             "Microsoft::Featurizer::Featurizers::SingleValueSparseVectorEncoding<{}>".format(self._type_info.CppType),
-            textwrap.dedent(
-                """\
-                uint64_t {result}_numElements(0);
-                {type} {result}_value;
-                uint64_t {result}_index(0);
-                """,
-            ).format(
-                type=self._type_info.CppType,
-                result=result_name,
-            ),
+            [
+                self.Type("uint64_t", "{}_numElements".format(result_name)),
+                self.Type(self._type_info.CppType, "{}_value".format(result_name)),
+                self.Type("uint64_t", "{}_index".format(result_name)),
+            ],
             "&{result}_numElements, &{result}_value, &{result}_index".format(
                 result=result_name,
             ),

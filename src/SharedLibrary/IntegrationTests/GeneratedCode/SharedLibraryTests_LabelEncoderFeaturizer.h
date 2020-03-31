@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <int8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -109,6 +120,7 @@ void LabelEncoderFeaturizer_int8_Test(
     REQUIRE(LabelEncoderFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -207,6 +219,7 @@ void LabelEncoderFeaturizer_int16_Test(
     REQUIRE(LabelEncoderFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -305,6 +318,7 @@ void LabelEncoderFeaturizer_int32_Test(
     REQUIRE(LabelEncoderFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -403,6 +417,7 @@ void LabelEncoderFeaturizer_int64_Test(
     REQUIRE(LabelEncoderFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -501,6 +516,7 @@ void LabelEncoderFeaturizer_uint8_Test(
     REQUIRE(LabelEncoderFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -599,6 +615,7 @@ void LabelEncoderFeaturizer_uint16_Test(
     REQUIRE(LabelEncoderFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -697,6 +714,7 @@ void LabelEncoderFeaturizer_uint32_Test(
     REQUIRE(LabelEncoderFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -795,6 +813,7 @@ void LabelEncoderFeaturizer_uint64_Test(
     REQUIRE(LabelEncoderFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -893,6 +912,7 @@ void LabelEncoderFeaturizer_float_Test(
     REQUIRE(LabelEncoderFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -991,6 +1011,7 @@ void LabelEncoderFeaturizer_double_Test(
     REQUIRE(LabelEncoderFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <bool> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1089,6 +1110,7 @@ void LabelEncoderFeaturizer_bool_Test(
     REQUIRE(LabelEncoderFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  LabelEncoderFeaturizer <string> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -1187,3 +1209,7 @@ void LabelEncoderFeaturizer_string_Test(
     REQUIRE(LabelEncoderFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

@@ -125,6 +125,12 @@ namespace Components {
         // |  Public Types
         // |
         // ----------------------------------------------------------------------
+        // std::vector<bool> operates differently than std::vector<T>, as std::vector<bool>
+        // bit packs values to conserve space. Because of this, it has slightly different
+        // methods that std::vector<T>. This code has not yet been refactored to be aware
+        // of vectors of bools. Remove this static assertion if that change is ever made.
+        static_assert(std::is_same<T, bool>::value == false, "CircularBuffers do not currently support bool types");
+
         using iterator = CircularIterator<T>;
         using const_iterator = CircularIterator<const T>;
 
@@ -307,7 +313,7 @@ void CircularBuffer<T>::clear() {
 
     // Make sure that the start offset is back to 0;
     _start_offset = 0;
-    
+
     // The c++ reference says "the vector capacity is not guaranteed to change due to calling this function."
     // Since the capacity may change, calling reserve again just to make sure we still have the correct size.
     _data.reserve(_max_size);

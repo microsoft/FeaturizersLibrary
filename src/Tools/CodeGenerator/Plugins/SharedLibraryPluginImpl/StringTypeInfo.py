@@ -60,7 +60,7 @@ class StringTypeInfo(TypeInfo):
             validation = """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
                 name=arg_name,
             )
-            invocation = invocation_template.format(arg_name)
+            invocation = invocation_template.format("std::string({})".format(arg_name))
 
         return self.Result(
             [self.Type("char const *", arg_name)],
@@ -144,16 +144,30 @@ class StringTypeInfo(TypeInfo):
         result_name="result",
         suppress_pointer=False,
     ):
-        return self.Result(
-            [self.Type("char const *{}".format("" if suppress_pointer else "*"), arg_name),],
-            textwrap.dedent(
+        if self.IsOptional:
+            statement = textwrap.dedent(
                 """\
-                if({name} == nullptr) throw std::invalid_argument("'{name}' is null");
+                if(!{result_name}) {{
+                    {pointer}{name} = nullptr;
+                }}
+                else {{
+                    std::string const & {result_name}_temp(*{result_name});
+                    char * string_buffer(new char[{result_name}_temp.size() + 1]);
+
+                    std::copy({result_name}_temp.begin(), {result_name}_temp.end(), string_buffer);
+                    string_buffer[{result_name}_temp.size()] = 0;
+
+                    {pointer}{name} = string_buffer;
+                }}
                 """,
             ).format(
                 name=arg_name,
-            ),
-            textwrap.dedent(
+                result_name=result_name,
+                pointer="" if suppress_pointer else "*",
+            )
+
+        else:
+            statement = textwrap.dedent(
                 """\
                 if({result_name}.empty()) {{
                     {pointer}{name} = nullptr;
@@ -171,7 +185,18 @@ class StringTypeInfo(TypeInfo):
                 name=arg_name,
                 result_name=result_name,
                 pointer="" if suppress_pointer else "*",
+            )
+
+        return self.Result(
+            [self.Type("char const *{}".format("" if suppress_pointer else "*"), arg_name),],
+            textwrap.dedent(
+                """\
+                if({name} == nullptr) throw std::invalid_argument("'{name}' is null");
+                """,
+            ).format(
+                name=arg_name,
             ),
+            statement,
         )
 
     # ----------------------------------------------------------------------

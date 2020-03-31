@@ -100,7 +100,7 @@ class TupleTypeInfo(TypeInfo):
         for index, type_info in enumerate(self._type_infos):
             result = type_info.GetInputInfo(
                 "{}{}".format(arg_name, index),
-                "std::move({})",
+                "{}",
             )
 
             parameters += result.Parameters
@@ -180,7 +180,6 @@ class TupleTypeInfo(TypeInfo):
                 ),
             )
 
-        # TODO: Needs number of items
         return self.Result(
             parameters,
             "\n".join(validation_statements),
@@ -188,7 +187,7 @@ class TupleTypeInfo(TypeInfo):
                 """\
                 {invocation_statements}
 
-                std::vector<{cpp_type}> {arg_name}_buffer;
+                std::vector<typename make_tuple_elements_const_references<{cpp_type}>::type> {arg_name}_buffer;
 
                 {arg_name}_buffer.reserve(input0_items);
 
@@ -217,7 +216,7 @@ class TupleTypeInfo(TypeInfo):
                         for index, invocation_tuple in enumerate(invocation_tuples)
                     ],
                 ),
-                emplace_args=", ".join(["std::move(*{}{}_creation_ptr)".format(arg_name, index) for index in range(len(invocation_tuples))]),
+                emplace_args=", ".join(["*{}{}_creation_ptr".format(arg_name, index) for index in range(len(invocation_tuples))]),
                 ptrs_increment=StringHelpers.LeftJustify(
                     "\n".join(["++{}{}_creation_ptr;".format(arg_name, index) for index in range(len(invocation_tuples))]),
                     4,

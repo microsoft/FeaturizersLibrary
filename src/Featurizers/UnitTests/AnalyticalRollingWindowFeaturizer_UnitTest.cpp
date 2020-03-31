@@ -13,7 +13,7 @@ using OutputType = NS::Featurizers::AnalyticalRollingWindowTransformer<std::int3
 
 TEST_CASE("Mean - int32, window size 1, horizon 1") {
     // Since we are doing the mean of one value and a horizon of one, the result should always be equal to the prior value passed into execute.
-    
+
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 1);
 
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
@@ -25,7 +25,7 @@ TEST_CASE("Mean - int32, window size 1, horizon 1") {
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(4), {3}));
 }
 
-TEST_CASE("Mean - int32, window size 2, horizon 1") {    
+TEST_CASE("Mean - int32, window size 2, horizon 1") {
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 2);
 
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
@@ -39,7 +39,7 @@ TEST_CASE("Mean - int32, window size 2, horizon 1") {
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(4), {2.5}));
 }
 
-TEST_CASE("Mean - int32, window size 2, horizon 1, min window size 2") {    
+TEST_CASE("Mean - int32, window size 2, horizon 1, min window size 2") {
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 2, 2);
 
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
@@ -94,7 +94,7 @@ TEST_CASE("Estimator Mean - int32, window size 2, horizon 2, min window size 2")
     estimator.begin_training();
     estimator.complete_training();
     auto transformer = estimator.create_transformer();
-    
+
     std::vector<OutputType>   output;
     auto const                              callback(
         [&output](std::vector<double> value) {
@@ -117,7 +117,7 @@ TEST_CASE("Estimator Mean - int32, window size 2, horizon 2, min window size 2")
 
 using GrainType = std::vector<std::string>;
 
-TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {    
+TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 1);
 
@@ -125,10 +125,13 @@ TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {
 
     const GrainType grain({"one"});
     const GrainedInputType tup1 = std::make_tuple(grain, 1);
-    const std::vector<std::tuple<std::vector<std::string> const &, std::int32_t const &>> vec = {tup1};
 
+    estimator.begin_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Finished);
 
-    NS::TestHelpers::Train(estimator, vec);
+    estimator.complete_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Completed);
+
     auto transformer = estimator.create_transformer();
 
     std::vector<OutputType>   output;
@@ -159,10 +162,13 @@ TEST_CASE("Grained Mean - 1 grain, window size 2, horizon 2, min window size 2")
 
     const GrainType grain({"one"});
     const GrainedInputType tup1 = std::make_tuple(grain, 1);
-    const std::vector<std::tuple<std::vector<std::string> const &, std::int32_t const &>> vec = {tup1};
 
+    estimator.begin_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Finished);
 
-    NS::TestHelpers::Train(estimator, vec);
+    estimator.complete_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Completed);
+
     auto transformer = estimator.create_transformer();
 
     std::vector<OutputType>   output;
@@ -198,10 +204,13 @@ TEST_CASE("Grained Mean - 2 grain, window size 2, horizon 2, min window size 1")
     const GrainType grainTwo({"two"});
     const GrainedInputType tup1 = std::make_tuple(grainOne, 1);
     const GrainedInputType tup2 = std::make_tuple(grainTwo, 1);
-    const std::vector<std::tuple<std::vector<std::string> const &, std::int32_t const &>> vec = {tup1, tup2};
 
+    estimator.begin_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Finished);
 
-    NS::TestHelpers::Train(estimator, vec);
+    estimator.complete_training();
+    CHECK(estimator.get_state() == NS::TrainingState::Completed);
+
     auto transformer = estimator.create_transformer();
 
     std::vector<OutputType>   output;
@@ -278,14 +287,14 @@ TEST_CASE("Invalid Constructor Args") {
 }
 
 TEST_CASE("Flush test") {
-    
+
     std::vector<OutputType>   output;
     auto const                              callback(
         [&output](OutputType value) {
             output.emplace_back(std::move(value));
         }
     );
-    
+
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 1);
 
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
@@ -296,7 +305,7 @@ TEST_CASE("Flush test") {
     // Flush should also return no values.
     transformer.flush(callback);
     CHECK(output.size() == 0);
-    
+
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
 
     CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(2), {1}));

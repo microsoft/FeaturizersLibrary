@@ -234,7 +234,7 @@ class VectorTypeInfo(TypeInfo):
 
         input_parameters = [self.Type("{}*".format(p.Type), "{}_ptr".format(p.Name)) for p in result.Parameters]
 
-        if self._type_info.TypeName == "bool":
+        if len(result.Parameters) == 1 and result.Parameters[0].Type == "bool *":
             # We can't take a reference to bools within a vector, as the values are stored as bits rather than
             # bool types.
             for_loop = "for(bool {result_name}_item : {result_name})".format(

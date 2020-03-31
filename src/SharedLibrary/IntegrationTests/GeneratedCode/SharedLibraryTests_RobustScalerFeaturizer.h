@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <int8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -109,6 +120,7 @@ void RobustScalerFeaturizer_int8_Test(
     REQUIRE(RobustScalerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <int16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -207,6 +219,7 @@ void RobustScalerFeaturizer_int16_Test(
     REQUIRE(RobustScalerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <uint8> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -305,6 +318,7 @@ void RobustScalerFeaturizer_uint8_Test(
     REQUIRE(RobustScalerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <uint16> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -403,6 +417,7 @@ void RobustScalerFeaturizer_uint16_Test(
     REQUIRE(RobustScalerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <float> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -501,6 +516,7 @@ void RobustScalerFeaturizer_float_Test(
     REQUIRE(RobustScalerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <int32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -599,6 +615,7 @@ void RobustScalerFeaturizer_int32_Test(
     REQUIRE(RobustScalerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <int64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -697,6 +714,7 @@ void RobustScalerFeaturizer_int64_Test(
     REQUIRE(RobustScalerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <uint32> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -795,6 +813,7 @@ void RobustScalerFeaturizer_uint32_Test(
     REQUIRE(RobustScalerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <uint64> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -893,6 +912,7 @@ void RobustScalerFeaturizer_uint64_Test(
     REQUIRE(RobustScalerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  RobustScalerFeaturizer <double> */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -991,3 +1011,7 @@ void RobustScalerFeaturizer_double_Test(
     REQUIRE(RobustScalerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

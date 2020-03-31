@@ -5,6 +5,7 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_NumericalizeFeaturizer.h"
+#include "SharedLibrary_Common.hpp"
 #include "SharedLibrary_PointerTable.h"
 
 #include "Archive.h"
@@ -16,11 +17,15 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
-// I don't know why MSVC thinks that there is unreachable
-// code in these methods during release builds.
 #if (defined _MSC_VER)
 #   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
 #   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
 #endif
 
 /* ---------------------------------------------------------------------- */
@@ -4214,7 +4219,7 @@ FEATURIZER_LIBRARY_API bool NumericalizeFeaturizer_string_Fit(/*in*/ Numericaliz
 
         Microsoft::Featurizer::Featurizers::NumericalizeEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::NumericalizeEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -4424,7 +4429,7 @@ FEATURIZER_LIBRARY_API bool NumericalizeFeaturizer_string_Transform(/*in*/ Numer
         using TransformedType = typename Microsoft::Featurizer::Featurizers::NumericalizeEstimator<std::string>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;

@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <int8> */
 template <typename VectorInputT>
@@ -90,8 +101,8 @@ void BackwardFillImputerFeaturizer_int8_Test(
     std::vector<std::vector<std::int8_t>> results;
 
     for(auto const & input : inference_input) {
-        int8_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::int8_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_int8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -104,8 +115,8 @@ void BackwardFillImputerFeaturizer_int8_Test(
     }
 
     if(flush) {
-        int8_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::int8_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_int8_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -125,6 +136,7 @@ void BackwardFillImputerFeaturizer_int8_Test(
     REQUIRE(BackwardFillImputerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <int16> */
 template <typename VectorInputT>
@@ -204,8 +216,8 @@ void BackwardFillImputerFeaturizer_int16_Test(
     std::vector<std::vector<std::int16_t>> results;
 
     for(auto const & input : inference_input) {
-        int16_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::int16_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_int16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -218,8 +230,8 @@ void BackwardFillImputerFeaturizer_int16_Test(
     }
 
     if(flush) {
-        int16_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::int16_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_int16_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -239,6 +251,7 @@ void BackwardFillImputerFeaturizer_int16_Test(
     REQUIRE(BackwardFillImputerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <int32> */
 template <typename VectorInputT>
@@ -318,8 +331,8 @@ void BackwardFillImputerFeaturizer_int32_Test(
     std::vector<std::vector<std::int32_t>> results;
 
     for(auto const & input : inference_input) {
-        int32_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::int32_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_int32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -332,8 +345,8 @@ void BackwardFillImputerFeaturizer_int32_Test(
     }
 
     if(flush) {
-        int32_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::int32_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_int32_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -353,6 +366,7 @@ void BackwardFillImputerFeaturizer_int32_Test(
     REQUIRE(BackwardFillImputerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <int64> */
 template <typename VectorInputT>
@@ -432,8 +446,8 @@ void BackwardFillImputerFeaturizer_int64_Test(
     std::vector<std::vector<std::int64_t>> results;
 
     for(auto const & input : inference_input) {
-        int64_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::int64_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_int64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -446,8 +460,8 @@ void BackwardFillImputerFeaturizer_int64_Test(
     }
 
     if(flush) {
-        int64_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::int64_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_int64_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -467,6 +481,7 @@ void BackwardFillImputerFeaturizer_int64_Test(
     REQUIRE(BackwardFillImputerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -546,8 +561,8 @@ void BackwardFillImputerFeaturizer_uint8_Test(
     std::vector<std::vector<std::uint8_t>> results;
 
     for(auto const & input : inference_input) {
-        uint8_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::uint8_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_uint8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -560,8 +575,8 @@ void BackwardFillImputerFeaturizer_uint8_Test(
     }
 
     if(flush) {
-        uint8_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::uint8_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_uint8_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -581,6 +596,7 @@ void BackwardFillImputerFeaturizer_uint8_Test(
     REQUIRE(BackwardFillImputerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -660,8 +676,8 @@ void BackwardFillImputerFeaturizer_uint16_Test(
     std::vector<std::vector<std::uint16_t>> results;
 
     for(auto const & input : inference_input) {
-        uint16_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::uint16_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_uint16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -674,8 +690,8 @@ void BackwardFillImputerFeaturizer_uint16_Test(
     }
 
     if(flush) {
-        uint16_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::uint16_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_uint16_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -695,6 +711,7 @@ void BackwardFillImputerFeaturizer_uint16_Test(
     REQUIRE(BackwardFillImputerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -774,8 +791,8 @@ void BackwardFillImputerFeaturizer_uint32_Test(
     std::vector<std::vector<std::uint32_t>> results;
 
     for(auto const & input : inference_input) {
-        uint32_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::uint32_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_uint32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -788,8 +805,8 @@ void BackwardFillImputerFeaturizer_uint32_Test(
     }
 
     if(flush) {
-        uint32_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::uint32_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_uint32_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -809,6 +826,7 @@ void BackwardFillImputerFeaturizer_uint32_Test(
     REQUIRE(BackwardFillImputerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -888,8 +906,8 @@ void BackwardFillImputerFeaturizer_uint64_Test(
     std::vector<std::vector<std::uint64_t>> results;
 
     for(auto const & input : inference_input) {
-        uint64_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::uint64_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_uint64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -902,8 +920,8 @@ void BackwardFillImputerFeaturizer_uint64_Test(
     }
 
     if(flush) {
-        uint64_t * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::uint64_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_uint64_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -923,6 +941,7 @@ void BackwardFillImputerFeaturizer_uint64_Test(
     REQUIRE(BackwardFillImputerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <float> */
 template <typename VectorInputT>
@@ -957,7 +976,7 @@ void BackwardFillImputerFeaturizer_float_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(BackwardFillImputerFeaturizer_float_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(BackwardFillImputerFeaturizer_float_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -1002,10 +1021,10 @@ void BackwardFillImputerFeaturizer_float_Test(
     std::vector<std::vector<std::float_t>> results;
 
     for(auto const & input : inference_input) {
-        float * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::float_t* result_ptr;
+        size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_float_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_float_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::vector<std::float_t>(result_ptr, result_ptr + result_items));
@@ -1016,8 +1035,8 @@ void BackwardFillImputerFeaturizer_float_Test(
     }
 
     if(flush) {
-        float * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::float_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_float_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1037,6 +1056,7 @@ void BackwardFillImputerFeaturizer_float_Test(
     REQUIRE(BackwardFillImputerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <double> */
 template <typename VectorInputT>
@@ -1071,7 +1091,7 @@ void BackwardFillImputerFeaturizer_double_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(BackwardFillImputerFeaturizer_double_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(BackwardFillImputerFeaturizer_double_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -1116,10 +1136,10 @@ void BackwardFillImputerFeaturizer_double_Test(
     std::vector<std::vector<std::double_t>> results;
 
     for(auto const & input : inference_input) {
-        double * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::double_t* result_ptr;
+        size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_double_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_double_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
@@ -1130,8 +1150,8 @@ void BackwardFillImputerFeaturizer_double_Test(
     }
 
     if(flush) {
-        double * result_ptr(nullptr);
-        std::size_t result_items(0);
+        std::double_t* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_double_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1151,6 +1171,7 @@ void BackwardFillImputerFeaturizer_double_Test(
     REQUIRE(BackwardFillImputerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <bool> */
 template <typename VectorInputT>
@@ -1230,8 +1251,8 @@ void BackwardFillImputerFeaturizer_bool_Test(
     std::vector<std::vector<bool>> results;
 
     for(bool input : inference_input) {
-        bool * result_ptr(nullptr);
-        std::size_t result_items(0);
+        bool* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_bool_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1244,8 +1265,8 @@ void BackwardFillImputerFeaturizer_bool_Test(
     }
 
     if(flush) {
-        bool * result_ptr(nullptr);
-        std::size_t result_items(0);
+        bool* result_ptr;
+        size_t result_items;
 
         REQUIRE(BackwardFillImputerFeaturizer_bool_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -1265,6 +1286,7 @@ void BackwardFillImputerFeaturizer_bool_Test(
     REQUIRE(BackwardFillImputerFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  BackwardFillImputerFeaturizer <string> */
 template <typename VectorInputT>
@@ -1344,30 +1366,30 @@ void BackwardFillImputerFeaturizer_string_Test(
     std::vector<std::vector<std::string>> results;
 
     for(auto const & input : inference_input) {
-        char const * * result_ptr(nullptr);
-        std::size_t result_items(0);
+        char const ** result_ptr_ptr;
+        size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &result_ptr_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::string>(result_ptr, result_ptr + result_items));
+        results.emplace_back(std::vector<std::string>(result_ptr_ptr, result_ptr_ptr + result_items));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_string_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_string_DestroyTransformedData(result_ptr_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     if(flush) {
-        char const * * result_ptr(nullptr);
-        std::size_t result_items(0);
+        char const ** result_ptr_ptr;
+        size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_string_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_string_Flush(pTransformerHandle, &result_ptr_ptr, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::string>(result_ptr, result_ptr + result_items));
+        results.emplace_back(std::vector<std::string>(result_ptr_ptr, result_ptr_ptr + result_items));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_string_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_string_DestroyTransformedData(result_ptr_ptr, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1379,3 +1401,7 @@ void BackwardFillImputerFeaturizer_string_Test(
     REQUIRE(BackwardFillImputerFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
