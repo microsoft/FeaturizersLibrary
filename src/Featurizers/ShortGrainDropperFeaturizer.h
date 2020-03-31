@@ -25,12 +25,13 @@ public:
     // ----------------------------------------------------------------------
     using BaseType                          = StandardTransformer<std::vector<std::string>, bool>;
     using GrainsSet                         = std::unordered_set<std::vector<std::string>, Microsoft::Featurizer::ContainerHash<std::vector<std::string>>>;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    explicit ShortGrainDropperTransformer(GrainsSet grainsToDrop);
+    explicit ShortGrainDropperTransformer(GrainsSet grainsToKeep);
     explicit ShortGrainDropperTransformer(Archive &ar);
 
     ~ShortGrainDropperTransformer(void) override = default;
@@ -47,7 +48,7 @@ private:
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
-    GrainsSet const                         _grainsToDrop;
+    GrainsSet const                         _grainsToKeep;
 
     // ----------------------------------------------------------------------
     // |
@@ -133,16 +134,16 @@ private:
     // MSVC has problems when the definition is separate from the declaration
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
 
-        ShortGrainDropperTransformer::GrainsSet grainsToDrop;
+        ShortGrainDropperTransformer::GrainsSet grainsToKeep;
 
         for (GrainsMap::value_type const & groupByGrainsElement : _groupByGrains) {
-            if (groupByGrainsElement.second <= _minPoints)
-                grainsToDrop.emplace(std::move(groupByGrainsElement.first));
+            if (groupByGrainsElement.second >= _minPoints)
+                grainsToKeep.emplace(std::move(groupByGrainsElement.first));
         }
         //clear _groupByGrains
         _groupByGrains = {};
 
-        return typename BaseType::TransformerUniquePtr(new TransformerType(std::move(grainsToDrop)));
+        return typename BaseType::TransformerUniquePtr(new TransformerType(std::move(grainsToKeep)));
     }
 };
 

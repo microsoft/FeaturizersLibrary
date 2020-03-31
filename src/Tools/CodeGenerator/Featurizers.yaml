@@ -1349,13 +1349,23 @@ featurizers:
     release_version: 0.4.0
     num_output_columns: 1
     description: |-
-      Drop rows of TimeSeriesDataFrame with short grains
+      Returns true to indicate that a row should be dropped if it wasn't encountered during training.
 
       C++-style pseudo signature:
         bool execute(std::vector<std::string> const &value);
 
       Examples:
-        todo:
+        Consider the training data:
+
+        [ ["one"], ["two"], ["two"], ["three"], ["three"], ["three"] ]
+
+        and a ShortGrainDropper configured with minPoints set to 2. Grains ["two"] and ["three"] appear
+        enough times in the training data to remain, while any other grain should be dropped:
+
+        [ "one" ] -> true                         # drop
+        [ "two" ] -> false                        # dont' drop
+        [ "three" ] -> false                      # don't drop
+        [ "never seen during training" ] -> true  # drop
 
     featurizer_is_a_template: true
 
@@ -1365,18 +1375,7 @@ featurizers:
 
     configuration_params:
       - type: uint32
-        name: maxWindowSize
-
-      - type: vector<int32>
-        name: lags
-
-      - type: uint32
-        name: horizon
-
-      - type: uint32?
-        name: crossValidation
-
-    status: Pending
+        name: minPoints
 
   # ----------------------------------------------------------------------
   - name: SimpleRollingWindowFeaturizer

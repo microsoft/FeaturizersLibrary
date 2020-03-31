@@ -78,12 +78,12 @@ TEST_CASE("Standard Test_Parameter Combination") {
         std::uint32_t minPoints = 5;
 
         std::vector<bool> inferencingOutput = {
+            false,
             true,
             true,
             true,
             true,
-            true,
-            false
+            true
         };
 
         TestImpl(
@@ -100,11 +100,11 @@ TEST_CASE("Standard Test_Parameter Combination") {
 
         std::vector<bool> inferencingOutput = {
             false,
+            false,
             true,
             true,
             true,
-            true,
-            false
+            true
         };
 
         TestImpl(
@@ -122,10 +122,10 @@ TEST_CASE("Standard Test_Parameter Combination") {
         std::vector<bool> inferencingOutput = {
             false,
             false,
+            false,
             true,
             true,
-            true,
-            false
+            true
         };
 
         TestImpl(
@@ -144,9 +144,9 @@ TEST_CASE("Standard Test_Parameter Combination") {
             false,
             false,
             false,
+            false,
             true,
-            true,
-            false
+            true
         };
 
         TestImpl(
@@ -166,8 +166,8 @@ TEST_CASE("Standard Test_Parameter Combination") {
             false,
             false,
             false,
-            true,
-            false
+            false,
+            true
         };
 
         TestImpl(
