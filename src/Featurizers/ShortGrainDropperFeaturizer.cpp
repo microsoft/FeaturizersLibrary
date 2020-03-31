@@ -14,9 +14,9 @@ namespace Featurizers {
 // |  ShortGrainDropperTransformer
 // |
 // ----------------------------------------------------------------------
-ShortGrainDropperTransformer::ShortGrainDropperTransformer(GrainsSet grainsToDrop) :
-    //grainsToDrop can be empty
-    _grainsToDrop(std::move(grainsToDrop)) {
+ShortGrainDropperTransformer::ShortGrainDropperTransformer(GrainsSet grainsToKeep) :
+    //grainsToKeep can be empty
+    _grainsToKeep(std::move(grainsToKeep)) {
 }
 
 ShortGrainDropperTransformer::ShortGrainDropperTransformer(Archive &ar) :
@@ -30,15 +30,15 @@ ShortGrainDropperTransformer::ShortGrainDropperTransformer(Archive &ar) :
                 throw std::runtime_error("Unsupported archive version");
 
             // Data
-            GrainsSet                       grainsToDrop(Traits<GrainsSet>::deserialize(ar));
+            GrainsSet                       grainsToKeep(Traits<GrainsSet>::deserialize(ar));
 
-            return ShortGrainDropperTransformer(std::move(grainsToDrop));
+            return ShortGrainDropperTransformer(std::move(grainsToKeep));
         }()
     ) {
 }
 
 bool ShortGrainDropperTransformer::operator==(ShortGrainDropperTransformer const &other) const {
-    return this->_grainsToDrop == other._grainsToDrop;
+    return this->_grainsToKeep == other._grainsToKeep;
 }
 
 void ShortGrainDropperTransformer::save(Archive &ar) const /*override*/ {
@@ -47,11 +47,12 @@ void ShortGrainDropperTransformer::save(Archive &ar) const /*override*/ {
     Traits<std::uint16_t>::serialize(ar, 0); // Minor
 
     // Data
-    Traits<decltype(_grainsToDrop)>::serialize(ar, _grainsToDrop);
+    Traits<decltype(_grainsToKeep)>::serialize(ar, _grainsToKeep);
 }
 
 void ShortGrainDropperTransformer::execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) /*override*/ {
-    callback(_grainsToDrop.find(input) != _grainsToDrop.end());
+    // Generate true to drop, false to keep
+    callback(_grainsToKeep.find(input) == _grainsToKeep.end());
 }
 
 } // namespace Featurizers

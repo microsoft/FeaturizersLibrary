@@ -119,8 +119,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_PointerTable.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_RobustScalerFeaturizer.h
-        # TODO: Not implemented yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ShortGrainDropperFeaturizer.h
-        # TODO: Not implemented yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ShortGrainDropperFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ShortGrainDropperFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ShortGrainDropperFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_SimpleRollingWindowFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_SimpleRollingWindowFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_StandardScaleWrapperFeaturizer.cpp
