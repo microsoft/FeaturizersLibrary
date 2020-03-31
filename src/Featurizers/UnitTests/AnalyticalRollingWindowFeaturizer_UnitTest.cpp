@@ -121,10 +121,12 @@ TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 1);
 
-    using GrainedInputType = std::tuple<GrainType, std::int32_t>;
+    using GrainedInputType = typename NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>::InputType;
 
     const GrainType grain({"one"});
-    const GrainedInputType tup1 = std::make_tuple(grain, 1);
+    const std::int32_t value1(1);
+    const GrainedInputType tup1(grain, value1);
+    const std::vector<std::tuple<std::vector<std::string> const &, std::int32_t const &>> vec = {tup1};
 
     estimator.begin_training();
     CHECK(estimator.get_state() == NS::TrainingState::Finished);
@@ -144,12 +146,14 @@ TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {
     transformer->execute(tup1, callback);
     CHECK(NS::TestHelpers::FuzzyCheck(output[0], {std::nan("")}));
 
-    const GrainedInputType tup2 = std::make_tuple(grain, 2);
+    const std::int32_t value2(2);
+    const GrainedInputType tup2(grain, value2);
 
     transformer->execute(tup2, callback);
     CHECK(NS::TestHelpers::FuzzyCheck(output[1], {1.0}));
 
-    const GrainedInputType tup3 = std::make_tuple(grain, 3);
+    const std::int32_t value3(3);
+    const GrainedInputType tup3(grain, value3);
     transformer->execute(tup3, callback);
     CHECK(NS::TestHelpers::FuzzyCheck(output[2], {2.0}));
 }
@@ -158,10 +162,12 @@ TEST_CASE("Grained Mean - 1 grain, window size 2, horizon 2, min window size 2")
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2, 2);
 
-    using GrainedInputType = std::tuple<GrainType, std::int32_t>;
+    using GrainedInputType = typename NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>::InputType;
 
     const GrainType grain({"one"});
-    const GrainedInputType tup1 = std::make_tuple(grain, 1);
+    const std::int32_t value1(1);
+    const GrainedInputType tup1(grain, value1);
+    const std::vector<std::tuple<std::vector<std::string> const &, std::int32_t const &>> vec = {tup1};
 
     estimator.begin_training();
     CHECK(estimator.get_state() == NS::TrainingState::Finished);
@@ -181,15 +187,18 @@ TEST_CASE("Grained Mean - 1 grain, window size 2, horizon 2, min window size 2")
     transformer->execute(tup1, callback);
     CHECK(NS::TestHelpers::FuzzyCheck(output[0], {std::nan(""), std::nan("")}));
 
-    const GrainedInputType tup2 = std::make_tuple(grain, 2);
+    const std::int32_t value2(2);
+    const GrainedInputType tup2(grain, value2);
     transformer->execute(tup2, callback);
     CHECK(NS::TestHelpers::FuzzyCheck(output[1], {std::nan(""), std::nan("")}));
 
-    const GrainedInputType tup3 = std::make_tuple(grain, 3);
+    const std::int32_t value3(3);
+    const GrainedInputType tup3(grain, value3);
     transformer->execute(tup3, callback);
     CHECK(NS::TestHelpers::FuzzyCheck(output[2], {std::nan(""), 1.5}));
 
-    const GrainedInputType tup4 = std::make_tuple(grain, 4);
+    const std::int32_t value4(4);
+    const GrainedInputType tup4(grain, value4);
     transformer->execute(tup4, callback);
     CHECK(NS::TestHelpers::FuzzyCheck(output[3], {1.5, 2.5}));
 }
@@ -198,12 +207,14 @@ TEST_CASE("Grained Mean - 2 grain, window size 2, horizon 2, min window size 1")
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>      estimator(pAllColumnAnnotations, NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
 
-    using GrainedInputType = std::tuple<GrainType, std::int32_t>;
+    using GrainedInputType = typename NS::Featurizers::GrainedAnalyticalRollingWindowEstimator<std::int32_t>::InputType;
 
     const GrainType grainOne({"one"});
     const GrainType grainTwo({"two"});
-    const GrainedInputType tup1 = std::make_tuple(grainOne, 1);
-    const GrainedInputType tup2 = std::make_tuple(grainTwo, 1);
+    const std::int32_t value1(1);
+    const GrainedInputType tup1(grainOne, value1);
+    const GrainedInputType tup2(grainTwo, value1);
+    const std::vector<std::tuple<std::vector<std::string> const &, std::int32_t const &>> vec = {tup1, tup2};
 
     estimator.begin_training();
     CHECK(estimator.get_state() == NS::TrainingState::Finished);
@@ -228,12 +239,13 @@ TEST_CASE("Grained Mean - 2 grain, window size 2, horizon 2, min window size 1")
     CHECK(NS::TestHelpers::FuzzyCheck(output[1], {std::nan(""), std::nan("")}));
 
 
-    const GrainedInputType tup3 = std::make_tuple(grainOne, 2);
+    const std::int32_t value2(2);
+    const GrainedInputType tup3(grainOne, value2);
     transformer->execute(tup3, callback);
     CHECK(NS::TestHelpers::FuzzyCheck(output[2], {std::nan(""), 1}));
 
 
-    const GrainedInputType tup4 = std::make_tuple(grainTwo, 2);
+    const GrainedInputType tup4(grainTwo, value2);
     transformer->execute(tup4, callback);
     CHECK(NS::TestHelpers::FuzzyCheck(output[3], {std::nan(""), 1}));
 }

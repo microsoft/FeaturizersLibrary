@@ -251,10 +251,12 @@ TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
     NS::AnnotationMapsPtr                   pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
     NS::Featurizers::GrainedSimpleRollingWindowEstimator<InputType>      estimator(pAllColumnAnnotations, NS::Featurizers::SimpleRollingWindowCalculation::Min, 1, 1);
 
-    using GrainedInputType = std::tuple<GrainType, InputType>;
+    using GrainedInputType = typename NS::Featurizers::GrainedSimpleRollingWindowEstimator<InputType>::InputType;
 
     const GrainType grain({"one"});
-    const GrainedInputType tup1(std::make_tuple(grain, 1));
+    const InputType value1(1);
+    const GrainedInputType tup1(grain, value1);
+    const std::vector<std::tuple<GrainType const &, InputType const &>> vec = {tup1};
 
     estimator.begin_training();
     CHECK(estimator.get_state() == NS::TrainingState::Finished);
@@ -278,7 +280,8 @@ TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
     CHECK(results.size() == 1);
     CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
 
-    const GrainedInputType tup2 = std::make_tuple(grain, 2);
+    const InputType value2(2);
+    const GrainedInputType tup2(grain, value2);
 
     transformer->execute(tup2, callback);
     results = output[1];
@@ -287,7 +290,8 @@ TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
     CHECK(results.size() == 1);
     CHECK(results[0] == 1);
 
-    const GrainedInputType tup3 = std::make_tuple(grain, 3);
+    const InputType value3(3);
+    const GrainedInputType tup3(grain, value3);
     transformer->execute(tup3, callback);
     results = output[2];
 
