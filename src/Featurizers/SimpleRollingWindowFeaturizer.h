@@ -37,7 +37,6 @@ enum class SimpleRollingWindowCalculation : std::uint8_t {
     Max = 2
 };
 
-
 /////////////////////////////////////////////////////////////////////////
 ///  \class         SimpleRollingWindowTransformer
 ///  \brief         RollingWindow class that is used for all simple window computations like min or max.
@@ -78,12 +77,6 @@ private:
     // |
     // ----------------------------------------------------------------------
     const SimpleRollingWindowCalculation            _windowCalculation;
-
-    // ----------------------------------------------------------------------
-    // |
-    // |  Public Methods
-    // |
-    // ----------------------------------------------------------------------
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -115,7 +108,6 @@ public:
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(SimpleRollingWindowEstimator);
 
-
 private:
     // ----------------------------------------------------------------------
     // |
@@ -126,7 +118,6 @@ private:
     const std::uint32_t                             _maxWindowSize;
     const std::uint32_t                             _minWindowSize;
     const SimpleRollingWindowCalculation            _windowCalculation;
-
 
     // ----------------------------------------------------------------------
     // |
@@ -145,14 +136,12 @@ private:
     typename BaseType::TransformerUniquePtr create_transformer_impl(void) override {
         return typename BaseType::TransformerUniquePtr(new SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>(_windowCalculation, _horizon, _maxWindowSize, _minWindowSize));
     }
-
 };
 
 /////////////////////////////////////////////////////////////////////////
 ///  \class       GrainedSimpleRollingWindowEstimator
 ///  \brief         GrainedTransformer that creates `SimpleRollingWindowEstimator`.
 ///
-
 template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
 class GrainedSimpleRollingWindowEstimator :
     public Components::PipelineExecutionEstimatorImpl<
@@ -167,12 +156,16 @@ public:
     // ----------------------------------------------------------------------
     using GrainType = std::vector<std::string>;
 
-    using BaseType = 
+    using BaseType =
         Components::PipelineExecutionEstimatorImpl<
             Components::GrainEstimatorImpl<GrainType, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
             Components::FilterDecoratorEstimator<std::tuple<GrainType const &, std::vector<typename Traits<InputT>::nullable_type>>, 1>
         >;
-    
+
+    // This is used by the code generator when generating code that invokes this
+    // object's constructor.
+    using SimpleRollingWindowCalculation    = Microsoft::Featurizer::Featurizers::SimpleRollingWindowCalculation;
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -215,9 +208,8 @@ SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::SimpleRollingWindo
         std::move(horizon),
         std::move(maxWindowSize),
         std::move(minWindowSize)),
-        _windowCalculation(std::move(windowCalculation)) 
+        _windowCalculation(std::move(windowCalculation))
     {
-
 }
 
 template <typename InputT, size_t MaxNumTrainingItemsV>
@@ -235,7 +227,6 @@ SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>::SimpleRollingWindo
             std::uint32_t                       horizon(Traits<std::uint32_t>::deserialize(ar));
             std::uint32_t                       maxWindowSize(Traits<std::uint32_t>::deserialize(ar));
             std::uint32_t                       minWindowSize(Traits<std::uint32_t>::deserialize(ar));
-
 
             return SimpleRollingWindowTransformer(std::move(windowCalculation), std::move(horizon), std::move(maxWindowSize), std::move(minWindowSize));
         }()
@@ -332,16 +323,33 @@ void SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::complete_traini
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, size_t MaxNumTrainingItemsV>
-GrainedSimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedSimpleRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t maxWindowSize, std::uint32_t minWindowCount) :
+GrainedSimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedSimpleRollingWindowEstimator(AnnotationMapsPtr pAllColumnAnnotations, SimpleRollingWindowCalculation windowCalculation, std::uint32_t horizon, std::uint32_t maxWindowSize, std::uint32_t minWindowSize) :
     BaseType(
         GrainedSimpleRollingWindowEstimatorName,
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, maxWindowSize, windowCalculation, horizon, minWindowCount] () {
+        [pAllColumnAnnotations, maxWindowSize, windowCalculation, horizon, minWindowSize] () {
             return Components::GrainEstimatorImpl<GrainType, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>> (
                 pAllColumnAnnotations,
-                [maxWindowSize, windowCalculation, horizon, minWindowCount](AnnotationMapsPtr pAllColumnAnnotationsParam) {
-                    return SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), windowCalculation, horizon, maxWindowSize, minWindowCount);
-                }
+                [windowCalculation, horizon, maxWindowSize, minWindowSize](AnnotationMapsPtr pAllColumnAnnotationsParam) {
+                    return SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>(
+                        std::move(pAllColumnAnnotationsParam),
+                        windowCalculation,
+                        horizon,
+                        maxWindowSize,
+                        minWindowSize
+                    );
+                },
+                [windowCalculation, horizon, maxWindowSize, minWindowSize](GrainType const &) {
+                    return typename SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::TransformerUniquePtr(
+                        new SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>(
+                            windowCalculation,
+                            horizon,
+                            maxWindowSize,
+                            minWindowSize
+                        )
+                    );
+                },
+                true // isTrainingOnlyEstimator
             );
         },
         [pAllColumnAnnotations]() {
@@ -349,7 +357,6 @@ GrainedSimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedSimple
         }
     ) {
 }
-
 
 } // namespace Featurizers
 } // namespace Featurizer

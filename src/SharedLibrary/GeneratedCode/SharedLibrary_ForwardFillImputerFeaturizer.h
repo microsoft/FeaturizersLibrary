@@ -227,7 +227,7 @@ FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_DestroyEstimator(
 
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_GetState(/*in*/ ForwardFillImputerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_IsTrainingComplete(/*in*/ ForwardFillImputerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_Fit(/*in*/ ForwardFillImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_Fit(/*in*/ ForwardFillImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_FitBuffer(/*in*/ ForwardFillImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_OnDataCompleted(/*in*/ ForwardFillImputerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_CompleteTraining(/*in*/ ForwardFillImputerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -239,7 +239,7 @@ FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_DestroyTransforme
 
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_CreateTransformerSaveData(/*in*/ ForwardFillImputerFeaturizer_float_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_Transform(/*in*/ ForwardFillImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_Transform(/*in*/ ForwardFillImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_float_Flush(/*in*/ ForwardFillImputerFeaturizer_float_TransformerHandle *pHandle, /*out*/ float ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
@@ -253,7 +253,7 @@ FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_DestroyEstimator
 
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_GetState(/*in*/ ForwardFillImputerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_IsTrainingComplete(/*in*/ ForwardFillImputerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_Fit(/*in*/ ForwardFillImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_Fit(/*in*/ ForwardFillImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_FitBuffer(/*in*/ ForwardFillImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_OnDataCompleted(/*in*/ ForwardFillImputerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_CompleteTraining(/*in*/ ForwardFillImputerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -265,7 +265,7 @@ FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_DestroyTransform
 
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_CreateTransformerSaveData(/*in*/ ForwardFillImputerFeaturizer_double_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_Transform(/*in*/ ForwardFillImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_Transform(/*in*/ ForwardFillImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ForwardFillImputerFeaturizer_double_Flush(/*in*/ ForwardFillImputerFeaturizer_double_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */

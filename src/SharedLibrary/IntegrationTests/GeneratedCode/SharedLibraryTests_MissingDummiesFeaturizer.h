@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <int8> */
 template <typename VectorInputT>
@@ -108,6 +119,7 @@ void MissingDummiesFeaturizer_int8_Test(
     REQUIRE(MissingDummiesFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <int16> */
 template <typename VectorInputT>
@@ -205,6 +217,7 @@ void MissingDummiesFeaturizer_int16_Test(
     REQUIRE(MissingDummiesFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <int32> */
 template <typename VectorInputT>
@@ -302,6 +315,7 @@ void MissingDummiesFeaturizer_int32_Test(
     REQUIRE(MissingDummiesFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <int64> */
 template <typename VectorInputT>
@@ -399,6 +413,7 @@ void MissingDummiesFeaturizer_int64_Test(
     REQUIRE(MissingDummiesFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -496,6 +511,7 @@ void MissingDummiesFeaturizer_uint8_Test(
     REQUIRE(MissingDummiesFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -593,6 +609,7 @@ void MissingDummiesFeaturizer_uint16_Test(
     REQUIRE(MissingDummiesFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -690,6 +707,7 @@ void MissingDummiesFeaturizer_uint32_Test(
     REQUIRE(MissingDummiesFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -787,6 +805,7 @@ void MissingDummiesFeaturizer_uint64_Test(
     REQUIRE(MissingDummiesFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <float> */
 template <typename VectorInputT>
@@ -820,7 +839,7 @@ void MissingDummiesFeaturizer_float_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MissingDummiesFeaturizer_float_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_float_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -869,7 +888,7 @@ void MissingDummiesFeaturizer_float_Test(
     for(auto const & input : inference_input) {
         std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_float_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::float_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -884,6 +903,7 @@ void MissingDummiesFeaturizer_float_Test(
     REQUIRE(MissingDummiesFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <double> */
 template <typename VectorInputT>
@@ -917,7 +937,7 @@ void MissingDummiesFeaturizer_double_Test(
             FitResult result(0);
             auto const & input(*iter);
 
-            REQUIRE(MissingDummiesFeaturizer_double_Fit(pEstimatorHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+            REQUIRE(MissingDummiesFeaturizer_double_Fit(pEstimatorHandle, input, &result, &pErrorInfo));
             REQUIRE(pErrorInfo == nullptr);
 
             if(result == ResetAndContinue) {
@@ -966,7 +986,7 @@ void MissingDummiesFeaturizer_double_Test(
     for(auto const & input : inference_input) {
         std::int8_t result;
 
-        REQUIRE(MissingDummiesFeaturizer_double_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::double_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MissingDummiesFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         results.emplace_back(std::move(result));
@@ -981,6 +1001,7 @@ void MissingDummiesFeaturizer_double_Test(
     REQUIRE(MissingDummiesFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <bool> */
 template <typename VectorInputT>
@@ -1078,6 +1099,7 @@ void MissingDummiesFeaturizer_bool_Test(
     REQUIRE(MissingDummiesFeaturizer_bool_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MissingDummiesFeaturizer <string> */
 template <typename VectorInputT>
@@ -1175,3 +1197,7 @@ void MissingDummiesFeaturizer_string_Test(
     REQUIRE(MissingDummiesFeaturizer_string_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

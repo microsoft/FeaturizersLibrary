@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  TruncatedSVDFeaturizer <float> */
 template <typename VectorInputT>
@@ -91,9 +102,9 @@ void TruncatedSVDFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        size_t result_cols(0);
-        size_t result_rows(0);
-        std::float_t * result_ptr(nullptr);
+        size_t result_cols;
+        size_t result_rows;
+        std::float_t * result_ptr;
 
         REQUIRE(TruncatedSVDFeaturizer_float_Transform(pTransformerHandle, static_cast<size_t>(input.cols()), static_cast<size_t>(input.rows()), input.data(), &result_cols, &result_rows, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -113,6 +124,7 @@ void TruncatedSVDFeaturizer_float_Test(
     REQUIRE(TruncatedSVDFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  TruncatedSVDFeaturizer <double> */
 template <typename VectorInputT>
@@ -193,9 +205,9 @@ void TruncatedSVDFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        size_t result_cols(0);
-        size_t result_rows(0);
-        std::double_t * result_ptr(nullptr);
+        size_t result_cols;
+        size_t result_rows;
+        std::double_t * result_ptr;
 
         REQUIRE(TruncatedSVDFeaturizer_double_Transform(pTransformerHandle, static_cast<size_t>(input.cols()), static_cast<size_t>(input.rows()), input.data(), &result_cols, &result_rows, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
@@ -215,3 +227,7 @@ void TruncatedSVDFeaturizer_double_Test(
     REQUIRE(TruncatedSVDFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

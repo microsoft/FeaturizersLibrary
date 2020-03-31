@@ -5,6 +5,7 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_CatImputerFeaturizer.h"
+#include "SharedLibrary_Common.hpp"
 #include "SharedLibrary_PointerTable.h"
 
 #include "Archive.h"
@@ -16,11 +17,15 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
-// I don't know why MSVC thinks that there is unreachable
-// code in these methods during release builds.
 #if (defined _MSC_VER)
 #   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
 #   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
 #endif
 
 /* ---------------------------------------------------------------------- */
@@ -3159,7 +3164,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_IsTrainingComplete(/*in*/
     }
 }
 
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_Fit(/*in*/ CatImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_Fit(/*in*/ CatImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3173,7 +3178,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_Fit(/*in*/ CatImputerFeat
 
         Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
         return true;
     }
@@ -3357,7 +3362,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_CreateTransformerSaveData
     }
 }
 
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_Transform(/*in*/ CatImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_Transform(/*in*/ CatImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out*/ float * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3374,7 +3379,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_float_Transform(/*in*/ CatImput
         using TransformedType = typename Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::float_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input));
 
         // Output
         *output = result;
@@ -3530,7 +3535,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_IsTrainingComplete(/*in*
     }
 }
 
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_Fit(/*in*/ CatImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_Fit(/*in*/ CatImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3544,7 +3549,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_Fit(/*in*/ CatImputerFea
 
         Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
         return true;
     }
@@ -3728,7 +3733,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_CreateTransformerSaveDat
     }
 }
 
-FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_Transform(/*in*/ CatImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_Transform(/*in*/ CatImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3745,7 +3750,7 @@ FEATURIZER_LIBRARY_API bool CatImputerFeaturizer_double_Transform(/*in*/ CatImpu
         using TransformedType = typename Microsoft::Featurizer::Featurizers::CatImputerEstimator<std::double_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
+        TransformedType result(transformer.execute(input));
 
         // Output
         *output = result;

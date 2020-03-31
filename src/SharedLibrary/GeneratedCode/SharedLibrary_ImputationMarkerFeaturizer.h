@@ -227,7 +227,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_DestroyEstimator(/*
 
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_GetState(/*in*/ ImputationMarkerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Fit(/*in*/ ImputationMarkerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Fit(/*in*/ ImputationMarkerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_FitBuffer(/*in*/ ImputationMarkerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -239,7 +239,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_DestroyTransformer(
 
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_CreateTransformerSaveData(/*in*/ ImputationMarkerFeaturizer_float_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Transform(/*in*/ ImputationMarkerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Transform(/*in*/ ImputationMarkerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Flush(/*in*/ ImputationMarkerFeaturizer_float_TransformerHandle *pHandle, /*out*/ bool ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
@@ -253,7 +253,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_DestroyEstimator(/
 
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_GetState(/*in*/ ImputationMarkerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_IsTrainingComplete(/*in*/ ImputationMarkerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Fit(/*in*/ ImputationMarkerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Fit(/*in*/ ImputationMarkerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_FitBuffer(/*in*/ ImputationMarkerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_OnDataCompleted(/*in*/ ImputationMarkerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_CompleteTraining(/*in*/ ImputationMarkerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -265,7 +265,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_DestroyTransformer
 
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_CreateTransformerSaveData(/*in*/ ImputationMarkerFeaturizer_double_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Transform(/*in*/ ImputationMarkerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Transform(/*in*/ ImputationMarkerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out*/ bool * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Flush(/*in*/ ImputationMarkerFeaturizer_double_TransformerHandle *pHandle, /*out*/ bool ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */

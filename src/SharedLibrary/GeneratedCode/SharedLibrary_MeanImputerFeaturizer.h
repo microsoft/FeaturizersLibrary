@@ -227,7 +227,7 @@ FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_DestroyEstimator(/*in*/ 
 
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_GetState(/*in*/ MeanImputerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_IsTrainingComplete(/*in*/ MeanImputerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_Fit(/*in*/ MeanImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_Fit(/*in*/ MeanImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_FitBuffer(/*in*/ MeanImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_OnDataCompleted(/*in*/ MeanImputerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_CompleteTraining(/*in*/ MeanImputerFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -239,7 +239,7 @@ FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_DestroyTransformer(/*in*
 
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_CreateTransformerSaveData(/*in*/ MeanImputerFeaturizer_float_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_Transform(/*in*/ MeanImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_Transform(/*in*/ MeanImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_float_Flush(/*in*/ MeanImputerFeaturizer_float_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
@@ -253,7 +253,7 @@ FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_DestroyEstimator(/*in*/
 
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_GetState(/*in*/ MeanImputerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_IsTrainingComplete(/*in*/ MeanImputerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_Fit(/*in*/ MeanImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_Fit(/*in*/ MeanImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_FitBuffer(/*in*/ MeanImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_OnDataCompleted(/*in*/ MeanImputerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_CompleteTraining(/*in*/ MeanImputerFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -265,7 +265,7 @@ FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_DestroyTransformer(/*in
 
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_CreateTransformerSaveData(/*in*/ MeanImputerFeaturizer_double_TransformerHandle *pHandle, /*out*/ unsigned char const **ppBuffer, /*out*/ size_t *pBufferSize, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
-FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_Transform(/*in*/ MeanImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_Transform(/*in*/ MeanImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out*/ double * output, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MeanImputerFeaturizer_double_Flush(/*in*/ MeanImputerFeaturizer_double_TransformerHandle *pHandle, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 } // extern "C"

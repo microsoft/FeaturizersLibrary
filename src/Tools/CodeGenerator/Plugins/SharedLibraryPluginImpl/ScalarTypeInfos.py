@@ -36,9 +36,24 @@ class _ScalarTypeInfo(TypeInfo):
     # |  Public Methods
     # |
     # ----------------------------------------------------------------------
+    def __init__(
+        self,
+        *args,
+        member_type=None,
+        create_type_info_func=None,
+        **kwargs
+    ):
+        if member_type is None:
+            return
+
+        super(_ScalarTypeInfo, self).__init__(*args, **kwargs)
+
+        self.RequiresOptionalType           = self.IsOptional and self.TypeName not in ["float", "double"]
+
+    # ----------------------------------------------------------------------
     @Interface.override
     def GetInputInfo(self, arg_name, invocation_template):
-        if self.IsOptional:
+        if self.RequiresOptionalType:
             input_type = "{} const *".format(self.CType)
             invocation_statement = invocation_template.format(
                 "{name} != nullptr ? *{name} : Microsoft::Featurizer::Traits<{cpp_type}>::CreateNullValue()".format(
@@ -60,7 +75,7 @@ class _ScalarTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     @Interface.override
     def GetInputBufferInfo(self, arg_name, invocation_template):
-        if self.IsOptional and self.CType not in ["double", "float"]:
+        if self.RequiresOptionalType:
             input_type = "{} const * const *".format(self.CType)
 
             validation_suffix = textwrap.dedent(
@@ -133,11 +148,20 @@ class _ScalarTypeInfo(TypeInfo):
         result_name="result",
         suppress_pointer=False,
     ):
+        if self.RequiresOptionalType:
+            statement_rhs = "{name} ? new {type}(*{name}) : nullptr".format(
+                name=result_name,
+                type=self.CType,
+            )
+        else:
+            statement_rhs = result_name
+
         return self.Result(
             [
                 self.Type(
-                    "{}{}".format(
+                    "{}{}{}".format(
                         self.CType,
+                        "" if not self.RequiresOptionalType else "*",
                         "" if suppress_pointer else " *",
                     ),
                     arg_name,
@@ -146,16 +170,34 @@ class _ScalarTypeInfo(TypeInfo):
             """if({name} == nullptr) throw std::invalid_argument("'{name}' is null");""".format(
                 name=arg_name,
             ),
-            "{}{} = {};".format("" if suppress_pointer else "*", arg_name, result_name),
+            "{}{} = {};".format(
+                "" if suppress_pointer else "*",
+                arg_name,
+                statement_rhs,
+            ),
         )
 
     # ----------------------------------------------------------------------
-    @staticmethod
     @Interface.override
     def GetDestroyOutputInfo(
+        self,
         arg_name="result",
     ):
-        return None
+        if not self.RequiresOptionalType:
+            return None
+
+        return self.Result(
+            [self.Type("{} const *".format(self.CType), arg_name)],
+            "",
+            textwrap.dedent(
+                """\
+                if({name} != nullptr)
+                    delete {name};
+                """,
+            ).format(
+                name=arg_name,
+            ),
+        )
 
 
 # ----------------------------------------------------------------------

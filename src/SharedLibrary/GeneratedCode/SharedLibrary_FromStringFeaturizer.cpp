@@ -5,6 +5,7 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_FromStringFeaturizer.h"
+#include "SharedLibrary_Common.hpp"
 #include "SharedLibrary_PointerTable.h"
 
 #include "Archive.h"
@@ -16,11 +17,15 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
-// I don't know why MSVC thinks that there is unreachable
-// code in these methods during release builds.
 #if (defined _MSC_VER)
 #   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
 #   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
 #endif
 
 /* ---------------------------------------------------------------------- */
@@ -133,7 +138,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int8_Fit(/*in*/ FromStringFeatu
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -343,7 +348,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int8_Transform(/*in*/ FromStrin
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int8_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;
@@ -513,7 +518,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int16_Fit(/*in*/ FromStringFeat
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -723,7 +728,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int16_Transform(/*in*/ FromStri
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int16_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;
@@ -893,7 +898,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int32_Fit(/*in*/ FromStringFeat
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -1103,7 +1108,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int32_Transform(/*in*/ FromStri
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int32_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;
@@ -1273,7 +1278,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int64_Fit(/*in*/ FromStringFeat
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -1483,7 +1488,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int64_Transform(/*in*/ FromStri
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int64_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;
@@ -1653,7 +1658,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint8_Fit(/*in*/ FromStringFeat
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -1863,7 +1868,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint8_Transform(/*in*/ FromStri
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint8_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;
@@ -2033,7 +2038,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint16_Fit(/*in*/ FromStringFea
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -2243,7 +2248,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint16_Transform(/*in*/ FromStr
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint16_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;
@@ -2413,7 +2418,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint32_Fit(/*in*/ FromStringFea
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -2623,7 +2628,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint32_Transform(/*in*/ FromStr
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint32_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;
@@ -2793,7 +2798,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint64_Fit(/*in*/ FromStringFea
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -3003,7 +3008,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint64_Transform(/*in*/ FromStr
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint64_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;
@@ -3173,7 +3178,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_float_Fit(/*in*/ FromStringFeat
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -3383,7 +3388,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_float_Transform(/*in*/ FromStri
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::float_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;
@@ -3553,7 +3558,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_double_Fit(/*in*/ FromStringFea
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -3763,7 +3768,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_double_Transform(/*in*/ FromStr
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::double_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;
@@ -3933,7 +3938,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_Fit(/*in*/ FromStringFeatu
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -4143,7 +4148,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_Transform(/*in*/ FromStrin
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<bool>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         *output = result;
@@ -4313,7 +4318,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_Fit(/*in*/ FromStringFea
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(std::string(input)));
     
         return true;
     }
@@ -4523,7 +4528,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_Transform(/*in*/ FromStr
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(input));
+        TransformedType result(transformer.execute(std::string(input)));
 
         // Output
         if(result.empty()) {

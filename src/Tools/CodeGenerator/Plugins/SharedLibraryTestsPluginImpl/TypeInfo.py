@@ -23,6 +23,17 @@ class TypeInfo(Interface.Interface):
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
+    class Type(object):
+        # ----------------------------------------------------------------------
+        def __init__(self, type, name):
+            self.Type                       = type
+            self.Name                       = name
+
+        # ----------------------------------------------------------------------
+        def __repr__(self):
+            return CommonEnvironment.ObjectReprImpl(self)
+
+    # ----------------------------------------------------------------------
     class Result(object):
         """Result information about a type when it is used in various scenarios."""
 
@@ -100,6 +111,8 @@ class TypeInfo(Interface.Interface):
     ):
         """\
         Returns information about the type when used to create transformer-related tests.
+        A tuple can be returned to include statements that should be executed prior to using
+        the args.
         """
         raise Exception("Abstract method")
 

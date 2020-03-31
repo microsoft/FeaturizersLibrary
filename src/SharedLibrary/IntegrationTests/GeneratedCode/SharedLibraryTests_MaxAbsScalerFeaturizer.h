@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxAbsScalerFeaturizer <int8> */
 template <typename VectorInputT>
@@ -108,6 +119,7 @@ void MaxAbsScalerFeaturizer_int8_Test(
     REQUIRE(MaxAbsScalerFeaturizer_int8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxAbsScalerFeaturizer <int16> */
 template <typename VectorInputT>
@@ -205,6 +217,7 @@ void MaxAbsScalerFeaturizer_int16_Test(
     REQUIRE(MaxAbsScalerFeaturizer_int16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxAbsScalerFeaturizer <uint8> */
 template <typename VectorInputT>
@@ -302,6 +315,7 @@ void MaxAbsScalerFeaturizer_uint8_Test(
     REQUIRE(MaxAbsScalerFeaturizer_uint8_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxAbsScalerFeaturizer <uint16> */
 template <typename VectorInputT>
@@ -399,6 +413,7 @@ void MaxAbsScalerFeaturizer_uint16_Test(
     REQUIRE(MaxAbsScalerFeaturizer_uint16_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxAbsScalerFeaturizer <float> */
 template <typename VectorInputT>
@@ -496,6 +511,7 @@ void MaxAbsScalerFeaturizer_float_Test(
     REQUIRE(MaxAbsScalerFeaturizer_float_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxAbsScalerFeaturizer <int32> */
 template <typename VectorInputT>
@@ -593,6 +609,7 @@ void MaxAbsScalerFeaturizer_int32_Test(
     REQUIRE(MaxAbsScalerFeaturizer_int32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxAbsScalerFeaturizer <int64> */
 template <typename VectorInputT>
@@ -690,6 +707,7 @@ void MaxAbsScalerFeaturizer_int64_Test(
     REQUIRE(MaxAbsScalerFeaturizer_int64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxAbsScalerFeaturizer <uint32> */
 template <typename VectorInputT>
@@ -787,6 +805,7 @@ void MaxAbsScalerFeaturizer_uint32_Test(
     REQUIRE(MaxAbsScalerFeaturizer_uint32_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxAbsScalerFeaturizer <uint64> */
 template <typename VectorInputT>
@@ -884,6 +903,7 @@ void MaxAbsScalerFeaturizer_uint64_Test(
     REQUIRE(MaxAbsScalerFeaturizer_uint64_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
 /* ---------------------------------------------------------------------- */
 /* |  MaxAbsScalerFeaturizer <double> */
 template <typename VectorInputT>
@@ -981,3 +1001,7 @@ void MaxAbsScalerFeaturizer_double_Test(
     REQUIRE(MaxAbsScalerFeaturizer_double_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif

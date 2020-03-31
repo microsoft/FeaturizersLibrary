@@ -5,6 +5,7 @@
 #define DLL_EXPORT_COMPILE
 
 #include "SharedLibrary_BackwardFillImputerFeaturizer.h"
+#include "SharedLibrary_Common.hpp"
 #include "SharedLibrary_PointerTable.h"
 
 #include "Archive.h"
@@ -16,11 +17,15 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
-// I don't know why MSVC thinks that there is unreachable
-// code in these methods during release builds.
 #if (defined _MSC_VER)
 #   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
 #   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
 #endif
 
 /* ---------------------------------------------------------------------- */
@@ -3495,7 +3500,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_IsTrainingComple
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Fit(/*in*/ BackwardFillImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Fit(/*in*/ BackwardFillImputerFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3509,7 +3514,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Fit(/*in*/ Backw
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
         return true;
     }
@@ -3693,7 +3698,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_CreateTransforme
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Transform(/*in*/ BackwardFillImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float const * input, /*out*/ float ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Transform(/*in*/ BackwardFillImputerFeaturizer_float_TransformerHandle *pHandle, /*in*/ float input, /*out*/ float ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3719,7 +3724,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Transform(/*in*/
             }
         );
 
-        transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::float_t>::CreateNullValue(), callback);
+        transformer.execute(input, callback);
 
         // Output
         // TODO: There are potential memory leaks if allocation fails
@@ -3908,7 +3913,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_IsTrainingCompl
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Fit(/*in*/ BackwardFillImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Fit(/*in*/ BackwardFillImputerFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double input, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3922,7 +3927,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Fit(/*in*/ Back
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue()));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(input));
     
         return true;
     }
@@ -4106,7 +4111,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_CreateTransform
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Transform(/*in*/ BackwardFillImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double const * input, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Transform(/*in*/ BackwardFillImputerFeaturizer_double_TransformerHandle *pHandle, /*in*/ double input, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -4132,7 +4137,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Transform(/*in*
             }
         );
 
-        transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::double_t>::CreateNullValue(), callback);
+        transformer.execute(input, callback);
 
         // Output
         // TODO: There are potential memory leaks if allocation fails

@@ -11,6 +11,17 @@
 
 #include "SharedLibrary_Common.hpp"
 
+#if (defined _MSC_VER)
+#   pragma warning(push)
+
+    // I don't know why MSVC thinks that there is unreachable
+    // code in these methods during release builds.
+#   pragma warning(disable: 4702) // Unreachable code
+
+#   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+#   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+#endif
+
 /* ---------------------------------------------------------------------- */
 /* |  TfidfVectorizerFeaturizer */
 template <typename VectorInputT, typename... ConstructorArgTs>
@@ -92,26 +103,26 @@ void TfidfVectorizerFeaturizer_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t numElements(0);
-        uint64_t numValues(0);
-        std::float_t * pValues(nullptr);
-        uint64_t *pIndexes(nullptr);
+        uint64_t result_numElements;
+        uint64_t result_numValues;
+        std::float_t * result_values;
+        uint64_t * result_indexes;
 
-        REQUIRE(TfidfVectorizerFeaturizer_Transform(pTransformerHandle, input.c_str(), &numElements, &numValues, &pValues, &pIndexes, &pErrorInfo));
+        REQUIRE(TfidfVectorizerFeaturizer_Transform(pTransformerHandle, input.c_str(), &result_numElements, &result_numValues, &result_values, &result_indexes, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         std::vector<typename Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::float_t>::ValueEncoding> encodings;
-        std::float_t const *pValue(pValues);
-        uint64_t const *pIndex(pIndexes);
+        std::float_t const *pValue(result_values);
+        uint64_t const *pIndex(result_indexes);
 
-        while(numValues--) {
+        while(result_numValues--) {
             encodings.emplace_back(*pValue++, *pIndex++);
         }
 
-        results.emplace_back(numElements, std::move(encodings));
+        results.emplace_back(result_numElements, std::move(encodings));
         
         // Destroy the contents
-        REQUIRE(TfidfVectorizerFeaturizer_DestroyTransformedData(numElements, numValues, pValues, pIndexes, &pErrorInfo));
+        REQUIRE(TfidfVectorizerFeaturizer_DestroyTransformedData(result_numElements, result_numValues, result_values, result_indexes, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -123,3 +134,7 @@ void TfidfVectorizerFeaturizer_Test(
     REQUIRE(TfidfVectorizerFeaturizer_DestroyTransformer(pTransformerHandle, &pErrorInfo));
     REQUIRE(pErrorInfo == nullptr);
 }
+
+#if (defined _MSC_VER)
+#   pragma warning(pop)
+#endif
