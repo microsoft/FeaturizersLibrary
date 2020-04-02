@@ -69,7 +69,7 @@ void Train(EstimatorT &estimator, std::vector<std::vector<InputT>> const &inputB
             }
         }
 
-        if(estimator.get_state() != NS::TrainingState::Finished)
+        if(estimator.get_state() != NS::TrainingState::Finished && wasTrained == false)
             throw std::runtime_error("Nothing was trained");
     }
 
