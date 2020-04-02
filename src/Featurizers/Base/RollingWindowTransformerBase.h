@@ -113,7 +113,7 @@ private:
                 result = _calculator(start_iter, end_iter);
             }
 
-            results(0, offset) = result;
+            results(0, static_cast<Eigen::Index>(offset)) = result;
         }
         callback(results);
     }

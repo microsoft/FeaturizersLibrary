@@ -91,7 +91,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             REQUIRE(args.size() == 16);
 
             CHECK(args[0].rows() == 1);
-            CHECK(args[0].cols() == horizon);
+            CHECK(args[0].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[0],
@@ -104,7 +104,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[1].rows() == 1);
-            CHECK(args[1].cols() == horizon);
+            CHECK(args[1].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[1],
@@ -117,7 +117,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
 
             CHECK(args[2].rows() == 1);
-            CHECK(args[2].cols() == horizon);
+            CHECK(args[2].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[2],
@@ -130,7 +130,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[3].rows() == 1);
-            CHECK(args[3].cols() == horizon);
+            CHECK(args[3].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[3],
@@ -143,7 +143,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[4].rows() == 1);
-            CHECK(args[4].cols() == horizon);
+            CHECK(args[4].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[4],
@@ -156,7 +156,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[5].rows() == 1);
-            CHECK(args[5].cols() == horizon);
+            CHECK(args[5].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[5],
@@ -169,7 +169,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
 
             CHECK(args[6].rows() == 1);
-            CHECK(args[6].cols() == horizon);
+            CHECK(args[6].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[6],
@@ -182,7 +182,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[7].rows() == 1);
-            CHECK(args[7].cols() == horizon);
+            CHECK(args[7].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[7],
@@ -195,7 +195,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[8].rows() == 1);
-            CHECK(args[8].cols() == horizon);
+            CHECK(args[8].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[8],
@@ -208,7 +208,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[9].rows() == 1);
-            CHECK(args[9].cols() == horizon);
+            CHECK(args[9].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[9],
@@ -221,7 +221,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[10].rows() == 1);
-            CHECK(args[10].cols() == horizon);
+            CHECK(args[10].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[10],
@@ -234,7 +234,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[11].rows() == 1);
-            CHECK(args[11].cols() == horizon);
+            CHECK(args[11].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[11],
@@ -247,7 +247,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[12].rows() == 1);
-            CHECK(args[12].cols() == horizon);
+            CHECK(args[12].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[12],
@@ -260,7 +260,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[13].rows() == 1);
-            CHECK(args[13].cols() == horizon);
+            CHECK(args[13].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[13],
@@ -273,7 +273,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[14].rows() == 1);
-            CHECK(args[14].cols() == horizon);
+            CHECK(args[14].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[14],
@@ -286,7 +286,7 @@ TEST_CASE("Max - double, window size 2, horizon 3") {
             );
             
             CHECK(args[15].rows() == 1);
-            CHECK(args[15].cols() == horizon);
+            CHECK(args[15].cols() == static_cast<Eigen::Index>(horizon));
             CHECK(
                 compareFunc(
                     args[15],
