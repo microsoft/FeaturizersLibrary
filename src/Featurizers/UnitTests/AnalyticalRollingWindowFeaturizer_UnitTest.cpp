@@ -10,82 +10,167 @@
 namespace NS = Microsoft::Featurizer;
 
 using OutputType = NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>::TransformedType;
+using MatrixMemberType = std::double_t;
+
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
 
 TEST_CASE("Mean - int32, window size 1, horizon 1") {
     // Since we are doing the mean of one value and a horizon of one, the result should always be equal to the prior value passed into execute.
 
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 1);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
+    OutputType results = transformer.execute(1);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(2), {1}));
+    CHECK(results.cols() == 1);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(3), {2}));
+    results = transformer.execute(2);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(4), {3}));
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 1);
+
+    results = transformer.execute(3);
+
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 2);
+
+    results = transformer.execute(4);
+
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 3);
 }
 
 TEST_CASE("Mean - int32, window size 2, horizon 1") {
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 2);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
+    OutputType results = transformer.execute(1);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(2), {1}));
+    CHECK(results.cols() == 1);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
 
-     // Correct result is now {1.5} because the mean of 1 + 2 is 1.5
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(3), {1.5}));
+    results = transformer.execute(2);
+
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 1);
+
+    results = transformer.execute(3);
+
+    // Correct result is now {1.5} because the mean of 1 + 2 is 1.5
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 1.5);
+
+    results = transformer.execute(4);
 
     // Correct result is now {2.5} because the mean of 2 + 3 is 2.5
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(4), {2.5}));
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 2.5);
 }
 
 TEST_CASE("Mean - int32, window size 2, horizon 1, min window size 2") {
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 2, 2);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
+    OutputType results = transformer.execute(1);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(2), {std::nan("")}));
+    CHECK(results.cols() == 1);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    
+    results = transformer.execute(2);
+    CHECK(results.cols() == 1);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(3), {1.5}));
+    results = transformer.execute(3);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(4), {2.5}));
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 1.5);
+
+    results = transformer.execute(4);
+
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 2.5);
 }
 
 TEST_CASE("Mean - int32, window size 1, horizon 2") {
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 1);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan(""), std::nan("")}));
+    OutputType results = transformer.execute(1);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(2), {std::nan(""), 1.0}));
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 1)));
+    
+    results = transformer.execute(2);
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(results(0, 1) == 1);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(3), {1.0, 2.0}));
+    results = transformer.execute(3);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(4), {2.0, 3.0}));
+    CHECK(results.cols() == 2);
+    CHECK(results(0, 0) == 1);
+    CHECK(results(0, 1) == 2);
 
+    results = transformer.execute(4);
+
+    CHECK(results.cols() == 2);
+    CHECK(results(0, 0) == 2);
+    CHECK(results(0, 1) == 3);
 }
 
 TEST_CASE("Mean - int32, window size 2, horizon 2") {
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan(""), std::nan("")}));
+    OutputType results = transformer.execute(1);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(2), {std::nan(""), 1.0}));
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 1)));
+    
+    results = transformer.execute(2);
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(results(0, 1) == 1);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(3), {1.0, 1.5}));
+    results = transformer.execute(3);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(3), {1.5, 2.5}));
+    CHECK(results.cols() == 2);
+    CHECK(results(0, 0) == 1);
+    CHECK(results(0, 1) == 1.5);
+
+    results = transformer.execute(4);
+
+    CHECK(results.cols() == 2);
+    CHECK(results(0, 0) == 1.5);
+    CHECK(results(0, 1) == 2.5);
 }
 
 TEST_CASE("Mean - int32, window size 2, horizon 2, min window size 2") {
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 2, 2, 2);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan(""), std::nan("")}));
+    OutputType results = transformer.execute(1);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(2), {std::nan(""), std::nan("")}));
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 1)));
+    
+    results = transformer.execute(2);
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 1)));
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(3), {std::nan(""), 1.5}));
+    results = transformer.execute(3);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(4), {1.5, 2.5}));
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(results(0, 1) == 1.5);
+
+    results = transformer.execute(4);
+
+    CHECK(results.cols() == 2);
+    CHECK(results(0, 0) == 1.5);
+    CHECK(results(0, 1) == 2.5);
 }
 
 TEST_CASE("Estimator Mean - int32, window size 2, horizon 2, min window size 2") {
@@ -97,22 +182,26 @@ TEST_CASE("Estimator Mean - int32, window size 2, horizon 2, min window size 2")
 
     std::vector<OutputType>   output;
     auto const                              callback(
-        [&output](std::vector<double> value) {
+        [&output](OutputType value) {
             output.emplace_back(std::move(value));
         }
     );
 
     transformer->execute(1, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[0], {std::nan(""), std::nan("")}));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[0](0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[0](0, 1)));
 
     transformer->execute(2, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[1], {std::nan(""), std::nan("")}));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[1](0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[1](0, 1)));
 
     transformer->execute(3, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[2], {std::nan(""), 1.5}));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[2](0, 0)));
+    CHECK(output[2](0, 1) == 1.5);
 
     transformer->execute(4, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[3], {1.5, 2.5}));
+    CHECK(output[3](0, 0) == 1.5);
+    CHECK(output[3](0, 1) == 2.5);
 }
 
 using GrainType = std::vector<std::string>;
@@ -138,24 +227,24 @@ TEST_CASE("Grained Mean - 1 grain, window size 1, horizon 1") {
 
     std::vector<OutputType>   output;
     auto const                              callback(
-        [&output](std::vector<double> value) {
+        [&output](OutputType value) {
             output.emplace_back(std::move(value));
         }
     );
 
     transformer->execute(tup1, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[0], {std::nan("")}));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[0](0, 0)));
 
     const std::int32_t value2(2);
     const GrainedInputType tup2(grain, value2);
 
     transformer->execute(tup2, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[1], {1.0}));
+    CHECK(output[1](0, 0) == 1);
 
     const std::int32_t value3(3);
     const GrainedInputType tup3(grain, value3);
     transformer->execute(tup3, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[2], {2.0}));
+    CHECK(output[2](0, 0) == 2);
 }
 
 TEST_CASE("Grained Mean - 1 grain, window size 2, horizon 2, min window size 2") {
@@ -179,28 +268,32 @@ TEST_CASE("Grained Mean - 1 grain, window size 2, horizon 2, min window size 2")
 
     std::vector<OutputType>   output;
     auto const                              callback(
-        [&output](std::vector<double> value) {
+        [&output](OutputType value) {
             output.emplace_back(std::move(value));
         }
     );
 
     transformer->execute(tup1, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[0], {std::nan(""), std::nan("")}));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[0](0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[0](0, 1)));
 
     const std::int32_t value2(2);
     const GrainedInputType tup2(grain, value2);
     transformer->execute(tup2, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[1], {std::nan(""), std::nan("")}));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[1](0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[1](0, 1)));
 
     const std::int32_t value3(3);
     const GrainedInputType tup3(grain, value3);
     transformer->execute(tup3, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[2], {std::nan(""), 1.5}));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[2](0, 0)));
+    CHECK(output[2](0, 1) == 1.5);
 
     const std::int32_t value4(4);
     const GrainedInputType tup4(grain, value4);
     transformer->execute(tup4, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[3], {1.5, 2.5}));
+    CHECK(output[3](0, 0) == 1.5);
+    CHECK(output[3](0, 1) == 2.5);
 }
 
 TEST_CASE("Grained Mean - 2 grain, window size 2, horizon 2, min window size 1") {
@@ -232,22 +325,23 @@ TEST_CASE("Grained Mean - 2 grain, window size 2, horizon 2, min window size 1")
     );
 
     transformer->execute(tup1, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[0], {std::nan(""), std::nan("")}));
-
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[0](0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[0](0, 1)));
 
     transformer->execute(tup2, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[1], {std::nan(""), std::nan("")}));
-
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[1](0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[1](0, 1)));
 
     const std::int32_t value2(2);
     const GrainedInputType tup3(grainOne, value2);
     transformer->execute(tup3, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[2], {std::nan(""), 1}));
-
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[2](0, 0)));
+    CHECK(output[2](0, 1) == 1);
 
     const GrainedInputType tup4(grainTwo, value2);
     transformer->execute(tup4, callback);
-    CHECK(NS::TestHelpers::FuzzyCheck(output[3], {std::nan(""), 1}));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[3](0, 0)));
+    CHECK(output[3](0, 1) == 1);
 }
 
 TEST_CASE("Serialization/Deserialization") {
@@ -309,16 +403,24 @@ TEST_CASE("Flush test") {
 
     NS::Featurizers::AnalyticalRollingWindowTransformer<std::int32_t>                transformer(NS::Featurizers::AnalyticalRollingWindowCalculation::Mean, 1, 1);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
-
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(2), {1}));
+    transformer.execute(1, callback);
+    transformer.execute(2, callback);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[0](0, 0)));
+    CHECK(output[1](0, 0) == 1);
 
     // Call flush. The next 2 calls with the same values from before the flush should return the same values.
     // Flush should also return no values.
     transformer.flush(callback);
-    CHECK(output.size() == 0);
+    CHECK(output.size() == 2);
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(1), {std::nan("")}));
+    transformer.execute(1, callback);
+    transformer.execute(2, callback);
+    
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(output[2](0, 0)));
 
-    CHECK(NS::TestHelpers::FuzzyCheck(transformer.execute(2), {1}));
+    CHECK(output[3](0, 0) == 1);
 }
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif

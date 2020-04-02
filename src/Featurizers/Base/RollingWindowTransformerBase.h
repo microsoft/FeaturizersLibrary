@@ -28,17 +28,17 @@ template <
     size_t MaxNumTrainingItemsV
 >
 class RollingWindowTransformerBase:
-    public Components::InferenceOnlyTransformerImpl<InputT, std::vector<OutputT>> {
+    public Components::InferenceOnlyTransformerImpl<InputT, Microsoft::Featurizer::RowMajMatrix<OutputT>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType = Components::InferenceOnlyTransformerImpl<InputT, std::vector<OutputT>>;
+    using BaseType                    = Components::InferenceOnlyTransformerImpl<InputT, Microsoft::Featurizer::RowMajMatrix<OutputT>>;
     using CalculatorFunctionInputType = typename Components::CircularBuffer<InputT>::iterator;
-    using CalculatorFunction = std::function<OutputT(CalculatorFunctionInputType, CalculatorFunctionInputType)>;
-    using CallbackFunction                  = typename BaseType::CallbackFunction;
+    using CalculatorFunction          = std::function<OutputT(CalculatorFunctionInputType, CalculatorFunctionInputType)>;
+    using CallbackFunction            = typename BaseType::CallbackFunction;
 
     // ----------------------------------------------------------------------
     // |
@@ -84,7 +84,7 @@ private:
         _buffer.push(input);
         const size_t bufferSize = _buffer.size();
 
-        typename BaseType::TransformedType         results(_horizon);
+        typename BaseType::TransformedType         results(1, _horizon);
 
         for (std::uint32_t offset = 0; offset < _horizon; ++offset){
             OutputT result;
@@ -111,12 +111,10 @@ private:
                 const typename Components::CircularBuffer<InputT>::iterator end_iter(std::get<1>(range));
 
                 result = _calculator(start_iter, end_iter);
-
             }
 
-            results[offset] = result;
+            results(0, offset) = result;
         }
-
         callback(results);
     }
 
