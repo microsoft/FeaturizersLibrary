@@ -9,7 +9,7 @@
 #include "Traits.h"
 #include "Featurizers/Structs.h"
 
-#include "SharedLibrary_Common.hpp"
+#include "SharedLibraryTests_Common.hpp"
 
 #if (defined _MSC_VER)
 #   pragma warning(push)
@@ -28,8 +28,7 @@ template <typename VectorInputT>
 void BackwardFillImputerFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::vector<std::int8_t>> const &)> const &verify_func,
-    bool flush=true
+    std::function<bool (std::vector<std::vector<std::int8_t>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -101,30 +100,58 @@ void BackwardFillImputerFeaturizer_int8_Test(
     std::vector<std::vector<std::int8_t>> results;
 
     for(auto const & input : inference_input) {
-        std::int8_t* result_ptr;
+        std::int8_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_int8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::GetNullableValue(input), &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::int8_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::int8_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::int8_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_int8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int8_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
-    if(flush) {
-        std::int8_t* result_ptr;
+    if(true) {
+        std::int8_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_int8_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int8_Flush(pTransformerHandle, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::int8_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::int8_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::int8_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_int8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int8_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -143,8 +170,7 @@ template <typename VectorInputT>
 void BackwardFillImputerFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::vector<std::int16_t>> const &)> const &verify_func,
-    bool flush=true
+    std::function<bool (std::vector<std::vector<std::int16_t>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -216,30 +242,58 @@ void BackwardFillImputerFeaturizer_int16_Test(
     std::vector<std::vector<std::int16_t>> results;
 
     for(auto const & input : inference_input) {
-        std::int16_t* result_ptr;
+        std::int16_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_int16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::GetNullableValue(input), &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::int16_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::int16_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::int16_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_int16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int16_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
-    if(flush) {
-        std::int16_t* result_ptr;
+    if(true) {
+        std::int16_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_int16_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int16_Flush(pTransformerHandle, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::int16_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::int16_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::int16_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_int16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int16_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -258,8 +312,7 @@ template <typename VectorInputT>
 void BackwardFillImputerFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::vector<std::int32_t>> const &)> const &verify_func,
-    bool flush=true
+    std::function<bool (std::vector<std::vector<std::int32_t>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -331,30 +384,58 @@ void BackwardFillImputerFeaturizer_int32_Test(
     std::vector<std::vector<std::int32_t>> results;
 
     for(auto const & input : inference_input) {
-        std::int32_t* result_ptr;
+        std::int32_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_int32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::GetNullableValue(input), &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::int32_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::int32_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::int32_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_int32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int32_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
-    if(flush) {
-        std::int32_t* result_ptr;
+    if(true) {
+        std::int32_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_int32_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int32_Flush(pTransformerHandle, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::int32_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::int32_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::int32_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_int32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int32_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -373,8 +454,7 @@ template <typename VectorInputT>
 void BackwardFillImputerFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::vector<std::int64_t>> const &)> const &verify_func,
-    bool flush=true
+    std::function<bool (std::vector<std::vector<std::int64_t>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -446,30 +526,58 @@ void BackwardFillImputerFeaturizer_int64_Test(
     std::vector<std::vector<std::int64_t>> results;
 
     for(auto const & input : inference_input) {
-        std::int64_t* result_ptr;
+        std::int64_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_int64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::GetNullableValue(input), &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::int64_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::int64_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::int64_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_int64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int64_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
-    if(flush) {
-        std::int64_t* result_ptr;
+    if(true) {
+        std::int64_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_int64_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int64_Flush(pTransformerHandle, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::int64_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::int64_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::int64_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_int64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_int64_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -488,8 +596,7 @@ template <typename VectorInputT>
 void BackwardFillImputerFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::vector<std::uint8_t>> const &)> const &verify_func,
-    bool flush=true
+    std::function<bool (std::vector<std::vector<std::uint8_t>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -561,30 +668,58 @@ void BackwardFillImputerFeaturizer_uint8_Test(
     std::vector<std::vector<std::uint8_t>> results;
 
     for(auto const & input : inference_input) {
-        std::uint8_t* result_ptr;
+        std::uint8_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_uint8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::GetNullableValue(input), &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::uint8_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::uint8_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::uint8_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_uint8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint8_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
-    if(flush) {
-        std::uint8_t* result_ptr;
+    if(true) {
+        std::uint8_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_uint8_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint8_Flush(pTransformerHandle, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::uint8_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::uint8_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::uint8_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_uint8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint8_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -603,8 +738,7 @@ template <typename VectorInputT>
 void BackwardFillImputerFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::vector<std::uint16_t>> const &)> const &verify_func,
-    bool flush=true
+    std::function<bool (std::vector<std::vector<std::uint16_t>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -676,30 +810,58 @@ void BackwardFillImputerFeaturizer_uint16_Test(
     std::vector<std::vector<std::uint16_t>> results;
 
     for(auto const & input : inference_input) {
-        std::uint16_t* result_ptr;
+        std::uint16_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_uint16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::GetNullableValue(input), &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::uint16_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::uint16_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::uint16_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_uint16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint16_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
-    if(flush) {
-        std::uint16_t* result_ptr;
+    if(true) {
+        std::uint16_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_uint16_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint16_Flush(pTransformerHandle, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::uint16_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::uint16_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::uint16_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_uint16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint16_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -718,8 +880,7 @@ template <typename VectorInputT>
 void BackwardFillImputerFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::vector<std::uint32_t>> const &)> const &verify_func,
-    bool flush=true
+    std::function<bool (std::vector<std::vector<std::uint32_t>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -791,30 +952,58 @@ void BackwardFillImputerFeaturizer_uint32_Test(
     std::vector<std::vector<std::uint32_t>> results;
 
     for(auto const & input : inference_input) {
-        std::uint32_t* result_ptr;
+        std::uint32_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_uint32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::GetNullableValue(input), &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::uint32_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::uint32_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::uint32_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_uint32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint32_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
-    if(flush) {
-        std::uint32_t* result_ptr;
+    if(true) {
+        std::uint32_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_uint32_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint32_Flush(pTransformerHandle, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::uint32_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::uint32_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::uint32_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_uint32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint32_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -833,8 +1022,7 @@ template <typename VectorInputT>
 void BackwardFillImputerFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::vector<std::uint64_t>> const &)> const &verify_func,
-    bool flush=true
+    std::function<bool (std::vector<std::vector<std::uint64_t>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -906,30 +1094,58 @@ void BackwardFillImputerFeaturizer_uint64_Test(
     std::vector<std::vector<std::uint64_t>> results;
 
     for(auto const & input : inference_input) {
-        std::uint64_t* result_ptr;
+        std::uint64_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_uint64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::GetNullableValue(input), &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::uint64_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::uint64_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::uint64_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_uint64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint64_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
-    if(flush) {
-        std::uint64_t* result_ptr;
+    if(true) {
+        std::uint64_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_uint64_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint64_Flush(pTransformerHandle, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::uint64_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::uint64_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::uint64_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_uint64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_uint64_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -948,8 +1164,7 @@ template <typename VectorInputT>
 void BackwardFillImputerFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::vector<std::float_t>> const &)> const &verify_func,
-    bool flush=true
+    std::function<bool (std::vector<std::vector<std::float_t>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -1021,30 +1236,58 @@ void BackwardFillImputerFeaturizer_float_Test(
     std::vector<std::vector<std::float_t>> results;
 
     for(auto const & input : inference_input) {
-        std::float_t* result_ptr;
+        std::float_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_float_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_float_Transform(pTransformerHandle, input, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::float_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::float_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::float_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_float_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_float_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
-    if(flush) {
-        std::float_t* result_ptr;
+    if(true) {
+        std::float_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_float_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_float_Flush(pTransformerHandle, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::float_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::float_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::float_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_float_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_float_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1063,8 +1306,7 @@ template <typename VectorInputT>
 void BackwardFillImputerFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::vector<std::double_t>> const &)> const &verify_func,
-    bool flush=true
+    std::function<bool (std::vector<std::vector<std::double_t>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -1136,30 +1378,58 @@ void BackwardFillImputerFeaturizer_double_Test(
     std::vector<std::vector<std::double_t>> results;
 
     for(auto const & input : inference_input) {
-        std::double_t* result_ptr;
+        std::double_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_double_Transform(pTransformerHandle, input, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_double_Transform(pTransformerHandle, input, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::double_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::double_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_double_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_double_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
-    if(flush) {
-        std::double_t* result_ptr;
+    if(true) {
+        std::double_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_double_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_double_Flush(pTransformerHandle, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::double_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::double_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_double_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_double_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1178,8 +1448,7 @@ template <typename VectorInputT>
 void BackwardFillImputerFeaturizer_bool_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::vector<bool>> const &)> const &verify_func,
-    bool flush=true
+    std::function<bool (std::vector<std::vector<bool>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -1251,30 +1520,58 @@ void BackwardFillImputerFeaturizer_bool_Test(
     std::vector<std::vector<bool>> results;
 
     for(bool input : inference_input) {
-        bool* result_ptr;
+        bool* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_bool_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::GetNullableValue(input), &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_bool_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::GetNullableValue(input), &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<bool>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        bool* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            bool & result_item(*result_item_items_ptr);
+
+            these_results.push_back(result_item);
+
+            ++result_item_items_ptr;
+        }
+
+        results.push_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_bool_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_bool_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
-    if(flush) {
-        bool* result_ptr;
+    if(true) {
+        bool* result_item_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_bool_Flush(pTransformerHandle, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_bool_Flush(pTransformerHandle, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<bool>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        bool* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            bool & result_item(*result_item_items_ptr);
+
+            these_results.push_back(result_item);
+
+            ++result_item_items_ptr;
+        }
+
+        results.push_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_bool_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_bool_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1293,8 +1590,7 @@ template <typename VectorInputT>
 void BackwardFillImputerFeaturizer_string_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::vector<std::string>> const &)> const &verify_func,
-    bool flush=true
+    std::function<bool (std::vector<std::vector<std::string>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -1366,30 +1662,58 @@ void BackwardFillImputerFeaturizer_string_Test(
     std::vector<std::vector<std::string>> results;
 
     for(auto const & input : inference_input) {
-        char const ** result_ptr_ptr;
+        char const ** result_item_ptr_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &result_ptr_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &result_item_ptr_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::string>(result_ptr_ptr, result_ptr_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        char const ** result_item_ptr_items_ptr(result_item_ptr_items);
+
+        while(these_results.size() < result_items) {
+            char const * & result_item_ptr(*result_item_ptr_items_ptr);
+
+            these_results.emplace_back(result_item_ptr ? std::string(result_item_ptr) : std::string());
+
+            ++result_item_ptr_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_string_DestroyTransformedData(result_ptr_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_string_DestroyTransformedData(result_item_ptr_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
-    if(flush) {
-        char const ** result_ptr_ptr;
+    if(true) {
+        char const ** result_item_ptr_items;
         size_t result_items;
 
-        REQUIRE(BackwardFillImputerFeaturizer_string_Flush(pTransformerHandle, &result_ptr_ptr, &result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_string_Flush(pTransformerHandle, &result_item_ptr_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::string>(result_ptr_ptr, result_ptr_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        char const ** result_item_ptr_items_ptr(result_item_ptr_items);
+
+        while(these_results.size() < result_items) {
+            char const * & result_item_ptr(*result_item_ptr_items_ptr);
+
+            these_results.emplace_back(result_item_ptr ? std::string(result_item_ptr) : std::string());
+
+            ++result_item_ptr_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(BackwardFillImputerFeaturizer_string_DestroyTransformedData(result_ptr_ptr, result_items, &pErrorInfo));
+        REQUIRE(BackwardFillImputerFeaturizer_string_DestroyTransformedData(result_item_ptr_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 

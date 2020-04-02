@@ -20,7 +20,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_DestroyEstimator(/*in*/ 
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_GetState(/*in*/ MaxNormalizeFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_IsTrainingComplete(/*in*/ MaxNormalizeFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_Fit(/*in*/ MaxNormalizeFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_FitBuffer(/*in*/ MaxNormalizeFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_FitBuffer(/*in*/ MaxNormalizeFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_OnDataCompleted(/*in*/ MaxNormalizeFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_CompleteTraining(/*in*/ MaxNormalizeFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -33,7 +33,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_CreateTransformerSaveDat
 
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_Transform(/*in*/ MaxNormalizeFeaturizer_int8_TransformerHandle *pHandle, /*in*/ int8_t const * input_ptr, /*in*/ size_t input_items, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_Flush(/*in*/ MaxNormalizeFeaturizer_int8_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <int16> */
@@ -47,7 +47,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_DestroyEstimator(/*in*/
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_GetState(/*in*/ MaxNormalizeFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_IsTrainingComplete(/*in*/ MaxNormalizeFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_Fit(/*in*/ MaxNormalizeFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_FitBuffer(/*in*/ MaxNormalizeFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_FitBuffer(/*in*/ MaxNormalizeFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_OnDataCompleted(/*in*/ MaxNormalizeFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_CompleteTraining(/*in*/ MaxNormalizeFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -60,7 +60,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_CreateTransformerSaveDa
 
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_Transform(/*in*/ MaxNormalizeFeaturizer_int16_TransformerHandle *pHandle, /*in*/ int16_t const * input_ptr, /*in*/ size_t input_items, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_Flush(/*in*/ MaxNormalizeFeaturizer_int16_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <int32> */
@@ -74,7 +74,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_DestroyEstimator(/*in*/
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_GetState(/*in*/ MaxNormalizeFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_IsTrainingComplete(/*in*/ MaxNormalizeFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_Fit(/*in*/ MaxNormalizeFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_FitBuffer(/*in*/ MaxNormalizeFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_FitBuffer(/*in*/ MaxNormalizeFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_OnDataCompleted(/*in*/ MaxNormalizeFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_CompleteTraining(/*in*/ MaxNormalizeFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -87,7 +87,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_CreateTransformerSaveDa
 
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_Transform(/*in*/ MaxNormalizeFeaturizer_int32_TransformerHandle *pHandle, /*in*/ int32_t const * input_ptr, /*in*/ size_t input_items, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_Flush(/*in*/ MaxNormalizeFeaturizer_int32_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <int64> */
@@ -101,7 +101,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_DestroyEstimator(/*in*/
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_GetState(/*in*/ MaxNormalizeFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_IsTrainingComplete(/*in*/ MaxNormalizeFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_Fit(/*in*/ MaxNormalizeFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_FitBuffer(/*in*/ MaxNormalizeFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_FitBuffer(/*in*/ MaxNormalizeFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_OnDataCompleted(/*in*/ MaxNormalizeFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_CompleteTraining(/*in*/ MaxNormalizeFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -114,7 +114,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_CreateTransformerSaveDa
 
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_Transform(/*in*/ MaxNormalizeFeaturizer_int64_TransformerHandle *pHandle, /*in*/ int64_t const * input_ptr, /*in*/ size_t input_items, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_Flush(/*in*/ MaxNormalizeFeaturizer_int64_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <uint8> */
@@ -128,7 +128,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_DestroyEstimator(/*in*/
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_GetState(/*in*/ MaxNormalizeFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_IsTrainingComplete(/*in*/ MaxNormalizeFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_Fit(/*in*/ MaxNormalizeFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_FitBuffer(/*in*/ MaxNormalizeFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_FitBuffer(/*in*/ MaxNormalizeFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_OnDataCompleted(/*in*/ MaxNormalizeFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_CompleteTraining(/*in*/ MaxNormalizeFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -141,7 +141,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_CreateTransformerSaveDa
 
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_Transform(/*in*/ MaxNormalizeFeaturizer_uint8_TransformerHandle *pHandle, /*in*/ uint8_t const * input_ptr, /*in*/ size_t input_items, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_Flush(/*in*/ MaxNormalizeFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <uint16> */
@@ -155,7 +155,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_DestroyEstimator(/*in*
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_GetState(/*in*/ MaxNormalizeFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_IsTrainingComplete(/*in*/ MaxNormalizeFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_Fit(/*in*/ MaxNormalizeFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_FitBuffer(/*in*/ MaxNormalizeFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_FitBuffer(/*in*/ MaxNormalizeFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_OnDataCompleted(/*in*/ MaxNormalizeFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_CompleteTraining(/*in*/ MaxNormalizeFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -168,7 +168,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_CreateTransformerSaveD
 
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_Transform(/*in*/ MaxNormalizeFeaturizer_uint16_TransformerHandle *pHandle, /*in*/ uint16_t const * input_ptr, /*in*/ size_t input_items, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_Flush(/*in*/ MaxNormalizeFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <uint32> */
@@ -182,7 +182,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_DestroyEstimator(/*in*
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_GetState(/*in*/ MaxNormalizeFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_IsTrainingComplete(/*in*/ MaxNormalizeFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_Fit(/*in*/ MaxNormalizeFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_FitBuffer(/*in*/ MaxNormalizeFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_FitBuffer(/*in*/ MaxNormalizeFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_OnDataCompleted(/*in*/ MaxNormalizeFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_CompleteTraining(/*in*/ MaxNormalizeFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -195,7 +195,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_CreateTransformerSaveD
 
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_Transform(/*in*/ MaxNormalizeFeaturizer_uint32_TransformerHandle *pHandle, /*in*/ uint32_t const * input_ptr, /*in*/ size_t input_items, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_Flush(/*in*/ MaxNormalizeFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <uint64> */
@@ -209,7 +209,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_DestroyEstimator(/*in*
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_GetState(/*in*/ MaxNormalizeFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_IsTrainingComplete(/*in*/ MaxNormalizeFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_Fit(/*in*/ MaxNormalizeFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_FitBuffer(/*in*/ MaxNormalizeFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_FitBuffer(/*in*/ MaxNormalizeFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_OnDataCompleted(/*in*/ MaxNormalizeFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_CompleteTraining(/*in*/ MaxNormalizeFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -222,7 +222,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_CreateTransformerSaveD
 
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_Transform(/*in*/ MaxNormalizeFeaturizer_uint64_TransformerHandle *pHandle, /*in*/ uint64_t const * input_ptr, /*in*/ size_t input_items, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_Flush(/*in*/ MaxNormalizeFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <float> */
@@ -236,7 +236,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_DestroyEstimator(/*in*/
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_GetState(/*in*/ MaxNormalizeFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_IsTrainingComplete(/*in*/ MaxNormalizeFeaturizer_float_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_Fit(/*in*/ MaxNormalizeFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_FitBuffer(/*in*/ MaxNormalizeFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_FitBuffer(/*in*/ MaxNormalizeFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_OnDataCompleted(/*in*/ MaxNormalizeFeaturizer_float_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_CompleteTraining(/*in*/ MaxNormalizeFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -249,7 +249,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_CreateTransformerSaveDa
 
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_Transform(/*in*/ MaxNormalizeFeaturizer_float_TransformerHandle *pHandle, /*in*/ float const * input_ptr, /*in*/ size_t input_items, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_Flush(/*in*/ MaxNormalizeFeaturizer_float_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  MaxNormalizeFeaturizer <double> */
@@ -263,7 +263,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_DestroyEstimator(/*in*
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_GetState(/*in*/ MaxNormalizeFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_IsTrainingComplete(/*in*/ MaxNormalizeFeaturizer_double_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_Fit(/*in*/ MaxNormalizeFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_FitBuffer(/*in*/ MaxNormalizeFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_FitBuffer(/*in*/ MaxNormalizeFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_OnDataCompleted(/*in*/ MaxNormalizeFeaturizer_double_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_CompleteTraining(/*in*/ MaxNormalizeFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -276,6 +276,6 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_CreateTransformerSaveD
 
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_Transform(/*in*/ MaxNormalizeFeaturizer_double_TransformerHandle *pHandle, /*in*/ double const * input_ptr, /*in*/ size_t input_items, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_Flush(/*in*/ MaxNormalizeFeaturizer_double_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 } // extern "C"

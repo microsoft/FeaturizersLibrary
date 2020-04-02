@@ -17,6 +17,11 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunused-local-typedef"
+#endif
+
 #if (defined _MSC_VER)
 #   pragma warning(push)
 
@@ -135,6 +140,8 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_Fit(/*in*/ Backwa
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int8_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -346,6 +353,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_Transform(/*in*/ 
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int8_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int8_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int8_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int8_t>::TransformedType;
 
         // Input
@@ -360,17 +368,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_Transform(/*in*/ 
         transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int8_t>::CreateNullValue(), callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int8_t[result.size()];
-        *output_items = result.size();
-
-        int8_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int8_t[result.size()];
+
+            int8_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -407,17 +423,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_Flush(/*in*/ Back
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int8_t[result.size()];
-        *output_items = result.size();
-
-        int8_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int8_t[result.size()];
+
+            int8_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -427,20 +451,22 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_Flush(/*in*/ Back
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_DestroyTransformedData(/*out*/ int8_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int8_DestroyTransformedData(/*out*/ int8_t * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -557,6 +583,8 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_Fit(/*in*/ Backw
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int16_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -768,6 +796,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_Transform(/*in*/
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int16_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int16_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int16_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int16_t>::TransformedType;
 
         // Input
@@ -782,17 +811,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_Transform(/*in*/
         transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int16_t>::CreateNullValue(), callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int16_t[result.size()];
-        *output_items = result.size();
-
-        int16_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int16_t[result.size()];
+
+            int16_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -829,17 +866,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_Flush(/*in*/ Bac
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int16_t[result.size()];
-        *output_items = result.size();
-
-        int16_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int16_t[result.size()];
+
+            int16_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -849,20 +894,22 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_Flush(/*in*/ Bac
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_DestroyTransformedData(/*out*/ int16_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int16_DestroyTransformedData(/*out*/ int16_t * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -979,6 +1026,8 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_Fit(/*in*/ Backw
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int32_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1190,6 +1239,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_Transform(/*in*/
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int32_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int32_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int32_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int32_t>::TransformedType;
 
         // Input
@@ -1204,17 +1254,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_Transform(/*in*/
         transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int32_t>::CreateNullValue(), callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int32_t[result.size()];
-        *output_items = result.size();
-
-        int32_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int32_t[result.size()];
+
+            int32_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1251,17 +1309,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_Flush(/*in*/ Bac
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int32_t[result.size()];
-        *output_items = result.size();
-
-        int32_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int32_t[result.size()];
+
+            int32_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1271,20 +1337,22 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_Flush(/*in*/ Bac
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_DestroyTransformedData(/*out*/ int32_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int32_DestroyTransformedData(/*out*/ int32_t * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -1401,6 +1469,8 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_Fit(/*in*/ Backw
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int64_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1612,6 +1682,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_Transform(/*in*/
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int64_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int64_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int64_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::int64_t>::TransformedType;
 
         // Input
@@ -1626,17 +1697,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_Transform(/*in*/
         transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::int64_t>::CreateNullValue(), callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int64_t[result.size()];
-        *output_items = result.size();
-
-        int64_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int64_t[result.size()];
+
+            int64_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1673,17 +1752,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_Flush(/*in*/ Bac
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int64_t[result.size()];
-        *output_items = result.size();
-
-        int64_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int64_t[result.size()];
+
+            int64_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1693,20 +1780,22 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_Flush(/*in*/ Bac
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_DestroyTransformedData(/*out*/ int64_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_int64_DestroyTransformedData(/*out*/ int64_t * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -1823,6 +1912,8 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_Fit(/*in*/ Backw
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint8_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2034,6 +2125,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_Transform(/*in*/
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint8_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint8_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint8_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint8_t>::TransformedType;
 
         // Input
@@ -2048,17 +2140,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_Transform(/*in*/
         transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint8_t>::CreateNullValue(), callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint8_t[result.size()];
-        *output_items = result.size();
-
-        uint8_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint8_t[result.size()];
+
+            uint8_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2095,17 +2195,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_Flush(/*in*/ Bac
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint8_t[result.size()];
-        *output_items = result.size();
-
-        uint8_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint8_t[result.size()];
+
+            uint8_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2115,20 +2223,22 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_Flush(/*in*/ Bac
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_DestroyTransformedData(/*out*/ uint8_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint8_DestroyTransformedData(/*out*/ uint8_t * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -2245,6 +2355,8 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_Fit(/*in*/ Back
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint16_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2456,6 +2568,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_Transform(/*in*
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint16_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint16_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint16_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint16_t>::TransformedType;
 
         // Input
@@ -2470,17 +2583,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_Transform(/*in*
         transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint16_t>::CreateNullValue(), callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint16_t[result.size()];
-        *output_items = result.size();
-
-        uint16_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint16_t[result.size()];
+
+            uint16_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2517,17 +2638,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_Flush(/*in*/ Ba
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint16_t[result.size()];
-        *output_items = result.size();
-
-        uint16_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint16_t[result.size()];
+
+            uint16_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2537,20 +2666,22 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_Flush(/*in*/ Ba
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_DestroyTransformedData(/*out*/ uint16_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint16_DestroyTransformedData(/*out*/ uint16_t * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -2667,6 +2798,8 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_Fit(/*in*/ Back
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint32_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2878,6 +3011,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_Transform(/*in*
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint32_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint32_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint32_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint32_t>::TransformedType;
 
         // Input
@@ -2892,17 +3026,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_Transform(/*in*
         transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint32_t>::CreateNullValue(), callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint32_t[result.size()];
-        *output_items = result.size();
-
-        uint32_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint32_t[result.size()];
+
+            uint32_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2939,17 +3081,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_Flush(/*in*/ Ba
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint32_t[result.size()];
-        *output_items = result.size();
-
-        uint32_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint32_t[result.size()];
+
+            uint32_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2959,20 +3109,22 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_Flush(/*in*/ Ba
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_DestroyTransformedData(/*out*/ uint32_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint32_DestroyTransformedData(/*out*/ uint32_t * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -3089,6 +3241,8 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_Fit(/*in*/ Back
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint64_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3300,6 +3454,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_Transform(/*in*
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint64_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint64_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint64_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::uint64_t>::TransformedType;
 
         // Input
@@ -3314,17 +3469,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_Transform(/*in*
         transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<std::uint64_t>::CreateNullValue(), callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint64_t[result.size()];
-        *output_items = result.size();
-
-        uint64_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint64_t[result.size()];
+
+            uint64_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3361,17 +3524,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_Flush(/*in*/ Ba
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint64_t[result.size()];
-        *output_items = result.size();
-
-        uint64_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint64_t[result.size()];
+
+            uint64_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3381,20 +3552,22 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_Flush(/*in*/ Ba
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_DestroyTransformedData(/*out*/ uint64_t const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_uint64_DestroyTransformedData(/*out*/ uint64_t * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -3511,6 +3684,8 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Fit(/*in*/ Backw
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::float_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3713,6 +3888,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Transform(/*in*/
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::float_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::float_t>::TransformedType;
 
         // Input
@@ -3727,17 +3903,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Transform(/*in*/
         transformer.execute(input, callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new float[result.size()];
-        *output_items = result.size();
-
-        float * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new float[result.size()];
+
+            float * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3774,17 +3958,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Flush(/*in*/ Bac
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new float[result.size()];
-        *output_items = result.size();
-
-        float * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new float[result.size()];
+
+            float * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3794,20 +3986,22 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_Flush(/*in*/ Bac
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_DestroyTransformedData(/*out*/ float const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_float_DestroyTransformedData(/*out*/ float * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -3924,6 +4118,8 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Fit(/*in*/ Back
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -4126,6 +4322,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Transform(/*in*
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::double_t>::TransformedType;
 
         // Input
@@ -4140,17 +4337,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Transform(/*in*
         transformer.execute(input, callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4187,17 +4392,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Flush(/*in*/ Ba
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4207,20 +4420,22 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_Flush(/*in*/ Ba
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_double_DestroyTransformedData(/*out*/ double * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -4337,6 +4552,8 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_Fit(/*in*/ Backwa
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<bool>::InputType;
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -4548,6 +4765,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_Transform(/*in*/ 
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<bool>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<bool>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<bool>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<bool>::TransformedType;
 
         // Input
@@ -4562,17 +4780,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_Transform(/*in*/ 
         transformer.execute(input != nullptr ? *input : Microsoft::Featurizer::Traits<bool>::CreateNullValue(), callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4609,17 +4835,25 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_Flush(/*in*/ Back
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4629,20 +4863,22 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_Flush(/*in*/ Back
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_DestroyTransformedData(/*out*/ bool const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_bool_DestroyTransformedData(/*out*/ bool * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -4759,6 +4995,8 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_Fit(/*in*/ Back
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::string>::InputType;
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -4970,6 +5208,7 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_Transform(/*in*
 
         Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::string>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::string>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::string>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::BackwardFillImputerEstimator<std::string>::TransformedType;
 
         // Input
@@ -4984,29 +5223,35 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_Transform(/*in*
         transformer.execute(input ? std::string(input) : nonstd::optional<std::string>(), callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new char const *[result.size()];
-        *output_items = result.size();
-
-        char const ** output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-
-            if(result_item.empty()) {
-                *output_item = nullptr;
-            }
-            else {
-                char * string_buffer(new char[result_item.size() + 1]);
-
-                std::copy(result_item.begin(), result_item.end(), string_buffer);
-                string_buffer[result_item.size()] = 0;
-
-                *output_item = string_buffer;
-            }
-
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new char const *[result.size()];
+
+            char const ** output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                if(result_item.empty()) {
+                    *output_item = nullptr;
+                }
+                else {
+                    char * string_buffer(new char[result_item.size() + 1]);
+
+                    std::copy(result_item.begin(), result_item.end(), string_buffer);
+                    string_buffer[result_item.size()] = 0;
+
+                    *output_item = string_buffer;
+                }
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -5043,29 +5288,35 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_Flush(/*in*/ Ba
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new char const *[result.size()];
-        *output_items = result.size();
-
-        char const ** output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-
-            if(result_item.empty()) {
-                *output_item = nullptr;
-            }
-            else {
-                char * string_buffer(new char[result_item.size() + 1]);
-
-                std::copy(result_item.begin(), result_item.end(), string_buffer);
-                string_buffer[result_item.size()] = 0;
-
-                *output_item = string_buffer;
-            }
-
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new char const *[result.size()];
+
+            char const ** output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                if(result_item.empty()) {
+                    *output_item = nullptr;
+                }
+                else {
+                    char * string_buffer(new char[result_item.size() + 1]);
+
+                    std::copy(result_item.begin(), result_item.end(), string_buffer);
+                    string_buffer[result_item.size()] = 0;
+
+                    *output_item = string_buffer;
+                }
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -5075,31 +5326,33 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_Flush(/*in*/ Ba
     }
 }
 
-FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_DestroyTransformedData(/*out*/ char const * const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_DestroyTransformedData(/*out*/ char const ** result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            char const ** this_result_item_ptr(result_item_ptr);
 
-        if(result_items == 0)
-            return true;
+            while(result_items--) {
+                char const * const & result_destroy_item(*this_result_item_ptr);
 
-        char const * const * result_ptr_item(result_ptr);
+                // No validation statements
 
-        for(size_t ctr=0; ctr < result_items; ++ctr) {
-            char const * result_item(*result_ptr_item);
+                if(result_destroy_item)
+                    delete [] result_destroy_item;
 
-            if(result_item)
-                delete [] result_item;
+                ++this_result_item_ptr;
+            }
 
-            ++result_ptr_item;
+            delete [] result_item_ptr;
         }
-
-        delete [] result_ptr;
     
         return true;
     }
@@ -5109,6 +5362,10 @@ FEATURIZER_LIBRARY_API bool BackwardFillImputerFeaturizer_string_DestroyTransfor
     }
 }
 
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)

@@ -12,6 +12,7 @@ import six
 
 import CommonEnvironment
 from CommonEnvironment import Interface
+from CommonEnvironment import StringHelpers
 
 from Plugins.SharedLibraryTestsPluginImpl.TypeInfo import TypeInfo
 
@@ -28,7 +29,7 @@ class VectorTypeInfo(TypeInfo):
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
-    TypeName                                = Interface.DerivedProperty(re.compile(r"vector\<(?P<type>\S+)\>"))
+    TypeName                                = Interface.DerivedProperty(re.compile(r"vector\<(?P<type>.+)\>"))
     CppType                                 = Interface.DerivedProperty(None)
 
     # ----------------------------------------------------------------------
@@ -86,58 +87,86 @@ class VectorTypeInfo(TypeInfo):
     @Interface.override
     def GetOutputInfo(
         self,
+        invocation_template,
         result_name="result",
     ):
-        result = self._type_info.GetOutputInfo(result_name)
-        assert len(result.TransformVars) == 1, result.TransformVars
-
-        parameters = [self.Type("{}*".format(p.Type), "{}_ptr".format(p.Name)) for p in result.TransformVars]
-        parameters.append(self.Type("size_t", "{}_items".format(result_name)))
-
-        assert len(parameters) == 2, parameters
-
-        if "nonstd::optional" in result.VectorResultType:
-            statements = textwrap.dedent(
-                """\
-                // Convert the pointers into optional values
-                {{
-                    std::vector<{type}> temp;
-
-                    temp.reserve({parameter1_name});
-
-                    for({parameter0_type}ptr = {parameter0_name}; ptr != {parameter0_name} + {parameter1_name}; ++ptr) {{
-                        if(*ptr != nullptr)
-                            temp.emplace_back(std::move(**ptr));
-                        else
-                            temp.emplace_back({type}());
-                    }}
-
-                    results.emplace_back(std::move(temp));
-                }}
-                """,
-            ).format(
-                result_name=result_name,
-                type=result.VectorResultType,
-                parameter0_type=parameters[0].Type,
-                parameter0_name=parameters[0].Name,
-                parameter1_name=parameters[1].Name,
-            )
+        if self._type_info.TypeName == "bool":
+            # vector<bool> doesn't support emplace_back on older compliers
+            item_invocation_template = "these_results.push_back({});"
         else:
-            statements = textwrap.dedent(
-                """\
-                results.emplace_back(std::vector<{type}>({parameter0_name}, {parameter0_name} + {parameter1_name}));
-                """,
-            ).format(
-                type=result.VectorResultType,
-                parameter0_name=parameters[0].Name,
-                parameter1_name=parameters[1].Name,
-            )
+            item_invocation_template = "these_results.emplace_back({});"
+
+        result = self._type_info.GetOutputInfo(
+            item_invocation_template,
+            result_name="{}_item".format(result_name),
+        )
+
+        parameters = [self.Type("{}*".format(p.Type), "{}_items".format(p.Name)) for p in result.TransformVars]
+
+        statements = textwrap.dedent(
+            """\
+            typename decltype(results)::value_type these_results;
+
+            these_results.reserve({name}_items);
+
+            {vars}
+
+            while(these_results.size() < {name}_items) {{
+                {references}
+
+                {item_statement}
+
+                {increment}
+            }}
+
+            {items_statement}
+            """,
+        ).format(
+            name=result_name,
+            vars="\n".join(
+                [
+                    "{type} {name}_ptr({name});".format(
+                        type=p.Type,
+                        name=p.Name,
+                    )
+                    for p in parameters
+                ]
+            ),
+            references=StringHelpers.LeftJustify(
+                "\n".join(
+                    [
+                        "{type} & {item_name}(*{name}_ptr);".format(
+                            type=item_p.Type,
+                            item_name=item_p.Name,
+                            name=p.Name,
+                        )
+                        for item_p, p in zip(result.TransformVars, parameters)
+                    ]
+                ),
+                4,
+            ).rstrip(),
+            item_statement=StringHelpers.LeftJustify(
+                result.AppendResultStatement,
+                4,
+            ).rstrip(),
+            increment=StringHelpers.LeftJustify(
+                "\n".join(
+                    [
+                        "++{}_ptr;".format(p.Name)
+                        for p in parameters
+                    ]
+                ),
+                4,
+            ).rstrip(),
+            items_statement=invocation_template.format("std::move(these_results)"),
+        )
+
+        parameters += [self.Type("size_t", "{}_items".format(result_name))]
 
         return self.Result(
             "std::vector<{}>".format(result.VectorResultType),
             parameters,
-            ", ".join(["&{}".format(p.Name) for p in parameters]),
             statements,
-            "{}, {}".format(parameters[0].Name, parameters[1].Name),
+            ", ".join([p.Name for p in parameters]),
             destroy_inline=True,
         )

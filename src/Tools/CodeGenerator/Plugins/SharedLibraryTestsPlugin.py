@@ -58,6 +58,12 @@ class Plugin(PluginBase):
             for items in data:
                 type_info_data.append([TypeInfoData(item, global_custom_structs, global_custom_enums) for item in items])
 
+        status_stream.write("Generating Common Files...")
+        with status_stream.DoneManager() as this_dm:
+            this_dm.result = _GenerateCommonFiles(open_file_func, output_dir, this_dm.stream)
+            if this_dm.result != 0:
+                return this_dm.result
+
         for desc, func in [("Generating .h files...", _GenerateHeaderFile)]:
             status_stream.write(desc)
             with status_stream.DoneManager(
@@ -112,7 +118,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                 #include "Traits.h"
                 #include "Featurizers/Structs.h"
 
-                #include "SharedLibrary_Common.hpp"
+                #include "SharedLibraryTests_Common.hpp"
 
                 #if (defined _MSC_VER)
                 #   pragma warning(push)
@@ -159,12 +165,28 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
             if isinstance(transform_input_args, tuple):
                 transform_input_args, fit_prefix_statements = transform_input_args
 
-            if item.has_dynamic_output:
-                output_statement_info = type_info_data.DynamicOutputTypeInfo.GetOutputInfo()
-                flush = ",\n    bool flush=true"
+            # Special processing for vector<bool>
+            if type_info_data.InputTypeInfo.TypeName == "bool":
+                # vector<bool> isn't actually a bool, so we can't take a direct reference to it
+                for_loop = "for(bool input : inference_input)"
             else:
-                output_statement_info = type_info_data.OutputTypeInfo.GetOutputInfo()
-                flush = ""
+                for_loop = "for(auto const & input : inference_input)"
+
+            if type_info_data.OutputTypeInfo.TypeName == "bool":
+                # vector<bool> doesn't support emplace_back on some platforms
+                invocation_template = "results.push_back({});"
+            else:
+                invocation_template = "results.emplace_back({});"
+
+            # Get the output statement information
+            if item.has_dynamic_output:
+                output_statement_info = type_info_data.DynamicOutputTypeInfo.GetOutputInfo(
+                    invocation_template=invocation_template,
+                )
+            else:
+                output_statement_info = type_info_data.OutputTypeInfo.GetOutputInfo(
+                    invocation_template=invocation_template,
+                )
 
             # Write the training statements
             f.write(
@@ -176,7 +198,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                     void {name}{suffix}Test(
                         std::vector<VectorInputT> const &training_input,
                         std::vector<VectorInputT> const &inference_input,
-                        std::function<bool (std::vector<{vector_result_type}> const &)> const &verify_func{constructor_params}{flush}
+                        std::function<bool (std::vector<{vector_result_type}> const &)> const &verify_func{constructor_params}
                     ) {{
                         ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -252,7 +274,6 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                     vector_result_type=output_statement_info.VectorResultType,
                     constructor_template_params=constructor_template_params,
                     constructor_params=constructor_params,
-                    flush=flush,
                     constructor_args=constructor_args,
                     fit_input_args=transform_input_args,
                     fit_prefix_statements="" if not fit_prefix_statements else "{}\n\n            ".format(
@@ -265,12 +286,6 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
             )
 
             # Write the inferencing statements
-            if type_info_data.InputTypeInfo.TypeName == "bool":
-                # vector<bool> isn't actually a bool, so we can't take a direct reference to it
-                for_loop = "for(bool input : inference_input)"
-            else:
-                for_loop = "for(auto const & input : inference_input)"
-
             inline_destroy_statement = "// No inline destroy statement"
             trailing_destroy_statement = "// No trailing destroy statement"
 
@@ -320,7 +335,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                                 {inline_destroy_statement}
                             }}
 
-                            if(flush) {{
+                            if(true) {{
                                 {transform_vars}
 
                                 REQUIRE({name}{suffix}Flush(pTransformerHandle, {transform_output_args}, &pErrorInfo));
@@ -351,7 +366,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                                 4,
                             ),
                             transform_input_args=transform_input_args,
-                            transform_output_args=output_statement_info.TransformOutputVars,
+                            transform_output_args=", ".join(["&{}".format(p.Name) for p in output_statement_info.TransformVars]),
                             transform_statement=StringHelpers.LeftJustify(
                                 output_statement_info.AppendResultStatement.rstrip(),
                                 4,
@@ -406,7 +421,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                                 4,
                             ),
                             transform_input_args=transform_input_args,
-                            transform_output_args=output_statement_info.TransformOutputVars,
+                            transform_output_args=", ".join(["&{}".format(p.Name) for p in output_statement_info.TransformVars]),
                             transform_statement=StringHelpers.LeftJustify(
                                 output_statement_info.AppendResultStatement.rstrip(),
                                 4,
@@ -454,6 +469,53 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                 """,
             ),
         )
+
+
+# ----------------------------------------------------------------------
+def _GenerateCommonFiles(open_file_func, output_dir, output_stream):
+    with open_file_func(
+        os.path.join(output_dir, "SharedLibraryTests_Common.hpp"),
+        "w",
+    ) as f:
+        f.write(
+            textwrap.dedent(
+                """\
+                /* ---------------------------------------------------------------------- */
+                /* Copyright (c) Microsoft Corporation. All rights reserved.              */
+                /* Licensed under the MIT License                                         */
+                /* ---------------------------------------------------------------------- */
+                #pragma once
+
+                #include "SharedLibrary_Common.hpp"
+
+                #if (defined _MSC_VER)
+                #   pragma warning(push)
+
+                    // I don't know why MSVC thinks that there is unreachable
+                    // code in these methods during release builds.
+                #   pragma warning(disable: 4702) // Unreachable code
+
+                #   pragma warning(disable: 4701) // potentially uninitialized local variable '<name>' used
+                #   pragma warning(disable: 4703) // potentially uninitialized local pointer variable '<name>' used
+                #endif
+                """,
+            ),
+        )
+
+        for type_info_class in TypeInfoData.EnumTypeInfoClasses():
+            type_info_class.CreateHelperMethods(f)
+
+        f.write(
+            textwrap.dedent(
+                """\
+                #if (defined _MSC_VER)
+                #   pragma warning(pop)
+                #endif
+                """,
+            ),
+        )
+
+    return 0
 
 
 # ----------------------------------------------------------------------
@@ -539,6 +601,12 @@ class TypeInfoData(object):
         self.DynamicOutputTypeInfo          = dynamic_output_info
 
     # ----------------------------------------------------------------------
+    @classmethod
+    def EnumTypeInfoClasses(cls):
+        cls._InitTypeInfoClasses()
+        yield from cls._type_info_classes
+
+    # ----------------------------------------------------------------------
     # |
     # |  Private Data
     # |
@@ -551,44 +619,51 @@ class TypeInfoData(object):
     # |
     # ----------------------------------------------------------------------
     @classmethod
+    def _InitTypeInfoClasses(cls):
+        if cls._type_info_classes is not None:
+            return
+
+        from Plugins.SharedLibraryTestsPluginImpl.DatetimeTypeInfo import DatetimeTypeInfo
+        from Plugins.SharedLibraryTestsPluginImpl.MatrixTypeInfo import MatrixTypeInfo
+        from Plugins.SharedLibraryTestsPluginImpl import ScalarTypeInfos
+        from Plugins.SharedLibraryTestsPluginImpl.SingleValueSparseVectorTypeInfo import SingleValueSparseVectorTypeInfo
+        from Plugins.SharedLibraryTestsPluginImpl.SparseVectorTypeInfo import SparseVectorTypeInfo
+        from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfo import StringTypeInfo
+        from Plugins.SharedLibraryTestsPluginImpl import StructTypeInfos
+        from Plugins.SharedLibraryTestsPluginImpl.TupleTypeInfo import TupleTypeInfo
+        from Plugins.SharedLibraryTestsPluginImpl.UniqueIdTypeInfo import UniqueIdTypeInfo
+        from Plugins.SharedLibraryTestsPluginImpl.VectorTypeInfo import VectorTypeInfo
+
+        type_info_classes = [
+            DatetimeTypeInfo,
+            MatrixTypeInfo,
+            SingleValueSparseVectorTypeInfo,
+            SparseVectorTypeInfo,
+            StringTypeInfo,
+            TupleTypeInfo,
+            UniqueIdTypeInfo,
+            VectorTypeInfo,
+        ]
+
+        for compound_module in [ScalarTypeInfos, StructTypeInfos]:
+            for obj_name in dir(compound_module):
+                if (
+                    obj_name.startswith("_")
+                    or not obj_name.endswith("TypeInfo")
+                    or obj_name == "TypeInfo"
+                ):
+                    continue
+
+                type_info_classes.append(getattr(compound_module, obj_name))
+
+        # Associate the type infos with the class rather than the instance
+        # so that we only need to perform this initialization once.
+        cls._type_info_classes = type_info_classes
+
+    # ----------------------------------------------------------------------
+    @classmethod
     def _CreateTypeInfo(cls, the_type, *args, **kwargs):
-        if cls._type_info_classes is None:
-            from Plugins.SharedLibraryTestsPluginImpl.DatetimeTypeInfo import DatetimeTypeInfo
-            from Plugins.SharedLibraryTestsPluginImpl.MatrixTypeInfo import MatrixTypeInfo
-            from Plugins.SharedLibraryTestsPluginImpl import ScalarTypeInfos
-            from Plugins.SharedLibraryTestsPluginImpl.SingleValueSparseVectorTypeInfo import SingleValueSparseVectorTypeInfo
-            from Plugins.SharedLibraryTestsPluginImpl.SparseVectorTypeInfo import SparseVectorTypeInfo
-            from Plugins.SharedLibraryTestsPluginImpl.StringTypeInfo import StringTypeInfo
-            from Plugins.SharedLibraryTestsPluginImpl import StructTypeInfos
-            from Plugins.SharedLibraryTestsPluginImpl.TupleTypeInfo import TupleTypeInfo
-            from Plugins.SharedLibraryTestsPluginImpl.UniqueIdTypeInfo import UniqueIdTypeInfo
-            from Plugins.SharedLibraryTestsPluginImpl.VectorTypeInfo import VectorTypeInfo
-
-            type_info_classes = [
-                DatetimeTypeInfo,
-                MatrixTypeInfo,
-                SingleValueSparseVectorTypeInfo,
-                SparseVectorTypeInfo,
-                StringTypeInfo,
-                TupleTypeInfo,
-                UniqueIdTypeInfo,
-                VectorTypeInfo,
-            ]
-
-            for compound_module in [ScalarTypeInfos, StructTypeInfos]:
-                for obj_name in dir(compound_module):
-                    if (
-                        obj_name.startswith("_")
-                        or not obj_name.endswith("TypeInfo")
-                        or obj_name == "TypeInfo"
-                    ):
-                        continue
-
-                    type_info_classes.append(getattr(compound_module, obj_name))
-
-            # Associate the type infos with the class rather than the instance
-            # so that we only need to perform this initialization once.
-            cls._type_info_classes = type_info_classes
+        cls._InitTypeInfoClasses()
 
         is_optional = False
 

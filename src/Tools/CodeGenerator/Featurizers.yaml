@@ -762,11 +762,12 @@ featurizers:
 
   # ----------------------------------------------------------------------
   - name: LagLeadOperatorFeaturizer
-    estimator_name: LagLeadOperatorEstimator
+    estimator_name: GrainedLagLeadOperatorEstimator
     release_version: 0.4.0
     num_output_columns: 1
     has_dynamic_output: true
     transformer_maintains_state: true
+    creates_annotations: false
     description: |-
       Copying values from prior or future per grain. Works for general time series data sets.
 
@@ -822,17 +823,20 @@ featurizers:
     templates:
       - name: T
         types:
-          # TODO - int8
-          # TODO - int16
-          # TODO - int32
-          # TODO - int64
-          # TODO - uint8
-          # TODO - uint16
-          # TODO - uint32
-          # TODO - uint64
+          # Note that optional values during output increase quite a bit of overhead when marshalling, therefore
+          # this featurizer only supports those types that don't have to pay that penality.
+          #
+          # - int8
+          # - int16
+          # - int32
+          # - int64
+          # - uint8
+          # - uint16
+          # - uint32
+          # - uint64
+          # - string
           - float
           - double
-          # TODO: string
 
     type_mappings:
       - input_type: tuple<unique_id, T>
@@ -843,9 +847,7 @@ featurizers:
         name: horizon
 
       - type: vector<int64>
-        name: offsets
-
-    status: Pending
+        name: deltas
 
   # ----------------------------------------------------------------------
   - name: MaxAbsScalerFeaturizer

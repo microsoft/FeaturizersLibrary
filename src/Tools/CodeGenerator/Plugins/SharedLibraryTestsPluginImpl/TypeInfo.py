@@ -42,14 +42,12 @@ class TypeInfo(Interface.Interface):
             self,
             vector_result_type,
             transform_vars,
-            transform_output_vars,
             append_result_statement,
             destroy_args=None,
             destroy_inline=None,
         ):
             self.VectorResultType           = vector_result_type
             self.TransformVars              = transform_vars
-            self.TransformOutputVars        = transform_output_vars
             self.AppendResultStatement      = append_result_statement
             self.DestroyArgs                = destroy_args
             self.DestroyInline              = destroy_inline
@@ -97,6 +95,13 @@ class TypeInfo(Interface.Interface):
     # ----------------------------------------------------------------------
     @Interface.extensionmethod
     @staticmethod
+    def CreateHelperMethods(output_stream):
+        """Write any helper methods that are necessary to process the type"""
+        pass
+
+    # ----------------------------------------------------------------------
+    @Interface.extensionmethod
+    @staticmethod
     def GetPrefixContent():
         """Return a string that contains content that should be placed at the beginning of the generated file"""
 
@@ -120,6 +125,7 @@ class TypeInfo(Interface.Interface):
     @Interface.abstractmethod
     def GetOutputInfo(
         self,
+        invocation_template,
         result_name="result",
     ):
         """\

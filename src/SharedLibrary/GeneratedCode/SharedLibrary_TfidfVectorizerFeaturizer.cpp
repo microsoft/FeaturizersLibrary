@@ -17,6 +17,11 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunused-local-typedef"
+#endif
+
 #if (defined _MSC_VER)
 #   pragma warning(push)
 
@@ -135,6 +140,8 @@ FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_Fit(/*in*/ TfidfVectorizer
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::InputType;
 
         Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -348,6 +355,7 @@ FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_Transform(/*in*/ TfidfVect
 
         Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::TfidfVectorizerEstimator<>::TransformedType;
 
         // Input
@@ -409,46 +417,55 @@ FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_Flush(/*in*/ TfidfVectoriz
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_numElements_ptr = new uint64_t[result.size()];
-        *output_item_numValues_ptr = new uint64_t[result.size()];
-        *output_item_values_ptr = new float *[result.size()];
-        *output_item_indexes_ptr = new uint64_t *[result.size()];
-        *output_items = result.size();
-
-        uint64_t * output_item_numElements(*output_item_numElements_ptr);
-        uint64_t * output_item_numValues(*output_item_numValues_ptr);
-        float ** output_item_values(*output_item_values_ptr);
-        uint64_t ** output_item_indexes(*output_item_indexes_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_numElements == nullptr) throw std::invalid_argument("'output_item_numElements' is null");
-            if(output_item_numValues == nullptr) throw std::invalid_argument("'output_item_numValues' is null");
-            if(output_item_values == nullptr) throw std::invalid_argument("'output_item_values' is null");
-            if(output_item_indexes == nullptr) throw std::invalid_argument("'output_item_indexes' is null");
-
-            std::unique_ptr<std::float_t []> pValues(new std::float_t [result_item.Values.size()]);
-            std::unique_ptr<uint64_t []> pIndexes(new uint64_t [result_item.Values.size()]);
-
-            std::float_t * pValue(pValues.get());
-            uint64_t * pIndex(pIndexes.get());
-
-            for(auto const & encoding : result_item.Values) {
-                *pValue++ = encoding.Value;
-                *pIndex++ = encoding.Index;
-            }
-
-            *output_item_numElements = result_item.NumElements;
-            *output_item_numValues = result_item.Values.size();
-
-            *output_item_values = pValues.release();
-            *output_item_indexes = pIndexes.release();
-
-            ++output_item_numElements;
-            ++output_item_numValues;
-            ++output_item_values;
-            ++output_item_indexes;
+        if(result.empty()) {
+            *output_item_numElements_ptr = nullptr;
+            *output_item_numValues_ptr = nullptr;
+            *output_item_values_ptr = nullptr;
+            *output_item_indexes_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_numElements_ptr = new uint64_t[result.size()];
+            *output_item_numValues_ptr = new uint64_t[result.size()];
+            *output_item_values_ptr = new float *[result.size()];
+            *output_item_indexes_ptr = new uint64_t *[result.size()];
+
+            uint64_t * output_item_numElements(*output_item_numElements_ptr);
+            uint64_t * output_item_numValues(*output_item_numValues_ptr);
+            float ** output_item_values(*output_item_values_ptr);
+            uint64_t ** output_item_indexes(*output_item_indexes_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_numElements == nullptr) throw std::invalid_argument("'output_item_numElements' is null");
+                if(output_item_numValues == nullptr) throw std::invalid_argument("'output_item_numValues' is null");
+                if(output_item_values == nullptr) throw std::invalid_argument("'output_item_values' is null");
+                if(output_item_indexes == nullptr) throw std::invalid_argument("'output_item_indexes' is null");
+
+                std::unique_ptr<std::float_t []> pValues(new std::float_t [result_item.Values.size()]);
+                std::unique_ptr<uint64_t []> pIndexes(new uint64_t [result_item.Values.size()]);
+
+                std::float_t * pValue(pValues.get());
+                uint64_t * pIndex(pIndexes.get());
+
+                for(auto const & encoding : result_item.Values) {
+                    *pValue++ = encoding.Value;
+                    *pIndex++ = encoding.Index;
+                }
+
+                *output_item_numElements = result_item.NumElements;
+                *output_item_numValues = result_item.Values.size();
+
+                *output_item_values = pValues.release();
+                *output_item_indexes = pIndexes.release();
+
+                ++output_item_numElements;
+                ++output_item_numValues;
+                ++output_item_values;
+                ++output_item_indexes;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -481,6 +498,10 @@ FEATURIZER_LIBRARY_API bool TfidfVectorizerFeaturizer_DestroyTransformedData(/*o
     }
 }
 
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)

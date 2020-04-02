@@ -29,7 +29,7 @@ class VectorTypeInfo(TypeInfo):
     # |  Public Types
     # |
     # ----------------------------------------------------------------------
-    TypeName                                = Interface.DerivedProperty(re.compile(r"vector\<(?P<type>\S+)\>"))
+    TypeName                                = Interface.DerivedProperty(re.compile(r"vector\<(?P<type>.+)\>"))
     CppType                                 = Interface.DerivedProperty(None)
 
     # ----------------------------------------------------------------------
@@ -75,30 +75,44 @@ class VectorTypeInfo(TypeInfo):
         assert result.InputBufferType is not None, self._type_info
 
         invocation_statements, invocation_tuple = self._ExtractDecoratedInvocationStatements(result.InvocationStatements)
-        assert not invocation_statements, invocation_statements
+        assert len(invocation_tuple) == 2, invocation_tuple
 
         return self.Result(
             result.Parameters,
             result.ValidationStatements,
-            invocation_template.format(
-                "std::make_tuple({ptr}, {ptr} + {size})".format(
-                    ptr=invocation_tuple[0],
-                    size=invocation_tuple[1],
+            "{}{}".format(
+                "{}\n\n".format(invocation_statements.rstrip()) if invocation_statements else "",
+                invocation_template.format(
+                    "std::make_tuple({ptr}, {ptr} + {size})".format(
+                        ptr=invocation_tuple[0],
+                        size=invocation_tuple[1],
+                    ),
                 ),
             ),
         )
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetInputBufferInfo(self, arg_name, invocation_template):
-        result = self._type_info.GetInputBufferInfo("{}_item".format(arg_name), self._InvocationTemplate)
+    def GetInputBufferInfo(
+        self,
+        arg_name,
+        invocation_template,
+        items_var_name=None,
+    ):
+        # Don't reuse the items var (if it exists)
+        items_var_name = "{}_items".format(arg_name)
+
+        result = self._type_info.GetInputBufferInfo(
+            "{}_item".format(arg_name),
+            self._InvocationTemplate,
+            items_var_name=items_var_name,
+        )
         assert result.InputBufferType is not None, self._type_info
+
+        input_parameters = [self.Type("{} const *".format(p.Type), "{}_ptr".format(p.Name)) for p in result.Parameters]
 
         invocation_statements, invocation_tuple = self._ExtractDecoratedInvocationStatements(result.InvocationStatements)
         assert not invocation_statements, invocation_statements
-
-        # Update the parameters to account for another level of indirection
-        input_parameters = [self.Type("{} const *".format(p.Type), "{}_ptr".format(p.Name)) for p in result.Parameters]
 
         # If the input buffer type is a pointer, it means that we don't
         # have to transform the input prior to passing it on. If it is not
@@ -151,13 +165,13 @@ class VectorTypeInfo(TypeInfo):
         validation_statements = textwrap.dedent(
             """\
             {parameter_validation}
-            if({name}_items == 0) throw std::invalid_argument("'{name}_items' is 0");
+            if({items_var_name} == 0) throw std::invalid_argument("'{items_var_name}' is 0");
 
             {buffer_type} {buffer_name};
 
-            {buffer_name}.reserve({name}_items);
+            {buffer_name}.reserve({items_var_name});
 
-            while({buffer_name}.size() < {name}_items) {{
+            while({buffer_name}.size() < {items_var_name}) {{
                 {references}
 
                 {validation_statements}
@@ -178,6 +192,7 @@ class VectorTypeInfo(TypeInfo):
                 ]
             ),
             name=arg_name,
+            items_var_name=items_var_name,
             buffer_type=buffer_type.Type,
             buffer_name=buffer_type.Name,
             references=StringHelpers.LeftJustify(
@@ -209,7 +224,7 @@ class VectorTypeInfo(TypeInfo):
         )
 
         return self.Result(
-            input_parameters + [self.Type("size_t", "{}_items".format(arg_name))],
+            input_parameters + [self.Type("size_t", items_var_name)],
             validation_statements,
             invocation_template.format(
                 "{name}_buffer.data(), {name}_buffer.size()".format(
@@ -266,46 +281,69 @@ class VectorTypeInfo(TypeInfo):
             ),
             textwrap.dedent(
                 """\
-                // TODO: There are potential memory leaks if allocation fails
-                {allocations}
-                *{name}_items = {result_name}.size();
-
-                {initial_assignments}
-
-                {for_loop} {{
-                    {validations}
-                    {statements}
-                    {ptr_increments}
+                if({result_name}.empty()) {{
+                    {empty_allocations}
                 }}
+                else {{
+                    // TODO: There are potential memory leaks if allocation fails
+                    {allocations}
+
+                    {initial_assignments}
+
+                    {for_loop} {{
+                        {validations}
+
+                        {statements}
+
+                        {ptr_increments}
+                    }}
+                }}
+
+                *{name}_items = {result_name}.size();
                 """,
             ).format(
                 name=arg_name,
                 result_name=result_name,
-                allocations="\n".join(
-                    [
-                        "*{name}_ptr = new {type}[{result_name}.size()];".format(
-                            name=p.Name,
-                            type=self._StripPointer(p.Type),
-                            result_name=result_name,
-                        )
-                        for p in result.Parameters
-                    ]
+                empty_allocations=StringHelpers.LeftJustify(
+                    "\n".join(
+                        [
+                            "*{}_ptr = nullptr;".format(p.Name)
+                            for p in result.Parameters
+                        ]
+                    ),
+                    4,
                 ),
-                initial_assignments="\n".join(
-                    [
-                        "{type} {name}(*{name}_ptr);".format(
-                            name=p.Name,
-                            type=p.Type,
-                        )
-                        for p in result.Parameters
-                    ]
+                allocations=StringHelpers.LeftJustify(
+                    "\n".join(
+                        [
+                            "*{name}_ptr = new {type}[{result_name}.size()];".format(
+                                name=p.Name,
+                                type=self._StripPointer(p.Type),
+                                result_name=result_name,
+                            )
+                            for p in result.Parameters
+                        ]
+                    ),
+                    4,
+                ),
+                initial_assignments=StringHelpers.LeftJustify(
+                    "\n".join(
+                        [
+                            "{type} {name}(*{name}_ptr);".format(
+                                name=p.Name,
+                                type=p.Type,
+                            )
+                            for p in result.Parameters
+                        ]
+                    ),
+                    4,
                 ),
                 for_loop=for_loop,
-                validations=StringHelpers.LeftJustify(result.ValidationStatements, 4),
-                statements=StringHelpers.LeftJustify(result.InvocationStatements, 4),
+                validations=StringHelpers.LeftJustify(result.ValidationStatements, 8).rstrip(),
+                statements=StringHelpers.LeftJustify(result.InvocationStatements, 8).rstrip(),
                 ptr_increments=StringHelpers.LeftJustify(
                     "\n".join(["++{};".format(p.Name) for p in result.Parameters]),
-                    4,
+                    8,
                 ),
             ),
         )
@@ -316,150 +354,117 @@ class VectorTypeInfo(TypeInfo):
         self,
         arg_name="result",
     ):
-        # Use the input info as a way to get arguments
-        input_item_info = self.GetInputInfo(arg_name, "")
-
-        # The expected convention is that all arguments are pointers except
-        # one (probably the last) that is the number of items.
-        pointer_parameters = []
-        size_parameter = None
-
-        for p in input_item_info.Parameters:
-            if p.Type.endswith("*"):
-                pointer_parameters.append(p)
-                continue
-
-            assert size_parameter is None
-            assert p.Type == "size_t", p.Type
-
-            size_parameter = p
-
-        assert pointer_parameters
-        assert size_parameter is not None
-
-        if len(pointer_parameters) == 1:
-            validation_statements = textwrap.dedent(
-                """\
-                if({ptr} == nullptr && {size} != 0) throw std::invalid_argument("'{size}' is not 0");
-                """,
-            ).format(
-                ptr=pointer_parameters[0].Name,
-                size=size_parameter.Name,
-            )
-        else:
-            validation_statements = textwrap.dedent(
-                """\
-                if({first_ptr} == nullptr) {{
-                    {verify_null}
-                    if({size} != 0) throw std::invalid_argument("'{size}' is not 0");
-                }}
-                else {{
-                    {verify_not_null}
-                    if({size} == 0) throw std::invalid_argument("'{size}' is 0");
-                """,
-            ).format(
-                first_ptr=pointer_parameters[0].Name,
-                size=size_parameter.Name,
-                verify_null=StringHelpers.LeftJustify(
-                    "\n".join(
-                        [
-                            """if({ptr} != nullptr) throw std::invalid_argument("'{ptr}' is not null");""".format(
-                                ptr=p.Name,
-                            )
-                            for p in pointer_parameters[1:]
-                        ]
-                    ),
-                    4,
-                ),
-                verify_not_null=StringHelpers.LeftJustify(
-                    "\n".join(
-                        [
-                            """if({ptr} == nullptr) throw std::invalid_argument("'{ptr}' is null");""".format(
-                                ptr=p.Name,
-                            )
-                            for p in pointer_parameters[1:]
-                        ]
-                    ),
-                    4,
-                ),
-            )
-
-        # Determine if individual items need to be destroyed
-        destroy_item_info = self._type_info.GetDestroyOutputInfo(
-            arg_name="{}_item".format(arg_name),
+        result = self.GetOutputInfo(
+            arg_name,
         )
 
-        if destroy_item_info is not None:
-            assert len(destroy_item_info.Parameters) == len(pointer_parameters), (destroy_item_info.Parameters, pointer_parameters)
+        input_parameters = [self.Type(self._StripPointer(p.Type), p.Name) for p in result.Parameters]
+
+        # Create the destroy statements
+        destroy_result = self._type_info.GetDestroyOutputInfo("{}_destroy_item".format(arg_name))
+        if destroy_result is not None:
+            assert input_parameters[-1].Type == "size_t", input_parameters[-1].Type
+            assert input_parameters[-1].Name.endswith("_items"), input_parameters[-1].Name
+            pointer_parameters = input_parameters[:-1]
+
+            assert len(destroy_result.Parameters) == len(result.Parameters) - 1
 
             destroy_statements = textwrap.dedent(
                 """\
-                {declarations}
+                {variable_statements}
 
-                for(size_t ctr=0; ctr < {size_name}; ++ctr) {{
-                    {references}
+                while({name}_items--) {{
+                    {assignment_statements}
 
-                    {statements}
-
-                    {increment}
+                    {delete_statements}
+                    {increment_statements}
                 }}
                 """,
             ).format(
-                declarations="\n".join(
+                name=arg_name,
+                variable_statements="\n".join(
                     [
-                        "{type} {name}_item({name});".format(
+                        "{type} this_{name}({name});".format(
                             type=p.Type,
                             name=p.Name,
                         )
                         for p in pointer_parameters
-                    ]
+                    ],
                 ),
-                size_name=size_parameter.Name,
-                references=StringHelpers.LeftJustify(
+                assignment_statements=StringHelpers.LeftJustify(
                     "\n".join(
                         [
-                            "{} {}(*{}_item);".format(
-                                destroy_param.Type,
-                                destroy_param.Name,
-                                pointer_param.Name,
+                            """{destroy_type} const & {destroy_name}(*this_{parameter_name});""".format(
+                                destroy_type=destroy_p.Type,
+                                destroy_name=destroy_p.Name,
+                                parameter_name=standard_p.Name,
                             )
-                            for destroy_param, pointer_param in zip(destroy_item_info.Parameters, pointer_parameters)
+                            for destroy_p, standard_p in zip(destroy_result.Parameters, pointer_parameters)
                         ]
                     ),
                     4,
                 ),
-                statements=StringHelpers.LeftJustify(destroy_item_info.InvocationStatements.rstrip(), 4),
-                increment=StringHelpers.LeftJustify("\n".join(["++{}_item;".format(p.Name) for p in pointer_parameters]), 4),
-            )
+                delete_statements=StringHelpers.LeftJustify(
+                    textwrap.dedent(
+                        """\
+                        {}
 
+                        {}
+                        """,
+                    ).format(
+                        destroy_result.ValidationStatements.rstrip() if destroy_result.ValidationStatements else "// No validation statements",
+                        destroy_result.InvocationStatements.rstrip(),
+                    ),
+                    4,
+                ),
+                increment_statements=StringHelpers.LeftJustify(
+                    "\n".join([ "++this_{};".format(p.Name) for p in pointer_parameters]),
+                    4,
+                ),
+            )
         else:
-            destroy_statements = ""
+            destroy_statements = "// No destroy statements"
 
         return self.Result(
-            input_item_info.Parameters,
+            input_parameters,
             textwrap.dedent(
                 """\
-                {validation_statements}
-
-                if({size} == 0)
-                    return true;
+                if({initial_ptr_name} != nullptr && {name}_items == 0) throw std::invalid_argument("'{name}_items' is 0");
+                if({initial_ptr_name} == nullptr && {name}_items != 0) throw std::invalid_argument("'{name}_items' is not 0");
+                {ptr_validations}
                 """,
             ).format(
-                validation_statements=validation_statements,
-                size=size_parameter.Name,
+                initial_ptr_name=input_parameters[0].Name,
+                name=arg_name,
+                ptr_validations="\n".join(
+                    [
+                        """if(bool({name}) != bool({initial_ptr_name})) throw std::invalid_argument("'{name}' is not internally consistent");""".format(
+                            initial_ptr_name=input_parameters[0].Name,
+                            name=p.Name,
+                        )
+                        for p in input_parameters[1:]
+                    ]
+                ),
             ),
             textwrap.dedent(
                 """\
-                {destroy_statements}
-                {statements}
+                if({initial_ptr_name} != nullptr) {{
+                    {statements}
+
+                    {delete_ptrs}
+                }}
                 """,
             ).format(
-                destroy_statements=destroy_statements,
-                statements="\n".join(
-                    [
-                        "delete [] {};".format(p.Name)
-                        for p in pointer_parameters
-                    ]
+                initial_ptr_name=input_parameters[0].Name,
+                statements=StringHelpers.LeftJustify(destroy_statements, 4).rstrip(),
+                delete_ptrs=StringHelpers.LeftJustify(
+                    "\n".join(
+                        [
+                            "delete [] {};".format(p.Name)
+                            for p in input_parameters if p.Type.endswith("*")
+                        ]
+                    ),
+                    4,
                 ),
             ),
         )

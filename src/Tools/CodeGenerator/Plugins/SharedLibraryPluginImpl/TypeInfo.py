@@ -110,7 +110,12 @@ class TypeInfo(Interface.Interface):
 
     # ----------------------------------------------------------------------
     @Interface.abstractmethod
-    def GetInputBufferInfo(self, arg_name, invocation_template):
+    def GetInputBufferInfo(
+        self,
+        arg_name,
+        invocation_template,
+        items_var_name=None,
+    ):
         """\
         Returns information about the type when used as a buffer input argument.
 

@@ -17,6 +17,11 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunused-local-typedef"
+#endif
+
 #if (defined _MSC_VER)
 #   pragma warning(push)
 
@@ -146,9 +151,11 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int8_Fit(/*in*/ Simple
             ++input0_ptr;
         }
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int8_t>::InputType;
+
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input0_buffer, input1)));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(InputType(input0_buffer, input1)));
     
         return true;
     }
@@ -158,7 +165,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int8_Fit(/*in*/ Simple
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int8_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ int8_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int8_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ int8_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -170,13 +177,13 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int8_FitBuffer(/*in*/ 
 
         if(input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' is null");
         if(input0_ptr_items == nullptr) throw std::invalid_argument("'input0_ptr_items' is null");
-        if(input0_items == 0) throw std::invalid_argument("'input0_items' is 0");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::vector<std::string>> input0_buffer;
 
-        input0_buffer.reserve(input0_items);
+        input0_buffer.reserve(input_items);
 
-        while(input0_buffer.size() < input0_items) {
+        while(input0_buffer.size() < input_items) {
             if(*input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' element is null");
             if(*input0_ptr_items == 0) throw std::invalid_argument("'input0_ptr_items' element is 0");
 
@@ -198,10 +205,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int8_FitBuffer(/*in*/ 
         }
 
         if(input1_ptr == nullptr) throw std::invalid_argument("'input1_ptr' is null");
-        if(input1_items == 0) throw std::invalid_argument("'input1_items' is 0");
-
-
-        if(input1_items != input0_items) throw std::invalid_argument("'input1_items' != 'input0_items'");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -212,12 +216,12 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int8_FitBuffer(/*in*/ 
 
         std::vector<typename make_tuple_elements_const_references<std::tuple<std::vector<std::string>, std::int8_t>>::type> input_buffer;
 
-        input_buffer.reserve(input0_items);
+        input_buffer.reserve(input_items);
 
         auto * input0_creation_ptr(input0_buffer.data());
         auto * input1_creation_ptr(input1_ptr);
 
-        while(input_buffer.size() < input0_items) {
+        while(input_buffer.size() < input_items) {
             input_buffer.emplace_back(*input0_creation_ptr, *input1_creation_ptr);
             ++input0_creation_ptr;
             ++input1_creation_ptr;
@@ -407,23 +411,32 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int8_Transform(/*in*/ 
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int8_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int8_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int8_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int8_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(std::make_tuple(input0_buffer, input1)));
+        TransformedType result(transformer.execute(InputType(input0_buffer, input1)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int8_t*[result.size()];
-        *output_items = result.size();
-
-        int8_t* * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item ? new int8_t(*result_item) : nullptr;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int8_t*[result.size()];
+
+            int8_t* * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item ? new int8_t(*result_item) : nullptr;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -461,33 +474,48 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int8_Flush(/*in*/ Simp
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new int8_t* *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        int8_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new int8_t*[result_item.size()];
-            *output_item_items = result_item.size();
-
-            int8_t* * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item ? new int8_t(*result_item_item) : nullptr;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new int8_t* *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            int8_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new int8_t*[result_item.size()];
+
+                    int8_t* * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item ? new int8_t(*result_item_item) : nullptr;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -497,31 +525,33 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int8_Flush(/*in*/ Simp
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int8_DestroyTransformedData(/*out*/ int8_t const * const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int8_DestroyTransformedData(/*out*/ int8_t* * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            int8_t* * this_result_item_ptr(result_item_ptr);
 
-        if(result_items == 0)
-            return true;
+            while(result_items--) {
+                int8_t const * const & result_destroy_item(*this_result_item_ptr);
 
-        int8_t const * const * result_ptr_item(result_ptr);
+                // No validation statements
 
-        for(size_t ctr=0; ctr < result_items; ++ctr) {
-            int8_t const * result_item(*result_ptr_item);
+                if(result_destroy_item != nullptr)
+                    delete result_destroy_item;
 
-            if(result_item != nullptr)
-                delete result_item;
+                ++this_result_item_ptr;
+            }
 
-            ++result_ptr_item;
+            delete [] result_item_ptr;
         }
-
-        delete [] result_ptr;
     
         return true;
     }
@@ -649,9 +679,11 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int16_Fit(/*in*/ Simpl
             ++input0_ptr;
         }
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int16_t>::InputType;
+
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input0_buffer, input1)));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(InputType(input0_buffer, input1)));
     
         return true;
     }
@@ -661,7 +693,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int16_Fit(/*in*/ Simpl
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int16_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ int16_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int16_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ int16_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -673,13 +705,13 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int16_FitBuffer(/*in*/
 
         if(input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' is null");
         if(input0_ptr_items == nullptr) throw std::invalid_argument("'input0_ptr_items' is null");
-        if(input0_items == 0) throw std::invalid_argument("'input0_items' is 0");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::vector<std::string>> input0_buffer;
 
-        input0_buffer.reserve(input0_items);
+        input0_buffer.reserve(input_items);
 
-        while(input0_buffer.size() < input0_items) {
+        while(input0_buffer.size() < input_items) {
             if(*input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' element is null");
             if(*input0_ptr_items == 0) throw std::invalid_argument("'input0_ptr_items' element is 0");
 
@@ -701,10 +733,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int16_FitBuffer(/*in*/
         }
 
         if(input1_ptr == nullptr) throw std::invalid_argument("'input1_ptr' is null");
-        if(input1_items == 0) throw std::invalid_argument("'input1_items' is 0");
-
-
-        if(input1_items != input0_items) throw std::invalid_argument("'input1_items' != 'input0_items'");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -715,12 +744,12 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int16_FitBuffer(/*in*/
 
         std::vector<typename make_tuple_elements_const_references<std::tuple<std::vector<std::string>, std::int16_t>>::type> input_buffer;
 
-        input_buffer.reserve(input0_items);
+        input_buffer.reserve(input_items);
 
         auto * input0_creation_ptr(input0_buffer.data());
         auto * input1_creation_ptr(input1_ptr);
 
-        while(input_buffer.size() < input0_items) {
+        while(input_buffer.size() < input_items) {
             input_buffer.emplace_back(*input0_creation_ptr, *input1_creation_ptr);
             ++input0_creation_ptr;
             ++input1_creation_ptr;
@@ -910,23 +939,32 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int16_Transform(/*in*/
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int16_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int16_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int16_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int16_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(std::make_tuple(input0_buffer, input1)));
+        TransformedType result(transformer.execute(InputType(input0_buffer, input1)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int16_t*[result.size()];
-        *output_items = result.size();
-
-        int16_t* * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item ? new int16_t(*result_item) : nullptr;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int16_t*[result.size()];
+
+            int16_t* * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item ? new int16_t(*result_item) : nullptr;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -964,33 +1002,48 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int16_Flush(/*in*/ Sim
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new int16_t* *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        int16_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new int16_t*[result_item.size()];
-            *output_item_items = result_item.size();
-
-            int16_t* * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item ? new int16_t(*result_item_item) : nullptr;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new int16_t* *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            int16_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new int16_t*[result_item.size()];
+
+                    int16_t* * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item ? new int16_t(*result_item_item) : nullptr;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1000,31 +1053,33 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int16_Flush(/*in*/ Sim
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int16_DestroyTransformedData(/*out*/ int16_t const * const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int16_DestroyTransformedData(/*out*/ int16_t* * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            int16_t* * this_result_item_ptr(result_item_ptr);
 
-        if(result_items == 0)
-            return true;
+            while(result_items--) {
+                int16_t const * const & result_destroy_item(*this_result_item_ptr);
 
-        int16_t const * const * result_ptr_item(result_ptr);
+                // No validation statements
 
-        for(size_t ctr=0; ctr < result_items; ++ctr) {
-            int16_t const * result_item(*result_ptr_item);
+                if(result_destroy_item != nullptr)
+                    delete result_destroy_item;
 
-            if(result_item != nullptr)
-                delete result_item;
+                ++this_result_item_ptr;
+            }
 
-            ++result_ptr_item;
+            delete [] result_item_ptr;
         }
-
-        delete [] result_ptr;
     
         return true;
     }
@@ -1152,9 +1207,11 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int32_Fit(/*in*/ Simpl
             ++input0_ptr;
         }
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int32_t>::InputType;
+
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input0_buffer, input1)));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(InputType(input0_buffer, input1)));
     
         return true;
     }
@@ -1164,7 +1221,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int32_Fit(/*in*/ Simpl
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int32_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ int32_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int32_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ int32_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1176,13 +1233,13 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int32_FitBuffer(/*in*/
 
         if(input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' is null");
         if(input0_ptr_items == nullptr) throw std::invalid_argument("'input0_ptr_items' is null");
-        if(input0_items == 0) throw std::invalid_argument("'input0_items' is 0");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::vector<std::string>> input0_buffer;
 
-        input0_buffer.reserve(input0_items);
+        input0_buffer.reserve(input_items);
 
-        while(input0_buffer.size() < input0_items) {
+        while(input0_buffer.size() < input_items) {
             if(*input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' element is null");
             if(*input0_ptr_items == 0) throw std::invalid_argument("'input0_ptr_items' element is 0");
 
@@ -1204,10 +1261,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int32_FitBuffer(/*in*/
         }
 
         if(input1_ptr == nullptr) throw std::invalid_argument("'input1_ptr' is null");
-        if(input1_items == 0) throw std::invalid_argument("'input1_items' is 0");
-
-
-        if(input1_items != input0_items) throw std::invalid_argument("'input1_items' != 'input0_items'");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1218,12 +1272,12 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int32_FitBuffer(/*in*/
 
         std::vector<typename make_tuple_elements_const_references<std::tuple<std::vector<std::string>, std::int32_t>>::type> input_buffer;
 
-        input_buffer.reserve(input0_items);
+        input_buffer.reserve(input_items);
 
         auto * input0_creation_ptr(input0_buffer.data());
         auto * input1_creation_ptr(input1_ptr);
 
-        while(input_buffer.size() < input0_items) {
+        while(input_buffer.size() < input_items) {
             input_buffer.emplace_back(*input0_creation_ptr, *input1_creation_ptr);
             ++input0_creation_ptr;
             ++input1_creation_ptr;
@@ -1413,23 +1467,32 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int32_Transform(/*in*/
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int32_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int32_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int32_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int32_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(std::make_tuple(input0_buffer, input1)));
+        TransformedType result(transformer.execute(InputType(input0_buffer, input1)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int32_t*[result.size()];
-        *output_items = result.size();
-
-        int32_t* * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item ? new int32_t(*result_item) : nullptr;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int32_t*[result.size()];
+
+            int32_t* * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item ? new int32_t(*result_item) : nullptr;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1467,33 +1530,48 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int32_Flush(/*in*/ Sim
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new int32_t* *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        int32_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new int32_t*[result_item.size()];
-            *output_item_items = result_item.size();
-
-            int32_t* * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item ? new int32_t(*result_item_item) : nullptr;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new int32_t* *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            int32_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new int32_t*[result_item.size()];
+
+                    int32_t* * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item ? new int32_t(*result_item_item) : nullptr;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1503,31 +1581,33 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int32_Flush(/*in*/ Sim
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int32_DestroyTransformedData(/*out*/ int32_t const * const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int32_DestroyTransformedData(/*out*/ int32_t* * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            int32_t* * this_result_item_ptr(result_item_ptr);
 
-        if(result_items == 0)
-            return true;
+            while(result_items--) {
+                int32_t const * const & result_destroy_item(*this_result_item_ptr);
 
-        int32_t const * const * result_ptr_item(result_ptr);
+                // No validation statements
 
-        for(size_t ctr=0; ctr < result_items; ++ctr) {
-            int32_t const * result_item(*result_ptr_item);
+                if(result_destroy_item != nullptr)
+                    delete result_destroy_item;
 
-            if(result_item != nullptr)
-                delete result_item;
+                ++this_result_item_ptr;
+            }
 
-            ++result_ptr_item;
+            delete [] result_item_ptr;
         }
-
-        delete [] result_ptr;
     
         return true;
     }
@@ -1655,9 +1735,11 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int64_Fit(/*in*/ Simpl
             ++input0_ptr;
         }
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int64_t>::InputType;
+
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input0_buffer, input1)));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(InputType(input0_buffer, input1)));
     
         return true;
     }
@@ -1667,7 +1749,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int64_Fit(/*in*/ Simpl
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int64_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ int64_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int64_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ int64_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1679,13 +1761,13 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int64_FitBuffer(/*in*/
 
         if(input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' is null");
         if(input0_ptr_items == nullptr) throw std::invalid_argument("'input0_ptr_items' is null");
-        if(input0_items == 0) throw std::invalid_argument("'input0_items' is 0");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::vector<std::string>> input0_buffer;
 
-        input0_buffer.reserve(input0_items);
+        input0_buffer.reserve(input_items);
 
-        while(input0_buffer.size() < input0_items) {
+        while(input0_buffer.size() < input_items) {
             if(*input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' element is null");
             if(*input0_ptr_items == 0) throw std::invalid_argument("'input0_ptr_items' element is 0");
 
@@ -1707,10 +1789,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int64_FitBuffer(/*in*/
         }
 
         if(input1_ptr == nullptr) throw std::invalid_argument("'input1_ptr' is null");
-        if(input1_items == 0) throw std::invalid_argument("'input1_items' is 0");
-
-
-        if(input1_items != input0_items) throw std::invalid_argument("'input1_items' != 'input0_items'");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1721,12 +1800,12 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int64_FitBuffer(/*in*/
 
         std::vector<typename make_tuple_elements_const_references<std::tuple<std::vector<std::string>, std::int64_t>>::type> input_buffer;
 
-        input_buffer.reserve(input0_items);
+        input_buffer.reserve(input_items);
 
         auto * input0_creation_ptr(input0_buffer.data());
         auto * input1_creation_ptr(input1_ptr);
 
-        while(input_buffer.size() < input0_items) {
+        while(input_buffer.size() < input_items) {
             input_buffer.emplace_back(*input0_creation_ptr, *input1_creation_ptr);
             ++input0_creation_ptr;
             ++input1_creation_ptr;
@@ -1916,23 +1995,32 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int64_Transform(/*in*/
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int64_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int64_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int64_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::int64_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(std::make_tuple(input0_buffer, input1)));
+        TransformedType result(transformer.execute(InputType(input0_buffer, input1)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int64_t*[result.size()];
-        *output_items = result.size();
-
-        int64_t* * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item ? new int64_t(*result_item) : nullptr;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int64_t*[result.size()];
+
+            int64_t* * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item ? new int64_t(*result_item) : nullptr;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1970,33 +2058,48 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int64_Flush(/*in*/ Sim
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new int64_t* *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        int64_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new int64_t*[result_item.size()];
-            *output_item_items = result_item.size();
-
-            int64_t* * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item ? new int64_t(*result_item_item) : nullptr;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new int64_t* *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            int64_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new int64_t*[result_item.size()];
+
+                    int64_t* * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item ? new int64_t(*result_item_item) : nullptr;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2006,31 +2109,33 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int64_Flush(/*in*/ Sim
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int64_DestroyTransformedData(/*out*/ int64_t const * const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_int64_DestroyTransformedData(/*out*/ int64_t* * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            int64_t* * this_result_item_ptr(result_item_ptr);
 
-        if(result_items == 0)
-            return true;
+            while(result_items--) {
+                int64_t const * const & result_destroy_item(*this_result_item_ptr);
 
-        int64_t const * const * result_ptr_item(result_ptr);
+                // No validation statements
 
-        for(size_t ctr=0; ctr < result_items; ++ctr) {
-            int64_t const * result_item(*result_ptr_item);
+                if(result_destroy_item != nullptr)
+                    delete result_destroy_item;
 
-            if(result_item != nullptr)
-                delete result_item;
+                ++this_result_item_ptr;
+            }
 
-            ++result_ptr_item;
+            delete [] result_item_ptr;
         }
-
-        delete [] result_ptr;
     
         return true;
     }
@@ -2158,9 +2263,11 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint8_Fit(/*in*/ Simpl
             ++input0_ptr;
         }
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint8_t>::InputType;
+
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input0_buffer, input1)));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(InputType(input0_buffer, input1)));
     
         return true;
     }
@@ -2170,7 +2277,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint8_Fit(/*in*/ Simpl
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint8_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ uint8_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint8_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ uint8_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2182,13 +2289,13 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint8_FitBuffer(/*in*/
 
         if(input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' is null");
         if(input0_ptr_items == nullptr) throw std::invalid_argument("'input0_ptr_items' is null");
-        if(input0_items == 0) throw std::invalid_argument("'input0_items' is 0");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::vector<std::string>> input0_buffer;
 
-        input0_buffer.reserve(input0_items);
+        input0_buffer.reserve(input_items);
 
-        while(input0_buffer.size() < input0_items) {
+        while(input0_buffer.size() < input_items) {
             if(*input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' element is null");
             if(*input0_ptr_items == 0) throw std::invalid_argument("'input0_ptr_items' element is 0");
 
@@ -2210,10 +2317,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint8_FitBuffer(/*in*/
         }
 
         if(input1_ptr == nullptr) throw std::invalid_argument("'input1_ptr' is null");
-        if(input1_items == 0) throw std::invalid_argument("'input1_items' is 0");
-
-
-        if(input1_items != input0_items) throw std::invalid_argument("'input1_items' != 'input0_items'");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2224,12 +2328,12 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint8_FitBuffer(/*in*/
 
         std::vector<typename make_tuple_elements_const_references<std::tuple<std::vector<std::string>, std::uint8_t>>::type> input_buffer;
 
-        input_buffer.reserve(input0_items);
+        input_buffer.reserve(input_items);
 
         auto * input0_creation_ptr(input0_buffer.data());
         auto * input1_creation_ptr(input1_ptr);
 
-        while(input_buffer.size() < input0_items) {
+        while(input_buffer.size() < input_items) {
             input_buffer.emplace_back(*input0_creation_ptr, *input1_creation_ptr);
             ++input0_creation_ptr;
             ++input1_creation_ptr;
@@ -2419,23 +2523,32 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint8_Transform(/*in*/
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint8_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint8_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint8_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint8_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(std::make_tuple(input0_buffer, input1)));
+        TransformedType result(transformer.execute(InputType(input0_buffer, input1)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint8_t*[result.size()];
-        *output_items = result.size();
-
-        uint8_t* * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item ? new uint8_t(*result_item) : nullptr;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint8_t*[result.size()];
+
+            uint8_t* * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item ? new uint8_t(*result_item) : nullptr;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2473,33 +2586,48 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint8_Flush(/*in*/ Sim
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new uint8_t* *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        uint8_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new uint8_t*[result_item.size()];
-            *output_item_items = result_item.size();
-
-            uint8_t* * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item ? new uint8_t(*result_item_item) : nullptr;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new uint8_t* *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            uint8_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new uint8_t*[result_item.size()];
+
+                    uint8_t* * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item ? new uint8_t(*result_item_item) : nullptr;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2509,31 +2637,33 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint8_Flush(/*in*/ Sim
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint8_DestroyTransformedData(/*out*/ uint8_t const * const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint8_DestroyTransformedData(/*out*/ uint8_t* * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            uint8_t* * this_result_item_ptr(result_item_ptr);
 
-        if(result_items == 0)
-            return true;
+            while(result_items--) {
+                uint8_t const * const & result_destroy_item(*this_result_item_ptr);
 
-        uint8_t const * const * result_ptr_item(result_ptr);
+                // No validation statements
 
-        for(size_t ctr=0; ctr < result_items; ++ctr) {
-            uint8_t const * result_item(*result_ptr_item);
+                if(result_destroy_item != nullptr)
+                    delete result_destroy_item;
 
-            if(result_item != nullptr)
-                delete result_item;
+                ++this_result_item_ptr;
+            }
 
-            ++result_ptr_item;
+            delete [] result_item_ptr;
         }
-
-        delete [] result_ptr;
     
         return true;
     }
@@ -2661,9 +2791,11 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint16_Fit(/*in*/ Simp
             ++input0_ptr;
         }
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint16_t>::InputType;
+
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input0_buffer, input1)));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(InputType(input0_buffer, input1)));
     
         return true;
     }
@@ -2673,7 +2805,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint16_Fit(/*in*/ Simp
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint16_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ uint16_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint16_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ uint16_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2685,13 +2817,13 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint16_FitBuffer(/*in*
 
         if(input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' is null");
         if(input0_ptr_items == nullptr) throw std::invalid_argument("'input0_ptr_items' is null");
-        if(input0_items == 0) throw std::invalid_argument("'input0_items' is 0");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::vector<std::string>> input0_buffer;
 
-        input0_buffer.reserve(input0_items);
+        input0_buffer.reserve(input_items);
 
-        while(input0_buffer.size() < input0_items) {
+        while(input0_buffer.size() < input_items) {
             if(*input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' element is null");
             if(*input0_ptr_items == 0) throw std::invalid_argument("'input0_ptr_items' element is 0");
 
@@ -2713,10 +2845,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint16_FitBuffer(/*in*
         }
 
         if(input1_ptr == nullptr) throw std::invalid_argument("'input1_ptr' is null");
-        if(input1_items == 0) throw std::invalid_argument("'input1_items' is 0");
-
-
-        if(input1_items != input0_items) throw std::invalid_argument("'input1_items' != 'input0_items'");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2727,12 +2856,12 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint16_FitBuffer(/*in*
 
         std::vector<typename make_tuple_elements_const_references<std::tuple<std::vector<std::string>, std::uint16_t>>::type> input_buffer;
 
-        input_buffer.reserve(input0_items);
+        input_buffer.reserve(input_items);
 
         auto * input0_creation_ptr(input0_buffer.data());
         auto * input1_creation_ptr(input1_ptr);
 
-        while(input_buffer.size() < input0_items) {
+        while(input_buffer.size() < input_items) {
             input_buffer.emplace_back(*input0_creation_ptr, *input1_creation_ptr);
             ++input0_creation_ptr;
             ++input1_creation_ptr;
@@ -2922,23 +3051,32 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint16_Transform(/*in*
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint16_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint16_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint16_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint16_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(std::make_tuple(input0_buffer, input1)));
+        TransformedType result(transformer.execute(InputType(input0_buffer, input1)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint16_t*[result.size()];
-        *output_items = result.size();
-
-        uint16_t* * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item ? new uint16_t(*result_item) : nullptr;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint16_t*[result.size()];
+
+            uint16_t* * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item ? new uint16_t(*result_item) : nullptr;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2976,33 +3114,48 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint16_Flush(/*in*/ Si
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new uint16_t* *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        uint16_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new uint16_t*[result_item.size()];
-            *output_item_items = result_item.size();
-
-            uint16_t* * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item ? new uint16_t(*result_item_item) : nullptr;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new uint16_t* *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            uint16_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new uint16_t*[result_item.size()];
+
+                    uint16_t* * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item ? new uint16_t(*result_item_item) : nullptr;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3012,31 +3165,33 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint16_Flush(/*in*/ Si
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint16_DestroyTransformedData(/*out*/ uint16_t const * const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint16_DestroyTransformedData(/*out*/ uint16_t* * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            uint16_t* * this_result_item_ptr(result_item_ptr);
 
-        if(result_items == 0)
-            return true;
+            while(result_items--) {
+                uint16_t const * const & result_destroy_item(*this_result_item_ptr);
 
-        uint16_t const * const * result_ptr_item(result_ptr);
+                // No validation statements
 
-        for(size_t ctr=0; ctr < result_items; ++ctr) {
-            uint16_t const * result_item(*result_ptr_item);
+                if(result_destroy_item != nullptr)
+                    delete result_destroy_item;
 
-            if(result_item != nullptr)
-                delete result_item;
+                ++this_result_item_ptr;
+            }
 
-            ++result_ptr_item;
+            delete [] result_item_ptr;
         }
-
-        delete [] result_ptr;
     
         return true;
     }
@@ -3164,9 +3319,11 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint32_Fit(/*in*/ Simp
             ++input0_ptr;
         }
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint32_t>::InputType;
+
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input0_buffer, input1)));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(InputType(input0_buffer, input1)));
     
         return true;
     }
@@ -3176,7 +3333,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint32_Fit(/*in*/ Simp
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint32_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ uint32_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint32_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ uint32_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3188,13 +3345,13 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint32_FitBuffer(/*in*
 
         if(input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' is null");
         if(input0_ptr_items == nullptr) throw std::invalid_argument("'input0_ptr_items' is null");
-        if(input0_items == 0) throw std::invalid_argument("'input0_items' is 0");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::vector<std::string>> input0_buffer;
 
-        input0_buffer.reserve(input0_items);
+        input0_buffer.reserve(input_items);
 
-        while(input0_buffer.size() < input0_items) {
+        while(input0_buffer.size() < input_items) {
             if(*input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' element is null");
             if(*input0_ptr_items == 0) throw std::invalid_argument("'input0_ptr_items' element is 0");
 
@@ -3216,10 +3373,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint32_FitBuffer(/*in*
         }
 
         if(input1_ptr == nullptr) throw std::invalid_argument("'input1_ptr' is null");
-        if(input1_items == 0) throw std::invalid_argument("'input1_items' is 0");
-
-
-        if(input1_items != input0_items) throw std::invalid_argument("'input1_items' != 'input0_items'");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3230,12 +3384,12 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint32_FitBuffer(/*in*
 
         std::vector<typename make_tuple_elements_const_references<std::tuple<std::vector<std::string>, std::uint32_t>>::type> input_buffer;
 
-        input_buffer.reserve(input0_items);
+        input_buffer.reserve(input_items);
 
         auto * input0_creation_ptr(input0_buffer.data());
         auto * input1_creation_ptr(input1_ptr);
 
-        while(input_buffer.size() < input0_items) {
+        while(input_buffer.size() < input_items) {
             input_buffer.emplace_back(*input0_creation_ptr, *input1_creation_ptr);
             ++input0_creation_ptr;
             ++input1_creation_ptr;
@@ -3425,23 +3579,32 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint32_Transform(/*in*
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint32_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint32_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint32_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint32_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(std::make_tuple(input0_buffer, input1)));
+        TransformedType result(transformer.execute(InputType(input0_buffer, input1)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint32_t*[result.size()];
-        *output_items = result.size();
-
-        uint32_t* * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item ? new uint32_t(*result_item) : nullptr;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint32_t*[result.size()];
+
+            uint32_t* * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item ? new uint32_t(*result_item) : nullptr;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3479,33 +3642,48 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint32_Flush(/*in*/ Si
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new uint32_t* *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        uint32_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new uint32_t*[result_item.size()];
-            *output_item_items = result_item.size();
-
-            uint32_t* * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item ? new uint32_t(*result_item_item) : nullptr;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new uint32_t* *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            uint32_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new uint32_t*[result_item.size()];
+
+                    uint32_t* * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item ? new uint32_t(*result_item_item) : nullptr;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3515,31 +3693,33 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint32_Flush(/*in*/ Si
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint32_DestroyTransformedData(/*out*/ uint32_t const * const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint32_DestroyTransformedData(/*out*/ uint32_t* * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            uint32_t* * this_result_item_ptr(result_item_ptr);
 
-        if(result_items == 0)
-            return true;
+            while(result_items--) {
+                uint32_t const * const & result_destroy_item(*this_result_item_ptr);
 
-        uint32_t const * const * result_ptr_item(result_ptr);
+                // No validation statements
 
-        for(size_t ctr=0; ctr < result_items; ++ctr) {
-            uint32_t const * result_item(*result_ptr_item);
+                if(result_destroy_item != nullptr)
+                    delete result_destroy_item;
 
-            if(result_item != nullptr)
-                delete result_item;
+                ++this_result_item_ptr;
+            }
 
-            ++result_ptr_item;
+            delete [] result_item_ptr;
         }
-
-        delete [] result_ptr;
     
         return true;
     }
@@ -3667,9 +3847,11 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint64_Fit(/*in*/ Simp
             ++input0_ptr;
         }
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint64_t>::InputType;
+
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input0_buffer, input1)));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(InputType(input0_buffer, input1)));
     
         return true;
     }
@@ -3679,7 +3861,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint64_Fit(/*in*/ Simp
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint64_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ uint64_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint64_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ uint64_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3691,13 +3873,13 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint64_FitBuffer(/*in*
 
         if(input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' is null");
         if(input0_ptr_items == nullptr) throw std::invalid_argument("'input0_ptr_items' is null");
-        if(input0_items == 0) throw std::invalid_argument("'input0_items' is 0");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::vector<std::string>> input0_buffer;
 
-        input0_buffer.reserve(input0_items);
+        input0_buffer.reserve(input_items);
 
-        while(input0_buffer.size() < input0_items) {
+        while(input0_buffer.size() < input_items) {
             if(*input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' element is null");
             if(*input0_ptr_items == 0) throw std::invalid_argument("'input0_ptr_items' element is 0");
 
@@ -3719,10 +3901,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint64_FitBuffer(/*in*
         }
 
         if(input1_ptr == nullptr) throw std::invalid_argument("'input1_ptr' is null");
-        if(input1_items == 0) throw std::invalid_argument("'input1_items' is 0");
-
-
-        if(input1_items != input0_items) throw std::invalid_argument("'input1_items' != 'input0_items'");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3733,12 +3912,12 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint64_FitBuffer(/*in*
 
         std::vector<typename make_tuple_elements_const_references<std::tuple<std::vector<std::string>, std::uint64_t>>::type> input_buffer;
 
-        input_buffer.reserve(input0_items);
+        input_buffer.reserve(input_items);
 
         auto * input0_creation_ptr(input0_buffer.data());
         auto * input1_creation_ptr(input1_ptr);
 
-        while(input_buffer.size() < input0_items) {
+        while(input_buffer.size() < input_items) {
             input_buffer.emplace_back(*input0_creation_ptr, *input1_creation_ptr);
             ++input0_creation_ptr;
             ++input1_creation_ptr;
@@ -3928,23 +4107,32 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint64_Transform(/*in*
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint64_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint64_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint64_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::uint64_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(std::make_tuple(input0_buffer, input1)));
+        TransformedType result(transformer.execute(InputType(input0_buffer, input1)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint64_t*[result.size()];
-        *output_items = result.size();
-
-        uint64_t* * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item ? new uint64_t(*result_item) : nullptr;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint64_t*[result.size()];
+
+            uint64_t* * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item ? new uint64_t(*result_item) : nullptr;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3982,33 +4170,48 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint64_Flush(/*in*/ Si
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new uint64_t* *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        uint64_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new uint64_t*[result_item.size()];
-            *output_item_items = result_item.size();
-
-            uint64_t* * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item ? new uint64_t(*result_item_item) : nullptr;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new uint64_t* *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            uint64_t* ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new uint64_t*[result_item.size()];
+
+                    uint64_t* * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item ? new uint64_t(*result_item_item) : nullptr;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4018,31 +4221,33 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint64_Flush(/*in*/ Si
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint64_DestroyTransformedData(/*out*/ uint64_t const * const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_uint64_DestroyTransformedData(/*out*/ uint64_t* * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            uint64_t* * this_result_item_ptr(result_item_ptr);
 
-        if(result_items == 0)
-            return true;
+            while(result_items--) {
+                uint64_t const * const & result_destroy_item(*this_result_item_ptr);
 
-        uint64_t const * const * result_ptr_item(result_ptr);
+                // No validation statements
 
-        for(size_t ctr=0; ctr < result_items; ++ctr) {
-            uint64_t const * result_item(*result_ptr_item);
+                if(result_destroy_item != nullptr)
+                    delete result_destroy_item;
 
-            if(result_item != nullptr)
-                delete result_item;
+                ++this_result_item_ptr;
+            }
 
-            ++result_ptr_item;
+            delete [] result_item_ptr;
         }
-
-        delete [] result_ptr;
     
         return true;
     }
@@ -4170,9 +4375,11 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_float_Fit(/*in*/ Simpl
             ++input0_ptr;
         }
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::float_t>::InputType;
+
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input0_buffer, input1)));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(InputType(input0_buffer, input1)));
     
         return true;
     }
@@ -4182,7 +4389,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_float_Fit(/*in*/ Simpl
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_float_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_float_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ float const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_float_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_float_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ float const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -4194,13 +4401,13 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_float_FitBuffer(/*in*/
 
         if(input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' is null");
         if(input0_ptr_items == nullptr) throw std::invalid_argument("'input0_ptr_items' is null");
-        if(input0_items == 0) throw std::invalid_argument("'input0_items' is 0");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::vector<std::string>> input0_buffer;
 
-        input0_buffer.reserve(input0_items);
+        input0_buffer.reserve(input_items);
 
-        while(input0_buffer.size() < input0_items) {
+        while(input0_buffer.size() < input_items) {
             if(*input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' element is null");
             if(*input0_ptr_items == 0) throw std::invalid_argument("'input0_ptr_items' element is 0");
 
@@ -4222,10 +4429,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_float_FitBuffer(/*in*/
         }
 
         if(input1_ptr == nullptr) throw std::invalid_argument("'input1_ptr' is null");
-        if(input1_items == 0) throw std::invalid_argument("'input1_items' is 0");
-
-
-        if(input1_items != input0_items) throw std::invalid_argument("'input1_items' != 'input0_items'");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -4236,12 +4440,12 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_float_FitBuffer(/*in*/
 
         std::vector<typename make_tuple_elements_const_references<std::tuple<std::vector<std::string>, std::float_t>>::type> input_buffer;
 
-        input_buffer.reserve(input0_items);
+        input_buffer.reserve(input_items);
 
         auto * input0_creation_ptr(input0_buffer.data());
         auto * input1_creation_ptr(input1_ptr);
 
-        while(input_buffer.size() < input0_items) {
+        while(input_buffer.size() < input_items) {
             input_buffer.emplace_back(*input0_creation_ptr, *input1_creation_ptr);
             ++input0_creation_ptr;
             ++input1_creation_ptr;
@@ -4431,23 +4635,32 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_float_Transform(/*in*/
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::float_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::float_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(std::make_tuple(input0_buffer, input1)));
+        TransformedType result(transformer.execute(InputType(input0_buffer, input1)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new float[result.size()];
-        *output_items = result.size();
-
-        float * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new float[result.size()];
+
+            float * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4485,33 +4698,48 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_float_Flush(/*in*/ Sim
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new float *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        float ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new float[result_item.size()];
-            *output_item_items = result_item.size();
-
-            float * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new float *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            float ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new float[result_item.size()];
+
+                    float * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4521,20 +4749,22 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_float_Flush(/*in*/ Sim
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_float_DestroyTransformedData(/*out*/ float const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_float_DestroyTransformedData(/*out*/ float * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -4662,9 +4892,11 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_double_Fit(/*in*/ Simp
             ++input0_ptr;
         }
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::double_t>::InputType;
+
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input0_buffer, input1)));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(InputType(input0_buffer, input1)));
     
         return true;
     }
@@ -4674,7 +4906,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_double_Fit(/*in*/ Simp
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_double_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_double_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ double const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_double_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_double_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ double const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -4686,13 +4918,13 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_double_FitBuffer(/*in*
 
         if(input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' is null");
         if(input0_ptr_items == nullptr) throw std::invalid_argument("'input0_ptr_items' is null");
-        if(input0_items == 0) throw std::invalid_argument("'input0_items' is 0");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::vector<std::string>> input0_buffer;
 
-        input0_buffer.reserve(input0_items);
+        input0_buffer.reserve(input_items);
 
-        while(input0_buffer.size() < input0_items) {
+        while(input0_buffer.size() < input_items) {
             if(*input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' element is null");
             if(*input0_ptr_items == 0) throw std::invalid_argument("'input0_ptr_items' element is 0");
 
@@ -4714,10 +4946,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_double_FitBuffer(/*in*
         }
 
         if(input1_ptr == nullptr) throw std::invalid_argument("'input1_ptr' is null");
-        if(input1_items == 0) throw std::invalid_argument("'input1_items' is 0");
-
-
-        if(input1_items != input0_items) throw std::invalid_argument("'input1_items' != 'input0_items'");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -4728,12 +4957,12 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_double_FitBuffer(/*in*
 
         std::vector<typename make_tuple_elements_const_references<std::tuple<std::vector<std::string>, std::double_t>>::type> input_buffer;
 
-        input_buffer.reserve(input0_items);
+        input_buffer.reserve(input_items);
 
         auto * input0_creation_ptr(input0_buffer.data());
         auto * input1_creation_ptr(input1_ptr);
 
-        while(input_buffer.size() < input0_items) {
+        while(input_buffer.size() < input_items) {
             input_buffer.emplace_back(*input0_creation_ptr, *input1_creation_ptr);
             ++input0_creation_ptr;
             ++input1_creation_ptr;
@@ -4923,23 +5152,32 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_double_Transform(/*in*
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::double_t>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(std::make_tuple(input0_buffer, input1)));
+        TransformedType result(transformer.execute(InputType(input0_buffer, input1)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4977,33 +5215,48 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_double_Flush(/*in*/ Si
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new double *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        double ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new double[result_item.size()];
-            *output_item_items = result_item.size();
-
-            double * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new double *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            double ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new double[result_item.size()];
+
+                    double * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -5013,20 +5266,22 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_double_Flush(/*in*/ Si
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_double_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_double_DestroyTransformedData(/*out*/ double * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -5156,9 +5411,11 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_Fit(/*in*/ Simp
 
         if(input1 == nullptr) throw std::invalid_argument("'input1' is null");
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::string>::InputType;
+
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input0_buffer, std::string(input1))));
+        *pFitResult = static_cast<unsigned char>(estimator.fit(InputType(input0_buffer, std::string(input1))));
     
         return true;
     }
@@ -5168,7 +5425,7 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_Fit(/*in*/ Simp
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ char const * const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_FitBuffer(/*in*/ SimpleRollingWindowFeaturizer_string_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ char const * const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -5180,13 +5437,13 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_FitBuffer(/*in*
 
         if(input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' is null");
         if(input0_ptr_items == nullptr) throw std::invalid_argument("'input0_ptr_items' is null");
-        if(input0_items == 0) throw std::invalid_argument("'input0_items' is 0");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::vector<std::string>> input0_buffer;
 
-        input0_buffer.reserve(input0_items);
+        input0_buffer.reserve(input_items);
 
-        while(input0_buffer.size() < input0_items) {
+        while(input0_buffer.size() < input_items) {
             if(*input0_ptrs == nullptr) throw std::invalid_argument("'input0_ptrs' element is null");
             if(*input0_ptr_items == 0) throw std::invalid_argument("'input0_ptr_items' element is 0");
 
@@ -5208,20 +5465,16 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_FitBuffer(/*in*
         }
 
         if(input1_ptr == nullptr) throw std::invalid_argument("'input1_ptr' is null");
-        if(input1_items == 0) throw std::invalid_argument("'input1_items' is 0");
+        if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::string> input1_buffer;
 
-        input1_buffer.reserve(input1_items);
+        input1_buffer.reserve(input_items);
 
-        while(input1_buffer.size() < input1_items) {
+        while(input1_buffer.size() < input_items) {
             input1_buffer.emplace_back(*input1_ptr);
             ++input1_ptr;
         }
-
-
-
-        if(input1_items != input0_items) throw std::invalid_argument("'input1_items' != 'input0_items'");
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -5232,12 +5485,12 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_FitBuffer(/*in*
 
         std::vector<typename make_tuple_elements_const_references<std::tuple<std::vector<std::string>, std::string>>::type> input_buffer;
 
-        input_buffer.reserve(input0_items);
+        input_buffer.reserve(input_items);
 
         auto * input0_creation_ptr(input0_buffer.data());
         auto * input1_creation_ptr(input1_buffer.data());
 
-        while(input_buffer.size() < input0_items) {
+        while(input_buffer.size() < input_items) {
             input_buffer.emplace_back(*input0_creation_ptr, *input1_creation_ptr);
             ++input0_creation_ptr;
             ++input1_creation_ptr;
@@ -5429,36 +5682,43 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_Transform(/*in*
 
         Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::string>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::string>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::string>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::GrainedSimpleRollingWindowEstimator<std::string>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(std::make_tuple(input0_buffer, std::string(input1))));
+        TransformedType result(transformer.execute(InputType(input0_buffer, std::string(input1))));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new char const *[result.size()];
-        *output_items = result.size();
-
-        char const ** output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-
-            if(!result_item) {
-                *output_item = nullptr;
-            }
-            else {
-                std::string const & result_item_temp(*result_item);
-                char * string_buffer(new char[result_item_temp.size() + 1]);
-
-                std::copy(result_item_temp.begin(), result_item_temp.end(), string_buffer);
-                string_buffer[result_item_temp.size()] = 0;
-
-                *output_item = string_buffer;
-            }
-
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new char const *[result.size()];
+
+            char const ** output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                if(!result_item) {
+                    *output_item = nullptr;
+                }
+                else {
+                    std::string const & result_item_temp(*result_item);
+                    char * string_buffer(new char[result_item_temp.size() + 1]);
+
+                    std::copy(result_item_temp.begin(), result_item_temp.end(), string_buffer);
+                    string_buffer[result_item_temp.size()] = 0;
+
+                    *output_item = string_buffer;
+                }
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -5496,46 +5756,59 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_Flush(/*in*/ Si
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new char const **[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        char const *** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
+        }
+        else {
             // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new char const *[result_item.size()];
-            *output_item_items = result_item.size();
+            *output_item_item_ptr_ptr = new char const **[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
 
-            char const ** output_item_item(*output_item_item_ptr);
+            char const *** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
 
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
 
-                if(!result_item_item) {
-                    *output_item_item = nullptr;
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
                 }
                 else {
-                    std::string const & result_item_item_temp(*result_item_item);
-                    char * string_buffer(new char[result_item_item_temp.size() + 1]);
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new char const *[result_item.size()];
 
-                    std::copy(result_item_item_temp.begin(), result_item_item_temp.end(), string_buffer);
-                    string_buffer[result_item_item_temp.size()] = 0;
+                    char const ** output_item_item(*output_item_item_ptr);
 
-                    *output_item_item = string_buffer;
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        if(!result_item_item) {
+                            *output_item_item = nullptr;
+                        }
+                        else {
+                            std::string const & result_item_item_temp(*result_item_item);
+                            char * string_buffer(new char[result_item_item_temp.size() + 1]);
+
+                            std::copy(result_item_item_temp.begin(), result_item_item_temp.end(), string_buffer);
+                            string_buffer[result_item_item_temp.size()] = 0;
+
+                            *output_item_item = string_buffer;
+                        }
+
+                        ++output_item_item;
+                    }
                 }
 
-                ++output_item_item;
-            }
+                *output_item_items = result_item.size();
 
-            ++output_item_item_ptr;
-            ++output_item_items;
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
         }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -5545,31 +5818,33 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_Flush(/*in*/ Si
     }
 }
 
-FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_DestroyTransformedData(/*out*/ char const * const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_DestroyTransformedData(/*out*/ char const ** result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            char const ** this_result_item_ptr(result_item_ptr);
 
-        if(result_items == 0)
-            return true;
+            while(result_items--) {
+                char const * const & result_destroy_item(*this_result_item_ptr);
 
-        char const * const * result_ptr_item(result_ptr);
+                // No validation statements
 
-        for(size_t ctr=0; ctr < result_items; ++ctr) {
-            char const * result_item(*result_ptr_item);
+                if(result_destroy_item)
+                    delete [] result_destroy_item;
 
-            if(result_item)
-                delete [] result_item;
+                ++this_result_item_ptr;
+            }
 
-            ++result_ptr_item;
+            delete [] result_item_ptr;
         }
-
-        delete [] result_ptr;
     
         return true;
     }
@@ -5579,6 +5854,10 @@ FEATURIZER_LIBRARY_API bool SimpleRollingWindowFeaturizer_string_DestroyTransfor
     }
 }
 
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)

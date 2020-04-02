@@ -74,6 +74,9 @@ class TupleTypeInfo(TypeInfo):
         self,
         input_name="input",
     ):
+        if self.IsOptional:
+            raise NotImplementedError("Optional tuples are not supported at this time")
+
         parameters = []
         prefix_statements = []
 
@@ -101,13 +104,37 @@ class TupleTypeInfo(TypeInfo):
     @Interface.override
     def GetOutputInfo(
         self,
+        invocation_template,
         result_name="result",
     ):
+        if self.IsOptional:
+            raise NotImplementedError("Optional tuples are not supported at this time")
+
+        tuple_elements = []
+        local_variables = []
+        append_result_statements = []
+        destroy_arguments = []
+
+        for index, type_info in enumerate(self._type_infos):
+            # This may ultimately need to use something like the SharedLibraryPlugin's _InvocationTemplate and
+            # _ExtractDecoratedInvocationStatements for those types with very complicated initialization semantics.
+
+            result = type_info.GetOutputInfo(
+                "{}",
+                result_name="{}{}".format(result_name, index),
+            )
+
+            tuple_elements.append(type_info.CppType)
+            local_variables += result.TransformVars
+            append_result_statements.append(result.AppendResultStatement)
+
+            if result.DestroyArgs:
+                destroy_arguments.append(result.DestroyArgs)
+
         return self.Result(
-            "TODO1",
-            [self.Type("TODO2,1", "TODO2.2")],
-            "TODO3",
-            "TODO4",
-            "TODO5",
+            "std::tuple<{}>".format(", ".join(tuple_elements)),
+            local_variables,
+            invocation_template.format(", ".join(append_result_statements)),
+            None if not destroy_arguments else ", ".join(destroy_arguments),
             destroy_inline=True,
         )
