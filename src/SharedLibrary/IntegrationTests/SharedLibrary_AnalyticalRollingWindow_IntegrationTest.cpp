@@ -8,19 +8,20 @@
 #include "GeneratedCode/SharedLibraryTests_AnalyticalRollingWindowFeaturizer.h"
 #include "../../3rdParty/optional.h"
 
-TEST_CASE("Min - int32, window size 2, horizon 3") {
+TEST_CASE("Mean - double, window size 2, horizon 3") {
     std::vector<std::string> const          grain1{ "one" };
     std::vector<std::string> const          grain2{ "one", "two" };
     std::vector<std::string> const          grain3{ "one", "two", "three" };
     std::vector<std::string> const          grain4{ "completely_different" };
-    int32_t const                           value1(1);
-    int32_t const                           value2(2);
-    int32_t const                           value3(3);
-    int32_t const                           value4(4);
+    double const                            value1(1);
+    double const                            value2(2);
+    double const                            value3(3);
+    double const                            value4(4);
+    uint32_t const                          horizon(3);
 
-    AnalyticalRollingWindowFeaturizer_int32_Test(
-        std::vector<std::tuple<std::vector<std::string> const &, int32_t const &>>(),
-        std::vector<std::tuple<std::vector<std::string> const &, int32_t const &>>{
+    AnalyticalRollingWindowFeaturizer_double_Test(
+        std::vector<std::tuple<std::vector<std::string> const &, double const &>>(),
+        std::vector<std::tuple<std::vector<std::string> const &, double const &>>{
             std::make_tuple(grain1, value1),
             std::make_tuple(grain1, value2),
             std::make_tuple(grain1, value3),
@@ -44,53 +45,258 @@ TEST_CASE("Min - int32, window size 2, horizon 3") {
             std::make_tuple(grain4, value3),
             std::make_tuple(grain4, value4)
         },
-        [](std::vector<std::vector<double>> const &args) {
-            // NaN values always compare as false, so we have to creatively compare.
-            std::vector<std::vector<double>> const      other{
-                std::vector<double>{ Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue() },
-                std::vector<double>{ Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1.0 },
-                std::vector<double>{ Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1.0, 1.5 },
-                std::vector<double>{ 1.0, 1.5, 2.5 },
+        [&horizon](std::vector<Microsoft::Featurizer::RowMajMatrix<double>> const &args) -> bool {
+            auto const                      createMatrixFunc(
+                [&horizon](std::vector<double> values) {
+                    assert(values.size() % horizon == 0);
 
-                std::vector<double>{ Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue() },
-                std::vector<double>{ Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1 },
-                std::vector<double>{ Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1.0, 1.5 },
+                    size_t const                                            numRows(values.size() / horizon);
+                    double const *                                          ptr(values.data());
+                    Microsoft::Featurizer::RowMajMatrix<double>             result(numRows, horizon);
 
-                std::vector<double>{ Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue() },
-                std::vector<double>{ Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1 },
-
-                std::vector<double>{ Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue() },
-
-                std::vector<double>{ 1.0, 1.5, 2.5 },
-
-                std::vector<double>{ Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1.0, 1.5 },
-                std::vector<double>{ 1.0, 1.5, 2.5 },
-
-                std::vector<double>{ Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1 },
-                std::vector<double>{ Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1.0, 1.5 },
-                std::vector<double>{ 1.0, 1.5, 2.5 }
-            };
-
-            CHECK(args.size() == other.size());
-
-            for(size_t row = 0; row < args.size(); ++row) {
-                std::vector<double> const &             v1(args[row]);
-                std::vector<double> const &             v2(other[row]);
-
-                REQUIRE(v1.size() == v2.size());
-
-                for(size_t col = 0; col < v1.size(); ++col) {
-                    double const &          d1(v1[col]);
-                    double const &          d2(v2[col]);
-
-                    if(Microsoft::Featurizer::Traits<double>::IsNull(d1)) {
-                        CHECK(Microsoft::Featurizer::Traits<double>::IsNull(d2));
+                    for(size_t row = 0; row < numRows; ++row) {
+                        for(size_t col = 0; col < horizon; ++col) {
+                            result(static_cast<Eigen::Index>(row), static_cast<Eigen::Index>(col)) = *ptr++;
+                        }
                     }
-                    else {
-                        CHECK(Approx(d1) == d2);
-                    }
+
+                    return result;
                 }
-            }
+            );
+            
+            auto const                      compareFunc(
+                [](Microsoft::Featurizer::RowMajMatrix<double> const &actualMatrix, Microsoft::Featurizer::RowMajMatrix<double> const &expectedMatrix) {
+                    REQUIRE(actualMatrix.rows() == expectedMatrix.rows());
+                    REQUIRE(actualMatrix.cols() == expectedMatrix.cols());
+
+                    for(Eigen::Index row = 0; row < actualMatrix.rows(); ++row) {
+                        for(Eigen::Index col = 0; col < actualMatrix.cols(); ++col) {
+                            double const &  actual(actualMatrix(row, col));
+                            double const &  expected(expectedMatrix(row, col));
+
+                            if(
+                                (Microsoft::Featurizer::Traits<double>::IsNull(actual) ^ Microsoft::Featurizer::Traits<double>::IsNull(expected))
+                                || (Microsoft::Featurizer::Traits<double>::IsNull(actual) == false && Approx(actual) != expected)
+                            ) {
+                                // Compare using Catch2's matrix statement so that we get nice output
+                                CHECK(actualMatrix == expectedMatrix);
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                }
+            );
+            REQUIRE(args.size() == 16);
+
+            CHECK(args[0].rows() == 1);
+            CHECK(args[0].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[0],
+                    createMatrixFunc(
+                        {
+                            Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue()
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[1].rows() == 1);
+            CHECK(args[1].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[1],
+                    createMatrixFunc(
+                        {
+                            Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1.0
+                        }
+                    )
+                )
+            );
+
+            CHECK(args[2].rows() == 1);
+            CHECK(args[2].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[2],
+                    createMatrixFunc(
+                        {
+                            Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1.0, 1.5
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[3].rows() == 1);
+            CHECK(args[3].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[3],
+                    createMatrixFunc(
+                        {
+                            1.0, 1.5, 2.5
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[4].rows() == 1);
+            CHECK(args[4].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[4],
+                    createMatrixFunc(
+                        {
+                            Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue()
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[5].rows() == 1);
+            CHECK(args[5].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[5],
+                    createMatrixFunc(
+                        {
+                            Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1
+                        }
+                    )
+                )
+            );
+
+            CHECK(args[6].rows() == 1);
+            CHECK(args[6].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[6],
+                    createMatrixFunc(
+                        {
+                            Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1.0, 1.5
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[7].rows() == 1);
+            CHECK(args[7].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[7],
+                    createMatrixFunc(
+                        {
+                            Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue()
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[8].rows() == 1);
+            CHECK(args[8].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[8],
+                    createMatrixFunc(
+                        {
+                            Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[9].rows() == 1);
+            CHECK(args[9].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[9],
+                    createMatrixFunc(
+                        {
+                            Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue()
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[10].rows() == 1);
+            CHECK(args[10].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[10],
+                    createMatrixFunc(
+                        {
+                            1.0, 1.5, 2.5
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[11].rows() == 1);
+            CHECK(args[11].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[11],
+                    createMatrixFunc(
+                        {
+                            Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1.0, 1.5
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[12].rows() == 1);
+            CHECK(args[12].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[12],
+                    createMatrixFunc(
+                        {
+                            1.0, 1.5, 2.5
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[13].rows() == 1);
+            CHECK(args[13].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[13],
+                    createMatrixFunc(
+                        {
+                            Microsoft::Featurizer::Traits<double>::CreateNullValue(), Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[14].rows() == 1);
+            CHECK(args[14].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[14],
+                    createMatrixFunc(
+                        {
+                            Microsoft::Featurizer::Traits<double>::CreateNullValue(), 1.0, 1.5
+                        }
+                    )
+                )
+            );
+            
+            CHECK(args[15].rows() == 1);
+            CHECK(args[15].cols() == horizon);
+            CHECK(
+                compareFunc(
+                    args[15],
+                    createMatrixFunc(
+                        {
+                            1.0, 1.5, 2.5
+                        }
+                    )
+                )
+            );
             return true;
         },
         static_cast<AnalyticalRollingWindowFeaturizer_AnalyticalRollingWindowCalculationType>(AnalyticalRollingWindowFeaturizer_AnalyticalRollingWindowCalculation_Mean),

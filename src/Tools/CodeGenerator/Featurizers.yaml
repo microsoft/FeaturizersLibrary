@@ -45,16 +45,20 @@ featurizers:
     templates:
       - name: T
         types:
-            - int8
-            - int16
-            - int32
-            - int64
-            - uint8
-            - uint16
-            - uint32
-            - uint64
-            - float
-            - double
+          # Note that optional values during output increase quite a bit of overhead when marshalling, therefore
+          # this featurizer only supports those types that don't have to pay that penality. We may still want to support
+          # these types in the future in some frameworks.
+          #
+          # - int8
+          # - int16
+          # - int32
+          # - int64
+          # - uint8
+          # - uint16
+          # - uint32
+          # - uint64
+          - float
+          - double
 
     type_mappings:
       - input_type: tuple<unique_id, T>
@@ -1425,17 +1429,21 @@ featurizers:
     templates:
       - name: T
         types:
-          - int8
-          - int16
-          - int32
-          - int64
-          - uint8
-          - uint16
-          - uint32
-          - uint64
+          # Note that optional values during output increase quite a bit of overhead when marshalling, therefore
+          # this featurizer only supports those types that don't have to pay that penality. We may still want to support
+          # these types in the future in some frameworks.
+          #
+          # - int8
+          # - int16
+          # - int32
+          # - int64
+          # - uint8
+          # - uint16
+          # - uint32
+          # - uint64
+          # - string
           - float
           - double
-          - string
 
     type_mappings:
       - input_type: tuple<unique_id, T>
