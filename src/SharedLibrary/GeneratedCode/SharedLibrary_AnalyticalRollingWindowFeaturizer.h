@@ -27,7 +27,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_DestroyEstima
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_GetState(/*in*/ AnalyticalRollingWindowFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_IsTrainingComplete(/*in*/ AnalyticalRollingWindowFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_Fit(/*in*/ AnalyticalRollingWindowFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ int8_t input1, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ int8_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ int8_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_OnDataCompleted(/*in*/ AnalyticalRollingWindowFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_CompleteTraining(/*in*/ AnalyticalRollingWindowFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -40,7 +40,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_CreateTransfo
 
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_Transform(/*in*/ AnalyticalRollingWindowFeaturizer_int8_TransformerHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ int8_t input1, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_Flush(/*in*/ AnalyticalRollingWindowFeaturizer_int8_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int8_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  AnalyticalRollingWindowFeaturizer <int16> */
@@ -54,7 +54,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_DestroyEstim
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_GetState(/*in*/ AnalyticalRollingWindowFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_IsTrainingComplete(/*in*/ AnalyticalRollingWindowFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_Fit(/*in*/ AnalyticalRollingWindowFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ int16_t input1, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ int16_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ int16_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_OnDataCompleted(/*in*/ AnalyticalRollingWindowFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_CompleteTraining(/*in*/ AnalyticalRollingWindowFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -67,7 +67,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_CreateTransf
 
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_Transform(/*in*/ AnalyticalRollingWindowFeaturizer_int16_TransformerHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ int16_t input1, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_Flush(/*in*/ AnalyticalRollingWindowFeaturizer_int16_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int16_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  AnalyticalRollingWindowFeaturizer <int32> */
@@ -81,7 +81,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_DestroyEstim
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_GetState(/*in*/ AnalyticalRollingWindowFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_IsTrainingComplete(/*in*/ AnalyticalRollingWindowFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_Fit(/*in*/ AnalyticalRollingWindowFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ int32_t input1, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ int32_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ int32_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_OnDataCompleted(/*in*/ AnalyticalRollingWindowFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_CompleteTraining(/*in*/ AnalyticalRollingWindowFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -94,7 +94,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_CreateTransf
 
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_Transform(/*in*/ AnalyticalRollingWindowFeaturizer_int32_TransformerHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ int32_t input1, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_Flush(/*in*/ AnalyticalRollingWindowFeaturizer_int32_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int32_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  AnalyticalRollingWindowFeaturizer <int64> */
@@ -108,7 +108,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_DestroyEstim
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_GetState(/*in*/ AnalyticalRollingWindowFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_IsTrainingComplete(/*in*/ AnalyticalRollingWindowFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_Fit(/*in*/ AnalyticalRollingWindowFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ int64_t input1, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ int64_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ int64_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_OnDataCompleted(/*in*/ AnalyticalRollingWindowFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_CompleteTraining(/*in*/ AnalyticalRollingWindowFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -121,7 +121,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_CreateTransf
 
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_Transform(/*in*/ AnalyticalRollingWindowFeaturizer_int64_TransformerHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ int64_t input1, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_Flush(/*in*/ AnalyticalRollingWindowFeaturizer_int64_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_int64_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  AnalyticalRollingWindowFeaturizer <uint8> */
@@ -135,7 +135,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_DestroyEstim
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_GetState(/*in*/ AnalyticalRollingWindowFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_IsTrainingComplete(/*in*/ AnalyticalRollingWindowFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_Fit(/*in*/ AnalyticalRollingWindowFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ uint8_t input1, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ uint8_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ uint8_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_OnDataCompleted(/*in*/ AnalyticalRollingWindowFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_CompleteTraining(/*in*/ AnalyticalRollingWindowFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -148,7 +148,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_CreateTransf
 
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_Transform(/*in*/ AnalyticalRollingWindowFeaturizer_uint8_TransformerHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ uint8_t input1, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_Flush(/*in*/ AnalyticalRollingWindowFeaturizer_uint8_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint8_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  AnalyticalRollingWindowFeaturizer <uint16> */
@@ -162,7 +162,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_DestroyEsti
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_GetState(/*in*/ AnalyticalRollingWindowFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_IsTrainingComplete(/*in*/ AnalyticalRollingWindowFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_Fit(/*in*/ AnalyticalRollingWindowFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ uint16_t input1, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ uint16_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ uint16_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_OnDataCompleted(/*in*/ AnalyticalRollingWindowFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_CompleteTraining(/*in*/ AnalyticalRollingWindowFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -175,7 +175,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_CreateTrans
 
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_Transform(/*in*/ AnalyticalRollingWindowFeaturizer_uint16_TransformerHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ uint16_t input1, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_Flush(/*in*/ AnalyticalRollingWindowFeaturizer_uint16_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint16_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  AnalyticalRollingWindowFeaturizer <uint32> */
@@ -189,7 +189,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_DestroyEsti
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_GetState(/*in*/ AnalyticalRollingWindowFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_IsTrainingComplete(/*in*/ AnalyticalRollingWindowFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_Fit(/*in*/ AnalyticalRollingWindowFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ uint32_t input1, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ uint32_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ uint32_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_OnDataCompleted(/*in*/ AnalyticalRollingWindowFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_CompleteTraining(/*in*/ AnalyticalRollingWindowFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -202,7 +202,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_CreateTrans
 
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_Transform(/*in*/ AnalyticalRollingWindowFeaturizer_uint32_TransformerHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ uint32_t input1, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_Flush(/*in*/ AnalyticalRollingWindowFeaturizer_uint32_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint32_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  AnalyticalRollingWindowFeaturizer <uint64> */
@@ -216,7 +216,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_DestroyEsti
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_GetState(/*in*/ AnalyticalRollingWindowFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_IsTrainingComplete(/*in*/ AnalyticalRollingWindowFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_Fit(/*in*/ AnalyticalRollingWindowFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ uint64_t input1, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ uint64_t const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ uint64_t const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_OnDataCompleted(/*in*/ AnalyticalRollingWindowFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_CompleteTraining(/*in*/ AnalyticalRollingWindowFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -229,7 +229,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_CreateTrans
 
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_Transform(/*in*/ AnalyticalRollingWindowFeaturizer_uint64_TransformerHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ uint64_t input1, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_Flush(/*in*/ AnalyticalRollingWindowFeaturizer_uint64_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_uint64_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  AnalyticalRollingWindowFeaturizer <float> */
@@ -243,7 +243,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_DestroyEstim
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_GetState(/*in*/ AnalyticalRollingWindowFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_IsTrainingComplete(/*in*/ AnalyticalRollingWindowFeaturizer_float_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_Fit(/*in*/ AnalyticalRollingWindowFeaturizer_float_EstimatorHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ float input1, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_float_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ float const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_float_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ float const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_OnDataCompleted(/*in*/ AnalyticalRollingWindowFeaturizer_float_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_CompleteTraining(/*in*/ AnalyticalRollingWindowFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -256,7 +256,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_CreateTransf
 
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_Transform(/*in*/ AnalyticalRollingWindowFeaturizer_float_TransformerHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ float input1, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_Flush(/*in*/ AnalyticalRollingWindowFeaturizer_float_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_float_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 /* ---------------------------------------------------------------------- */
 /* |  AnalyticalRollingWindowFeaturizer <double> */
@@ -270,7 +270,7 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_DestroyEsti
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_GetState(/*in*/ AnalyticalRollingWindowFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_IsTrainingComplete(/*in*/ AnalyticalRollingWindowFeaturizer_double_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_Fit(/*in*/ AnalyticalRollingWindowFeaturizer_double_EstimatorHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ double input1, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_double_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ size_t input0_items, /*in*/ double const * input1_ptr, /*in*/ size_t input1_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_FitBuffer(/*in*/ AnalyticalRollingWindowFeaturizer_double_EstimatorHandle *pHandle, /*in*/ char const * const * const * input0_ptrs, /*in*/ size_t const * input0_ptr_items, /*in*/ double const * input1_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_OnDataCompleted(/*in*/ AnalyticalRollingWindowFeaturizer_double_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_CompleteTraining(/*in*/ AnalyticalRollingWindowFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -283,6 +283,6 @@ FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_CreateTrans
 
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_Transform(/*in*/ AnalyticalRollingWindowFeaturizer_double_TransformerHandle *pHandle, /*in*/ char const * const * input0_ptr, /*in*/ size_t input0_items, /*in*/ double input1, /*out*/ double ** output_item_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_Flush(/*in*/ AnalyticalRollingWindowFeaturizer_double_TransformerHandle *pHandle, /*out*/ double *** output_item_item_ptr_ptr, /*out*/ size_t ** output_item_items_ptr, /*out*/ size_t * output_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_DestroyTransformedData(/*in*/ double const * result_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool AnalyticalRollingWindowFeaturizer_double_DestroyTransformedData(/*in*/ double * result_item_ptr, /*in*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 } // extern "C"

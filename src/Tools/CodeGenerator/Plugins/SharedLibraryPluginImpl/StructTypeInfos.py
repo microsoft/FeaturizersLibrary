@@ -57,7 +57,12 @@ class _StructTypeInfo(TypeInfo):
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetInputBufferInfo(self, arg_name, invocation_template):
+    def GetInputBufferInfo(
+        self,
+        arg_name,
+        invocation_template,
+        items_var_name=None,
+    ):
         raise Exception("'{}' is only used as a OutputType".format(self.TypeName))
 
     # ----------------------------------------------------------------------

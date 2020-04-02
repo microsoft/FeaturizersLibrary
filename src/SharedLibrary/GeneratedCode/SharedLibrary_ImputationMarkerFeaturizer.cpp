@@ -17,6 +17,11 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunused-local-typedef"
+#endif
+
 #if (defined _MSC_VER)
 #   pragma warning(push)
 
@@ -135,6 +140,8 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_Fit(/*in*/ Imputatio
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -345,6 +352,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_Transform(/*in*/ Imp
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int8_t>::TransformedType;
 
         // Input
@@ -388,17 +396,25 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int8_Flush(/*in*/ Imputat
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -515,6 +531,8 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_Fit(/*in*/ Imputati
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -725,6 +743,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_Transform(/*in*/ Im
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int16_t>::TransformedType;
 
         // Input
@@ -768,17 +787,25 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int16_Flush(/*in*/ Imputa
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -895,6 +922,8 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_Fit(/*in*/ Imputati
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1105,6 +1134,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_Transform(/*in*/ Im
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int32_t>::TransformedType;
 
         // Input
@@ -1148,17 +1178,25 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int32_Flush(/*in*/ Imputa
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1275,6 +1313,8 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_Fit(/*in*/ Imputati
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1485,6 +1525,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_Transform(/*in*/ Im
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::int64_t>::TransformedType;
 
         // Input
@@ -1528,17 +1569,25 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_int64_Flush(/*in*/ Imputa
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1655,6 +1704,8 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_Fit(/*in*/ Imputati
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1865,6 +1916,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_Transform(/*in*/ Im
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint8_t>::TransformedType;
 
         // Input
@@ -1908,17 +1960,25 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint8_Flush(/*in*/ Imputa
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2035,6 +2095,8 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_Fit(/*in*/ Imputat
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2245,6 +2307,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_Transform(/*in*/ I
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint16_t>::TransformedType;
 
         // Input
@@ -2288,17 +2351,25 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint16_Flush(/*in*/ Imput
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2415,6 +2486,8 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_Fit(/*in*/ Imputat
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2625,6 +2698,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_Transform(/*in*/ I
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint32_t>::TransformedType;
 
         // Input
@@ -2668,17 +2742,25 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint32_Flush(/*in*/ Imput
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2795,6 +2877,8 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_Fit(/*in*/ Imputat
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3005,6 +3089,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_Transform(/*in*/ I
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::uint64_t>::TransformedType;
 
         // Input
@@ -3048,17 +3133,25 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_uint64_Flush(/*in*/ Imput
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3175,6 +3268,8 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Fit(/*in*/ Imputati
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3376,6 +3471,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Transform(/*in*/ Im
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::float_t>::TransformedType;
 
         // Input
@@ -3419,17 +3515,25 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_float_Flush(/*in*/ Imputa
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3546,6 +3650,8 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Fit(/*in*/ Imputat
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3747,6 +3853,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Transform(/*in*/ I
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::double_t>::TransformedType;
 
         // Input
@@ -3790,17 +3897,25 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_double_Flush(/*in*/ Imput
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3917,6 +4032,8 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_Fit(/*in*/ Imputatio
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>::InputType;
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -4127,6 +4244,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_Transform(/*in*/ Imp
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<bool>::TransformedType;
 
         // Input
@@ -4170,17 +4288,25 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_bool_Flush(/*in*/ Imputat
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4297,6 +4423,8 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_Fit(/*in*/ Imputat
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>::InputType;
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -4507,6 +4635,7 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_Transform(/*in*/ I
 
         Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ImputationMarkerEstimator<std::string>::TransformedType;
 
         // Input
@@ -4550,17 +4679,25 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_Flush(/*in*/ Imput
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4570,6 +4707,10 @@ FEATURIZER_LIBRARY_API bool ImputationMarkerFeaturizer_string_Flush(/*in*/ Imput
     }
 }
 
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)

@@ -9,7 +9,7 @@
 #include "Traits.h"
 #include "Featurizers/Structs.h"
 
-#include "SharedLibrary_Common.hpp"
+#include "SharedLibraryTests_Common.hpp"
 
 #if (defined _MSC_VER)
 #   pragma warning(push)
@@ -28,7 +28,7 @@ template <typename VectorInputT>
 void TruncatedSVDFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<Eigen::MatrixX<std::float_t>> const &)> const &verify_func
+    std::function<bool (std::vector<Microsoft::Featurizer::RowMajMatrix<std::float_t>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -97,7 +97,7 @@ void TruncatedSVDFeaturizer_float_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<Eigen::MatrixX<std::float_t>> results;
+    std::vector<Microsoft::Featurizer::RowMajMatrix<std::float_t>> results;
 
     results.reserve(inference_input.size());
 
@@ -109,7 +109,7 @@ void TruncatedSVDFeaturizer_float_Test(
         REQUIRE(TruncatedSVDFeaturizer_float_Transform(pTransformerHandle, static_cast<size_t>(input.cols()), static_cast<size_t>(input.rows()), input.data(), &result_cols, &result_rows, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(Eigen::Map<Eigen::MatrixX<std::float_t>>(result_ptr, static_cast<Eigen::Index>(result_cols), static_cast<Eigen::Index>(result_rows)));
+        results.emplace_back(CreateMatrix(result_cols, result_rows, result_ptr));
         
         // Destroy the contents
         REQUIRE(TruncatedSVDFeaturizer_float_DestroyTransformedData(result_cols, result_rows, result_ptr, &pErrorInfo));
@@ -131,7 +131,7 @@ template <typename VectorInputT>
 void TruncatedSVDFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<Eigen::MatrixX<std::double_t>> const &)> const &verify_func
+    std::function<bool (std::vector<Microsoft::Featurizer::RowMajMatrix<std::double_t>> const &)> const &verify_func
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
@@ -200,7 +200,7 @@ void TruncatedSVDFeaturizer_double_Test(
     REQUIRE(pErrorInfo == nullptr);
 
     // Inference
-    std::vector<Eigen::MatrixX<std::double_t>> results;
+    std::vector<Microsoft::Featurizer::RowMajMatrix<std::double_t>> results;
 
     results.reserve(inference_input.size());
 
@@ -212,7 +212,7 @@ void TruncatedSVDFeaturizer_double_Test(
         REQUIRE(TruncatedSVDFeaturizer_double_Transform(pTransformerHandle, static_cast<size_t>(input.cols()), static_cast<size_t>(input.rows()), input.data(), &result_cols, &result_rows, &result_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(Eigen::Map<Eigen::MatrixX<std::double_t>>(result_ptr, static_cast<Eigen::Index>(result_cols), static_cast<Eigen::Index>(result_rows)));
+        results.emplace_back(CreateMatrix(result_cols, result_rows, result_ptr));
         
         // Destroy the contents
         REQUIRE(TruncatedSVDFeaturizer_double_DestroyTransformedData(result_cols, result_rows, result_ptr, &pErrorInfo));

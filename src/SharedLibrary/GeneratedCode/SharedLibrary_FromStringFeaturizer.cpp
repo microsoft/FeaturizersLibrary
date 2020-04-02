@@ -17,6 +17,11 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunused-local-typedef"
+#endif
+
 #if (defined _MSC_VER)
 #   pragma warning(push)
 
@@ -135,6 +140,8 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int8_Fit(/*in*/ FromStringFeatu
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int8_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int8_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -345,6 +352,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int8_Transform(/*in*/ FromStrin
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int8_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int8_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int8_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int8_t>::TransformedType;
 
         // Input
@@ -388,17 +396,25 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int8_Flush(/*in*/ FromStringFea
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int8_t[result.size()];
-        *output_items = result.size();
-
-        int8_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int8_t[result.size()];
+
+            int8_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -515,6 +531,8 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int16_Fit(/*in*/ FromStringFeat
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int16_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int16_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -725,6 +743,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int16_Transform(/*in*/ FromStri
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int16_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int16_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int16_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int16_t>::TransformedType;
 
         // Input
@@ -768,17 +787,25 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int16_Flush(/*in*/ FromStringFe
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int16_t[result.size()];
-        *output_items = result.size();
-
-        int16_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int16_t[result.size()];
+
+            int16_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -895,6 +922,8 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int32_Fit(/*in*/ FromStringFeat
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int32_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int32_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1105,6 +1134,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int32_Transform(/*in*/ FromStri
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int32_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int32_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int32_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int32_t>::TransformedType;
 
         // Input
@@ -1148,17 +1178,25 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int32_Flush(/*in*/ FromStringFe
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int32_t[result.size()];
-        *output_items = result.size();
-
-        int32_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int32_t[result.size()];
+
+            int32_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1275,6 +1313,8 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int64_Fit(/*in*/ FromStringFeat
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int64_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int64_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1485,6 +1525,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int64_Transform(/*in*/ FromStri
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int64_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int64_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int64_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::int64_t>::TransformedType;
 
         // Input
@@ -1528,17 +1569,25 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int64_Flush(/*in*/ FromStringFe
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new int64_t[result.size()];
-        *output_items = result.size();
-
-        int64_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new int64_t[result.size()];
+
+            int64_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1655,6 +1704,8 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint8_Fit(/*in*/ FromStringFeat
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint8_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint8_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint8_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1865,6 +1916,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint8_Transform(/*in*/ FromStri
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint8_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint8_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint8_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint8_t>::TransformedType;
 
         // Input
@@ -1908,17 +1960,25 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint8_Flush(/*in*/ FromStringFe
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint8_t[result.size()];
-        *output_items = result.size();
-
-        uint8_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint8_t[result.size()];
+
+            uint8_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2035,6 +2095,8 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint16_Fit(/*in*/ FromStringFea
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint16_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint16_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint16_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2245,6 +2307,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint16_Transform(/*in*/ FromStr
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint16_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint16_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint16_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint16_t>::TransformedType;
 
         // Input
@@ -2288,17 +2351,25 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint16_Flush(/*in*/ FromStringF
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint16_t[result.size()];
-        *output_items = result.size();
-
-        uint16_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint16_t[result.size()];
+
+            uint16_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2415,6 +2486,8 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint32_Fit(/*in*/ FromStringFea
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint32_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint32_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint32_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2625,6 +2698,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint32_Transform(/*in*/ FromStr
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint32_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint32_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint32_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint32_t>::TransformedType;
 
         // Input
@@ -2668,17 +2742,25 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint32_Flush(/*in*/ FromStringF
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint32_t[result.size()];
-        *output_items = result.size();
-
-        uint32_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint32_t[result.size()];
+
+            uint32_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2795,6 +2877,8 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint64_Fit(/*in*/ FromStringFea
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint64_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint64_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint64_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3005,6 +3089,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint64_Transform(/*in*/ FromStr
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint64_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint64_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint64_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::uint64_t>::TransformedType;
 
         // Input
@@ -3048,17 +3133,25 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint64_Flush(/*in*/ FromStringF
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new uint64_t[result.size()];
-        *output_items = result.size();
-
-        uint64_t * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new uint64_t[result.size()];
+
+            uint64_t * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3175,6 +3268,8 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_float_Fit(/*in*/ FromStringFeat
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::float_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3385,6 +3480,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_float_Transform(/*in*/ FromStri
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::float_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::float_t>::TransformedType;
 
         // Input
@@ -3428,17 +3524,25 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_float_Flush(/*in*/ FromStringFe
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new float[result.size()];
-        *output_items = result.size();
-
-        float * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new float[result.size()];
+
+            float * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3555,6 +3659,8 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_double_Fit(/*in*/ FromStringFea
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3765,6 +3871,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_double_Transform(/*in*/ FromStr
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::double_t>::TransformedType;
 
         // Input
@@ -3808,17 +3915,25 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_double_Flush(/*in*/ FromStringF
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3935,6 +4050,8 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_Fit(/*in*/ FromStringFeatu
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<bool>::InputType;
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<bool>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -4145,6 +4262,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_Transform(/*in*/ FromStrin
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<bool>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<bool>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<bool>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<bool>::TransformedType;
 
         // Input
@@ -4188,17 +4306,25 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_Flush(/*in*/ FromStringFea
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4315,6 +4441,8 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_Fit(/*in*/ FromStringFea
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input == nullptr) throw std::invalid_argument("'input' is null");
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::InputType;
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -4525,6 +4653,7 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_Transform(/*in*/ FromStr
 
         Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::FromStringEstimator<std::string>::TransformedType;
 
         // Input
@@ -4578,29 +4707,35 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_Flush(/*in*/ FromStringF
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new char const *[result.size()];
-        *output_items = result.size();
-
-        char const ** output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-
-            if(result_item.empty()) {
-                *output_item = nullptr;
-            }
-            else {
-                char * string_buffer(new char[result_item.size() + 1]);
-
-                std::copy(result_item.begin(), result_item.end(), string_buffer);
-                string_buffer[result_item.size()] = 0;
-
-                *output_item = string_buffer;
-            }
-
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new char const *[result.size()];
+
+            char const ** output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                if(result_item.empty()) {
+                    *output_item = nullptr;
+                }
+                else {
+                    char * string_buffer(new char[result_item.size() + 1]);
+
+                    std::copy(result_item.begin(), result_item.end(), string_buffer);
+                    string_buffer[result_item.size()] = 0;
+
+                    *output_item = string_buffer;
+                }
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4630,6 +4765,10 @@ FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_DestroyTransformedData(/
     }
 }
 
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)

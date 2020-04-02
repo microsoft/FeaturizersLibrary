@@ -129,7 +129,9 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    LagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> deltas);
+    template <typename DeltasInputIteratorRangeT>
+    LagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, DeltasInputIteratorRangeT deltas);
+    LagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<int64_t> deltas);
 
     ~LagLeadOperatorEstimator(void) override = default;
 
@@ -176,14 +178,18 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType = Components::GrainEstimatorImpl<std::vector<std::string>, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>>;
+    using GrainType = std::vector<std::string>;
+
+    using BaseType = Components::GrainEstimatorImpl<GrainType, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>>;
 
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> deltas);
+    template <typename DeltasInputIteratorRangeT>
+    GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, DeltasInputIteratorRangeT deltas);
+    GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<int64_t> deltas);
     ~GrainedLagLeadOperatorEstimator(void) override = default;
 
     FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GrainedLagLeadOperatorEstimator);
@@ -373,7 +379,13 @@ std::int64_t LagLeadOperatorTransformer<T>::get_max_delta() {
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, size_t MaxNumTrainingItemsV>
-LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::LagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> deltas) :
+template <typename DeltasInputIteratorRangeT>
+LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::LagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, DeltasInputIteratorRangeT deltas) :
+    LagLeadOperatorEstimator(std::move(pAllColumnAnnotations), std::move(horizon), std::vector<int64_t>(std::get<0>(deltas), std::get<1>(deltas)))
+{}
+
+template <typename InputT, size_t MaxNumTrainingItemsV>
+LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::LagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<int64_t> deltas) :
     BaseType(LagLeadOperatorEstimatorName, std::move(pAllColumnAnnotations)),
     _horizon(
         std::move(
@@ -388,14 +400,14 @@ LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::LagLeadOperatorEstimator
     _deltas(
         std::move(
             [&deltas](void) -> std::vector<std::int64_t> & {
-                if (deltas.empty()) {
-                    throw std::invalid_argument("Lag lead orders is empty!");
-                }
+                if(deltas.empty())
+                    throw std::invalid_argument("deltas");
+
                 return deltas;
             }()
         )
-    ) {
-}
+    )
+{}
 
 template <typename InputT, size_t MaxNumTrainingItemsV>
 bool LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
@@ -418,14 +430,33 @@ void LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::complete_training_i
 // |
 // ----------------------------------------------------------------------
 template <typename InputT, size_t MaxNumTrainingItemsV>
-GrainedLagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<std::int64_t> deltas) :
+template <typename DeltasInputIteratorRangeT>
+GrainedLagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, DeltasInputIteratorRangeT deltas) :
+    GrainedLagLeadOperatorEstimator(std::move(pAllColumnAnnotations), horizon, std::vector<int64_t>(std::get<0>(deltas), std::get<1>(deltas)))
+{}
+
+template <typename InputT, size_t MaxNumTrainingItemsV>
+GrainedLagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::GrainedLagLeadOperatorEstimator(AnnotationMapsPtr pAllColumnAnnotations, std::uint32_t horizon, std::vector<int64_t> deltas) :
     BaseType(
-        pAllColumnAnnotations,
+        std::move(pAllColumnAnnotations),
         [horizon, deltas](AnnotationMapsPtr pAllColumnAnnotationsParam) {
-            return LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>(std::move(pAllColumnAnnotationsParam), horizon, deltas);
-        }
-    ) {
-}
+            return LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>(
+                std::move(pAllColumnAnnotationsParam),
+                horizon,
+                deltas
+            );
+        },
+        [horizon, deltas](GrainType const &) {
+            return typename LagLeadOperatorEstimator<InputT>::TransformerUniquePtr(
+                new LagLeadOperatorTransformer<InputT>(
+                    horizon,
+                    deltas
+                )
+            );
+        },
+        true // isTrainingOnlyEstimator
+    )
+{}
 
 } // namespace Featurizers
 } // namespace Featurizer

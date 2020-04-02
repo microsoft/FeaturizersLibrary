@@ -166,7 +166,7 @@ private:
         transformer.execute(
             grainInput,
             [&callback, &grain](typename EstimatorT::TransformedType output) {
-                callback(std::make_tuple(grain, std::move(output)));
+                callback(typename TheseGrainFeaturizerTraits::TransformedType(grain, std::move(output)));
             }
         );
     }
@@ -176,7 +176,7 @@ private:
         for(auto &kvp : _transformers) {
             kvp.second->flush(
                 [&callback, &kvp](typename EstimatorT::TransformedType output) {
-                    callback(std::make_tuple(kvp.first, std::move(output)));
+                    callback(typename TheseGrainFeaturizerTraits::TransformedType(kvp.first, std::move(output)));
                 }
             );
         }

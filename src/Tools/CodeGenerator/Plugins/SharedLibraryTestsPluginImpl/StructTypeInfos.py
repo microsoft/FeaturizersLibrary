@@ -56,19 +56,13 @@ class _StructTypeInfo(TypeInfo):
     @Interface.override
     def GetOutputInfo(
         self,
+        invocation_template,
         result_name="result",
     ):
         return self.Result(
             self.TypeName,
             [self.Type(self.TypeName, result_name)],
-            "&{}".format(result_name),
-            textwrap.dedent(
-                """\
-                results.emplace_back({result});
-                """,
-            ).format(
-                result=result_name,
-            ),
+            invocation_template.format(result_name),
             "&{}".format(result_name),
             destroy_inline=False,
         )

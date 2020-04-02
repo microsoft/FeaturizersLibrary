@@ -74,6 +74,7 @@ class SingleValueSparseVectorTypeInfo(TypeInfo):
     @Interface.override
     def GetOutputInfo(
         self,
+        invocation_template,
         result_name="result",
     ):
         return self.Result(
@@ -83,16 +84,10 @@ class SingleValueSparseVectorTypeInfo(TypeInfo):
                 self.Type(self._type_info.CppType, "{}_value".format(result_name)),
                 self.Type("uint64_t", "{}_index".format(result_name)),
             ],
-            "&{result}_numElements, &{result}_value, &{result}_index".format(
-                result=result_name,
-            ),
-            textwrap.dedent(
-                """\
-                results.emplace_back({result}_numElements, {result}_value, {result}_index);
-                """,
-            ).format(
-                result=result_name,
-                type=self._type_info.CppType,
+            invocation_template.format(
+                "{result}_numElements, {result}_value, {result}_index".format(
+                    result=result_name,
+                ),
             ),
             None,
         )

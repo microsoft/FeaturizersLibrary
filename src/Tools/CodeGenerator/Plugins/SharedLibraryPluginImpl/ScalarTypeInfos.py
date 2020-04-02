@@ -74,7 +74,21 @@ class _ScalarTypeInfo(TypeInfo):
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetInputBufferInfo(self, arg_name, invocation_template):
+    def GetInputBufferInfo(
+        self,
+        arg_name,
+        invocation_template,
+        items_var_name=None,
+    ):
+        parameters = [
+            # The type value will be replaced below
+            self.Type(None, "{}_ptr".format(arg_name)),
+        ]
+
+        if items_var_name is None:
+            items_var_name = "{}_items".format(arg_name)
+            parameters.append(self.Type("size_t", items_var_name))
+
         if self.RequiresOptionalType:
             input_type = "{} const * const *".format(self.CType)
 
@@ -82,15 +96,16 @@ class _ScalarTypeInfo(TypeInfo):
                 """\
                 std::vector<Microsoft::Featurizer::Traits<{cpp_type}>::nullable_type> {name}_buffer;
 
-                {name}_buffer.reserve({name}_items);
+                {name}_buffer.reserve({items_var_name});
 
-                while({name}_buffer.size() < {name}_items) {{
+                while({name}_buffer.size() < {items_var_name}) {{
                     {name}_buffer.emplace_back(*{name}_ptr ? **{name}_ptr : Microsoft::Featurizer::Traits<{cpp_type}>::CreateNullValue());
                     ++{name}_ptr;
                 }}
                 """,
             ).format(
                 name=arg_name,
+                items_var_name=items_var_name,
                 cpp_type=self.CppType,
             )
 
@@ -109,8 +124,9 @@ class _ScalarTypeInfo(TypeInfo):
             input_type = "{} const *".format(self.CType)
             validation_suffix = None
             invocation_statement = invocation_template.format(
-                "{name}_ptr, {name}_items".format(
+                "{name}_ptr, {items_var_name}".format(
                     name=arg_name,
+                    items_var_name=items_var_name,
                 ),
             )
 
@@ -119,19 +135,19 @@ class _ScalarTypeInfo(TypeInfo):
                 "{}_ptr".format(arg_name),
             )
 
+        parameters[0].Type = input_type
+
         return self.Result(
-            [
-                self.Type(input_type, "{}_ptr".format(arg_name)),
-                self.Type("size_t", "{}_items".format(arg_name)),
-            ],
+            parameters,
             textwrap.dedent(
                 """\
                 if({name}_ptr == nullptr) throw std::invalid_argument("'{name}_ptr' is null");
-                if({name}_items == 0) throw std::invalid_argument("'{name}_items' is 0");
+                if({items_var_name} == 0) throw std::invalid_argument("'{items_var_name}' is 0");
                 {validation_suffix}
                 """,
             ).format(
                 name=arg_name,
+                items_var_name=items_var_name,
                 validation_suffix="\n{}\n".format(
                     validation_suffix,
                 ) if validation_suffix else "",

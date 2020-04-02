@@ -17,6 +17,11 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunused-local-typedef"
+#endif
+
 #if (defined _MSC_VER)
 #   pragma warning(push)
 
@@ -135,6 +140,8 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Fit(/*in*/ DateTimeFeaturizer_Est
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::DateTimeEstimator::InputType;
 
         Microsoft::Featurizer::Featurizers::DateTimeEstimator & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::DateTimeEstimator>(reinterpret_cast<size_t>(pHandle)));
 
@@ -347,6 +354,7 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Transform(/*in*/ DateTimeFeaturiz
 
         Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::DateTimeEstimator::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::DateTimeEstimator::TransformedType;
 
         // Input
@@ -454,81 +462,89 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_Flush(/*in*/ DateTimeFeaturizer_T
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new TimePoint[result.size()];
-        *output_items = result.size();
-
-        TimePoint * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            output_item->year = result_item.year;
-            output_item->month = result_item.month;
-            output_item->day = result_item.day;
-            output_item->hour = result_item.hour;
-            output_item->minute = result_item.minute;
-            output_item->second = result_item.second;
-            output_item->amPm = result_item.amPm;
-            output_item->hour12 = result_item.hour12;
-            output_item->dayOfWeek = result_item.dayOfWeek;
-            output_item->dayOfQuarter = result_item.dayOfQuarter;
-            output_item->dayOfYear = result_item.dayOfYear;
-            output_item->weekOfMonth = result_item.weekOfMonth;
-            output_item->quarterOfYear = result_item.quarterOfYear;
-            output_item->halfOfYear = result_item.halfOfYear;
-            output_item->weekIso = result_item.weekIso;
-            output_item->yearIso = result_item.yearIso;
-            if(result_item.monthLabel.empty()) {
-                output_item->monthLabel = nullptr;
-            }
-            else {
-                char * string_buffer(new char[result_item.monthLabel.size() + 1]);
-
-                std::copy(result_item.monthLabel.begin(), result_item.monthLabel.end(), string_buffer);
-                string_buffer[result_item.monthLabel.size()] = 0;
-
-                output_item->monthLabel = string_buffer;
-            }
-
-            if(result_item.amPmLabel.empty()) {
-                output_item->amPmLabel = nullptr;
-            }
-            else {
-                char * string_buffer(new char[result_item.amPmLabel.size() + 1]);
-
-                std::copy(result_item.amPmLabel.begin(), result_item.amPmLabel.end(), string_buffer);
-                string_buffer[result_item.amPmLabel.size()] = 0;
-
-                output_item->amPmLabel = string_buffer;
-            }
-
-            if(result_item.dayOfWeekLabel.empty()) {
-                output_item->dayOfWeekLabel = nullptr;
-            }
-            else {
-                char * string_buffer(new char[result_item.dayOfWeekLabel.size() + 1]);
-
-                std::copy(result_item.dayOfWeekLabel.begin(), result_item.dayOfWeekLabel.end(), string_buffer);
-                string_buffer[result_item.dayOfWeekLabel.size()] = 0;
-
-                output_item->dayOfWeekLabel = string_buffer;
-            }
-
-            if(result_item.holidayName.empty()) {
-                output_item->holidayName = nullptr;
-            }
-            else {
-                char * string_buffer(new char[result_item.holidayName.size() + 1]);
-
-                std::copy(result_item.holidayName.begin(), result_item.holidayName.end(), string_buffer);
-                string_buffer[result_item.holidayName.size()] = 0;
-
-                output_item->holidayName = string_buffer;
-            }
-
-            output_item->isPaidTimeOff = result_item.isPaidTimeOff;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new TimePoint[result.size()];
+
+            TimePoint * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                output_item->year = result_item.year;
+                output_item->month = result_item.month;
+                output_item->day = result_item.day;
+                output_item->hour = result_item.hour;
+                output_item->minute = result_item.minute;
+                output_item->second = result_item.second;
+                output_item->amPm = result_item.amPm;
+                output_item->hour12 = result_item.hour12;
+                output_item->dayOfWeek = result_item.dayOfWeek;
+                output_item->dayOfQuarter = result_item.dayOfQuarter;
+                output_item->dayOfYear = result_item.dayOfYear;
+                output_item->weekOfMonth = result_item.weekOfMonth;
+                output_item->quarterOfYear = result_item.quarterOfYear;
+                output_item->halfOfYear = result_item.halfOfYear;
+                output_item->weekIso = result_item.weekIso;
+                output_item->yearIso = result_item.yearIso;
+                if(result_item.monthLabel.empty()) {
+                    output_item->monthLabel = nullptr;
+                }
+                else {
+                    char * string_buffer(new char[result_item.monthLabel.size() + 1]);
+
+                    std::copy(result_item.monthLabel.begin(), result_item.monthLabel.end(), string_buffer);
+                    string_buffer[result_item.monthLabel.size()] = 0;
+
+                    output_item->monthLabel = string_buffer;
+                }
+
+                if(result_item.amPmLabel.empty()) {
+                    output_item->amPmLabel = nullptr;
+                }
+                else {
+                    char * string_buffer(new char[result_item.amPmLabel.size() + 1]);
+
+                    std::copy(result_item.amPmLabel.begin(), result_item.amPmLabel.end(), string_buffer);
+                    string_buffer[result_item.amPmLabel.size()] = 0;
+
+                    output_item->amPmLabel = string_buffer;
+                }
+
+                if(result_item.dayOfWeekLabel.empty()) {
+                    output_item->dayOfWeekLabel = nullptr;
+                }
+                else {
+                    char * string_buffer(new char[result_item.dayOfWeekLabel.size() + 1]);
+
+                    std::copy(result_item.dayOfWeekLabel.begin(), result_item.dayOfWeekLabel.end(), string_buffer);
+                    string_buffer[result_item.dayOfWeekLabel.size()] = 0;
+
+                    output_item->dayOfWeekLabel = string_buffer;
+                }
+
+                if(result_item.holidayName.empty()) {
+                    output_item->holidayName = nullptr;
+                }
+                else {
+                    char * string_buffer(new char[result_item.holidayName.size() + 1]);
+
+                    std::copy(result_item.holidayName.begin(), result_item.holidayName.end(), string_buffer);
+                    string_buffer[result_item.holidayName.size()] = 0;
+
+                    output_item->holidayName = string_buffer;
+                }
+
+                output_item->isPaidTimeOff = result_item.isPaidTimeOff;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -567,6 +583,10 @@ FEATURIZER_LIBRARY_API bool DateTimeFeaturizer_DestroyTransformedData(/*out*/ Ti
     }
 }
 
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)

@@ -65,7 +65,7 @@ class MatrixTypeInfo(TypeInfo):
         self._type_info                 = type_info
 
         # Override the CppType property with this type info
-        self._matrix_type               = "Eigen::MatrixX<{}>".format(self._type_info.CppType);
+        self._matrix_type               = "Microsoft::Featurizer::RowMajMatrix<{}>".format(self._type_info.CppType);
         self._map_type                  = "Eigen::Map<{}>".format(self._matrix_type)
 
         self.CppType                    = self._map_type
@@ -102,39 +102,46 @@ class MatrixTypeInfo(TypeInfo):
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetInputBufferInfo(self, arg_name, invocation_template):
+    def GetInputBufferInfo(
+        self,
+        arg_name,
+        invocation_template,
+        items_var_name=None,
+    ):
         if self.IsOptional:
             raise Exception("Optional matrix values are not supported")
 
+        parameters = [
+            self.Type("size_t", "{}_cols".format(arg_name)),
+            self.Type("size_t", "{}_rows".format(arg_name)),
+            self.Type("{} const **".format(self._type_info.CType), "{}_values_ptr".format(arg_name)),
+        ]
+
+        if items_var_name is None:
+            items_var_name = "{}_items".format(arg_name)
+            parameters.append(self.Type("size_t", items_var_name))
+
         return self.Result(
-            [
-                self.Type("size_t", "{}_cols".format(arg_name)),
-                self.Type("size_t", "{}_rows".format(arg_name)),
-                self.Type("{} const **".format(self._type_info.CType), "{}_values_ptr".format(arg_name)),
-                self.Type("size_t", "{}_items".format(arg_name)),
-            ],
+            parameters,
             textwrap.dedent(
                 """\
                 if({name}_cols == 0) throw std::invalid_argument("'{name}_cols' is 0");
                 if({name}_rows == 0) throw std::invalid_argument("'{name}_rows' is 0");
                 if({name}_values_ptr == nullptr) throw std::invalid_argument("'{name}_values_ptr' is null");
-                if({name}_items == 0) throw std::invalid_argument("'{name}_items' is 0");
+                if({items_var_name} == 0) throw std::invalid_argument("'{items_var_name}' is 0");
 
                 std::vector<{map_type}> {name}_buffer;
 
-                {name}_buffer.reserve({name}_items);
+                {name}_buffer.reserve({items_var_name});
 
-                while({name}_buffer.size() < {name}_items) {{
-                #if (defined __apple_build_verion__)
-                    {name}_buffer.push_back({map_type}(const_cast<{type} *>(*{name}_values_ptr), static_cast<Eigen::Index>({name}_rows), static_cast<Eigen::Index>({name}_cols)));
-                #else
+                while({name}_buffer.size() < {items_var_name}) {{
                     {name}_buffer.emplace_back({map_type}(const_cast<{type} *>(*{name}_values_ptr), static_cast<Eigen::Index>({name}_rows), static_cast<Eigen::Index>({name}_cols)));
-                #endif
                     ++{name}_values_ptr;
                 }}
                 """,
             ).format(
                 name=arg_name,
+                items_var_name=items_var_name,
                 map_type=self._map_type,
                 matrix_type=self._matrix_type,
                 type=self._type_info.CType,
@@ -204,7 +211,7 @@ class MatrixTypeInfo(TypeInfo):
             [
                 self.Type("size_t", "{}_cols".format(arg_name)),
                 self.Type("size_t", "{}_rows".format(arg_name)),
-                self.Type("{} *".format(self._type_info.CType), "{}_ptr".format(arg_name)),
+                self.Type("{} const *".format(self._type_info.CType), "{}_ptr".format(arg_name)),
             ],
             textwrap.dedent(
                 """\

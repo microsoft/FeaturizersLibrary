@@ -460,7 +460,7 @@ TEST_CASE("Transformer Test - deltas not in sorted order - horizon 2, lead 1 lag
     // before flush is called, there are 3 elements in ret
     CHECK(ret.size() == 3);
     transformer.flush(callback);
-    
+
     // output matrix for row "1", 10
     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[0](0,0)) == "10");
     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(ret[0](0,1)) == "11");
@@ -526,7 +526,9 @@ TEST_CASE("Estimator Test - horizon 2, lag 3 lag 2 lead 1 lead 3") {
     using InputType = std::string;
     using OutputMatrixDataType = NS::Traits<InputType>::nullable_type;
     using TransformedType = NS::RowMajMatrix<OutputMatrixDataType>;
-    NS::AnnotationMapsPtr                                pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+
+    NS::AnnotationMapsPtr                               pAllColumnAnnotations(NS::CreateTestAnnotationMapsPtr(1));
+
     NS::Featurizers::LagLeadOperatorEstimator<InputType> estimator(pAllColumnAnnotations, 2, {-3, -2, 1, 3});
     estimator.begin_training();
     estimator.complete_training();
@@ -628,7 +630,7 @@ TEST_CASE("Grained Estimator Test - 1 grain, horizon 2, lead 1 lead 2") {
     const GrainedInputType tup1(grain, value1);
     const GrainedInputType tup2(grain, value2);
     const GrainedInputType tup3(grain, value3);
-    
+
     NS::TestHelpers::Train(estimator, NS::TestHelpers::make_vector<std::tuple<GrainType const &, InputType const &>>(tup1, tup2, tup3));
 
     auto transformer = estimator.create_transformer();

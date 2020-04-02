@@ -10,15 +10,14 @@
 TEST_CASE("float") {
     // ----------------------------------------------------------------------
     using InputMatrix                       = Eigen::Map<Eigen::MatrixX<float>>;
-    using OutputMatrix                      = Eigen::MatrixX<float>;
+    using OutputMatrix                      = Microsoft::Featurizer::RowMajMatrix<float>;
     // ----------------------------------------------------------------------
 
-    // Column-base data
+    // Row-based data
     float                                   trainingData[]{
-        -1, 0, -3,
-        -1, -2, 0,
-        0, -1, -2
-
+        -1, -1, 0,
+        0, -2, -1,
+        -3, 0, -2
     };
     InputMatrix                             trainingMatrix(trainingData, 3, 3);
 

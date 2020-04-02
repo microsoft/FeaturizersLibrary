@@ -17,6 +17,11 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunused-local-typedef"
+#endif
+
 #if (defined _MSC_VER)
 #   pragma warning(push)
 
@@ -135,6 +140,8 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int8_Fit(/*in*/ RobustScalerF
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int8_t, std::float_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -336,6 +343,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int8_Transform(/*in*/ RobustS
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int8_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int8_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int8_t, std::float_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int8_t, std::float_t>::TransformedType;
 
         // Input
@@ -379,17 +387,25 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int8_Flush(/*in*/ RobustScale
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new float[result.size()];
-        *output_items = result.size();
-
-        float * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new float[result.size()];
+
+            float * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -506,6 +522,8 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int16_Fit(/*in*/ RobustScaler
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int16_t, std::float_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -707,6 +725,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int16_Transform(/*in*/ Robust
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int16_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int16_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int16_t, std::float_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int16_t, std::float_t>::TransformedType;
 
         // Input
@@ -750,17 +769,25 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int16_Flush(/*in*/ RobustScal
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new float[result.size()];
-        *output_items = result.size();
-
-        float * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new float[result.size()];
+
+            float * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -877,6 +904,8 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint8_Fit(/*in*/ RobustScaler
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint8_t, std::float_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint8_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint8_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1078,6 +1107,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint8_Transform(/*in*/ Robust
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint8_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint8_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint8_t, std::float_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint8_t, std::float_t>::TransformedType;
 
         // Input
@@ -1121,17 +1151,25 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint8_Flush(/*in*/ RobustScal
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new float[result.size()];
-        *output_items = result.size();
-
-        float * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new float[result.size()];
+
+            float * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1248,6 +1286,8 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint16_Fit(/*in*/ RobustScale
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint16_t, std::float_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint16_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint16_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1449,6 +1489,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint16_Transform(/*in*/ Robus
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint16_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint16_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint16_t, std::float_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint16_t, std::float_t>::TransformedType;
 
         // Input
@@ -1492,17 +1533,25 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint16_Flush(/*in*/ RobustSca
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new float[result.size()];
-        *output_items = result.size();
-
-        float * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new float[result.size()];
+
+            float * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1619,6 +1668,8 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_float_Fit(/*in*/ RobustScaler
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::float_t, std::float_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::float_t, std::float_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::float_t, std::float_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1820,6 +1871,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_float_Transform(/*in*/ Robust
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::float_t, std::float_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::float_t, std::float_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::float_t, std::float_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::float_t, std::float_t>::TransformedType;
 
         // Input
@@ -1863,17 +1915,25 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_float_Flush(/*in*/ RobustScal
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new float[result.size()];
-        *output_items = result.size();
-
-        float * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new float[result.size()];
+
+            float * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1990,6 +2050,8 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int32_Fit(/*in*/ RobustScaler
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int32_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2191,6 +2253,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int32_Transform(/*in*/ Robust
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int32_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int32_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int32_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int32_t, std::double_t>::TransformedType;
 
         // Input
@@ -2234,17 +2297,25 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int32_Flush(/*in*/ RobustScal
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2361,6 +2432,8 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int64_Fit(/*in*/ RobustScaler
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int64_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2562,6 +2635,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int64_Transform(/*in*/ Robust
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int64_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int64_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int64_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::int64_t, std::double_t>::TransformedType;
 
         // Input
@@ -2605,17 +2679,25 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_int64_Flush(/*in*/ RobustScal
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2732,6 +2814,8 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint32_Fit(/*in*/ RobustScale
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint32_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2933,6 +3017,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint32_Transform(/*in*/ Robus
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint32_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint32_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint32_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint32_t, std::double_t>::TransformedType;
 
         // Input
@@ -2976,17 +3061,25 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint32_Flush(/*in*/ RobustSca
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3103,6 +3196,8 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint64_Fit(/*in*/ RobustScale
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint64_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3304,6 +3399,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint64_Transform(/*in*/ Robus
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint64_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint64_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint64_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::uint64_t, std::double_t>::TransformedType;
 
         // Input
@@ -3347,17 +3443,25 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_uint64_Flush(/*in*/ RobustSca
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3474,6 +3578,8 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_double_Fit(/*in*/ RobustScale
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::double_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3675,6 +3781,7 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_double_Transform(/*in*/ Robus
 
         Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::double_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::double_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::double_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::RobustScalerEstimator<std::double_t, std::double_t>::TransformedType;
 
         // Input
@@ -3718,17 +3825,25 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_double_Flush(/*in*/ RobustSca
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3738,6 +3853,10 @@ FEATURIZER_LIBRARY_API bool RobustScalerFeaturizer_double_Flush(/*in*/ RobustSca
     }
 }
 
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)
