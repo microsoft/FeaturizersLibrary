@@ -41,7 +41,7 @@ foreach(_test_name IN ITEMS
     SharedLibrary_L1Normalize_IntegrationTest
     SharedLibrary_L2Normalize_IntegrationTest
     SharedLibrary_LabelEncoder_IntegrationTest
-    # TODO: Not available yet SharedLibrary_LagLeadOperator_IntegrationTest
+    SharedLibrary_LagLeadOperator_IntegrationTest
     SharedLibrary_MaxAbsScaler_IntegrationTest
     SharedLibrary_MaxNormalize_IntegrationTest
     SharedLibrary_MeanImputer_IntegrationTest

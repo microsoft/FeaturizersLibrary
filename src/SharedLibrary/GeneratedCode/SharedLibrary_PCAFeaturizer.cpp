@@ -17,6 +17,11 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunused-local-typedef"
+#endif
+
 #if (defined _MSC_VER)
 #   pragma warning(push)
 
@@ -41,7 +46,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_CreateEstimator(/*out*/ PCAFeatu
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>* pEstimator = new Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>* pEstimator = new Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
 
         pEstimator->begin_training();
 
@@ -67,7 +72,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_DestroyEstimator(/*in*/ PCAFeatu
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>>(index);
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>>(index);
         g_pointerTable.Remove(index);
 
         delete pEstimator;
@@ -90,7 +95,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_GetState(/*in*/ PCAFeaturizer_fl
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pState == nullptr) throw std::invalid_argument("'pState' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pState = static_cast<TrainingState>(estimator.get_state());
     
@@ -112,7 +117,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_IsTrainingComplete(/*in*/ PCAFea
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -138,9 +143,11 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_Fit(/*in*/ PCAFeaturizer_float_E
         if(input_rows == 0) throw std::invalid_argument("'input_rows' is 0");
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>>(reinterpret_cast<size_t>(pHandle)));
+        using InputType = typename Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::InputType;
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(Eigen::Map<Eigen::MatrixX<std::float_t>>(const_cast<float *>(input_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols))));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pFitResult = static_cast<unsigned char>(estimator.fit(Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>(const_cast<float *>(input_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols))));
     
         return true;
     }
@@ -165,20 +172,16 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_FitBuffer(/*in*/ PCAFeaturizer_f
         if(input_values_ptr == nullptr) throw std::invalid_argument("'input_values_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Eigen::Map<Eigen::MatrixX<std::float_t>>> input_buffer;
+        std::vector<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>> input_buffer;
 
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-        #if (defined __apple_build_verion__)
-            input_buffer.push_back(Eigen::Map<Eigen::MatrixX<std::float_t>>(const_cast<float *>(*input_values_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols)));
-        #else
-            input_buffer.emplace_back(Eigen::Map<Eigen::MatrixX<std::float_t>>(const_cast<float *>(*input_values_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols)));
-        #endif
+            input_buffer.emplace_back(Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>(const_cast<float *>(*input_values_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols)));
             ++input_values_ptr;
         }
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -199,7 +202,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_OnDataCompleted(/*in*/ PCAFeatur
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.on_data_completed();
     
@@ -220,7 +223,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_CompleteTraining(/*in*/ PCAFeatu
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.complete_training();
     
@@ -242,9 +245,9 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_CreateTransformerFromEstimator(/
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformerType*>(estimator.create_transformer().release());
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformerType*>(estimator.create_transformer().release());
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<PCAFeaturizer_float_TransformerHandle*>(index);
@@ -270,7 +273,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_CreateTransformerFromSavedData(/
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformerType(archive));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<PCAFeaturizer_float_TransformerHandle*>(index);
@@ -293,7 +296,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_DestroyTransformer(/*in*/ PCAFea
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformerType>(index);
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
         delete pTransformer;
@@ -317,7 +320,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_CreateTransformerSaveData(/*in*/
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -355,12 +358,13 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_Transform(/*in*/ PCAFeaturizer_f
         if(output_rows == nullptr) throw std::invalid_argument("'output_rows' is null");
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
-        using TransformedType = typename Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformedType;
+        using InputType = typename Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::InputType;
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(Eigen::Map<Eigen::MatrixX<std::float_t>>(const_cast<float *>(input_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols))));
+        TransformedType result(transformer.execute(Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>(const_cast<float *>(input_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols))));
 
         // Output
         struct outputInternal {
@@ -399,9 +403,9 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_Flush(/*in*/ PCAFeaturizer_float
         if(output_item_ptr_ptr == nullptr) throw std::invalid_argument("'output_item_ptr_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
-        using TransformedType = typename Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::float_t>>>::TransformedType;
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>>::TransformedType;
 
         std::vector<TransformedType> result;
 
@@ -414,39 +418,47 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_Flush(/*in*/ PCAFeaturizer_float
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_cols_ptr = new size_t[result.size()];
-        *output_item_rows_ptr = new size_t[result.size()];
-        *output_item_ptr_ptr = new float *[result.size()];
-        *output_items = result.size();
-
-        size_t * output_item_cols(*output_item_cols_ptr);
-        size_t * output_item_rows(*output_item_rows_ptr);
-        float ** output_item_ptr(*output_item_ptr_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_cols == nullptr) throw std::invalid_argument("'output_item_cols' is null");
-            if(output_item_rows == nullptr) throw std::invalid_argument("'output_item_rows' is null");
-            if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
-
-            struct output_itemInternal {
-                static void Deleter(float *pData) {
-                    delete [] pData;
-                }
-            };
-
-            std::unique_ptr<float, void (*)(float *)> output_item_buffer(new float[static_cast<size_t>(result_item.size())], output_itemInternal::Deleter);
-
-            memcpy(output_item_buffer.get(), result_item.data(), static_cast<size_t>(result_item.size()) * sizeof(float));
-
-            *output_item_ptr = output_item_buffer.release();
-            *output_item_cols = static_cast<size_t>(result_item.cols());
-            *output_item_rows = static_cast<size_t>(result_item.rows());
-
-            ++output_item_cols;
-            ++output_item_rows;
-            ++output_item_ptr;
+        if(result.empty()) {
+            *output_item_cols_ptr = nullptr;
+            *output_item_rows_ptr = nullptr;
+            *output_item_ptr_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_cols_ptr = new size_t[result.size()];
+            *output_item_rows_ptr = new size_t[result.size()];
+            *output_item_ptr_ptr = new float *[result.size()];
+
+            size_t * output_item_cols(*output_item_cols_ptr);
+            size_t * output_item_rows(*output_item_rows_ptr);
+            float ** output_item_ptr(*output_item_ptr_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_cols == nullptr) throw std::invalid_argument("'output_item_cols' is null");
+                if(output_item_rows == nullptr) throw std::invalid_argument("'output_item_rows' is null");
+                if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+
+                struct output_itemInternal {
+                    static void Deleter(float *pData) {
+                        delete [] pData;
+                    }
+                };
+
+                std::unique_ptr<float, void (*)(float *)> output_item_buffer(new float[static_cast<size_t>(result_item.size())], output_itemInternal::Deleter);
+
+                memcpy(output_item_buffer.get(), result_item.data(), static_cast<size_t>(result_item.size()) * sizeof(float));
+
+                *output_item_ptr = output_item_buffer.release();
+                *output_item_cols = static_cast<size_t>(result_item.cols());
+                *output_item_rows = static_cast<size_t>(result_item.rows());
+
+                ++output_item_cols;
+                ++output_item_rows;
+                ++output_item_ptr;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -456,7 +468,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_Flush(/*in*/ PCAFeaturizer_float
     }
 }
 
-FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_DestroyTransformedData(/*out*/ size_t result_cols, /*out*/ size_t result_rows, /*out*/ float * result_ptr, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_DestroyTransformedData(/*out*/ size_t result_cols, /*out*/ size_t result_rows, /*out*/ float const * result_ptr, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -490,7 +502,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_CreateEstimator(/*out*/ PCAFeat
         *ppErrorInfo = nullptr;
 
         // No validation
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>* pEstimator = new Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>* pEstimator = new Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>(std::make_shared<Microsoft::Featurizer::AnnotationMaps>(1), 0 );
 
         pEstimator->begin_training();
 
@@ -516,7 +528,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_DestroyEstimator(/*in*/ PCAFeat
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>>(index);
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>> * pEstimator = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>>(index);
         g_pointerTable.Remove(index);
 
         delete pEstimator;
@@ -539,7 +551,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_GetState(/*in*/ PCAFeaturizer_d
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pState == nullptr) throw std::invalid_argument("'pState' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pState = static_cast<TrainingState>(estimator.get_state());
     
@@ -561,7 +573,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_IsTrainingComplete(/*in*/ PCAFe
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pIsTrainingComplete == nullptr) throw std::invalid_argument("'pIsTrainingComplete' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>> const & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pIsTrainingComplete = estimator.get_state() != Microsoft::Featurizer::TrainingState::Training;
     
@@ -587,9 +599,11 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_Fit(/*in*/ PCAFeaturizer_double
         if(input_rows == 0) throw std::invalid_argument("'input_rows' is 0");
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>>(reinterpret_cast<size_t>(pHandle)));
+        using InputType = typename Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::InputType;
 
-        *pFitResult = static_cast<unsigned char>(estimator.fit(Eigen::Map<Eigen::MatrixX<std::double_t>>(const_cast<double *>(input_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols))));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>>(reinterpret_cast<size_t>(pHandle)));
+
+        *pFitResult = static_cast<unsigned char>(estimator.fit(Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>(const_cast<double *>(input_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols))));
     
         return true;
     }
@@ -614,20 +628,16 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_FitBuffer(/*in*/ PCAFeaturizer_
         if(input_values_ptr == nullptr) throw std::invalid_argument("'input_values_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
-        std::vector<Eigen::Map<Eigen::MatrixX<std::double_t>>> input_buffer;
+        std::vector<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>> input_buffer;
 
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-        #if (defined __apple_build_verion__)
-            input_buffer.push_back(Eigen::Map<Eigen::MatrixX<std::double_t>>(const_cast<double *>(*input_values_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols)));
-        #else
-            input_buffer.emplace_back(Eigen::Map<Eigen::MatrixX<std::double_t>>(const_cast<double *>(*input_values_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols)));
-        #endif
+            input_buffer.emplace_back(Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>(const_cast<double *>(*input_values_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols)));
             ++input_values_ptr;
         }
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(input_buffer.data(), input_buffer.size()));
     
@@ -648,7 +658,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_OnDataCompleted(/*in*/ PCAFeatu
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.on_data_completed();
     
@@ -669,7 +679,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_CompleteTraining(/*in*/ PCAFeat
 
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>>(reinterpret_cast<size_t>(pHandle)));
 
         estimator.complete_training();
     
@@ -691,9 +701,9 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_CreateTransformerFromEstimator(
         if(pEstimatorHandle == nullptr) throw std::invalid_argument("'pEstimatorHandle' is null");
         if(ppTransformerHandle == nullptr) throw std::invalid_argument("'ppTransformerHandle' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>>(reinterpret_cast<size_t>(pEstimatorHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>>(reinterpret_cast<size_t>(pEstimatorHandle)));
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformerType*>(estimator.create_transformer().release());
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformerType * pTransformer = reinterpret_cast<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformerType*>(estimator.create_transformer().release());
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<PCAFeaturizer_double_TransformerHandle*>(index);
@@ -719,7 +729,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_CreateTransformerFromSavedData(
 
         Microsoft::Featurizer::Archive archive(pBuffer, cBufferSize);
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformerType(archive));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformerType* pTransformer(new Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformerType(archive));
 
         size_t index = g_pointerTable.Add(pTransformer);
         *ppTransformerHandle = reinterpret_cast<PCAFeaturizer_double_TransformerHandle*>(index);
@@ -742,7 +752,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_DestroyTransformer(/*in*/ PCAFe
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
 
         size_t index = reinterpret_cast<size_t>(pHandle);
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformerType>(index);
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformerType* pTransformer = g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformerType>(index);
         g_pointerTable.Remove(index);
 
         delete pTransformer;
@@ -766,7 +776,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_CreateTransformerSaveData(/*in*
         if(ppBuffer == nullptr) throw std::invalid_argument("'ppBuffer' is null");
         if(pBufferSize == nullptr) throw std::invalid_argument("'pBufferSize' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
         Microsoft::Featurizer::Archive archive;
 
         transformer.save(archive);
@@ -804,12 +814,13 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_Transform(/*in*/ PCAFeaturizer_
         if(output_rows == nullptr) throw std::invalid_argument("'output_rows' is null");
         if(output_ptr == nullptr) throw std::invalid_argument("'output_ptr' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
-        using TransformedType = typename Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformedType;
+        using InputType = typename Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::InputType;
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformedType;
 
         // Input
-        TransformedType result(transformer.execute(Eigen::Map<Eigen::MatrixX<std::double_t>>(const_cast<double *>(input_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols))));
+        TransformedType result(transformer.execute(Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>(const_cast<double *>(input_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols))));
 
         // Output
         struct outputInternal {
@@ -848,9 +859,9 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_Flush(/*in*/ PCAFeaturizer_doub
         if(output_item_ptr_ptr == nullptr) throw std::invalid_argument("'output_item_ptr_ptr' is null");
         if(output_items == nullptr) throw std::invalid_argument("'output_items' is null");
 
-        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
+        Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
-        using TransformedType = typename Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Eigen::MatrixX<std::double_t>>>::TransformedType;
+        using TransformedType = typename Microsoft::Featurizer::Featurizers::PCAEstimator<Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>>::TransformedType;
 
         std::vector<TransformedType> result;
 
@@ -863,39 +874,47 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_Flush(/*in*/ PCAFeaturizer_doub
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_cols_ptr = new size_t[result.size()];
-        *output_item_rows_ptr = new size_t[result.size()];
-        *output_item_ptr_ptr = new double *[result.size()];
-        *output_items = result.size();
-
-        size_t * output_item_cols(*output_item_cols_ptr);
-        size_t * output_item_rows(*output_item_rows_ptr);
-        double ** output_item_ptr(*output_item_ptr_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_cols == nullptr) throw std::invalid_argument("'output_item_cols' is null");
-            if(output_item_rows == nullptr) throw std::invalid_argument("'output_item_rows' is null");
-            if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
-
-            struct output_itemInternal {
-                static void Deleter(double *pData) {
-                    delete [] pData;
-                }
-            };
-
-            std::unique_ptr<double, void (*)(double *)> output_item_buffer(new double[static_cast<size_t>(result_item.size())], output_itemInternal::Deleter);
-
-            memcpy(output_item_buffer.get(), result_item.data(), static_cast<size_t>(result_item.size()) * sizeof(double));
-
-            *output_item_ptr = output_item_buffer.release();
-            *output_item_cols = static_cast<size_t>(result_item.cols());
-            *output_item_rows = static_cast<size_t>(result_item.rows());
-
-            ++output_item_cols;
-            ++output_item_rows;
-            ++output_item_ptr;
+        if(result.empty()) {
+            *output_item_cols_ptr = nullptr;
+            *output_item_rows_ptr = nullptr;
+            *output_item_ptr_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_cols_ptr = new size_t[result.size()];
+            *output_item_rows_ptr = new size_t[result.size()];
+            *output_item_ptr_ptr = new double *[result.size()];
+
+            size_t * output_item_cols(*output_item_cols_ptr);
+            size_t * output_item_rows(*output_item_rows_ptr);
+            double ** output_item_ptr(*output_item_ptr_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_cols == nullptr) throw std::invalid_argument("'output_item_cols' is null");
+                if(output_item_rows == nullptr) throw std::invalid_argument("'output_item_rows' is null");
+                if(output_item_ptr == nullptr) throw std::invalid_argument("'output_item_ptr' is null");
+
+                struct output_itemInternal {
+                    static void Deleter(double *pData) {
+                        delete [] pData;
+                    }
+                };
+
+                std::unique_ptr<double, void (*)(double *)> output_item_buffer(new double[static_cast<size_t>(result_item.size())], output_itemInternal::Deleter);
+
+                memcpy(output_item_buffer.get(), result_item.data(), static_cast<size_t>(result_item.size()) * sizeof(double));
+
+                *output_item_ptr = output_item_buffer.release();
+                *output_item_cols = static_cast<size_t>(result_item.cols());
+                *output_item_rows = static_cast<size_t>(result_item.rows());
+
+                ++output_item_cols;
+                ++output_item_rows;
+                ++output_item_ptr;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -905,7 +924,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_Flush(/*in*/ PCAFeaturizer_doub
     }
 }
 
-FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_DestroyTransformedData(/*out*/ size_t result_cols, /*out*/ size_t result_rows, /*out*/ double * result_ptr, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_DestroyTransformedData(/*out*/ size_t result_cols, /*out*/ size_t result_rows, /*out*/ double const * result_ptr, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -926,6 +945,10 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_DestroyTransformedData(/*out*/ 
     }
 }
 
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)

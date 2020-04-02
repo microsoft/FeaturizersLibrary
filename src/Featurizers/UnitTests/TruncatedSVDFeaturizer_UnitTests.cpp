@@ -346,7 +346,7 @@ TEST_CASE("Invalid_fit RowMajor") {
 }
 
 TEST_CASE("Different training and inferencing data ColMajor") {
-    using MatrixType = Eigen::MatrixX<std::double_t>;
+    using MatrixType = NS::RowMajMatrix<std::double_t>;
 
     MatrixType trainingMatrix(3, 3);
     trainingMatrix(0, 0) = -1;

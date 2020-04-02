@@ -67,30 +67,31 @@ class _ScalarTypeInfo(TypeInfo):
     @Interface.override
     def GetOutputInfo(
         self,
+        invocation_template,
         result_name="result",
     ):
         if self.RequiresOptionalType:
             vector_type = "nonstd::optional<{}>".format(self.CppType)
             local_type = "{} *".format(self.CppType)
-            statement = "results.emplace_back({name} ? std::move(*{name}) : nonstd::optional<{type}>()".format(
+            statement = "{name} ? std::move(*{name}) : nonstd::optional<{type}>()".format(
                 type=self.CppType,
                 name=result_name,
             )
+
         else:
             vector_type = self.CppType
             local_type = self.CppType
 
             if self.TypeName == "bool":
                 # vector<bool> doesn't support `emplace_back` on older compilers
-                statement = "results.push_back({});".format(result_name)
+                statement = result_name
             else:
-                statement = "results.emplace_back(std::move({}));".format(result_name)
+                statement = "std::move({})".format(result_name)
 
         return self.Result(
             vector_type,
             [self.Type(local_type, result_name)],
-            "&{}".format(result_name),
-            statement,
+            invocation_template.format(statement),
         )
 
 

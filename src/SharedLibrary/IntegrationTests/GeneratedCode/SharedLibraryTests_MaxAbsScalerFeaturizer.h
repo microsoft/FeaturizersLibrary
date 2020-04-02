@@ -9,7 +9,7 @@
 #include "Traits.h"
 #include "Featurizers/Structs.h"
 
-#include "SharedLibrary_Common.hpp"
+#include "SharedLibraryTests_Common.hpp"
 
 #if (defined _MSC_VER)
 #   pragma warning(push)

@@ -10,14 +10,14 @@
 TEST_CASE("double") {
     // ----------------------------------------------------------------------
     using InputMatrix                       = Eigen::Map<Eigen::MatrixX<double>>;
-    using OutputMatrix                      = Eigen::MatrixX<double>;
+    using OutputMatrix                      = Microsoft::Featurizer::RowMajMatrix<double>;
     // ----------------------------------------------------------------------
 
-    // Column-based data
+    // Row-based data
     double                                  trainingData[]{
-        -1, 0, -3,
-        -1, -2, 0,
-        0, -1, -2
+        -1, -1, 0,
+        0, -2, -1,
+        -3, 0, -2
     };
     InputMatrix                             trainingMatrix(trainingData, 3, 3);
 

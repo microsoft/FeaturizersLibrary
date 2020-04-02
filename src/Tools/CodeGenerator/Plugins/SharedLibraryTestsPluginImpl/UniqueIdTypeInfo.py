@@ -30,6 +30,36 @@ class UniqueIdTypeInfo(TypeInfo):
 
     # ----------------------------------------------------------------------
     @Interface.override
+    @staticmethod
+    def CreateHelperMethods(output_stream):
+        output_stream.write(
+            textwrap.dedent(
+                """\
+                std::vector<std::string> CreateUniqueId(char const * const *strings, size_t items) {
+                    if(strings == nullptr) throw std::invalid_argument("strings");
+                    if(items == 0) throw std::invalid_argument("items");
+
+                    std::vector<std::string> result;
+
+                    result.reserve(items);
+
+                    while(result.size() < items) {
+                        char const * const ptr(*strings++);
+
+                        if(ptr == nullptr) throw std::invalid_argument("'strings' element is null");
+
+                        result.emplace_back(ptr);
+                    }
+
+                    return result;
+                }
+
+                """,
+            ),
+        )
+
+    # ----------------------------------------------------------------------
+    @Interface.override
     def GetTransformInputArgs(
         self,
         input_name="input",
@@ -57,13 +87,22 @@ class UniqueIdTypeInfo(TypeInfo):
     @Interface.override
     def GetOutputInfo(
         self,
+        invocation_template,
         result_name="result",
     ):
         return self.Result(
-            "TODO100",
-            [self.Type("TODO200.0", "TODO200.1")],
-            "TODO300",
-            "TODO400",
-            "TODO500",
+            self.CppType,
+            [
+                self.Type("char **", "{}_ptr".format(result_name)),
+                self.Type("size_t", "{}_items".format(result_name)),
+            ],
+            invocation_template.format(
+                "CreateUniqueId({name}_ptr, {name}_items)".format(
+                    name=result_name,
+                ),
+            ),
+            "{name}_ptr, {name}_items".format(
+                name=result_name,
+            ),
             destroy_inline=True,
         )

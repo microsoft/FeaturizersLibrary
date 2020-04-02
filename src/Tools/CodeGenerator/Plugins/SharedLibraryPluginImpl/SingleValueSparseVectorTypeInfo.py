@@ -69,7 +69,12 @@ class SingleValueSparseVectorTypeInfo(TypeInfo):
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetInputBufferInfo(self, arg_name, invocation_template):
+    def GetInputBufferInfo(
+        self,
+        arg_name,
+        invocation_template,
+        items_var_name=None,
+    ):
         raise NotImplementedError("This structure is only used during output")
 
     # ----------------------------------------------------------------------

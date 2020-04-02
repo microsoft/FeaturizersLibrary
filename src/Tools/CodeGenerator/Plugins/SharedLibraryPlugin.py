@@ -71,7 +71,6 @@ class Plugin(PluginBase):
         for desc, func in [
             ("Generating .h files...", _GenerateHeaderFile),
             ("Generating .cpp files...", _GenerateCppFile),
-            # TODO: ("Generating .cpp wrappers...", _GenerateCppFile),
         ]:
             status_stream.write(desc)
             with status_stream.DoneManager(
@@ -735,6 +734,11 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
 
                 extern "C" {{
 
+                #if (defined __clang__)
+                #   pragma clang diagnostic push
+                #   pragma clang diagnostic ignored "-Wunused-local-typedef"
+                #endif
+
                 #if (defined _MSC_VER)
                 #   pragma warning(push)
 
@@ -930,6 +934,8 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                             if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
                             {validation}
+
+                            using InputType = typename Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::InputType;
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix} & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1160,6 +1166,7 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
 
                             Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+                            using InputType = typename Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::InputType;
                             using TransformedType = typename Microsoft::Featurizer::Featurizers::{estimator_name}{cpp_template_suffix}::TransformedType;
 
                             // Input
@@ -1265,6 +1272,10 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
             textwrap.dedent(
                 """\
 
+                #if (defined __clang__)
+                #   pragma clang diagnostic pop
+                #endif
+
                 #if (defined _MSC_VER)
                 #   pragma warning(pop)
                 #endif
@@ -1273,12 +1284,6 @@ def _GenerateCppFile(open_file_func, output_dir, items, c_data_items, output_str
                 """,
             ),
         )
-
-
-# ----------------------------------------------------------------------
-# TODO: def _GenerateCppFile(output_dir, items, c_data, output_stream):
-# TODO:     # Write files that provide RAII wrappers around the export C functions.
-# TODO:     pass
 
 
 # ----------------------------------------------------------------------

@@ -17,6 +17,11 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunused-local-typedef"
+#endif
+
 #if (defined _MSC_VER)
 #   pragma warning(push)
 
@@ -145,6 +150,8 @@ FEATURIZER_LIBRARY_API bool ShortGrainDropperFeaturizer_Fit(/*in*/ ShortGrainDro
             input_buffer.emplace_back(*input_ptr);
             ++input_ptr;
         }
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::ShortGrainDropperEstimator<>::InputType;
 
         Microsoft::Featurizer::Featurizers::ShortGrainDropperEstimator<> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ShortGrainDropperEstimator<>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -382,6 +389,7 @@ FEATURIZER_LIBRARY_API bool ShortGrainDropperFeaturizer_Transform(/*in*/ ShortGr
 
         Microsoft::Featurizer::Featurizers::ShortGrainDropperEstimator<>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::ShortGrainDropperEstimator<>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::ShortGrainDropperEstimator<>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::ShortGrainDropperEstimator<>::TransformedType;
 
         // Input
@@ -425,17 +433,25 @@ FEATURIZER_LIBRARY_API bool ShortGrainDropperFeaturizer_Flush(/*in*/ ShortGrainD
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -445,6 +461,10 @@ FEATURIZER_LIBRARY_API bool ShortGrainDropperFeaturizer_Flush(/*in*/ ShortGrainD
     }
 }
 
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)

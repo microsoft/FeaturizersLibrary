@@ -51,6 +51,7 @@ class DatetimeTypeInfo(TypeInfo):
     @Interface.override
     def GetOutputInfo(
         self,
+        invocation_template,
         result_name="result",
     ):
         raise NotImplementedError("Not implemented yet")

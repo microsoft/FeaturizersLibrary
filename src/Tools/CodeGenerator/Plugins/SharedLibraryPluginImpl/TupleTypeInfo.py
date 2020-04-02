@@ -112,14 +112,25 @@ class TupleTypeInfo(TypeInfo):
         return self.Result(
             parameters,
             "\n".join(validation_statements),
-            invocation_template.format("std::make_tuple({})".format(", ".join(invocation_statements)))
+            invocation_template.format("InputType({})".format(", ".join(invocation_statements)))
         )
 
     # ----------------------------------------------------------------------
     @Interface.override
-    def GetInputBufferInfo(self, arg_name, invocation_template):
+    def GetInputBufferInfo(
+        self,
+        arg_name,
+        invocation_template,
+        items_var_name=None,
+    ):
         if self.IsOptional:
             raise NotImplementedError("Optional tuples are not supported at this time")
+
+        if items_var_name is None:
+            items_var_name = "{}_items".format(arg_name)
+            append_items_parameter = True
+        else:
+            append_items_parameter = False
 
         parameters = []
         validation_statements = []
@@ -132,27 +143,18 @@ class TupleTypeInfo(TypeInfo):
         # the content within the string for later use, and then remove it from
         # the invocation contents.
 
-        # TODO: This needs some work
-        invocation_statement_regex = re.compile(
-            r"\*\*\*\*\*(?P<content>.+)\*\*\*\*\*",
-            re.DOTALL | re.MULTILINE,
-        )
-
         for index, type_info in enumerate(self._type_infos):
             result = type_info.GetInputBufferInfo(
                 "{}{}".format(arg_name, index),
-                "*****{}*****",
+                self._InvocationTemplate,
+                items_var_name=items_var_name,
             )
 
             parameters += result.Parameters
             if result.ValidationStatements:
                 validation_statements.append(result.ValidationStatements)
 
-            match = invocation_statement_regex.search(result.InvocationStatements)
-            assert match, result.InvocationStatements
-
-            invocation_tuple = [item.strip() for item in match.group("content").split(",")]
-            assert len(invocation_tuple) == 2, match.group("content")
+            item_invocation_statements, invocation_tuple = self._ExtractDecoratedInvocationStatements(result.InvocationStatements)
 
             invocation_tuples.append(invocation_tuple)
             invocation_statements.append(
@@ -164,21 +166,12 @@ class TupleTypeInfo(TypeInfo):
                     """,
                 ).format(
                     type_info.CppType,
-                    result.InvocationStatements[:match.start()].rstrip(),
+                    item_invocation_statements,
                 ),
             )
 
-        for index in range(1, len(self._type_infos)):
-            validation_statements.append(
-                textwrap.dedent(
-                    """\
-                    if({arg_name}{index}_items != {arg_name}0_items) throw std::invalid_argument("'{arg_name}{index}_items' != '{arg_name}0_items'");
-                    """,
-                ).format(
-                    arg_name=arg_name,
-                    index=index,
-                ),
-            )
+        if append_items_parameter:
+            parameters.append(self.Type("size_t", items_var_name))
 
         return self.Result(
             parameters,
@@ -189,11 +182,11 @@ class TupleTypeInfo(TypeInfo):
 
                 std::vector<typename make_tuple_elements_const_references<{cpp_type}>::type> {arg_name}_buffer;
 
-                {arg_name}_buffer.reserve(input0_items);
+                {arg_name}_buffer.reserve({items_var_name});
 
                 {ptrs}
 
-                while({arg_name}_buffer.size() < input0_items) {{
+                while({arg_name}_buffer.size() < {items_var_name}) {{
                     {arg_name}_buffer.emplace_back({emplace_args});
                     {ptrs_increment}
                 }}
@@ -204,8 +197,7 @@ class TupleTypeInfo(TypeInfo):
                 invocation_statements="".join(invocation_statements).rstrip(),
                 cpp_type=self.CppType,
                 arg_name=arg_name,
-                first_element_buffer=invocation_tuples[0][0],
-                first_element_size=invocation_tuples[0][1],
+                items_var_name=items_var_name,
                 ptrs="\n".join(
                     [
                         "auto * {arg_name}{index}_creation_ptr({value});".format(
@@ -241,7 +233,46 @@ class TupleTypeInfo(TypeInfo):
         result_name="result",
         suppress_pointer=False,
     ):
-        raise NotImplementedError("Tuples are only used during input; use custom structures for output")
+        if self.IsOptional:
+            raise NotImplementedError("Optional tuples are not supported at this time")
+
+        parameters = []
+        validation_statements = []
+        invocation_statements = []
+
+        for index, type_info in enumerate(self._type_infos):
+            result = type_info.GetOutputInfo(
+                "{}{}".format(arg_name, index),
+                result_name="{}{}".format(result_name, index),
+                suppress_pointer=suppress_pointer,
+            )
+
+            parameters += result.Parameters
+            if result.ValidationStatements:
+                validation_statements.append(result.ValidationStatements)
+
+            invocation_statements.append(
+                textwrap.dedent(
+                    """\
+                    // [{index}] {type}
+
+                    auto const & {result_name}{index}(std::get<{index}>({result_name}));
+
+                    {statements}
+                    """,
+                ).format(
+                    index=index,
+                    type=type_info.CppType,
+                    result_name=result_name,
+                    statements=result.InvocationStatements.rstrip(),
+                ),
+            )
+
+        return self.Result(
+            parameters,
+            "{}\n".format("\n".join(validation_statements).rstrip()),
+            "\n".join(invocation_statements).rstrip(),
+        )
 
     # ----------------------------------------------------------------------
     @Interface.override
@@ -249,4 +280,40 @@ class TupleTypeInfo(TypeInfo):
         self,
         arg_name="result",
     ):
-        raise NotImplementedError("Tuples are only used during input; use custom structures for output")
+        if self.IsOptional:
+            raise NotImplementedError("Optional tuples are not supported at this time")
+
+        parameters = []
+        validation_statements = []
+        invocation_statements = []
+
+        for index, type_info in enumerate(self._type_infos):
+            result = type_info.GetDestroyOutputInfo("{}{}".format(arg_name, index))
+            if result is None:
+                continue
+
+            parameters += result.Parameters
+            if result.ValidationStatements:
+                validation_statements.append(result.ValidationStatements)
+
+            invocation_statements.append(
+                textwrap.dedent(
+                    """\
+                    // [{index}] {type}
+                    {statements}
+                    """,
+                ).format(
+                    index=index,
+                    type=type_info.CppType,
+                    statements=result.InvocationStatements.rstrip(),
+                ),
+            )
+
+        if not parameters:
+            return None
+
+        return self.Result(
+            parameters,
+            "{}\n".format("\n".join(validation_statements).rstrip()),
+            "\n".join(invocation_statements).rstrip(),
+        )

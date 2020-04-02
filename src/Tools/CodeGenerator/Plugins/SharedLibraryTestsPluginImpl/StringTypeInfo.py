@@ -50,28 +50,24 @@ class StringTypeInfo(TypeInfo):
     @Interface.override
     def GetOutputInfo(
         self,
+        invocation_template,
         result_name="result",
     ):
         if self.IsOptional:
             vector_type = "nonstd::optional<std::string>"
-            statement = "results.emplace_back({result}_ptr ? std::string({result}_ptr) : nonstd::optional<std::string>());".format(
+            statement = "{result}_ptr ? std::string({result}_ptr) : nonstd::optional<std::string>()".format(
                 result=result_name,
             )
         else:
             vector_type = "std::string"
-            statement = "results.emplace_back({result}_ptr ? std::string({result}_ptr) : std::string());".format(
+            statement = "{result}_ptr ? std::string({result}_ptr) : std::string()".format(
                 result=result_name,
             )
 
         return self.Result(
             vector_type,
             [self.Type("char const *", "{}_ptr".format(result_name))],
-            "&{result_name}_ptr".format(
-                result_name=result_name,
-            ),
-            statement,
-            "{result_name}_ptr".format(
-                result_name=result_name,
-            ),
+            invocation_template.format(statement),
+            "{}_ptr".format(result_name),
             destroy_inline=True,
         )

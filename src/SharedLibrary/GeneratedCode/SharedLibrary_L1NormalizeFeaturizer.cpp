@@ -17,6 +17,11 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunused-local-typedef"
+#endif
+
 #if (defined _MSC_VER)
 #   pragma warning(push)
 
@@ -137,6 +142,8 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int8_Fit(/*in*/ L1NormalizeFea
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int8_t const *, std::int8_t const *>>::InputType;
+
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int8_t const *, std::int8_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int8_t const *, std::int8_t const *>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input_ptr, input_ptr + input_items)));
@@ -149,7 +156,7 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int8_Fit(/*in*/ L1NormalizeFea
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int8_FitBuffer(/*in*/ L1NormalizeFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int8_FitBuffer(/*in*/ L1NormalizeFeaturizer_int8_EstimatorHandle *pHandle, /*in*/ int8_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -160,7 +167,6 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int8_FitBuffer(/*in*/ L1Normal
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input_item_ptr_ptr == nullptr) throw std::invalid_argument("'input_item_ptr_ptr' is null");
-        if(input_item_items_ptr == nullptr) throw std::invalid_argument("'input_item_items_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::tuple<int8_t const *, int8_t const *>> input_buffer;
@@ -169,16 +175,14 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int8_FitBuffer(/*in*/ L1Normal
 
         while(input_buffer.size() < input_items) {
             int8_t const * const &input_item_ptr(*input_item_ptr_ptr);
-            size_t const &input_item_items(*input_item_items_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
-            if(input_item_items == 0) throw std::invalid_argument("'input_item_items' is 0");
+            if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
             
 
-            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_item_items);
+            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_items);
 
             ++input_item_ptr_ptr;
-            ++input_item_items_ptr;
         }
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int8_t const *, std::int8_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int8_t const *, std::int8_t const *>>>(reinterpret_cast<size_t>(pHandle)));
@@ -358,23 +362,32 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int8_Transform(/*in*/ L1Normal
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int8_t const *, std::int8_t const *>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int8_t const *, std::int8_t const *>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int8_t const *, std::int8_t const *>>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int8_t const *, std::int8_t const *>>::TransformedType;
 
         // Input
         TransformedType result(transformer.execute(std::make_tuple(input_ptr, input_ptr + input_items)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -412,33 +425,48 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int8_Flush(/*in*/ L1NormalizeF
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new double *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        double ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new double[result_item.size()];
-            *output_item_items = result_item.size();
-
-            double * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new double *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            double ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new double[result_item.size()];
+
+                    double * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -448,20 +476,22 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int8_Flush(/*in*/ L1NormalizeF
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int8_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int8_DestroyTransformedData(/*out*/ double * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -580,6 +610,8 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int16_Fit(/*in*/ L1NormalizeFe
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int16_t const *, std::int16_t const *>>::InputType;
+
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int16_t const *, std::int16_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int16_t const *, std::int16_t const *>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input_ptr, input_ptr + input_items)));
@@ -592,7 +624,7 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int16_Fit(/*in*/ L1NormalizeFe
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int16_FitBuffer(/*in*/ L1NormalizeFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int16_FitBuffer(/*in*/ L1NormalizeFeaturizer_int16_EstimatorHandle *pHandle, /*in*/ int16_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -603,7 +635,6 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int16_FitBuffer(/*in*/ L1Norma
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input_item_ptr_ptr == nullptr) throw std::invalid_argument("'input_item_ptr_ptr' is null");
-        if(input_item_items_ptr == nullptr) throw std::invalid_argument("'input_item_items_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::tuple<int16_t const *, int16_t const *>> input_buffer;
@@ -612,16 +643,14 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int16_FitBuffer(/*in*/ L1Norma
 
         while(input_buffer.size() < input_items) {
             int16_t const * const &input_item_ptr(*input_item_ptr_ptr);
-            size_t const &input_item_items(*input_item_items_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
-            if(input_item_items == 0) throw std::invalid_argument("'input_item_items' is 0");
+            if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
             
 
-            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_item_items);
+            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_items);
 
             ++input_item_ptr_ptr;
-            ++input_item_items_ptr;
         }
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int16_t const *, std::int16_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int16_t const *, std::int16_t const *>>>(reinterpret_cast<size_t>(pHandle)));
@@ -801,23 +830,32 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int16_Transform(/*in*/ L1Norma
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int16_t const *, std::int16_t const *>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int16_t const *, std::int16_t const *>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int16_t const *, std::int16_t const *>>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int16_t const *, std::int16_t const *>>::TransformedType;
 
         // Input
         TransformedType result(transformer.execute(std::make_tuple(input_ptr, input_ptr + input_items)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -855,33 +893,48 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int16_Flush(/*in*/ L1Normalize
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new double *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        double ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new double[result_item.size()];
-            *output_item_items = result_item.size();
-
-            double * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new double *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            double ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new double[result_item.size()];
+
+                    double * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -891,20 +944,22 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int16_Flush(/*in*/ L1Normalize
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int16_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int16_DestroyTransformedData(/*out*/ double * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -1023,6 +1078,8 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int32_Fit(/*in*/ L1NormalizeFe
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int32_t const *, std::int32_t const *>>::InputType;
+
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int32_t const *, std::int32_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int32_t const *, std::int32_t const *>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input_ptr, input_ptr + input_items)));
@@ -1035,7 +1092,7 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int32_Fit(/*in*/ L1NormalizeFe
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int32_FitBuffer(/*in*/ L1NormalizeFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int32_FitBuffer(/*in*/ L1NormalizeFeaturizer_int32_EstimatorHandle *pHandle, /*in*/ int32_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1046,7 +1103,6 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int32_FitBuffer(/*in*/ L1Norma
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input_item_ptr_ptr == nullptr) throw std::invalid_argument("'input_item_ptr_ptr' is null");
-        if(input_item_items_ptr == nullptr) throw std::invalid_argument("'input_item_items_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::tuple<int32_t const *, int32_t const *>> input_buffer;
@@ -1055,16 +1111,14 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int32_FitBuffer(/*in*/ L1Norma
 
         while(input_buffer.size() < input_items) {
             int32_t const * const &input_item_ptr(*input_item_ptr_ptr);
-            size_t const &input_item_items(*input_item_items_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
-            if(input_item_items == 0) throw std::invalid_argument("'input_item_items' is 0");
+            if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
             
 
-            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_item_items);
+            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_items);
 
             ++input_item_ptr_ptr;
-            ++input_item_items_ptr;
         }
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int32_t const *, std::int32_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int32_t const *, std::int32_t const *>>>(reinterpret_cast<size_t>(pHandle)));
@@ -1244,23 +1298,32 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int32_Transform(/*in*/ L1Norma
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int32_t const *, std::int32_t const *>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int32_t const *, std::int32_t const *>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int32_t const *, std::int32_t const *>>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int32_t const *, std::int32_t const *>>::TransformedType;
 
         // Input
         TransformedType result(transformer.execute(std::make_tuple(input_ptr, input_ptr + input_items)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1298,33 +1361,48 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int32_Flush(/*in*/ L1Normalize
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new double *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        double ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new double[result_item.size()];
-            *output_item_items = result_item.size();
-
-            double * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new double *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            double ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new double[result_item.size()];
+
+                    double * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1334,20 +1412,22 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int32_Flush(/*in*/ L1Normalize
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int32_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int32_DestroyTransformedData(/*out*/ double * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -1466,6 +1546,8 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int64_Fit(/*in*/ L1NormalizeFe
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int64_t const *, std::int64_t const *>>::InputType;
+
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int64_t const *, std::int64_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int64_t const *, std::int64_t const *>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input_ptr, input_ptr + input_items)));
@@ -1478,7 +1560,7 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int64_Fit(/*in*/ L1NormalizeFe
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int64_FitBuffer(/*in*/ L1NormalizeFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int64_FitBuffer(/*in*/ L1NormalizeFeaturizer_int64_EstimatorHandle *pHandle, /*in*/ int64_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1489,7 +1571,6 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int64_FitBuffer(/*in*/ L1Norma
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input_item_ptr_ptr == nullptr) throw std::invalid_argument("'input_item_ptr_ptr' is null");
-        if(input_item_items_ptr == nullptr) throw std::invalid_argument("'input_item_items_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::tuple<int64_t const *, int64_t const *>> input_buffer;
@@ -1498,16 +1579,14 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int64_FitBuffer(/*in*/ L1Norma
 
         while(input_buffer.size() < input_items) {
             int64_t const * const &input_item_ptr(*input_item_ptr_ptr);
-            size_t const &input_item_items(*input_item_items_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
-            if(input_item_items == 0) throw std::invalid_argument("'input_item_items' is 0");
+            if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
             
 
-            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_item_items);
+            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_items);
 
             ++input_item_ptr_ptr;
-            ++input_item_items_ptr;
         }
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int64_t const *, std::int64_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int64_t const *, std::int64_t const *>>>(reinterpret_cast<size_t>(pHandle)));
@@ -1687,23 +1766,32 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int64_Transform(/*in*/ L1Norma
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int64_t const *, std::int64_t const *>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int64_t const *, std::int64_t const *>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int64_t const *, std::int64_t const *>>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::int64_t const *, std::int64_t const *>>::TransformedType;
 
         // Input
         TransformedType result(transformer.execute(std::make_tuple(input_ptr, input_ptr + input_items)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1741,33 +1829,48 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int64_Flush(/*in*/ L1Normalize
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new double *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        double ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new double[result_item.size()];
-            *output_item_items = result_item.size();
-
-            double * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new double *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            double ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new double[result_item.size()];
+
+                    double * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1777,20 +1880,22 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int64_Flush(/*in*/ L1Normalize
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int64_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_int64_DestroyTransformedData(/*out*/ double * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -1909,6 +2014,8 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint8_Fit(/*in*/ L1NormalizeFe
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint8_t const *, std::uint8_t const *>>::InputType;
+
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint8_t const *, std::uint8_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint8_t const *, std::uint8_t const *>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input_ptr, input_ptr + input_items)));
@@ -1921,7 +2028,7 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint8_Fit(/*in*/ L1NormalizeFe
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint8_FitBuffer(/*in*/ L1NormalizeFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint8_FitBuffer(/*in*/ L1NormalizeFeaturizer_uint8_EstimatorHandle *pHandle, /*in*/ uint8_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -1932,7 +2039,6 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint8_FitBuffer(/*in*/ L1Norma
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input_item_ptr_ptr == nullptr) throw std::invalid_argument("'input_item_ptr_ptr' is null");
-        if(input_item_items_ptr == nullptr) throw std::invalid_argument("'input_item_items_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::tuple<uint8_t const *, uint8_t const *>> input_buffer;
@@ -1941,16 +2047,14 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint8_FitBuffer(/*in*/ L1Norma
 
         while(input_buffer.size() < input_items) {
             uint8_t const * const &input_item_ptr(*input_item_ptr_ptr);
-            size_t const &input_item_items(*input_item_items_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
-            if(input_item_items == 0) throw std::invalid_argument("'input_item_items' is 0");
+            if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
             
 
-            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_item_items);
+            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_items);
 
             ++input_item_ptr_ptr;
-            ++input_item_items_ptr;
         }
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint8_t const *, std::uint8_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint8_t const *, std::uint8_t const *>>>(reinterpret_cast<size_t>(pHandle)));
@@ -2130,23 +2234,32 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint8_Transform(/*in*/ L1Norma
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint8_t const *, std::uint8_t const *>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint8_t const *, std::uint8_t const *>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint8_t const *, std::uint8_t const *>>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint8_t const *, std::uint8_t const *>>::TransformedType;
 
         // Input
         TransformedType result(transformer.execute(std::make_tuple(input_ptr, input_ptr + input_items)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2184,33 +2297,48 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint8_Flush(/*in*/ L1Normalize
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new double *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        double ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new double[result_item.size()];
-            *output_item_items = result_item.size();
-
-            double * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new double *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            double ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new double[result_item.size()];
+
+                    double * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2220,20 +2348,22 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint8_Flush(/*in*/ L1Normalize
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint8_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint8_DestroyTransformedData(/*out*/ double * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -2352,6 +2482,8 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint16_Fit(/*in*/ L1NormalizeF
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint16_t const *, std::uint16_t const *>>::InputType;
+
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint16_t const *, std::uint16_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint16_t const *, std::uint16_t const *>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input_ptr, input_ptr + input_items)));
@@ -2364,7 +2496,7 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint16_Fit(/*in*/ L1NormalizeF
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint16_FitBuffer(/*in*/ L1NormalizeFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint16_FitBuffer(/*in*/ L1NormalizeFeaturizer_uint16_EstimatorHandle *pHandle, /*in*/ uint16_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2375,7 +2507,6 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint16_FitBuffer(/*in*/ L1Norm
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input_item_ptr_ptr == nullptr) throw std::invalid_argument("'input_item_ptr_ptr' is null");
-        if(input_item_items_ptr == nullptr) throw std::invalid_argument("'input_item_items_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::tuple<uint16_t const *, uint16_t const *>> input_buffer;
@@ -2384,16 +2515,14 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint16_FitBuffer(/*in*/ L1Norm
 
         while(input_buffer.size() < input_items) {
             uint16_t const * const &input_item_ptr(*input_item_ptr_ptr);
-            size_t const &input_item_items(*input_item_items_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
-            if(input_item_items == 0) throw std::invalid_argument("'input_item_items' is 0");
+            if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
             
 
-            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_item_items);
+            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_items);
 
             ++input_item_ptr_ptr;
-            ++input_item_items_ptr;
         }
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint16_t const *, std::uint16_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint16_t const *, std::uint16_t const *>>>(reinterpret_cast<size_t>(pHandle)));
@@ -2573,23 +2702,32 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint16_Transform(/*in*/ L1Norm
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint16_t const *, std::uint16_t const *>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint16_t const *, std::uint16_t const *>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint16_t const *, std::uint16_t const *>>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint16_t const *, std::uint16_t const *>>::TransformedType;
 
         // Input
         TransformedType result(transformer.execute(std::make_tuple(input_ptr, input_ptr + input_items)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2627,33 +2765,48 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint16_Flush(/*in*/ L1Normaliz
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new double *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        double ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new double[result_item.size()];
-            *output_item_items = result_item.size();
-
-            double * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new double *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            double ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new double[result_item.size()];
+
+                    double * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2663,20 +2816,22 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint16_Flush(/*in*/ L1Normaliz
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint16_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint16_DestroyTransformedData(/*out*/ double * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -2795,6 +2950,8 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint32_Fit(/*in*/ L1NormalizeF
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint32_t const *, std::uint32_t const *>>::InputType;
+
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint32_t const *, std::uint32_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint32_t const *, std::uint32_t const *>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input_ptr, input_ptr + input_items)));
@@ -2807,7 +2964,7 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint32_Fit(/*in*/ L1NormalizeF
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint32_FitBuffer(/*in*/ L1NormalizeFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint32_FitBuffer(/*in*/ L1NormalizeFeaturizer_uint32_EstimatorHandle *pHandle, /*in*/ uint32_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -2818,7 +2975,6 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint32_FitBuffer(/*in*/ L1Norm
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input_item_ptr_ptr == nullptr) throw std::invalid_argument("'input_item_ptr_ptr' is null");
-        if(input_item_items_ptr == nullptr) throw std::invalid_argument("'input_item_items_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::tuple<uint32_t const *, uint32_t const *>> input_buffer;
@@ -2827,16 +2983,14 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint32_FitBuffer(/*in*/ L1Norm
 
         while(input_buffer.size() < input_items) {
             uint32_t const * const &input_item_ptr(*input_item_ptr_ptr);
-            size_t const &input_item_items(*input_item_items_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
-            if(input_item_items == 0) throw std::invalid_argument("'input_item_items' is 0");
+            if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
             
 
-            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_item_items);
+            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_items);
 
             ++input_item_ptr_ptr;
-            ++input_item_items_ptr;
         }
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint32_t const *, std::uint32_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint32_t const *, std::uint32_t const *>>>(reinterpret_cast<size_t>(pHandle)));
@@ -3016,23 +3170,32 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint32_Transform(/*in*/ L1Norm
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint32_t const *, std::uint32_t const *>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint32_t const *, std::uint32_t const *>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint32_t const *, std::uint32_t const *>>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint32_t const *, std::uint32_t const *>>::TransformedType;
 
         // Input
         TransformedType result(transformer.execute(std::make_tuple(input_ptr, input_ptr + input_items)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3070,33 +3233,48 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint32_Flush(/*in*/ L1Normaliz
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new double *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        double ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new double[result_item.size()];
-            *output_item_items = result_item.size();
-
-            double * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new double *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            double ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new double[result_item.size()];
+
+                    double * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3106,20 +3284,22 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint32_Flush(/*in*/ L1Normaliz
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint32_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint32_DestroyTransformedData(/*out*/ double * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -3238,6 +3418,8 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint64_Fit(/*in*/ L1NormalizeF
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint64_t const *, std::uint64_t const *>>::InputType;
+
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint64_t const *, std::uint64_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint64_t const *, std::uint64_t const *>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input_ptr, input_ptr + input_items)));
@@ -3250,7 +3432,7 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint64_Fit(/*in*/ L1NormalizeF
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint64_FitBuffer(/*in*/ L1NormalizeFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint64_FitBuffer(/*in*/ L1NormalizeFeaturizer_uint64_EstimatorHandle *pHandle, /*in*/ uint64_t const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3261,7 +3443,6 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint64_FitBuffer(/*in*/ L1Norm
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input_item_ptr_ptr == nullptr) throw std::invalid_argument("'input_item_ptr_ptr' is null");
-        if(input_item_items_ptr == nullptr) throw std::invalid_argument("'input_item_items_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::tuple<uint64_t const *, uint64_t const *>> input_buffer;
@@ -3270,16 +3451,14 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint64_FitBuffer(/*in*/ L1Norm
 
         while(input_buffer.size() < input_items) {
             uint64_t const * const &input_item_ptr(*input_item_ptr_ptr);
-            size_t const &input_item_items(*input_item_items_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
-            if(input_item_items == 0) throw std::invalid_argument("'input_item_items' is 0");
+            if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
             
 
-            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_item_items);
+            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_items);
 
             ++input_item_ptr_ptr;
-            ++input_item_items_ptr;
         }
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint64_t const *, std::uint64_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint64_t const *, std::uint64_t const *>>>(reinterpret_cast<size_t>(pHandle)));
@@ -3459,23 +3638,32 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint64_Transform(/*in*/ L1Norm
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint64_t const *, std::uint64_t const *>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint64_t const *, std::uint64_t const *>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint64_t const *, std::uint64_t const *>>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::uint64_t const *, std::uint64_t const *>>::TransformedType;
 
         // Input
         TransformedType result(transformer.execute(std::make_tuple(input_ptr, input_ptr + input_items)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3513,33 +3701,48 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint64_Flush(/*in*/ L1Normaliz
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new double *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        double ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new double[result_item.size()];
-            *output_item_items = result_item.size();
-
-            double * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new double *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            double ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new double[result_item.size()];
+
+                    double * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3549,20 +3752,22 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint64_Flush(/*in*/ L1Normaliz
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint64_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_uint64_DestroyTransformedData(/*out*/ double * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -3681,6 +3886,8 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_float_Fit(/*in*/ L1NormalizeFe
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::float_t const *, std::float_t const *>>::InputType;
+
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::float_t const *, std::float_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::float_t const *, std::float_t const *>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input_ptr, input_ptr + input_items)));
@@ -3693,7 +3900,7 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_float_Fit(/*in*/ L1NormalizeFe
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_float_FitBuffer(/*in*/ L1NormalizeFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_float_FitBuffer(/*in*/ L1NormalizeFeaturizer_float_EstimatorHandle *pHandle, /*in*/ float const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -3704,7 +3911,6 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_float_FitBuffer(/*in*/ L1Norma
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input_item_ptr_ptr == nullptr) throw std::invalid_argument("'input_item_ptr_ptr' is null");
-        if(input_item_items_ptr == nullptr) throw std::invalid_argument("'input_item_items_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::tuple<float const *, float const *>> input_buffer;
@@ -3713,16 +3919,14 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_float_FitBuffer(/*in*/ L1Norma
 
         while(input_buffer.size() < input_items) {
             float const * const &input_item_ptr(*input_item_ptr_ptr);
-            size_t const &input_item_items(*input_item_items_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
-            if(input_item_items == 0) throw std::invalid_argument("'input_item_items' is 0");
+            if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
             
 
-            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_item_items);
+            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_items);
 
             ++input_item_ptr_ptr;
-            ++input_item_items_ptr;
         }
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::float_t const *, std::float_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::float_t const *, std::float_t const *>>>(reinterpret_cast<size_t>(pHandle)));
@@ -3902,23 +4106,32 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_float_Transform(/*in*/ L1Norma
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::float_t const *, std::float_t const *>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::float_t const *, std::float_t const *>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::float_t const *, std::float_t const *>>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::float_t const *, std::float_t const *>>::TransformedType;
 
         // Input
         TransformedType result(transformer.execute(std::make_tuple(input_ptr, input_ptr + input_items)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3956,33 +4169,48 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_float_Flush(/*in*/ L1Normalize
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new double *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        double ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
-            // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new double[result_item.size()];
-            *output_item_items = result_item.size();
-
-            double * output_item_item(*output_item_item_ptr);
-
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item;
-                ++output_item_item;
-            }
-
-            ++output_item_item_ptr;
-            ++output_item_items;
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_item_ptr_ptr = new double *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
+
+            double ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new double[result_item.size()];
+
+                    double * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3992,20 +4220,22 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_float_Flush(/*in*/ L1Normalize
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_float_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_float_DestroyTransformedData(/*out*/ double * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
     try {
         *ppErrorInfo = nullptr;
 
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
 
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
 
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
+            delete [] result_item_ptr;
+        }
     
         return true;
     }
@@ -4124,6 +4354,8 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_double_Fit(/*in*/ L1NormalizeF
         if(input_ptr == nullptr) throw std::invalid_argument("'input_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::double_t const *, std::double_t const *>>::InputType;
+
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::double_t const *, std::double_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::double_t const *, std::double_t const *>>>(reinterpret_cast<size_t>(pHandle)));
 
         *pFitResult = static_cast<unsigned char>(estimator.fit(std::make_tuple(input_ptr, input_ptr + input_items)));
@@ -4136,7 +4368,7 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_double_Fit(/*in*/ L1NormalizeF
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_double_FitBuffer(/*in*/ L1NormalizeFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * const * input_item_ptr_ptr, /*in*/ size_t const * input_item_items_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_double_FitBuffer(/*in*/ L1NormalizeFeaturizer_double_EstimatorHandle *pHandle, /*in*/ double const * const * input_item_ptr_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -4147,7 +4379,6 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_double_FitBuffer(/*in*/ L1Norm
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         if(input_item_ptr_ptr == nullptr) throw std::invalid_argument("'input_item_ptr_ptr' is null");
-        if(input_item_items_ptr == nullptr) throw std::invalid_argument("'input_item_items_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
         std::vector<std::tuple<double const *, double const *>> input_buffer;
@@ -4156,16 +4387,14 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_double_FitBuffer(/*in*/ L1Norm
 
         while(input_buffer.size() < input_items) {
             double const * const &input_item_ptr(*input_item_ptr_ptr);
-            size_t const &input_item_items(*input_item_items_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
-            if(input_item_items == 0) throw std::invalid_argument("'input_item_items' is 0");
+            if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
             
 
-            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_item_items);
+            input_buffer.emplace_back(input_item_ptr, input_item_ptr + input_items);
 
             ++input_item_ptr_ptr;
-            ++input_item_items_ptr;
         }
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::double_t const *, std::double_t const *>> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::double_t const *, std::double_t const *>>>(reinterpret_cast<size_t>(pHandle)));
@@ -4345,23 +4574,32 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_double_Transform(/*in*/ L1Norm
 
         Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::double_t const *, std::double_t const *>>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::double_t const *, std::double_t const *>>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::double_t const *, std::double_t const *>>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::L1NormalizeEstimator<std::tuple<std::double_t const *, std::double_t const *>>::TransformedType;
 
         // Input
         TransformedType result(transformer.execute(std::make_tuple(input_ptr, input_ptr + input_items)));
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4399,32 +4637,72 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_double_Flush(/*in*/ L1Normaliz
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_item_ptr_ptr = new double *[result.size()];
-        *output_item_items_ptr = new size_t[result.size()];
-        *output_items = result.size();
-
-        double ** output_item_item_ptr(*output_item_item_ptr_ptr);
-        size_t * output_item_items(*output_item_items_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
-            if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
-
+        if(result.empty()) {
+            *output_item_item_ptr_ptr = nullptr;
+            *output_item_items_ptr = nullptr;
+        }
+        else {
             // TODO: There are potential memory leaks if allocation fails
-            *output_item_item_ptr = new double[result_item.size()];
-            *output_item_items = result_item.size();
+            *output_item_item_ptr_ptr = new double *[result.size()];
+            *output_item_items_ptr = new size_t[result.size()];
 
-            double * output_item_item(*output_item_item_ptr);
+            double ** output_item_item_ptr(*output_item_item_ptr_ptr);
+            size_t * output_item_items(*output_item_items_ptr);
 
-            for(auto const & result_item_item : result_item) {
-                if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
-                *output_item_item = result_item_item;
-                ++output_item_item;
+            for(auto const & result_item : result) {
+                if(output_item_item_ptr == nullptr) throw std::invalid_argument("'output_item_item_ptr' is null");
+                if(output_item_items == nullptr) throw std::invalid_argument("'output_item_items' is null");
+
+                if(result_item.empty()) {
+                    *output_item_item_ptr = nullptr;
+                }
+                else {
+                    // TODO: There are potential memory leaks if allocation fails
+                    *output_item_item_ptr = new double[result_item.size()];
+
+                    double * output_item_item(*output_item_item_ptr);
+
+                    for(auto const & result_item_item : result_item) {
+                        if(output_item_item == nullptr) throw std::invalid_argument("'output_item_item' is null");
+
+                        *output_item_item = result_item_item;
+
+                        ++output_item_item;
+                    }
+                }
+
+                *output_item_items = result_item.size();
+
+                ++output_item_item_ptr;
+                ++output_item_items;
             }
+        }
 
-            ++output_item_item_ptr;
-            ++output_item_items;
+        *output_items = result.size();
+    
+        return true;
+    }
+    catch(std::exception const &ex) {
+        *ppErrorInfo = CreateErrorInfo(ex);
+        return false;
+    }
+}
+
+FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_double_DestroyTransformedData(/*out*/ double * result_item_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+    if(ppErrorInfo == nullptr)
+        return false;
+
+    try {
+        *ppErrorInfo = nullptr;
+
+        if(result_item_ptr != nullptr && result_items == 0) throw std::invalid_argument("'result_items' is 0");
+        if(result_item_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
+        if(bool(result_items) != bool(result_item_ptr)) throw std::invalid_argument("'result_items' is not internally consistent");
+
+        if(result_item_ptr != nullptr) {
+            // No destroy statements
+
+            delete [] result_item_ptr;
         }
     
         return true;
@@ -4435,29 +4713,10 @@ FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_double_Flush(/*in*/ L1Normaliz
     }
 }
 
-FEATURIZER_LIBRARY_API bool L1NormalizeFeaturizer_double_DestroyTransformedData(/*out*/ double const * result_ptr, /*out*/ size_t result_items, /*out*/ ErrorInfoHandle **ppErrorInfo) {
-    if(ppErrorInfo == nullptr)
-        return false;
 
-    try {
-        *ppErrorInfo = nullptr;
-
-        if(result_ptr == nullptr && result_items != 0) throw std::invalid_argument("'result_items' is not 0");
-
-
-        if(result_items == 0)
-            return true;
-
-        delete [] result_ptr;
-    
-        return true;
-    }
-    catch(std::exception const &ex) {
-        *ppErrorInfo = CreateErrorInfo(ex);
-        return false;
-    }
-}
-
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)

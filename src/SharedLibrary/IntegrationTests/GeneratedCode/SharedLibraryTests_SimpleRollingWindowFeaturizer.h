@@ -9,7 +9,7 @@
 #include "Traits.h"
 #include "Featurizers/Structs.h"
 
-#include "SharedLibrary_Common.hpp"
+#include "SharedLibraryTests_Common.hpp"
 
 #if (defined _MSC_VER)
 #   pragma warning(push)
@@ -125,30 +125,30 @@ void SimpleRollingWindowFeaturizer_int8_Test(
 
         auto const & input1(std::get<1>(input));
 
-        std::int8_t ** result_ptr;
+        std::int8_t ** result_item_items;
         size_t result_items;
 
-        REQUIRE(SimpleRollingWindowFeaturizer_int8_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_int8_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        // Convert the pointers into optional values
-        {
-            std::vector<nonstd::optional<std::int8_t>> temp;
+        typename decltype(results)::value_type these_results;
 
-            temp.reserve(result_items);
+        these_results.reserve(result_items);
 
-            for(std::int8_t **ptr = result_ptr; ptr != result_ptr + result_items; ++ptr) {
-                if(*ptr != nullptr)
-                    temp.emplace_back(std::move(**ptr));
-                else
-                    temp.emplace_back(nonstd::optional<std::int8_t>());
-            }
+        std::int8_t ** result_item_items_ptr(result_item_items);
 
-            results.emplace_back(std::move(temp));
+        while(these_results.size() < result_items) {
+            std::int8_t * & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(result_item ? std::move(*result_item) : nonstd::optional<std::int8_t>());
+
+            ++result_item_items_ptr;
         }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(SimpleRollingWindowFeaturizer_int8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_int8_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -264,30 +264,30 @@ void SimpleRollingWindowFeaturizer_int16_Test(
 
         auto const & input1(std::get<1>(input));
 
-        std::int16_t ** result_ptr;
+        std::int16_t ** result_item_items;
         size_t result_items;
 
-        REQUIRE(SimpleRollingWindowFeaturizer_int16_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_int16_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        // Convert the pointers into optional values
-        {
-            std::vector<nonstd::optional<std::int16_t>> temp;
+        typename decltype(results)::value_type these_results;
 
-            temp.reserve(result_items);
+        these_results.reserve(result_items);
 
-            for(std::int16_t **ptr = result_ptr; ptr != result_ptr + result_items; ++ptr) {
-                if(*ptr != nullptr)
-                    temp.emplace_back(std::move(**ptr));
-                else
-                    temp.emplace_back(nonstd::optional<std::int16_t>());
-            }
+        std::int16_t ** result_item_items_ptr(result_item_items);
 
-            results.emplace_back(std::move(temp));
+        while(these_results.size() < result_items) {
+            std::int16_t * & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(result_item ? std::move(*result_item) : nonstd::optional<std::int16_t>());
+
+            ++result_item_items_ptr;
         }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(SimpleRollingWindowFeaturizer_int16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_int16_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -403,30 +403,30 @@ void SimpleRollingWindowFeaturizer_int32_Test(
 
         auto const & input1(std::get<1>(input));
 
-        std::int32_t ** result_ptr;
+        std::int32_t ** result_item_items;
         size_t result_items;
 
-        REQUIRE(SimpleRollingWindowFeaturizer_int32_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_int32_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        // Convert the pointers into optional values
-        {
-            std::vector<nonstd::optional<std::int32_t>> temp;
+        typename decltype(results)::value_type these_results;
 
-            temp.reserve(result_items);
+        these_results.reserve(result_items);
 
-            for(std::int32_t **ptr = result_ptr; ptr != result_ptr + result_items; ++ptr) {
-                if(*ptr != nullptr)
-                    temp.emplace_back(std::move(**ptr));
-                else
-                    temp.emplace_back(nonstd::optional<std::int32_t>());
-            }
+        std::int32_t ** result_item_items_ptr(result_item_items);
 
-            results.emplace_back(std::move(temp));
+        while(these_results.size() < result_items) {
+            std::int32_t * & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(result_item ? std::move(*result_item) : nonstd::optional<std::int32_t>());
+
+            ++result_item_items_ptr;
         }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(SimpleRollingWindowFeaturizer_int32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_int32_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -542,30 +542,30 @@ void SimpleRollingWindowFeaturizer_int64_Test(
 
         auto const & input1(std::get<1>(input));
 
-        std::int64_t ** result_ptr;
+        std::int64_t ** result_item_items;
         size_t result_items;
 
-        REQUIRE(SimpleRollingWindowFeaturizer_int64_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_int64_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        // Convert the pointers into optional values
-        {
-            std::vector<nonstd::optional<std::int64_t>> temp;
+        typename decltype(results)::value_type these_results;
 
-            temp.reserve(result_items);
+        these_results.reserve(result_items);
 
-            for(std::int64_t **ptr = result_ptr; ptr != result_ptr + result_items; ++ptr) {
-                if(*ptr != nullptr)
-                    temp.emplace_back(std::move(**ptr));
-                else
-                    temp.emplace_back(nonstd::optional<std::int64_t>());
-            }
+        std::int64_t ** result_item_items_ptr(result_item_items);
 
-            results.emplace_back(std::move(temp));
+        while(these_results.size() < result_items) {
+            std::int64_t * & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(result_item ? std::move(*result_item) : nonstd::optional<std::int64_t>());
+
+            ++result_item_items_ptr;
         }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(SimpleRollingWindowFeaturizer_int64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_int64_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -681,30 +681,30 @@ void SimpleRollingWindowFeaturizer_uint8_Test(
 
         auto const & input1(std::get<1>(input));
 
-        std::uint8_t ** result_ptr;
+        std::uint8_t ** result_item_items;
         size_t result_items;
 
-        REQUIRE(SimpleRollingWindowFeaturizer_uint8_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_uint8_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        // Convert the pointers into optional values
-        {
-            std::vector<nonstd::optional<std::uint8_t>> temp;
+        typename decltype(results)::value_type these_results;
 
-            temp.reserve(result_items);
+        these_results.reserve(result_items);
 
-            for(std::uint8_t **ptr = result_ptr; ptr != result_ptr + result_items; ++ptr) {
-                if(*ptr != nullptr)
-                    temp.emplace_back(std::move(**ptr));
-                else
-                    temp.emplace_back(nonstd::optional<std::uint8_t>());
-            }
+        std::uint8_t ** result_item_items_ptr(result_item_items);
 
-            results.emplace_back(std::move(temp));
+        while(these_results.size() < result_items) {
+            std::uint8_t * & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(result_item ? std::move(*result_item) : nonstd::optional<std::uint8_t>());
+
+            ++result_item_items_ptr;
         }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(SimpleRollingWindowFeaturizer_uint8_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_uint8_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -820,30 +820,30 @@ void SimpleRollingWindowFeaturizer_uint16_Test(
 
         auto const & input1(std::get<1>(input));
 
-        std::uint16_t ** result_ptr;
+        std::uint16_t ** result_item_items;
         size_t result_items;
 
-        REQUIRE(SimpleRollingWindowFeaturizer_uint16_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_uint16_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        // Convert the pointers into optional values
-        {
-            std::vector<nonstd::optional<std::uint16_t>> temp;
+        typename decltype(results)::value_type these_results;
 
-            temp.reserve(result_items);
+        these_results.reserve(result_items);
 
-            for(std::uint16_t **ptr = result_ptr; ptr != result_ptr + result_items; ++ptr) {
-                if(*ptr != nullptr)
-                    temp.emplace_back(std::move(**ptr));
-                else
-                    temp.emplace_back(nonstd::optional<std::uint16_t>());
-            }
+        std::uint16_t ** result_item_items_ptr(result_item_items);
 
-            results.emplace_back(std::move(temp));
+        while(these_results.size() < result_items) {
+            std::uint16_t * & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(result_item ? std::move(*result_item) : nonstd::optional<std::uint16_t>());
+
+            ++result_item_items_ptr;
         }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(SimpleRollingWindowFeaturizer_uint16_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_uint16_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -959,30 +959,30 @@ void SimpleRollingWindowFeaturizer_uint32_Test(
 
         auto const & input1(std::get<1>(input));
 
-        std::uint32_t ** result_ptr;
+        std::uint32_t ** result_item_items;
         size_t result_items;
 
-        REQUIRE(SimpleRollingWindowFeaturizer_uint32_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_uint32_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        // Convert the pointers into optional values
-        {
-            std::vector<nonstd::optional<std::uint32_t>> temp;
+        typename decltype(results)::value_type these_results;
 
-            temp.reserve(result_items);
+        these_results.reserve(result_items);
 
-            for(std::uint32_t **ptr = result_ptr; ptr != result_ptr + result_items; ++ptr) {
-                if(*ptr != nullptr)
-                    temp.emplace_back(std::move(**ptr));
-                else
-                    temp.emplace_back(nonstd::optional<std::uint32_t>());
-            }
+        std::uint32_t ** result_item_items_ptr(result_item_items);
 
-            results.emplace_back(std::move(temp));
+        while(these_results.size() < result_items) {
+            std::uint32_t * & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(result_item ? std::move(*result_item) : nonstd::optional<std::uint32_t>());
+
+            ++result_item_items_ptr;
         }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(SimpleRollingWindowFeaturizer_uint32_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_uint32_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1098,30 +1098,30 @@ void SimpleRollingWindowFeaturizer_uint64_Test(
 
         auto const & input1(std::get<1>(input));
 
-        std::uint64_t ** result_ptr;
+        std::uint64_t ** result_item_items;
         size_t result_items;
 
-        REQUIRE(SimpleRollingWindowFeaturizer_uint64_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_uint64_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        // Convert the pointers into optional values
-        {
-            std::vector<nonstd::optional<std::uint64_t>> temp;
+        typename decltype(results)::value_type these_results;
 
-            temp.reserve(result_items);
+        these_results.reserve(result_items);
 
-            for(std::uint64_t **ptr = result_ptr; ptr != result_ptr + result_items; ++ptr) {
-                if(*ptr != nullptr)
-                    temp.emplace_back(std::move(**ptr));
-                else
-                    temp.emplace_back(nonstd::optional<std::uint64_t>());
-            }
+        std::uint64_t ** result_item_items_ptr(result_item_items);
 
-            results.emplace_back(std::move(temp));
+        while(these_results.size() < result_items) {
+            std::uint64_t * & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(result_item ? std::move(*result_item) : nonstd::optional<std::uint64_t>());
+
+            ++result_item_items_ptr;
         }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(SimpleRollingWindowFeaturizer_uint64_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_uint64_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1237,16 +1237,30 @@ void SimpleRollingWindowFeaturizer_float_Test(
 
         auto const & input1(std::get<1>(input));
 
-        std::float_t* result_ptr;
+        std::float_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(SimpleRollingWindowFeaturizer_float_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_float_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::float_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::float_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::float_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(SimpleRollingWindowFeaturizer_float_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_float_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1362,16 +1376,30 @@ void SimpleRollingWindowFeaturizer_double_Test(
 
         auto const & input1(std::get<1>(input));
 
-        std::double_t* result_ptr;
+        std::double_t* result_item_items;
         size_t result_items;
 
-        REQUIRE(SimpleRollingWindowFeaturizer_double_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_ptr, &result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_double_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_item_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::vector<std::double_t>(result_ptr, result_ptr + result_items));
+        typename decltype(results)::value_type these_results;
+
+        these_results.reserve(result_items);
+
+        std::double_t* result_item_items_ptr(result_item_items);
+
+        while(these_results.size() < result_items) {
+            std::double_t & result_item(*result_item_items_ptr);
+
+            these_results.emplace_back(std::move(result_item));
+
+            ++result_item_items_ptr;
+        }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(SimpleRollingWindowFeaturizer_double_DestroyTransformedData(result_ptr, result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_double_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1487,30 +1515,30 @@ void SimpleRollingWindowFeaturizer_string_Test(
 
         auto const & input1(std::get<1>(input));
 
-        char const ** result_ptr_ptr;
+        char const ** result_item_ptr_items;
         size_t result_items;
 
-        REQUIRE(SimpleRollingWindowFeaturizer_string_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1.c_str(), &result_ptr_ptr, &result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_string_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1.c_str(), &result_item_ptr_items, &result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        // Convert the pointers into optional values
-        {
-            std::vector<nonstd::optional<std::string>> temp;
+        typename decltype(results)::value_type these_results;
 
-            temp.reserve(result_items);
+        these_results.reserve(result_items);
 
-            for(char const **ptr = result_ptr_ptr; ptr != result_ptr_ptr + result_items; ++ptr) {
-                if(*ptr != nullptr)
-                    temp.emplace_back(std::move(**ptr));
-                else
-                    temp.emplace_back(nonstd::optional<std::string>());
-            }
+        char const ** result_item_ptr_items_ptr(result_item_ptr_items);
 
-            results.emplace_back(std::move(temp));
+        while(these_results.size() < result_items) {
+            char const * & result_item_ptr(*result_item_ptr_items_ptr);
+
+            these_results.emplace_back(result_item_ptr ? std::string(result_item_ptr) : nonstd::optional<std::string>());
+
+            ++result_item_ptr_items_ptr;
         }
+
+        results.emplace_back(std::move(these_results));
         
         // Destroy the contents
-        REQUIRE(SimpleRollingWindowFeaturizer_string_DestroyTransformedData(result_ptr_ptr, result_items, &pErrorInfo));
+        REQUIRE(SimpleRollingWindowFeaturizer_string_DestroyTransformedData(result_item_ptr_items, result_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 

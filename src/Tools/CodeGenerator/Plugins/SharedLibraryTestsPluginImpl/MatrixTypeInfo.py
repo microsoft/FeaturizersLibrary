@@ -65,10 +65,35 @@ class MatrixTypeInfo(TypeInfo):
         self._type_info                 = type_info
 
         # Override the CppType property with this type info
-        self._matrix_type               = "Eigen::MatrixX<{}>".format(self._type_info.CppType);
-        self._map_type                  = "Eigen::Map<{}>".format(self._matrix_type)
+        self.CppType                    = "Microsoft::Featurizer::RowMajMatrix<{}>".format(self._type_info.CppType)
 
-        self.CppType                    = self._map_type
+    # ----------------------------------------------------------------------
+    @Interface.override
+    @staticmethod
+    def CreateHelperMethods(output_stream):
+        output_stream.write(
+            textwrap.dedent(
+                """\
+                template <typename T>
+                Microsoft::Featurizer::RowMajMatrix<T> CreateMatrix(size_t numCols, size_t numRows, T *pData) {
+                    if(numCols == 0) throw std::invalid_argument("numCols");
+                    if(numRows == 0) throw std::invalid_argument("numRows");
+                    if(pData == nullptr) throw std::invalid_argument("pData");
+
+                    Microsoft::Featurizer::RowMajMatrix<T> result(numRows, numCols);
+
+                    for(size_t row = 0; row < numRows; ++row) {
+                        for(size_t col = 0; col < numCols; ++col) {
+                            result(static_cast<Eigen::Index>(row), static_cast<Eigen::Index>(col)) = *pData++;
+                        }
+                    }
+
+                    return result;
+                }
+
+                """,
+            ),
+        )
 
     # ----------------------------------------------------------------------
     @Interface.override
@@ -87,25 +112,21 @@ class MatrixTypeInfo(TypeInfo):
     @Interface.override
     def GetOutputInfo(
         self,
+        invocation_template,
         result_name="result",
     ):
         return self.Result(
-            "Eigen::MatrixX<{}>".format(self._type_info.CppType),
+            "Microsoft::Featurizer::RowMajMatrix<{}>".format(self._type_info.CppType),
             [
                 self.Type("size_t", "{}_cols".format(result_name)),
                 self.Type("size_t", "{}_rows".format(result_name)),
                 self.Type("{} *".format(self._type_info.CppType), "{}_ptr".format(result_name)),
             ],
-            "&{name}_cols, &{name}_rows, &{name}_ptr".format(
-                name=result_name,
-            ),
-            textwrap.dedent(
-                """\
-                results.emplace_back(Eigen::Map<Eigen::MatrixX<{type}>>({name}_ptr, static_cast<Eigen::Index>({name}_cols), static_cast<Eigen::Index>({name}_rows)));
-                """,
-            ).format(
-                type=self._type_info.CppType,
-                name=result_name,
+            invocation_template.format(
+                "CreateMatrix({name}_cols, {name}_rows, {name}_ptr)".format(
+                    type=self._type_info.CppType,
+                    name=result_name,
+                ),
             ),
             "{name}_cols, {name}_rows, {name}_ptr".format(
                 name=result_name,

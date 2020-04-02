@@ -74,6 +74,7 @@ class SparseVectorTypeInfo(TypeInfo):
     @Interface.override
     def GetOutputInfo(
         self,
+        invocation_template,
         result_name="result",
     ):
         return self.Result(
@@ -84,9 +85,6 @@ class SparseVectorTypeInfo(TypeInfo):
                 self.Type("{} *".format(self._type_info.CppType), "{}_values".format(result_name)),
                 self.Type("uint64_t *", "{}_indexes".format(result_name)),
             ],
-            "&{name}_numElements, &{name}_numValues, &{name}_values, &{name}_indexes".format(
-                name=result_name,
-            ),
             textwrap.dedent(
                 """\
                 std::vector<typename Microsoft::Featurizer::Featurizers::SparseVectorEncoding<{type}>::ValueEncoding> encodings;
@@ -97,11 +95,14 @@ class SparseVectorTypeInfo(TypeInfo):
                     encodings.emplace_back(*pValue++, *pIndex++);
                 }}
 
-                results.emplace_back({name}_numElements, std::move(encodings));
+                {statement}
                 """
             ).format(
                 type=self._type_info.CppType,
                 name=result_name,
+                statement=invocation_template.format(
+                    "{}_numElements, std::move(encodings)".format(result_name),
+                ),
             ),
             "{name}_numElements, {name}_numValues, {name}_values, {name}_indexes".format(
                 name=result_name,

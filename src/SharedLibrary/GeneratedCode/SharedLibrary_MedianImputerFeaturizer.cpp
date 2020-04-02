@@ -17,6 +17,11 @@ std::chrono::system_clock::time_point CreateDateTime(DateTimeParameter const &pa
 
 extern "C" {
 
+#if (defined __clang__)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunused-local-typedef"
+#endif
+
 #if (defined _MSC_VER)
 #   pragma warning(push)
 
@@ -135,6 +140,8 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_Fit(/*in*/ MedianImpute
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -345,6 +352,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_Transform(/*in*/ Median
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int8_t, std::double_t>::TransformedType;
 
         // Input
@@ -388,17 +396,25 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int8_Flush(/*in*/ MedianImpu
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -515,6 +531,8 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_Fit(/*in*/ MedianImput
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -725,6 +743,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_Transform(/*in*/ Media
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int16_t, std::double_t>::TransformedType;
 
         // Input
@@ -768,17 +787,25 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int16_Flush(/*in*/ MedianImp
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -895,6 +922,8 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_Fit(/*in*/ MedianImput
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1105,6 +1134,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_Transform(/*in*/ Media
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int32_t, std::double_t>::TransformedType;
 
         // Input
@@ -1148,17 +1178,25 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int32_Flush(/*in*/ MedianImp
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1275,6 +1313,8 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_Fit(/*in*/ MedianImput
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1485,6 +1525,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_Transform(/*in*/ Media
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::int64_t, std::double_t>::TransformedType;
 
         // Input
@@ -1528,17 +1569,25 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_int64_Flush(/*in*/ MedianImp
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -1655,6 +1704,8 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_Fit(/*in*/ MedianImput
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -1865,6 +1916,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_Transform(/*in*/ Media
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint8_t, std::double_t>::TransformedType;
 
         // Input
@@ -1908,17 +1960,25 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint8_Flush(/*in*/ MedianImp
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2035,6 +2095,8 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_Fit(/*in*/ MedianImpu
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2245,6 +2307,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_Transform(/*in*/ Medi
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint16_t, std::double_t>::TransformedType;
 
         // Input
@@ -2288,17 +2351,25 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint16_Flush(/*in*/ MedianIm
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2415,6 +2486,8 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_Fit(/*in*/ MedianImpu
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -2625,6 +2698,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_Transform(/*in*/ Medi
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint32_t, std::double_t>::TransformedType;
 
         // Input
@@ -2668,17 +2742,25 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint32_Flush(/*in*/ MedianIm
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -2795,6 +2877,8 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_Fit(/*in*/ MedianImpu
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3005,6 +3089,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_Transform(/*in*/ Medi
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::uint64_t, std::double_t>::TransformedType;
 
         // Input
@@ -3048,17 +3133,25 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_uint64_Flush(/*in*/ MedianIm
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3175,6 +3268,8 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_Fit(/*in*/ MedianImput
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3376,6 +3471,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_Transform(/*in*/ Media
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::float_t, std::double_t>::TransformedType;
 
         // Input
@@ -3419,17 +3515,25 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_float_Flush(/*in*/ MedianImp
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3546,6 +3650,8 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_Fit(/*in*/ MedianImpu
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::InputType;
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -3747,6 +3853,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_Transform(/*in*/ Medi
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::double_t, std::double_t>::TransformedType;
 
         // Input
@@ -3790,17 +3897,25 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_double_Flush(/*in*/ MedianIm
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new double[result.size()];
-        *output_items = result.size();
-
-        double * output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new double[result.size()];
+
+            double * output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -3917,6 +4032,8 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_Fit(/*in*/ MedianImpute
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::InputType;
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -4127,6 +4244,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_Transform(/*in*/ Median
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<bool, bool>::TransformedType;
 
         // Input
@@ -4170,17 +4288,25 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_bool_Flush(/*in*/ MedianImpu
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new bool[result.size()];
-        *output_items = result.size();
-
-        bool * output_item(*output_item_ptr);
-
-        for(bool result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-            *output_item = result_item;
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new bool[result.size()];
+
+            bool * output_item(*output_item_ptr);
+
+            for(bool result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                *output_item = result_item;
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4297,6 +4423,8 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Fit(/*in*/ MedianImpu
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
         // No validation
+
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::InputType;
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string> & estimator(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>>(reinterpret_cast<size_t>(pHandle)));
 
@@ -4507,6 +4635,7 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Transform(/*in*/ Medi
 
         Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformerType & transformer(*g_pointerTable.Get<Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformerType>(reinterpret_cast<size_t>(pHandle)));
 
+        using InputType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::InputType;
         using TransformedType = typename Microsoft::Featurizer::Featurizers::MedianImputerEstimator<std::string, std::string>::TransformedType;
 
         // Input
@@ -4560,29 +4689,35 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_Flush(/*in*/ MedianIm
         transformer.flush(callback);
 
         // Output
-        // TODO: There are potential memory leaks if allocation fails
-        *output_item_ptr = new char const *[result.size()];
-        *output_items = result.size();
-
-        char const ** output_item(*output_item_ptr);
-
-        for(auto const & result_item : result) {
-            if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
-
-            if(result_item.empty()) {
-                *output_item = nullptr;
-            }
-            else {
-                char * string_buffer(new char[result_item.size() + 1]);
-
-                std::copy(result_item.begin(), result_item.end(), string_buffer);
-                string_buffer[result_item.size()] = 0;
-
-                *output_item = string_buffer;
-            }
-
-            ++output_item;
+        if(result.empty()) {
+            *output_item_ptr = nullptr;
         }
+        else {
+            // TODO: There are potential memory leaks if allocation fails
+            *output_item_ptr = new char const *[result.size()];
+
+            char const ** output_item(*output_item_ptr);
+
+            for(auto const & result_item : result) {
+                if(output_item == nullptr) throw std::invalid_argument("'output_item' is null");
+
+                if(result_item.empty()) {
+                    *output_item = nullptr;
+                }
+                else {
+                    char * string_buffer(new char[result_item.size() + 1]);
+
+                    std::copy(result_item.begin(), result_item.end(), string_buffer);
+                    string_buffer[result_item.size()] = 0;
+
+                    *output_item = string_buffer;
+                }
+
+                ++output_item;
+            }
+        }
+
+        *output_items = result.size();
     
         return true;
     }
@@ -4612,6 +4747,10 @@ FEATURIZER_LIBRARY_API bool MedianImputerFeaturizer_string_DestroyTransformedDat
     }
 }
 
+
+#if (defined __clang__)
+#   pragma clang diagnostic pop
+#endif
 
 #if (defined _MSC_VER)
 #   pragma warning(pop)

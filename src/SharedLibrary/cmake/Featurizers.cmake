@@ -91,8 +91,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_L2NormalizeFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LabelEncoderFeaturizer.h
-        # TODO: Not available yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LagLeadOperatorFeaturizer.h
-        # TODO: Not available yet ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LagLeadOperatorFeaturizer.cpp
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LagLeadOperatorFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_LagLeadOperatorFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxAbsScalerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_MaxNormalizeFeaturizer.cpp
