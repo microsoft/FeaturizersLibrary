@@ -130,3 +130,90 @@ TEST_CASE("Serialization_Based_On_Endianess") {
     CHECK(SerializeOnly(static_cast<std::double_t>(-23)) == expected_result);
     CHECK(SerializeOnly(static_cast<std::float_t>(-23)) == expected_result);
 }
+
+TEST_CASE("Clone") {
+    NS::Archive                             out;
+
+    out.serialize(10);
+    out.serialize(20);
+    out.serialize(30);
+
+    NS::Archive                             in(out.commit());
+
+    SECTION("Clone entire") {
+        NS::Archive                         other(in.clone());
+
+        CHECK(in.template deserialize<int>() == 10);
+        CHECK(in.template deserialize<int>() == 20);
+        CHECK(in.template deserialize<int>() == 30);
+
+        CHECK(other.template deserialize<int>() == 10);
+        CHECK(other.template deserialize<int>() == 20);
+        CHECK(other.template deserialize<int>() == 30);
+    }
+
+    SECTION("Clone partial") {
+        CHECK(in.template deserialize<int>() == 10);
+
+        NS::Archive                         other(in.clone());
+
+        CHECK(in.template deserialize<int>() == 20);
+        CHECK(in.template deserialize<int>() == 30);
+
+        CHECK(other.template deserialize<int>() == 20);
+        CHECK(other.template deserialize<int>() == 30);
+    }
+
+    SECTION("Error cloning sink") {
+        CHECK_THROWS_WITH(out.clone(), "Invalid mode");
+    }
+
+    SECTION("Error cloning complete archive") {
+        CHECK(in.template deserialize<int>() == 10);
+        CHECK(in.template deserialize<int>() == 20);
+        CHECK(in.template deserialize<int>() == 30);
+
+        CHECK_THROWS_WITH(in.clone(), "It isn't possible to clone a completed archive");
+    }
+}
+
+TEST_CASE("Clone and movement") {
+    NS::Archive                             out;
+
+    out.serialize(10);
+    out.serialize(20);
+    out.serialize(30);
+
+    NS::Archive                             in(out.commit());
+
+    CHECK(in.Mode == NS::Archive::ModeValue::Deserializing);
+
+    NS::Archive                             in2(in.clone());
+
+    CHECK(in.Mode == NS::Archive::ModeValue::Deserializing);
+    CHECK(in2.Mode == NS::Archive::ModeValue::Deserializing);
+
+    NS::Archive                             in3(in.clone());
+
+    CHECK(in.Mode == NS::Archive::ModeValue::Deserializing);
+    CHECK(in2.Mode == NS::Archive::ModeValue::Deserializing);
+    CHECK(in3.Mode == NS::Archive::ModeValue::Deserializing);
+
+    NS::Archive                             movedIn1(std::move(in3));
+
+    CHECK(in.Mode == NS::Archive::ModeValue::Deserializing);
+    CHECK(in2.Mode == NS::Archive::ModeValue::Deserializing);
+    CHECK(movedIn1.Mode == NS::Archive::ModeValue::Deserializing);
+
+    NS::Archive                             movedIn2(std::move(movedIn1));
+
+    CHECK(in.Mode == NS::Archive::ModeValue::Deserializing);
+    CHECK(in2.Mode == NS::Archive::ModeValue::Deserializing);
+    CHECK(movedIn2.Mode == NS::Archive::ModeValue::Deserializing);
+
+    NS::Archive                             movedIn3(std::move(movedIn2));
+
+    CHECK(in.Mode == NS::Archive::ModeValue::Deserializing);
+    CHECK(in2.Mode == NS::Archive::ModeValue::Deserializing);
+    CHECK(movedIn3.Mode == NS::Archive::ModeValue::Deserializing);
+}

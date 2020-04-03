@@ -1502,6 +1502,37 @@ struct MakeNullableType {
     using type = typename Traits<T>::nullable_type;
 };
 
+/////////////////////////////////////////////////////////////////////////
+///  \typedef       MakeTargetMutable
+///  \brief         Makes the target (type with pointers and references removed)
+///                 mutable, then restores any pointers or references encountered.
+///
+template <typename T>
+using MakeTargetMutable =
+    typename std::conditional<
+        std::is_pointer<T>::value,
+        typename std::add_pointer<
+            typename std::remove_const<
+                typename std::remove_pointer<T>::type
+            >::type
+        >::type,
+        typename std::conditional<
+            std::is_reference<T>::value,
+            typename std::add_lvalue_reference<
+                typename std::remove_const<
+                    typename std::remove_reference<T>::type
+                >::type
+            >::type,
+            typename std::remove_const<T>::type
+        >::type
+    >::type;
+
+/////////////////////////////////////////////////////////////////////////
+///  \def           make_mutable
+///  \brief         Makes the target mutable
+///
+#define make_mutable(value)                 const_cast<typename std::add_lvalue_reference<Microsoft::Featurizer::MakeTargetMutable<decltype(value)>>::type>(value)
+
 } // namespace Featurizer
 } // namespace Microsoft
 

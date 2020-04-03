@@ -523,3 +523,38 @@ TEST_CASE("key_equal") {
     CHECK(Traits<double>::key_equal()(10.0, Traits<double>::CreateNullValue()) == false);
     CHECK(Traits<double>::key_equal()(Traits<double>::CreateNullValue(), Traits<double>::CreateNullValue()));
 }
+
+// MakeTargetMutable
+static_assert(std::is_same<MakeTargetMutable<int>, int>::value, "");
+static_assert(std::is_same<MakeTargetMutable<int const>, int>::value, "");
+static_assert(std::is_same<MakeTargetMutable<int &>, int &>::value, "");
+static_assert(std::is_same<MakeTargetMutable<int const &>, int &>::value, "");
+static_assert(std::is_same<MakeTargetMutable<int *>, int *>::value, "");
+static_assert(std::is_same<MakeTargetMutable<int const *>, int *>::value, "");
+static_assert(std::is_same<MakeTargetMutable<int const * const>, int *>::value, "");
+
+TEST_CASE("make_mutable") {
+    int a(10);
+
+    CHECK(a == 10);
+    make_mutable(a) = 11;
+    CHECK(a == 11);
+
+    int const & b(a);
+
+    CHECK(b == 11);
+    make_mutable(b) = 12;
+    CHECK(b == 12);
+    CHECK(a == 12);
+
+    int const c(11);
+    make_mutable(c) = 12;
+    CHECK(c == 12);
+
+    int const *d(&c);
+
+    CHECK(*d == 12);
+    *make_mutable(d) = 13;
+    CHECK(*d == 13);
+    CHECK(c == 13);
+}

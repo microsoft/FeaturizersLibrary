@@ -6,6 +6,7 @@
 
 #include <unordered_map>
 
+#include "../../Archive.h"
 #include "../../Featurizer.h"
 #include "Details/EstimatorTraits.h"
 
@@ -100,7 +101,7 @@ public:
     using GrainTransformerTypeUniquePtr     = std::unique_ptr<GrainTransformerType>;
     using TransformerMap                    = std::map<GrainT, GrainTransformerTypeUniquePtr>;
 
-    using CreateTransformerFunc             = std::function<GrainTransformerTypeUniquePtr (GrainT const &)>;
+    using CreateTransformerFunc             = std::function<GrainTransformerTypeUniquePtr (void)>;
 
     // ----------------------------------------------------------------------
     // |
@@ -113,21 +114,39 @@ public:
     GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc=CreateTransformerFunc());
     GrainTransformer(CreateTransformerFunc createFunc);
 
-    GrainTransformer(Archive &ar, CreateTransformerFunc createFunc=CreateTransformerFunc());
+    GrainTransformer(Archive &ar);
+
+    GrainTransformer(GrainTransformer && other);
+    GrainTransformer(GrainTransformer const &) = delete;
 
     ~GrainTransformer(void) override = default;
 
-    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(GrainTransformer);
+    GrainTransformer & operator =(GrainTransformer const &) = delete;
+    GrainTransformer & operator =(GrainTransformer &&) = delete;
 
     void save(Archive &ar) const override;
 
 private:
     // ----------------------------------------------------------------------
     // |
+    // |  Private Types
+    // |
+    // ----------------------------------------------------------------------
+    struct UseDeserializationCtorTag {};
+
+    // ----------------------------------------------------------------------
+    // |
     // |  Private Data
     // |
     // ----------------------------------------------------------------------
+    bool const                              _hadTransformersWhenCreated;
+
+    // Archive used when deserializing an object that was serialized with a createFunc.
+    // This archive will be used by a special createFunc that creates Transformers
+    // based on the data available in an archive.
+    Archive const                           _createFuncArchive;
     CreateTransformerFunc const             _createFunc;
+
     TransformerMap                          _transformers;
 
     // ----------------------------------------------------------------------
@@ -135,6 +154,7 @@ private:
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
+    GrainTransformer(TransformerMap transformers, Archive createFuncArchive, UseDeserializationCtorTag);
 
     // MSVC has problems when the declaration and definition are separated
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
@@ -152,7 +172,7 @@ private:
                         if(!_createFunc)
                             throw std::runtime_error("Grain not found");
 
-                        return _transformers.emplace(grain, _createFunc(grain)).first;
+                        return _transformers.emplace(grain, _createFunc()).first;
                     }()
                 );
 
@@ -181,6 +201,8 @@ private:
             );
         }
     }
+
+    GrainTransformerTypeUniquePtr CreateTransformerFromArchive(void) const;
 };
 
 namespace Impl {
@@ -213,8 +235,8 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, bool isTrainingOnlyEstimator);
-    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc, bool isTrainingOnlyEstimator);
+    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, bool isInferenceOnlyEstimator);
+    GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc, bool isInferenceOnlyEstimator);
 
     ~GrainEstimatorImplBase(void) override = default;
 
@@ -249,7 +271,7 @@ private:
     // invoking _createFunc.
     AnnotationMapsPtr const                 _pAllColumnAnnotations;
     CreateEstimatorFunc const               _createFunc;
-    bool const                              _isTrainingOnlyEstimator;
+    bool const                              _isInferenceOnlyEstimator;
 
     size_t                                  _cRemainingTrainingItems;
 
@@ -378,8 +400,8 @@ public:
         BaseType(std::move(pAllColumnAnnotations), false) {
     }
 
-    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateTransformerFunc createTransformerFunc, bool isTrainingOnlyEstimator=false) :
-        BaseType(std::move(pAllColumnAnnotations), isTrainingOnlyEstimator),
+    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateTransformerFunc createTransformerFunc, bool isInferenceOnlyEstimator=false) :
+        BaseType(std::move(pAllColumnAnnotations), isInferenceOnlyEstimator),
         _createTransformerFunc(
             std::move(
                 [&createTransformerFunc](void) -> CreateTransformerFunc & {
@@ -396,8 +418,8 @@ public:
         BaseType(std::move(pAllColumnAnnotations), std::move(createEstimatorFunc), false) {
     }
 
-    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createEstimatorFunc, CreateTransformerFunc createTransformerFunc, bool isTrainingOnlyEstimator=false) :
-        BaseType(std::move(pAllColumnAnnotations), std::move(createEstimatorFunc), isTrainingOnlyEstimator),
+    GrainEstimatorImpl(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createEstimatorFunc, CreateTransformerFunc createTransformerFunc, bool isInferenceOnlyEstimator=false) :
+        BaseType(std::move(pAllColumnAnnotations), std::move(createEstimatorFunc), isInferenceOnlyEstimator),
         _createTransformerFunc(
             std::move(
                 [&createTransformerFunc](void) -> CreateTransformerFunc & {
@@ -510,6 +532,7 @@ GrainEstimatorAnnotation<GrainT>::GrainEstimatorAnnotation(AnnotationMap annotat
 // ----------------------------------------------------------------------
 template <typename GrainT, typename EstimatorT>
 GrainTransformer<GrainT, EstimatorT>::GrainTransformer(CreateTransformerFunc createFunc) :
+    _hadTransformersWhenCreated(false),
     _createFunc(
         std::move(
             [&createFunc]() -> CreateTransformerFunc & {
@@ -524,6 +547,7 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(CreateTransformerFunc cre
 
 template <typename GrainT, typename EstimatorT>
 GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc/*=CreateTransformerFunc()*/) :
+    _hadTransformersWhenCreated(true),
     _createFunc(std::move(createFunc)),
     _transformers(
         std::move(
@@ -538,9 +562,9 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transforme
 }
 
 template <typename GrainT, typename EstimatorT>
-GrainTransformer<GrainT, EstimatorT>::GrainTransformer(Archive &ar, CreateTransformerFunc createFunc/*=CreateTransformerFunc()*/) :
+GrainTransformer<GrainT, EstimatorT>::GrainTransformer(Archive &ar) :
     GrainTransformer(
-        [&ar, &createFunc](void) {
+        [&ar](void) -> GrainTransformer {
             std::uint64_t                   cElements(Traits<std::uint64_t>::deserialize(ar));
             TransformerMap                  transformers;
 
@@ -554,29 +578,88 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(Archive &ar, CreateTransf
                     throw std::runtime_error("Invalid insertion");
             }
 
-            if(transformers.empty()) {
-                if(!createFunc)
-                    throw std::runtime_error("A `createFunc` must be provided when there aren't any transformers in the transformer map");
+            bool                            hasCreateFunc(Traits<bool>::deserialize(ar));
 
-                return GrainTransformer(std::move(createFunc));
+            if(hasCreateFunc == false) {
+                if(transformers.empty())
+                    throw std::runtime_error("A `createFunc` must be provided to the serializing object when there aren't any transformers in the transformer map");
+
+                return GrainTransformer(std::move(transformers));
             }
 
-            if(createFunc)
-                return GrainTransformer(std::move(transformers), std::move(createFunc));
-
-            return GrainTransformer(std::move(transformers));
+            return GrainTransformer(std::move(transformers), ar.clone(), UseDeserializationCtorTag());
         }()
-    ) {
-}
+    )
+{}
+
+template <typename GrainT, typename EstimatorT>
+GrainTransformer<GrainT, EstimatorT>::GrainTransformer(GrainTransformer && other) :
+    _hadTransformersWhenCreated(std::move(make_mutable(other._hadTransformersWhenCreated))),
+    _createFuncArchive(std::move(make_mutable(other._createFuncArchive))),
+    _createFunc(
+        [this](void) -> CreateTransformerFunc {
+            if(_createFuncArchive.Mode == Archive::ModeValue::Serializing)
+                return CreateTransformerFunc();
+
+            return [this](void) { return CreateTransformerFromArchive(); };
+        }()
+    ),
+    _transformers(std::move(make_mutable(other._transformers)))
+{}
 
 template <typename GrainT, typename EstimatorT>
 void GrainTransformer<GrainT, EstimatorT>::save(Archive &ar) const /*override*/ {
-    Traits<std::uint64_t>::serialize(ar, _transformers.size());
+    if(_hadTransformersWhenCreated) {
+        Traits<std::uint64_t>::serialize(ar, _transformers.size());
 
-    for(auto const &kvp: _transformers) {
-        Traits<GrainT>::serialize(ar, kvp.first);
-        kvp.second->save(ar);
+        for(auto const &kvp: _transformers) {
+            Traits<GrainT>::serialize(ar, kvp.first);
+            kvp.second->save(ar);
+        }
     }
+    else
+        Traits<std::uint64_t>::serialize(ar, 0);
+
+    // If there is a _createFunc, create a Transformer based on that func and then
+    // serialize it. This will serve as a template for the function created when
+    // deserializing the transformer.
+    Traits<bool>::serialize(ar, static_cast<bool>(_createFunc));
+
+    if(_createFunc)
+        _createFunc()->save(ar);
+}
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+template <typename GrainT, typename EstimatorT>
+GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transformers, Archive createFuncArchive, UseDeserializationCtorTag) :
+    _hadTransformersWhenCreated(transformers.empty()),
+    _createFuncArchive(
+        std::move(
+            [&createFuncArchive](void) -> Archive & {
+                if(createFuncArchive.Mode != Archive::ModeValue::Deserializing)
+                    throw std::invalid_argument("Invalid serialization mode");
+
+                return createFuncArchive;
+            }()
+        )
+    ),
+    _createFunc(
+        [this](void) { return CreateTransformerFromArchive(); }
+    ),
+    _transformers(std::move(transformers))
+{}
+
+template <typename GrainT, typename EstimatorT>
+typename GrainTransformer<GrainT, EstimatorT>::GrainTransformerTypeUniquePtr
+GrainTransformer<GrainT, EstimatorT>::CreateTransformerFromArchive(void) const {
+    assert(_createFuncArchive.Mode == Archive::ModeValue::Deserializing);
+
+    // Clone the archive before using it so that it can be invoked multiple times.
+    Archive                                 ar(_createFuncArchive.clone());
+
+    return GrainTransformerTypeUniquePtr(new typename EstimatorT::TransformerType(ar));
 }
 
 // ----------------------------------------------------------------------
@@ -585,18 +668,18 @@ void GrainTransformer<GrainT, EstimatorT>::save(Archive &ar) const /*override*/ 
 // |
 // ----------------------------------------------------------------------
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, bool isTrainingOnlyEstimator) :
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, bool isInferenceOnlyEstimator) :
     GrainEstimatorImplBase(
         std::move(pAllColumnAnnotations),
         [](AnnotationMapsPtr pAllColumnAnnotationsParam) {
             return EstimatorT(std::move(pAllColumnAnnotationsParam));
         },
-        std::move(isTrainingOnlyEstimator)
+        std::move(isInferenceOnlyEstimator)
     ) {
 }
 
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc, bool isTrainingOnlyEstimator) :
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc, bool isInferenceOnlyEstimator) :
     BaseT(
         [pAllColumnAnnotations, &createFunc](void) -> std::string {
             if(!createFunc)
@@ -614,7 +697,7 @@ Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::G
     ),
     _pAllColumnAnnotations(pAllColumnAnnotations),
     _createFunc(std::move(createFunc)), // Note that createFunc has been validated when creating the Estimator name in the call to BaseT's constructor above
-    _isTrainingOnlyEstimator(std::move(isTrainingOnlyEstimator)),
+    _isInferenceOnlyEstimator(std::move(isInferenceOnlyEstimator)),
     _cRemainingTrainingItems(MaxNumTrainingItemsV) {
 }
 
@@ -640,7 +723,7 @@ Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::g
 // ----------------------------------------------------------------------
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
 bool Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
-    return _isTrainingOnlyEstimator == false && _cRemainingTrainingItems != 0;
+    return _isInferenceOnlyEstimator == false && _cRemainingTrainingItems != 0;
 }
 
 template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>

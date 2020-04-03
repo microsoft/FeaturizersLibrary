@@ -646,7 +646,7 @@ TEST_CASE("Estimator - no training items") {
     SECTION("With transformer creation func") {
         Estimator                           estimator(
             NS::CreateTestAnnotationMapsPtr(1),
-            [](std::string const &) {
+            [](void) {
                 return typename Estimator::TransformerType::GrainTransformerTypeUniquePtr(new DeltaTransformer(0));
             }
         );
@@ -663,10 +663,10 @@ TEST_CASE("Estimator - no training items") {
     SECTION("With transformer creation func, no training required") {
         Estimator                           estimator(
             NS::CreateTestAnnotationMapsPtr(1),
-            [](std::string const &) {
+            [](void) {
                 return typename Estimator::TransformerType::GrainTransformerTypeUniquePtr(new DeltaTransformer(0));
             },
-            true // isTrainingOnlyEstimator
+            true // isInferenceOnlyEstimator
         );
 
         estimator.begin_training();
@@ -823,12 +823,13 @@ TEST_CASE("GrainTransformer - deserialization errors") {
         NS::Archive                         outArchive;
 
         NS::Traits<std::uint64_t>::serialize(outArchive, 0);
+        NS::Traits<bool>::serialize(outArchive, false);
 
         NS::Archive                         inArchive(outArchive.commit());
 
         CHECK_THROWS_WITH(
             GrainTransformer(inArchive),
-            "A `createFunc` must be provided when there aren't any transformers in the transformer map"
+            "A `createFunc` must be provided to the serializing object when there aren't any transformers in the transformer map"
         );
     }
 
@@ -919,8 +920,8 @@ TEST_CASE("Transformer without training") {
     // ----------------------------------------------------------------------
 
     GrainTransformer                        transformer(
-        [](std::string const &grain) {
-            return typename GrainTransformer::GrainTransformerTypeUniquePtr(new DeltaTransformer(static_cast<uint64_t>(atoi(grain.c_str()) * 100)));
+        [](void) {
+            return typename GrainTransformer::GrainTransformerTypeUniquePtr(new DeltaTransformer(100));
         }
     );
 
@@ -932,10 +933,10 @@ TEST_CASE("Transformer without training") {
     Execute(transformer, grain1, value10, 110);
     Execute(transformer, grain1, value20, 120);
 
-    Execute(transformer, grain2, value10, 210);
+    Execute(transformer, grain2, value10, 110);
     Execute(transformer, grain1, value20, 120);
 
-    Execute(transformer, grain2, value10, 210);
+    Execute(transformer, grain2, value10, 110);
 }
 
 TEST_CASE("Deserialization of Transformer without training") {
@@ -944,8 +945,8 @@ TEST_CASE("Deserialization of Transformer without training") {
     // ----------------------------------------------------------------------
 
     GrainTransformer                        transformer1(
-        [](std::string const &grain) {
-            return typename GrainTransformer::GrainTransformerTypeUniquePtr(new DeltaTransformer(static_cast<uint64_t>(atoi(grain.c_str()) * 100)));
+        [](void) {
+            return typename GrainTransformer::GrainTransformerTypeUniquePtr(new DeltaTransformer(100));
         }
     );
 
@@ -954,27 +955,12 @@ TEST_CASE("Deserialization of Transformer without training") {
     transformer1.save(out);
 
     NS::Archive                             in(out.commit());
+    GrainTransformer                        transformer2(in);
 
-    SECTION("Deserialize without a custom functor") {
-        CHECK_THROWS_WITH(
-            GrainTransformer(in),
-            "A `createFunc` must be provided when there aren't any transformers in the transformer map"
-        );
-    }
+    std::string const                       grain1("1");
+    std::string const                       grain2("2");
+    std::uint64_t const                     value10(10);
 
-    SECTION("Deserialize with a custom functor") {
-        GrainTransformer                    transformer2(
-            in,
-            [](std::string const &) {
-                return typename GrainTransformer::GrainTransformerTypeUniquePtr(new DeltaTransformer(1000));
-            }
-        );
-
-        std::string const                   grain1("1");
-        std::string const                   grain2("2");
-        std::uint64_t const                 value10(10);
-
-        Execute(transformer2, grain1, value10, 1010);
-        Execute(transformer2, grain2, value10, 1010);
-    }
+    Execute(transformer2, grain1, value10, 110);
+    Execute(transformer2, grain2, value10, 110);
 }
