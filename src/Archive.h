@@ -81,6 +81,8 @@ public:
 
     bool AtEnd(void) const;
 
+    Archive clone(void) const;
+
 private:
     // ----------------------------------------------------------------------
     // |
@@ -202,6 +204,16 @@ inline bool Archive::AtEnd(void) const {
         throw std::runtime_error("Invalid mode");
 
     return _pBuffer == _pEndBuffer;
+}
+
+inline Archive Archive::clone(void) const {
+    if(Mode != ModeValue::Deserializing)
+        throw std::runtime_error("Invalid mode");
+
+    if(_pBuffer == _pEndBuffer)
+        throw std::runtime_error("It isn't possible to clone a completed archive");
+
+    return Archive(ByteArray(_pBuffer, _pEndBuffer));
 }
 
 // ----------------------------------------------------------------------

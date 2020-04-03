@@ -316,7 +316,7 @@ GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAn
     BaseType(
         GrainedAnalyticalRollingWindowEstimatorName,
         pAllColumnAnnotations,
-        [pAllColumnAnnotations, windowCalculation, horizon, maxWindowSize, minWindowSize] () {
+        [pAllColumnAnnotations, windowCalculation, horizon, maxWindowSize, minWindowSize]() {
             return Components::GrainEstimatorImpl<GrainType, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>> (
                 pAllColumnAnnotations,
                 [windowCalculation, horizon, maxWindowSize, minWindowSize](AnnotationMapsPtr pAllColumnAnnotationsParam) {
@@ -328,7 +328,7 @@ GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAn
                         minWindowSize
                     );
                 },
-                [windowCalculation, horizon, maxWindowSize, minWindowSize](GrainType const &) {
+                [windowCalculation, horizon, maxWindowSize, minWindowSize]() {
                     return typename AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::TransformerUniquePtr(
                         new AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>(
                             windowCalculation,
@@ -338,7 +338,7 @@ GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAn
                         )
                     );
                 },
-                true // isTrainingOnlyEstimator
+                true // isInferenceOnlyEstimator
             );
         },
         [pAllColumnAnnotations]() {

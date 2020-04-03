@@ -446,7 +446,7 @@ GrainedLagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::GrainedLagLeadOpe
                 deltas
             );
         },
-        [horizon, deltas](GrainType const &) {
+        [horizon, deltas]() {
             return typename LagLeadOperatorEstimator<InputT>::TransformerUniquePtr(
                 new LagLeadOperatorTransformer<InputT>(
                     horizon,
@@ -454,7 +454,7 @@ GrainedLagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>::GrainedLagLeadOpe
                 )
             );
         },
-        true // isTrainingOnlyEstimator
+        true // isInferenceOnlyEstimator
     )
 {}
 
