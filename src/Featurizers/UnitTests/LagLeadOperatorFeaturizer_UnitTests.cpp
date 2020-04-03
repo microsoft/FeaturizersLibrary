@@ -695,7 +695,12 @@ TEST_CASE("Grained Estimator - 2 grain, horizon 2, lead 1 lead 2") {
     const GrainedInputType tup6(grain2, value6);
 
     NS::TestHelpers::Train(estimator, NS::TestHelpers::make_vector<std::tuple<GrainType const &, InputType const &>>(tup1, tup2, tup3, tup4, tup5, tup6));
-    auto transformer = estimator.create_transformer();
+    auto pTransformer = estimator.create_transformer();
+    NS::Archive ar;
+    pTransformer->save(ar);
+    auto stream = ar.commit();
+    Microsoft::Featurizer::Archive archive(stream);
+    typename NS::Featurizers::GrainedLagLeadOperatorEstimator<InputType>::TransformerType transformer(archive);
 
     std::vector<TransformedType> ret;
     auto const              callback(
@@ -703,21 +708,21 @@ TEST_CASE("Grained Estimator - 2 grain, horizon 2, lead 1 lead 2") {
             ret.emplace_back(value);
         }
     );
-    transformer->execute(tup1, callback);
-    transformer->execute(tup2, callback);
-    transformer->execute(tup3, callback);
+    transformer.execute(tup1, callback);
+    transformer.execute(tup2, callback);
+    transformer.execute(tup3, callback);
 
     // before flush is called, there is 1 element in ret
     CHECK(ret.size() == 1);
-    transformer->flush(callback);
+    transformer.flush(callback);
 
-    transformer->execute(tup4, callback);
-    transformer->execute(tup5, callback);
-    transformer->execute(tup6, callback);
+    transformer.execute(tup4, callback);
+    transformer.execute(tup5, callback);
+    transformer.execute(tup6, callback);
 
     // before flush is called, there are 4 elements in ret since the execute call for tup1, tup2, tup3 will add 3 more elements in ret
     CHECK(ret.size() == 4);
-    transformer->flush(callback);
+    transformer.flush(callback);
 
     CHECK(std::get<0>(ret[0])[0] == "one");
     CHECK(NS::Traits<OutputMatrixDataType>::GetNullableValue(std::get<1>(ret[0])(0,0)) == 10);
