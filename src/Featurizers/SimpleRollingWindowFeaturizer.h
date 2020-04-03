@@ -88,14 +88,14 @@ template <
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class SimpleRollingWindowEstimator :
-    public TransformerEstimator<InputT, std::vector<typename Traits<InputT>::nullable_type>> {
+    public TransformerEstimator<InputT, Microsoft::Featurizer::RowMajMatrix<typename Traits<InputT>::nullable_type>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = TransformerEstimator<InputT, std::vector<typename Traits<InputT>::nullable_type>>;
+    using BaseType                          = TransformerEstimator<InputT, Microsoft::Featurizer::RowMajMatrix<typename Traits<InputT>::nullable_type>>;
     using TransformerType                   = SimpleRollingWindowTransformer<InputT, MaxNumTrainingItemsV>;
 
     // ----------------------------------------------------------------------
@@ -146,7 +146,7 @@ template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_
 class GrainedSimpleRollingWindowEstimator :
     public Components::PipelineExecutionEstimatorImpl<
         Components::GrainEstimatorImpl<std::vector<std::string>, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
-        Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string> const &, std::vector<typename Traits<InputT>::nullable_type>>, 1>
+        Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string> const &, Microsoft::Featurizer::RowMajMatrix<typename Traits<InputT>::nullable_type>>, 1>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -159,7 +159,7 @@ public:
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
             Components::GrainEstimatorImpl<GrainType, SimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
-            Components::FilterDecoratorEstimator<std::tuple<GrainType const &, std::vector<typename Traits<InputT>::nullable_type>>, 1>
+            Components::FilterDecoratorEstimator<std::tuple<GrainType const &, Microsoft::Featurizer::RowMajMatrix<typename Traits<InputT>::nullable_type>>, 1>
         >;
 
     // This is used by the code generator when generating code that invokes this
@@ -353,7 +353,7 @@ GrainedSimpleRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedSimple
             );
         },
         [pAllColumnAnnotations]() {
-            return Components::FilterDecoratorEstimator<std::tuple<GrainType const &, std::vector<typename Traits<InputT>::nullable_type>>, 1>(std::move(pAllColumnAnnotations));
+            return Components::FilterDecoratorEstimator<std::tuple<GrainType const &, Microsoft::Featurizer::RowMajMatrix<typename Traits<InputT>::nullable_type>>, 1>(std::move(pAllColumnAnnotations));
         }
     ) {
 }

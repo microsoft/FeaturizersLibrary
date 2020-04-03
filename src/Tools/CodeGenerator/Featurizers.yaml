@@ -12,7 +12,7 @@ featurizers:
         Input type for this featurizer is a tuple of the grain columns and target value column. It is assumed that the data is sorted in the correct order.
 
         C++-style pseudo signature:
-        template <typename T> std::vector<double> execute(std::tuple<std::vector<std::string> const &, T const &> value);
+        template <typename T> matrix<double> execute(std::tuple<std::vector<std::string> const &, T const &> value);
 
         Examples:
             A simple example would be horizon = 1, maxWindowSize = 2, and we want to take the mean.
@@ -20,46 +20,50 @@ featurizers:
             +-----------+-------+-------------------+
             | grain     | target| target_mean       |
             +===========+=======+===================+
-            | A         | 10    | [NAN]             |
+            | A         | 10    | [[NAN]]           |
             +-----------+-------+-------------------+
-            | A         | 4     | [10]              |
+            | A         | 4     | [[10]]            |
             +-----------+-------+-------------------+
-            | A         | 6     | [7]               |
+            | A         | 6     | [[7]]             |
             +-----------+-------+-------------------+
-            | A         | 11    | [5]               |
+            | A         | 11    | [[5]]             |
             +-----------+-------+-------------------+
 
             A more complex example would be, assuming we have horizon = 2, maxWindowSize = 2, min window size = 2, and we want the mean
             +-----------+-------+-------------------+
             | grain     | target| target_max        |
             +===========+=======+===================+
-            | A         | 10    | [NAN, NAN]        |
+            | A         | 10    | [[NAN, NAN]]      |
             +-----------+-------+-------------------+
-            | A         | 4     | [NAN, NAN]        |
+            | A         | 4     | [[NAN, NAN]]      |
             +-----------+-------+-------------------+
-            | A         | 6     | [NAN, 7]          |
+            | A         | 6     | [[NAN, 7]]        |
             +-----------+-------+-------------------+
-            | A         | 11    | [7, 5]            |
+            | A         | 11    | [[7, 5]]          |
             +-----------+-------+-------------------+
 
     templates:
       - name: T
         types:
-            - int8
-            - int16
-            - int32
-            - int64
-            - uint8
-            - uint16
-            - uint32
-            - uint64
-            - float
-            - double
+          # Note that optional values during output increase quite a bit of overhead when marshalling, therefore
+          # this featurizer only supports those types that don't have to pay that penality. We may still want to support
+          # these types in the future in some frameworks.
+          #
+          # - int8
+          # - int16
+          # - int32
+          # - int64
+          # - uint8
+          # - uint16
+          # - uint32
+          # - uint64
+          - float
+          - double
 
     type_mappings:
       - input_type: tuple<unique_id, T>
-        output_type: vector<double?>
-        description: A vector of size horizon will always be output, but the individual elements could be NaN.
+        output_type: matrix<double?>
+        description: A matrix always of 1 row and column of size horizon, but the individual elements could be NaN.
 
     custom_enums:
       - name: AnalyticalRollingWindowCalculation
@@ -1392,7 +1396,7 @@ featurizers:
       Input type for this featurizer is a tuple of the grain columns and target column to find the value. It is assumed that the data is sorted in the correct order.
 
       C++-style pseudo signature:
-        template <typename T> std::vector<T> execute(std::tuple<std::vector<std::string> const &, T const &> value);
+        template <typename T> matrix<T> execute(std::tuple<std::vector<std::string> const &, T const &> value);
 
       Examples:
           A simple example would be horizon = 1, maxWindowSize = 2, and we want to take the minimum.
@@ -1400,47 +1404,51 @@ featurizers:
           +-----------+-------+-------------------+
           | grain     | target| target_minimum    |
           +===========+=======+===================+
-          | A         | 10    | [NAN]             |
+          | A         | 10    | [[NAN]]           |
           +-----------+-------+-------------------+
-          | A         | 4     | [10]              |
+          | A         | 4     | [[10]]            |
           +-----------+-------+-------------------+
-          | A         | 6     | [4]               |
+          | A         | 6     | [[4]]             |
           +-----------+-------+-------------------+
-          | A         | 11    | [4]               |
+          | A         | 11    | [[4]]             |
           +-----------+-------+-------------------+
 
           A more complex example would be, assuming we have horizon = 2, maxWindowSize = 2, minWindowSize = 2, and we want the maximum value
           +-----------+-------+-------------------+
           | grain     | target| target_max        |
           +===========+=======+===================+
-          | A         | 10    | [NAN, NAN]        |
+          | A         | 10    | [[NAN, NAN]]      |
           +-----------+-------+-------------------+
-          | A         | 4     | [NAN, NAN]        |
+          | A         | 4     | [[NAN, NAN]]      |
           +-----------+-------+-------------------+
-          | A         | 6     | [NAN, 10]         |
+          | A         | 6     | [[NAN, 10]]       |
           +-----------+-------+-------------------+
-          | A         | 11    | [10, 6]           |
+          | A         | 11    | [[10, 6]]         |
           +-----------+-------+-------------------+
 
     templates:
       - name: T
         types:
-          - int8
-          - int16
-          - int32
-          - int64
-          - uint8
-          - uint16
-          - uint32
-          - uint64
+          # Note that optional values during output increase quite a bit of overhead when marshalling, therefore
+          # this featurizer only supports those types that don't have to pay that penality. We may still want to support
+          # these types in the future in some frameworks.
+          #
+          # - int8
+          # - int16
+          # - int32
+          # - int64
+          # - uint8
+          # - uint16
+          # - uint32
+          # - uint64
+          # - string
           - float
           - double
-          - string
 
     type_mappings:
       - input_type: tuple<unique_id, T>
-        output_type: vector<T?>
-        description: A vector of size horizon will always be output, but the individual elements could be NaN.
+        output_type: matrix<T?>
+        description: A matrix always of 1 row and column of size horizon, but the individual elements could be NaN.
 
     custom_enums:
       - name: SimpleRollingWindowCalculation

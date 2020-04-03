@@ -12,7 +12,7 @@ namespace NS = Microsoft::Featurizer;
 
 using InputType = std::int32_t;
 using OutputType = NS::Featurizers::SimpleRollingWindowTransformer<InputType>::TransformedType;
-using VectorMemberType = NS::Traits<InputType>::nullable_type;
+using MatrixMemberType = NS::Traits<InputType>::nullable_type;
 
 TEST_CASE("Min - int32, window size 1, horizon 1") {
 
@@ -22,26 +22,26 @@ TEST_CASE("Min - int32, window size 1, horizon 1") {
 
     // Since there are NaN values, cannot directly compare the vectors.
     // Correct result is {NaN}
-    CHECK(results.size() == 1);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
+    CHECK(results.cols() == 1);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
 
     results = transformer.execute(2);
 
     // Correct result is now {1}
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 1);
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 1);
 
     results = transformer.execute(3);
 
     // Correct result is now {2}
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 2);
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 2);
 
     results = transformer.execute(4);
 
     // Correct result is now {3}
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 3);
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 3);
 }
 
 TEST_CASE("Min - int32, window size 2, horizon 1") {
@@ -51,24 +51,24 @@ TEST_CASE("Min - int32, window size 2, horizon 1") {
 
     // Since there are NaN values, cannot directly compare the vectors.
     // Correct result is {NaN}
-    CHECK(results.size() == 1);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
+    CHECK(results.cols() == 1);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
 
     results = transformer.execute(2);
 
     // Correct result is now {1}
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 1);
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 1);
 
     results = transformer.execute(3);
 
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 1);
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 1);
 
     results = transformer.execute(4);
 
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 2);
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 2);
 }
 
 TEST_CASE("Max - int32, window size 2, horizon 1, min window size 2") {
@@ -78,24 +78,24 @@ TEST_CASE("Max - int32, window size 2, horizon 1, min window size 2") {
 
     // Since there are NaN values, cannot directly compare the vectors.
     // Correct result is {NaN}
-    CHECK(results.size() == 1);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
+    CHECK(results.cols() == 1);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
 
     results = transformer.execute(2);
 
     // Correct result is still {NaN} due to min window size of 2
-    CHECK(results.size() == 1);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
+    CHECK(results.cols() == 1);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
 
     results = transformer.execute(3);
 
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 2);
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 2);
 
     results = transformer.execute(4);
 
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 3);
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 3);
 }
 
 TEST_CASE("Max - int32, window size 1, horizon 2") {
@@ -105,30 +105,30 @@ TEST_CASE("Max - int32, window size 1, horizon 2") {
 
     // Since there are NaN values, cannot directly compare the vectors.
     // Correct result is {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[1]));
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 1)));
 
     results = transformer.execute(2);
 
     // Correct result is now {NaN, 1}
-    CHECK(results.size() == 2);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
-    CHECK(results[1] == 1);
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(results(0, 1) == 1);
 
     results = transformer.execute(3);
 
     // Correct result is now {1, 2}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 1);
-    CHECK(results[1] == 2);
+    CHECK(results.cols() == 2);
+    CHECK(results(0, 0) == 1);
+    CHECK(results(0, 1) == 2);
 
     results = transformer.execute(4);
 
     // Correct result is now {2, 3}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 2);
-    CHECK(results[1] == 3);
+    CHECK(results.cols() == 2);
+    CHECK(results(0, 0) == 2);
+    CHECK(results(0, 1) == 3);
 }
 
 TEST_CASE("Min - int32, window size 2, horizon 2") {
@@ -138,30 +138,30 @@ TEST_CASE("Min - int32, window size 2, horizon 2") {
 
     // Since there are NaN values, cannot directly compare the vectors.
     // Correct result is {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[1]));
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 1)));
 
     results = transformer.execute(2);
 
     // Correct result is now {NaN, 1}
-    CHECK(results.size() == 2);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
-    CHECK(results[1] == 1);
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(results(0, 1) == 1);
 
     results = transformer.execute(3);
 
     // Correct result is now {1, 1}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 1);
-    CHECK(results[1] == 1);
+    CHECK(results.cols() == 2);
+    CHECK(results(0, 0) == 1);
+    CHECK(results(0, 1) == 1);
 
     results = transformer.execute(4);
 
     // Correct result is now {1, 2}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 1);
-    CHECK(results[1] == 2);
+    CHECK(results.cols() == 2);
+    CHECK(results(0, 0) == 1);
+    CHECK(results(0, 1) == 2);
 }
 
 TEST_CASE("Min - int32, window size 2, horizon 2, min window size 2") {
@@ -171,30 +171,30 @@ TEST_CASE("Min - int32, window size 2, horizon 2, min window size 2") {
 
     // Since there are NaN values, cannot directly compare the vectors.
     // Correct result is {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[1]));
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 1)));
 
     results = transformer.execute(2);
 
     // Correct result is now {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[1]));
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 1)));
 
     results = transformer.execute(3);
 
     // Correct result is now {NaN, 1}
-    CHECK(results.size() == 2);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
-    CHECK(results[1] == 1);
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(results(0, 1) == 1);
 
     results = transformer.execute(4);
 
     // Correct result is now {1, 2}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 1);
-    CHECK(results[1] == 2);
+    CHECK(results.cols() == 2);
+    CHECK(results(0, 0) == 1);
+    CHECK(results(0, 1) == 2);
 }
 
 TEST_CASE("Estimator Min - int32, window size 2, horizon 2, min window size 2") {
@@ -207,7 +207,7 @@ TEST_CASE("Estimator Min - int32, window size 2, horizon 2, min window size 2") 
     std::vector<OutputType>   output;
     auto const                              callback(
         [&output](OutputType value) {
-            output.emplace_back(std::move(value));
+            output.emplace_back(value);
         }
     );
 
@@ -216,33 +216,33 @@ TEST_CASE("Estimator Min - int32, window size 2, horizon 2, min window size 2") 
 
     // Since there are NaN values, cannot directly compare the vectors.
     // Correct result is {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[1]));
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 1)));
 
     transformer->execute(2, callback);
     results = output[1];
 
     // Correct result is now {NaN, NaN}
-    CHECK(results.size() == 2);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[1]));
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 1)));
 
     transformer->execute(3, callback);
     results = output[2];
 
     // Correct result is now {NaN, 1}
-    CHECK(results.size() == 2);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
-    CHECK(results[1] == 1);
+    CHECK(results.cols() == 2);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
+    CHECK(results(0, 1) == 1);
 
     transformer->execute(4, callback);
     results = output[3];
 
     // Correct result is now {1, 2}
-    CHECK(results.size() == 2);
-    CHECK(results[0] == 1);
-    CHECK(results[1] == 2);
+    CHECK(results.cols() == 2);
+    CHECK(results(0, 0) == 1);
+    CHECK(results(0, 1) == 2);
 }
 
 using GrainType = std::vector<std::string>;
@@ -277,8 +277,8 @@ TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
     OutputType results = output[0];
 
     // Correct result is {NaN}
-    CHECK(results.size() == 1);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
+    CHECK(results.cols() == 1);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
 
     const InputType value2(2);
     const GrainedInputType tup2(grain, value2);
@@ -287,8 +287,8 @@ TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
     results = output[1];
 
     // Correct result is now {1}
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 1);
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 1);
 
     const InputType value3(3);
     const GrainedInputType tup3(grain, value3);
@@ -296,8 +296,8 @@ TEST_CASE("Grained Min - 1 grain, window size 1, horizon 1") {
     results = output[2];
 
     // Correct result is now {2}
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 2);
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 2);
 }
 
 TEST_CASE("Serialization/Deserialization") {
@@ -361,13 +361,13 @@ TEST_CASE("Flush test") {
 
     OutputType results = transformer.execute(1);
 
-    CHECK(results.size() == 1);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
+    CHECK(results.cols() == 1);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
 
     results = transformer.execute(2);
 
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 1);
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 1);
 
     // Call flush. The next 2 calls with the same values from before the flush should return the same values.
     // Flush should also return no values.
@@ -376,11 +376,11 @@ TEST_CASE("Flush test") {
 
     results = transformer.execute(1);
 
-    CHECK(results.size() == 1);
-    CHECK(NS::Traits<VectorMemberType>::IsNull(results[0]));
+    CHECK(results.cols() == 1);
+    CHECK(NS::Traits<MatrixMemberType>::IsNull(results(0, 0)));
 
     results = transformer.execute(2);
 
-    CHECK(results.size() == 1);
-    CHECK(results[0] == 1);
+    CHECK(results.cols() == 1);
+    CHECK(results(0, 0) == 1);
 }

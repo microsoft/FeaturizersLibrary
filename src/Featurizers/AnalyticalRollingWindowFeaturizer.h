@@ -86,14 +86,14 @@ template <
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 class AnalyticalRollingWindowEstimator :
-    public TransformerEstimator<InputT, std::vector<double>> {
+    public TransformerEstimator<InputT, Microsoft::Featurizer::RowMajMatrix<double>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = TransformerEstimator<InputT, std::vector<double>>;
+    using BaseType                          = TransformerEstimator<InputT, Microsoft::Featurizer::RowMajMatrix<double>>;
     using TransformerType                   = AnalyticalRollingWindowTransformer<InputT, MaxNumTrainingItemsV>;
 
     // ----------------------------------------------------------------------
@@ -144,7 +144,7 @@ template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_
 class GrainedAnalyticalRollingWindowEstimator :
     public Components::PipelineExecutionEstimatorImpl<
         Components::GrainEstimatorImpl<std::vector<std::string>, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
-        Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string> const &, std::vector<double>>, 1>
+        Components::FilterDecoratorEstimator<std::tuple<std::vector<std::string> const &, Microsoft::Featurizer::RowMajMatrix<double>>, 1>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -157,7 +157,7 @@ public:
     using BaseType =
         Components::PipelineExecutionEstimatorImpl<
             Components::GrainEstimatorImpl<GrainType, AnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>>,
-            Components::FilterDecoratorEstimator<std::tuple<GrainType const &, std::vector<double>>, 1>
+            Components::FilterDecoratorEstimator<std::tuple<GrainType const &, Microsoft::Featurizer::RowMajMatrix<double>>, 1>
         >;
 
     // This is used by the code generator when generating code that invokes this
@@ -342,7 +342,7 @@ GrainedAnalyticalRollingWindowEstimator<InputT, MaxNumTrainingItemsV>::GrainedAn
             );
         },
         [pAllColumnAnnotations]() {
-            return Components::FilterDecoratorEstimator<std::tuple<GrainType const &, std::vector<double>>, 1>(std::move(pAllColumnAnnotations));
+            return Components::FilterDecoratorEstimator<std::tuple<GrainType const &, Microsoft::Featurizer::RowMajMatrix<double>>, 1>(std::move(pAllColumnAnnotations));
         }
     ) {
 }
