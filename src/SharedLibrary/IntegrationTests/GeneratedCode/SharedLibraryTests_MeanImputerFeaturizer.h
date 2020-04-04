@@ -102,12 +102,12 @@ void MeanImputerFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MeanImputerFeaturizer_int8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MeanImputerFeaturizer_int8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -200,12 +200,12 @@ void MeanImputerFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MeanImputerFeaturizer_int16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MeanImputerFeaturizer_int16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -298,12 +298,12 @@ void MeanImputerFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MeanImputerFeaturizer_int32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MeanImputerFeaturizer_int32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -396,12 +396,12 @@ void MeanImputerFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MeanImputerFeaturizer_int64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MeanImputerFeaturizer_int64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -494,12 +494,12 @@ void MeanImputerFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MeanImputerFeaturizer_uint8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MeanImputerFeaturizer_uint8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -592,12 +592,12 @@ void MeanImputerFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MeanImputerFeaturizer_uint16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MeanImputerFeaturizer_uint16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -690,12 +690,12 @@ void MeanImputerFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MeanImputerFeaturizer_uint32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MeanImputerFeaturizer_uint32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -788,12 +788,12 @@ void MeanImputerFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MeanImputerFeaturizer_uint64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(MeanImputerFeaturizer_uint64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -886,12 +886,12 @@ void MeanImputerFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MeanImputerFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MeanImputerFeaturizer_float_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -984,12 +984,12 @@ void MeanImputerFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MeanImputerFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MeanImputerFeaturizer_double_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 

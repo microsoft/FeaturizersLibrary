@@ -1489,6 +1489,42 @@ struct Traits<nonstd::optional<T>>  {
 // TODO: Apache Arrow
 
 /////////////////////////////////////////////////////////////////////////
+///  \class         IsIteratorRange
+///  \brief         Determines whether a type is a pair or tuple of iterators
+///
+template <typename T>
+struct IsIteratorRange {
+    static constexpr bool const value = false;
+};
+template <typename T>
+struct IsIteratorRange<std::tuple<T, T>> {
+    static constexpr bool const value = true;
+};
+template <typename T>
+struct IsIteratorRange<std::pair<T, T>> {
+    static constexpr bool const value = true;
+};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         IsMatrix
+///  \brief         Determines if a type is an Eigen Matrix.
+///
+template <typename T>
+struct IsMatrix {
+    static constexpr bool const value = false;
+};
+
+template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
+struct IsMatrix<Eigen::Matrix<_Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols>> {
+    static constexpr bool const value = true;
+};
+
+template <typename T>
+struct IsMatrix<Eigen::Map<T>> {
+    static constexpr bool const value = IsMatrix<T>::value;
+};
+
+/////////////////////////////////////////////////////////////////////////
 ///  \class         MakeNullableType
 ///  \brief         We have many several situations where the transformer operates on nullable types,
 ///                 but we don't want to instantiate the class as Transformer<optional<type>>.

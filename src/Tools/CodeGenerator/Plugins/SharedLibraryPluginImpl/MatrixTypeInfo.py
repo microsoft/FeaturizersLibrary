@@ -112,8 +112,8 @@ class MatrixTypeInfo(TypeInfo):
             raise Exception("Optional matrix values are not supported")
 
         parameters = [
-            self.Type("size_t", "{}_cols".format(arg_name)),
-            self.Type("size_t", "{}_rows".format(arg_name)),
+            self.Type("size_t const *", "{}_cols_ptr".format(arg_name)),
+            self.Type("size_t const *", "{}_rows_ptr".format(arg_name)),
             self.Type("{} const **".format(self._type_info.CType), "{}_values_ptr".format(arg_name)),
         ]
 
@@ -125,8 +125,8 @@ class MatrixTypeInfo(TypeInfo):
             parameters,
             textwrap.dedent(
                 """\
-                if({name}_cols == 0) throw std::invalid_argument("'{name}_cols' is 0");
-                if({name}_rows == 0) throw std::invalid_argument("'{name}_rows' is 0");
+                if({name}_cols_ptr == nullptr) throw std::invalid_argument("'{name}_cols_ptr' is nullptr");
+                if({name}_rows_ptr == nullptr) throw std::invalid_argument("'{name}_rows_ptr' is nullptr");
                 if({name}_values_ptr == nullptr) throw std::invalid_argument("'{name}_values_ptr' is null");
                 if({items_var_name} == 0) throw std::invalid_argument("'{items_var_name}' is 0");
 
@@ -135,7 +135,14 @@ class MatrixTypeInfo(TypeInfo):
                 {name}_buffer.reserve({items_var_name});
 
                 while({name}_buffer.size() < {items_var_name}) {{
-                    {name}_buffer.emplace_back({map_type}(const_cast<{type} *>(*{name}_values_ptr), static_cast<Eigen::Index>({name}_rows), static_cast<Eigen::Index>({name}_cols)));
+                    if(*{name}_cols_ptr == 0) throw std::invalid_argument("Invalid col element");
+                    if(*{name}_rows_ptr == 0) throw std::invalid_argument("Invalid row element");
+                    if(*{name}_values_ptr == nullptr) throw std::invalid_argument("Invalid values element");
+
+                    {name}_buffer.emplace_back({map_type}(const_cast<{type} *>(*{name}_values_ptr), static_cast<Eigen::Index>(*{name}_rows_ptr), static_cast<Eigen::Index>(*{name}_cols_ptr)));
+
+                    ++{name}_cols_ptr;
+                    ++{name}_rows_ptr;
                     ++{name}_values_ptr;
                 }}
                 """,

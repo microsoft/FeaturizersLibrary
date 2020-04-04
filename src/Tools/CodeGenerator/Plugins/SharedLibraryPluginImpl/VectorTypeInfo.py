@@ -117,7 +117,7 @@ class VectorTypeInfo(TypeInfo):
         # If the input buffer type is a pointer, it means that we don't
         # have to transform the input prior to passing it on. If it is not
         # a pointer, transformation is required.
-        if result.InputBufferType.Type.endswith("*"):
+        if self._IsPointer(result.InputBufferType.Type):
             # No transformation is required
             buffer_type = self.Type(
                 "std::vector<std::tuple<{type}, {type}>>".format(
@@ -151,14 +151,14 @@ class VectorTypeInfo(TypeInfo):
                 """\
                 std::vector<std::tuple<{type}, {type}>> {name}_buffer;
 
-                {name}_buffer.reserve({temp_buffer}.size();
+                {name}_buffer.reserve({temp_buffer}.size());
 
                 for(auto const & {temp_buffer}_item : {temp_buffer})
-                    {name}_buffer.emplace_back({temp_buffer}_item.cbegin(), {temp_buffer}_item.cend());
+                    {name}_buffer.emplace_back({temp_buffer}_item.data(), {temp_buffer}_item.data() + {temp_buffer}_item.size());
                 """,
             ).format(
                 name=arg_name,
-                type="typename {}::const_iterator".format(result.InputBufferType.Type),
+                type="typename {}::const_pointer".format(result.InputBufferType.Type),
                 temp_buffer=buffer_type.Name,
             )
 
@@ -198,9 +198,10 @@ class VectorTypeInfo(TypeInfo):
             references=StringHelpers.LeftJustify(
                 "\n".join(
                     [
-                        "{type} const &{name}(*{name}_ptr);".format(
+                        "{type}{const_and_ref}{name}(*{name}_ptr);".format(
                             type=p.Type,
                             name=p.Name,
+                            const_and_ref=" const &" if not self._IsPointer(p.Type) else "",
                         )
                         for p in result.Parameters
                     ]
@@ -360,13 +361,13 @@ class VectorTypeInfo(TypeInfo):
 
         input_parameters = [self.Type(self._StripPointer(p.Type), p.Name) for p in result.Parameters]
 
+        assert input_parameters[-1].Type == "size_t", input_parameters[-1].Type
+        assert input_parameters[-1].Name.endswith("_items"), input_parameters[-1].Name
+        pointer_parameters = input_parameters[:-1]
+
         # Create the destroy statements
         destroy_result = self._type_info.GetDestroyOutputInfo("{}_destroy_item".format(arg_name))
         if destroy_result is not None:
-            assert input_parameters[-1].Type == "size_t", input_parameters[-1].Type
-            assert input_parameters[-1].Name.endswith("_items"), input_parameters[-1].Name
-            pointer_parameters = input_parameters[:-1]
-
             assert len(destroy_result.Parameters) == len(result.Parameters) - 1
 
             destroy_statements = textwrap.dedent(
@@ -461,7 +462,7 @@ class VectorTypeInfo(TypeInfo):
                     "\n".join(
                         [
                             "delete [] {};".format(p.Name)
-                            for p in input_parameters if p.Type.endswith("*")
+                            for p in pointer_parameters
                         ]
                     ),
                     4,
@@ -474,5 +475,18 @@ class VectorTypeInfo(TypeInfo):
     # ----------------------------------------------------------------------
     @staticmethod
     def _StripPointer(value):
+        value = value.strip()
+        if value.endswith("const"):
+            value = value[:-len("const")].rstrip()
+
         assert value.endswith("*"), value
         return value[:-1].rstrip()
+
+    # ----------------------------------------------------------------------
+    @staticmethod
+    def _IsPointer(value):
+        value = value.strip()
+        if value.endswith("const"):
+            value = value[:-len("const")].rstrip()
+
+        return value.endswith("*")

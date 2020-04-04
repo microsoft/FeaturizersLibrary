@@ -54,17 +54,28 @@ class _StructTypeInfo(TypeInfo):
 
     # ----------------------------------------------------------------------
     @Interface.override
+    def GetTransformInputBufferArgs(
+        self,
+        input_name='input',
+    ):
+        raise Exception("'{}' is only used as a OutputType".format(self.TypeName))
+
+    # ----------------------------------------------------------------------
+    @Interface.override
     def GetOutputInfo(
         self,
         invocation_template,
         result_name="result",
     ):
+        result_name = "{}_value".format(result_name)
+
         return self.Result(
             self.TypeName,
             [self.Type(self.TypeName, result_name)],
             invocation_template.format(result_name),
             "&{}".format(result_name),
             destroy_inline=False,
+            destroy_var_name=result_name,
         )
 
 

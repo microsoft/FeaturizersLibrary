@@ -60,10 +60,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-
-    // checks if IteratorRangeT is a pair of iterators
-    static_assert(Components::IsIteratorPair<IteratorRangeT>::value, "VectorNormsEstimator input type need to a pair of iterators of same type!");
-
+    static_assert(IsIteratorRange<IteratorRangeT>::value, "VectorNormsEstimator input type need to a pair of iterators of same type!");
 
     using BaseType     = StandardTransformer<IteratorRangeT, std::vector<std::double_t>>;
 

@@ -117,12 +117,12 @@ void ShortGrainDropperFeaturizer_Test(
         for(std::string const &value : input)
             input_buffer.emplace_back(value.c_str());
 
-        bool result;
+        bool results_value;
 
-        REQUIRE(ShortGrainDropperFeaturizer_Transform(pTransformerHandle, input_buffer.data(), input_buffer.size(), &result, &pErrorInfo));
+        REQUIRE(ShortGrainDropperFeaturizer_Transform(pTransformerHandle, input_buffer.data(), input_buffer.size(), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 

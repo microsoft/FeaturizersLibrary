@@ -20,7 +20,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_DestroyEstimator(/*in*/ PCAFeatu
 FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_GetState(/*in*/ PCAFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_IsTrainingComplete(/*in*/ PCAFeaturizer_float_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_Fit(/*in*/ PCAFeaturizer_float_EstimatorHandle *pHandle, /*in*/ size_t input_cols, /*in*/ size_t input_rows, /*in*/ float const * input_ptr, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_FitBuffer(/*in*/ PCAFeaturizer_float_EstimatorHandle *pHandle, /*in*/ size_t input_cols, /*in*/ size_t input_rows, /*in*/ float const ** input_values_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_FitBuffer(/*in*/ PCAFeaturizer_float_EstimatorHandle *pHandle, /*in*/ size_t const * input_cols_ptr, /*in*/ size_t const * input_rows_ptr, /*in*/ float const ** input_values_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_OnDataCompleted(/*in*/ PCAFeaturizer_float_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_CompleteTraining(/*in*/ PCAFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
@@ -47,7 +47,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_DestroyEstimator(/*in*/ PCAFeat
 FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_GetState(/*in*/ PCAFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_IsTrainingComplete(/*in*/ PCAFeaturizer_double_EstimatorHandle *pHandle, /*out*/ bool *pIsTrainingComplete, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_Fit(/*in*/ PCAFeaturizer_double_EstimatorHandle *pHandle, /*in*/ size_t input_cols, /*in*/ size_t input_rows, /*in*/ double const * input_ptr, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
-FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_FitBuffer(/*in*/ PCAFeaturizer_double_EstimatorHandle *pHandle, /*in*/ size_t input_cols, /*in*/ size_t input_rows, /*in*/ double const ** input_values_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_FitBuffer(/*in*/ PCAFeaturizer_double_EstimatorHandle *pHandle, /*in*/ size_t const * input_cols_ptr, /*in*/ size_t const * input_rows_ptr, /*in*/ double const ** input_values_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_OnDataCompleted(/*in*/ PCAFeaturizer_double_EstimatorHandle *pHandle, /*out*/ /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_CompleteTraining(/*in*/ PCAFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 

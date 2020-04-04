@@ -72,6 +72,14 @@ class SparseVectorTypeInfo(TypeInfo):
 
     # ----------------------------------------------------------------------
     @Interface.override
+    def GetTransformInputBufferArgs(
+        self,
+        input_name='input',
+    ):
+        raise NotImplementedError("This structure is only used during output")
+
+    # ----------------------------------------------------------------------
+    @Interface.override
     def GetOutputInfo(
         self,
         invocation_template,

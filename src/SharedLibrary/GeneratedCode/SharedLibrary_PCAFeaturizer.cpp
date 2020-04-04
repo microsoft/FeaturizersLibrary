@@ -157,7 +157,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_Fit(/*in*/ PCAFeaturizer_float_E
     }
 }
 
-FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_FitBuffer(/*in*/ PCAFeaturizer_float_EstimatorHandle *pHandle, /*in*/ size_t input_cols, /*in*/ size_t input_rows, /*in*/ float const ** input_values_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_FitBuffer(/*in*/ PCAFeaturizer_float_EstimatorHandle *pHandle, /*in*/ size_t const * input_cols_ptr, /*in*/ size_t const * input_rows_ptr, /*in*/ float const ** input_values_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -167,8 +167,8 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_FitBuffer(/*in*/ PCAFeaturizer_f
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        if(input_cols == 0) throw std::invalid_argument("'input_cols' is 0");
-        if(input_rows == 0) throw std::invalid_argument("'input_rows' is 0");
+        if(input_cols_ptr == nullptr) throw std::invalid_argument("'input_cols_ptr' is nullptr");
+        if(input_rows_ptr == nullptr) throw std::invalid_argument("'input_rows_ptr' is nullptr");
         if(input_values_ptr == nullptr) throw std::invalid_argument("'input_values_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -177,7 +177,14 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_float_FitBuffer(/*in*/ PCAFeaturizer_f
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-            input_buffer.emplace_back(Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>(const_cast<float *>(*input_values_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols)));
+            if(*input_cols_ptr == 0) throw std::invalid_argument("Invalid col element");
+            if(*input_rows_ptr == 0) throw std::invalid_argument("Invalid row element");
+            if(*input_values_ptr == nullptr) throw std::invalid_argument("Invalid values element");
+
+            input_buffer.emplace_back(Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::float_t>>(const_cast<float *>(*input_values_ptr), static_cast<Eigen::Index>(*input_rows_ptr), static_cast<Eigen::Index>(*input_cols_ptr)));
+
+            ++input_cols_ptr;
+            ++input_rows_ptr;
             ++input_values_ptr;
         }
 
@@ -613,7 +620,7 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_Fit(/*in*/ PCAFeaturizer_double
     }
 }
 
-FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_FitBuffer(/*in*/ PCAFeaturizer_double_EstimatorHandle *pHandle, /*in*/ size_t input_cols, /*in*/ size_t input_rows, /*in*/ double const ** input_values_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
+FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_FitBuffer(/*in*/ PCAFeaturizer_double_EstimatorHandle *pHandle, /*in*/ size_t const * input_cols_ptr, /*in*/ size_t const * input_rows_ptr, /*in*/ double const ** input_values_ptr, /*in*/ size_t input_items, /*out*/ FitResult *pFitResult, /*out*/ ErrorInfoHandle **ppErrorInfo) {
     if(ppErrorInfo == nullptr)
         return false;
 
@@ -623,8 +630,8 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_FitBuffer(/*in*/ PCAFeaturizer_
         if(pHandle == nullptr) throw std::invalid_argument("'pHandle' is null");
         if(pFitResult == nullptr) throw std::invalid_argument("'pFitResult' is null");
 
-        if(input_cols == 0) throw std::invalid_argument("'input_cols' is 0");
-        if(input_rows == 0) throw std::invalid_argument("'input_rows' is 0");
+        if(input_cols_ptr == nullptr) throw std::invalid_argument("'input_cols_ptr' is nullptr");
+        if(input_rows_ptr == nullptr) throw std::invalid_argument("'input_rows_ptr' is nullptr");
         if(input_values_ptr == nullptr) throw std::invalid_argument("'input_values_ptr' is null");
         if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
 
@@ -633,7 +640,14 @@ FEATURIZER_LIBRARY_API bool PCAFeaturizer_double_FitBuffer(/*in*/ PCAFeaturizer_
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-            input_buffer.emplace_back(Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>(const_cast<double *>(*input_values_ptr), static_cast<Eigen::Index>(input_rows), static_cast<Eigen::Index>(input_cols)));
+            if(*input_cols_ptr == 0) throw std::invalid_argument("Invalid col element");
+            if(*input_rows_ptr == 0) throw std::invalid_argument("Invalid row element");
+            if(*input_values_ptr == nullptr) throw std::invalid_argument("Invalid values element");
+
+            input_buffer.emplace_back(Eigen::Map<Microsoft::Featurizer::RowMajMatrix<std::double_t>>(const_cast<double *>(*input_values_ptr), static_cast<Eigen::Index>(*input_rows_ptr), static_cast<Eigen::Index>(*input_cols_ptr)));
+
+            ++input_cols_ptr;
+            ++input_rows_ptr;
             ++input_values_ptr;
         }
 

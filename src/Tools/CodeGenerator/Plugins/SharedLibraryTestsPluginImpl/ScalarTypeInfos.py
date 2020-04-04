@@ -65,11 +65,26 @@ class _ScalarTypeInfo(TypeInfo):
 
     # ----------------------------------------------------------------------
     @Interface.override
+    def GetTransformInputBufferArgs(
+        self,
+        input_name='input',
+    ):
+        if self.RequiresOptionalType:
+            raise NotImplementedError("Not implemented yet")
+
+        return "{name}.data(), {name}.size()".format(
+            name=input_name,
+        )
+
+    # ----------------------------------------------------------------------
+    @Interface.override
     def GetOutputInfo(
         self,
         invocation_template,
         result_name="result",
     ):
+        result_name = "{}_value".format(result_name)
+
         if self.RequiresOptionalType:
             vector_type = "nonstd::optional<{}>".format(self.CppType)
             local_type = "{} *".format(self.CppType)

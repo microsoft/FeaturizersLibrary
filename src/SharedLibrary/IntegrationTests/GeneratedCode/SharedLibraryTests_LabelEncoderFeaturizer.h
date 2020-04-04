@@ -103,12 +103,12 @@ void LabelEncoderFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        std::uint32_t results_value;
 
-        REQUIRE(LabelEncoderFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(LabelEncoderFeaturizer_int8_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -202,12 +202,12 @@ void LabelEncoderFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        std::uint32_t results_value;
 
-        REQUIRE(LabelEncoderFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(LabelEncoderFeaturizer_int16_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -301,12 +301,12 @@ void LabelEncoderFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        std::uint32_t results_value;
 
-        REQUIRE(LabelEncoderFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(LabelEncoderFeaturizer_int32_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -400,12 +400,12 @@ void LabelEncoderFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        std::uint32_t results_value;
 
-        REQUIRE(LabelEncoderFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(LabelEncoderFeaturizer_int64_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -499,12 +499,12 @@ void LabelEncoderFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        std::uint32_t results_value;
 
-        REQUIRE(LabelEncoderFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(LabelEncoderFeaturizer_uint8_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -598,12 +598,12 @@ void LabelEncoderFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        std::uint32_t results_value;
 
-        REQUIRE(LabelEncoderFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(LabelEncoderFeaturizer_uint16_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -697,12 +697,12 @@ void LabelEncoderFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        std::uint32_t results_value;
 
-        REQUIRE(LabelEncoderFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(LabelEncoderFeaturizer_uint32_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -796,12 +796,12 @@ void LabelEncoderFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        std::uint32_t results_value;
 
-        REQUIRE(LabelEncoderFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(LabelEncoderFeaturizer_uint64_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -895,12 +895,12 @@ void LabelEncoderFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        std::uint32_t results_value;
 
-        REQUIRE(LabelEncoderFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(LabelEncoderFeaturizer_float_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -994,12 +994,12 @@ void LabelEncoderFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        std::uint32_t results_value;
 
-        REQUIRE(LabelEncoderFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(LabelEncoderFeaturizer_double_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -1093,12 +1093,12 @@ void LabelEncoderFeaturizer_bool_Test(
     results.reserve(inference_input.size());
 
     for(bool input : inference_input) {
-        std::uint32_t result;
+        std::uint32_t results_value;
 
-        REQUIRE(LabelEncoderFeaturizer_bool_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(LabelEncoderFeaturizer_bool_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -1192,12 +1192,12 @@ void LabelEncoderFeaturizer_string_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::uint32_t result;
+        std::uint32_t results_value;
 
-        REQUIRE(LabelEncoderFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result, &pErrorInfo));
+        REQUIRE(LabelEncoderFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 

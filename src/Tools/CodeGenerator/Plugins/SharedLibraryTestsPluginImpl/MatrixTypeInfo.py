@@ -110,6 +110,38 @@ class MatrixTypeInfo(TypeInfo):
 
     # ----------------------------------------------------------------------
     @Interface.override
+    def GetTransformInputBufferArgs(
+        self,
+        input_name='input',
+    ):
+        return (
+            "{name}_cols_buffer.data(), {name}_rows_buffer.data(), {name}_data_buffer.data(), {name}.size()".format(
+                name=input_name,
+            ),
+            textwrap.dedent(
+                """\
+                std::vector<size_t> {name}_cols_buffer;
+                std::vector<size_t> {name}_rows_buffer;
+                std::vector<{type} const *> {name}_data_buffer;
+
+                {name}_cols_buffer.reserve({name}.size());
+                {name}_rows_buffer.reserve({name}.size());
+                {name}_data_buffer.reserve({name}.size());
+
+                for(auto const & {name}_element : {name}) {{
+                    {name}_cols_buffer.emplace_back({name}_element.cols());
+                    {name}_rows_buffer.emplace_back({name}_element.rows());
+                    {name}_data_buffer.emplace_back({name}_element.data());
+                }}
+                """,
+            ).format(
+                name=input_name,
+                type=self._type_info.CType,
+            ),
+        )
+
+    # ----------------------------------------------------------------------
+    @Interface.override
     def GetOutputInfo(
         self,
         invocation_template,

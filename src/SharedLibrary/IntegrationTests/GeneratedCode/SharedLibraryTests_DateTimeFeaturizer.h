@@ -103,19 +103,19 @@ void DateTimeFeaturizer_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        TimePoint result;
+        TimePoint results_value;
 
-        REQUIRE(DateTimeFeaturizer_Transform(pTransformerHandle, CreateDateTimeParameter(input), &result, &pErrorInfo));
+        REQUIRE(DateTimeFeaturizer_Transform(pTransformerHandle, CreateDateTimeParameter(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result);
+        results.emplace_back(results_value);
         // No inline destroy statement
     }
 
     REQUIRE(verify_func(results));
 
-    for(auto & result: results) {
-        REQUIRE(DateTimeFeaturizer_DestroyTransformedData(&result, &pErrorInfo));
+    for(auto & results_value: results) {
+        REQUIRE(DateTimeFeaturizer_DestroyTransformedData(&results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 

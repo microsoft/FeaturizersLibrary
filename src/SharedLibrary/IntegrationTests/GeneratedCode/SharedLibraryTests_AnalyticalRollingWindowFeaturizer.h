@@ -125,17 +125,17 @@ void AnalyticalRollingWindowFeaturizer_float_Test(
 
         auto const & input1(std::get<1>(input));
 
-        size_t result_cols;
-        size_t result_rows;
-        std::double_t * result_ptr;
+        size_t results_cols;
+        size_t results_rows;
+        std::double_t * results_ptr;
 
-        REQUIRE(AnalyticalRollingWindowFeaturizer_float_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_cols, &result_rows, &result_ptr, &pErrorInfo));
+        REQUIRE(AnalyticalRollingWindowFeaturizer_float_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &results_cols, &results_rows, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(CreateMatrix(result_cols, result_rows, result_ptr));
+        results.emplace_back(CreateMatrix(results_cols, results_rows, results_ptr));
         
         // Destroy the contents
-        REQUIRE(AnalyticalRollingWindowFeaturizer_float_DestroyTransformedData(result_cols, result_rows, result_ptr, &pErrorInfo));
+        REQUIRE(AnalyticalRollingWindowFeaturizer_float_DestroyTransformedData(results_cols, results_rows, results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -251,17 +251,17 @@ void AnalyticalRollingWindowFeaturizer_double_Test(
 
         auto const & input1(std::get<1>(input));
 
-        size_t result_cols;
-        size_t result_rows;
-        std::double_t * result_ptr;
+        size_t results_cols;
+        size_t results_rows;
+        std::double_t * results_ptr;
 
-        REQUIRE(AnalyticalRollingWindowFeaturizer_double_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_cols, &result_rows, &result_ptr, &pErrorInfo));
+        REQUIRE(AnalyticalRollingWindowFeaturizer_double_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &results_cols, &results_rows, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(CreateMatrix(result_cols, result_rows, result_ptr));
+        results.emplace_back(CreateMatrix(results_cols, results_rows, results_ptr));
         
         // Destroy the contents
-        REQUIRE(AnalyticalRollingWindowFeaturizer_double_DestroyTransformedData(result_cols, result_rows, result_ptr, &pErrorInfo));
+        REQUIRE(AnalyticalRollingWindowFeaturizer_double_DestroyTransformedData(results_cols, results_rows, results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 

@@ -103,15 +103,15 @@ void StringFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr;
+        char const * results_ptr;
 
-        REQUIRE(StringFeaturizer_int8_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int8_Transform(pTransformerHandle, input, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
+        results.emplace_back(results_ptr ? std::string(results_ptr) : std::string());
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_int8_DestroyTransformedData(result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int8_DestroyTransformedData(results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -205,15 +205,15 @@ void StringFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr;
+        char const * results_ptr;
 
-        REQUIRE(StringFeaturizer_int16_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int16_Transform(pTransformerHandle, input, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
+        results.emplace_back(results_ptr ? std::string(results_ptr) : std::string());
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_int16_DestroyTransformedData(result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int16_DestroyTransformedData(results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -307,15 +307,15 @@ void StringFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr;
+        char const * results_ptr;
 
-        REQUIRE(StringFeaturizer_int32_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int32_Transform(pTransformerHandle, input, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
+        results.emplace_back(results_ptr ? std::string(results_ptr) : std::string());
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_int32_DestroyTransformedData(result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int32_DestroyTransformedData(results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -409,15 +409,15 @@ void StringFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr;
+        char const * results_ptr;
 
-        REQUIRE(StringFeaturizer_int64_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int64_Transform(pTransformerHandle, input, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
+        results.emplace_back(results_ptr ? std::string(results_ptr) : std::string());
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_int64_DestroyTransformedData(result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_int64_DestroyTransformedData(results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -511,15 +511,15 @@ void StringFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr;
+        char const * results_ptr;
 
-        REQUIRE(StringFeaturizer_uint8_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint8_Transform(pTransformerHandle, input, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
+        results.emplace_back(results_ptr ? std::string(results_ptr) : std::string());
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_uint8_DestroyTransformedData(result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint8_DestroyTransformedData(results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -613,15 +613,15 @@ void StringFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr;
+        char const * results_ptr;
 
-        REQUIRE(StringFeaturizer_uint16_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint16_Transform(pTransformerHandle, input, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
+        results.emplace_back(results_ptr ? std::string(results_ptr) : std::string());
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_uint16_DestroyTransformedData(result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint16_DestroyTransformedData(results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -715,15 +715,15 @@ void StringFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr;
+        char const * results_ptr;
 
-        REQUIRE(StringFeaturizer_uint32_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint32_Transform(pTransformerHandle, input, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
+        results.emplace_back(results_ptr ? std::string(results_ptr) : std::string());
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_uint32_DestroyTransformedData(result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint32_DestroyTransformedData(results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -817,15 +817,15 @@ void StringFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr;
+        char const * results_ptr;
 
-        REQUIRE(StringFeaturizer_uint64_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint64_Transform(pTransformerHandle, input, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
+        results.emplace_back(results_ptr ? std::string(results_ptr) : std::string());
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_uint64_DestroyTransformedData(result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_uint64_DestroyTransformedData(results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -919,15 +919,15 @@ void StringFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr;
+        char const * results_ptr;
 
-        REQUIRE(StringFeaturizer_float_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_float_Transform(pTransformerHandle, input, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
+        results.emplace_back(results_ptr ? std::string(results_ptr) : std::string());
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_float_DestroyTransformedData(result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_float_DestroyTransformedData(results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1021,15 +1021,15 @@ void StringFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr;
+        char const * results_ptr;
 
-        REQUIRE(StringFeaturizer_double_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_double_Transform(pTransformerHandle, input, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
+        results.emplace_back(results_ptr ? std::string(results_ptr) : std::string());
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_double_DestroyTransformedData(result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_double_DestroyTransformedData(results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1123,15 +1123,15 @@ void StringFeaturizer_bool_Test(
     results.reserve(inference_input.size());
 
     for(bool input : inference_input) {
-        char const * result_ptr;
+        char const * results_ptr;
 
-        REQUIRE(StringFeaturizer_bool_Transform(pTransformerHandle, input, &result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_bool_Transform(pTransformerHandle, input, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
+        results.emplace_back(results_ptr ? std::string(results_ptr) : std::string());
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_bool_DestroyTransformedData(result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_bool_DestroyTransformedData(results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1225,15 +1225,15 @@ void StringFeaturizer_string_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        char const * result_ptr;
+        char const * results_ptr;
 
-        REQUIRE(StringFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_ptr ? std::string(result_ptr) : std::string());
+        results.emplace_back(results_ptr ? std::string(results_ptr) : std::string());
         
         // Destroy the contents
-        REQUIRE(StringFeaturizer_string_DestroyTransformedData(result_ptr, &pErrorInfo));
+        REQUIRE(StringFeaturizer_string_DestroyTransformedData(results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 

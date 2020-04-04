@@ -13,16 +13,52 @@ namespace Microsoft {
 namespace Featurizer {
 namespace Featurizers {
 
+namespace Details {
+
+template <typename T, bool IsNativeNullableTypeV>
+struct ScalarTypeImpl {
+    using type                              = T;
+};
+
+template <typename T>
+struct ScalarTypeImpl<T, false> {
+    using type                              = typename T::value_type;
+};
+
+} // namespace Details
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         ForecastingPivotTransformerTraits
+///  \brief         Extracts information from types passed to
+///                 `ForecastingPivotTransformer`.
+///
+template <typename MatrixIteratorRangeT>
+struct ForecastingPivotTransformerTraits {
+    static_assert(IsIteratorRange<MatrixIteratorRangeT>::value, "'MatrixIteratorRangeT' must be an iterator pair");
+
+    using IteratorType                      = typename std::remove_reference<decltype(std::get<0>(std::declval<MatrixIteratorRangeT>()))>::type;
+    using MatrixType                        = typename std::iterator_traits<IteratorType>::value_type;
+
+    static_assert(IsMatrix<MatrixType>::value, "'MatrixIteratorRangeT' must be an iterator range of Matrix types");
+
+    using MatrixScalarType                  = typename MatrixType::Scalar;
+
+    static_assert(Traits<MatrixScalarType>::IsNullableType, "'MatrixIteratorRangeT' must be an iterator range of Matrix types composed of nullable values");
+
+    // Remove the "optional-ness" if the matrix scalar type
+    using ScalarType                        = typename Details::ScalarTypeImpl<MatrixScalarType, Traits<MatrixScalarType>::IsNativeNullableType>::type;
+};
+
 /////////////////////////////////////////////////////////////////////////
 ///  \class         ForecastingPivotTransformer
 ///  \brief         Expand output from upstream featurizers where all values
 ///                 in the same column across matrixes are not null/empty
 ///
-template <typename InputT>
+template <typename MatrixIteratorRangeT>
 class ForecastingPivotTransformer :
     public Components::InferenceOnlyTransformerImpl<
-        typename std::vector<Eigen::Map<const Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>>,
-        std::vector<InputT>
+        MatrixIteratorRangeT,
+        std::vector<typename ForecastingPivotTransformerTraits<MatrixIteratorRangeT>::ScalarType>
     > {
 public:
     // ----------------------------------------------------------------------
@@ -30,12 +66,12 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    static_assert(Traits<InputT>::IsNullableType == false || Traits<InputT>::IsNativeNullableType, "'InputT' should not be a nullable type");
+    using TheseTraits                       = ForecastingPivotTransformerTraits<MatrixIteratorRangeT>;
 
     using BaseType =
         Components::InferenceOnlyTransformerImpl<
-            typename std::vector<Eigen::Map<const Microsoft::Featurizer::RowMajMatrix<typename Microsoft::Featurizer::Traits<InputT>::nullable_type>>>,
-            std::vector<InputT>
+            MatrixIteratorRangeT,
+            std::vector<typename TheseTraits::ScalarType>
         >;
 
     // ----------------------------------------------------------------------
@@ -53,32 +89,37 @@ public:
 private:
     // ----------------------------------------------------------------------
     // |
-    // |  Private Types
-    // |
-    // ----------------------------------------------------------------------
-    using NullableType                      = typename Microsoft::Featurizer::Traits<InputT>::nullable_type;
-    using MatrixType                        = Eigen::Map<const Microsoft::Featurizer::RowMajMatrix<NullableType>>;
-
-    // ----------------------------------------------------------------------
-    // |
     // |  Private Methods
     // |
     // ----------------------------------------------------------------------
 
     // MSVC runs into problems when the declaration and definition are separated
     void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
-        if (input.empty()) {
+        // ----------------------------------------------------------------------
+        using MatrixType                    = typename TheseTraits::MatrixType;
+        using IteratorType                  = typename TheseTraits::IteratorType;
+        using NullableType                  = typename Microsoft::Featurizer::Traits<typename TheseTraits::ScalarType>::nullable_type;
+        // ----------------------------------------------------------------------
+
+        IteratorType const                  begin(std::get<0>(input));
+        IteratorType const                  end(std::get<1>(input));
+
+        if (begin == end) {
             throw std::invalid_argument("There's no input matrix passed in!");
         }
 
-        Eigen::Index const col_size(input[0].cols());
+        Eigen::Index const col_size(begin->cols());
 
         for (Eigen::Index col = 0; col < col_size; ++col) {
-            std::vector<InputT> ret;
-            bool has_nan(false);
+            typename BaseType::TransformedType          ret;
+            bool                                        has_nan(false);
 
             // if any nans is found in the current column across all matrixes, this column is omitted
-            for (MatrixType const & matrix : input) {
+            IteratorType                    ptr(begin);
+
+            while(ptr != end) {
+                MatrixType const &          matrix(*ptr++);
+
                 // all matrixes must have the same column number
                 if (matrix.cols() != col_size) {
                     throw std::invalid_argument("All input matrixes should have the same number of columns!");
@@ -109,15 +150,15 @@ private:
 ///  \typedef       ForecastingPivotEstimator
 ///  \brief         Estimator that creates `ForecastingPivotTransformer`.
 ///
-template <typename T>
-class ForecastingPivotEstimator : public Components::InferenceOnlyEstimatorImpl<ForecastingPivotTransformer<T>> {
+template <typename MatrixIteratorRangeT>
+class ForecastingPivotEstimator : public Components::InferenceOnlyEstimatorImpl<ForecastingPivotTransformer<MatrixIteratorRangeT>> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using BaseType                          = Components::InferenceOnlyEstimatorImpl<ForecastingPivotTransformer<T>>;
+    using BaseType                          = Components::InferenceOnlyEstimatorImpl<ForecastingPivotTransformer<MatrixIteratorRangeT>>;
 
     // ----------------------------------------------------------------------
     // |
@@ -145,8 +186,8 @@ public:
 // |  ForecastingPivotTransformer
 // |
 // ----------------------------------------------------------------------
-template <typename T>
-ForecastingPivotTransformer<T>::ForecastingPivotTransformer(Archive &ar) :
+template <typename MatrixIteratorRangeT>
+ForecastingPivotTransformer<MatrixIteratorRangeT>::ForecastingPivotTransformer(Archive &ar) :
     BaseType(ar) {
 }
 
@@ -155,8 +196,8 @@ ForecastingPivotTransformer<T>::ForecastingPivotTransformer(Archive &ar) :
 // |  ForecastingPivotEstimator
 // |
 // ----------------------------------------------------------------------
-template <typename T>
-ForecastingPivotEstimator<T>::ForecastingPivotEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
+template <typename MatrixIteratorRangeT>
+ForecastingPivotEstimator<MatrixIteratorRangeT>::ForecastingPivotEstimator(AnnotationMapsPtr pAllColumnAnnotations) :
     BaseType("ForecastingPivotEstimator", std::move(pAllColumnAnnotations)) {
 }
 

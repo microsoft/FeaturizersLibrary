@@ -45,12 +45,18 @@ class TypeInfo(Interface.Interface):
             append_result_statement,
             destroy_args=None,
             destroy_inline=None,
+            destroy_var_name=None,
         ):
             self.VectorResultType           = vector_result_type
             self.TransformVars              = transform_vars
             self.AppendResultStatement      = append_result_statement
             self.DestroyArgs                = destroy_args
             self.DestroyInline              = destroy_inline
+
+            if destroy_var_name and destroy_inline:
+                raise Exception("'destroy_var_name' should only be provided when 'destroy_inline' is False")
+
+            self.DestroyVarName             = destroy_var_name
 
         # ----------------------------------------------------------------------
         def __repr__(self):
@@ -116,8 +122,17 @@ class TypeInfo(Interface.Interface):
     ):
         """\
         Returns information about the type when used to create transformer-related tests.
-        A tuple can be returned to include statements that should be executed prior to using
-        the args.
+        """
+        raise Exception("Abstract method")
+
+    # ----------------------------------------------------------------------
+    @Interface.abstractmethod
+    def GetTransformInputBufferArgs(
+        self,
+        input_name="input",
+    ):
+        """\
+        Returns information about the type when used as a buffer to create transformer-related tests.
         """
         raise Exception("Abstract method")
 

@@ -103,14 +103,14 @@ void HashOneHotVectorizerFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements;
-        std::uint8_t result_value;
-        uint64_t result_index;
+        uint64_t results_numElements;
+        std::uint8_t results_value;
+        uint64_t results_index;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int8_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int8_Transform(pTransformerHandle, input, &results_numElements, &results_value, &results_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_numElements, result_value, result_index);
+        results.emplace_back(results_numElements, results_value, results_index);
         // No inline destroy statement
     }
 
@@ -204,14 +204,14 @@ void HashOneHotVectorizerFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements;
-        std::uint8_t result_value;
-        uint64_t result_index;
+        uint64_t results_numElements;
+        std::uint8_t results_value;
+        uint64_t results_index;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int16_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int16_Transform(pTransformerHandle, input, &results_numElements, &results_value, &results_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_numElements, result_value, result_index);
+        results.emplace_back(results_numElements, results_value, results_index);
         // No inline destroy statement
     }
 
@@ -305,14 +305,14 @@ void HashOneHotVectorizerFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements;
-        std::uint8_t result_value;
-        uint64_t result_index;
+        uint64_t results_numElements;
+        std::uint8_t results_value;
+        uint64_t results_index;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int32_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int32_Transform(pTransformerHandle, input, &results_numElements, &results_value, &results_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_numElements, result_value, result_index);
+        results.emplace_back(results_numElements, results_value, results_index);
         // No inline destroy statement
     }
 
@@ -406,14 +406,14 @@ void HashOneHotVectorizerFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements;
-        std::uint8_t result_value;
-        uint64_t result_index;
+        uint64_t results_numElements;
+        std::uint8_t results_value;
+        uint64_t results_index;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_int64_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_int64_Transform(pTransformerHandle, input, &results_numElements, &results_value, &results_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_numElements, result_value, result_index);
+        results.emplace_back(results_numElements, results_value, results_index);
         // No inline destroy statement
     }
 
@@ -507,14 +507,14 @@ void HashOneHotVectorizerFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements;
-        std::uint8_t result_value;
-        uint64_t result_index;
+        uint64_t results_numElements;
+        std::uint8_t results_value;
+        uint64_t results_index;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint8_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint8_Transform(pTransformerHandle, input, &results_numElements, &results_value, &results_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_numElements, result_value, result_index);
+        results.emplace_back(results_numElements, results_value, results_index);
         // No inline destroy statement
     }
 
@@ -608,14 +608,14 @@ void HashOneHotVectorizerFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements;
-        std::uint8_t result_value;
-        uint64_t result_index;
+        uint64_t results_numElements;
+        std::uint8_t results_value;
+        uint64_t results_index;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint16_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint16_Transform(pTransformerHandle, input, &results_numElements, &results_value, &results_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_numElements, result_value, result_index);
+        results.emplace_back(results_numElements, results_value, results_index);
         // No inline destroy statement
     }
 
@@ -709,14 +709,14 @@ void HashOneHotVectorizerFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements;
-        std::uint8_t result_value;
-        uint64_t result_index;
+        uint64_t results_numElements;
+        std::uint8_t results_value;
+        uint64_t results_index;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint32_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint32_Transform(pTransformerHandle, input, &results_numElements, &results_value, &results_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_numElements, result_value, result_index);
+        results.emplace_back(results_numElements, results_value, results_index);
         // No inline destroy statement
     }
 
@@ -810,14 +810,14 @@ void HashOneHotVectorizerFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements;
-        std::uint8_t result_value;
-        uint64_t result_index;
+        uint64_t results_numElements;
+        std::uint8_t results_value;
+        uint64_t results_index;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_uint64_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_uint64_Transform(pTransformerHandle, input, &results_numElements, &results_value, &results_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_numElements, result_value, result_index);
+        results.emplace_back(results_numElements, results_value, results_index);
         // No inline destroy statement
     }
 
@@ -911,14 +911,14 @@ void HashOneHotVectorizerFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements;
-        std::uint8_t result_value;
-        uint64_t result_index;
+        uint64_t results_numElements;
+        std::uint8_t results_value;
+        uint64_t results_index;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_float_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_float_Transform(pTransformerHandle, input, &results_numElements, &results_value, &results_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_numElements, result_value, result_index);
+        results.emplace_back(results_numElements, results_value, results_index);
         // No inline destroy statement
     }
 
@@ -1012,14 +1012,14 @@ void HashOneHotVectorizerFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements;
-        std::uint8_t result_value;
-        uint64_t result_index;
+        uint64_t results_numElements;
+        std::uint8_t results_value;
+        uint64_t results_index;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_double_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_double_Transform(pTransformerHandle, input, &results_numElements, &results_value, &results_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_numElements, result_value, result_index);
+        results.emplace_back(results_numElements, results_value, results_index);
         // No inline destroy statement
     }
 
@@ -1113,14 +1113,14 @@ void HashOneHotVectorizerFeaturizer_bool_Test(
     results.reserve(inference_input.size());
 
     for(bool input : inference_input) {
-        uint64_t result_numElements;
-        std::uint8_t result_value;
-        uint64_t result_index;
+        uint64_t results_numElements;
+        std::uint8_t results_value;
+        uint64_t results_index;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_bool_Transform(pTransformerHandle, input, &result_numElements, &result_value, &result_index, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_bool_Transform(pTransformerHandle, input, &results_numElements, &results_value, &results_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_numElements, result_value, result_index);
+        results.emplace_back(results_numElements, results_value, results_index);
         // No inline destroy statement
     }
 
@@ -1214,14 +1214,14 @@ void HashOneHotVectorizerFeaturizer_string_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements;
-        std::uint8_t result_value;
-        uint64_t result_index;
+        uint64_t results_numElements;
+        std::uint8_t results_value;
+        uint64_t results_index;
 
-        REQUIRE(HashOneHotVectorizerFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &result_numElements, &result_value, &result_index, &pErrorInfo));
+        REQUIRE(HashOneHotVectorizerFeaturizer_string_Transform(pTransformerHandle, input.c_str(), &results_numElements, &results_value, &results_index, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(result_numElements, result_value, result_index);
+        results.emplace_back(results_numElements, results_value, results_index);
         // No inline destroy statement
     }
 

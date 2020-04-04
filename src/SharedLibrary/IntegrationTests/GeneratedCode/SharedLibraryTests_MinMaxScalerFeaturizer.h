@@ -102,12 +102,12 @@ void MinMaxScalerFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MinMaxScalerFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_int8_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -200,12 +200,12 @@ void MinMaxScalerFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MinMaxScalerFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_int16_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -298,12 +298,12 @@ void MinMaxScalerFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MinMaxScalerFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_int32_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -396,12 +396,12 @@ void MinMaxScalerFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MinMaxScalerFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_int64_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -494,12 +494,12 @@ void MinMaxScalerFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MinMaxScalerFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_uint8_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -592,12 +592,12 @@ void MinMaxScalerFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MinMaxScalerFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_uint16_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -690,12 +690,12 @@ void MinMaxScalerFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MinMaxScalerFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_uint32_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -788,12 +788,12 @@ void MinMaxScalerFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MinMaxScalerFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_uint64_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -886,12 +886,12 @@ void MinMaxScalerFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MinMaxScalerFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_float_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -984,12 +984,12 @@ void MinMaxScalerFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MinMaxScalerFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MinMaxScalerFeaturizer_double_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 

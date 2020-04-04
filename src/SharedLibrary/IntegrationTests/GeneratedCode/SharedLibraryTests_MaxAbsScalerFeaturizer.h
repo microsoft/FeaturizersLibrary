@@ -102,12 +102,12 @@ void MaxAbsScalerFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::float_t result;
+        std::float_t results_value;
 
-        REQUIRE(MaxAbsScalerFeaturizer_int8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MaxAbsScalerFeaturizer_int8_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -200,12 +200,12 @@ void MaxAbsScalerFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::float_t result;
+        std::float_t results_value;
 
-        REQUIRE(MaxAbsScalerFeaturizer_int16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MaxAbsScalerFeaturizer_int16_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -298,12 +298,12 @@ void MaxAbsScalerFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::float_t result;
+        std::float_t results_value;
 
-        REQUIRE(MaxAbsScalerFeaturizer_uint8_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MaxAbsScalerFeaturizer_uint8_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -396,12 +396,12 @@ void MaxAbsScalerFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::float_t result;
+        std::float_t results_value;
 
-        REQUIRE(MaxAbsScalerFeaturizer_uint16_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MaxAbsScalerFeaturizer_uint16_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -494,12 +494,12 @@ void MaxAbsScalerFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::float_t result;
+        std::float_t results_value;
 
-        REQUIRE(MaxAbsScalerFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MaxAbsScalerFeaturizer_float_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -592,12 +592,12 @@ void MaxAbsScalerFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MaxAbsScalerFeaturizer_int32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MaxAbsScalerFeaturizer_int32_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -690,12 +690,12 @@ void MaxAbsScalerFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MaxAbsScalerFeaturizer_int64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MaxAbsScalerFeaturizer_int64_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -788,12 +788,12 @@ void MaxAbsScalerFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MaxAbsScalerFeaturizer_uint32_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MaxAbsScalerFeaturizer_uint32_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -886,12 +886,12 @@ void MaxAbsScalerFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MaxAbsScalerFeaturizer_uint64_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MaxAbsScalerFeaturizer_uint64_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 
@@ -984,12 +984,12 @@ void MaxAbsScalerFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t result;
+        std::double_t results_value;
 
-        REQUIRE(MaxAbsScalerFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(MaxAbsScalerFeaturizer_double_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(std::move(result));
+        results.emplace_back(std::move(results_value));
         // No inline destroy statement
     }
 

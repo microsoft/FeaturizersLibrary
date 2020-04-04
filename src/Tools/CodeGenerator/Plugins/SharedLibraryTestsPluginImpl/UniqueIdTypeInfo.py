@@ -85,6 +85,14 @@ class UniqueIdTypeInfo(TypeInfo):
 
     # ----------------------------------------------------------------------
     @Interface.override
+    def GetTransformInputBufferArgs(
+        self,
+        input_name='input',
+    ):
+        raise NotImplementedError("Not implemented yet")
+
+    # ----------------------------------------------------------------------
+    @Interface.override
     def GetOutputInfo(
         self,
         invocation_template,
