@@ -1309,13 +1309,50 @@ featurizers:
     num_output_columns: 1
     is_output_a_template: true
     description: |-
-      MinMaxScalerEstimator + centering?
+      Remove the median and scales the data according to the quantile range.
 
       C++-style pseudo signature:
-          TODO
+          float execute(TInputFloat const &value);
+          double execute(TInputDouble const &value);
 
       Examples:
-        TODO
+        Assuming the Training data [[ 1, -2, 2], [-2, 1, 3], [ 4, 1,-2]]
+
+        There are 3 columns...
+
+            column 1          column 2          column 3
+               1                 -2                2
+              -2                  1                3
+               4                  1               -2
+
+        For each column, we calculate the median value...
+
+            column 1          column 2          column 3
+               1                  1                2
+
+        Also calculate the range for each column
+
+            column 1          column 2          column 3
+          4 - (-2) = 6      1 - (-2) = 3      3 - (-2) = 5
+
+        Apply quantile range(QR) to the ranges, assuming the QR is [q_min = 25, q_max = 75], we get the scaling value = range * (q_max% - q_min%) for each column
+
+            column 1          column 2          column 3
+          6 * 50% = 3       3 * 50% = 1.5     5 * 50% = 2.5
+
+        Remove the median and scales the original data per column
+
+            column 1          column 2          column 3
+          ( 1 - 1) / 3     (-2 - 1) / 1.5    ( 2 - 2) / 2.5
+          (-2 - 1) / 3     ( 1 - 1) / 1.5    ( 3 - 2) / 2.5
+          ( 4 - 1) / 3     ( 1 - 1) / 1.5    (-2 - 2) / 2.5
+
+        The final result is
+
+            column 1          column 2          column 3
+               0                 -2                0
+              -1                  0              0.4
+               1                  0             -1.6
 
     templates:
       - name: TInputFloat
