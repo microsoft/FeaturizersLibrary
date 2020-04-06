@@ -102,12 +102,12 @@ void ImputationMarkerFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        bool result;
+        bool results_value;
 
-        REQUIRE(ImputationMarkerFeaturizer_int8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int8_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 
@@ -200,12 +200,12 @@ void ImputationMarkerFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        bool result;
+        bool results_value;
 
-        REQUIRE(ImputationMarkerFeaturizer_int16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int16_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 
@@ -298,12 +298,12 @@ void ImputationMarkerFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        bool result;
+        bool results_value;
 
-        REQUIRE(ImputationMarkerFeaturizer_int32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int32_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 
@@ -396,12 +396,12 @@ void ImputationMarkerFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        bool result;
+        bool results_value;
 
-        REQUIRE(ImputationMarkerFeaturizer_int64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_int64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::int64_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 
@@ -494,12 +494,12 @@ void ImputationMarkerFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        bool result;
+        bool results_value;
 
-        REQUIRE(ImputationMarkerFeaturizer_uint8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint8_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint8_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 
@@ -592,12 +592,12 @@ void ImputationMarkerFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        bool result;
+        bool results_value;
 
-        REQUIRE(ImputationMarkerFeaturizer_uint16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint16_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint16_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 
@@ -690,12 +690,12 @@ void ImputationMarkerFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        bool result;
+        bool results_value;
 
-        REQUIRE(ImputationMarkerFeaturizer_uint32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint32_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint32_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 
@@ -788,12 +788,12 @@ void ImputationMarkerFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        bool result;
+        bool results_value;
 
-        REQUIRE(ImputationMarkerFeaturizer_uint64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_uint64_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<std::uint64_t>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 
@@ -886,12 +886,12 @@ void ImputationMarkerFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        bool result;
+        bool results_value;
 
-        REQUIRE(ImputationMarkerFeaturizer_float_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_float_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 
@@ -984,12 +984,12 @@ void ImputationMarkerFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        bool result;
+        bool results_value;
 
-        REQUIRE(ImputationMarkerFeaturizer_double_Transform(pTransformerHandle, input, &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_double_Transform(pTransformerHandle, input, &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 
@@ -1082,12 +1082,12 @@ void ImputationMarkerFeaturizer_bool_Test(
     results.reserve(inference_input.size());
 
     for(bool input : inference_input) {
-        bool result;
+        bool results_value;
 
-        REQUIRE(ImputationMarkerFeaturizer_bool_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::GetNullableValue(input), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_bool_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::IsNull(input) ? nullptr : &Microsoft::Featurizer::Traits<typename Microsoft::Featurizer::Traits<bool>::nullable_type>::GetNullableValue(input), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 
@@ -1180,12 +1180,12 @@ void ImputationMarkerFeaturizer_string_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        bool result;
+        bool results_value;
 
-        REQUIRE(ImputationMarkerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &result, &pErrorInfo));
+        REQUIRE(ImputationMarkerFeaturizer_string_Transform(pTransformerHandle, Microsoft::Featurizer::Traits<nonstd::optional<std::string>>::IsNull(input) ? nullptr : input->c_str(), &results_value, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.push_back(result);
+        results.push_back(results_value);
         // No inline destroy statement
     }
 

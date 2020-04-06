@@ -103,26 +103,26 @@ void TfidfVectorizerFeaturizer_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        uint64_t result_numElements;
-        uint64_t result_numValues;
-        std::float_t * result_values;
-        uint64_t * result_indexes;
+        uint64_t results_numElements;
+        uint64_t results_numValues;
+        std::float_t * results_values;
+        uint64_t * results_indexes;
 
-        REQUIRE(TfidfVectorizerFeaturizer_Transform(pTransformerHandle, input.c_str(), &result_numElements, &result_numValues, &result_values, &result_indexes, &pErrorInfo));
+        REQUIRE(TfidfVectorizerFeaturizer_Transform(pTransformerHandle, input.c_str(), &results_numElements, &results_numValues, &results_values, &results_indexes, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
         std::vector<typename Microsoft::Featurizer::Featurizers::SparseVectorEncoding<std::float_t>::ValueEncoding> encodings;
-        std::float_t const *pValue(result_values);
-        uint64_t const *pIndex(result_indexes);
+        std::float_t const *pValue(results_values);
+        uint64_t const *pIndex(results_indexes);
 
-        while(result_numValues--) {
+        while(results_numValues--) {
             encodings.emplace_back(*pValue++, *pIndex++);
         }
 
-        results.emplace_back(result_numElements, std::move(encodings));
+        results.emplace_back(results_numElements, std::move(encodings));
         
         // Destroy the contents
-        REQUIRE(TfidfVectorizerFeaturizer_DestroyTransformedData(result_numElements, result_numValues, result_values, result_indexes, &pErrorInfo));
+        REQUIRE(TfidfVectorizerFeaturizer_DestroyTransformedData(results_numElements, results_numValues, results_values, results_indexes, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 

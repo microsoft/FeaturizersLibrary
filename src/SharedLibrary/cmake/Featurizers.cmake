@@ -77,6 +77,8 @@ function(Impl)
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_CountVectorizerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_DateTimeFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ForecastingPivotFeaturizer.h
+        ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ForecastingPivotFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ForwardFillImputerFeaturizer.h
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_ForwardFillImputerFeaturizer.cpp
         ${_featurizers_this_path}/../GeneratedCode/SharedLibrary_FromStringFeaturizer.cpp

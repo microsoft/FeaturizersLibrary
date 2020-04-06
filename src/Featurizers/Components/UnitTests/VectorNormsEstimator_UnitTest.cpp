@@ -13,16 +13,10 @@
 namespace NS = Microsoft::Featurizer;
 
 template <typename T>
-using Range = std::pair<typename std::vector<T>::iterator, typename std::vector<T>::iterator>;
-
-TEST_CASE("invalid input types") {
-    CHECK(NS::Featurizers::Components::IsIteratorPair<Range<int>>::value);
-    CHECK(NS::Featurizers::Components::IsIteratorPair<std::pair<int, int>>::value);
-    CHECK(NS::Featurizers::Components::IsIteratorPair<std::tuple<int, int>>::value);
-    CHECK(!NS::Featurizers::Components::IsIteratorPair<std::tuple<int, int, int>>::value);
-    CHECK(!NS::Featurizers::Components::IsIteratorPair<std::pair<int, std::double_t>>::value);
-    CHECK(!NS::Featurizers::Components::IsIteratorPair<std::tuple<int, std::double_t>>::value);
-}
+using Range = std::tuple<
+    typename std::vector<T>::iterator,
+    typename std::vector<T>::iterator
+>;
 
 TEST_CASE("invalid annotation") {
     CHECK_THROWS_WITH(NS::Featurizers::Components::VectorNormsAnnotationData<NS::Featurizers::Components::Updaters::L1NormUpdater<int>>({}), "No norm is passed in to VectorNormsAnnotationData!");

@@ -359,8 +359,9 @@ featurizers:
   - name: ForecastingPivotFeaturizer
     estimator_name: ForecastingPivotEstimator
     release_version: 0.4.0
-    has_dynamic_output: true
     num_output_columns: 1
+    creates_annotations: false
+    has_dynamic_output: true
     description: |-
         Similar to an Excel pivot table, this featurizer will expand values in the given output
         where all "linked" values are not null/empty. "linked" means that all values in the same
@@ -439,24 +440,25 @@ featurizers:
     templates:
       - name: T
         types:
-            - int8
-            - int16
-            - int32
-            - int64
-            - uint8
-            - uint16
-            - uint32
-            - uint64
+            # Note that optional values during output increase quite a bit of overhead when marshalling, therefore
+            # this featurizer only supports those types that don't have to pay that penalty.
+            #
+            # - int8
+            # - int16
+            # - int32
+            # - int64
+            # - uint8
+            # - uint16
+            # - uint32
+            # - uint64
+            # - bool
+            # - string
             - float
             - double
-            - bool
-            - string
 
     type_mappings:
       - input_type: vector<matrix<T?>>
         output_type: vector<T>
-
-    status: Pending
 
   # ----------------------------------------------------------------------
   - name: ForwardFillImputerFeaturizer
@@ -828,7 +830,7 @@ featurizers:
       - name: T
         types:
           # Note that optional values during output increase quite a bit of overhead when marshalling, therefore
-          # this featurizer only supports those types that don't have to pay that penality.
+          # this featurizer only supports those types that don't have to pay that penalty.
           #
           # - int8
           # - int16

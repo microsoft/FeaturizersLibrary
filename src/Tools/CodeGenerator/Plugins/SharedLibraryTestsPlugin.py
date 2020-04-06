@@ -182,10 +182,12 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
             if item.has_dynamic_output:
                 output_statement_info = type_info_data.DynamicOutputTypeInfo.GetOutputInfo(
                     invocation_template=invocation_template,
+                    result_name="results",
                 )
             else:
                 output_statement_info = type_info_data.OutputTypeInfo.GetOutputInfo(
                     invocation_template=invocation_template,
+                    result_name="results",
                 )
 
             # Write the training statements
@@ -306,7 +308,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                 else:
                     trailing_destroy_statement = textwrap.dedent(
                         """\
-                        for(auto & result: results) {{
+                        for(auto & {var_name}: results) {{
                             REQUIRE({name}{suffix}DestroyTransformedData({args}, &pErrorInfo));
                             REQUIRE(pErrorInfo == nullptr);
                         }}
@@ -315,6 +317,7 @@ def _GenerateHeaderFile(open_file_func, output_dir, items, all_type_info_data, o
                         name=item.name,
                         suffix=suffix,
                         args=output_statement_info.DestroyArgs,
+                        var_name=output_statement_info.DestroyVarName or "result",
                     )
 
             if item.has_dynamic_output:

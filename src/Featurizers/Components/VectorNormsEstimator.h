@@ -18,23 +18,6 @@ namespace Components {
 static constexpr char const * const         VectorNormsEstimatorName("VectorNormsEstimator");
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         IsIteratorPair
-///  \brief         Determines whether a type is a pair or tuple of iterators
-///
-template <typename T>
-struct IsIteratorPair {
-    static constexpr bool const value = false;
-};
-template <typename T>
-struct IsIteratorPair<std::tuple<T, T>> {
-    static constexpr bool const value = true;
-};
-template <typename T>
-struct IsIteratorPair<std::pair<T, T>> {
-    static constexpr bool const value = true;
-};
-
-/////////////////////////////////////////////////////////////////////////
 ///  \class         VectorNormsAnnotationData
 ///  \brief         An annotation class which contains the norms for all rows of a matrix
 ///
@@ -75,7 +58,7 @@ public:
     // ----------------------------------------------------------------------
 
     // checks if IteratorRangeT is a pair of iterators
-    static_assert(IsIteratorPair<IteratorRangeT>::value, "VectorNormsEstimator input type need to a pair of iterators of same type!");
+    static_assert(IsIteratorRange<IteratorRangeT>::value, "VectorNormsEstimator input type need to a pair of iterators of same type!");
 
     using InputType = IteratorRangeT;
 

@@ -123,90 +123,90 @@ void LagLeadOperatorFeaturizer_float_Test(
 
         auto const & input1(std::get<1>(input));
 
-        char *** result_item0_ptr_items;
-        size_t* result_item0_items_items;
-        size_t* result_item1_cols_items;
-        size_t* result_item1_rows_items;
-        std::float_t ** result_item1_ptr_items;
-        size_t result_items;
+        char *** results_item0_ptr_items;
+        size_t* results_item0_items_items;
+        size_t* results_item1_cols_items;
+        size_t* results_item1_rows_items;
+        std::float_t ** results_item1_ptr_items;
+        size_t results_items;
 
-        REQUIRE(LagLeadOperatorFeaturizer_float_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_item0_ptr_items, &result_item0_items_items, &result_item1_cols_items, &result_item1_rows_items, &result_item1_ptr_items, &result_items, &pErrorInfo));
+        REQUIRE(LagLeadOperatorFeaturizer_float_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &results_item0_ptr_items, &results_item0_items_items, &results_item1_cols_items, &results_item1_rows_items, &results_item1_ptr_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        char *** result_item0_ptr_items_ptr(result_item0_ptr_items);
-        size_t* result_item0_items_items_ptr(result_item0_items_items);
-        size_t* result_item1_cols_items_ptr(result_item1_cols_items);
-        size_t* result_item1_rows_items_ptr(result_item1_rows_items);
-        std::float_t ** result_item1_ptr_items_ptr(result_item1_ptr_items);
+        char *** results_item0_ptr_items_ptr(results_item0_ptr_items);
+        size_t* results_item0_items_items_ptr(results_item0_items_items);
+        size_t* results_item1_cols_items_ptr(results_item1_cols_items);
+        size_t* results_item1_rows_items_ptr(results_item1_rows_items);
+        std::float_t ** results_item1_ptr_items_ptr(results_item1_ptr_items);
 
-        while(these_results.size() < result_items) {
-            char ** & result_item0_ptr(*result_item0_ptr_items_ptr);
-            size_t & result_item0_items(*result_item0_items_items_ptr);
-            size_t & result_item1_cols(*result_item1_cols_items_ptr);
-            size_t & result_item1_rows(*result_item1_rows_items_ptr);
-            std::float_t * & result_item1_ptr(*result_item1_ptr_items_ptr);
+        while(results_buffer.size() < results_items) {
+            char ** & results_item0_ptr(*results_item0_ptr_items_ptr);
+            size_t & results_item0_items(*results_item0_items_items_ptr);
+            size_t & results_item1_cols(*results_item1_cols_items_ptr);
+            size_t & results_item1_rows(*results_item1_rows_items_ptr);
+            std::float_t * & results_item1_ptr(*results_item1_ptr_items_ptr);
 
-            these_results.emplace_back(CreateUniqueId(result_item0_ptr, result_item0_items), CreateMatrix(result_item1_cols, result_item1_rows, result_item1_ptr));
+            results_buffer.emplace_back(CreateUniqueId(results_item0_ptr, results_item0_items), CreateMatrix(results_item1_cols, results_item1_rows, results_item1_ptr));
 
-            ++result_item0_ptr_items_ptr;
-            ++result_item0_items_items_ptr;
-            ++result_item1_cols_items_ptr;
-            ++result_item1_rows_items_ptr;
-            ++result_item1_ptr_items_ptr;
+            ++results_item0_ptr_items_ptr;
+            ++results_item0_items_items_ptr;
+            ++results_item1_cols_items_ptr;
+            ++results_item1_rows_items_ptr;
+            ++results_item1_ptr_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(LagLeadOperatorFeaturizer_float_DestroyTransformedData(result_item0_ptr_items, result_item0_items_items, result_item1_cols_items, result_item1_rows_items, result_item1_ptr_items, result_items, &pErrorInfo));
+        REQUIRE(LagLeadOperatorFeaturizer_float_DestroyTransformedData(results_item0_ptr_items, results_item0_items_items, results_item1_cols_items, results_item1_rows_items, results_item1_ptr_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     if(true) {
-        char *** result_item0_ptr_items;
-        size_t* result_item0_items_items;
-        size_t* result_item1_cols_items;
-        size_t* result_item1_rows_items;
-        std::float_t ** result_item1_ptr_items;
-        size_t result_items;
+        char *** results_item0_ptr_items;
+        size_t* results_item0_items_items;
+        size_t* results_item1_cols_items;
+        size_t* results_item1_rows_items;
+        std::float_t ** results_item1_ptr_items;
+        size_t results_items;
 
-        REQUIRE(LagLeadOperatorFeaturizer_float_Flush(pTransformerHandle, &result_item0_ptr_items, &result_item0_items_items, &result_item1_cols_items, &result_item1_rows_items, &result_item1_ptr_items, &result_items, &pErrorInfo));
+        REQUIRE(LagLeadOperatorFeaturizer_float_Flush(pTransformerHandle, &results_item0_ptr_items, &results_item0_items_items, &results_item1_cols_items, &results_item1_rows_items, &results_item1_ptr_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        char *** result_item0_ptr_items_ptr(result_item0_ptr_items);
-        size_t* result_item0_items_items_ptr(result_item0_items_items);
-        size_t* result_item1_cols_items_ptr(result_item1_cols_items);
-        size_t* result_item1_rows_items_ptr(result_item1_rows_items);
-        std::float_t ** result_item1_ptr_items_ptr(result_item1_ptr_items);
+        char *** results_item0_ptr_items_ptr(results_item0_ptr_items);
+        size_t* results_item0_items_items_ptr(results_item0_items_items);
+        size_t* results_item1_cols_items_ptr(results_item1_cols_items);
+        size_t* results_item1_rows_items_ptr(results_item1_rows_items);
+        std::float_t ** results_item1_ptr_items_ptr(results_item1_ptr_items);
 
-        while(these_results.size() < result_items) {
-            char ** & result_item0_ptr(*result_item0_ptr_items_ptr);
-            size_t & result_item0_items(*result_item0_items_items_ptr);
-            size_t & result_item1_cols(*result_item1_cols_items_ptr);
-            size_t & result_item1_rows(*result_item1_rows_items_ptr);
-            std::float_t * & result_item1_ptr(*result_item1_ptr_items_ptr);
+        while(results_buffer.size() < results_items) {
+            char ** & results_item0_ptr(*results_item0_ptr_items_ptr);
+            size_t & results_item0_items(*results_item0_items_items_ptr);
+            size_t & results_item1_cols(*results_item1_cols_items_ptr);
+            size_t & results_item1_rows(*results_item1_rows_items_ptr);
+            std::float_t * & results_item1_ptr(*results_item1_ptr_items_ptr);
 
-            these_results.emplace_back(CreateUniqueId(result_item0_ptr, result_item0_items), CreateMatrix(result_item1_cols, result_item1_rows, result_item1_ptr));
+            results_buffer.emplace_back(CreateUniqueId(results_item0_ptr, results_item0_items), CreateMatrix(results_item1_cols, results_item1_rows, results_item1_ptr));
 
-            ++result_item0_ptr_items_ptr;
-            ++result_item0_items_items_ptr;
-            ++result_item1_cols_items_ptr;
-            ++result_item1_rows_items_ptr;
-            ++result_item1_ptr_items_ptr;
+            ++results_item0_ptr_items_ptr;
+            ++results_item0_items_items_ptr;
+            ++results_item1_cols_items_ptr;
+            ++results_item1_rows_items_ptr;
+            ++results_item1_ptr_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(LagLeadOperatorFeaturizer_float_DestroyTransformedData(result_item0_ptr_items, result_item0_items_items, result_item1_cols_items, result_item1_rows_items, result_item1_ptr_items, result_items, &pErrorInfo));
+        REQUIRE(LagLeadOperatorFeaturizer_float_DestroyTransformedData(results_item0_ptr_items, results_item0_items_items, results_item1_cols_items, results_item1_rows_items, results_item1_ptr_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -320,90 +320,90 @@ void LagLeadOperatorFeaturizer_double_Test(
 
         auto const & input1(std::get<1>(input));
 
-        char *** result_item0_ptr_items;
-        size_t* result_item0_items_items;
-        size_t* result_item1_cols_items;
-        size_t* result_item1_rows_items;
-        std::double_t ** result_item1_ptr_items;
-        size_t result_items;
+        char *** results_item0_ptr_items;
+        size_t* results_item0_items_items;
+        size_t* results_item1_cols_items;
+        size_t* results_item1_rows_items;
+        std::double_t ** results_item1_ptr_items;
+        size_t results_items;
 
-        REQUIRE(LagLeadOperatorFeaturizer_double_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &result_item0_ptr_items, &result_item0_items_items, &result_item1_cols_items, &result_item1_rows_items, &result_item1_ptr_items, &result_items, &pErrorInfo));
+        REQUIRE(LagLeadOperatorFeaturizer_double_Transform(pTransformerHandle, input0_buffer.data(), input0_buffer.size(), input1, &results_item0_ptr_items, &results_item0_items_items, &results_item1_cols_items, &results_item1_rows_items, &results_item1_ptr_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        char *** result_item0_ptr_items_ptr(result_item0_ptr_items);
-        size_t* result_item0_items_items_ptr(result_item0_items_items);
-        size_t* result_item1_cols_items_ptr(result_item1_cols_items);
-        size_t* result_item1_rows_items_ptr(result_item1_rows_items);
-        std::double_t ** result_item1_ptr_items_ptr(result_item1_ptr_items);
+        char *** results_item0_ptr_items_ptr(results_item0_ptr_items);
+        size_t* results_item0_items_items_ptr(results_item0_items_items);
+        size_t* results_item1_cols_items_ptr(results_item1_cols_items);
+        size_t* results_item1_rows_items_ptr(results_item1_rows_items);
+        std::double_t ** results_item1_ptr_items_ptr(results_item1_ptr_items);
 
-        while(these_results.size() < result_items) {
-            char ** & result_item0_ptr(*result_item0_ptr_items_ptr);
-            size_t & result_item0_items(*result_item0_items_items_ptr);
-            size_t & result_item1_cols(*result_item1_cols_items_ptr);
-            size_t & result_item1_rows(*result_item1_rows_items_ptr);
-            std::double_t * & result_item1_ptr(*result_item1_ptr_items_ptr);
+        while(results_buffer.size() < results_items) {
+            char ** & results_item0_ptr(*results_item0_ptr_items_ptr);
+            size_t & results_item0_items(*results_item0_items_items_ptr);
+            size_t & results_item1_cols(*results_item1_cols_items_ptr);
+            size_t & results_item1_rows(*results_item1_rows_items_ptr);
+            std::double_t * & results_item1_ptr(*results_item1_ptr_items_ptr);
 
-            these_results.emplace_back(CreateUniqueId(result_item0_ptr, result_item0_items), CreateMatrix(result_item1_cols, result_item1_rows, result_item1_ptr));
+            results_buffer.emplace_back(CreateUniqueId(results_item0_ptr, results_item0_items), CreateMatrix(results_item1_cols, results_item1_rows, results_item1_ptr));
 
-            ++result_item0_ptr_items_ptr;
-            ++result_item0_items_items_ptr;
-            ++result_item1_cols_items_ptr;
-            ++result_item1_rows_items_ptr;
-            ++result_item1_ptr_items_ptr;
+            ++results_item0_ptr_items_ptr;
+            ++results_item0_items_items_ptr;
+            ++results_item1_cols_items_ptr;
+            ++results_item1_rows_items_ptr;
+            ++results_item1_ptr_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(LagLeadOperatorFeaturizer_double_DestroyTransformedData(result_item0_ptr_items, result_item0_items_items, result_item1_cols_items, result_item1_rows_items, result_item1_ptr_items, result_items, &pErrorInfo));
+        REQUIRE(LagLeadOperatorFeaturizer_double_DestroyTransformedData(results_item0_ptr_items, results_item0_items_items, results_item1_cols_items, results_item1_rows_items, results_item1_ptr_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
     if(true) {
-        char *** result_item0_ptr_items;
-        size_t* result_item0_items_items;
-        size_t* result_item1_cols_items;
-        size_t* result_item1_rows_items;
-        std::double_t ** result_item1_ptr_items;
-        size_t result_items;
+        char *** results_item0_ptr_items;
+        size_t* results_item0_items_items;
+        size_t* results_item1_cols_items;
+        size_t* results_item1_rows_items;
+        std::double_t ** results_item1_ptr_items;
+        size_t results_items;
 
-        REQUIRE(LagLeadOperatorFeaturizer_double_Flush(pTransformerHandle, &result_item0_ptr_items, &result_item0_items_items, &result_item1_cols_items, &result_item1_rows_items, &result_item1_ptr_items, &result_items, &pErrorInfo));
+        REQUIRE(LagLeadOperatorFeaturizer_double_Flush(pTransformerHandle, &results_item0_ptr_items, &results_item0_items_items, &results_item1_cols_items, &results_item1_rows_items, &results_item1_ptr_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        char *** result_item0_ptr_items_ptr(result_item0_ptr_items);
-        size_t* result_item0_items_items_ptr(result_item0_items_items);
-        size_t* result_item1_cols_items_ptr(result_item1_cols_items);
-        size_t* result_item1_rows_items_ptr(result_item1_rows_items);
-        std::double_t ** result_item1_ptr_items_ptr(result_item1_ptr_items);
+        char *** results_item0_ptr_items_ptr(results_item0_ptr_items);
+        size_t* results_item0_items_items_ptr(results_item0_items_items);
+        size_t* results_item1_cols_items_ptr(results_item1_cols_items);
+        size_t* results_item1_rows_items_ptr(results_item1_rows_items);
+        std::double_t ** results_item1_ptr_items_ptr(results_item1_ptr_items);
 
-        while(these_results.size() < result_items) {
-            char ** & result_item0_ptr(*result_item0_ptr_items_ptr);
-            size_t & result_item0_items(*result_item0_items_items_ptr);
-            size_t & result_item1_cols(*result_item1_cols_items_ptr);
-            size_t & result_item1_rows(*result_item1_rows_items_ptr);
-            std::double_t * & result_item1_ptr(*result_item1_ptr_items_ptr);
+        while(results_buffer.size() < results_items) {
+            char ** & results_item0_ptr(*results_item0_ptr_items_ptr);
+            size_t & results_item0_items(*results_item0_items_items_ptr);
+            size_t & results_item1_cols(*results_item1_cols_items_ptr);
+            size_t & results_item1_rows(*results_item1_rows_items_ptr);
+            std::double_t * & results_item1_ptr(*results_item1_ptr_items_ptr);
 
-            these_results.emplace_back(CreateUniqueId(result_item0_ptr, result_item0_items), CreateMatrix(result_item1_cols, result_item1_rows, result_item1_ptr));
+            results_buffer.emplace_back(CreateUniqueId(results_item0_ptr, results_item0_items), CreateMatrix(results_item1_cols, results_item1_rows, results_item1_ptr));
 
-            ++result_item0_ptr_items_ptr;
-            ++result_item0_items_items_ptr;
-            ++result_item1_cols_items_ptr;
-            ++result_item1_rows_items_ptr;
-            ++result_item1_ptr_items_ptr;
+            ++results_item0_ptr_items_ptr;
+            ++results_item0_items_items_ptr;
+            ++results_item1_cols_items_ptr;
+            ++results_item1_rows_items_ptr;
+            ++results_item1_ptr_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(LagLeadOperatorFeaturizer_double_DestroyTransformedData(result_item0_ptr_items, result_item0_items_items, result_item1_cols_items, result_item1_rows_items, result_item1_ptr_items, result_items, &pErrorInfo));
+        REQUIRE(LagLeadOperatorFeaturizer_double_DestroyTransformedData(results_item0_ptr_items, results_item0_items_items, results_item1_cols_items, results_item1_rows_items, results_item1_ptr_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 

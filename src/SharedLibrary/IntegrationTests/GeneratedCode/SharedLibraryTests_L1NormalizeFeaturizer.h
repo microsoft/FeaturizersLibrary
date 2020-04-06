@@ -102,30 +102,30 @@ void L1NormalizeFeaturizer_int8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t* result_item_items;
-        size_t result_items;
+        std::double_t* results_item_value_items;
+        size_t results_items;
 
-        REQUIRE(L1NormalizeFeaturizer_int8_Transform(pTransformerHandle, input.data(), input.size(), &result_item_items, &result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int8_Transform(pTransformerHandle, input.data(), input.size(), &results_item_value_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        std::double_t* result_item_items_ptr(result_item_items);
+        std::double_t* results_item_value_items_ptr(results_item_value_items);
 
-        while(these_results.size() < result_items) {
-            std::double_t & result_item(*result_item_items_ptr);
+        while(results_buffer.size() < results_items) {
+            std::double_t & results_item_value(*results_item_value_items_ptr);
 
-            these_results.emplace_back(std::move(result_item));
+            results_buffer.emplace_back(std::move(results_item_value));
 
-            ++result_item_items_ptr;
+            ++results_item_value_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_int8_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int8_DestroyTransformedData(results_item_value_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -218,30 +218,30 @@ void L1NormalizeFeaturizer_int16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t* result_item_items;
-        size_t result_items;
+        std::double_t* results_item_value_items;
+        size_t results_items;
 
-        REQUIRE(L1NormalizeFeaturizer_int16_Transform(pTransformerHandle, input.data(), input.size(), &result_item_items, &result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int16_Transform(pTransformerHandle, input.data(), input.size(), &results_item_value_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        std::double_t* result_item_items_ptr(result_item_items);
+        std::double_t* results_item_value_items_ptr(results_item_value_items);
 
-        while(these_results.size() < result_items) {
-            std::double_t & result_item(*result_item_items_ptr);
+        while(results_buffer.size() < results_items) {
+            std::double_t & results_item_value(*results_item_value_items_ptr);
 
-            these_results.emplace_back(std::move(result_item));
+            results_buffer.emplace_back(std::move(results_item_value));
 
-            ++result_item_items_ptr;
+            ++results_item_value_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_int16_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int16_DestroyTransformedData(results_item_value_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -334,30 +334,30 @@ void L1NormalizeFeaturizer_int32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t* result_item_items;
-        size_t result_items;
+        std::double_t* results_item_value_items;
+        size_t results_items;
 
-        REQUIRE(L1NormalizeFeaturizer_int32_Transform(pTransformerHandle, input.data(), input.size(), &result_item_items, &result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int32_Transform(pTransformerHandle, input.data(), input.size(), &results_item_value_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        std::double_t* result_item_items_ptr(result_item_items);
+        std::double_t* results_item_value_items_ptr(results_item_value_items);
 
-        while(these_results.size() < result_items) {
-            std::double_t & result_item(*result_item_items_ptr);
+        while(results_buffer.size() < results_items) {
+            std::double_t & results_item_value(*results_item_value_items_ptr);
 
-            these_results.emplace_back(std::move(result_item));
+            results_buffer.emplace_back(std::move(results_item_value));
 
-            ++result_item_items_ptr;
+            ++results_item_value_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_int32_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int32_DestroyTransformedData(results_item_value_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -450,30 +450,30 @@ void L1NormalizeFeaturizer_int64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t* result_item_items;
-        size_t result_items;
+        std::double_t* results_item_value_items;
+        size_t results_items;
 
-        REQUIRE(L1NormalizeFeaturizer_int64_Transform(pTransformerHandle, input.data(), input.size(), &result_item_items, &result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int64_Transform(pTransformerHandle, input.data(), input.size(), &results_item_value_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        std::double_t* result_item_items_ptr(result_item_items);
+        std::double_t* results_item_value_items_ptr(results_item_value_items);
 
-        while(these_results.size() < result_items) {
-            std::double_t & result_item(*result_item_items_ptr);
+        while(results_buffer.size() < results_items) {
+            std::double_t & results_item_value(*results_item_value_items_ptr);
 
-            these_results.emplace_back(std::move(result_item));
+            results_buffer.emplace_back(std::move(results_item_value));
 
-            ++result_item_items_ptr;
+            ++results_item_value_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_int64_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_int64_DestroyTransformedData(results_item_value_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -566,30 +566,30 @@ void L1NormalizeFeaturizer_uint8_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t* result_item_items;
-        size_t result_items;
+        std::double_t* results_item_value_items;
+        size_t results_items;
 
-        REQUIRE(L1NormalizeFeaturizer_uint8_Transform(pTransformerHandle, input.data(), input.size(), &result_item_items, &result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint8_Transform(pTransformerHandle, input.data(), input.size(), &results_item_value_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        std::double_t* result_item_items_ptr(result_item_items);
+        std::double_t* results_item_value_items_ptr(results_item_value_items);
 
-        while(these_results.size() < result_items) {
-            std::double_t & result_item(*result_item_items_ptr);
+        while(results_buffer.size() < results_items) {
+            std::double_t & results_item_value(*results_item_value_items_ptr);
 
-            these_results.emplace_back(std::move(result_item));
+            results_buffer.emplace_back(std::move(results_item_value));
 
-            ++result_item_items_ptr;
+            ++results_item_value_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_uint8_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint8_DestroyTransformedData(results_item_value_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -682,30 +682,30 @@ void L1NormalizeFeaturizer_uint16_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t* result_item_items;
-        size_t result_items;
+        std::double_t* results_item_value_items;
+        size_t results_items;
 
-        REQUIRE(L1NormalizeFeaturizer_uint16_Transform(pTransformerHandle, input.data(), input.size(), &result_item_items, &result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint16_Transform(pTransformerHandle, input.data(), input.size(), &results_item_value_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        std::double_t* result_item_items_ptr(result_item_items);
+        std::double_t* results_item_value_items_ptr(results_item_value_items);
 
-        while(these_results.size() < result_items) {
-            std::double_t & result_item(*result_item_items_ptr);
+        while(results_buffer.size() < results_items) {
+            std::double_t & results_item_value(*results_item_value_items_ptr);
 
-            these_results.emplace_back(std::move(result_item));
+            results_buffer.emplace_back(std::move(results_item_value));
 
-            ++result_item_items_ptr;
+            ++results_item_value_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_uint16_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint16_DestroyTransformedData(results_item_value_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -798,30 +798,30 @@ void L1NormalizeFeaturizer_uint32_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t* result_item_items;
-        size_t result_items;
+        std::double_t* results_item_value_items;
+        size_t results_items;
 
-        REQUIRE(L1NormalizeFeaturizer_uint32_Transform(pTransformerHandle, input.data(), input.size(), &result_item_items, &result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint32_Transform(pTransformerHandle, input.data(), input.size(), &results_item_value_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        std::double_t* result_item_items_ptr(result_item_items);
+        std::double_t* results_item_value_items_ptr(results_item_value_items);
 
-        while(these_results.size() < result_items) {
-            std::double_t & result_item(*result_item_items_ptr);
+        while(results_buffer.size() < results_items) {
+            std::double_t & results_item_value(*results_item_value_items_ptr);
 
-            these_results.emplace_back(std::move(result_item));
+            results_buffer.emplace_back(std::move(results_item_value));
 
-            ++result_item_items_ptr;
+            ++results_item_value_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_uint32_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint32_DestroyTransformedData(results_item_value_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -914,30 +914,30 @@ void L1NormalizeFeaturizer_uint64_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t* result_item_items;
-        size_t result_items;
+        std::double_t* results_item_value_items;
+        size_t results_items;
 
-        REQUIRE(L1NormalizeFeaturizer_uint64_Transform(pTransformerHandle, input.data(), input.size(), &result_item_items, &result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint64_Transform(pTransformerHandle, input.data(), input.size(), &results_item_value_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        std::double_t* result_item_items_ptr(result_item_items);
+        std::double_t* results_item_value_items_ptr(results_item_value_items);
 
-        while(these_results.size() < result_items) {
-            std::double_t & result_item(*result_item_items_ptr);
+        while(results_buffer.size() < results_items) {
+            std::double_t & results_item_value(*results_item_value_items_ptr);
 
-            these_results.emplace_back(std::move(result_item));
+            results_buffer.emplace_back(std::move(results_item_value));
 
-            ++result_item_items_ptr;
+            ++results_item_value_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_uint64_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_uint64_DestroyTransformedData(results_item_value_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1030,30 +1030,30 @@ void L1NormalizeFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t* result_item_items;
-        size_t result_items;
+        std::double_t* results_item_value_items;
+        size_t results_items;
 
-        REQUIRE(L1NormalizeFeaturizer_float_Transform(pTransformerHandle, input.data(), input.size(), &result_item_items, &result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_float_Transform(pTransformerHandle, input.data(), input.size(), &results_item_value_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        std::double_t* result_item_items_ptr(result_item_items);
+        std::double_t* results_item_value_items_ptr(results_item_value_items);
 
-        while(these_results.size() < result_items) {
-            std::double_t & result_item(*result_item_items_ptr);
+        while(results_buffer.size() < results_items) {
+            std::double_t & results_item_value(*results_item_value_items_ptr);
 
-            these_results.emplace_back(std::move(result_item));
+            results_buffer.emplace_back(std::move(results_item_value));
 
-            ++result_item_items_ptr;
+            ++results_item_value_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_float_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_float_DestroyTransformedData(results_item_value_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -1146,30 +1146,30 @@ void L1NormalizeFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        std::double_t* result_item_items;
-        size_t result_items;
+        std::double_t* results_item_value_items;
+        size_t results_items;
 
-        REQUIRE(L1NormalizeFeaturizer_double_Transform(pTransformerHandle, input.data(), input.size(), &result_item_items, &result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_double_Transform(pTransformerHandle, input.data(), input.size(), &results_item_value_items, &results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        typename decltype(results)::value_type these_results;
+        typename decltype(results)::value_type results_buffer;
 
-        these_results.reserve(result_items);
+        results_buffer.reserve(results_items);
 
-        std::double_t* result_item_items_ptr(result_item_items);
+        std::double_t* results_item_value_items_ptr(results_item_value_items);
 
-        while(these_results.size() < result_items) {
-            std::double_t & result_item(*result_item_items_ptr);
+        while(results_buffer.size() < results_items) {
+            std::double_t & results_item_value(*results_item_value_items_ptr);
 
-            these_results.emplace_back(std::move(result_item));
+            results_buffer.emplace_back(std::move(results_item_value));
 
-            ++result_item_items_ptr;
+            ++results_item_value_items_ptr;
         }
 
-        results.emplace_back(std::move(these_results));
+        results.emplace_back(std::move(results_buffer));
         
         // Destroy the contents
-        REQUIRE(L1NormalizeFeaturizer_double_DestroyTransformedData(result_item_items, result_items, &pErrorInfo));
+        REQUIRE(L1NormalizeFeaturizer_double_DestroyTransformedData(results_item_value_items, results_items, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 

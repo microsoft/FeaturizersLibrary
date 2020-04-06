@@ -71,17 +71,17 @@ class VectorTypeInfo(TypeInfo):
         self,
         input_name="input",
     ):
-        if self.IsOptional:
-            statement = "{input}.empty() ? nullptr : {input}.data(), {input}.empty() ? 0 : {input}.size()".format(
-                input=input_name,
-                type=self._type_info.CppType,
-            )
-        else:
-            statement = "{input_name}.data(), {input_name}.size()".format(
-                input_name=input_name,
-            )
+        return self._type_info.GetTransformInputBufferArgs(
+            input_name=input_name,
+        )
 
-        return statement
+    # ----------------------------------------------------------------------
+    @Interface.override
+    def GetTransformInputBufferArgs(
+        self,
+        input_name='input',
+    ):
+        raise NotImplementedError("Not implemented yet")
 
     # ----------------------------------------------------------------------
     @Interface.override
@@ -90,14 +90,16 @@ class VectorTypeInfo(TypeInfo):
         invocation_template,
         result_name="result",
     ):
+        buffer_name = "{}_buffer".format(result_name)
+
         if self._type_info.TypeName == "bool":
             # vector<bool> doesn't support emplace_back on older compliers
-            item_invocation_template = "these_results.push_back({});"
+            item_invocation_template = "{}.push_back({{}});".format(buffer_name)
         else:
-            item_invocation_template = "these_results.emplace_back({});"
+            item_invocation_template = "{}.emplace_back({{}});".format(buffer_name)
 
         result = self._type_info.GetOutputInfo(
-            item_invocation_template,
+            invocation_template=item_invocation_template,
             result_name="{}_item".format(result_name),
         )
 
@@ -105,13 +107,13 @@ class VectorTypeInfo(TypeInfo):
 
         statements = textwrap.dedent(
             """\
-            typename decltype(results)::value_type these_results;
+            typename decltype({decl_name})::value_type {buffer_name};
 
-            these_results.reserve({name}_items);
+            {buffer_name}.reserve({name}_items);
 
             {vars}
 
-            while(these_results.size() < {name}_items) {{
+            while({buffer_name}.size() < {name}_items) {{
                 {references}
 
                 {item_statement}
@@ -123,6 +125,8 @@ class VectorTypeInfo(TypeInfo):
             """,
         ).format(
             name=result_name,
+            buffer_name=buffer_name,
+            decl_name="{}_buffer".format(result_name[:-len("_item")]) if result_name.endswith("_item") else result_name,
             vars="\n".join(
                 [
                     "{type} {name}_ptr({name});".format(
@@ -158,7 +162,7 @@ class VectorTypeInfo(TypeInfo):
                 ),
                 4,
             ).rstrip(),
-            items_statement=invocation_template.format("std::move(these_results)"),
+            items_statement=invocation_template.format("std::move({})".format(buffer_name)),
         )
 
         parameters += [self.Type("size_t", "{}_items".format(result_name))]

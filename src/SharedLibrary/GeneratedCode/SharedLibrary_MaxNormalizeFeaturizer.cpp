@@ -174,7 +174,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int8_FitBuffer(/*in*/ MaxNorm
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-            int8_t const * const &input_item_ptr(*input_item_ptr_ptr);
+            int8_t const *input_item_ptr(*input_item_ptr_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
             if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
@@ -642,7 +642,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int16_FitBuffer(/*in*/ MaxNor
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-            int16_t const * const &input_item_ptr(*input_item_ptr_ptr);
+            int16_t const *input_item_ptr(*input_item_ptr_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
             if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
@@ -1110,7 +1110,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int32_FitBuffer(/*in*/ MaxNor
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-            int32_t const * const &input_item_ptr(*input_item_ptr_ptr);
+            int32_t const *input_item_ptr(*input_item_ptr_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
             if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
@@ -1578,7 +1578,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_int64_FitBuffer(/*in*/ MaxNor
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-            int64_t const * const &input_item_ptr(*input_item_ptr_ptr);
+            int64_t const *input_item_ptr(*input_item_ptr_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
             if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
@@ -2046,7 +2046,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint8_FitBuffer(/*in*/ MaxNor
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-            uint8_t const * const &input_item_ptr(*input_item_ptr_ptr);
+            uint8_t const *input_item_ptr(*input_item_ptr_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
             if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
@@ -2514,7 +2514,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint16_FitBuffer(/*in*/ MaxNo
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-            uint16_t const * const &input_item_ptr(*input_item_ptr_ptr);
+            uint16_t const *input_item_ptr(*input_item_ptr_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
             if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
@@ -2982,7 +2982,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint32_FitBuffer(/*in*/ MaxNo
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-            uint32_t const * const &input_item_ptr(*input_item_ptr_ptr);
+            uint32_t const *input_item_ptr(*input_item_ptr_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
             if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
@@ -3450,7 +3450,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_uint64_FitBuffer(/*in*/ MaxNo
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-            uint64_t const * const &input_item_ptr(*input_item_ptr_ptr);
+            uint64_t const *input_item_ptr(*input_item_ptr_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
             if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
@@ -3918,7 +3918,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_float_FitBuffer(/*in*/ MaxNor
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-            float const * const &input_item_ptr(*input_item_ptr_ptr);
+            float const *input_item_ptr(*input_item_ptr_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
             if(input_items == 0) throw std::invalid_argument("'input_items' is 0");
@@ -4386,7 +4386,7 @@ FEATURIZER_LIBRARY_API bool MaxNormalizeFeaturizer_double_FitBuffer(/*in*/ MaxNo
         input_buffer.reserve(input_items);
 
         while(input_buffer.size() < input_items) {
-            double const * const &input_item_ptr(*input_item_ptr_ptr);
+            double const *input_item_ptr(*input_item_ptr_ptr);
 
             if(input_item_ptr == nullptr) throw std::invalid_argument("'input_item_ptr' is null");
             if(input_items == 0) throw std::invalid_argument("'input_items' is 0");

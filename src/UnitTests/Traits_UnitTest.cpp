@@ -558,3 +558,23 @@ TEST_CASE("make_mutable") {
     CHECK(*d == 13);
     CHECK(c == 13);
 }
+
+template <typename T>
+using Range = std::pair<typename std::vector<T>::iterator, typename std::vector<T>::iterator>;
+
+TEST_CASE("IsIteratorRange") {
+    CHECK(IsIteratorRange<Range<int>>::value);
+    CHECK(IsIteratorRange<std::pair<int, int>>::value);
+    CHECK(IsIteratorRange<std::tuple<int, int>>::value);
+    CHECK(!IsIteratorRange<std::tuple<int, int, int>>::value);
+    CHECK(!IsIteratorRange<std::pair<int, std::double_t>>::value);
+    CHECK(!IsIteratorRange<std::tuple<int, std::double_t>>::value);
+}
+
+static_assert(IsMatrix<std::vector<int>>::value == false, "");
+static_assert(IsMatrix<Eigen::MatrixX<double>>::value, "");
+static_assert(IsMatrix<Eigen::MatrixX<std::string>>::value, "");
+static_assert(IsMatrix<RowMajMatrix<double>>::value, "");
+static_assert(IsMatrix<ColMajMatrix<double>>::value, "");
+static_assert(IsMatrix<Eigen::Map<RowMajMatrix<double>>>::value, "");
+static_assert(IsMatrix<Eigen::Map<ColMajMatrix<double>>>::value, "");

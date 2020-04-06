@@ -17,15 +17,17 @@ namespace NS = Microsoft::Featurizer;
 #endif
 
 TEST_CASE("Invalid execute argument") {
-    using InputType       = std::double_t;
-    using NullableType    = NS::Traits<InputType>::nullable_type;
-    using TransformedType = std::vector<InputType>;
-    using MatrixType      = Eigen::Map<const NS::RowMajMatrix<NullableType>>;
+    using InputType                         = std::double_t;
+    using NullableType                      = NS::Traits<InputType>::nullable_type;
+    using TransformedType                   = std::vector<InputType>;
+    using MatrixType                        = Eigen::Map<NS::RowMajMatrix<NullableType>>;
+    using Matrixes                          = std::vector<MatrixType>;
+    using ForecastingPivotTransformer       = NS::Featurizers::ForecastingPivotTransformer<std::tuple<Matrixes::iterator, Matrixes::iterator>>;
 
-    NullableType matrix_data[]{0};
+    NullableType matrix_data[12]{0};
 
     MatrixType matrix1(matrix_data, 3, 4);
-    MatrixType matrix2(matrix_data, 2, 3);
+    MatrixType matrix2(matrix_data, 4, 3);
 
     std::vector<TransformedType> ret;
     auto const              callback(
@@ -34,16 +36,19 @@ TEST_CASE("Invalid execute argument") {
         }
     );
 
-    CHECK_THROWS_WITH(NS::Featurizers::ForecastingPivotTransformer<InputType>().execute({}, callback), "There's no input matrix passed in!");
-    CHECK_THROWS_WITH(NS::Featurizers::ForecastingPivotTransformer<InputType>().execute(NS::TestHelpers::make_vector<MatrixType>(matrix1, matrix2), callback), "All input matrixes should have the same number of columns!");
+    std::vector<MatrixType>                 matrixes{ std::move(matrix1), std::move(matrix2) };
+
+    CHECK_THROWS_WITH(ForecastingPivotTransformer().execute(std::make_tuple(matrixes.begin(), matrixes.begin()), callback), "There's no input matrix passed in!");
+    CHECK_THROWS_WITH(ForecastingPivotTransformer().execute(std::make_tuple(matrixes.begin(), matrixes.end()), callback), "All input matrixes should have the same number of columns!");
 }
 
-
 TEST_CASE("One matrix of double") {
-    using InputType       = std::double_t;
-    using NullableType    = NS::Traits<InputType>::nullable_type;
-    using TransformedType = std::vector<InputType>;
-    using MatrixType      = Eigen::Map<const NS::RowMajMatrix<NullableType>>;
+    using InputType                         = std::double_t;
+    using NullableType                      = NS::Traits<InputType>::nullable_type;
+    using TransformedType                   = std::vector<InputType>;
+    using MatrixType                        = Eigen::Map<NS::RowMajMatrix<NullableType>>;
+    using Matrixes                          = std::vector<MatrixType>;
+    using ForecastingPivotTransformer       = NS::Featurizers::ForecastingPivotTransformer<std::tuple<Matrixes::iterator, Matrixes::iterator>>;
 
     // 1    4    6 null
     // 2    5 null null
@@ -62,7 +67,9 @@ TEST_CASE("One matrix of double") {
         }
     );
 
-    NS::Featurizers::ForecastingPivotTransformer<InputType>().execute(NS::TestHelpers::make_vector<MatrixType>(matrix), callback);
+    Matrixes                                matrixes{ std::move(matrix) };
+
+    ForecastingPivotTransformer().execute(std::make_tuple(matrixes.begin(), matrixes.end()), callback);
 
     CHECK(ret.size()    == 1);
     CHECK(ret[0].size() == 3);
@@ -72,11 +79,12 @@ TEST_CASE("One matrix of double") {
 }
 
 TEST_CASE("Two matrixes of string") {
-    using InputType       = std::string;
-    using NullableType    = NS::Traits<InputType>::nullable_type;
-    using TransformedType = std::vector<InputType>;
-    using MatrixType      = Eigen::Map<const NS::RowMajMatrix<NullableType>>;
-
+    using InputType                         = std::string;
+    using NullableType                      = NS::Traits<InputType>::nullable_type;
+    using TransformedType                   = std::vector<InputType>;
+    using MatrixType                        = Eigen::Map<NS::RowMajMatrix<NullableType>>;
+    using Matrixes                          = std::vector<MatrixType>;
+    using ForecastingPivotTransformer       = NS::Featurizers::ForecastingPivotTransformer<std::tuple<Matrixes::iterator, Matrixes::iterator>>;
     // matrix1
     // "one"   "six" "three"  "nine"
     // "two"  "four"  "five" "eight"
@@ -103,7 +111,9 @@ TEST_CASE("Two matrixes of string") {
         }
     );
 
-    NS::Featurizers::ForecastingPivotTransformer<InputType>().execute(NS::TestHelpers::make_vector<MatrixType>(matrix1, matrix2), callback);
+    Matrixes                                matrixes{ std::move(matrix1), std::move(matrix2) };
+
+    ForecastingPivotTransformer().execute(std::make_tuple(matrixes.begin(), matrixes.end()), callback);
 
     CHECK(ret.size()    == 2);
     CHECK(ret[0].size() == 5);
@@ -123,19 +133,30 @@ TEST_CASE("Two matrixes of string") {
 }
 
 TEST_CASE("Transformer serialization") {
-    NS::Featurizers::ForecastingPivotTransformer<int>   original;
-    NS::Archive                                         out;
+    using InputType                         = std::string;
+    using NullableType                      = NS::Traits<InputType>::nullable_type;
+    using MatrixType                        = Eigen::Map<NS::RowMajMatrix<NullableType>>;
+    using Matrixes                          = std::vector<MatrixType>;
+    using ForecastingPivotTransformer       = NS::Featurizers::ForecastingPivotTransformer<std::tuple<Matrixes::iterator, Matrixes::iterator>>;
+
+    ForecastingPivotTransformer             original;
+    NS::Archive                             out;
 
     original.save(out);
 
-    NS::Archive                                         in(out.commit());
-
-    NS::Featurizers::ForecastingPivotTransformer<int>   other(in);
+    NS::Archive                             in(out.commit());
+    ForecastingPivotTransformer             other(in);
 
     CHECK(other == original);
 }
 
 TEST_CASE("Serialization Version Error") {
+    using InputType                         = std::string;
+    using NullableType                      = NS::Traits<InputType>::nullable_type;
+    using MatrixType                        = Eigen::Map<NS::RowMajMatrix<NullableType>>;
+    using Matrixes                          = std::vector<MatrixType>;
+    using ForecastingPivotTransformer       = NS::Featurizers::ForecastingPivotTransformer<std::tuple<Matrixes::iterator, Matrixes::iterator>>;
+
     NS::Archive                             out;
 
     out.serialize(static_cast<std::uint16_t>(2));
@@ -144,7 +165,7 @@ TEST_CASE("Serialization Version Error") {
     NS::Archive                             in(out.commit());
 
     CHECK_THROWS_WITH(
-        NS::Featurizers::ForecastingPivotTransformer<int>(in),
+        ForecastingPivotTransformer(in),
         Catch::Contains("Unsupported archive version")
     );
 }

@@ -34,6 +34,7 @@ foreach(_test_name IN ITEMS
     SharedLibrary_CatImputer_IntegrationTest
     SharedLibrary_CountVectorizer_IntegrationTest
     SharedLibrary_DateTime_IntegrationTest
+    SharedLibrary_ForecastingPivot_IntegrationTest
     SharedLibrary_ForwardFillImputer_IntegrationTest
     SharedLibrary_FromString_IntegrationTest
     SharedLibrary_HashOneHotVectorizer_IntegrationTest

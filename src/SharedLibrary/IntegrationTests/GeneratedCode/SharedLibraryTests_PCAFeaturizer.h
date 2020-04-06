@@ -102,17 +102,17 @@ void PCAFeaturizer_float_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        size_t result_cols;
-        size_t result_rows;
-        std::float_t * result_ptr;
+        size_t results_cols;
+        size_t results_rows;
+        std::float_t * results_ptr;
 
-        REQUIRE(PCAFeaturizer_float_Transform(pTransformerHandle, static_cast<size_t>(input.cols()), static_cast<size_t>(input.rows()), input.data(), &result_cols, &result_rows, &result_ptr, &pErrorInfo));
+        REQUIRE(PCAFeaturizer_float_Transform(pTransformerHandle, static_cast<size_t>(input.cols()), static_cast<size_t>(input.rows()), input.data(), &results_cols, &results_rows, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(CreateMatrix(result_cols, result_rows, result_ptr));
+        results.emplace_back(CreateMatrix(results_cols, results_rows, results_ptr));
         
         // Destroy the contents
-        REQUIRE(PCAFeaturizer_float_DestroyTransformedData(result_cols, result_rows, result_ptr, &pErrorInfo));
+        REQUIRE(PCAFeaturizer_float_DestroyTransformedData(results_cols, results_rows, results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
@@ -205,17 +205,17 @@ void PCAFeaturizer_double_Test(
     results.reserve(inference_input.size());
 
     for(auto const & input : inference_input) {
-        size_t result_cols;
-        size_t result_rows;
-        std::double_t * result_ptr;
+        size_t results_cols;
+        size_t results_rows;
+        std::double_t * results_ptr;
 
-        REQUIRE(PCAFeaturizer_double_Transform(pTransformerHandle, static_cast<size_t>(input.cols()), static_cast<size_t>(input.rows()), input.data(), &result_cols, &result_rows, &result_ptr, &pErrorInfo));
+        REQUIRE(PCAFeaturizer_double_Transform(pTransformerHandle, static_cast<size_t>(input.cols()), static_cast<size_t>(input.rows()), input.data(), &results_cols, &results_rows, &results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
 
-        results.emplace_back(CreateMatrix(result_cols, result_rows, result_ptr));
+        results.emplace_back(CreateMatrix(results_cols, results_rows, results_ptr));
         
         // Destroy the contents
-        REQUIRE(PCAFeaturizer_double_DestroyTransformedData(result_cols, result_rows, result_ptr, &pErrorInfo));
+        REQUIRE(PCAFeaturizer_double_DestroyTransformedData(results_cols, results_rows, results_ptr, &pErrorInfo));
         REQUIRE(pErrorInfo == nullptr);
     }
 
