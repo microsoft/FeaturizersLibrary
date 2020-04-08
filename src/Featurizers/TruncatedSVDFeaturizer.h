@@ -227,7 +227,7 @@ public:
     // |  Public Methods
     // |
     // ----------------------------------------------------------------------
-    TruncatedSVDEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, nonstd::optional<int> seed = nonstd::optional<int>());
+    TruncatedSVDEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, nonstd::optional<unsigned int> seed = nonstd::optional<unsigned int>());
 
     ~TruncatedSVDEstimator(void) override = default;
 
@@ -382,7 +382,7 @@ std::ptrdiff_t TruncatedSVDTransformer<InputEigenMatrixT, OutputEigenMatrixT>::g
 // |
 // ----------------------------------------------------------------------
 template <typename InputEigenMatrixT, typename OutputEigenMatrixT, size_t MaxNumTrainingItemsV>
-TruncatedSVDEstimator<InputEigenMatrixT, OutputEigenMatrixT, MaxNumTrainingItemsV>::TruncatedSVDEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, nonstd::optional<int> seed) :
+TruncatedSVDEstimator<InputEigenMatrixT, OutputEigenMatrixT, MaxNumTrainingItemsV>::TruncatedSVDEstimator(AnnotationMapsPtr pAllColumnAnnotations, size_t colIndex, nonstd::optional<unsigned int> seed) :
     BaseType("SVDEstimatorImpl", std::move(pAllColumnAnnotations)),
     _colIndex(
         std::move(

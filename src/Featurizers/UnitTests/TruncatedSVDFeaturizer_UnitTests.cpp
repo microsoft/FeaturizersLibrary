@@ -24,7 +24,7 @@ void TruncatedSVDTransformerTestImpl(MatrixT const &trainingMatrix, MatrixT cons
     );
 
     std::vector<MatrixT> inputContainers = NS::TestHelpers::make_vector<MatrixT>(input);
-    std::vector<typename NS::InputMatrixTypeMapper<MatrixT>::MatrixType> outputContainer = NS::TestHelpers::TransformerEstimatorTest(SVDEstimator(pAllColumnAnnotations, 0, 42), trainingBatches, inputContainers);
+    std::vector<typename NS::InputMatrixTypeMapper<MatrixT>::MatrixType> outputContainer = NS::TestHelpers::TransformerEstimatorTest(SVDEstimator(pAllColumnAnnotations, 0, static_cast<unsigned int>(42)), trainingBatches, inputContainers);
 
     REQUIRE(outputContainer.size() == 1);
 
