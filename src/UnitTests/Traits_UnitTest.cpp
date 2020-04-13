@@ -566,6 +566,8 @@ TEST_CASE("IsIteratorRange") {
     CHECK(IsIteratorRange<Range<int>>::value);
     CHECK(IsIteratorRange<std::pair<int, int>>::value);
     CHECK(IsIteratorRange<std::tuple<int, int>>::value);
+    CHECK(IsIteratorRange<std::pair<const int, const int>>::value);
+    CHECK(IsIteratorRange<std::tuple<const int, const int>>::value);
     CHECK(!IsIteratorRange<std::tuple<int, int, int>>::value);
     CHECK(!IsIteratorRange<std::pair<int, std::double_t>>::value);
     CHECK(!IsIteratorRange<std::tuple<int, std::double_t>>::value);
@@ -578,3 +580,5 @@ static_assert(IsMatrix<RowMajMatrix<double>>::value, "");
 static_assert(IsMatrix<ColMajMatrix<double>>::value, "");
 static_assert(IsMatrix<Eigen::Map<RowMajMatrix<double>>>::value, "");
 static_assert(IsMatrix<Eigen::Map<ColMajMatrix<double>>>::value, "");
+static_assert(IsMatrix<Eigen::Map<const RowMajMatrix<double>>>::value, "");
+static_assert(IsMatrix<Eigen::Map<const ColMajMatrix<double>>>::value, "");
