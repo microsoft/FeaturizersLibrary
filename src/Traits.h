@@ -1501,8 +1501,16 @@ struct IsIteratorRange<std::tuple<T, T>> {
     static constexpr bool const value = true;
 };
 template <typename T>
+struct IsIteratorRange<std::tuple<const T, const T>> {
+    static constexpr bool const value = IsIteratorRange<std::tuple<T, T>>::value;
+};
+template <typename T>
 struct IsIteratorRange<std::pair<T, T>> {
     static constexpr bool const value = true;
+};
+template <typename T>
+struct IsIteratorRange<std::pair<const T, const T>> {
+    static constexpr bool const value = IsIteratorRange<std::pair<T, T>>::value;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -1521,6 +1529,11 @@ struct IsMatrix<Eigen::Matrix<_Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCol
 
 template <typename T>
 struct IsMatrix<Eigen::Map<T>> {
+    static constexpr bool const value = IsMatrix<T>::value;
+};
+
+template <typename T>
+struct IsMatrix<Eigen::Map<const T>> {
     static constexpr bool const value = IsMatrix<T>::value;
 };
 
