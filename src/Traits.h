@@ -122,13 +122,13 @@ enum class TypeId : uint32_t {
     LastStaticValue,
 
     // The following values have N number of trailing types
-    Tensor = 0x1001 | (LastStaticValue + 1),
-    SparseTensor = 0x1001 | (LastStaticValue + 2),
-    Tabular = 0x1001 | (LastStaticValue + 3),
+    Tensor = 0x10010000 | (LastStaticValue + 1),
+    SparseTensor = 0x10010000 | (LastStaticValue + 2),
+    Tabular = 0x10010000 | (LastStaticValue + 3),
 
-    Nullable = 0x1001 | (LastStaticValue + 4),
-    Vector = 0x1001 | (LastStaticValue + 5),
-    Map = 0x1002 | (LastStaticValue + 6)
+    Nullable = 0x10010000 | (LastStaticValue + 4),
+    Vector = 0x10010000 | (LastStaticValue + 5),
+    Map = 0x10020000 | (LastStaticValue + 6)
 };
 
 inline bool IsValid(TypeId id) {
