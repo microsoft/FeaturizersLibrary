@@ -11,6 +11,13 @@ Activate.*.ps1
 Activate.sh
 Activate.*.sh
 
+Deactivate.cmd
+Deactivate.*.cmd
+Deactivate.ps1
+Deactivate.*.ps1
+Deactivate.sh
+Deactivate.*.sh
+
 .coverage
 coverage.xml
 CmakeSettings.json
