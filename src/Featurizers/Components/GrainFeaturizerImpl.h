@@ -16,32 +16,6 @@ namespace Featurizers {
 namespace Components {
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         StandardGrainImplPolicy
-///  \brief         BugBug
-///
-template <typename GrainT, typename EstimatorT>
-struct StandardGrainImplPolicy {
-    // ----------------------------------------------------------------------
-    // |  Public Types
-    static_assert(std::is_reference<GrainT>::value == false, "'GrainT' must not be a reference");
-    static_assert(std::is_reference<typename EstimatorT::InputType>::value == false, "'EstimatorT::InputType' must not be a reference");
-
-    using EstimatorInputType                = typename EstimatorT::InputType;
-    using EstimatorTransformedType          = typename Details::EstimatorOutputType<EstimatorT>::type;
-
-    using InputType                         = std::tuple<GrainT const &, EstimatorInputType const &>;
-    using TransformedType                   = std::tuple<GrainT const &, EstimatorTransformedType>;
-
-    // ----------------------------------------------------------------------
-    // |  Public Methods
-    template <typename TransformerT, typename CallbackT>
-    static void execute(GrainT const &grain, TransformerT &transformer, EstimatorInputType const &input, CallbackT const &callback);
-
-    template <typename TransformerMapT, typename CallbackT>
-    static void flush(TransformerMapT const &transformers, CallbackT const &callback);
-};
-
-/////////////////////////////////////////////////////////////////////////
 ///  \class         GrainEstimatorAnnotation
 ///  \brief         Per-grain annotation information.
 ///
@@ -78,6 +52,32 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////
+///  \class         StandardGrainImplPolicy
+///  \brief         BugBug
+///
+template <typename GrainT, typename EstimatorT>
+struct StandardGrainImplPolicy {
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    static_assert(std::is_reference<GrainT>::value == false, "'GrainT' must not be a reference");
+    static_assert(std::is_reference<typename EstimatorT::InputType>::value == false, "'EstimatorT::InputType' must not be a reference");
+
+    using EstimatorInputType                = typename EstimatorT::InputType;
+    using EstimatorTransformedType          = typename Details::EstimatorOutputType<EstimatorT>::type;
+
+    using InputType                         = std::tuple<GrainT const &, EstimatorInputType const &>;
+    using TransformedType                   = std::tuple<GrainT const &, EstimatorTransformedType>;
+
+    // ----------------------------------------------------------------------
+    // |  Public Methods
+    template <typename TransformerT, typename CallbackT>
+    static void execute(GrainT const &grain, TransformerT &transformer, EstimatorInputType const &input, CallbackT const &callback);
+
+    template <typename TransformerMapT, typename CallbackT>
+    static void flush(TransformerMapT const &transformers, CallbackT const &callback);
+};
+
+/////////////////////////////////////////////////////////////////////////
 ///  \class         GrainTransformer
 ///  \brief         A Transformer that applies a Transformer unique to the
 ///                 observed grain using grain-specific state.
@@ -85,6 +85,7 @@ public:
 template <
     typename GrainT,
     typename EstimatorT,
+    // BugBug: Explain policy
     template <typename, typename> class GrainImplPolicyT
 >
 class GrainTransformer :
@@ -100,6 +101,9 @@ public:
     // |
     // ----------------------------------------------------------------------
     using GrainImplPolicy                   = GrainImplPolicyT<GrainT, EstimatorT>;
+
+    using typename GrainImplPolicy::InputType;
+    using typename GrainImplPolicy::TransformedType;
 
     using BaseType =
         Transformer<
@@ -530,6 +534,7 @@ private:
 template <
     typename GrainT,
     typename EstimatorT,
+    // BugBug: Better description
     // The policy type is used to determine how the results of flush should be interpreted.
     // In some cases, the output of flush must contain additional information that is used when
     // returning output to the framework.
@@ -547,6 +552,25 @@ using GrainEstimatorImpl                    = Impl::GrainEstimatorImpl<GrainT, E
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
+
+// ----------------------------------------------------------------------
+// |
+// |  GrainEstimatorAnnotation
+// |
+// ----------------------------------------------------------------------
+template <typename GrainT>
+GrainEstimatorAnnotation<GrainT>::GrainEstimatorAnnotation(AnnotationMap annotations) :
+    Annotations(
+        std::move(
+            [&annotations](void) -> AnnotationMap & {
+                if(annotations.empty())
+                    throw std::invalid_argument("annotations");
+
+                return annotations;
+            }()
+        )
+    ) {
+}
 
 // ----------------------------------------------------------------------
 // |
@@ -576,25 +600,6 @@ void StandardGrainImplPolicy<GrainT, EstimatorT>::flush(TransformerMapT const &t
             }
         );
     }
-}
-
-// ----------------------------------------------------------------------
-// |
-// |  GrainEstimatorAnnotation
-// |
-// ----------------------------------------------------------------------
-template <typename GrainT>
-GrainEstimatorAnnotation<GrainT>::GrainEstimatorAnnotation(AnnotationMap annotations) :
-    Annotations(
-        std::move(
-            [&annotations](void) -> AnnotationMap & {
-                if(annotations.empty())
-                    throw std::invalid_argument("annotations");
-
-                return annotations;
-            }()
-        )
-    ) {
 }
 
 // ----------------------------------------------------------------------
