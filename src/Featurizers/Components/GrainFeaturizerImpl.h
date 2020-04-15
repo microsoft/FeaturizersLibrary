@@ -124,12 +124,13 @@ public:
     // |
     // ----------------------------------------------------------------------
 
-    // BugBug: Pass grainimpl featurizers
-
     // The `createFunc` is invoked (if available) when a grain is encountered during
     // prediction time that wasn't seen during training.
-    GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc=CreateTransformerFunc());
-    GrainTransformer(CreateTransformerFunc createFunc);
+    template <typename... PolicyArgTs>
+    GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc=CreateTransformerFunc(), PolicyArgTs &&... policy_args);
+
+    template <typename... PolicyArgTs>
+    GrainTransformer(CreateTransformerFunc createFunc, PolicyArgTs &&... policy_args);
 
     GrainTransformer(Archive &ar);
 
@@ -603,7 +604,8 @@ void StandardGrainImplPolicy<GrainT, EstimatorT>::flush(TransformerMapT const &t
 // |
 // ----------------------------------------------------------------------
 template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
-GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(CreateTransformerFunc createFunc) :
+template <typename... PolicyArgTs>
+GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(CreateTransformerFunc createFunc, PolicyArgTs &&... policy_args) :
     _hadTransformersWhenCreated(false),
     _createFunc(
         std::move(
@@ -614,13 +616,16 @@ GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(CreateT
                 return createFunc;
             }()
         )
-    ) {
-}
+    ),
+    _policy(std::forward<PolicyArgTs>(policy_args)...)
+{}
 
 template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
-GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc/*=CreateTransformerFunc()*/) :
+template <typename... PolicyArgTs>
+GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc/*=CreateTransformerFunc()*/, PolicyArgTs &&... policy_args) :
     _hadTransformersWhenCreated(true),
     _createFunc(std::move(createFunc)),
+    _policy(std::forward<PolicyArgTs>(policy_args)...),
     _transformers(
         std::move(
             [&transformers](void) -> TransformerMap & {
