@@ -78,26 +78,6 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////
-///  \class         GrainFeaturizerTraits
-///  \brief         Traits common to all types of `Estimators` when used within
-///                 a `GrainEstimator`.
-///
-template <
-    typename GrainT,
-    typename EstimatorT,
-    template <typename, typename> class GrainImplPolicyT
->
-struct GrainFeaturizerTraits {
-    // ----------------------------------------------------------------------
-    // |  Public Types
-    static_assert(std::is_reference<GrainT>::value == false, "'GrainT' must not be a reference");
-    static_assert(std::is_reference<typename EstimatorT::InputType>::value == false, "'EstimatorT::InputType' must not be a reference");
-
-    using InputType                         = std::tuple<GrainT const &, typename GrainImplPolicyT<GrainT, EstimatorT>::InputType const &>;
-    using TransformedType                   = std::tuple<GrainT const &, typename GrainImplPolicyT<GrainT, EstimatorT>::TransformedType>;
-};
-
-/////////////////////////////////////////////////////////////////////////
 ///  \class         GrainTransformer
 ///  \brief         A Transformer that applies a Transformer unique to the
 ///                 observed grain using grain-specific state.
@@ -368,9 +348,6 @@ public:
     // ----------------------------------------------------------------------
     using GrainImplPolicy                   = GrainImplPolicyT<GrainT, EstimatorT>;
 
-    // BugBug: Remove this
-    using TheseGrainTraits                  = GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>;
-
     using BaseType =
         Impl::GrainEstimatorImplBase<
             FitEstimator<typename GrainImplPolicy::InputType>,
@@ -435,9 +412,6 @@ public:
     // |
     // ----------------------------------------------------------------------
     using GrainImplPolicy                   = GrainImplPolicyT<GrainT, EstimatorT>;
-
-    // BugBug: Remove
-    using TheseGrainTraits                  = GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>;
 
     using BaseType =
         Impl::GrainEstimatorImplBase<
