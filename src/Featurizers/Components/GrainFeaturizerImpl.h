@@ -92,8 +92,7 @@ class GrainTransformer :
     public Transformer<
         typename GrainImplPolicyT<GrainT, EstimatorT>::InputType,
         typename GrainImplPolicyT<GrainT, EstimatorT>::TransformedType
-    >,
-    private GrainImplPolicyT<GrainT, EstimatorT> {
+    > {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -101,9 +100,6 @@ public:
     // |
     // ----------------------------------------------------------------------
     using GrainImplPolicy                   = GrainImplPolicyT<GrainT, EstimatorT>;
-
-    using typename GrainImplPolicy::InputType;
-    using typename GrainImplPolicy::TransformedType;
 
     using BaseType =
         Transformer<
@@ -171,6 +167,7 @@ private:
     Archive const                           _createFuncArchive;
     CreateTransformerFunc const             _createFunc;
 
+    GrainImplPolicy                         _policy;
     TransformerMap                          _transformers;
 
     // ----------------------------------------------------------------------
@@ -207,12 +204,12 @@ private:
 
         typename EstimatorT::InputType const &          grainInput(std::get<1>(input));
 
-        static_cast<GrainImplPolicy &>(*this).execute(grain, transformer, grainInput, callback);
+        _policy.execute(grain, transformer, grainInput, callback);
     }
 
     // MSVC has problems when the declaration and definition are separated
     void flush_impl(typename BaseType::CallbackFunction const &callback) override {
-        static_cast<GrainImplPolicy &>(*this).flush(_transformers, callback);
+        _policy.flush(_transformers, callback);
     }
 
     GrainTransformerTypeUniquePtr CreateTransformerFromArchive(void) const;
