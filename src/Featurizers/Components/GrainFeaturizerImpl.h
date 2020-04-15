@@ -158,8 +158,6 @@ private:
     // ----------------------------------------------------------------------
     struct UseDeserializationCtorTag {};
 
-    using GrainImplPolicy                   = GrainImplPolicyT<GrainT, EstimatorT>;
-
     // ----------------------------------------------------------------------
     // |
     // |  Private Data
