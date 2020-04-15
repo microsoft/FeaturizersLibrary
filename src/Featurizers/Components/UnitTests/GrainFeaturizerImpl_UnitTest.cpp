@@ -298,7 +298,7 @@ TEST_CASE("Estimator") {
 TEST_CASE("Estimator - limited total training items") {
     // ----------------------------------------------------------------------
     using ThisSumTrainingOnlyEstimator      = SumTrainingOnlyEstimator<>;
-    using Estimator                         = Components::GrainEstimatorImpl<std::string, ThisSumTrainingOnlyEstimator, Components::BugBug, 3>;
+    using Estimator                         = Components::GrainEstimatorImpl<std::string, ThisSumTrainingOnlyEstimator, Components::StandardGrainImplPolicy, 3>;
     using GrainEstimatorAnnotation          = Components::GrainEstimatorAnnotation<std::string>;
     // ----------------------------------------------------------------------
 
@@ -804,7 +804,7 @@ TEST_CASE("Transformer") {
 
         NS::Archive                         inArchive(outArchive.commit());
 
-        Components::GrainTransformer<std::string, DeltaEstimator, Components::BugBug>   otherTransformer(inArchive);
+        Components::GrainTransformer<std::string, DeltaEstimator, Components::StandardGrainImplPolicy>  otherTransformer(inArchive);
 
         Execute(otherTransformer, grain1, 1, 31);
         Execute(otherTransformer, grain1, 100, 130);
@@ -816,7 +816,7 @@ TEST_CASE("Transformer") {
 
 TEST_CASE("GrainTransformer - deserialization errors") {
     // ----------------------------------------------------------------------
-    using GrainTransformer                  = Components::GrainTransformer<int, DeltaEstimator, Components::BugBug>;
+    using GrainTransformer                  = Components::GrainTransformer<int, DeltaEstimator, Components::StandardGrainImplPolicy>;
     // ----------------------------------------------------------------------
 
     SECTION("Invalid number of items") {
@@ -869,7 +869,7 @@ TEST_CASE("GrainEstimatorAnnotation - construct errors") {
 
 TEST_CASE("GrainTransformer - construct errors") {
     // ----------------------------------------------------------------------
-    using GrainTransformer                  = Components::GrainTransformer<int, DeltaEstimator, Components::BugBug>;
+    using GrainTransformer                  = Components::GrainTransformer<int, DeltaEstimator, Components::StandardGrainImplPolicy>;
     // ----------------------------------------------------------------------
 
     CHECK_THROWS_WITH(
@@ -880,7 +880,7 @@ TEST_CASE("GrainTransformer - construct errors") {
 
 TEST_CASE("GrainEstimatorImpl - construct errors") {
     // ----------------------------------------------------------------------
-    using GrainEstimator                    = Components::GrainEstimatorImpl<int, DeltaEstimator, Components::BugBug>;
+    using GrainEstimator                    = Components::GrainEstimatorImpl<int, DeltaEstimator, Components::StandardGrainImplPolicy>;
     // ----------------------------------------------------------------------
 
     CHECK_THROWS_WITH(
@@ -905,7 +905,7 @@ TEST_CASE("GrainEstimatorImpl - construct errors") {
 
 TEST_CASE("Transformer - construct errors") {
     // ----------------------------------------------------------------------
-    using GrainTransformer                  = Components::GrainTransformer<int, DeltaEstimator, Components::BugBug>;
+    using GrainTransformer                  = Components::GrainTransformer<int, DeltaEstimator, Components::StandardGrainImplPolicy>;
     // ----------------------------------------------------------------------
 
     CHECK_THROWS_WITH(
@@ -916,7 +916,7 @@ TEST_CASE("Transformer - construct errors") {
 
 TEST_CASE("Transformer without training") {
     // ----------------------------------------------------------------------
-    using GrainTransformer                  = Components::GrainTransformer<std::string, DeltaEstimator, Components::BugBug>;
+    using GrainTransformer                  = Components::GrainTransformer<std::string, DeltaEstimator, Components::StandardGrainImplPolicy>;
     // ----------------------------------------------------------------------
 
     GrainTransformer                        transformer(
@@ -941,7 +941,7 @@ TEST_CASE("Transformer without training") {
 
 TEST_CASE("Deserialization of Transformer without training") {
     // ----------------------------------------------------------------------
-    using GrainTransformer                  = Components::GrainTransformer<std::string, DeltaEstimator, Components::BugBug>;
+    using GrainTransformer                  = Components::GrainTransformer<std::string, DeltaEstimator, Components::StandardGrainImplPolicy>;
     // ----------------------------------------------------------------------
 
     GrainTransformer                        transformer1(

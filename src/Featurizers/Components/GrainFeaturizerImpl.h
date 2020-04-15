@@ -15,10 +15,30 @@ namespace Featurizer {
 namespace Featurizers {
 namespace Components {
 
+/////////////////////////////////////////////////////////////////////////
+///  \class         StandardGrainImplPolicy
+///  \brief         BugBug
+///
 template <typename GrainT, typename EstimatorT>
-struct BugBug {
-    using InputType = typename EstimatorT::InputType;
-    using TransformedType = typename Details::EstimatorOutputType<EstimatorT>::type;
+struct StandardGrainImplPolicy {
+    // ----------------------------------------------------------------------
+    // |  Public Types
+    static_assert(std::is_reference<GrainT>::value == false, "'GrainT' must not be a reference");
+    static_assert(std::is_reference<typename EstimatorT::InputType>::value == false, "'EstimatorT::InputType' must not be a reference");
+
+    using EstimatorInputType                = typename EstimatorT::InputType;
+    using EstimatorTransformedType          = typename Details::EstimatorOutputType<EstimatorT>::type;
+
+    using InputType                         = std::tuple<GrainT const &, EstimatorInputType const &>;
+    using TransformedType                   = std::tuple<GrainT const &, EstimatorTransformedType>;
+
+    // ----------------------------------------------------------------------
+    // |  Public Methods
+    template <typename TransformerT, typename CallbackT>
+    static void execute(GrainT const &grain, TransformerT &transformer, EstimatorInputType const &input, CallbackT const &callback);
+
+    template <typename TransformerMapT, typename CallbackT>
+    static void flush(TransformerMapT const &transformers, CallbackT const &callback);
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -73,8 +93,6 @@ struct GrainFeaturizerTraits {
     static_assert(std::is_reference<GrainT>::value == false, "'GrainT' must not be a reference");
     static_assert(std::is_reference<typename EstimatorT::InputType>::value == false, "'EstimatorT::InputType' must not be a reference");
 
-    // BugBug: Use GrainImplPolicyT
-
     using InputType                         = std::tuple<GrainT const &, typename GrainImplPolicyT<GrainT, EstimatorT>::InputType const &>;
     using TransformedType                   = std::tuple<GrainT const &, typename GrainImplPolicyT<GrainT, EstimatorT>::TransformedType>;
 };
@@ -91,21 +109,22 @@ template <
 >
 class GrainTransformer :
     public Transformer<
-        typename GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>::InputType,
-        typename GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>::TransformedType
-    > {
+        typename GrainImplPolicyT<GrainT, EstimatorT>::InputType,
+        typename GrainImplPolicyT<GrainT, EstimatorT>::TransformedType
+    >,
+    private GrainImplPolicyT<GrainT, EstimatorT> {
 public:
     // ----------------------------------------------------------------------
     // |
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using TheseGrainFeaturizerTraits        = GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>;
+    using GrainImplPolicy                   = GrainImplPolicyT<GrainT, EstimatorT>;
 
     using BaseType =
         Transformer<
-            typename TheseGrainFeaturizerTraits::InputType,
-            typename TheseGrainFeaturizerTraits::TransformedType
+            typename GrainImplPolicy::InputType,
+            typename GrainImplPolicy::TransformedType
         >;
 
     using GrainTransformerType =
@@ -125,6 +144,8 @@ public:
     // |
     // ----------------------------------------------------------------------
 
+    // BugBug: Pass grainimpl featurizers
+
     // The `createFunc` is invoked (if available) when a grain is encountered during
     // prediction time that wasn't seen during training.
     GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc=CreateTransformerFunc());
@@ -142,6 +163,9 @@ public:
 
     void save(Archive &ar) const override;
 
+    using BaseType::execute;
+    using BaseType::flush;
+
 private:
     // ----------------------------------------------------------------------
     // |
@@ -149,6 +173,8 @@ private:
     // |
     // ----------------------------------------------------------------------
     struct UseDeserializationCtorTag {};
+
+    using GrainImplPolicy                   = GrainImplPolicyT<GrainT, EstimatorT>;
 
     // ----------------------------------------------------------------------
     // |
@@ -199,23 +225,12 @@ private:
 
         typename EstimatorT::InputType const &          grainInput(std::get<1>(input));
 
-        transformer.execute(
-            grainInput,
-            [&callback, &grain](typename EstimatorT::TransformedType output) {
-                callback(typename TheseGrainFeaturizerTraits::TransformedType(grain, std::move(output)));
-            }
-        );
+        static_cast<GrainImplPolicy &>(*this).execute(grain, transformer, grainInput, callback);
     }
 
     // MSVC has problems when the declaration and definition are separated
     void flush_impl(typename BaseType::CallbackFunction const &callback) override {
-        for(auto &kvp : _transformers) {
-            kvp.second->flush(
-                [&callback, &kvp](typename EstimatorT::TransformedType output) {
-                    callback(typename TheseGrainFeaturizerTraits::TransformedType(kvp.first, std::move(output)));
-                }
-            );
-        }
+        static_cast<GrainImplPolicy &>(*this).flush(_transformers, callback);
     }
 
     GrainTransformerTypeUniquePtr CreateTransformerFromArchive(void) const;
@@ -244,10 +259,10 @@ public:
     // ----------------------------------------------------------------------
     using GrainType                         = GrainT;
 
-    using TheseGrainFeaturizerTraits        = GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>;
+    using GrainImplPolicy                   = GrainImplPolicyT<GrainType, EstimatorT>;
 
-    using InputType                         = typename TheseGrainFeaturizerTraits::InputType;
-    using TransformedType                   = typename TheseGrainFeaturizerTraits::TransformedType;
+    using InputType                         = typename GrainImplPolicy::InputType;
+    using TransformedType                   = typename GrainImplPolicy::TransformedType;
 
     using GrainEstimatorAnnotation          = Microsoft::Featurizer::Featurizers::Components::GrainEstimatorAnnotation<GrainType>;
     using CreateEstimatorFunc               = std::function<EstimatorT (AnnotationMapsPtr)>;
@@ -339,7 +354,7 @@ class GrainEstimatorImpl<
     typename std::enable_if<Details::IsTransformerEstimator<EstimatorT>::value == false>::type
 > :
     public Impl::GrainEstimatorImplBase<
-        FitEstimator<typename GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>::InputType>,
+        FitEstimator<typename GrainImplPolicyT<GrainT, EstimatorT>::InputType>,
         GrainT,
         EstimatorT,
         GrainImplPolicyT,
@@ -351,11 +366,14 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
+    using GrainImplPolicy                   = GrainImplPolicyT<GrainT, EstimatorT>;
+
+    // BugBug: Remove this
     using TheseGrainTraits                  = GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>;
 
     using BaseType =
         Impl::GrainEstimatorImplBase<
-            FitEstimator<typename TheseGrainTraits::InputType>,
+            FitEstimator<typename GrainImplPolicy::InputType>,
             GrainT,
             EstimatorT,
             GrainImplPolicyT,
@@ -402,8 +420,8 @@ class GrainEstimatorImpl<
 > :
     public Impl::GrainEstimatorImplBase<
         TransformerEstimator<
-            typename GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>::InputType,
-            typename GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>::TransformedType
+            typename GrainImplPolicyT<GrainT, EstimatorT>::InputType,
+            typename GrainImplPolicyT<GrainT, EstimatorT>::TransformedType
         >,
         GrainT,
         EstimatorT,
@@ -416,13 +434,16 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
+    using GrainImplPolicy                   = GrainImplPolicyT<GrainT, EstimatorT>;
+
+    // BugBug: Remove
     using TheseGrainTraits                  = GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>;
 
     using BaseType =
         Impl::GrainEstimatorImplBase<
             TransformerEstimator<
-                typename TheseGrainTraits::InputType,
-                typename TheseGrainTraits::TransformedType
+                typename GrainImplPolicy::InputType,
+                typename GrainImplPolicy::TransformedType
             >,
             GrainT,
             EstimatorT,
@@ -538,7 +559,7 @@ template <
     // The policy type is used to determine how the results of flush should be interpreted.
     // In some cases, the output of flush must contain additional information that is used when
     // returning output to the framework.
-    template <typename, typename> class GrainImplPolicyT=BugBug,
+    template <typename, typename> class GrainImplPolicyT=StandardGrainImplPolicy,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
 using GrainEstimatorImpl                    = Impl::GrainEstimatorImpl<GrainT, EstimatorT, GrainImplPolicyT, MaxNumTrainingItemsV>;
@@ -552,6 +573,36 @@ using GrainEstimatorImpl                    = Impl::GrainEstimatorImpl<GrainT, E
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
+
+// ----------------------------------------------------------------------
+// |
+// |  StandardGrainImplPolicy
+// |
+// ----------------------------------------------------------------------
+template <typename GrainT, typename EstimatorT>
+template <typename TransformerT, typename CallbackT>
+// static
+void StandardGrainImplPolicy<GrainT, EstimatorT>::execute(GrainT const &grain, TransformerT &transformer, EstimatorInputType const &input, CallbackT const &callback) {
+    transformer.execute(
+        input,
+        [&callback, &grain](EstimatorTransformedType output) {
+            callback(TransformedType(grain, std::move(output)));
+        }
+    );
+}
+
+template <typename GrainT, typename EstimatorT>
+template <typename TransformerMapT, typename CallbackT>
+// static
+void StandardGrainImplPolicy<GrainT, EstimatorT>::flush(TransformerMapT const &transformers, CallbackT const &callback) {
+    for(auto &kvp : transformers) {
+        kvp.second->flush(
+            [&callback, &kvp](EstimatorTransformedType output) {
+                callback(TransformedType(kvp.first, std::move(output)));
+            }
+        );
+    }
+}
 
 // ----------------------------------------------------------------------
 // |
