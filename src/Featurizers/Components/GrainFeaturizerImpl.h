@@ -15,6 +15,12 @@ namespace Featurizer {
 namespace Featurizers {
 namespace Components {
 
+template <typename GrainT, typename EstimatorT>
+struct BugBug {
+    using InputType = typename EstimatorT::InputType;
+    using TransformedType = typename Details::EstimatorOutputType<EstimatorT>::type;
+};
+
 /////////////////////////////////////////////////////////////////////////
 ///  \class         GrainEstimatorAnnotation
 ///  \brief         Per-grain annotation information.
@@ -56,15 +62,21 @@ public:
 ///  \brief         Traits common to all types of `Estimators` when used within
 ///                 a `GrainEstimator`.
 ///
-template <typename GrainT, typename EstimatorT>
+template <
+    typename GrainT,
+    typename EstimatorT,
+    template <typename, typename> class GrainImplPolicyT
+>
 struct GrainFeaturizerTraits {
     // ----------------------------------------------------------------------
     // |  Public Types
     static_assert(std::is_reference<GrainT>::value == false, "'GrainT' must not be a reference");
     static_assert(std::is_reference<typename EstimatorT::InputType>::value == false, "'EstimatorT::InputType' must not be a reference");
 
-    using InputType                         = std::tuple<GrainT const &, typename EstimatorT::InputType const &>;
-    using TransformedType                   = std::tuple<GrainT const &, typename Details::EstimatorOutputType<EstimatorT>::type>;
+    // BugBug: Use GrainImplPolicyT
+
+    using InputType                         = std::tuple<GrainT const &, typename GrainImplPolicyT<GrainT, EstimatorT>::InputType const &>;
+    using TransformedType                   = std::tuple<GrainT const &, typename GrainImplPolicyT<GrainT, EstimatorT>::TransformedType>;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -72,11 +84,15 @@ struct GrainFeaturizerTraits {
 ///  \brief         A Transformer that applies a Transformer unique to the
 ///                 observed grain using grain-specific state.
 ///
-template <typename GrainT, typename EstimatorT>
+template <
+    typename GrainT,
+    typename EstimatorT,
+    template <typename, typename> class GrainImplPolicyT
+>
 class GrainTransformer :
     public Transformer<
-        typename GrainFeaturizerTraits<GrainT, EstimatorT>::InputType,
-        typename GrainFeaturizerTraits<GrainT, EstimatorT>::TransformedType
+        typename GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>::InputType,
+        typename GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>::TransformedType
     > {
 public:
     // ----------------------------------------------------------------------
@@ -84,7 +100,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using TheseGrainFeaturizerTraits        = GrainFeaturizerTraits<GrainT, EstimatorT>;
+    using TheseGrainFeaturizerTraits        = GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>;
 
     using BaseType =
         Transformer<
@@ -212,7 +228,13 @@ namespace Impl {
 ///  \brief         Functionality common to GrainEstimators based on
 ///                 FitEstimator or TransformerEstimator objects.
 ///
-template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
+template <
+    typename BaseT,
+    typename GrainT,
+    typename EstimatorT,
+    template <typename, typename> class GrainImplPolicyT,
+    size_t MaxNumTrainingItemsV
+>
 class GrainEstimatorImplBase : public BaseT {
 public:
     // ----------------------------------------------------------------------
@@ -222,7 +244,7 @@ public:
     // ----------------------------------------------------------------------
     using GrainType                         = GrainT;
 
-    using TheseGrainFeaturizerTraits        = GrainFeaturizerTraits<GrainT, EstimatorT>;
+    using TheseGrainFeaturizerTraits        = GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>;
 
     using InputType                         = typename TheseGrainFeaturizerTraits::InputType;
     using TransformedType                   = typename TheseGrainFeaturizerTraits::TransformedType;
@@ -289,7 +311,13 @@ private:
 ///  \class         GrainEstimatorImpl
 ///  \brief         Baseline template for implementations specialized below.
 ///
-template <typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV, typename EnableIfT=void>
+template <
+    typename GrainT,
+    typename EstimatorT,
+    template <typename, typename> class GrainImplPolicyT,
+    size_t MaxNumTrainingItemsV,
+    typename EnableIfT=void
+>
 class GrainEstimatorImpl;
 
 /////////////////////////////////////////////////////////////////////////
@@ -297,17 +325,24 @@ class GrainEstimatorImpl;
 ///  \brief         Implementation for a GrainEstimator when the underlying
 ///                 Estimator is a FitEstimator.
 ///
-template <typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
+template <
+    typename GrainT,
+    typename EstimatorT,
+    template <typename, typename> class GrainImplPolicyT,
+    size_t MaxNumTrainingItemsV
+>
 class GrainEstimatorImpl<
     GrainT,
     EstimatorT,
+    GrainImplPolicyT,
     MaxNumTrainingItemsV,
     typename std::enable_if<Details::IsTransformerEstimator<EstimatorT>::value == false>::type
 > :
     public Impl::GrainEstimatorImplBase<
-        FitEstimator<typename GrainFeaturizerTraits<GrainT, EstimatorT>::InputType>,
+        FitEstimator<typename GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>::InputType>,
         GrainT,
         EstimatorT,
+        GrainImplPolicyT,
         MaxNumTrainingItemsV
     > {
 public:
@@ -316,13 +351,14 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using TheseGrainTraits                  = GrainFeaturizerTraits<GrainT, EstimatorT>;
+    using TheseGrainTraits                  = GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>;
 
     using BaseType =
         Impl::GrainEstimatorImplBase<
             FitEstimator<typename TheseGrainTraits::InputType>,
             GrainT,
             EstimatorT,
+            GrainImplPolicyT,
             MaxNumTrainingItemsV
         >;
 
@@ -351,20 +387,27 @@ public:
 ///  \brief         Implementation for a GrainEstimator when the underlying
 ///                 Estimator is a TransformerEstimator.
 ///
-template <typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
+template <
+    typename GrainT,
+    typename EstimatorT,
+    template <typename, typename> class GrainImplPolicyT,
+    size_t MaxNumTrainingItemsV
+>
 class GrainEstimatorImpl<
     GrainT,
     EstimatorT,
+    GrainImplPolicyT,
     MaxNumTrainingItemsV,
     typename std::enable_if<Details::IsTransformerEstimator<EstimatorT>::value>::type
 > :
     public Impl::GrainEstimatorImplBase<
         TransformerEstimator<
-            typename GrainFeaturizerTraits<GrainT, EstimatorT>::InputType,
-            typename GrainFeaturizerTraits<GrainT, EstimatorT>::TransformedType
+            typename GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>::InputType,
+            typename GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>::TransformedType
         >,
         GrainT,
         EstimatorT,
+        GrainImplPolicyT,
         MaxNumTrainingItemsV
     > {
 public:
@@ -373,7 +416,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using TheseGrainTraits                  = GrainFeaturizerTraits<GrainT, EstimatorT>;
+    using TheseGrainTraits                  = GrainFeaturizerTraits<GrainT, EstimatorT, GrainImplPolicyT>;
 
     using BaseType =
         Impl::GrainEstimatorImplBase<
@@ -383,10 +426,11 @@ public:
             >,
             GrainT,
             EstimatorT,
+            GrainImplPolicyT,
             MaxNumTrainingItemsV
         >;
 
-    using TransformerType                   = GrainTransformer<GrainT, EstimatorT>;
+    using TransformerType                   = GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>;
 
     using CreateEstimatorFunc               = typename BaseType::CreateEstimatorFunc;
     using CreateTransformerFunc             = typename TransformerType::CreateTransformerFunc;
@@ -479,7 +523,6 @@ private:
 ///                 being aware of grains, and then "wrapped" by this object
 ///                 in those scenarios where grain-specific state is required.
 ///
-///
 ///                 Note that the name of this estimator will be:
 ///                     "Grain" + EstimatorT::Name
 ///
@@ -492,9 +535,13 @@ private:
 template <
     typename GrainT,
     typename EstimatorT,
+    // The policy type is used to determine how the results of flush should be interpreted.
+    // In some cases, the output of flush must contain additional information that is used when
+    // returning output to the framework.
+    template <typename, typename> class GrainImplPolicyT=BugBug,
     size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
 >
-using GrainEstimatorImpl                    = Impl::GrainEstimatorImpl<GrainT, EstimatorT, MaxNumTrainingItemsV>;
+using GrainEstimatorImpl                    = Impl::GrainEstimatorImpl<GrainT, EstimatorT, GrainImplPolicyT, MaxNumTrainingItemsV>;
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -530,8 +577,8 @@ GrainEstimatorAnnotation<GrainT>::GrainEstimatorAnnotation(AnnotationMap annotat
 // |  GrainTransformer
 // |
 // ----------------------------------------------------------------------
-template <typename GrainT, typename EstimatorT>
-GrainTransformer<GrainT, EstimatorT>::GrainTransformer(CreateTransformerFunc createFunc) :
+template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
+GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(CreateTransformerFunc createFunc) :
     _hadTransformersWhenCreated(false),
     _createFunc(
         std::move(
@@ -545,8 +592,8 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(CreateTransformerFunc cre
     ) {
 }
 
-template <typename GrainT, typename EstimatorT>
-GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc/*=CreateTransformerFunc()*/) :
+template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
+GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc/*=CreateTransformerFunc()*/) :
     _hadTransformersWhenCreated(true),
     _createFunc(std::move(createFunc)),
     _transformers(
@@ -561,8 +608,8 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transforme
     ) {
 }
 
-template <typename GrainT, typename EstimatorT>
-GrainTransformer<GrainT, EstimatorT>::GrainTransformer(Archive &ar) :
+template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
+GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(Archive &ar) :
     GrainTransformer(
         [&ar](void) -> GrainTransformer {
             std::uint64_t                   cElements(Traits<std::uint64_t>::deserialize(ar));
@@ -592,8 +639,8 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(Archive &ar) :
     )
 {}
 
-template <typename GrainT, typename EstimatorT>
-GrainTransformer<GrainT, EstimatorT>::GrainTransformer(GrainTransformer && other) :
+template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
+GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(GrainTransformer && other) :
     _hadTransformersWhenCreated(std::move(make_mutable(other._hadTransformersWhenCreated))),
     _createFuncArchive(std::move(make_mutable(other._createFuncArchive))),
     _createFunc(
@@ -607,8 +654,8 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(GrainTransformer && other
     _transformers(std::move(make_mutable(other._transformers)))
 {}
 
-template <typename GrainT, typename EstimatorT>
-void GrainTransformer<GrainT, EstimatorT>::save(Archive &ar) const /*override*/ {
+template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
+void GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::save(Archive &ar) const /*override*/ {
     if(_hadTransformersWhenCreated) {
         Traits<std::uint64_t>::serialize(ar, _transformers.size());
 
@@ -632,8 +679,8 @@ void GrainTransformer<GrainT, EstimatorT>::save(Archive &ar) const /*override*/ 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-template <typename GrainT, typename EstimatorT>
-GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transformers, Archive createFuncArchive, UseDeserializationCtorTag) :
+template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
+GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(TransformerMap transformers, Archive createFuncArchive, UseDeserializationCtorTag) :
     _hadTransformersWhenCreated(transformers.empty()),
     _createFuncArchive(
         std::move(
@@ -651,9 +698,9 @@ GrainTransformer<GrainT, EstimatorT>::GrainTransformer(TransformerMap transforme
     _transformers(std::move(transformers))
 {}
 
-template <typename GrainT, typename EstimatorT>
-typename GrainTransformer<GrainT, EstimatorT>::GrainTransformerTypeUniquePtr
-GrainTransformer<GrainT, EstimatorT>::CreateTransformerFromArchive(void) const {
+template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
+typename GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformerTypeUniquePtr
+GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::CreateTransformerFromArchive(void) const {
     assert(_createFuncArchive.Mode == Archive::ModeValue::Deserializing);
 
     // Clone the archive before using it so that it can be invoked multiple times.
@@ -667,8 +714,8 @@ GrainTransformer<GrainT, EstimatorT>::CreateTransformerFromArchive(void) const {
 // |  Impl::GrainEstimatorImplBase
 // |
 // ----------------------------------------------------------------------
-template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, bool isInferenceOnlyEstimator) :
+template <typename BaseT, typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT, size_t MaxNumTrainingItemsV>
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, GrainImplPolicyT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, bool isInferenceOnlyEstimator) :
     GrainEstimatorImplBase(
         std::move(pAllColumnAnnotations),
         [](AnnotationMapsPtr pAllColumnAnnotationsParam) {
@@ -678,8 +725,8 @@ Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::G
     ) {
 }
 
-template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc, bool isInferenceOnlyEstimator) :
+template <typename BaseT, typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT, size_t MaxNumTrainingItemsV>
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, GrainImplPolicyT, MaxNumTrainingItemsV>::GrainEstimatorImplBase(AnnotationMapsPtr pAllColumnAnnotations, CreateEstimatorFunc createFunc, bool isInferenceOnlyEstimator) :
     BaseT(
         [pAllColumnAnnotations, &createFunc](void) -> std::string {
             if(!createFunc)
@@ -701,9 +748,9 @@ Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::G
     _cRemainingTrainingItems(MaxNumTrainingItemsV) {
 }
 
-template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-/*static*/ typename Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorAnnotation const &
-Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::get_annotation(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name) {
+template <typename BaseT, typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT, size_t MaxNumTrainingItemsV>
+/*static*/ typename Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, GrainImplPolicyT, MaxNumTrainingItemsV>::GrainEstimatorAnnotation const &
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, GrainImplPolicyT, MaxNumTrainingItemsV>::get_annotation(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name) {
     GrainEstimatorAnnotation const * const  ptr(get_annotation_nothrow(columnAnnotations, colIndex, name));
 
     if(ptr == nullptr)
@@ -712,22 +759,22 @@ Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::g
     return *ptr;
 }
 
-template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-/*static*/ typename Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::GrainEstimatorAnnotation const *
-Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::get_annotation_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name) {
+template <typename BaseT, typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT, size_t MaxNumTrainingItemsV>
+/*static*/ typename Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, GrainImplPolicyT, MaxNumTrainingItemsV>::GrainEstimatorAnnotation const *
+Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, GrainImplPolicyT, MaxNumTrainingItemsV>::get_annotation_nothrow(AnnotationMaps const &columnAnnotations, size_t colIndex, char const *name) {
     return BaseT::template get_annotation_impl<GrainEstimatorAnnotation>(columnAnnotations, colIndex, name);
 }
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-bool Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
+template <typename BaseT, typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT, size_t MaxNumTrainingItemsV>
+bool Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, GrainImplPolicyT, MaxNumTrainingItemsV>::begin_training_impl(void) /*override*/ {
     return _isInferenceOnlyEstimator == false && _cRemainingTrainingItems != 0;
 }
 
-template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-FitResult Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::fit_impl(InputType const *pItems, size_t cItems) /*override*/ {
+template <typename BaseT, typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT, size_t MaxNumTrainingItemsV>
+FitResult Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, GrainImplPolicyT, MaxNumTrainingItemsV>::fit_impl(InputType const *pItems, size_t cItems) /*override*/ {
     size_t const                            cRemainingItems(std::min(_cRemainingTrainingItems, cItems));
     InputType const * const                 pEndItems(pItems + cRemainingItems);
 
@@ -766,8 +813,8 @@ FitResult Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTraining
     return _cRemainingTrainingItems ? FitResult::Continue : FitResult::Complete;
 }
 
-template <typename BaseT, typename GrainT, typename EstimatorT, size_t MaxNumTrainingItemsV>
-void Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
+template <typename BaseT, typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT, size_t MaxNumTrainingItemsV>
+void Impl::GrainEstimatorImplBase<BaseT, GrainT, EstimatorT, GrainImplPolicyT, MaxNumTrainingItemsV>::complete_training_impl(void) /*override*/ {
     // ----------------------------------------------------------------------
     using GrainEstimatorAnnotationMap       = typename GrainEstimatorAnnotation::AnnotationMap;
     using Sizes                             = std::vector<size_t>;
