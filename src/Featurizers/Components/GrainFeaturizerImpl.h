@@ -118,6 +118,15 @@ public:
 
     using CreateTransformerFunc             = std::function<GrainTransformerTypeUniquePtr (void)>;
 
+    /////////////////////////////////////////////////////////////////////////
+    ///  \class         TransformerMapWithPolicyArgsConstructorTag
+    ///  \brief         Tag that can be provided during object construction to
+    ///                 disambiguate overloads for older compilers that don't
+    ///                 play nice with default arguments and variadic template
+    ///                 arguments.
+    ///
+    struct TransformerMapWithPolicyArgsConstructorTag {};
+
     // ----------------------------------------------------------------------
     // |
     // |  Public Methods
@@ -126,8 +135,20 @@ public:
 
     // The `createFunc` is invoked (if available) when a grain is encountered during
     // prediction time that wasn't seen during training.
+    GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc=CreateTransformerFunc());
+
+    // Older compilers don't support default arguments followed by variadic arguments which is why we add
+    // this additional constructor. However, we don't want to introduce ambiguity for constructor invocation
+    // when there aren't any policy arguments provided. To work around this, we ask the caller to provide
+    // a tag when calling this variation with transformers, an optional creation function, and policy
+    // that requires arguments during construction.
     template <typename... PolicyArgTs>
-    GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc=CreateTransformerFunc(), PolicyArgTs &&... policy_args);
+    GrainTransformer(
+        TransformerMap transformers,
+        CreateTransformerFunc optionalCreateFunc,
+        TransformerMapWithPolicyArgsConstructorTag tag,
+        PolicyArgTs &&... policy_args
+    );
 
     template <typename... PolicyArgTs>
     GrainTransformer(CreateTransformerFunc createFunc, PolicyArgTs &&... policy_args);
@@ -604,6 +625,45 @@ void StandardGrainImplPolicy<GrainT, EstimatorT>::flush(TransformerMapT const &t
 // |
 // ----------------------------------------------------------------------
 template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
+GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc/*=CreateTransformerFunc()*/) :
+    _hadTransformersWhenCreated(true),
+    _createFunc(std::move(createFunc)),
+    _transformers(
+        std::move(
+            [&transformers](void) -> TransformerMap & {
+                if(transformers.empty())
+                    throw std::invalid_argument("transformers");
+
+                return transformers;
+            }()
+        )
+    )
+{}
+
+template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
+template <typename... PolicyArgTs>
+GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(
+    TransformerMap transformers,
+    CreateTransformerFunc optionalCreateFunc,
+    TransformerMapWithPolicyArgsConstructorTag,
+    PolicyArgTs &&... policy_args
+) :
+    _hadTransformersWhenCreated(true),
+    _createFunc(std::move(optionalCreateFunc)),
+    _policy(std::forward<PolicyArgTs>(policy_args)...),
+    _transformers(
+        std::move(
+            [&transformers](void) -> TransformerMap & {
+                if(transformers.empty())
+                    throw std::invalid_argument("transformers");
+
+                return transformers;
+            }()
+        )
+    )
+{}
+
+template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
 template <typename... PolicyArgTs>
 GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(CreateTransformerFunc createFunc, PolicyArgTs &&... policy_args) :
     _hadTransformersWhenCreated(false),
@@ -619,24 +679,6 @@ GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(CreateT
     ),
     _policy(std::forward<PolicyArgTs>(policy_args)...)
 {}
-
-template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
-template <typename... PolicyArgTs>
-GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(TransformerMap transformers, CreateTransformerFunc createFunc/*=CreateTransformerFunc()*/, PolicyArgTs &&... policy_args) :
-    _hadTransformersWhenCreated(true),
-    _createFunc(std::move(createFunc)),
-    _policy(std::forward<PolicyArgTs>(policy_args)...),
-    _transformers(
-        std::move(
-            [&transformers](void) -> TransformerMap & {
-                if(transformers.empty())
-                    throw std::invalid_argument("transformers");
-
-                return transformers;
-            }()
-        )
-    ) {
-}
 
 template <typename GrainT, typename EstimatorT, template <typename, typename> class GrainImplPolicyT>
 GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(Archive &ar) :
