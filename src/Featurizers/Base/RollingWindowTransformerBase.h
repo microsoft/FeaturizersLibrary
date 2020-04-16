@@ -4,8 +4,9 @@
 // ----------------------------------------------------------------------
 #pragma once
 
+#include "../Components/CircularBuffer.h"
 #include "../Components/InferenceOnlyFeaturizerImpl.h"
-#include "../Components/WindowFeaturizerBase.h"
+
 #include "../../Featurizer.h"
 #include "../../Traits.h"
 
@@ -88,7 +89,7 @@ private:
 
         for (std::uint32_t offset = 0; offset < _horizon; ++offset){
             OutputT result;
-            
+
             // If we don't have enough elements then output NaN
             if (bufferSize < _horizon - offset + _minWindowSize) {
                 result = Traits<OutputT>::CreateNullValue();

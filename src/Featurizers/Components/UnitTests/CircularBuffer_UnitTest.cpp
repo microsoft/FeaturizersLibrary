@@ -6,7 +6,7 @@
 #include "catch.hpp"
 
 #include "../../../3rdParty/optional.h"
-#include "../WindowFeaturizerBase.h"
+#include "../CircularBuffer.h"
 
 namespace NS = Microsoft::Featurizer;
 
@@ -212,19 +212,19 @@ TEST_CASE("CircularBuffer - Size capacity full") {
     // size would be incremented as data are pushed
     circ_buf.push("1");
     CHECK(circ_buf.size() == 1);
-    
+
     // capacity remains the same after an element is pushed
     CHECK(circ_buf.capacity() == 5);
-    
+
     circ_buf.push("2");
     CHECK(circ_buf.size() == 2);
-    
+
     circ_buf.push("3");
     CHECK(circ_buf.size() == 3);
-    
+
     circ_buf.push("4");
     CHECK(circ_buf.size() == 4);
-    
+
     circ_buf.push("5");
     CHECK(circ_buf.size() == 5);
     // buffer is full
@@ -411,7 +411,7 @@ TEST_CASE("CircularBuffer - range with offset") {
 
 TEST_CASE("CircularBuffer - clear") {
     NS::Featurizers::Components::CircularBuffer<std::int16_t> circ_buf(5);
-    
+
     // Add some dummy data
     circ_buf.push(1);
     circ_buf.push(2);

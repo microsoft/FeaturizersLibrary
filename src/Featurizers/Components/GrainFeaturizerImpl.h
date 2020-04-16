@@ -8,6 +8,9 @@
 
 #include "../../Archive.h"
 #include "../../Featurizer.h"
+
+#include "CircularBuffer.h"
+
 #include "Details/EstimatorTraits.h"
 
 namespace Microsoft {
@@ -27,11 +30,7 @@ public:
     // |  Public Types
     // |
     // ----------------------------------------------------------------------
-    using AnnotationMap =
-        std::map<
-            GrainT,
-            AnnotationPtr
-        >;
+    using AnnotationMap =                   std::map<GrainT, AnnotationPtr>;
 
     // ----------------------------------------------------------------------
     // |
@@ -78,6 +77,67 @@ struct StandardGrainImplPolicy {
 };
 
 /////////////////////////////////////////////////////////////////////////
+///  \class         DelayedGrainImplPolicy
+///  \brief         BugBug
+///
+template <typename GrainT, typename EstimatorT>
+class DelayedGrainImplPolicy {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    static_assert(std::is_reference<GrainT>::value == false, "'GrainT' must not be a reference");
+    static_assert(std::is_reference<typename EstimatorT::InputType>::value == false, "'EstimatorT::InputType' must not be a reference");
+
+    using EstimatorInputType                = typename EstimatorT::InputType;
+    using EstimatorTransformedType          = typename Details::EstimatorOutputType<EstimatorT>::type;
+
+    // size_t is an opaque id used to uniquely identify an input row and its corresponding output
+    // (which is necessary when there is a delay between the input and output).
+    using ThisInputType                     = std::tuple<size_t, EstimatorInputType const &>;
+    using ThisTransformedType               = std::tuple<size_t, EstimatorTransformedType>;
+
+    using InputType                         = std::tuple<GrainT const &, ThisInputType>;
+    using TransformedType                   = std::tuple<GrainT const &, ThisTransformedType>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    DelayedGrainImplPolicy(size_t delaySize);
+
+    template <typename TransformerT, typename CallbackT>
+    void execute(GrainT const &grain, TransformerT &transformer, ThisInputType const &input, CallbackT const &callback);
+
+    template <typename TransformerMapT, typename CallbackT>
+    void flush(TransformerMapT const &transformers, CallbackT const &callback);
+
+    // TODO: Add functionality to save dirty state
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DelayedGrainImplPolicy);
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Types
+    // |
+    // ----------------------------------------------------------------------
+    using RowIdCircularBuffer               = CircularBuffer<size_t>;
+    using BufferMap                         = std::map<GrainT, RowIdCircularBuffer>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+    size_t const                            _delaySize;
+    BufferMap                               _buffers;
+};
+
+/////////////////////////////////////////////////////////////////////////
 ///  \class         GrainTransformer
 ///  \brief         A Transformer that applies a Transformer unique to the
 ///                 observed grain using grain-specific state.
@@ -119,13 +179,13 @@ public:
     using CreateTransformerFunc             = std::function<GrainTransformerTypeUniquePtr (void)>;
 
     /////////////////////////////////////////////////////////////////////////
-    ///  \class         TransformerMapWithPolicyArgsConstructorTag
+    ///  \class         PolicyArgsConstructorTag
     ///  \brief         Tag that can be provided during object construction to
     ///                 disambiguate overloads for older compilers that don't
     ///                 play nice with default arguments and variadic template
     ///                 arguments.
     ///
-    struct TransformerMapWithPolicyArgsConstructorTag {};
+    struct PolicyArgsConstructorTag {};
 
     // ----------------------------------------------------------------------
     // |
@@ -146,7 +206,7 @@ public:
     GrainTransformer(
         TransformerMap transformers,
         CreateTransformerFunc optionalCreateFunc,
-        TransformerMapWithPolicyArgsConstructorTag tag,
+        PolicyArgsConstructorTag tag,
         PolicyArgTs &&... policy_args
     );
 
@@ -224,9 +284,7 @@ private:
             }()
         );
 
-        typename EstimatorT::InputType const &          grainInput(std::get<1>(input));
-
-        _policy.execute(grain, transformer, grainInput, callback);
+        _policy.execute(grain, transformer, std::get<1>(input), callback);
     }
 
     // MSVC has problems when the declaration and definition are separated
@@ -621,6 +679,95 @@ void StandardGrainImplPolicy<GrainT, EstimatorT>::flush(TransformerMapT const &t
 
 // ----------------------------------------------------------------------
 // |
+// |  DelayedGrainImplPolicy
+// |
+// ----------------------------------------------------------------------
+template <typename GrainT, typename EstimatorT>
+DelayedGrainImplPolicy<GrainT, EstimatorT>::DelayedGrainImplPolicy(size_t delaySize) :
+    _delaySize(
+        std::move(
+            [&delaySize](void) -> size_t & {
+                if(delaySize == 0)
+                    throw std::invalid_argument("delaySize");
+
+                return delaySize;
+            }()
+        )
+    )
+{}
+
+template <typename GrainT, typename EstimatorT>
+template <typename TransformerT, typename CallbackT>
+void DelayedGrainImplPolicy<GrainT, EstimatorT>::execute(GrainT const &grain, TransformerT &transformer, ThisInputType const &input, CallbackT const &callback) {
+    RowIdCircularBuffer &                   buffer(
+        [&grain, this](void) -> RowIdCircularBuffer & {
+            typename BufferMap::iterator const          iter(_buffers.find(grain));
+
+            if(iter != _buffers.end())
+                return iter->second;
+
+            std::pair<typename BufferMap::iterator, bool> const             result(_buffers.emplace(grain, RowIdCircularBuffer(_delaySize)));
+
+            assert(result.second);
+            return result.first->second;
+        }()
+    );
+
+    size_t const &                          rowId(std::get<0>(input));
+    EstimatorInputType const &              estimatorInput(std::get<1>(input));
+
+    transformer.execute(
+        estimatorInput,
+        [&callback, &grain, &buffer](EstimatorTransformedType output) {
+            assert(buffer.empty() == false);
+            callback(TransformedType(grain, ThisTransformedType(*buffer.cbegin(), std::move(output))));
+        }
+    );
+
+    buffer.push(rowId);
+}
+
+template <typename GrainT, typename EstimatorT>
+template <typename TransformerMapT, typename CallbackT>
+void DelayedGrainImplPolicy<GrainT, EstimatorT>::flush(TransformerMapT const &transformers, CallbackT const &callback) {
+    assert(transformers.size() == _buffers.size());
+
+    for(auto &kvp : transformers) {
+        GrainT const &                      grain(kvp.first);
+        RowIdCircularBuffer &               buffer(
+            [this, &grain](void) -> RowIdCircularBuffer & {
+                typename BufferMap::iterator const      iter(_buffers.find(grain));
+
+                // We should not see content here in flush that wasn't seen
+                // previously in a call to execute.
+                if(iter == _buffers.end())
+                    throw std::runtime_error("Invalid grain");
+
+                return iter->second;
+            }()
+        );
+
+        typename RowIdCircularBuffer::iterator          ptr(buffer.begin());
+        typename RowIdCircularBuffer::iterator const    pEnd(buffer.end());
+
+        kvp.second->flush(
+            [&callback, &grain, &ptr, &pEnd](EstimatorTransformedType output) {
+                if(ptr == pEnd)
+                    throw std::runtime_error("The number of items flushed is greater than the number of delayed input items");
+
+                callback(TransformedType(grain, ThisTransformedType(*ptr++, std::move(output))));
+            }
+        );
+
+        if(ptr != pEnd)
+            throw std::runtime_error("The number of items flushed is less than the number of delayed input items");
+    }
+
+    _buffers.clear();
+}
+
+// ----------------------------------------------------------------------
+// |
 // |  GrainTransformer
 // |
 // ----------------------------------------------------------------------
@@ -645,7 +792,7 @@ template <typename... PolicyArgTs>
 GrainTransformer<GrainT, EstimatorT, GrainImplPolicyT>::GrainTransformer(
     TransformerMap transformers,
     CreateTransformerFunc optionalCreateFunc,
-    TransformerMapWithPolicyArgsConstructorTag,
+    PolicyArgsConstructorTag,
     PolicyArgTs &&... policy_args
 ) :
     _hadTransformersWhenCreated(true),

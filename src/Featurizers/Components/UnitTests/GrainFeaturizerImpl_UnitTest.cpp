@@ -964,3 +964,380 @@ TEST_CASE("Deserialization of Transformer without training") {
     Execute(transformer2, grain1, value10, 110);
     Execute(transformer2, grain2, value10, 110);
 }
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         DelayDeltaTransformer
+///  \brief         Transformer that adds a delta (which is considered to be
+///                 the transformer's state) to each incoming value.
+///
+template <size_t DelayV>
+class DelayDeltaTransformer : public NS::Transformer<std::uint64_t, std::uint64_t> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Types
+    // |
+    // ----------------------------------------------------------------------
+    using BaseType                          = NS::Transformer<std::uint64_t, std::uint64_t>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+    DelayDeltaTransformer(std::uint64_t delta) :
+        _delta(std::move(delta)),
+        _buffer(DelayV)
+    {}
+
+    DelayDeltaTransformer(NS::Archive &ar) :
+        DelayDeltaTransformer(NS::Traits<std::uint64_t>::deserialize(ar))
+    {}
+
+    ~DelayDeltaTransformer(void) override = default;
+
+    FEATURIZER_MOVE_CONSTRUCTOR_ONLY(DelayDeltaTransformer);
+
+    void save(Archive &ar) const override {
+        NS::Traits<std::uint64_t>::serialize(ar, _delta);
+    }
+
+private:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+    using CircularBuffer                    = Components::CircularBuffer<std::uint64_t>;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Data
+    // |
+    // ----------------------------------------------------------------------
+    std::uint64_t const                     _delta;
+    CircularBuffer                          _buffer;
+
+    // ----------------------------------------------------------------------
+    // |
+    // |  Private Methods
+    // |
+    // ----------------------------------------------------------------------
+    void execute_impl(typename BaseType::InputType const &input, typename BaseType::CallbackFunction const &callback) override {
+        if(_buffer.is_full())
+            callback(*_buffer.begin());
+
+        _buffer.push(input + _delta);
+    }
+
+    void flush_impl(typename BaseType::CallbackFunction const &callback) override {
+        CircularBuffer::iterator            ptr(_buffer.begin());
+        CircularBuffer::iterator const      pEnd(_buffer.end());
+
+        while(ptr != pEnd)
+            callback(*ptr++);
+    }
+};
+
+template <size_t DelayV>
+using GrainedDelayDeltaTransformer          = Components::GrainTransformer<std::string, DelayDeltaTransformer<DelayV>, Components::DelayedGrainImplPolicy>;
+
+TEST_CASE("GrainedDelayDeltaTransformer - single grain, delay 1") {
+    // ----------------------------------------------------------------------
+    constexpr size_t const Delay            = 1;
+
+    using Transformer                       = DelayDeltaTransformer<Delay>;
+    using GrainedTransformer                = GrainedDelayDeltaTransformer<Delay>;
+    using Results                           = std::vector<typename GrainedTransformer::TransformedType>;
+    // ----------------------------------------------------------------------
+
+    std::string const                       grain("one");
+    std::uint64_t const                     value100(100);
+    std::uint64_t const                     value200(200);
+    std::uint64_t const                     value300(300);
+    Results                                 results;
+
+    auto const                              callback(
+        [&results](typename GrainedTransformer::TransformedType output) {
+            results.emplace_back(std::move(output));
+        }
+    );
+
+    GrainedTransformer                      transformer(
+        [](void) {
+            return std::unique_ptr<Transformer>(new Transformer(10));
+        },
+        Delay
+    );
+
+    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(0, value100)), callback);
+    CHECK(results.empty());
+
+    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(1, value200)), callback);
+    CHECK(
+        results == Results{
+            {grain, {0, 110}}
+        }
+    );
+
+    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(2, value300)), callback);
+    CHECK(
+        results == Results{
+            {grain, {0, 110}},
+            {grain, {1, 210}}
+        }
+    );
+
+    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(3000, value200)), callback);
+    CHECK(
+        results == Results{
+            {grain, {0, 110}},
+            {grain, {1, 210}},
+            {grain, {2, 310}}
+        }
+    );
+
+    transformer.flush(callback);
+    CHECK(
+        results == Results{
+            {grain, {0, 110}},
+            {grain, {1, 210}},
+            {grain, {2, 310}},
+            {grain, {3000, 210}}
+        }
+    );
+}
+
+TEST_CASE("GrainedDelayDeltaTransformer - single grain, delay 2") {
+    // ----------------------------------------------------------------------
+    constexpr size_t const Delay            = 2;
+
+    using Transformer                       = DelayDeltaTransformer<Delay>;
+    using GrainedTransformer                = GrainedDelayDeltaTransformer<Delay>;
+    using Results                           = std::vector<typename GrainedTransformer::TransformedType>;
+    // ----------------------------------------------------------------------
+
+    std::string const                       grain("one");
+    std::uint64_t const                     value100(100);
+    std::uint64_t const                     value200(200);
+    std::uint64_t const                     value300(300);
+    Results                                 results;
+
+    auto const                              callback(
+        [&results](typename GrainedTransformer::TransformedType output) {
+            results.emplace_back(std::move(output));
+        }
+    );
+
+    GrainedTransformer                      transformer(
+        [](void) {
+            return std::unique_ptr<Transformer>(new Transformer(10));
+        },
+        Delay
+    );
+
+    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(0, value100)), callback);
+    CHECK(results.empty());
+
+    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(1, value200)), callback);
+    CHECK(results.empty());
+
+    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(2, value300)), callback);
+    CHECK(
+        results == Results{
+            {grain, {0, 110}}
+        }
+    );
+
+    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(3000, value200)), callback);
+    CHECK(
+        results == Results{
+            {grain, {0, 110}},
+            {grain, {1, 210}}
+        }
+    );
+
+    transformer.flush(callback);
+    CHECK(
+        results == Results{
+            {grain, {0, 110}},
+            {grain, {1, 210}},
+            {grain, {2, 310}},
+            {grain, {3000, 210}}
+        }
+    );
+}
+
+TEST_CASE("GrainedDelayDeltaTransformer - multi grain, delay 1") {
+    // ----------------------------------------------------------------------
+    constexpr size_t const Delay            = 1;
+
+    using Transformer                       = DelayDeltaTransformer<Delay>;
+    using GrainedTransformer                = GrainedDelayDeltaTransformer<Delay>;
+    using Results                           = std::vector<typename GrainedTransformer::TransformedType>;
+    // ----------------------------------------------------------------------
+
+    std::string const                       grain1("one");
+    std::string const                       grain2("two");
+    std::uint64_t const                     value100(100);
+    std::uint64_t const                     value200(200);
+    std::uint64_t const                     value300(300);
+    Results                                 results;
+
+    auto const                              callback(
+        [&results](typename GrainedTransformer::TransformedType output) {
+            results.emplace_back(std::move(output));
+        }
+    );
+
+    GrainedTransformer                      transformer(
+        [](void) {
+            return std::unique_ptr<Transformer>(new Transformer(10));
+        },
+        Delay
+    );
+
+    transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(0, value100)), callback);
+    CHECK(results.empty());
+
+    transformer.execute(GrainedTransformer::InputType(grain2, GrainedTransformer::GrainImplPolicy::ThisInputType(1, value300)), callback);
+    CHECK(results.empty());
+
+    transformer.execute(GrainedTransformer::InputType(grain2, GrainedTransformer::GrainImplPolicy::ThisInputType(2, value200)), callback);
+    CHECK(
+        results == Results{
+            {grain2, {1, 310}}
+        }
+    );
+
+    transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(3, value200)), callback);
+    CHECK(
+        results == Results{
+            {grain2, {1, 310}},
+            {grain1, {0, 110}}
+        }
+    );
+
+    transformer.flush(callback);
+    CHECK(
+        results == Results{
+            {grain2, {1, 310}},
+            {grain1, {0, 110}},
+            // Flush output is grouped by grain, but not necessarily in row order.
+            {grain1, {3, 210}},
+            {grain2, {2, 210}}
+        }
+    );
+}
+
+TEST_CASE("GrainedDelayDeltaTransformer - multi grain, delay 3") {
+    // ----------------------------------------------------------------------
+    constexpr size_t const Delay            = 3;
+
+    using Transformer                       = DelayDeltaTransformer<Delay>;
+    using GrainedTransformer                = GrainedDelayDeltaTransformer<Delay>;
+    using Results                           = std::vector<typename GrainedTransformer::TransformedType>;
+    // ----------------------------------------------------------------------
+
+    std::string const                       grain1("one");
+    std::string const                       grain2("two");
+    std::uint64_t const                     value100(100);
+    std::uint64_t const                     value200(200);
+    std::uint64_t const                     value300(300);
+    std::uint64_t const                     value400(400);
+    std::uint64_t const                     value500(500);
+    Results                                 results;
+
+    auto const                              callback(
+        [&results](typename GrainedTransformer::TransformedType output) {
+            results.emplace_back(std::move(output));
+        }
+    );
+
+    GrainedTransformer                      transformer(
+        [](void) {
+            return std::unique_ptr<Transformer>(new Transformer(10));
+        },
+        Delay
+    );
+
+    transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(0, value100)), callback);
+    CHECK(results.empty());
+
+    transformer.execute(GrainedTransformer::InputType(grain2, GrainedTransformer::GrainImplPolicy::ThisInputType(1, value500)), callback);
+    CHECK(results.empty());
+
+    transformer.execute(GrainedTransformer::InputType(grain2, GrainedTransformer::GrainImplPolicy::ThisInputType(2, value400)), callback);
+    CHECK(results.empty());
+
+    transformer.execute(GrainedTransformer::InputType(grain2, GrainedTransformer::GrainImplPolicy::ThisInputType(3, value300)), callback);
+    CHECK(results.empty());
+
+    transformer.execute(GrainedTransformer::InputType(grain2, GrainedTransformer::GrainImplPolicy::ThisInputType(4, value200)), callback);
+    CHECK(
+        results == Results{
+            {grain2, {1, 510}}
+        }
+    );
+
+    SECTION("Early flush") {
+        transformer.flush(callback);
+        CHECK(
+            results == Results{
+                {grain2, {1, 510}},
+                {grain1, {0, 110}},
+                {grain2, {2, 410}},
+                {grain2, {3, 310}},
+                {grain2, {4, 210}}
+            }
+        );
+    }
+
+    SECTION("Additional grain1 values") {
+        transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(5, value200)), callback);
+        CHECK(
+            results == Results{
+                {grain2, {1, 510}}
+            }
+        );
+
+        transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(6, value300)), callback);
+        CHECK(
+            results == Results{
+                {grain2, {1, 510}}
+            }
+        );
+
+        transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(7, value400)), callback);
+        CHECK(
+            results == Results{
+                {grain2, {1, 510}},
+                {grain1, {0, 110}}
+            }
+        );
+
+        transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(8, value500)), callback);
+        CHECK(
+            results == Results{
+                {grain2, {1, 510}},
+                {grain1, {0, 110}},
+                {grain1, {5, 210}}
+            }
+        );
+
+        transformer.flush(callback);
+        CHECK(
+            results == Results{
+                {grain2, {1, 510}},
+                {grain1, {0, 110}},
+                {grain1, {5, 210}},
+                {grain1, {6, 310}},
+                {grain1, {7, 410}},
+                {grain1, {8, 510}},
+                {grain2, {2, 410}},
+                {grain2, {3, 310}},
+                {grain2, {4, 210}}
+            }
+        );
+    }
+}

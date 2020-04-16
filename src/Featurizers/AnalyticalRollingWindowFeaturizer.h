@@ -9,12 +9,13 @@
 #include "../Traits.h"
 
 #include "Base/RollingWindowTransformerBase.h"
+
 #include "Calculators/MeanCalculator.h"
+
 #include "Components/InferenceOnlyFeaturizerImpl.h"
 #include "Components/FilterDecoratorFeaturizer.h"
 #include "Components/GrainFeaturizerImpl.h"
 #include "Components/PipelineExecutionEstimatorImpl.h"
-#include "Components/WindowFeaturizerBase.h"
 
 #include <vector>
 

@@ -6,10 +6,11 @@
 
 #include "../Featurizer.h"
 #include "../Archive.h"
-#include "Components/PipelineExecutionEstimatorImpl.h"
+
+#include "Components/CircularBuffer.h"
 #include "Components/FilterDecoratorFeaturizer.h"
 #include "Components/GrainFeaturizerImpl.h"
-#include "Components/WindowFeaturizerBase.h"
+#include "Components/PipelineExecutionEstimatorImpl.h"
 
 namespace Microsoft {
 namespace Featurizer {

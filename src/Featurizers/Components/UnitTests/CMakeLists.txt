@@ -30,6 +30,7 @@ enable_testing()
 
 SET(
     _test_names
+    CircularBuffer_UnitTest
     DocumentStatisticsEstimator_UnitTest
     FilterFeaturizerImpl_UnitTest
     FilterDecoratorFeaturizer_UnitTest
@@ -52,7 +53,6 @@ SET(
     StatisticalMetricsEstimator_UnitTest
     TrainingOnlyEstimatorImpl_UnitTest
     VectorNormsEstimator_UnitTest
-    WindowFeaturizerBase_UnitTest
     # TODO: Add tests for:
     #   - TimeSeriesFrequencyEstimator
     #   - TimeSeriesMedianEstimator

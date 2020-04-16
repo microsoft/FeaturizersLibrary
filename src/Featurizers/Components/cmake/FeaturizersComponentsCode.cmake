@@ -12,6 +12,7 @@ function(Impl)
 
     add_library(FeaturizersComponentsCode STATIC
         ${_this_path}/../Components.h
+        ${_this_path}/../CircularBuffer.h
         ${_this_path}/../DocumentStatisticsEstimator.h
         ${_this_path}/../DocumentStatisticsEstimator.cpp
         ${_this_path}/../FilterFeaturizerImpl.h

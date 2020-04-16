@@ -96,6 +96,7 @@ featurizers:
     num_output_columns: 1
     creates_annotations: false
     transformer_maintains_state: true
+    # BugBug: flushable
     has_dynamic_output: true
     description: |-
       Imputes (populates) previously encountered null values with the current non-null value encountered during
@@ -771,6 +772,7 @@ featurizers:
     estimator_name: GrainedLagLeadOperatorEstimator
     release_version: 0.4.0
     num_output_columns: 1
+    # BugBug: flushable
     has_dynamic_output: true
     transformer_maintains_state: true
     creates_annotations: false
@@ -1693,6 +1695,7 @@ featurizers:
   - name: TimeSeriesImputerFeaturizer
     estimator_name: TimeSeriesImputerEstimator
     release_version: 0.3.6
+    # BugBug: flushable
     has_dynamic_output: true
     transformer_maintains_state: true
     num_output_columns: 1
