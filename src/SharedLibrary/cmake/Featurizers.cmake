@@ -11,7 +11,7 @@ function(Impl)
     set(_project_name Featurizers)
     set(_version_major 0)                   # '1' in the release 1.2.3-alpha1+201910161322
     set(_version_minor 4)                   # '2' in the release 1.2.3-alpha1+201910161322
-    set(_version_patch 0)                   # '3' in the release 1.2.3-alpha1+201910161322
+    set(_version_patch 1)                   # '3' in the release 1.2.3-alpha1+201910161322
     set(_version_prerelease_info "")        # Optional 'alpha1' in the release 1.2.3-alpha1+201910161322
     set(_version_build_info "")             # Optional '201910161322' in the release 1.2.3-alpha1+201910161322
 
