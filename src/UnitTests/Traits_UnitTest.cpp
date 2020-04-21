@@ -454,8 +454,13 @@ std::chrono::system_clock::time_point TimePointTest(time_t posix_time) {
 }
 
 TEST_CASE("std::chrono::system_clock::time_point serialization") {
-    CHECK(SerializationTestImpl(std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now())));
+    // `std::chrono::floor(std::chrono::time_point)` isn't available on all compilers, so we have to do it manually
+    std::chrono::system_clock::time_point const         now(std::chrono::system_clock::now());
+    std::chrono::system_clock::time_point const         roundedNow(std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()));
 
+    CHECK(SerializationTestImpl(roundedNow));
+
+    // epoch + 10 seconds
     CHECK(TimePointTest(10) == Traits<std::chrono::system_clock::time_point>::FromString("1970-01-01T00:00:10Z"));
 
     // epoch + 1 month

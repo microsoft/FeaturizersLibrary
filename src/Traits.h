@@ -1450,13 +1450,13 @@ struct Traits<std::chrono::system_clock::time_point> : public Impl::CommonTimePo
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::chrono::system_clock::time_point const &tp) {
-        Traits<time_t>::serialize(ar, std::chrono::system_clock::to_time_t(tp));
+        Traits<std::int64_t>::serialize(ar, static_cast<std::int64_t>(std::chrono::system_clock::to_time_t(tp)));
         return ar;
     }
 
     template <typename ArchiveT>
     static std::chrono::system_clock::time_point deserialize(ArchiveT &ar) {
-        return std::chrono::system_clock::from_time_t(Traits<time_t>::deserialize(ar));
+        return std::chrono::system_clock::from_time_t(Traits<std::int64_t>::deserialize(ar));
     }
 };
 
