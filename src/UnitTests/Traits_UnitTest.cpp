@@ -443,6 +443,28 @@ TEST_CASE("std::chrono::system_clock::duration serialization") {
     CHECK(DurationTest(100000) == std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::microseconds(100000)));
 }
 
+std::chrono::system_clock::time_point TimePointTest(time_t posix_time) {
+    Archive                                 in;
+
+    Traits<time_t>::serialize(in, posix_time);
+
+    Archive                                 out(in.commit());
+
+    return Traits<std::chrono::system_clock::time_point>::deserialize(out);
+}
+
+TEST_CASE("std::chrono::system_clock::time_point serialization") {
+    CHECK(SerializationTestImpl(std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now())));
+
+    CHECK(TimePointTest(10) == Traits<std::chrono::system_clock::time_point>::FromString("1970-01-01T00:00:10Z"));
+
+    // epoch + 1 month
+    CHECK(TimePointTest(60 * 60 * 24 * 31) == Traits<std::chrono::system_clock::time_point>::FromString("1970-02-01T00:00:00Z"));
+
+    // epoch + 1 year
+    CHECK(TimePointTest(60 * 60 * 24 * 365) == Traits<std::chrono::system_clock::time_point>::FromString("1971-01-01T00:00:00Z"));
+}
+
 #if (defined __clang__)
 #   pragma clang diagnostic pop
 #endif

@@ -1359,8 +1359,14 @@ struct Traits<std::chrono::system_clock::duration> : public Impl::CommonDuration
     }
 };
 
+namespace Impl {
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         CommonTimePointTraits
+///  \brief         Traits that are common to all time_point types.
+///
 template <typename ClockT, typename DurationT>
-struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<std::chrono::time_point<ClockT, DurationT>> {
+struct CommonTimePointTraits : public TraitsImpl<std::chrono::time_point<ClockT, DurationT>> {
     static std::string ToString(std::chrono::time_point<ClockT, DurationT> const &tp) {
         return date::format("%FT%TZ", date::floor<std::chrono::seconds>(tp));
     }
@@ -1404,7 +1410,9 @@ struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<st
         std::istringstream ss(*ptr);
         std::ostringstream date_template;
         date_template << "%Y" << dash_template_component << "%m" << dash_template_component << "%d" << T_template_component << "%H" << colon_template_component <<"%M" << colon_template_component << "%S" << Z_template_component;
-        date::sys_time<std::chrono::system_clock::duration> tp;
+
+        date::sys_time<std::chrono::time_point<ClockT, DurationT>::duration> tp;
+
         date::from_stream(ss, date_template.str().c_str(), tp);
 
         if (ss.fail() ) {
@@ -1421,6 +1429,34 @@ struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<st
     template <typename ArchiveT>
     static std::chrono::time_point<ClockT, DurationT> deserialize(ArchiveT &ar) {
         return std::chrono::time_point<ClockT, DurationT>(Traits<DurationT>::deserialize(ar));
+    }
+};
+
+} // namepsace Impl
+
+template <typename ClockT, typename DurationT>
+struct Traits<std::chrono::time_point<ClockT, DurationT>> : public Impl::CommonTimePointTraits<ClockT, DurationT>
+{};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         Traits
+///  \brief         These traits are specific to the system clock, which may be
+///                 different on different systems. This class contains functionality
+///                 that might be impacted by these differences.
+///
+template <>
+struct Traits<std::chrono::system_clock::time_point> : public Impl::CommonTimePointTraits<std::chrono::system_clock::time_point::clock, std::chrono::system_clock::duration> {
+    // Serialize and deserialize according to POSIX time (seconds since 1/1/1970)
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::chrono::system_clock::time_point const &tp) {
+        Traits<time_t>::serialize(ar, std::chrono::system_clock::to_time_t(tp));
+        return ar;
+    }
+
+    template <typename ArchiveT>
+    static std::chrono::system_clock::time_point deserialize(ArchiveT &ar) {
+        return std::chrono::system_clock::from_time_t(Traits<time_t>::deserialize(ar));
     }
 };
 
