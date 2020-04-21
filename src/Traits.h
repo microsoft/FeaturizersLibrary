@@ -1411,7 +1411,7 @@ struct CommonTimePointTraits : public TraitsImpl<std::chrono::time_point<ClockT,
         std::ostringstream date_template;
         date_template << "%Y" << dash_template_component << "%m" << dash_template_component << "%d" << T_template_component << "%H" << colon_template_component <<"%M" << colon_template_component << "%S" << Z_template_component;
 
-        date::sys_time<std::chrono::time_point<ClockT, DurationT>::duration> tp;
+        date::sys_time<typename std::chrono::time_point<ClockT, DurationT>::duration> tp;
 
         date::from_stream(ss, date_template.str().c_str(), tp);
 
