@@ -389,7 +389,6 @@ TEST_CASE("Transformer_TimePoint") {
     CHECK(time.minutes().count() == 35);
     CHECK(time.seconds().count() == 15);
 
-
     // invalid 02/29 year
     CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-02-29T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
 
@@ -420,8 +419,28 @@ TEST_CASE("Transformer_TimePoint") {
     // invalid Z
     CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T12:02:15")), "Date time string is not in valid ISO 8601 form!");
     CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T12:02:15-0700Z")), "Date time string is not in valid ISO 8601 form!");
+}
 
+std::chrono::system_clock::duration DurationTest(typename std::chrono::system_clock::duration::rep microseconds) {
+    Archive                                 in;
 
+    Traits<typename std::chrono::system_clock::duration::rep>::serialize(in, microseconds);
+
+    Archive                                 out(in.commit());
+
+    return Traits<std::chrono::system_clock::duration>::deserialize(out);
+}
+
+TEST_CASE("std::chrono::system_clock::duration serialization") {
+    CHECK(SerializationTestImpl(std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::nanoseconds(10))));
+    CHECK(SerializationTestImpl(std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::microseconds(20))));
+    CHECK(SerializationTestImpl(std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::milliseconds(30))));
+    CHECK(SerializationTestImpl(std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::seconds(40))));
+
+    CHECK(DurationTest(10) == std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::microseconds(10)));
+    CHECK(DurationTest(100) == std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::microseconds(100)));
+    CHECK(DurationTest(1000) == std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::microseconds(1000)));
+    CHECK(DurationTest(100000) == std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::microseconds(100000)));
 }
 
 #if (defined __clang__)

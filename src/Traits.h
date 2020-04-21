@@ -1335,24 +1335,27 @@ struct Traits<std::chrono::duration<RepT, PeriodT>> : public Impl::CommonDuratio
 ///
 template <>
 struct Traits<std::chrono::system_clock::duration> : public Impl::CommonDurationTraits<std::chrono::system_clock::rep, std::chrono::system_clock::period> {
-    // "std::chrono::system_clock::duration" is a specialization of std::chrono::system_clock::duration
-    // However it specializes differently on Windows(std::chrono::duration<int64_t, std::ratio<1,10000000>>)
-    // and Linux(std::chrono::duration<int64_t, std::ratio<1,1000000000>>). So for serDe, we cast input to a
-    // fixed specialization(SystemClockSerDeDurationType).
-
-    using SystemClockDurationRepType = decltype(std::chrono::system_clock::duration())::rep;
-    using SystemClockDurationPeriodType = decltype(std::chrono::system_clock::duration())::period;
-    using SystemClockSerDeDurationType = std::chrono::duration<int64_t, std::ratio<1,1000>>;
+    // A duration is measured using different units across different operating systems and compilers.
+    // This code uses the least-common-denominator to ensure a consistent serialization behavior
+    // across platforms.
+    //
+    //      GCC:        nanosecond
+    //      MSVC:       100 nanosecond
+    //      Clang:      microsecond
+    //
+    //  Additional info: https://stackoverflow.com/a/55124538
+    //
+    using MicrosecondDuration               = std::chrono::duration<int64_t, std::ratio<1, 1000000>>;
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::chrono::system_clock::duration const &duration) {
-        Traits<SystemClockSerDeDurationType>::serialize(ar,std::chrono::duration_cast<SystemClockSerDeDurationType>(duration));
+        Traits<MicrosecondDuration>::serialize(ar, std::chrono::duration_cast<MicrosecondDuration>(duration));
         return ar;
     }
 
     template <typename ArchiveT>
     static std::chrono::system_clock::duration deserialize(ArchiveT &ar) {
-        return std::chrono::duration_cast<std::chrono::system_clock::duration>(Traits<SystemClockSerDeDurationType>::deserialize(ar));
+        return std::chrono::duration_cast<std::chrono::system_clock::duration>(Traits<MicrosecondDuration>::deserialize(ar));
     }
 };
 
