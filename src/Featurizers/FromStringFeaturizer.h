@@ -214,7 +214,7 @@ T FromStringTransformer<T>::FromStringWithEmptyStringsForNullValuesImpl(std::str
 
 template <typename T>
 // static
-T FromStringTransformer<T>::FromStringWithEmptyStringsForNullValuesImpl(std::string const &value, std::false_type) {
+T FromStringTransformer<T>::FromStringWithEmptyStringsForNullValuesImpl(std::string const &, std::false_type) {
     throw std::runtime_error("This should never be called");
 }
 
