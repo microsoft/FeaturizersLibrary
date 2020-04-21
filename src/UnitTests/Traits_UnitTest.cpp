@@ -448,7 +448,7 @@ TEST_CASE("std::chrono::system_clock::duration serialization") {
 std::chrono::system_clock::time_point TimePointTest(time_t posix_time) {
     Archive                                 in;
 
-    Traits<time_t>::serialize(in, posix_time);
+    Traits<std::int64_t>::serialize(in, posix_time);
 
     Archive                                 out(in.commit());
 
