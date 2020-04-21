@@ -546,6 +546,10 @@ featurizers:
       - input_type: string
         output_type: T
 
+    configuration_params:
+      - type: bool
+        name: useEmptyStringsForNullValues
+
   # ----------------------------------------------------------------------
   - name: HashOneHotVectorizerFeaturizer
     estimator_name: HashOneHotVectorizerEstimator

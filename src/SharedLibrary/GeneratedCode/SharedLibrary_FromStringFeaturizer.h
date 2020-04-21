@@ -14,7 +14,7 @@ struct FromStringFeaturizer_int8_EstimatorHandle {};
 struct FromStringFeaturizer_int8_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int8_CreateEstimator(/*out*/ FromStringFeaturizer_int8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int8_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues,/*out*/ FromStringFeaturizer_int8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int8_DestroyEstimator(/*in*/ FromStringFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int8_GetState(/*in*/ FromStringFeaturizer_int8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -40,7 +40,7 @@ struct FromStringFeaturizer_int16_EstimatorHandle {};
 struct FromStringFeaturizer_int16_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int16_CreateEstimator(/*out*/ FromStringFeaturizer_int16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int16_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues,/*out*/ FromStringFeaturizer_int16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int16_DestroyEstimator(/*in*/ FromStringFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int16_GetState(/*in*/ FromStringFeaturizer_int16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -66,7 +66,7 @@ struct FromStringFeaturizer_int32_EstimatorHandle {};
 struct FromStringFeaturizer_int32_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int32_CreateEstimator(/*out*/ FromStringFeaturizer_int32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int32_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues,/*out*/ FromStringFeaturizer_int32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int32_DestroyEstimator(/*in*/ FromStringFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int32_GetState(/*in*/ FromStringFeaturizer_int32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -92,7 +92,7 @@ struct FromStringFeaturizer_int64_EstimatorHandle {};
 struct FromStringFeaturizer_int64_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int64_CreateEstimator(/*out*/ FromStringFeaturizer_int64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int64_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues,/*out*/ FromStringFeaturizer_int64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int64_DestroyEstimator(/*in*/ FromStringFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_int64_GetState(/*in*/ FromStringFeaturizer_int64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -118,7 +118,7 @@ struct FromStringFeaturizer_uint8_EstimatorHandle {};
 struct FromStringFeaturizer_uint8_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint8_CreateEstimator(/*out*/ FromStringFeaturizer_uint8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint8_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues,/*out*/ FromStringFeaturizer_uint8_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint8_DestroyEstimator(/*in*/ FromStringFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint8_GetState(/*in*/ FromStringFeaturizer_uint8_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -144,7 +144,7 @@ struct FromStringFeaturizer_uint16_EstimatorHandle {};
 struct FromStringFeaturizer_uint16_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint16_CreateEstimator(/*out*/ FromStringFeaturizer_uint16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint16_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues,/*out*/ FromStringFeaturizer_uint16_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint16_DestroyEstimator(/*in*/ FromStringFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint16_GetState(/*in*/ FromStringFeaturizer_uint16_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -170,7 +170,7 @@ struct FromStringFeaturizer_uint32_EstimatorHandle {};
 struct FromStringFeaturizer_uint32_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint32_CreateEstimator(/*out*/ FromStringFeaturizer_uint32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint32_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues,/*out*/ FromStringFeaturizer_uint32_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint32_DestroyEstimator(/*in*/ FromStringFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint32_GetState(/*in*/ FromStringFeaturizer_uint32_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -196,7 +196,7 @@ struct FromStringFeaturizer_uint64_EstimatorHandle {};
 struct FromStringFeaturizer_uint64_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint64_CreateEstimator(/*out*/ FromStringFeaturizer_uint64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint64_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues,/*out*/ FromStringFeaturizer_uint64_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint64_DestroyEstimator(/*in*/ FromStringFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_uint64_GetState(/*in*/ FromStringFeaturizer_uint64_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -222,7 +222,7 @@ struct FromStringFeaturizer_float_EstimatorHandle {};
 struct FromStringFeaturizer_float_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool FromStringFeaturizer_float_CreateEstimator(/*out*/ FromStringFeaturizer_float_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_float_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues,/*out*/ FromStringFeaturizer_float_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_float_DestroyEstimator(/*in*/ FromStringFeaturizer_float_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_float_GetState(/*in*/ FromStringFeaturizer_float_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -248,7 +248,7 @@ struct FromStringFeaturizer_double_EstimatorHandle {};
 struct FromStringFeaturizer_double_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool FromStringFeaturizer_double_CreateEstimator(/*out*/ FromStringFeaturizer_double_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_double_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues,/*out*/ FromStringFeaturizer_double_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_double_DestroyEstimator(/*in*/ FromStringFeaturizer_double_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_double_GetState(/*in*/ FromStringFeaturizer_double_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -274,7 +274,7 @@ struct FromStringFeaturizer_bool_EstimatorHandle {};
 struct FromStringFeaturizer_bool_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_CreateEstimator(/*out*/ FromStringFeaturizer_bool_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues,/*out*/ FromStringFeaturizer_bool_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_DestroyEstimator(/*in*/ FromStringFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_bool_GetState(/*in*/ FromStringFeaturizer_bool_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);
@@ -300,7 +300,7 @@ struct FromStringFeaturizer_string_EstimatorHandle {};
 struct FromStringFeaturizer_string_TransformerHandle {};
 
 /* Training Methods */
-FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_CreateEstimator(/*out*/ FromStringFeaturizer_string_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
+FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_CreateEstimator(/*in*/ bool useEmptyStringsForNullValues,/*out*/ FromStringFeaturizer_string_EstimatorHandle **ppHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_DestroyEstimator(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ ErrorInfoHandle **ppErrorInfo);
 
 FEATURIZER_LIBRARY_API bool FromStringFeaturizer_string_GetState(/*in*/ FromStringFeaturizer_string_EstimatorHandle *pHandle, /*out*/ TrainingState *pState, /*out*/ ErrorInfoHandle **ppErrorInfo);

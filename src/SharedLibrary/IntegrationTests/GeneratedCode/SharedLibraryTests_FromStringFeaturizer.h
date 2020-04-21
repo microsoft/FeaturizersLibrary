@@ -24,18 +24,19 @@
 
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <int8> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void FromStringFeaturizer_int8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int8_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     FromStringFeaturizer_int8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(FromStringFeaturizer_int8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(FromStringFeaturizer_int8_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -122,18 +123,19 @@ void FromStringFeaturizer_int8_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <int16> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void FromStringFeaturizer_int16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int16_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int16_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     FromStringFeaturizer_int16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(FromStringFeaturizer_int16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(FromStringFeaturizer_int16_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -220,18 +222,19 @@ void FromStringFeaturizer_int16_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <int32> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void FromStringFeaturizer_int32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int32_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     FromStringFeaturizer_int32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(FromStringFeaturizer_int32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(FromStringFeaturizer_int32_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -318,18 +321,19 @@ void FromStringFeaturizer_int32_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <int64> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void FromStringFeaturizer_int64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::int64_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::int64_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     FromStringFeaturizer_int64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(FromStringFeaturizer_int64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(FromStringFeaturizer_int64_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -416,18 +420,19 @@ void FromStringFeaturizer_int64_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <uint8> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void FromStringFeaturizer_uint8_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint8_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::uint8_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     FromStringFeaturizer_uint8_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(FromStringFeaturizer_uint8_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(FromStringFeaturizer_uint8_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -514,18 +519,19 @@ void FromStringFeaturizer_uint8_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <uint16> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void FromStringFeaturizer_uint16_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint16_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::uint16_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     FromStringFeaturizer_uint16_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(FromStringFeaturizer_uint16_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(FromStringFeaturizer_uint16_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -612,18 +618,19 @@ void FromStringFeaturizer_uint16_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <uint32> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void FromStringFeaturizer_uint32_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::uint32_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     FromStringFeaturizer_uint32_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(FromStringFeaturizer_uint32_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(FromStringFeaturizer_uint32_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -710,18 +717,19 @@ void FromStringFeaturizer_uint32_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <uint64> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void FromStringFeaturizer_uint64_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::uint64_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::uint64_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     FromStringFeaturizer_uint64_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(FromStringFeaturizer_uint64_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(FromStringFeaturizer_uint64_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -808,18 +816,19 @@ void FromStringFeaturizer_uint64_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <float> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void FromStringFeaturizer_float_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::float_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::float_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     FromStringFeaturizer_float_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(FromStringFeaturizer_float_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(FromStringFeaturizer_float_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -906,18 +915,19 @@ void FromStringFeaturizer_float_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <double> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void FromStringFeaturizer_double_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::double_t> const &)> const &verify_func
+    std::function<bool (std::vector<std::double_t> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     FromStringFeaturizer_double_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(FromStringFeaturizer_double_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(FromStringFeaturizer_double_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1004,18 +1014,19 @@ void FromStringFeaturizer_double_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <bool> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void FromStringFeaturizer_bool_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<bool> const &)> const &verify_func
+    std::function<bool (std::vector<bool> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     FromStringFeaturizer_bool_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(FromStringFeaturizer_bool_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(FromStringFeaturizer_bool_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
@@ -1102,18 +1113,19 @@ void FromStringFeaturizer_bool_Test(
 
 /* ---------------------------------------------------------------------- */
 /* |  FromStringFeaturizer <string> */
-template <typename VectorInputT>
+template <typename VectorInputT, typename... ConstructorArgTs>
 void FromStringFeaturizer_string_Test(
     std::vector<VectorInputT> const &training_input,
     std::vector<VectorInputT> const &inference_input,
-    std::function<bool (std::vector<std::string> const &)> const &verify_func
+    std::function<bool (std::vector<std::string> const &)> const &verify_func,
+    ConstructorArgTs &&... constructor_args
 ) {
     ErrorInfoHandle * pErrorInfo(nullptr);
 
     // Create the estimator
     FromStringFeaturizer_string_EstimatorHandle *pEstimatorHandle(nullptr);
 
-    REQUIRE(FromStringFeaturizer_string_CreateEstimator(&pEstimatorHandle, &pErrorInfo));
+    REQUIRE(FromStringFeaturizer_string_CreateEstimator(std::forward<ConstructorArgTs>(constructor_args)..., &pEstimatorHandle, &pErrorInfo));
     REQUIRE(pEstimatorHandle != nullptr);
     REQUIRE(pErrorInfo == nullptr);
 
