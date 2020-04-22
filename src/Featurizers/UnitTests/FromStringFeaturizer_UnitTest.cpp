@@ -22,6 +22,19 @@ TEST_CASE("int") {
     CHECK_THROWS(NS::Featurizers::FromStringTransformer<int>().execute("invalid"));
 }
 
+TEST_CASE("Use Empty Strings") {
+    CHECK_THROWS(NS::Featurizers::FromStringTransformer<float>(false).execute(""));
+    CHECK(NS::Traits<float>::IsNull(NS::Featurizers::FromStringTransformer<float>(true).execute("")));
+    CHECK(NS::Traits<float>::IsNull(NS::Featurizers::FromStringTransformer<float>(true).execute("NaN")));
+
+    CHECK(Approx(NS::Featurizers::FromStringTransformer<float>(false).execute("1.0")) == 1.0);
+    CHECK(Approx(NS::Featurizers::FromStringTransformer<float>(true).execute("1.0")) == 1.0);
+}
+
+TEST_CASE("Use Empty Strings - Error") {
+    CHECK_THROWS_WITH(NS::Featurizers::FromStringTransformer<int>(true), "empty strings cannot be used with types that are not nullable");
+}
+
 TEST_CASE("Transformer serialization") {
     NS::Featurizers::FromStringTransformer<int>         original;
     NS::Archive                                         out;
