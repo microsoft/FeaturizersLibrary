@@ -1070,40 +1070,40 @@ TEST_CASE("GrainedDelayDeltaTransformer - single grain, delay 1") {
         Delay
     );
 
-    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(0, value100)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain, GrainedTransformer::PolicyInputType(0, value100)), callback);
     CHECK(results.empty());
 
-    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(1, value200)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain, GrainedTransformer::PolicyInputType(1, value200)), callback);
     CHECK(
         results == Results{
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)}
+            {grain, GrainedTransformer::PolicyTransformedType(0, 110)}
         }
     );
 
-    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(2, value300)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain, GrainedTransformer::PolicyInputType(2, value300)), callback);
     CHECK(
         results == Results{
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)},
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 210)}
+            {grain, GrainedTransformer::PolicyTransformedType(0, 110)},
+            {grain, GrainedTransformer::PolicyTransformedType(1, 210)}
         }
     );
 
-    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(3000, value200)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain, GrainedTransformer::PolicyInputType(3000, value200)), callback);
     CHECK(
         results == Results{
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)},
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 210)},
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(2, 310)}
+            {grain, GrainedTransformer::PolicyTransformedType(0, 110)},
+            {grain, GrainedTransformer::PolicyTransformedType(1, 210)},
+            {grain, GrainedTransformer::PolicyTransformedType(2, 310)}
         }
     );
 
     transformer.flush(callback);
     CHECK(
         results == Results{
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)},
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 210)},
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(2, 310)},
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(3000, 210)}
+            {grain, GrainedTransformer::PolicyTransformedType(0, 110)},
+            {grain, GrainedTransformer::PolicyTransformedType(1, 210)},
+            {grain, GrainedTransformer::PolicyTransformedType(2, 310)},
+            {grain, GrainedTransformer::PolicyTransformedType(3000, 210)}
         }
     );
 }
@@ -1136,34 +1136,34 @@ TEST_CASE("GrainedDelayDeltaTransformer - single grain, delay 2") {
         Delay
     );
 
-    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(0, value100)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain, GrainedTransformer::PolicyInputType(0, value100)), callback);
     CHECK(results.empty());
 
-    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(1, value200)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain, GrainedTransformer::PolicyInputType(1, value200)), callback);
     CHECK(results.empty());
 
-    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(2, value300)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain, GrainedTransformer::PolicyInputType(2, value300)), callback);
     CHECK(
         results == Results{
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)}
+            {grain, GrainedTransformer::PolicyTransformedType(0, 110)}
         }
     );
 
-    transformer.execute(GrainedTransformer::InputType(grain, GrainedTransformer::GrainImplPolicy::ThisInputType(3000, value200)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain, GrainedTransformer::PolicyInputType(3000, value200)), callback);
     CHECK(
         results == Results{
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)},
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 210)}
+            {grain, GrainedTransformer::PolicyTransformedType(0, 110)},
+            {grain, GrainedTransformer::PolicyTransformedType(1, 210)}
         }
     );
 
     transformer.flush(callback);
     CHECK(
         results == Results{
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)},
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 210)},
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(2, 310)},
-            {grain, GrainedTransformer::GrainImplPolicy::ThisTransformedType(3000, 210)}
+            {grain, GrainedTransformer::PolicyTransformedType(0, 110)},
+            {grain, GrainedTransformer::PolicyTransformedType(1, 210)},
+            {grain, GrainedTransformer::PolicyTransformedType(2, 310)},
+            {grain, GrainedTransformer::PolicyTransformedType(3000, 210)}
         }
     );
 }
@@ -1197,35 +1197,35 @@ TEST_CASE("GrainedDelayDeltaTransformer - multi grain, delay 1") {
         Delay
     );
 
-    transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(0, value100)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain1, GrainedTransformer::PolicyInputType(0, value100)), callback);
     CHECK(results.empty());
 
-    transformer.execute(GrainedTransformer::InputType(grain2, GrainedTransformer::GrainImplPolicy::ThisInputType(1, value300)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain2, GrainedTransformer::PolicyInputType(1, value300)), callback);
     CHECK(results.empty());
 
-    transformer.execute(GrainedTransformer::InputType(grain2, GrainedTransformer::GrainImplPolicy::ThisInputType(2, value200)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain2, GrainedTransformer::PolicyInputType(2, value200)), callback);
     CHECK(
         results == Results{
-            {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 310)}
+            {grain2, GrainedTransformer::PolicyTransformedType(1, 310)}
         }
     );
 
-    transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(3, value200)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain1, GrainedTransformer::PolicyInputType(3, value200)), callback);
     CHECK(
         results == Results{
-            {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 310)},
-            {grain1, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)}
+            {grain2, GrainedTransformer::PolicyTransformedType(1, 310)},
+            {grain1, GrainedTransformer::PolicyTransformedType(0, 110)}
         }
     );
 
     transformer.flush(callback);
     CHECK(
         results == Results{
-            {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 310)},
-            {grain1, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)},
+            {grain2, GrainedTransformer::PolicyTransformedType(1, 310)},
+            {grain1, GrainedTransformer::PolicyTransformedType(0, 110)},
             // Flush output is grouped by grain, but not necessarily in row order.
-            {grain1, GrainedTransformer::GrainImplPolicy::ThisTransformedType(3, 210)},
-            {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(2, 210)}
+            {grain1, GrainedTransformer::PolicyTransformedType(3, 210)},
+            {grain2, GrainedTransformer::PolicyTransformedType(2, 210)}
         }
     );
 }
@@ -1261,22 +1261,22 @@ TEST_CASE("GrainedDelayDeltaTransformer - multi grain, delay 3") {
         Delay
     );
 
-    transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(0, value100)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain1, GrainedTransformer::PolicyInputType(0, value100)), callback);
     CHECK(results.empty());
 
-    transformer.execute(GrainedTransformer::InputType(grain2, GrainedTransformer::GrainImplPolicy::ThisInputType(1, value500)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain2, GrainedTransformer::PolicyInputType(1, value500)), callback);
     CHECK(results.empty());
 
-    transformer.execute(GrainedTransformer::InputType(grain2, GrainedTransformer::GrainImplPolicy::ThisInputType(2, value400)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain2, GrainedTransformer::PolicyInputType(2, value400)), callback);
     CHECK(results.empty());
 
-    transformer.execute(GrainedTransformer::InputType(grain2, GrainedTransformer::GrainImplPolicy::ThisInputType(3, value300)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain2, GrainedTransformer::PolicyInputType(3, value300)), callback);
     CHECK(results.empty());
 
-    transformer.execute(GrainedTransformer::InputType(grain2, GrainedTransformer::GrainImplPolicy::ThisInputType(4, value200)), callback);
+    transformer.execute(GrainedTransformer::GrainedInputType(grain2, GrainedTransformer::PolicyInputType(4, value200)), callback);
     CHECK(
         results == Results{
-            {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 510)}
+            {grain2, GrainedTransformer::PolicyTransformedType(1, 510)}
         }
     );
 
@@ -1284,59 +1284,59 @@ TEST_CASE("GrainedDelayDeltaTransformer - multi grain, delay 3") {
         transformer.flush(callback);
         CHECK(
             results == Results{
-                {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 510)},
-                {grain1, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)},
-                {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(2, 410)},
-                {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(3, 310)},
-                {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(4, 210)}
+                {grain2, GrainedTransformer::PolicyTransformedType(1, 510)},
+                {grain1, GrainedTransformer::PolicyTransformedType(0, 110)},
+                {grain2, GrainedTransformer::PolicyTransformedType(2, 410)},
+                {grain2, GrainedTransformer::PolicyTransformedType(3, 310)},
+                {grain2, GrainedTransformer::PolicyTransformedType(4, 210)}
             }
         );
     }
 
     SECTION("Additional grain1 values") {
-        transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(5, value200)), callback);
+        transformer.execute(GrainedTransformer::GrainedInputType(grain1, GrainedTransformer::PolicyInputType(5, value200)), callback);
         CHECK(
             results == Results{
-                {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 510)}
+                {grain2, GrainedTransformer::PolicyTransformedType(1, 510)}
             }
         );
 
-        transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(6, value300)), callback);
+        transformer.execute(GrainedTransformer::GrainedInputType(grain1, GrainedTransformer::PolicyInputType(6, value300)), callback);
         CHECK(
             results == Results{
-                {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 510)}
+                {grain2, GrainedTransformer::PolicyTransformedType(1, 510)}
             }
         );
 
-        transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(7, value400)), callback);
+        transformer.execute(GrainedTransformer::GrainedInputType(grain1, GrainedTransformer::PolicyInputType(7, value400)), callback);
         CHECK(
             results == Results{
-                {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 510)},
-                {grain1, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)}
+                {grain2, GrainedTransformer::PolicyTransformedType(1, 510)},
+                {grain1, GrainedTransformer::PolicyTransformedType(0, 110)}
             }
         );
 
-        transformer.execute(GrainedTransformer::InputType(grain1, GrainedTransformer::GrainImplPolicy::ThisInputType(8, value500)), callback);
+        transformer.execute(GrainedTransformer::GrainedInputType(grain1, GrainedTransformer::PolicyInputType(8, value500)), callback);
         CHECK(
             results == Results{
-                {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 510)},
-                {grain1, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)},
-                {grain1, GrainedTransformer::GrainImplPolicy::ThisTransformedType(5, 210)}
+                {grain2, GrainedTransformer::PolicyTransformedType(1, 510)},
+                {grain1, GrainedTransformer::PolicyTransformedType(0, 110)},
+                {grain1, GrainedTransformer::PolicyTransformedType(5, 210)}
             }
         );
 
         transformer.flush(callback);
         CHECK(
             results == Results{
-                {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(1, 510)},
-                {grain1, GrainedTransformer::GrainImplPolicy::ThisTransformedType(0, 110)},
-                {grain1, GrainedTransformer::GrainImplPolicy::ThisTransformedType(5, 210)},
-                {grain1, GrainedTransformer::GrainImplPolicy::ThisTransformedType(6, 310)},
-                {grain1, GrainedTransformer::GrainImplPolicy::ThisTransformedType(7, 410)},
-                {grain1, GrainedTransformer::GrainImplPolicy::ThisTransformedType(8, 510)},
-                {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(2, 410)},
-                {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(3, 310)},
-                {grain2, GrainedTransformer::GrainImplPolicy::ThisTransformedType(4, 210)}
+                {grain2, GrainedTransformer::PolicyTransformedType(1, 510)},
+                {grain1, GrainedTransformer::PolicyTransformedType(0, 110)},
+                {grain1, GrainedTransformer::PolicyTransformedType(5, 210)},
+                {grain1, GrainedTransformer::PolicyTransformedType(6, 310)},
+                {grain1, GrainedTransformer::PolicyTransformedType(7, 410)},
+                {grain1, GrainedTransformer::PolicyTransformedType(8, 510)},
+                {grain2, GrainedTransformer::PolicyTransformedType(2, 410)},
+                {grain2, GrainedTransformer::PolicyTransformedType(3, 310)},
+                {grain2, GrainedTransformer::PolicyTransformedType(4, 210)}
             }
         );
     }

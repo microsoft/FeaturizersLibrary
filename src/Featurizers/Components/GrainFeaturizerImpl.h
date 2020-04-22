@@ -64,8 +64,12 @@ struct StandardGrainImplPolicy {
     using EstimatorInputType                = typename EstimatorT::InputType;
     using EstimatorTransformedType          = typename Details::EstimatorOutputType<EstimatorT>::type;
 
-    using InputType                         = std::tuple<GrainT const &, EstimatorInputType const &>;
-    using TransformedType                   = std::tuple<GrainT const &, EstimatorTransformedType>;
+    // No decoration based on the policy
+    using PolicyInputType                   = EstimatorInputType;
+    using PolicyTransformedType             = EstimatorTransformedType;
+
+    using GrainedInputType                  = std::tuple<GrainT const &, EstimatorInputType const &>;
+    using GrainedTransformedType            = std::tuple<GrainT const &, EstimatorTransformedType>;
 
     // ----------------------------------------------------------------------
     // |  Public Methods
@@ -96,11 +100,11 @@ public:
 
     // size_t is an opaque id used to uniquely identify an input row and its corresponding output
     // (which is necessary when there is a delay between the input and output).
-    using ThisInputType                     = std::tuple<size_t, EstimatorInputType const &>;
-    using ThisTransformedType               = std::tuple<size_t, EstimatorTransformedType>;
+    using PolicyInputType                   = std::tuple<size_t, EstimatorInputType const &>;
+    using PolicyTransformedType             = std::tuple<size_t, EstimatorTransformedType>;
 
-    using InputType                         = std::tuple<GrainT const &, ThisInputType>;
-    using TransformedType                   = std::tuple<GrainT const &, ThisTransformedType>;
+    using GrainedInputType                  = std::tuple<GrainT const &, PolicyInputType>;
+    using GrainedTransformedType            = std::tuple<GrainT const &, PolicyTransformedType>;
 
     // ----------------------------------------------------------------------
     // |
@@ -110,7 +114,7 @@ public:
     DelayedGrainImplPolicy(size_t delaySize);
 
     template <typename TransformerT, typename CallbackT>
-    void execute(GrainT const &grain, TransformerT &transformer, ThisInputType const &input, CallbackT const &callback);
+    void execute(GrainT const &grain, TransformerT &transformer, PolicyInputType const &input, CallbackT const &callback);
 
     template <typename TransformerMapT, typename CallbackT>
     void flush(TransformerMapT const &transformers, CallbackT const &callback);
@@ -150,8 +154,8 @@ template <
 >
 class GrainTransformer :
     public Transformer<
-        typename GrainImplPolicyT<GrainT, EstimatorT>::InputType,
-        typename GrainImplPolicyT<GrainT, EstimatorT>::TransformedType
+        typename GrainImplPolicyT<GrainT, EstimatorT>::GrainedInputType,
+        typename GrainImplPolicyT<GrainT, EstimatorT>::GrainedTransformedType
     > {
 public:
     // ----------------------------------------------------------------------
@@ -161,10 +165,16 @@ public:
     // ----------------------------------------------------------------------
     using GrainImplPolicy                   = GrainImplPolicyT<GrainT, EstimatorT>;
 
+    using PolicyInputType                   = typename GrainImplPolicy::PolicyInputType;
+    using PolicyTransformedType             = typename GrainImplPolicy::PolicyTransformedType;
+
+    using GrainedInputType                  = typename GrainImplPolicy::GrainedInputType;
+    using GrainedTransformedType            = typename GrainImplPolicy::GrainedTransformedType;
+
     using BaseType =
         Transformer<
-            typename GrainImplPolicy::InputType,
-            typename GrainImplPolicy::TransformedType
+            typename GrainImplPolicy::GrainedInputType,
+            typename GrainImplPolicy::GrainedTransformedType
         >;
 
     using GrainTransformerType =
@@ -320,8 +330,11 @@ public:
 
     using GrainImplPolicy                   = GrainImplPolicyT<GrainType, EstimatorT>;
 
-    using InputType                         = typename GrainImplPolicy::InputType;
-    using TransformedType                   = typename GrainImplPolicy::TransformedType;
+    using PolicyInputType                   = typename GrainImplPolicy::PolicyInputType;
+    using PolicyTransformedType             = typename GrainImplPolicy::PolicyTransformedType;
+
+    using InputType                         = typename GrainImplPolicy::GrainedInputType;
+    using TransformedType                   = typename GrainImplPolicy::GrainedTransformedType;
 
     using GrainEstimatorAnnotation          = Microsoft::Featurizer::Featurizers::Components::GrainEstimatorAnnotation<GrainType>;
     using CreateEstimatorFunc               = std::function<EstimatorT (AnnotationMapsPtr)>;
@@ -413,7 +426,7 @@ class GrainEstimatorImpl<
     typename std::enable_if<Details::IsTransformerEstimator<EstimatorT>::value == false>::type
 > :
     public Impl::GrainEstimatorImplBase<
-        FitEstimator<typename GrainImplPolicyT<GrainT, EstimatorT>::InputType>,
+        FitEstimator<typename GrainImplPolicyT<GrainT, EstimatorT>::GrainedInputType>,
         GrainT,
         EstimatorT,
         GrainImplPolicyT,
@@ -429,7 +442,7 @@ public:
 
     using BaseType =
         Impl::GrainEstimatorImplBase<
-            FitEstimator<typename GrainImplPolicy::InputType>,
+            FitEstimator<typename GrainImplPolicy::GrainedInputType>,
             GrainT,
             EstimatorT,
             GrainImplPolicyT,
@@ -476,8 +489,8 @@ class GrainEstimatorImpl<
 > :
     public Impl::GrainEstimatorImplBase<
         TransformerEstimator<
-            typename GrainImplPolicyT<GrainT, EstimatorT>::InputType,
-            typename GrainImplPolicyT<GrainT, EstimatorT>::TransformedType
+            typename GrainImplPolicyT<GrainT, EstimatorT>::GrainedInputType,
+            typename GrainImplPolicyT<GrainT, EstimatorT>::GrainedTransformedType
         >,
         GrainT,
         EstimatorT,
@@ -495,8 +508,8 @@ public:
     using BaseType =
         Impl::GrainEstimatorImplBase<
             TransformerEstimator<
-                typename GrainImplPolicy::InputType,
-                typename GrainImplPolicy::TransformedType
+                typename GrainImplPolicy::GrainedInputType,
+                typename GrainImplPolicy::GrainedTransformedType
             >,
             GrainT,
             EstimatorT,
@@ -659,7 +672,7 @@ void StandardGrainImplPolicy<GrainT, EstimatorT>::execute(GrainT const &grain, T
     transformer.execute(
         input,
         [&callback, &grain](EstimatorTransformedType output) {
-            callback(TransformedType(grain, std::move(output)));
+            callback(GrainedTransformedType(grain, std::move(output)));
         }
     );
 }
@@ -671,7 +684,7 @@ void StandardGrainImplPolicy<GrainT, EstimatorT>::flush(TransformerMapT const &t
     for(auto &kvp : transformers) {
         kvp.second->flush(
             [&callback, &kvp](EstimatorTransformedType output) {
-                callback(TransformedType(kvp.first, std::move(output)));
+                callback(GrainedTransformedType(kvp.first, std::move(output)));
             }
         );
     }
@@ -698,7 +711,7 @@ DelayedGrainImplPolicy<GrainT, EstimatorT>::DelayedGrainImplPolicy(size_t delayS
 
 template <typename GrainT, typename EstimatorT>
 template <typename TransformerT, typename CallbackT>
-void DelayedGrainImplPolicy<GrainT, EstimatorT>::execute(GrainT const &grain, TransformerT &transformer, ThisInputType const &input, CallbackT const &callback) {
+void DelayedGrainImplPolicy<GrainT, EstimatorT>::execute(GrainT const &grain, TransformerT &transformer, PolicyInputType const &input, CallbackT const &callback) {
     RowIdCircularBuffer &                   buffer(
         [&grain, this](void) -> RowIdCircularBuffer & {
             typename BufferMap::iterator const          iter(_buffers.find(grain));
@@ -720,7 +733,7 @@ void DelayedGrainImplPolicy<GrainT, EstimatorT>::execute(GrainT const &grain, Tr
         estimatorInput,
         [&callback, &grain, &buffer](EstimatorTransformedType output) {
             assert(buffer.empty() == false);
-            callback(TransformedType(grain, ThisTransformedType(*buffer.cbegin(), std::move(output))));
+            callback(GrainedTransformedType(grain, PolicyTransformedType(*buffer.cbegin(), std::move(output))));
         }
     );
 
@@ -755,7 +768,7 @@ void DelayedGrainImplPolicy<GrainT, EstimatorT>::flush(TransformerMapT const &tr
                 if(ptr == pEnd)
                     throw std::runtime_error("The number of items flushed is greater than the number of delayed input items");
 
-                callback(TransformedType(grain, ThisTransformedType(*ptr++, std::move(output))));
+                callback(GrainedTransformedType(grain, PolicyTransformedType(*ptr++, std::move(output))));
             }
         );
 

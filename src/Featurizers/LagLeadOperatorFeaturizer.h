@@ -170,9 +170,16 @@ private:
 ///  \class       GrainedLagLeadOperatorEstimator
 ///  \brief       GrainedTransformer that creates `LagLeadOperatorEstimator`.
 ///
-template <typename InputT, size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()>
+template <
+    typename InputT,
+    size_t MaxNumTrainingItemsV=std::numeric_limits<size_t>::max()
+>
 class GrainedLagLeadOperatorEstimator :
-    public Components::GrainEstimatorImpl<std::vector<std::string>, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>> {
+    public Components::GrainEstimatorImpl<
+        std::vector<std::string>,
+        LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>,
+        Components::DelayedGrainImplPolicy
+    > {
 public:
     // ----------------------------------------------------------------------
     // |
@@ -181,7 +188,12 @@ public:
     // ----------------------------------------------------------------------
     using GrainType = std::vector<std::string>;
 
-    using BaseType = Components::GrainEstimatorImpl<GrainType, LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>>;
+    using BaseType =
+        Components::GrainEstimatorImpl<
+            GrainType,
+            LagLeadOperatorEstimator<InputT, MaxNumTrainingItemsV>,
+            Components::DelayedGrainImplPolicy
+        >;
 
     // ----------------------------------------------------------------------
     // |
