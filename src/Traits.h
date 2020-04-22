@@ -1334,30 +1334,71 @@ struct Traits<std::chrono::duration<RepT, PeriodT>> : public Impl::CommonDuratio
 ///                 that might be impacted by these differences.
 ///
 template <>
-struct Traits<std::chrono::system_clock::duration> : public Impl::CommonDurationTraits<std::chrono::system_clock::rep, std::chrono::system_clock::period> {
-    // "std::chrono::system_clock::duration" is a specialization of std::chrono::system_clock::duration
-    // However it specializes differently on Windows(std::chrono::duration<int64_t, std::ratio<1,10000000>>)
-    // and Linux(std::chrono::duration<int64_t, std::ratio<1,1000000000>>). So for serDe, we cast input to a
-    // fixed specialization(SystemClockSerDeDurationType).
+class Traits<std::chrono::system_clock::duration> : public Impl::CommonDurationTraits<std::chrono::system_clock::rep, std::chrono::system_clock::period> {
+public:
+    // ----------------------------------------------------------------------
+    // |  Public Methods
 
-    using SystemClockDurationRepType = decltype(std::chrono::system_clock::duration())::rep;
-    using SystemClockDurationPeriodType = decltype(std::chrono::system_clock::duration())::period;
-    using SystemClockSerDeDurationType = std::chrono::duration<int64_t, std::ratio<1,1000>>;
+    // A duration is measured using different units across different operating systems and compilers.
+    // This code uses the least-common-denominator to ensure a consistent serialization behavior
+    // across platforms.
+    //
+    //      GCC:        nanosecond
+    //      MSVC:       100 nanosecond
+    //      Clang:      microsecond
+    //
+    //  Additional info: https://stackoverflow.com/a/55124538
+    //
+    using MicrosecondDuration               = std::chrono::duration<int64_t, std::ratio<1, 1000000>>;
 
     template <typename ArchiveT>
     static ArchiveT & serialize(ArchiveT &ar, std::chrono::system_clock::duration const &duration) {
-        Traits<SystemClockSerDeDurationType>::serialize(ar,std::chrono::duration_cast<SystemClockSerDeDurationType>(duration));
+        Traits::serialize_impl(ar, duration, IsSameBoolCompileTimeType());
         return ar;
     }
 
     template <typename ArchiveT>
     static std::chrono::system_clock::duration deserialize(ArchiveT &ar) {
-        return std::chrono::duration_cast<std::chrono::system_clock::duration>(Traits<SystemClockSerDeDurationType>::deserialize(ar));
+        return Traits::deserialize_impl(ar, IsSameBoolCompileTimeType());
+    }
+
+private:
+    // ----------------------------------------------------------------------
+    // |  Private Types
+    using BaseClass                         = Impl::CommonDurationTraits<std::chrono::system_clock::rep, std::chrono::system_clock::period>;
+    using IsSameBoolCompileTimeType         = std::integral_constant<bool, std::is_same<std::chrono::system_clock::duration, MicrosecondDuration>::value>;
+
+    // ----------------------------------------------------------------------
+    // |  Private Methods
+    template <typename ArchiveT>
+    static void serialize_impl(ArchiveT &ar, std::chrono::system_clock::duration const &duration, std::true_type /*is_same*/) {
+        BaseClass::serialize(ar, duration);
+    }
+
+    template <typename ArchiveT>
+    static void serialize_impl(ArchiveT &ar, std::chrono::system_clock::duration const &duration, std::false_type /*is_same*/) {
+        Traits<MicrosecondDuration>::serialize(ar, std::chrono::duration_cast<MicrosecondDuration>(duration));
+    }
+
+    template <typename ArchiveT>
+    static std::chrono::system_clock::duration deserialize_impl(ArchiveT &ar, std::true_type /*is_same*/) {
+        return BaseClass::deserialize(ar);
+    }
+
+    template <typename ArchiveT>
+    static std::chrono::system_clock::duration deserialize_impl(ArchiveT &ar, std::false_type /*is_same*/) {
+        return std::chrono::duration_cast<std::chrono::system_clock::duration>(Traits<MicrosecondDuration>::deserialize(ar));
     }
 };
 
+namespace Impl {
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         CommonTimePointTraits
+///  \brief         Traits that are common to all time_point types.
+///
 template <typename ClockT, typename DurationT>
-struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<std::chrono::time_point<ClockT, DurationT>> {
+struct CommonTimePointTraits : public TraitsImpl<std::chrono::time_point<ClockT, DurationT>> {
     static std::string ToString(std::chrono::time_point<ClockT, DurationT> const &tp) {
         return date::format("%FT%TZ", date::floor<std::chrono::seconds>(tp));
     }
@@ -1401,7 +1442,9 @@ struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<st
         std::istringstream ss(*ptr);
         std::ostringstream date_template;
         date_template << "%Y" << dash_template_component << "%m" << dash_template_component << "%d" << T_template_component << "%H" << colon_template_component <<"%M" << colon_template_component << "%S" << Z_template_component;
-        date::sys_time<std::chrono::system_clock::duration> tp;
+
+        date::sys_time<typename std::chrono::time_point<ClockT, DurationT>::duration> tp;
+
         date::from_stream(ss, date_template.str().c_str(), tp);
 
         if (ss.fail() ) {
@@ -1418,6 +1461,41 @@ struct Traits<std::chrono::time_point<ClockT, DurationT>> : public TraitsImpl<st
     template <typename ArchiveT>
     static std::chrono::time_point<ClockT, DurationT> deserialize(ArchiveT &ar) {
         return std::chrono::time_point<ClockT, DurationT>(Traits<DurationT>::deserialize(ar));
+    }
+};
+
+} // namepsace Impl
+
+template <typename ClockT, typename DurationT>
+struct Traits<std::chrono::time_point<ClockT, DurationT>> : public Impl::CommonTimePointTraits<ClockT, DurationT>
+{};
+
+/////////////////////////////////////////////////////////////////////////
+///  \class         Traits
+///  \brief         These traits are specific to the system clock, which may be
+///                 different on different systems. This class contains functionality
+///                 that might be impacted by these differences.
+///
+template <>
+class Traits<std::chrono::system_clock::time_point> : public Impl::CommonTimePointTraits<std::chrono::system_clock::time_point::clock, std::chrono::system_clock::duration> {
+public:
+    // ----------------------------------------------------------------------
+    // |
+    // |  Public Methods
+    // |
+    // ----------------------------------------------------------------------
+
+    // Serialize and deserialize according to POSIX time (seconds since 1/1/1970)
+
+    template <typename ArchiveT>
+    static ArchiveT & serialize(ArchiveT &ar, std::chrono::system_clock::time_point const &tp) {
+        Traits<std::int64_t>::serialize(ar, static_cast<std::int64_t>(std::chrono::system_clock::to_time_t(tp)));
+        return ar;
+    }
+
+    template <typename ArchiveT>
+    static std::chrono::system_clock::time_point deserialize(ArchiveT &ar) {
+        return std::chrono::system_clock::from_time_t(Traits<std::int64_t>::deserialize(ar));
     }
 };
 
