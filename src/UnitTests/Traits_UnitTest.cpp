@@ -389,7 +389,6 @@ TEST_CASE("Transformer_TimePoint") {
     CHECK(time.minutes().count() == 35);
     CHECK(time.seconds().count() == 15);
 
-
     // invalid 02/29 year
     CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-02-29T12:02:15Z")), "Date time string is not in valid ISO 8601 form!");
 
@@ -420,8 +419,57 @@ TEST_CASE("Transformer_TimePoint") {
     // invalid Z
     CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T12:02:15")), "Date time string is not in valid ISO 8601 form!");
     CHECK_THROWS_WITH((Traits<std::chrono::system_clock::time_point>::FromString("1975-04-28T12:02:15-0700Z")), "Date time string is not in valid ISO 8601 form!");
+}
 
+std::chrono::system_clock::duration DurationTest(typename std::chrono::system_clock::duration::rep microseconds) {
+    Archive                                 in;
 
+    Traits<typename std::chrono::system_clock::duration::rep>::serialize(in, microseconds);
+
+    Archive                                 out(in.commit());
+
+    return Traits<std::chrono::system_clock::duration>::deserialize(out);
+}
+
+TEST_CASE("std::chrono::system_clock::duration serialization") {
+    // This test fails on Linux
+    // CHECK(SerializationTestImpl(std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::nanoseconds(10))));
+
+    CHECK(SerializationTestImpl(std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::microseconds(20))));
+    CHECK(SerializationTestImpl(std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::milliseconds(30))));
+    CHECK(SerializationTestImpl(std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::seconds(40))));
+
+    CHECK(DurationTest(10) == std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::microseconds(10)));
+    CHECK(DurationTest(100) == std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::microseconds(100)));
+    CHECK(DurationTest(1000) == std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::microseconds(1000)));
+    CHECK(DurationTest(100000) == std::chrono::duration_cast<typename std::chrono::system_clock::duration>(std::chrono::microseconds(100000)));
+}
+
+std::chrono::system_clock::time_point TimePointTest(time_t posix_time) {
+    Archive                                 in;
+
+    Traits<std::int64_t>::serialize(in, static_cast<std::int64_t>(posix_time));
+
+    Archive                                 out(in.commit());
+
+    return Traits<std::chrono::system_clock::time_point>::deserialize(out);
+}
+
+TEST_CASE("std::chrono::system_clock::time_point serialization") {
+    // `std::chrono::floor(std::chrono::time_point)` isn't available on all compilers, so we have to do it manually
+    std::chrono::system_clock::time_point const         now(std::chrono::system_clock::now());
+    std::chrono::system_clock::time_point const         roundedNow(std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()));
+
+    CHECK(SerializationTestImpl(roundedNow));
+
+    // epoch + 10 seconds
+    CHECK(TimePointTest(10) == Traits<std::chrono::system_clock::time_point>::FromString("1970-01-01T00:00:10Z"));
+
+    // epoch + 1 month
+    CHECK(TimePointTest(60 * 60 * 24 * 31) == Traits<std::chrono::system_clock::time_point>::FromString("1970-02-01T00:00:00Z"));
+
+    // epoch + 1 year
+    CHECK(TimePointTest(60 * 60 * 24 * 365) == Traits<std::chrono::system_clock::time_point>::FromString("1971-01-01T00:00:00Z"));
 }
 
 #if (defined __clang__)
