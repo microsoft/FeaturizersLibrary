@@ -46,6 +46,25 @@ namespace Featurizer {
 namespace Featurizers {
 
 /////////////////////////////////////////////////////////////////////////
+///  \fn            IsValidDirectory
+///  \brief         Returns true if the specified directory is valid.
+///
+bool IsValidDirectory(std::string const &dirname);
+
+/////////////////////////////////////////////////////////////////////////
+///  \fn            GetExecutable
+///  \brief         Returns the fullpath of the current executable.
+///
+std::string GetExecutable(void);
+
+/////////////////////////////////////////////////////////////////////////
+///  \fn            GetDateTimeFeaturizerDataDirectory
+///  \brief         Returns the fullpath of the data directory. The executable's
+///                 path is used as the root if `optionalDataRootDir` is empty.
+///
+std::string GetDateTimeFeaturizerDataDirectory(std::string optionalDataRootDir);
+
+/////////////////////////////////////////////////////////////////////////
 ///  \struct        TimePoint
 ///  \brief         Struct to hold various components of DateTime information
 ///
