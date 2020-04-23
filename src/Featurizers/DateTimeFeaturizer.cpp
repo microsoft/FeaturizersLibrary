@@ -109,7 +109,7 @@ bool EnumCountries(
 
 bool IsValidDirectory(std::string const &dirname) {
     // Note that this code is not exception safe
-    DIR *                                   dir(opendir(dirnme.c_str()));
+    DIR *                                   dir(opendir(dirname.c_str()));
 
     if(dir == nullptr)
         return false;
