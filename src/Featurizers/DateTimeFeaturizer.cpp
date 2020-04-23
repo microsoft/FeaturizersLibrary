@@ -28,6 +28,226 @@ namespace Featurizers {
 
 // ----------------------------------------------------------------------
 // |
+// |  Public Helper Methods
+// |
+// ----------------------------------------------------------------------
+#if (defined _WIN32)
+
+bool IsValidDirectory(std::string const &dirname) {
+    unsigned long const                 attributes(GetFileAttributes(dirname.c_str()));
+
+    return attributes != INVALID_FILE_ATTRIBUTES &&
+           attributes & FILE_ATTRIBUTE_DIRECTORY;
+}
+
+std::string GetExecutable(void) {
+    char                                    result[MAX_PATH];
+
+    GetModuleFileName(nullptr, result, sizeof(result));
+
+    unsigned long const                     error(GetLastError());
+
+    if(error != 0)
+        throw std::runtime_error(std::to_string(error));
+
+    return result;
+}
+
+std::string GetDateTimeFeaturizerDataDirectory(std::string optionalDataRootDir) {
+    std::string const                       binaryPath(
+        [&optionalDataRootDir](void) {
+            if(optionalDataRootDir.empty() == false) {
+                if(*optionalDataRootDir.rbegin() == '\\')
+                    optionalDataRootDir.resize(optionalDataRootDir.size() - 1);
+
+                if(IsValidDirectory(optionalDataRootDir) == false)
+                    throw std::invalid_argument("Invalid 'dataRootDir'");
+
+                return optionalDataRootDir;
+            }
+
+            std::string                     result(GetExecutable());
+
+            return result.substr(0, result.find_last_of("\\"));
+        }()
+    );
+
+    return binaryPath + "\\Data\\DateTimeFeaturizer\\";
+}
+
+bool EnumCountries(
+    std::function<bool (std::string)> const &callback,
+    std::string const &optionalDataRootDir
+) {
+    // Note that this code is not exception safe!
+    std::string                             dataDir(GetDateTimeFeaturizerDataDirectory(optionalDataRootDir) + "*");
+    WIN32_FIND_DATA                         data;
+    HANDLE                                  handle;
+    bool                                    result(true);
+
+    handle = FindFirstFile(dataDir.c_str(), &data);
+    if(handle == INVALID_HANDLE_VALUE)
+        return result;
+
+    while(true) {
+        if((data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+            if(callback(data.cFileName) == false) {
+                result = false;
+                break;
+            }
+        }
+
+        if(FindNextFile(handle, &data) == false)
+            break;
+    }
+
+    FindClose(handle);
+    return result;
+}
+
+#else
+
+bool IsValidDirectory(std::string const &dirname) {
+    // Note that this code is not exception safe
+    DIR *                                   dir(opendir(dirnme.c_str()));
+
+    if(dir == nullptr)
+        return false;
+
+    closedir(dir);
+    return true;
+}
+
+#   if (defined __APPLE__)
+std::string GetExecutable(void) {
+    char                                    result[PATH_MAX + 1];
+    uint32_t                                size(sizeof(result));
+
+    if(_NSGetExecutablePath(result, &size) != 0)
+        throw std::runtime_error("_NSGetExecutablePath");
+
+    return result;
+}
+#else
+std::string GetExecutable(void) {
+    char                                    result[PATH_MAX + 1];
+
+    memset(result, 0x00, sizeof(result));
+
+    ssize_t const                           count(readlink("/proc/self/exe", result, sizeof(result)));
+
+    if(count < 0)
+        throw std::runtime_error("readlink");
+
+    return result;
+}
+#endif
+
+std::string GetDateTimeFeaturizerDataDirectory(std::string optionalDataRootDir) {
+    std::string const                       binaryPath(
+        [&optionalDataRootDir](void) {
+            if(optionalDataRootDir.empty() == false) {
+                if(*optionalDataRootDir.rbegin() == '/')
+                    optionalDataRootDir.resize(optionalDataRootDir.size() - 1);
+
+                if(IsValidDirectory(optionalDataRootDir) == false)
+                    throw std::invalid_argument("Invalid 'dataRootDir'");
+
+                return optionalDataRootDir;
+            }
+
+            std::string                     result(GetExecutable());
+
+            return result.substr(0, result.find_last_of("/"));
+        }()
+    );
+
+    return binaryPath + "/Data/DateTimeFeaturizer/";
+}
+
+bool EnumCountries(
+    std::function<bool (std::string)> const &callback,
+    std::string const &optionalDataRootDir
+) {
+    // Note that this code is not exception safe
+    bool                                    result(true);
+    DIR *                                   dir(opendir(GetDateTimeFeaturizerDataDirectory(optionalDataRootDir).c_str()));
+
+    if(dir == nullptr)
+        return result;
+
+    dirent *                                info(nullptr);
+
+    while((info = readdir(dir)) != nullptr) {
+        // Skip directories
+        if(info->d_type == DT_DIR)
+            continue;
+
+        if(callback(info->d_name) == false)
+            return false;
+    }
+
+    closedir(dir);
+
+    return result;
+}
+
+#endif
+
+// ----------------------------------------------------------------------
+// |
+// |  Internal Helper Methods
+// |
+// ----------------------------------------------------------------------
+namespace {
+
+nlohmann::json GetJsonStream(std::string const & jsonFilename) {
+    nlohmann::json                          holidaysByCountry;
+    std::ifstream                           file(jsonFilename);
+
+    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    if(file)
+        holidaysByCountry = nlohmann::json::parse(file);
+
+    return holidaysByCountry;
+}
+
+std::string RemoveCountryExtension(std::string const &country) {
+    std::string::size_type const            dot(country.find_last_of('.'));
+
+    if(dot == std::string::npos)
+        return country;
+
+    return country.substr(0, dot);
+}
+
+bool DoesCountryMatch(std::string const &country, std::string query) {
+    if(query == country)
+        return true;
+
+    // Remove the ext
+    query = RemoveCountryExtension(query);
+    if(query == country)
+        return true;
+
+    // Convert to lowercase
+    std::transform(query.begin(), query.end(), query.begin(), [](char c) { return std::tolower(c); });
+    if(query == country)
+        return true;
+
+    // Remove spaces
+    query.erase(std::remove_if(query.begin(), query.end(), [](char c) { return std::isspace(c); }), query.end());
+    if(query == country)
+        return true;
+
+    return false;
+}
+
+} // anonymous namespace
+
+// ----------------------------------------------------------------------
+// |
 // |  TimePoint
 // |
 // ----------------------------------------------------------------------
@@ -99,202 +319,6 @@ TimePoint::TimePoint(const std::chrono::system_clock::time_point& sysTime) {
 // |  DateTimeTransformer
 // |
 // ----------------------------------------------------------------------
-namespace {
-
-#if (defined _WIN32)
-    std::string GetBinaryPath(void) {
-        char                                result[MAX_PATH];
-
-        GetModuleFileName(nullptr, result, sizeof(result));
-
-        unsigned long const                 error(GetLastError());
-
-        if(error != 0)
-            throw std::runtime_error(std::to_string(error));
-
-        return result;
-    }
-
-    std::string GetDataDirectory(std::string optionalDataRootDir) {
-        std::string const                   binaryPath(
-            [&optionalDataRootDir](void) {
-                if(optionalDataRootDir.empty() == false) {
-                    if(*optionalDataRootDir.rbegin() == '\\')
-                        optionalDataRootDir.resize(optionalDataRootDir.size() - 1);
-
-                    unsigned long const     attributes(GetFileAttributes(optionalDataRootDir.c_str()));
-
-                    if(attributes == INVALID_FILE_ATTRIBUTES || (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
-                        throw std::invalid_argument("Invalid 'dataRootDir'");
-
-                    return optionalDataRootDir;
-                }
-
-                std::string                 result(GetBinaryPath());
-
-                return result.substr(0, result.find_last_of("\\"));
-            }()
-        );
-
-        return binaryPath + "\\Data\\DateTimeFeaturizer\\";
-    }
-
-    bool EnumCountries(
-        std::function<bool (std::string)> const &callback,
-        std::string const &optionalDataRootDir
-    ) {
-        // Note that this code is not exception safe!
-        std::string                         dataDir(GetDataDirectory(optionalDataRootDir) + "*");
-        WIN32_FIND_DATA                     data;
-        HANDLE                              handle;
-        bool                                result(true);
-
-        handle = FindFirstFile(dataDir.c_str(), &data);
-        if(handle == INVALID_HANDLE_VALUE)
-            return result;
-
-        while(true) {
-            if((data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
-                if(callback(data.cFileName) == false) {
-                    result = false;
-                    break;
-                }
-            }
-
-            if(FindNextFile(handle, &data) == false)
-                break;
-        }
-
-        FindClose(handle);
-        return result;
-    }
-
-#else
-#   if (defined __APPLE__)
-    std::string GetBinaryPath(void) {
-        char                                result[PATH_MAX + 1];
-        uint32_t                            size(sizeof(result));
-
-        if(_NSGetExecutablePath(result, &size) != 0)
-            throw std::runtime_error("_NSGetExecutablePath");
-
-        return result;
-    }
-#else
-    std::string GetBinaryPath(void) {
-        char                                result[PATH_MAX + 1];
-
-        memset(result, 0x00, sizeof(result));
-
-        ssize_t const                       count(readlink("/proc/self/exe", result, sizeof(result)));
-
-        if(count < 0)
-            throw std::runtime_error("readlink");
-
-        return result;
-    }
-#endif
-
-    std::string GetDataDirectory(std::string optionalDataRootDir) {
-        std::string const                   binaryPath(
-            [&optionalDataRootDir](void) {
-                if(optionalDataRootDir.empty() == false) {
-                    if(*optionalDataRootDir.rbegin() == '/')
-                        optionalDataRootDir.resize(optionalDataRootDir.size() - 1);
-
-                    DIR *                           dir(opendir(optionalDataRootDir.c_str()));
-
-                    if(dir == nullptr)
-                        throw std::invalid_argument("Invalid 'dataRootDir'");
-
-                    closedir(dir);
-
-                    return optionalDataRootDir;
-                }
-
-                std::string                 result(GetBinaryPath());
-
-                return result.substr(0, result.find_last_of("/"));
-            }()
-        );
-
-        return binaryPath + "/Data/DateTimeFeaturizer/";
-    }
-
-    bool EnumCountries(
-        std::function<bool (std::string)> const &callback,
-        std::string const &optionalDataRootDir
-    ) {
-        // Note that this code is not exception safe
-        bool                                result(true);
-        DIR *                               dir(opendir(GetDataDirectory(optionalDataRootDir).c_str()));
-
-        if(dir == nullptr)
-            return result;
-
-        dirent *                            info(nullptr);
-
-        while((info = readdir(dir)) != nullptr) {
-            // Skip directories
-            if(info->d_type == DT_DIR)
-                continue;
-
-            if(callback(info->d_name) == false)
-                return false;
-        }
-
-        closedir(dir);
-
-        return result;
-    }
-
-#endif
-
-nlohmann::json GetJsonStream(std::string const & jsonFilename) {
-    nlohmann::json                          holidaysByCountry;
-    std::ifstream                           file(jsonFilename);
-
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-    if(file)
-        holidaysByCountry = nlohmann::json::parse(file);
-
-    return holidaysByCountry;
-}
-
-std::string RemoveCountryExtension(std::string const &country) {
-    std::string::size_type const            dot(country.find_last_of('.'));
-
-    if(dot == std::string::npos)
-        return country;
-
-    return country.substr(0, dot);
-}
-
-bool DoesCountryMatch(std::string const &country, std::string query) {
-    if(query == country)
-        return true;
-
-    // Remove the ext
-    query = RemoveCountryExtension(query);
-    if(query == country)
-        return true;
-
-    // Convert to lowercase
-    std::transform(query.begin(), query.end(), query.begin(), [](char c) { return std::tolower(c); });
-    if(query == country)
-        return true;
-
-    // Remove spaces
-    query.erase(std::remove_if(query.begin(), query.end(), [](char c) { return std::isspace(c); }), query.end());
-    if(query == country)
-        return true;
-
-    return false;
-}
-
-} // anonymous namespace
-
 DateTimeTransformer::DateTimeTransformer(Archive &ar) :
     DateTimeTransformer(ar, "") {
 }
@@ -343,7 +367,7 @@ DateTimeTransformer::DateTimeTransformer(std::string optionalCountryName, std::s
                 throw std::invalid_argument(_countryName);
             }
 
-            JsonStream holidaysByCountry = GetJsonStream(GetDataDirectory(optionalDataRootDir) + filename);
+            JsonStream holidaysByCountry = GetJsonStream(GetDateTimeFeaturizerDataDirectory(optionalDataRootDir) + filename);
 
             //Convert Jsonstream to std::unordered_map
             //Note that the map keys are generated with "Date" and "Holiday" so no need to check existence
